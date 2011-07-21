@@ -27,7 +27,7 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key')
 					onCancel: this._cancel,
 					onComplete: $.proxy(function(id, fileName, response) {
 						if($.isEmptyObject(response)) return;
-						this.map[id] = response.url.substring(response.url.lastIndexOf('/') + 1);
+						this.map[id] = {resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag};
 						// TODO Tag Button
 						if(!this.element.find('#tag_button').length) {
 							this.element.find('.qq-upload-button').after('<button id="tag_button">Tag</button>');

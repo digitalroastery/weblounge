@@ -43,26 +43,27 @@ steal.then('jsonix')
 		
 		/**
 		 * Updates the specified file or the specified file content.
-		 * @param {Object} params The file identifier
+		 * @param {Object} params The file identifier, language and eTag
 		 * @param {File} file The file object
 		 */
 		update: function(params, file, success, error){
-			if ('language' in params) {
-				$.ajax({
-					url: '/system/weblounge/files/' + params.id + '/content/' + params.language,
-					type: 'put',
-					dataType: 'xml',
-					data: {content : Editor.File.parseJSON(file)}
-				});
-			}	
-			if ('id' in params) {
-				$.ajax({
-					url: '/system/weblounge/files/' + params.id,
-					type: 'put',
-					dataType: 'xml',
-					data: {content : Editor.File.parseJSON(file)}
-				});
-			}	
+			var headers = {};
+			var url = '';
+			
+			if('eTag' in params)
+				headers = {"If-None-Match": params.eTag};
+			if ('id' in params)
+				url = '/system/weblounge/files/' + params.id;
+			if ('language' in params)
+				url += '/content/' + params.language;
+			
+			$.ajax({
+				url: url,
+				type: 'put',
+				headers: headers,
+				dataType: 'xml',
+				data: {content : Editor.File.parseJSON(file)}
+			});
 		},
 		
 		/**
@@ -161,7 +162,7 @@ steal.then('jsonix')
 			return metadata;
 		},
 		
-		saveMetadata: function(metadata, language) {
+		saveMetadata: function(metadata, language, eTag) {
 			if($.isEmptyObject(this.value.head.metadata)) {
 				this.value.head.metadata = {};
 			}
@@ -184,7 +185,8 @@ steal.then('jsonix')
 			});
 			
 			this.value.head.created.user.name = metadata.author;
-			Editor.File.update({id:this.value.id}, this);
+			if(eTag == null) Editor.File.update({id:this.value.id}, this);
+			else Editor.File.update({id:this.value.id, eTag: eTag}, this);
 		}
 		
 	});

@@ -1224,7 +1224,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         this._options.onProgress(id, name, size, size);
                 
         if (xhr.status == 201){
-            var result = {success: true, url: xhr.getResponseHeader('Location')};
+            var result = {success: true, url: xhr.getResponseHeader('Location'), eTag: xhr.getResponseHeader('Etag')};
             this._options.onComplete(id, name, result);
         } else {
             this._options.onComplete(id, name, {});

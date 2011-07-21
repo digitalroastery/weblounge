@@ -59,15 +59,21 @@ steal.then('jsonix')
 		
 		/**
 		 * Updates the specified page.
-		 * @param {Object} params The page identifier
+		 * @param {Object} params The page identifier and eTag
 		 * @param {Page} page The page object
 		 */
 		update: function(params, page, success, error){
+			var headers = {};
+			if('eTag' in params) 
+				headers = {"If-None-Match": params.eTag};
+			
 			if ('id' in params) {
 				$.ajax({
 					url: '/system/weblounge/pages/' + params.id,
 					async: false,
 					type: 'put',
+					success: success,
+					headers: headers,
 					dataType: 'xml',
 					data: {content : Page.parseJSON(page)}
 				});
@@ -151,6 +157,13 @@ steal.then('jsonix')
 	    		}
     		});
 	    	return composer;
+	    },
+	    
+	    /**
+	     * Return the page path
+	     */
+	    getPath: function() {
+	    	return this.value.path;
 	    },
 	    
 	    /**
@@ -247,7 +260,7 @@ steal.then('jsonix')
 	     * @param {Object} creationData The data from the creation dialog
 	     * @param {String} language The languageId
 	     */
-	    saveCreationData: function(creationData, language) {
+	    saveCreationData: function(creationData, language, success) {
 			if($.isEmptyObject(this.value.head.metadata)) {
 				this.value.head.metadata = {};
 			}
@@ -271,7 +284,7 @@ steal.then('jsonix')
 				return value != ''; 
 			});
 			
-			Page.update({id:this.value.id}, this);
+			Page.update({id:this.value.id}, this, success);
 		}
 	    
 	});

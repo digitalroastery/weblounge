@@ -81,7 +81,7 @@ steal.plugins('jquery',
 					},
 					Fertig: $.proxy(function () {
 						$.each(this.metadata, $.proxy(function(key, value) {
-							this.file[key].saveMetadata(value, this.options.language);
+							this.file[key].saveMetadata(value, this.options.language, this.options.map[key].eTag);
 				    	},this));
 						
 						this.element.dialog('close');
@@ -96,8 +96,7 @@ steal.plugins('jquery',
 	    
 	    _loadMetadata: function(index) {
 	    	if(this.metadata[index] == undefined) {
-	    		Editor.File.findOne({id: this.options.map[index]}, $.proxy(function(file) {
-//	    		Editor.File.findOne({id: '5bc19990-8f99-4873-a813-71b6dfac22ad'}, function(file) {
+	    		Editor.File.findOne({id: this.options.map[index].resourceId}, $.proxy(function(file) {
 	    			this.file[index] = file;
 	    			this.metadata[index] = file.getMetadata(this.options.language);
 	    			this._showMetadata(index);
@@ -120,11 +119,9 @@ steal.plugins('jquery',
 	    },
 	    
 	    _saveMetadata: function(id, params) {
-	    	var index = id;
-	    	var resourceId = this.options.map[index];
 	    	$.each(params,$.proxy(function(key, value) {
-	    		if($.isEmptyObject(this.metadata[index])) this.metadata[index] = {};
-	    		this.metadata[index][key] = value;
+	    		if($.isEmptyObject(this.metadata[id])) this.metadata[id] = {};
+	    		this.metadata[id][key] = value;
 	    	},this));
 	    },
 	    

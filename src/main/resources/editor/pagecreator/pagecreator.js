@@ -143,7 +143,9 @@ steal.plugins('jquery',
 						
 						// Create page and update pageData
 						Page.create({path: pageData.url}, $.proxy(function(page) {
-							page.saveCreationData(pageData, this.options.language);
+							page.saveCreationData(pageData, this.options.language, function() {
+								location.href = page.getPath() + "?edit";
+							});
 						}, this));
 						
 						this.element.dialog('destroy');

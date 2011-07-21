@@ -52,7 +52,7 @@ steal.plugins('jquery',
 				},
 				close: $.proxy(function () {
 					$.each(this.map, $.proxy(function(key, value) {
-						this._deleteFile(value);
+						this._deleteFile(value.resourceId);
 					},this));
 					
 //					this.divScroll.smoothDivScroll('destroy');
@@ -77,7 +77,7 @@ steal.plugins('jquery',
 				onCancel: this._cancel,
 				onComplete: $.proxy(function(id, fileName, response) {
 					if($.isEmptyObject(response)) return;
-					this.map[id] = response.url.substring(response.url.lastIndexOf('/') + 1);
+					this.map[id] = {resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag};
 					this._loadImage(response.url + '/content/' + this.options.language, id);
 					this._updateUploadButton();
 			    }, this),
@@ -116,8 +116,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    _deleteFile: function(resourceId) {
-	    	// Endpoint BUG
-//	    	Editor.File.destroy({id: resourceId});
+	    	Editor.File.destroy({id: resourceId});
 	    },
 	    
 	    _openTagDialog: function() {
@@ -151,7 +150,7 @@ steal.plugins('jquery',
         "a.removeButton click": function(el, ev) {
         	var index = el.parent().index();
         	el.parent().remove();
-        	this._deleteFile(this.map[index]);
+        	this._deleteFile(this.map[index].resourceId);
         	this.map.splice(index, 1);
         	this._updateUploadButton();
         }
