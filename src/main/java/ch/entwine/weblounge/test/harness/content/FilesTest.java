@@ -34,6 +34,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -70,8 +71,20 @@ public class FilesTest extends IntegrationTestBase {
   /** File name of the German version */
   private static final String filenameGerman = "porsche.jpg";
 
+  /** Path to the German file */
+  private static final String filePathGerman = "/repository/images/test/image/de.jpg";
+
+  /** Path to the English file */
+  private static final String filePathEnglish = "/repository/images/test/image/en.jpg";
+
   /** Resource identifier */
   private static final String resourceId = "6bc19990-8f99-4873-a813-71b6dfac22ad";
+
+  /** File id */
+  protected String fileId = null;
+
+  /** File path */
+  protected String filePath = null;
 
   /**
    * Creates a new instance of the images test.
@@ -105,9 +118,88 @@ public class FilesTest extends IntegrationTestBase {
       testGetDocumentByIdAndName(serverUrl);
       testGetDocumentByPathLanguage(serverUrl);
       testGetDocumentByHeaderLanguage(serverUrl);
+      testUploadFile(serverUrl);
+      testUpdateFile(serverUrl);
+      testUpdateFileContents(serverUrl);
+      testDeleteFileContents(serverUrl);
+      testDeleteFile(serverUrl);
     } catch (Throwable t) {
       fail("Error occured while testing files request handler: " + t.getMessage());
     }
+  }
+
+  /**
+   * Creates a new file on the server.
+   * 
+   * @param serverUrl
+   *          the base url
+   * @param return the resource identifier of the new file
+   * @throws Exception
+   *           if file creation fails
+   */
+  private String testUploadFile(String serverUrl) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
+    HttpPost createFileRequest = new HttpPost(requestUrl);
+    String[][] params = new String[][] { { "language", "de" } };
+    logger.debug("Creating new file at {}", createFileRequest.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, createFileRequest, params);
+      assertEquals(HttpServletResponse.SC_CREATED, response.getStatusLine().getStatusCode());
+      assertEquals(0, response.getEntity().getContentLength());
+
+      // Extract the id of the new page
+      assertNotNull(response.getHeaders("Location"));
+      String locationHeader = response.getHeaders("Location")[0].getValue();
+      assertTrue(locationHeader.startsWith(serverUrl));
+      fileId = locationHeader.substring(locationHeader.lastIndexOf("/") + 1);
+      assertEquals("Identifier doesn't have correct length", 36, fileId.length());
+      logger.debug("Id of the new file is {}", fileId);
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // TODO: Test automatic mime type extraction
+
+    // TODO: Test existing path
+
+    // TODO: Test exceeding of size limit
+    return null;
+  }
+
+  /**
+   * @param serverUrl
+   *          the base url
+   */
+  private void testUpdateFileContents(String serverUrl) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @param serverUrl
+   *          the base url
+   */
+  private void testUpdateFile(String serverUrl) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @param serverUrl
+   *          the base url
+   */
+  private void testDeleteFileContents(String serverUrl) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @param serverUrl
+   *          the base url
+   */
+  private void testDeleteFile(String serverUrl) {
+    // TODO Auto-generated method stub
 
   }
 
@@ -144,7 +236,7 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
-      
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -169,8 +261,8 @@ public class FilesTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests for the special <code>/weblounge-files</code> uri prefix that is provided by
-   * the file request handler.
+   * Tests for the special <code>/weblounge-files</code> uri prefix that is
+   * provided by the file request handler.
    * 
    * @param serverUrl
    *          the base url
@@ -202,7 +294,7 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
-      
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -227,13 +319,13 @@ public class FilesTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests for the special <code>/weblounge-files</code> uri prefix that is provided by
-   * the file request handler. The handler should be able to respond to these
-   * requests:
+   * Tests for the special <code>/weblounge-files</code> uri prefix that is
+   * provided by the file request handler. The handler should be able to respond
+   * to these requests:
    * <ul>
-   *  <li>/weblounge-files/&lt;id&gt;</li>
-   *  <li>/weblounge-files/&lt;id&gt;/</li>
-   *  <li>/weblounge-files/&lt;id&gt;/&lt;filename&gt;</li>
+   * <li>/weblounge-files/&lt;id&gt;</li>
+   * <li>/weblounge-files/&lt;id&gt;/</li>
+   * <li>/weblounge-files/&lt;id&gt;/&lt;filename&gt;</li>
    * </ul>
    * 
    * @param serverUrl
@@ -259,9 +351,9 @@ public class FilesTest extends IntegrationTestBase {
       assertEquals(sizeGerman, response.getEntity().getContentLength());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
       assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
-      
+
       // Consume the content
-      response.getEntity().consumeContent();      
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -301,7 +393,7 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
-      
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -344,7 +436,7 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
-      
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
