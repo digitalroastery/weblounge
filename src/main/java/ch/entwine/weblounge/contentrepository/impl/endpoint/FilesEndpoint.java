@@ -256,7 +256,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Extract the language
-    Language language = LanguageUtils.getLanguage(languageId);
+    Language language;
+    try {
+      language = LanguageUtils.getLanguage(languageId);
+    } catch (UnknownLanguageException e) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
     if (language == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
