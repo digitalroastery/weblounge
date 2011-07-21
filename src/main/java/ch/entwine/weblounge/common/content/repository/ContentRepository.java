@@ -131,6 +131,19 @@ public interface ContentRepository {
   boolean exists(ResourceURI uri) throws ContentRepositoryException;
 
   /**
+   * Returns the resource uri for the resource specified by
+   * <code>resourceId</code> or <code>null</code> if the resource does not
+   * exist.
+   * 
+   * @param resourceId
+   *          the resource identifier
+   * @return the resource uri or <code>null</code> if the resource doesn't exist
+   * @throws ContentRepositoryException
+   *           if looking up the resource from the repository fails
+   */
+  ResourceURI getResourceURI(String resourceId) throws ContentRepositoryException;
+
+  /**
    * Returns a resource uri for every available revision of the resource.
    * 
    * @param uri
