@@ -70,6 +70,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -458,7 +459,8 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   @Path("/{resource}")
   public Response updateFile(@Context HttpServletRequest request,
       @PathParam("resource") String resourceId,
-      @FormParam("content") String resourceXml) {
+      @FormParam("content") String resourceXml,
+      @HeaderParam("If-Match") String ifMatchHeader) {
 
     // Check the parameters
     if (resourceId == null)
@@ -491,14 +493,17 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Check the value of the If-Match header against the etag
-    try {
-      Resource<?> currentResource = contentRepository.get(resourceURI);
-      if (ResourceUtils.isMismatch(currentResource, null, request)) {
-        throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    if (ifMatchHeader != null) {
+      try {
+        Resource<?> currentResource = contentRepository.get(resourceURI);
+        String etag = Long.toString(currentResource.getModificationDate().getTime());
+        if (!etag.equals(ifMatchHeader)) {
+          throw new WebApplicationException(Status.PRECONDITION_FAILED);
+        }
+      } catch (ContentRepositoryException e) {
+        logger.warn("Error reading current resource {} from repository: {}", resourceURI, e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
-    } catch (ContentRepositoryException e) {
-      logger.warn("Error reading current resource {} from repository: {}", resourceURI, e.getMessage());
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Parse the resource and update it in the repository
