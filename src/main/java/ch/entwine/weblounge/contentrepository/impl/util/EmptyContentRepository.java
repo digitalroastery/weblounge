@@ -85,6 +85,16 @@ public class EmptyContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getResourceURI(java.lang.String)
+   */
+  public ResourceURI getResourceURI(String resourceId)
+      throws ContentRepositoryException {
+    return null;
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#find(ch.entwine.weblounge.common.content.SearchQuery)
    */

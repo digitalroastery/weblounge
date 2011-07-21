@@ -165,6 +165,25 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throw new ContentRepositoryException(e);
     }
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getResourceURI(java.lang.String)
+   */
+  public ResourceURI getResourceURI(String resourceId)
+      throws ContentRepositoryException {
+    if (!isStarted())
+      throw new IllegalStateException("Content repository is not connected");
+    try {
+      ResourceURI uri = new ResourceURIImpl(null, getSite(), null, resourceId);
+      uri.setType(index.getType(uri));
+      uri.setPath(index.getPath(uri));
+      return uri;
+    } catch (IOException e) {
+      throw new ContentRepositoryException(e);
+    }
+  }
 
   /**
    * {@inheritDoc}

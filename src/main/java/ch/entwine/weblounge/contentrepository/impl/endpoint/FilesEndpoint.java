@@ -477,11 +477,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI resourceURI = new ResourceURIImpl(null, site, null, resourceId);
+    ResourceURI resourceURI = null;
 
     // Does the resource exist?
     try {
-      if (!contentRepository.exists(resourceURI)) {
+      resourceURI = contentRepository.getResourceURI(resourceId);
+      if (resourceURI == null) {
         throw new WebApplicationException(Status.NOT_FOUND);
       }
     } catch (ContentRepositoryException e) {
@@ -672,12 +673,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
-    ResourceURI resourceURI = new ResourceURIImpl(null, site, null, resourceId);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+    ResourceURI resourceURI = null;
 
     // Make sure the resource exists
     try {
-      if (!contentRepository.exists(resourceURI)) {
+      resourceURI = contentRepository.getResourceURI(resourceId);
+      if (resourceURI == null) {
         logger.warn("Tried to delete non existing resource {} in site '{}'", resourceURI, site);
         throw new WebApplicationException(Status.NOT_FOUND);
       }
@@ -689,6 +691,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Delete the resource
     try {
       // TODO: Versions?
+      resourceURI = contentRepository.get(resourceURI).getURI();
       contentRepository.delete(resourceURI);
     } catch (IOException e) {
       logger.warn("Error deleting resource {} from site '{}': {}", new Object[] {
