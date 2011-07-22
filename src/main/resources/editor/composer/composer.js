@@ -20,6 +20,7 @@ steal.plugins('jquery/controller','jqueryui/sortable')
      */
     init: function(el) {
       this.id = this.element.attr('id');
+      this.element.addClass('nojQuery');
       
       // init jQuery UI sortable plugin to support drag'n'drop of pagelets
       $(el).sortable({
@@ -31,23 +32,32 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         cursor: 'move',
         cursorAt: { top: -8, left: -10 },
         revert: true,
+        start: $.proxy(function(event, ui) {
+        	// TODO Remove image overlay at start
+//        	this.element.find('a.add-pagelet').remove();
+        	
+        	// add pageletData to draggable helper
+        	var index = ui.item.attr('index');
+        	var pagelet = this.options.page.getPagelet(this.id, index);
+        	var copyPagelet = jQuery.extend(true, {}, pagelet);
+        	ui.helper.data('pagelet', copyPagelet);
+        	this._disablePagelets();
+        }, this),
+        stop: $.proxy(function(event, ui) {
+        	this._enablePagelets();
+        }, this),
         update: $.proxy(function(event, ui) {
-        	if(ui.sender != null) return;
         	var page = this.options.page;
         	var composerId = this.id;
         	
-        	var newComposer = [];
-        	
+        	// Create new composer when empty
         	if(this.element.hasClass('empty')) {
-        		this.options.page.createComposer(this.id);
-        	}
-        	else {
-        		newComposer = $.map(this.element.find('.pagelet'), function(elem, i) {
-        			var oldIndex = $(elem).attr("index");
-        			return page.getPagelet(composerId, oldIndex);
-        		});
+        		page.createComposer(composerId);
         	}
         	
+        	var pagelets = jQuery.extend(true, [], page.getComposer(composerId).pagelets);
+        	
+        	// Insert new pagelet to composer
             if(ui.item.hasClass('draggable')) {
             	var newPagelet = {};
             	newPagelet.id = ui.item.attr('id');
@@ -61,18 +71,26 @@ steal.plugins('jquery/controller','jqueryui/sortable')
             	newPagelet.created.user.name = this.options.runtime.getUserName();
             	newPagelet.created.user.realm = this.options.runtime.getId();
             	newPagelet.created.date = new Date();
-            	newComposer.splice(ui.item.index(), 0, newPagelet);
+            	pagelets.splice(ui.item.index(), 0, newPagelet);
             	ui.item.after('<div class="pagelet editor_pagelet" >');
             	var pagelet = ui.item.next();
             	ui.item.remove();
+        	} 
+            else { // Iterate over Pagelets and insert to composer
+        		pagelets = $.map(this.element.find('.pagelet'), function(elem, i) {
+        			var oldIndex = $(elem).attr("index");
+        			var pageletData = $(elem).data('pagelet');
+        			if(pageletData != undefined) return pageletData;
+        			return page.getPagelet(composerId, oldIndex);
+        		});
         	}
             
-            this.options.page.updateComposer(this.id, newComposer);
+            page.updateComposer(composerId, pagelets);
             this.update();
             
-            // Index false
+            // If pagelet is new open page editor dialog
             if(ui.item.hasClass('draggable')) {
-            	Workbench.findOne({ id: this.options.page.value.id, composer: this.id, pagelet: pagelet.attr('index') }, $.proxy(function(pageletEditor) {
+            	Workbench.findOne({ id: page.value.id, composer: composerId, pagelet: pagelet.attr('index') }, $.proxy(function(pageletEditor) {
             		pagelet.editor_pagelet('_openPageEditor', pageletEditor, true);
             	}, this));
         	}
@@ -113,6 +131,16 @@ steal.plugins('jquery/controller','jqueryui/sortable')
             runtime: this.options.runtime
           }
         });
+    },
+    
+    _enablePagelets: function() {
+    	$('.composer').addClass('nojQuery');
+    	$('.composer').find('div.pagelet').editor_pagelet('enable');
+    },
+    
+    _disablePagelets: function() {
+    	$('.composer').removeClass('nojQuery');
+    	$('.composer').find('div.pagelet').editor_pagelet('disable');
     },
     
     "a.add-pagelet click": function(el, ev) {

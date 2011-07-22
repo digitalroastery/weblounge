@@ -22,12 +22,22 @@ steal.plugins('jqueryui/dialog',
      */
     init: function(el) {
 		this.element.attr('index', this.element.index());
+		this.showHover = true;
     },
     
     update: function(options) {
     	if(options === undefined) return;
     	this.element.attr('index', this.element.index());
     	this.options.composer = options.composer;
+    	this.showHover = true;
+    },
+    
+    enable: function() {
+    	this.showHover = true;
+    },
+    
+    disable: function() {
+    	this.showHover = false;
     },
     
     _openPageEditor: function(pageletEditor, isNew) {
@@ -215,11 +225,13 @@ steal.plugins('jqueryui/dialog',
     },
 
 	'hoverenter': function(ev, hover) {
-		this.element.append('<img class="icon_editing" src="/weblounge/editor/composer/resources/icon_editing.png" />');
+		if(this.showHover) 
+			this.element.append('<img class="icon_editing" src="/weblounge/editor/composer/resources/icon_editing.png" />');
     },
 
 	'hoverleave': function(ev, hover) {
-		this.element.find('img.icon_editing').remove();
+		if(this.showHover) 
+			this.element.find('img.icon_editing').remove();
     },
 
 	'img.icon_editing click': function(ev) {

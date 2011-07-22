@@ -40,7 +40,8 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         },
         
         _loadCurrentLanguage: function() {
-        	var language = location.pathname.substring(location.pathname.lastIndexOf('/') + 1, location.pathname.length);
+        	var temp = location.pathname.substring(location.pathname.lastIndexOf('/') + 1, location.pathname.length);
+        	var language = temp.length == 2 ? temp : '';
         	if(language == '') {
         		language = localStorage['weblounge.editor.' + this.runtime.getId() + '.language'];
         	}

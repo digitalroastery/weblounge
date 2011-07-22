@@ -205,6 +205,9 @@ steal.then('jsonix')
 	    	if($.isEmptyObject(this.value.body.composers)) {
 	    		this.value.body.composers = new Array();
 	    	}
+	    	if($.isEmptyObject(this.value.body.composers.pagelets)) {
+	    		this.value.body.composers.pagelets = new Array();
+	    	}
 	    	
 	    	if(this.getComposerIndex(composerId) != -1) return;
 	    	this.value.body.composers.push({id: composerId});

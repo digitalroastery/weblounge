@@ -54,23 +54,7 @@ div.pagelet-editor a {
     padding: 0 !important;
 }
 
-div.pagelet:hover {
+div.composer.nojQuery div.pagelet:hover {
     background-color: #CCCCCC;
     opacity: 0.5;
-}
-
-div.pagelet:hover {
-	background-color: #ccc;
-	opacity: 0.5;
-}
-
-/* move to new plugin "designer" */
-.pagelet:hover,
-.pagelet:hover div,
-.pagelet:hover p {
-	background-color: #ccc !important
-}
-
-.pagelet:hover {
-	background-color: yellow;
-}
+}	

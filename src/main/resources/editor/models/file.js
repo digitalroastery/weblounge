@@ -11,7 +11,13 @@ steal.then('jsonix')
 		findOne: function(params, success, error) {
 			if ('path' in params) {
 				$.ajax('/system/weblounge/files?path=' + params.path, {
-					success: this.callback(['parseXML', 'wrap', success])
+					success: function(data, textStatus, jqXHR) {
+						var json = Editor.File.parseXML(data);
+						var file = Editor.File.wrap(json);
+						file.setETag(jqXHR.getResponseHeader('Etag'));
+						success(file);
+						this.callback(['parseXML', 'wrap', success])
+					}
 				});
 			} 
 			else if ('language' in params) {
@@ -87,7 +93,7 @@ steal.then('jsonix')
 		 * @param {Object} params The target path, mimeType and languageid
 		 * @param {File} file The file data
 		 */
-		create: function(params, file, success, error){
+		upload: function(params, file, success, error){
 			if ('path' in params) {
 				$.ajax({
 					url: '/system/weblounge/files/uploads',

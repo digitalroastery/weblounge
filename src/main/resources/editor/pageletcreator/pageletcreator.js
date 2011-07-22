@@ -26,7 +26,6 @@ steal.plugins('jquery',
 	    },
 	    
 	    _initViews: function(el, modules) {
-			// LOAD FAVORITES
 	    	var siteId = this.options.runtime.getId();
 	    	var favorites = new Array();
 	    	var favoritesLength = localStorage['weblounge.editor.' + siteId + '.favorites.size'];
@@ -85,6 +84,10 @@ steal.plugins('jquery',
 				start: function(e, ui) {
 					$(ui.helper).removeClass('draggable');
 					$(ui.helper).addClass('draggable_helper');
+				},
+				stop: function(e, ui) {
+			    	$('.composer').addClass('nojQuery');
+			    	$('.composer').find('div.pagelet').editor_pagelet('enable');
 				}
 			}).disableSelection();
 	    },
