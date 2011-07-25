@@ -244,6 +244,11 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       IOUtils.closeQuietly(resourceInputStream);
       FileUtils.deleteQuietly(scaledResourceFile);
       throw new WebApplicationException();
+    } catch (Throwable t) {
+      logger.error("Error scaling image '{}': {}", resourceURI, t.getMessage());
+      IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
+      throw new WebApplicationException();
     } finally {
       IOUtils.closeQuietly(contentRepositoryIs);
       IOUtils.closeQuietly(fos);
