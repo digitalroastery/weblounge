@@ -157,7 +157,7 @@ public class ImageResourceTag extends WebloungeTag {
       uri = new ImageResourceURIImpl(site, null, imageId);
     } else if (StringUtils.isNotBlank(imagePath)) {
       uri = new ImageResourceURIImpl(site, imagePath, null);
-    } else if (imageSubjects.size() > 0) {
+    } else if (imageSubjects != null && imageSubjects.size() > 0) {
       SearchQuery query = new SearchQueryImpl(site);
       query.withType(ImageResource.TYPE);
       for (int i = 0; i < imageSubjects.size(); i++)
@@ -263,6 +263,7 @@ public class ImageResourceTag extends WebloungeTag {
     imageId = null;
     imagePath = null;
     imageStyle = null;
+    imageSubjects = null;
   }
 
 }
