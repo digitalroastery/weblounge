@@ -172,8 +172,13 @@ public class Precompiler {
           logger.debug("Precompiling {}:/{}", site, pathInfo);
           servlet.service(request, response);
         } catch (Throwable t) {
+          while (t != t.getCause() && t.getCause() != null)
+            t = t.getCause();
           if (logErrors)
-            logger.warn("Error precompiling " + site + ":/" + pathInfo, t);
+            logger.warn("Error precompiling {}:/{}: {}", new Object[] {
+                site,
+                pathInfo,
+                t.getMessage() });
           errorCount++;
         }
       }
@@ -181,7 +186,7 @@ public class Precompiler {
       // Log the precompilation results
       if (!keepGoing) {
         logger.info("Precompilation for '{}' canceled", site);
-      } else if (!logErrors && errorCount > 0) {
+      } else if (errorCount > 0) {
         String compilationResult = "finished";
         compilationResult += " with " + errorCount + " errors";
         logger.warn("Precompilation for '{}' {}", site, compilationResult);
