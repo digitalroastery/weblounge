@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.impl.security.Guest;
 import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.User;
@@ -153,8 +154,13 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     if (language == null) {
       Matcher m = LANG_EXTRACTOR_REGEX.matcher(getRequestURI());
       if (m.find()) {
-        language = LanguageUtils.getLanguage(m.group(1));
-        logger.trace("Selected language " + language + " from request uri");
+        String languageCandidate = m.group(1);
+        try {
+          language = LanguageUtils.getLanguage(languageCandidate);
+          logger.trace("Selected language " + language + " from request uri");
+        } catch (UnknownLanguageException e) {
+          logger.trace("'{}' does not represent a langauge", languageCandidate);
+        }
       }
     }
 
