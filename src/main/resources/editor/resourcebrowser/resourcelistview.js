@@ -41,8 +41,8 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		"img.settings click": function(el, ev) {
-			var pageId = this.options.selectedPages = el.parents('tr.pageEntry');
-			steal.dev.log('open settings: ' + pageId);
+			this.options.selectedPages = el.parents('tr.pageEntry');
+			steal.dev.log('open settings: ' + this.options.selectedPages);
 		},
 		
 		"img.delete click": function(el, ev) {

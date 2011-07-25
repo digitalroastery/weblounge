@@ -1,8 +1,8 @@
 <tr class="pageEntry" id="${page.id}">
 	<td><input type="checkbox"><a href="${page.path}" class="pagePath">${page.path}</a></input></td>
 	<td>${page.head.metadata.title.de}</td>
-	<td>${page.head.created.user.name} / ${page.head.created.date}</td>
-	<td>${page.head.modified.user.name} / ${page.head.modified.date}</td>
+	<td>${page.head.created.user.name} / ${page.head.created.date.toLocaleString()}</td>
+	<td>${page.head.modified.user.name} / ${page.head.modified.date.toLocaleString()}</td>
 	<td class="action">
 		<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_settings.png" class="settings" alt="settings">
 		<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_trash.png" class="delete" alt="trash">

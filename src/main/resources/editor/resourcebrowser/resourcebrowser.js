@@ -75,6 +75,21 @@ steal.plugins(
 //			}
 //		},
 		
+        _removeResource: function(id) {
+	    	var index = -1;
+	    	$.each(this.options.resources, function(i, resources) {
+	    		if(resources.id == id) {
+	    			index = i;
+	    			return false;
+	    		};
+    		});
+	    	
+	    	if(index == -1) return;
+	    	
+			this.options.resources.splice(index, 1);
+			this.update();
+        },
+		
 		_toggleElement: function(el) {
         	this.activeElement.hide();
         	this.activeElement = el;
@@ -107,8 +122,9 @@ steal.plugins(
         
         // Delete Pages
         "div#mainContainer deletePages": function(el, ev, pages) {
-//        	Page.remove(pages);
-        	this.update();
+        	pages.each($.proxy(function(index, element) {
+        		Page.destroy({id: element.id}, this.callback('_removeResource', element.id));
+        	}, this))
         },
         
         // Duplicate Pages

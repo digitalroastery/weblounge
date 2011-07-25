@@ -1,13 +1,13 @@
-.composer {
+.editor_composer {
 	min-height: 50px;
 }
 
-.empty {
+.editor_composer .empty {
 	position: relative;
 	border: 1px solid black;
 }
 
-a.add-pagelet {
+.editor_composer a.add-pagelet {
 	cursor: pointer;
 	background: url("../menubar/images/menu_add.png") center center no-repeat ;
 	display: inline-block;
@@ -18,7 +18,7 @@ a.add-pagelet {
   	height:24px;
 }
 
-img.icon_editing {
+.editor_composer img.icon_editing {
 	cursor: pointer;
 	display: inline-block;
 	position:absolute;
@@ -31,30 +31,30 @@ img.icon_editing {
 	background-color: white;
 }
 
-.pagelet-placeholder {
+.editor_composer .pagelet-placeholder {
     border: 2px dashed black;
     color: #363636;
 	height: 1.5em; line-height: 1.2em;
 }
 
-div.pagelet {
+.editor_composer div.pagelet {
 	position:relative;
 }
 
-div.pagelet-editor {
+.editor_composer div.pagelet-editor {
 	display: none;
 }
 
-div.pagelet-editor {
+.editor_composer div.pagelet-editor {
     display: none;
 }
 
-div.pagelet-editor a {
+.editor_composer div.pagelet-editor a {
     display: inline !important;
     padding: 0 !important;
 }
 
-div.composer.nojQuery div.pagelet:hover {
+.editor_composer.nojQuery div.pagelet:hover {
     background-color: #CCCCCC;
     opacity: 0.5;
 }	

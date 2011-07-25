@@ -11,15 +11,15 @@
     z-index: 1;
 }
 
-div#module_tabs {
+.editor_pageletcreator div#module_tabs {
 	height: 100%;
 }
 
-.tab_hover {
+.editor_pageletcreator .tab_hover {
 	background: green !important;
 }
 
-a.tab_close {
+.editor_pageletcreator a.tab_close {
 	background-image: url("../css/images/ui-icons_ffffff_256x240.png");
 	background-position: -96px -128px;
 	background-repeat: no-repeat;
@@ -31,7 +31,7 @@ a.tab_close {
 	z-index: 1000;
 }
 
-.draggable {
+.editor_pageletcreator .draggable {
 	width: 100px; 
 	height: 20px; 
 	padding: 0.5em; 
@@ -39,7 +39,7 @@ a.tab_close {
 	margin: 10px 10px 10px 0; 
 }
 
-.draggable_helper {
+.editor_pageletcreator .draggable_helper {
 	width: 100px; 
 	height: 30px; 
 	padding: 0.5em; 

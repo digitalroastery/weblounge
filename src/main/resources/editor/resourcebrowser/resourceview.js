@@ -33,7 +33,7 @@ steal.plugins('jquery/controller',
 			.load(this.options.runtime.getRootPath() + '/editor/resourcebrowser/views/delete-dialog.html')
 			.dialog({
 				modal: true,
-				title: 'Seite(n) löschen',
+				title: 'Seite(n) l&ouml;schen',
 				autoOpen: false,
 				resizable: true,
 				buttons: {

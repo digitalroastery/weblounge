@@ -1,39 +1,39 @@
-.taggerImage {
+.editor_tagger .taggerImage {
     width: 300px;
     height: 300px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.metadata {
+.editor_tagger .metadata {
 	width: 500px;
 	height: 200px;
 	margin-left: auto;
     margin-right: auto;
 }
 
-div.buttonLeft {
+.editor_tagger div.buttonLeft {
 	position: absolute;
 	left: 0;
 	width: 10%;
 	height: 90%;
-	background-image: url(../resourcebrowser/images/arrow_left.png);
+	background-image: url(../resourcebrowser/resources/images/arrow_left.png);
 	background-repeat: no-repeat;
 	background-position: center center;
 	cursor: pointer;
 }
 
-div.buttonRight {
+.editor_tagger div.buttonRight {
 	position: absolute;
 	right: 0;
 	width: 10%;
 	height: 90%;
-	background-image: url(../resourcebrowser/images/arrow_right.png);				
+	background-image: url(../resourcebrowser/resources/images/arrow_right.png);				
 	background-repeat: no-repeat;
 	background-position: center center;
 	cursor: pointer;
 }
 
-img.copyMetadata {
+.editor_tagger img.copyMetadata {
 	cursor: pointer;
 }

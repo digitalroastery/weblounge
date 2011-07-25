@@ -67,6 +67,7 @@ steal.then('jsonix')
 				url: url,
 				type: 'put',
 				headers: headers,
+				success: success,
 				dataType: 'xml',
 				data: {content : Editor.File.parseJSON(file)}
 			});
@@ -83,6 +84,7 @@ steal.then('jsonix')
 					url: '/system/weblounge/files/',
 					type: 'post',
 					dataType: 'xml',
+					success: success,
 					data: {path : params.path, content : Editor.File.parseJSON(file)}
 				});
 			}	
@@ -112,13 +114,15 @@ steal.then('jsonix')
 			if ('language' in params) {
 				$.ajax({
 					url: '/system/weblounge/files/' + params.id + '/content/' + params.language,
-					type: 'delete'
+					type: 'delete',
+					success: success
 				});
 			}
 			else if ('id' in params) {
 				$.ajax({
 					url: '/system/weblounge/files/' + params.id,
-					type: 'delete'
+					type: 'delete',
+					success: success
 				});
 			}
 		},

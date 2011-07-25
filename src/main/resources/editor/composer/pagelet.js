@@ -6,7 +6,6 @@ steal.plugins('jqueryui/dialog',
 .models('../../models/workbench',
 		'../../models/pagelet')
 .resources('trimpath-template')
-.css('validation')
 .then('inputconverter')
 .then(function($) {
 

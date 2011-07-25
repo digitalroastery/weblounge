@@ -7,7 +7,7 @@
 	height: 100%;
 }
 
-nav.weblounge {
+.editor_resourcebrowser nav.weblounge {
 	position: relative;
 	top: 46px;
 	height: 30px;
@@ -16,86 +16,81 @@ nav.weblounge {
 	padding: 10px 5px;
 }
 
-nav.weblounge div.center {
+.editor_resourcebrowser nav.weblounge div.center {
 	width: 150px;
 	margin-left: 50%;
 	position: relative;
 	left: -75px;
 }
 
-nav {
+.editor_resourcebrowser nav {
 	padding: 10px 0;
 }
 
-nav.weblounge ul,
-nav.weblounge ul li {
+.editor_resourcebrowser nav.weblounge ul,
+.editor_resourcebrowser nav.weblounge ul li {
 	list-style: none;
 	float: left;
 }
 
-.align_left {
+.editor_resourcebrowser .align_left {
 	float: left;
 }
 
-.align_center {
+.editor_resourcebrowser .align_center {
 	margin: 0 auto;
 	text-align: center;
 }
 
-.align_right {
+.editor_resourcebrowser .align_right {
 	float: right;
 }
 
 
-nav.weblounge ul {
+.editor_resourcebrowser nav.weblounge ul {
 	margin-left: 300px;
 }
 
-#mainContainer {
+.editor_resourcebrowser #mainContainer {
 	position: relative;
 	top: 50px;
 	text-align: left;
 }
 
-/* Eigene Icons */
-.icon-list {background: url('images/icon_list.png') no-repeat top left !important}
-.icon-tree {background: url('images/icon_tree.png') no-repeat top left !important}
-.icon-thumbnails {background: url('images/icon_thumbnails.png') no-repeat top left !important}
-
 /* Page Browser */
-
-#container div.scrollingHotSpotLeft,
-#container div.scrollingHotSpotRight {
+.editor_resourcebrowser #container div.scrollingHotSpotLeft,
+.editor_resourcebrowser #container div.scrollingHotSpotRight {
 	height: 261px;
 	background-color: #000;
 }
 
-div.listView {
+.editor_resourcebrowser div.listView {
 	width: 80%;
 	margin: 50px auto;
 	padding:  5px;
 }
-div.listView table {
+
+.editor_resourcebrowser div.listView table {
 	width: 100%;
 	text-align: left !important;
 	background-color: #fff;
 }
 
-div.treeView,
-div.listView {
+.editor_resourcebrowser div.treeView,
+.editor_resourcebrowser div.listView {
 	display: none;
 }
 
-div.listView input[type="checkbox"] {
+.editor_resourcebrowser div.listView input[type="checkbox"] {
 	margin-right: 10px;
 }
 
-.thumbnailView {
+.editor_resourcebrowser .thumbnailView {
 	margin: 50px auto;
 	overflow: hidden;
 }
 
-.message {
+.editor_resourcebrowser .message {
 	margin: 20px auto;
 	padding: 5px;
 	text-align: center;
@@ -106,40 +101,42 @@ div.listView input[type="checkbox"] {
 	color: #fff;
 	visibility: hidden;
 }
-.message.success {
+
+.editor_resourcebrowser .message.success {
 	border-color: #006600;
 	background-color: #669900;
 	color: #fff;
 }
-.message.error {
+
+.editor_resourcebrowser .message.error {
 	border-color: #990000;
 	background-color: #FF6600;
 	color: #fff;
 }
 
-td.action img {
+.editor_resourcebrowser td.action img {
 	display:none;
 }
 
-td.action img.settings {
+.editor_resourcebrowser td.action img.settings {
 	display:inline;
 }
 
-tr.bg td {
+.editor_resourcebrowser tr.bg td {
 	background-color: #efefef;
 }
 
-.action {
+.editor_resourcebrowser .action {
 	width: 50px;
 }
 
-button.lock {
+.editor_resourcebrowser button.lock {
 	position: relative;
 	top: 50px;
 	left: 20px;
 }
 
-.page {
+.editor_resourcebrowser .page {
     width: 400px;
 	position: relative;
 	height: 350px;
@@ -147,85 +144,90 @@ button.lock {
 	margin: 0 10px;
 }
 
-img.page_thumbnail {
+.editor_resourcebrowser img.page_thumbnail {
 }
 
-.page.marked img {
+.editor_resourcebrowser .page.marked img {
 	opacity: 0.3;
 }
 
-.page.marked * {
+.editor_resourcebrowser .page.marked * {
 	color: #ccc !important;
 }
 
-.pageData {
+.editor_resourcebrowser .pageData {
 	display: none;
 	height: 263px;
 	width: 100%;
 }
 
-.pageData label,
-#editor label {
+.editor_resourcebrowser .pageData label,
+.editor_resourcebrowser #editor label {
 	float: left;
 	display: block;
 	width: 70px;
 }
 
-.pageData input[type="text"],
-.pageData ul.token-input-list-facebook,
-#editor input[type="text"],
-#editor ul.token-input-list-facebook {
+.editor_resourcebrowser .pageData input[type="text"],
+.editor_resourcebrowser .pageData ul.token-input-list-facebook,
+.editor_resourcebrowser #editor input[type="text"],
+.editor_resourcebrowser #editor ul.token-input-list-facebook {
 	width: 280px;
 	height: 12px;
 	display: inline-block;
 	border: 1px solid #666;
 }
 
-.pageData input[type="text"],
-#editor input[type="text"] {
+.editor_resourcebrowser .pageData input[type="text"],
+.editor_resourcebrowser #editor input[type="text"] {
 	padding: 4px 0;
 }
 
-.pageData input[type="checkbox"] {
+.editor_resourcebrowser .pageData input[type="checkbox"] {
 	position: relative;
 	top: -3px;
 }
 
-input[type="checkbox"] + ul.token-input-list-facebook {
+.editor_resourcebrowser input[type="checkbox"] + ul.token-input-list-facebook {
     position: relative;
     top: 5px;
 }
 
-.pageData ul.ui-tabs-nav li {
+.editor_resourcebrowser .pageData ul.ui-tabs-nav li {
 	width: 33%;
 }
-.pageData ul.ui-tabs-nav li:first-child {
+.editor_resourcebrowser .pageData ul.ui-tabs-nav li:first-child {
 	width: 34% !important;
 }
 
-.pageData .ui-tabs-panel {
+.editor_resourcebrowser .pageData .ui-tabs-panel {
 	padding: 0 !important;
 }
 
-.pageData p,
-#editor p {
+.editor_resourcebrowser .pageData p,
+.editor_resourcebrowser #editor p {
     border-bottom: 1px solid #EFEFEF;
     padding: 5px 0;
     margin: 5px;
 }
 
-.page p,
-.page h2,
-.page a {
+.editor_resourcebrowser .page p,
+.editor_resourcebrowser .page h2,
+.editor_resourcebrowser .page a {
 	color: #fff;
 }
 
-.pageData p:last-child,
-#editor p:last-child {
+.editor_resourcebrowser .pageData p:last-child,
+.editor_resourcebrowser #editor p:last-child {
 	border: 0;
 }
 
-.page img.close {
+/* custom button icons */
+.editor_resourcebrowser .icon-list {background: url('images/icon_list.png') no-repeat top left !important}
+.editor_resourcebrowser .icon-tree {background: url('images/icon_tree.png') no-repeat top left !important}
+.editor_resourcebrowser .icon-thumbnails {background: url('images/icon_thumbnails.png') no-repeat top left !important}
+
+.editor_resourcebrowser .page img.close {
 	position: relative;
 	left: -5px;
     top: 15px;
@@ -233,7 +235,7 @@ input[type="checkbox"] + ul.token-input-list-facebook {
     display: none;
 }
 
-.overlay_icons {
+.editor_resourcebrowser .overlay_icons {
 	display: none;
 	background: url('images/bg_editing_icons.png') no-repeat top left;
     left: 150px;
@@ -246,38 +248,38 @@ input[type="checkbox"] + ul.token-input-list-facebook {
     margin-bottom: -30px; /* to set the dimensions to 0x0 */
 }
 
-.overlay_icons img {
+.editor_resourcebrowser .overlay_icons img {
 	padding: 0 6px;
 	cursor: pointer;
 }
 
-.hoverflip {
+.editor_resourcebrowser .hoverflip {
 	background: url('resources/icon_flip.png') no-repeat top left;
 }
 
-ul.token-input-list-facebook input {
+.editor_resourcebrowser ul.token-input-list-facebook input {
 	border: 0 !important;
 	padding: 0 !important;
 }
 
-div.icon_bg {
+.editor_resourcebrowser div.icon_bg {
 	border: 1px solid #999;
 	-moz-border-radius: 6px;
 	background-color: #efefef;
 }
 
-#makeMeScrollable {
+.editor_resourcebrowser #makeMeScrollable {
     height: 330px;
     position: relative;
     width: 100%;
     padding-bottom: 20px;
 }
 
-div.searchBox {
+.editor_resourcebrowser div.searchBox {
     height: 70%;
 }
 
-div.resourceSearch {
+.editor_resourcebrowser div.resourceSearch {
 	position: relative;
 	float: left;
 	align: center;
@@ -286,7 +288,7 @@ div.resourceSearch {
 	text-align: center;
 }
 
-div#media-file-uploader {
+.editor_resourcebrowser div#media-file-uploader {
 	position: relative;
 	float: left;
     height: 400px;
@@ -295,7 +297,7 @@ div#media-file-uploader {
     margin-top: 5%;
 }
 
-#tag_button {
+.editor_resourcebrowser #tag_button {
 	cursor: pointer;
 	position: absolute;
 	top: 0;
@@ -310,14 +312,14 @@ div#media-file-uploader {
     padding: 6px;
 }
 
-#tag_button:hover {
+.editor_resourcebrowser #tag_button:hover {
     background: none repeat scroll 0 0 #CC0000;
 }
-#tag_button:focus {
+.editor_resourcebrowser #tag_button:focus {
     outline: 1px dotted black;
 }
 
-#resourceSearch {
+.editor_resourcebrowser #resourceSearch {
 	border-left: 0 none;
     border-radius: 6px 6px 6px 6px;
     border-top: 0 none;
@@ -326,7 +328,7 @@ div#media-file-uploader {
     width: 300px;
 }
 
-#tutorial_stage_1 {
+.editor_resourcebrowser #tutorial_stage_1 {
 	display: block;
     position: absolute;
     z-index: 4;
@@ -337,7 +339,7 @@ div#media-file-uploader {
     width: 230px;
 }
 
-#tutorial_stage_2 {
+.editor_resourcebrowser #tutorial_stage_2 {
 	display: block;
     position: absolute;
     z-index: 4;
@@ -348,7 +350,7 @@ div#media-file-uploader {
     width: 230px;
 }
 
-#tutorial_stage_3 {
+.editor_resourcebrowser #tutorial_stage_3 {
 	display: block;
     position: absolute;
     z-index: 4;
@@ -359,7 +361,7 @@ div#media-file-uploader {
     width: 330px;
 }
 
-#tutorial_stage_4 {
+.editor_resourcebrowser #tutorial_stage_4 {
 	display: block;
     position: absolute;
     z-index: 4;

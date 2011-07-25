@@ -2,39 +2,44 @@
 
 }
 
-#makeMeScrollablePageCreator {
+/* custom button icons */
+.editor_pagecreator .icon-list {background: url('../resourcebrowser/images/icon_list.png') no-repeat top left !important}
+.editor_pagecreator .icon-tree {background: url('../resourcebrowser/images/icon_tree.png') no-repeat top left !important}
+.editor_pagecreator .icon-thumbnails {background: url('../resourcebrowser/images/icon_thumbnails.png') no-repeat top left !important}
+
+.editor_pagecreator #makeMeScrollablePageCreator {
     height: 330px;
     padding-bottom: 20px;
     position: relative;
     width: 100%;
 }
 
-#pagecreator_step1 {
+.editor_pagecreator #pagecreator_step1 {
 	position: relative;
 }
 
-#pagecreator_step1 input[type="text"], #pagecreator_step2 input[type="text"] {
+.editor_pagecreator #pagecreator_step1 input[type="text"], .editor_pagecreator #pagecreator_step2 input[type="text"] {
     width: 200px;
 }
 
-.top_right {
+.editor_pagecreator .top_right {
 	position: absolute;
 	top: 0;
 	right: 0;
 }
 
-.filetree span.file {
+.editor_pagecreator .filetree span.file {
 	cursor: pointer;
 }
 
-.active img {
+.editor_pagecreator .active img {
 	opacity: 0.3;
 }
 
-.active {
+.editor_pagecreator .active {
 	color: #CCCCCC !important;
 }
 
-#pagecreator_step2 {
+.editor_pagecreator #pagecreator_step2 {
 
 }
