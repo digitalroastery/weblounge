@@ -819,10 +819,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
           is = request.getInputStream();
           if (is == null)
             throw new WebApplicationException(Status.BAD_REQUEST);
-          if (StringUtils.isBlank(mimeType)) { // try guessing mime type
-            Tika tika = new Tika();
-            mimeType = tika.detect(is);
-          }
           uploadedFile = File.createTempFile("upload-", null);
           fos = new FileOutputStream(uploadedFile);
           IOUtils.copy(is, fos);
@@ -835,6 +831,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
       }
 
+      // Check the filename
       if (fileName == null && uploadedFile != null) {
         logger.warn("No filename found for upload, request header 'X-File-Name' not specified");
         fileName = uploadedFile.getName();
@@ -843,6 +840,20 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       // Make sure there is a language
       if (language == null) {
         language = LanguageUtils.getPreferredLanguage(request, site);
+      }
+
+      // A mime type would be nice as well
+      if (StringUtils.isBlank(mimeType)) {
+        InputStream is = null;
+        try {
+          is = new FileInputStream(uploadedFile);
+          Tika tika = new Tika();
+          mimeType = tika.detect(is);
+        } catch (IOException e) {
+          logger.warn("Error detecting mime type: {}", e.getMessage());
+        } finally {
+          IOUtils.closeQuietly(is);
+        }
       }
 
       WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
