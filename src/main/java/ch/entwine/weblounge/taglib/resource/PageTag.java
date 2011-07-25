@@ -104,6 +104,8 @@ public class PageTag extends WebloungeTag {
     } else if (!request.getRequestURI().endsWith(".jsp")) {
       logger.warn("Neither uuid nor path were specified for image");
       return SKIP_BODY;
+    } else {
+      return SKIP_BODY;
     }
 
     // Try to load the page from the content repository
