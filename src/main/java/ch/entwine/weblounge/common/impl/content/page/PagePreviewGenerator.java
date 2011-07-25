@@ -48,6 +48,7 @@ import org.xhtmlrenderer.swing.Java2DRenderer;
 import org.xhtmlrenderer.swing.NaiveUserAgent;
 import org.xhtmlrenderer.util.FSImageWriter;
 import org.xhtmlrenderer.util.XRLog;
+import org.xhtmlrenderer.util.XRRuntimeException;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -190,6 +191,9 @@ public class PagePreviewGenerator implements PreviewGenerator {
       ImageStyleUtils.style(new ByteArrayInputStream(tos.toByteArray()), os, html, style);
     } catch (IOException e) {
       logger.error("Error creating temporary copy of file content at " + f, e);
+      throw e;
+    } catch (XRRuntimeException e) {
+      logger.warn("Error rendering page content at " + uri + ": " + e.getMessage());
       throw e;
     } catch (Throwable t) {
       logger.warn("Error rendering page content at " + uri + ": " + t.getMessage(), t);
