@@ -739,7 +739,7 @@
 
     <repository>
       <id>central</id>
-      <url>http://maven.entwinemedia.com/nexus/content/groups/public</url>
+      <url>http://maven.entwinemedia.com/content/groups/public</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -750,7 +750,7 @@
 
     <repository>
       <id>snapshots</id>
-      <url>http://maven.entwinemedia.com/nexus/content/groups/public-snapshots</url>
+      <url>http://maven.entwinemedia.com/content/groups/public-snapshots</url>
       <releases>
         <enabled>false</enabled>
       </releases>
@@ -766,14 +766,14 @@
     <repository>
         <id>entwine.releases</id>
         <name>Entwine Release Repository</name>
-        <url>http://maven.entwinemedia.com/nexus/content/repositories/releases</url>
+        <url>http://maven.entwinemedia.com/content/repositories/releases</url>
         <!-- url>s3://com.entwinemedia.maven/releases</url -->
     </repository>
 
     <snapshotRepository>
         <id>entwine.snapshots</id>
         <name>Entwine Snapshot Repository</name>
-        <url>http://maven.entwinemedia.com/nexus/content/repositories/snapshots</url>
+        <url>http://maven.entwinemedia.com/content/repositories/snapshots</url>
         <!-- url>s3://com.entwinemedia.maven/snapshots</url -->
     </snapshotRepository>
 
