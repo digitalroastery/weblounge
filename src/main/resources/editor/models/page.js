@@ -234,6 +234,7 @@ steal.then('jsonix')
 	    	var pagelet = this.getPagelet(composerId, index);
 	    	var copyPagelet = jQuery.extend(true, {}, pagelet);
 
+	    	if($.isEmptyObject(copyPagelet.locale)) return copyPagelet;
 			$.each(copyPagelet.locale, function(i, locale) {
 				if(locale.language == language) {
 					copyPagelet.locale.current = locale;

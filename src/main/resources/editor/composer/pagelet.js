@@ -47,7 +47,10 @@ steal.plugins('jqueryui/dialog',
     	var editor = $(pageletEditor).find('editor:first');
     	
     	if(!editor.length) {
-    		this.element.html(this._processTemplate(renderer, pagelet));
+    		var html = this._processTemplate(renderer, pagelet);
+    		if(html == null && isNew) 
+    			this._deletePagelet();
+    		else this.element.html(html);
     		return;
     	}
     	
@@ -104,10 +107,7 @@ steal.plugins('jqueryui/dialog',
 			},
 			close: $.proxy(function () {
 				if(isNew == true) {
-					this.options.composer.page.deletePagelet(this.options.composer.id, this.element.index());
-					var composer = this.element.parent();
-					this.element.remove();
-					composer.editor_composer();
+					this._deletePagelet();
 				}
 				this.editorDialog.dialog('destroy');
 			}, this)
@@ -120,7 +120,20 @@ steal.plugins('jqueryui/dialog',
      */
     _processTemplate: function(template, data) {
 		var templateObject = TrimPath.parseTemplate(template);
-		return templateObject.process(data);
+		var result = templateObject.process(data);
+		if($.isEmptyObject(result.exception)) return result;
+		alert('TrimPath Process Error: ' + result.exception.message);
+		return null;
+    },
+    
+    /**
+     * Delete this Pagelet and update Composer
+     */
+    _deletePagelet: function() {
+		this.options.composer.page.deletePagelet(this.options.composer.id, this.element.index());
+		var composer = this.element.parent();
+		this.element.remove();
+		composer.editor_composer();
     },
     
     /**
@@ -223,15 +236,15 @@ steal.plugins('jqueryui/dialog',
     	pagelet.locale.push(pagelet.locale.current);
 		return pagelet;
     },
-
+    
 	'hoverenter': function(ev, hover) {
-		if(this.showHover) 
-			this.element.append('<img class="icon_editing" src="/weblounge/editor/composer/resources/icon_editing.png" />');
+		if(!this.showHover) return;
+		this.hallo = this.element.append('<img class="icon_editing" src="/weblounge/editor/composer/resources/icon_editing.png" />');
     },
-
+    
 	'hoverleave': function(ev, hover) {
-		if(this.showHover) 
-			this.element.find('img.icon_editing').remove();
+		if(!this.showHover) return;
+		this.element.find('img.icon_editing').remove();
     },
 
 	'img.icon_editing click': function(ev) {

@@ -33,11 +33,11 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         cursorAt: { top: -8, left: -10 },
         revert: true,
         start: $.proxy(function(event, ui) {
-        	// TODO Remove image overlay at start
-//        	this.element.find('a.add-pagelet').remove();
+        	this.element.find('img.icon_editing').remove();
         	
         	// add pageletData to draggable helper
         	var index = ui.item.attr('index');
+        	var test = ui.item.next();
         	var pagelet = this.options.page.getPagelet(this.id, index);
         	var copyPagelet = jQuery.extend(true, {}, pagelet);
         	ui.helper.data('pagelet', copyPagelet);
