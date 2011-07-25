@@ -28,6 +28,15 @@ import ch.entwine.weblounge.common.content.Resource;
 public interface AuthorizationService {
 
   /**
+   * Determines whether the resource contains a security policy.
+   * 
+   * @param resource
+   *          the resource
+   * @return whether the resource contains a security policy
+   */
+  boolean hasPolicy(Resource<?> resource);
+
+  /**
    * Determines whether the current user can take the specified action on the
    * resource.
    * 
@@ -41,14 +50,11 @@ public interface AuthorizationService {
   boolean hasPermission(Resource<?> resource, String action);
 
   /**
-   * Gets the permissions associated with this resource, as specified by its
-   * XACML attachment.
+   * Gets the permissions associated with this resource.
    * 
    * @param resource
    *          the resource
    * @return the set of permissions and explicit denials
-   * @throws MediaPackageException
-   *           if the policy can not be read from the resource
    */
   AccessControlList getAccessControlList(Resource<?> resource);
 
@@ -60,8 +66,6 @@ public interface AuthorizationService {
    * @param accessControlList
    *          the tuples of roles to actions
    * @return the resource with attached XACML policy
-   * @throws MediaPackageException
-   *           if the policy can not be attached to the resource
    */
   Resource<?> setAccessControl(Resource<?> resource,
       AccessControlList accessControlList);
