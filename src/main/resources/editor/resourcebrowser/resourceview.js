@@ -22,10 +22,10 @@ steal.plugins('jquery/controller',
 		},
 		
 		_initButtons: function() {
-			$('nav.weblounge div.icons').buttonset();
-			$('button.delete').button({icons: {primary: "ui-icon-trash"}, text: false});
-			$('button.duplicate').button({icons: {primary: "ui-icon-copy"}, text: false});
-			$('button.favorize').button({icons: {primary: "ui-icon-star"}, text: false });
+			$('nav.weblounge div.wbl-icons').buttonset();
+			$('button.wbl-delete').button({icons: {primary: "ui-icon-trash"}, text: false});
+			$('button.wbl-duplicate').button({icons: {primary: "ui-icon-copy"}, text: false});
+			$('button.wbl-favorize').button({icons: {primary: "ui-icon-star"}, text: false });
 		},
 		
 		_initDialogs: function() {
@@ -69,11 +69,11 @@ steal.plugins('jquery/controller',
 		},
 		
 		_showMessage: function(messageText) {
-			$('.message').removeClass('error').addClass('success').css('visibility', 'visible').delay(3000).queue(function() {
+			$('.wbl-message').removeClass('wbl-error').addClass('wbl-success').css('visibility', 'visible').delay(3000).queue(function() {
 				$(this).empty().css('visibility', 'hidden');
 				$(this).dequeue();
 			});
-			$('.message').text(messageText);
+			$('.wbl-message').text(messageText);
 		}
 		
 	});

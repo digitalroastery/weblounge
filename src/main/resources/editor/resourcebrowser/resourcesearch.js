@@ -15,7 +15,7 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key')
 				
 				var uploader = new qq.FileUploader({
 				    // pass the dom node (ex. $(selector)[0] for jQuery users)
-				    element: document.getElementById('media-file-uploader'),
+				    element: document.getElementById('wbl-mediaFileUploader'),
 				    params: {language: this.options.language},
 					// validation    
 					// ex. ['jpg', 'jpeg', 'png', 'gif'] or []
@@ -29,8 +29,8 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key')
 						if($.isEmptyObject(response)) return;
 						this.map[id] = {resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag};
 						// TODO Tag Button
-						if(!this.element.find('#tag_button').length) {
-							this.element.find('.qq-upload-button').after('<button id="tag_button">Tag</button>');
+						if(!this.element.find('#wbl-tagButton').length) {
+							this.element.find('.qq-upload-button').after('<button id="wbl-tagButton">Tag</button>');
 						}
 				    }, this),
 				    // path to server-side upload script
@@ -38,7 +38,7 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key')
 				});
 			}
 			
-			$("input#resourceSearch").keypress($.proxy(function(ev) {
+			$("input#wbl-resourceSearch").keypress($.proxy(function(ev) {
 				if(ev.key() == '\r') {
 					ev.preventDefault();
 					if(this.options.resourceType == 'pages') {
@@ -56,8 +56,8 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key')
 	    	steal.dev.log(id + fileName);
 	    },
 	    
-	    "button#tag_button click": function(el, ev) {
-	    	$('div#tagger').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
+	    "button#wbl-tagButton click": function(el, ev) {
+	    	$('div#wbl-tagger').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
 	    }
 		
 	});

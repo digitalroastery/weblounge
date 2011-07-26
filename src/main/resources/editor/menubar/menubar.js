@@ -56,22 +56,22 @@ steal.plugins(
         _updateView: function() {
         	switch (this.options.mode) {
 	      	  case 0:
-	      		  this._toggleTab(this.find('.tab.designer'));
-	      		  this.toolbarMore = this.find('img.more').show();
-	      		  this.toolbarEdit = this.find('span.editmode').show();
-	      		  this.pageOptions = this.find('div#page_options').show();
+	      		  this._toggleTab(this.find('.wbl-tab.designer'));
+	      		  this.toolbarMore = this.find('img.wbl-more').show();
+	      		  this.toolbarEdit = this.find('span.wbl-editmode').show();
+	      		  this.pageOptions = this.find('div#wbl-pageOptions').show();
 	      		  break;
 	      	  case 1:
-	      		  this._toggleTab(this.find('.tab.pages'));
-	      		  this.toolbarMore = this.find('img.more').hide();
-	      		  this.toolbarEdit = this.find('span.editmode').hide();
-	      		  this.pageOptions = this.find('div#page_options').hide();
+	      		  this._toggleTab(this.find('.wbl-tab.wbl-pages'));
+	      		  this.toolbarMore = this.find('img.wbl-more').hide();
+	      		  this.toolbarEdit = this.find('span.wbl-editmode').hide();
+	      		  this.pageOptions = this.find('div#wbl-pageOptions').hide();
 	      		  break;
 	      	  case 2:
-	      		  this._toggleTab(this.find('.tab.media'));
-	      		  this.toolbarMore = this.find('img.more').hide();
-	      		  this.toolbarEdit = this.find('span.editmode').hide();
-	      		  this.pageOptions = this.find('div#page_options').hide();
+	      		  this._toggleTab(this.find('.wbl-tab.wbl-media'));
+	      		  this.toolbarMore = this.find('img.wbl-more').hide();
+	      		  this.toolbarEdit = this.find('span.wbl-editmode').hide();
+	      		  this.pageOptions = this.find('div#wbl-pageOptions').hide();
 	      		  break;
         	}
         },
@@ -118,10 +118,10 @@ steal.plugins(
         },
         
         _initDragDrop: function() {
-    		this.element.find("#trashcan").droppable({
+    		this.element.find("#wbl-trashcan").droppable({
     			accept: "div.pagelet",
-    			activeClass: "trashcan_active",
-    			hoverClass: "trashcan_hover",
+    			activeClass: "wbl-trashcanActive",
+    			hoverClass: "wbl-trashcanHover",
     			tolerance: "pointer",
     			drop: $.proxy(function(event, ui) {
     				ui.draggable.remove();
@@ -130,87 +130,87 @@ steal.plugins(
         },
         
         _toggleTab: function(el) {
-        	this.element.find('.tab.active').removeClass('active');
-        	el.addClass('active');
+        	this.element.find('.wbl-tab.wbl-active').removeClass('wbl-active');
+        	el.addClass('wbl-active');
         },
         
-        ".tab click": function(el, ev) {
+        ".wbl-tab click": function(el, ev) {
         	this._toggleTab(el);
         },
         
-        ".tab.designer click": function(el, ev) {
+        ".wbl-tab.wbl-designer click": function(el, ev) {
         	el.trigger('showDesigner');
         },
         
-		".tab.pages click": function(el, ev) {
+		".wbl-tab.wbl-pages click": function(el, ev) {
 			el.trigger('showPages');
 		},
 		
-		".tab.media click": function(el, ev) {
+		".wbl-tab.wbl-media click": function(el, ev) {
 			el.trigger('showMedia');
 		},
 		
-		"li.settings click": function(el, ev) {
-			$('.menu').hide();
+		"li.wbl-settings click": function(el, ev) {
+			$('.wbl-menu').hide();
 			this.userDialog.dialog('open');
 		},
 		
-		"li.news click": function(el, ev) {
+		"li.wbl-news click": function(el, ev) {
 			// TODO
 			steal.dev.log('news')
 		},
 		
-		"li.logout click": function(el, ev) {
+		"li.wbl-logout click": function(el, ev) {
 			// TODO
 			steal.dev.log('logout')
 		},
 		
-		"li.new_page click": function(el, ev) {
-			$('.menu').hide();
-			$('#pagecreator').editor_pagecreator({language: this.options.language, runtime: this.options.runtime});
+		"li.wbl-newPage click": function(el, ev) {
+			$('.wbl-menu').hide();
+			$('#wbl-pagecreator').editor_pagecreator({language: this.options.language, runtime: this.options.runtime});
 		},
 		
-		"li.new_upload click": function(el, ev) {
-			$('.menu').hide();
-			$('#massuploader').editor_massuploader({language: this.options.language, runtime: this.options.runtime});
+		"li.wbl-newUpload click": function(el, ev) {
+			$('.wbl-menu').hide();
+			$('#wbl-massuploader').editor_massuploader({language: this.options.language, runtime: this.options.runtime});
 		},
 		
-		"li.new_note click": function(el, ev) {
+		"li.wbl-newNote click": function(el, ev) {
 			// TODO
 			steal.dev.log('note')
 		},
 		
-		"li.new_pagelet click": function(el, ev) {
-			$('.menu').hide();
-			$('#pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
+		"li.wbl-newPagelet click": function(el, ev) {
+			$('.wbl-menu').hide();
+			$('#wbl-pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
 		},
 		
-		".editor_menubar span.language-menu img click": function(el, ev) {
+		"span.wbl-languageMenu img click": function(el, ev) {
 			el.trigger('changeLanguage', el.attr('title'));
 		},
 		
 		// trigger menus
-		".editor_menubar img.add click": function(el, ev) {
-			$('.menu').hide();
-			$('div#add-menu').show().hover(function() { }, function() {$(this).hide();});
+		"img.wbl-add click": function(el, ev) {
+			$('.wbl-menu').hide();
+			$('div#wbl-addMenu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
-		".editor_menubar span.language click": function(el, ev) {
-			$('.menu').hide();
-			$('span.language-menu').show().hover(function() { }, function() {$(this).hide();});
+		"span.wbl-language click": function(el, ev) {
+			$('.wbl-menu').hide();
+			$('span.wbl-languageMenu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
-		".editor_menubar img.more click": function(el, ev) {
-			$('.menu').hide();
-			$('div#more-menu').show().hover(function() { }, function() {$(this).hide();});
+		"img.wbl-more click": function(el, ev) {
+			$('.wbl-menu').hide();
+			$('div#wbl-moreMenu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
-		".editor_menubar span.profile-menu click": function(el, ev) {
-			$('.menu').hide();
-			$('div#profile-menu').show().hover(function() { }, function() {$(this).hide();});
+		"span.wbl-profileMenu click": function(el, ev) {
+			$('.wbl-menu').hide();
+			$('div#wbl-profileMenu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
-		"div#page_options click": function(el, ev) {
+		"div#wbl-pageOptions click": function(el, ev) {
 			el.toggle(function() {
 				$(this).animate({"right": "0"}, "slow")
 			}, function() {
@@ -218,26 +218,21 @@ steal.plugins(
 			});
 		},
 		
-		".editor_menubar input focus": function(el, ev) {
-			$('div#search-result').show();
+		"input focus": function(el, ev) {
+			$('div#wbl-searchResult').show();
 		},
 		
-		".editor_menubar input blur": function() {
-			$('div#search-result').hide();
+		"input blur": function() {
+			$('div#wbl-searchResult').hide();
 		},
 		
-		".div.search-result p.footer click": function() {
+		"div.wbl-searchResult p.wbl-footer click": function() {
 //			$('#editor').dialog( "option", "title", 'Suchresultate' ).dialog('open')
-			$('div.search-result').hide();
-		},
-		
-		/* move to new plugin "designer" */
-		".pagelet hover": function() {
-			$(this).addClass('hover');
+			$('div.wbl-searchResult').hide();
 		},
 		
 		// trigger editmode
-		"input#editmode click": function(el, ev) {
+		"input#wbl-editmode click": function(el, ev) {
 			if(el.is(':checked')) {
 //				el.trigger('editMode', true);
 			} else {

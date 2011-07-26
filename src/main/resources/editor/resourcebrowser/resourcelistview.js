@@ -16,7 +16,7 @@ steal.plugins('jquery/view/tmpl')
 		
 		update: function(options) {
 			this.options.resources = options.resources;
-			this.find('tr.pageEntry').remove();
+			this.find('tr.wbl-pageEntry').remove();
 			this._initViewItems();
 		},
 		
@@ -35,18 +35,18 @@ steal.plugins('jquery/view/tmpl')
 		
 		_initViewItems: function() {
 			$.each(this.options.resources,$.proxy(function(i, res) {
-				var listViewItem = this.element.find('#listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {page: res, runtime: this.options.runtime});
-				listViewItem.find('tr.pageEntry').editor_resourcelistviewitem({page: res});
+				var listViewItem = this.element.find('#wbl-listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {page: res, runtime: this.options.runtime});
+				listViewItem.find('tr.wbl-pageEntry').editor_resourcelistviewitem({page: res});
 			}, this));
 		},
 		
-		"img.settings click": function(el, ev) {
-			this.options.selectedPages = el.parents('tr.pageEntry');
+		"img.wbl-settings click": function(el, ev) {
+			this.options.selectedPages = el.parents('tr.wbl-pageEntry');
 			steal.dev.log('open settings: ' + this.options.selectedPages);
 		},
 		
-		"img.delete click": function(el, ev) {
-			this.options.selectedPages = el.parents('tr.pageEntry');
+		"img.wbl-delete click": function(el, ev) {
+			this.options.selectedPages = el.parents('tr.wbl-pageEntry');
 			if(this.options.selectedPages.length) {
 				this.deleteDialog.dialog('open');
 			} else {
@@ -55,13 +55,13 @@ steal.plugins('jquery/view/tmpl')
 			
 		},
 		
-		"img.favorite click": function(el, ev) {
-			this.element.trigger('favorizePages', [el.parents('tr.pageEntry')]);
+		"img.wbl-favorite click": function(el, ev) {
+			this.element.trigger('favorizePages', [el.parents('tr.wbl-pageEntry')]);
 			this._showMessage('Zu Favoriten hinzugefügt');
 		},
 		
-		"button.duplicate click": function(el, ev) {
-			this.options.selectedPages = this.find('tr.pageEntry input:checked').parents('tr.pageEntry');
+		"button.wbl-duplicate click": function(el, ev) {
+			this.options.selectedPages = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
 			if(this.options.selectedPages.length == 1) {
 				this.duplicateDialog.dialog('open');
 			} else if(this.options.selectedPages.length > 1) {
@@ -71,8 +71,8 @@ steal.plugins('jquery/view/tmpl')
 			}
 		},
 		
-		"button.delete click": function(el, ev) {
-			this.options.selectedPages = this.find('tr.pageEntry input:checked').parents('tr.pageEntry');
+		"button.wbl-delete click": function(el, ev) {
+			this.options.selectedPages = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
 			if(this.options.selectedPages.length) {
 				this.deleteDialog.dialog('open');
 			} else {
@@ -80,8 +80,8 @@ steal.plugins('jquery/view/tmpl')
 			}
 		},
 		
-		"button.favorize click": function(el, ev) {
-			this.options.selectedPages = this.find('tr.pageEntry input:checked').parents('tr.pageEntry');
+		"button.wbl-favorize click": function(el, ev) {
+			this.options.selectedPages = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
 			if(this.options.selectedPages.length) {
 				this.element.trigger('favorizePages', [this.options.selectedPages]);
 				this._showMessage('Zu Favoriten hinzugefügt');

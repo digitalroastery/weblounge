@@ -1,8 +1,7 @@
 /* mini-rest & general declarations */
-.editor_app * {
-  font-size: 100.01%;
-  font-family: arial,verdana,tahoma;
-  font-size: 12px;
+#weblounge-editor {
+   	font-family: arial,verdana,tahoma;
+	font-size: 12px;
 }
 
 /* global */
@@ -14,4 +13,3 @@ div.DataTables_sort_wrapper span {
 body {
   margin-top: 45px;
 }
-

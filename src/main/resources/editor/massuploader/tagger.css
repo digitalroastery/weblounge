@@ -1,18 +1,18 @@
-.editor_tagger .taggerImage {
+.editor_tagger .wbl-taggerImage {
     width: 300px;
     height: 300px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.editor_tagger .metadata {
+.editor_tagger .wbl-metadata {
 	width: 500px;
 	height: 200px;
 	margin-left: auto;
     margin-right: auto;
 }
 
-.editor_tagger div.buttonLeft {
+.editor_tagger div.wbl-buttonLeft {
 	position: absolute;
 	left: 0;
 	width: 10%;
@@ -23,7 +23,7 @@
 	cursor: pointer;
 }
 
-.editor_tagger div.buttonRight {
+.editor_tagger div.wbl-buttonRight {
 	position: absolute;
 	right: 0;
 	width: 10%;
@@ -34,6 +34,6 @@
 	cursor: pointer;
 }
 
-.editor_tagger img.copyMetadata {
+.editor_tagger img.wbl-copyMetadata {
 	cursor: pointer;
 }

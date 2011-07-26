@@ -78,7 +78,7 @@ steal.plugins('jqueryui/dialog',
     	var resultDom = $('<div></div>').html(result);
     	this._convertInputs(resultDom, pagelet);
     	
-		this.editorDialog = $('#pageleteditor').html('<form id="validate" onsubmit="return false;">' + resultDom.html() + '</form>')
+		this.editorDialog = $('#wbl-pageleteditor').html('<form id="wbl-validate" onsubmit="return false;">' + resultDom.html() + '</form>')
 		.dialog({
 			title: 'Pagelet bearbeiten',
 			width: 900,
@@ -91,8 +91,8 @@ steal.plugins('jqueryui/dialog',
 					$(this).dialog('close');
 				},
 				OK: $.proxy(function () {
-					this.editorDialog.find("form#validate").submit();
-					if(!this.editorDialog.find("form#validate").valid()) return;
+					this.editorDialog.find("form#wbl-validate").submit();
+					if(!this.editorDialog.find("form#wbl-validate").valid()) return;
 					var newPagelet = this._updatePageletValues(pagelet);
 					
 					// Render site
@@ -111,7 +111,7 @@ steal.plugins('jqueryui/dialog',
 				this.editorDialog.dialog('destroy');
 			}, this)
 		});
-		this.editorDialog.find("form#validate").validate();
+		this.editorDialog.find("form#wbl-validate").validate();
     },
     
     /**
@@ -238,15 +238,16 @@ steal.plugins('jqueryui/dialog',
     
 	'hoverenter': function(ev, hover) {
 		if(!this.showHover) return;
-		this.hallo = this.element.append('<img class="icon_editing" src="/weblounge/editor/composer/resources/icon_editing.png" />');
+		this.element.append('<img class="wbl-iconEditing" src="' + this.options.composer.runtime.getRootPath() + 
+				'/editor/composer/resources/icon_editing.png" />');
     },
     
 	'hoverleave': function(ev, hover) {
 		if(!this.showHover) return;
-		this.element.find('img.icon_editing').remove();
+		this.element.find('img.wbl-iconEditing').remove();
     },
 
-	'img.icon_editing click': function(ev) {
+	'img.wbl-iconEditing click': function(ev) {
 		Workbench.findOne({ id: this.options.composer.page.value.id, composer: this.options.composer.id, pagelet: this.element.index() }, this.callback('_openPageEditor'));
 	}
 

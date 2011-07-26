@@ -14,7 +14,7 @@ steal.plugins().then(function($) {
     init: function(el) {
     },
     
-	"a.pagePath click": function(el, ev) {
+	"a.wbl-pagePath click": function(el, ev) {
 		ev.preventDefault();
 		el.trigger('openDesigner');
 	}

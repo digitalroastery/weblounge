@@ -27,9 +27,9 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
 			this._loadCurrentLanguage();
 			this._loadValidateLanguage();
 			
-			this.menuBar = this.find('#menubar').editor_menubar({runtime: this.runtime, language: this.options.language});
-            this.pagesTab = this.find('#pagebrowser');
-            this.mediaTab = this.find('#mediabrowser');
+			this.menuBar = this.find('#wbl-menubar').editor_menubar({runtime: this.runtime, language: this.options.language});
+            this.pagesTab = this.find('#wbl-pagebrowser');
+            this.mediaTab = this.find('#wbl-mediabrowser');
             this._initTab();
             this._loadPage();
         },

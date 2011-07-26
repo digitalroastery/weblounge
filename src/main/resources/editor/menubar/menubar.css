@@ -14,24 +14,25 @@
     z-index: 99;
 }
 
-.editor_menubar a.tab {
+.editor_menubar a.wbl-tab {
     border-left: 1px solid transparent;
     border-right: 1px solid transparent;
     color: #FFFFFF;
     margin: 0 1px;
     padding: 15px 15px;
+    font-size: 12px;
     text-decoration: none;
 }
 
-.editor_menubar a.tab.active,
-.editor_menubar a.tab:hover {
+.editor_menubar a.wbl-tab.wbl-active,
+.editor_menubar a.wbl-tab:hover {
     background-color: #2C2C2D;
     background-image: -moz-linear-gradient(left center , #323232 0%, #454444 50%, #323232 100%);
     border-left: 1px solid #464647;
     border-right: 1px solid #464647;
 }
 
-.editor_menubar input[type="search"], nav.icons input[type="text"] {
+.editor_menubar input[type="search"], nav.wbl-icons input[type="text"] {
     border-left: 0 none;
     background: #000 url('images/lupe.png') no-repeat 3px right;
     border-radius: 6px 6px 6px 6px;
@@ -41,12 +42,12 @@
     padding: 5px;
 }
 
-.editor_menubar .right {
+.editor_menubar .wbl-right {
     float: right;
     margin-right: 10px;
 }
 
-.editor_menubar .triangle-down {
+.editor_menubar .wbl-triangleDown {
 	position: relative;
 	top: 10px;
 	margin: 0 5px;
@@ -57,7 +58,7 @@
 	width: 10px;
 }
 
-.editor_menubar .triangle-up {
+.editor_menubar .wbl-triangleUp {
 	border-color: transparent transparent #fff transparent;
 	border-style: solid;
 	border-width: 5px;
@@ -70,32 +71,32 @@
 }
 
 .editor_menubar img,
-.editor_menubar .language,
-.editor_menubar .profile-menu,
-div.overlay_icons span.more {
+.editor_menubar .wbl-language,
+.editor_menubar .wbl-profileMenu,
+div.wbl-overlayIcons span.wbl-more {
 	cursor: pointer;
 }
 
-.editor_menubar img.user {
+.editor_menubar img.wbl-user {
 	position: relative;
 	top: 8px;
 	padding-right: 5px;
 }
 
-.editor_menubar img.add {
+.editor_menubar img.wbl-add {
 	position: relative;
 	top: 8px;
 	padding: 0 30px;
 }
 
-.editor_menubar img.more {
+.editor_menubar img.wbl-more {
 	position: relative;
 	top: 8px;
 	padding: 0 30px;
 }
 
 /* menu */
-.editor_menubar .menu {
+.editor_menubar .wbl-menu {
 	display: none;
 	background-color: #242F37;
 	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
@@ -107,34 +108,34 @@ div.overlay_icons span.more {
     z-index: 2;
 }
 
-.editor_menubar .menu ul {
+.editor_menubar .wbl-menu ul {
 	list-style: none;
 	margin-top: -2em;
 	color: #fff;
 }
-.editor_menubar .menu ul li:hover {
+.editor_menubar .wbl-menu ul li:hover {
 	color: red;
 	cursor: pointer;
 }
-.editor_menubar .menu ul li.inactive,
-.editor_menubar .menu ul li.inactive:hover {
+.editor_menubar .wbl-menu ul li.inactive,
+.editor_menubar .wbl-menu ul li.inactive:hover {
 	color: #999;
 	cursor: default;
 }
 
-.editor_menubar #add-menu {
+.editor_menubar #wbl-addMenu {
 	position: absolute;
 	top: 55px;
     left: 220px;
 }
 
-.editor_menubar #more-menu {
+.editor_menubar #wbl-moreMenu {
 	position: absolute;
 	top: 55px;
     left: 310px;
 }
 
-.editor_menubar #trashcan {
+.editor_menubar #wbl-trashcan {
 	position: relative;
 	left: 100px;
 	padding: 10px 50px;
@@ -143,37 +144,37 @@ div.overlay_icons span.more {
 	visibility: hidden;
 }
 
-.editor_menubar .trashcan_hover {
+.editor_menubar .wbl-trashcanHover {
 	background: url('images/trashcan_hover.png') no-repeat center !important;
 }
 
-.editor_menubar .trashcan_active {
+.editor_menubar .wbl-trashcanActive {
 	visibility: visible !important;
 }
 
-.editor_menubar #profile-menu {
+.editor_menubar #wbl-profileMenu {
 	position: absolute;
 	top: 55px;
 	right: 10px;
 }
 
-.editor_menubar .language {
+.editor_menubar .wbl-language {
 	position: absolute;
 	top: 15px;
 	right: 500px;
 }
 
-.editor_menubar .language-menu {
+.editor_menubar .wbl-languageMenu {
 	position: absolute;
 	right: 400px;
 	display: none;
 }
 
-.editor_menubar #profile-menu span.triangle-up {
+.editor_menubar #wbl-profileMenu span.wbl-triangleUp {
 	left: 180px;
 }
 
-.editor_menubar div#search-result {
+.editor_menubar div#wbl-searchResult {
 	display: none;
 	width: 500px;
 	height: 400px;
@@ -186,39 +187,39 @@ div.overlay_icons span.more {
 	z-index: 2;
 }
 
-.editor_menubar div#search-result span {
+.editor_menubar div#wbl-searchResult span {
 	display: block;
 	float: right;
 	width: 300px;
 	padding-left: 25px;
 }
 
-.editor_menubar div#search-result p {
+.editor_menubar div#wbl-searchResult p {
 	line-height: 20px;
 	padding: 5px 10px;
 }
 
-.editor_menubar div#search-result p:hover {
+.editor_menubar div#wbl-searchResult p:hover {
 	background-color: #000;	
 }
 
-.editor_menubar div#search-result p.section {
+.editor_menubar div#wbl-searchResult p.wbl-section {
 	border-top: 1px solid #999;
 }
 
-.editor_menubar div#search-result p.section:first-child {
+.editor_menubar div#wbl-searchResult p.wbl-section:first-child {
 	border: 0 !important;
 }
 
-.editor_menubar div#search-result span.pdf {
+.editor_menubar div#wbl-searchResult span.wbl-pdf {
 	background: url('images/search_result_pdf.png') no-repeat;
 }
 
-.editor_menubar div#search-result span.website {
+.editor_menubar div#wbl-searchResult span.wbl-website {
 	background: url('images/search_result_page.png') no-repeat;
 }
 
-.editor_menubar div#search-result p.footer {
+.editor_menubar div#wbl-searchResult p.wbl-footer {
 	border-top: 1px solid #999;
 	color: #999;
 	clear: both;
@@ -230,25 +231,16 @@ div.overlay_icons span.more {
 	cursor: pointer;
 }
 
-.editor_menubar nav.weblounge {
-	position: relative;
-	height: 30px;
-	line-height: 30px;
-	text-align: left;
-	padding: 10px 5px;
-	padding: 10px 0;
-}
-
-.editor_menubar .align_left {
+.editor_menubar .wbl-alignLeft {
 	float: left;
 }
 
-.editor_menubar .align_center {
+.editor_menubar .wbl-alignCenter {
 	margin: 0 auto;
 	text-align: center;
 }
 
-.editor_menubar .align_right {
+.editor_menubar .wbl-alignRight {
 	float: right;
 }
 

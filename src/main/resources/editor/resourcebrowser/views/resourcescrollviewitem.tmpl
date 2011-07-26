@@ -1,10 +1,10 @@
-<div class="scrollviewitem page" id="${page.id}">
-	<img src="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview" alt="" class="page_thumbnail" />
+<div class="wbl-scrollViewItem wbl-page" id="${page.id}">
+	<img src="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview" alt="" class="wbl-pageThumbnail" />
 	<h2>${page.head.metadata.title.de}</h2>
 	<p>
 		Created by ${page.head.created.user.name}<br />
 		Updated by ${page.head.modified.user.name}<br />
 		Tags: {{each page.head.metadata.subject}} ${$value}, {{/each}}<br/>
-		URL: <a href="${page.path}" class="pagePath" title="Gehe zu Seite">${page.path}</a>
+		URL: <a href="${page.path}" class="wbl-pagePath" title="Gehe zu Seite">${page.path}</a>
 	</p>
 </div>

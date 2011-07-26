@@ -38,11 +38,11 @@ steal.plugins('jquery',
 	    	
 			$(el).html('//editor/pageletcreator/views/init.tmpl', {modules: modules, favorites: favorites});
 			
-			var tabs = $("#module_tabs").tabs();
+			var tabs = $("#wbl-moduleTabs").tabs();
 			
 			var tab_items = $("ul:first li:first", tabs).droppable({
-				accept: ".draggable",
-				hoverClass: "tab_hover",
+				accept: ".wbl-draggable",
+				hoverClass: "wbl-tabHover",
 				tolerance: 'pointer',
 				drop: function(event, ui) {
 					var item = $(this);
@@ -75,18 +75,18 @@ steal.plugins('jquery',
 	    },
 	    
 	    _updateDraggable: function() {
-			this.element.find('.draggable').draggable({
+			this.element.find('.wbl-draggable').draggable({
 				connectToSortable: ".composer",
 				helper: "clone",
 				revert: "invalid",
 				cursor: 'move',
 				cursorAt: { top: -8, left: -10 },
 				start: function(e, ui) {
-					$(ui.helper).removeClass('draggable');
-					$(ui.helper).addClass('draggable_helper');
+					$(ui.helper).removeClass('wbl-draggable');
+					$(ui.helper).addClass('wbl-draggableHelper');
 				},
 				stop: function(e, ui) {
-			    	$('.composer').addClass('nojQuery');
+			    	$('.composer').addClass('wbl-nojQuery');
 			    	$('.composer').find('div.pagelet').editor_pagelet('enable');
 				}
 			}).disableSelection();
@@ -94,9 +94,9 @@ steal.plugins('jquery',
 	    
 	    _loadContent: function(module) {
 	    	this.options.runtime.getModulePagelets(module, $.proxy(function(pagelets) {
-	    		var tabContent = $("#tabcontent").empty();
+	    		var tabContent = $("#wbl-tabContent").empty();
 	    		$.each(pagelets, function(key, pagelet) {
-	    			tabContent.append('<div id="' + pagelet.id + '" class="draggable ui-widget-content" module="' + module + '">' + pagelet.id + '</div>');
+	    			tabContent.append('<div id="' + pagelet.id + '" class="wbl-draggable ui-widget-content" module="' + module + '">' + pagelet.id + '</div>');
 	    		});
 	    		this._updateDraggable();
 	    	}, this));
@@ -107,7 +107,7 @@ steal.plugins('jquery',
 	    	this._loadContent(el.attr('id'));
 	    },
 	    
-	    "a.tab_close click": function(el, ev) {
+	    "a.wbl-tabClose click": function(el, ev) {
 	    	this.element.hide();
 	    	$("body").css("margin-top","45px");
 	    }

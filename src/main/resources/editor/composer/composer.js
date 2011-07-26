@@ -20,20 +20,20 @@ steal.plugins('jquery/controller','jqueryui/sortable')
      */
     init: function(el) {
       this.id = this.element.attr('id');
-      this.element.addClass('nojQuery');
+      this.element.addClass('wbl-nojQuery');
       
       // init jQuery UI sortable plugin to support drag'n'drop of pagelets
       $(el).sortable({
         connectWith: this.options.connectWith,
         distance: 15,
-        placeholder: "pagelet-placeholder",
+        placeholder: "wbl-pageletPlaceholder",
         items: 'div.pagelet',
         tolerance: 'pointer',
         cursor: 'move',
         cursorAt: { top: -8, left: -10 },
         revert: true,
         start: $.proxy(function(event, ui) {
-        	this.element.find('img.icon_editing').remove();
+        	this.element.find('img.wbl-iconEditing').remove();
         	
         	// add pageletData to draggable helper
         	var index = ui.item.attr('index');
@@ -58,7 +58,7 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         	var pagelets = jQuery.extend(true, [], page.getComposer(composerId).pagelets);
         	
         	// Insert new pagelet to composer
-            if(ui.item.hasClass('draggable')) {
+            if(ui.item.hasClass('wbl-draggable')) {
             	var newPagelet = {};
             	newPagelet.id = ui.item.attr('id');
             	newPagelet.module = ui.item.attr('module')
@@ -98,7 +98,7 @@ steal.plugins('jquery/controller','jqueryui/sortable')
       });
       
       if(this.element.hasClass('empty')) {
-    	  this.element.append('<a class="add-pagelet" />');
+    	  this.element.append('<a class="wbl-addPagelet" />');
     	  return;
       }
       
@@ -116,12 +116,12 @@ steal.plugins('jquery/controller','jqueryui/sortable')
     update: function() {
     	var pagelets = this.element.find('div.pagelet');
     	if(!pagelets.length) {
-    		this.element.append('<a class="add-pagelet" />');
+    		this.element.append('<a class="wbl-addPagelet" />');
     		this.element.addClass('empty');
     		return;
     	}
 		this.element.removeClass('empty');
-		this.element.find('a.add-pagelet').remove();
+		this.element.find('a.wbl-addPagelet').remove();
 		
     	pagelets.editor_pagelet({
         composer: {
@@ -134,17 +134,17 @@ steal.plugins('jquery/controller','jqueryui/sortable')
     },
     
     _enablePagelets: function() {
-    	$('.composer').addClass('nojQuery');
+    	$('.composer').addClass('wbl-nojQuery');
     	$('.composer').find('div.pagelet').editor_pagelet('enable');
     },
     
     _disablePagelets: function() {
-    	$('.composer').removeClass('nojQuery');
+    	$('.composer').removeClass('wbl-nojQuery');
     	$('.composer').find('div.pagelet').editor_pagelet('disable');
     },
     
-    "a.add-pagelet click": function(el, ev) {
-    	$('#pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
+    "a.wbl-addPagelet click": function(el, ev) {
+    	$('#wbl-pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
     }
     
   });

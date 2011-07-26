@@ -2,12 +2,7 @@
 	min-height: 50px;
 }
 
-.editor_composer .empty {
-	position: relative;
-	border: 1px solid black;
-}
-
-.editor_composer a.add-pagelet {
+.editor_composer a.wbl-addPagelet {
 	cursor: pointer;
 	background: url("../menubar/images/menu_add.png") center center no-repeat ;
 	display: inline-block;
@@ -18,7 +13,7 @@
   	height:24px;
 }
 
-.editor_composer img.icon_editing {
+.editor_composer img.wbl-iconEditing {
 	cursor: pointer;
 	display: inline-block;
 	position:absolute;
@@ -31,30 +26,22 @@
 	background-color: white;
 }
 
-.editor_composer .pagelet-placeholder {
+.editor_composer .wbl-pageletPlaceholder {
     border: 2px dashed black;
     color: #363636;
 	height: 1.5em; line-height: 1.2em;
 }
 
-.editor_composer div.pagelet {
-	position:relative;
-}
-
-.editor_composer div.pagelet-editor {
-	display: none;
-}
-
-.editor_composer div.pagelet-editor {
-    display: none;
-}
-
-.editor_composer div.pagelet-editor a {
-    display: inline !important;
-    padding: 0 !important;
-}
-
-.editor_composer.nojQuery div.pagelet:hover {
+.editor_composer.wbl-nojQuery div.pagelet:hover {
     background-color: #CCCCCC;
     opacity: 0.5;
-}	
+}
+
+div.composer.empty {
+	position: relative;
+	border: 1px solid black;
+}
+
+div.pagelet {
+	position:relative;
+}

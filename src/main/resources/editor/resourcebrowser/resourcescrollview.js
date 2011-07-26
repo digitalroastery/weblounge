@@ -17,12 +17,12 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		
 		update: function(options) {
 			this.options.resources = options.resources;
-			this.find('div.scrollviewitem').remove();
+			this.find('div.wbl-scrollviewitem').remove();
 			this._initViewItems();
 		},
 		
 		_initSmoothDivScroll: function() {
-			this.find('#makeMeScrollable').smoothDivScroll({
+			this.find('#wbl-makeMeScrollable').smoothDivScroll({
 			  	autoScroll: "onstart" , 
 				autoScrollDirection: "backandforth", 
 				autoScrollStep: 1, 
@@ -34,12 +34,12 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		_initViewItems: function() {
 			$.each(this.options.resources, $.proxy(function (i, res) {
 				var scrollViewItem = this.element.find('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {page: res, language: this.options.language});
-				scrollViewItem.find('div.scrollviewitem').editor_resourcescrollviewitem({page: res});
+				scrollViewItem.find('div.wbl-scrollViewItem').editor_resourcescrollviewitem({page: res});
 			}, this));
 		},
 		
-		"button.duplicate click": function(el, ev) {
-			this.options.selectedPages = this.find('div.editor_resourcescrollviewitem.marked');
+		"button.wbl-duplicate click": function(el, ev) {
+			this.options.selectedPages = this.find('div.wbl-resourceScrollViewItem.wbl-marked');
 			if(this.options.selectedPages.length == 1) {
 				this.duplicateDialog.dialog('open');
 			} else if(this.options.selectedPages.length > 1) {
@@ -49,8 +49,8 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 			}
 		},
 		
-		"button.delete click": function(el, ev) {
-			this.options.selectedPages = this.find('div.editor_resourcescrollviewitem.marked');
+		"button.wbl-delete click": function(el, ev) {
+			this.options.selectedPages = this.find('div.wbl-resourceScrollViewItem.wbl-marked');
 			if(this.options.selectedPages.length) {
 				this.deleteDialog.dialog('open');
 			} else {
@@ -58,8 +58,8 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 			}
 		},
 		
-		"button.favorize click": function(el, ev) {
-			this.options.selectedPages = $('div.editor_resourcescrollviewitem.marked');
+		"button.wbl-favorize click": function(el, ev) {
+			this.options.selectedPages = $('div.wbl-resourceScrollViewItem.wbl-marked');
 			if(this.options.selectedPages.length) {
 				this.options.selectedPages.trigger('favorizePages', [this.options.selectedPages]);
 				this._showMessage('Zu Favoriten hinzugefügt');

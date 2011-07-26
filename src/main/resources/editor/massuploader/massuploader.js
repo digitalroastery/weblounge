@@ -65,7 +65,7 @@ steal.plugins('jquery',
 			
 			var uploader = new qq.FileUploader({
 			    // pass the dom node (ex. $(selector)[0] for jQuery users)
-			    element: document.getElementById('file-uploader'),
+			    element: document.getElementById('wbl-fileUploader'),
 			    params: {language: this.options.language},
 				// validation    
 				// ex. ['jpg', 'jpeg', 'png', 'gif'] or []
@@ -85,11 +85,11 @@ steal.plugins('jquery',
 			    action: '/system/weblounge/files/uploads'
 			});
 			
-			this.divScroll = this.element.find('div#makeMeScrollableImage').smoothDivScroll({
+			this.divScroll = this.element.find('div#wbl-makeMeScrollableImage').smoothDivScroll({
 			  	autoScroll: "onstart" ,
 				autoScrollDirection: "backandforth", 
 				autoScrollStep: 1, 
-				scrollableArea:	"div.scrollableImageArea",
+				scrollableArea:	"div.wbl-scrollableImageArea",
 				autoScrollInterval: 15,
 				visibleHotSpots: "always"
 		  	});
@@ -120,7 +120,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    _openTagDialog: function() {
-	    	$('div#tagger').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
+	    	$('div#wbl-tagger').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
 	    },
 	    
         _loadImage: function(url, id) {
@@ -128,15 +128,15 @@ steal.plugins('jquery',
         		var divScroll = this.divScroll;
         		var image = new jsu.PreloadImage({
         			url: url,
-        			containerId: "previewImageContainer",
+        			containerId: "wbl-previewImageContainer",
         			onLoad: function(img_data) {
         				var element = image.getElement();
-        				$(element).wrap('<div class="previewImage" />');
+        				$(element).wrap('<div class="wbl-previewImage" />');
         				image.setSize(200, -1);
         				divScroll.smoothDivScroll('recalculateScrollableArea');
         			    $(element).bind('hoverinit', function(el, hover){
         			    	hover.leave(500); //wait until the mouse leaves for 1/2 a second
-        			    	$(element).parent().append('<a class="removeButton" />');
+        			    	$(element).parent().append('<a class="wbl-removeButton" />');
         			    }).bind('hoverleave', function(){
         			    	if($(element).next()[0].tagName == "A") {
         			    		$(element).next().remove();
@@ -147,7 +147,7 @@ steal.plugins('jquery',
             }
         },
         
-        "a.removeButton click": function(el, ev) {
+        "a.wbl-removeButton click": function(el, ev) {
         	var index = el.parent().index();
         	el.parent().remove();
         	this._deleteFile(this.map[index].resourceId);

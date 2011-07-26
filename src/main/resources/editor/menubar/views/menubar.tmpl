@@ -1,50 +1,50 @@
 <span style="width:50px; display:inline-block">&nbsp;</span>
-<a name="designer" class="tab designer active" href="#designer">Designer</a>
-<a name="pages" class="tab pages" href="#pages">Pages</a>
-<a name="media" class="tab media" href="#media">Media</a>
+<a name="designer" class="wbl-tab wbl-designer wbl-active" href="#wbl-designer">Designer</a>
+<a name="pages" class="wbl-tab wbl-pages" href="#wbl-pages">Pages</a>
+<a name="media" class="wbl-tab wbl-media" href="#wbl-media">Media</a>
 
-<img src="${runtime.getRootPath()}/editor/menubar/images/menu_add.png" class="add" title="Neue Seite..." alt="Neue Seite..." />
-<img src="${runtime.getRootPath()}/editor/menubar/images/menu_more.png" class="more" title="Weitere Befehle..." alt="Weitere Befehle..." />
+<img src="${runtime.getRootPath()}/editor/menubar/images/menu_add.png" class="wbl-add" title="Neue Seite..." alt="Neue Seite..." />
+<img src="${runtime.getRootPath()}/editor/menubar/images/menu_more.png" class="wbl-more" title="Weitere Befehle..." alt="Weitere Befehle..." />
 
-<span class="editmode">
-	<input type="checkbox" name="editmode" value="" id="editmode"> Editiermodus</input>
+<span class="wbl-editmode">
+	<input type="checkbox" name="editmode" value="" id="wbl-editmode"> Editiermodus</input>
 </span>
 
-<span id="trashcan"></span>
+<span id="wbl-trashcan"></span>
 
-<span class="language">
+<span class="wbl-language">
 	<img src='${runtime.getRootPath()}/editor/resources/flags/${current}.png' title='${current}'/>
 </span> 
 
-<span class="language-menu">
+<span class="wbl-languageMenu">
 	{{each runtime.getLanguages()}}
 		<img src="${runtime.getRootPath()}/editor/resources/flags/${$value.language}.png" alt="${$value.language}" title="${$value.language}" />
     {{/each}}
 </span>
 
-<span class="right">
+<span class="wbl-right">
 	<input type="search" name="search" placeholder="Suchen..." />
-	<span class="profile-menu">
-		<img src="${runtime.getRootPath()}/editor/menubar/images/user.png" class="user" alt="" />
-		<span id="user">${runtime.getUserName()}</span>
+	<span class="wbl-profileMenu">
+		<img src="${runtime.getRootPath()}/editor/menubar/images/user.png" class="wbl-user" alt="" />
+		<span id="wbl-user">${runtime.getUserName()}</span>
 		<span>&#x25BC;</span>
 	</span>
 </span>
 
-<div id="add-menu" class="menu">
-	<span class="triangle-up"></span>
+<div id="wbl-addMenu" class="wbl-menu">
+	<span class="wbl-triangleUp"></span>
 	<ul>
-		<li class="new_page">Neue Seite erstellen</li>
-		<li class="new_upload">Neues Medium hochladen</li>
-		<li class="new_note">Neue Notiz erstellen</li>
-		<li class="new_pagelet">Pagelet Toolbar</li>
+		<li class="wbl-newPage">Neue Seite erstellen</li>
+		<li class="wbl-newUpload">Neues Medium hochladen</li>
+		<li class="wbl-newNote">Neue Notiz erstellen</li>
+		<li class="wbl-newPagelet">Pagelet Toolbar</li>
 	</ul>
 </div>
 
-<div id="more-menu" class="menu">
-	<span class="triangle-up"></span>
+<div id="wbl-moreMenu" class="wbl-menu">
+	<span class="wbl-triangleUp"></span>
 	<ul>
-		<li class="pageinfo">Seiten-Eigenschaften</li>
+		<li class="wbl-pageSettings">Seiten-Eigenschaften</li>
 		<li>Als Favorit kennzeichnen</li>
 		<li>Seite duplizieren</li>
 		<li>Publizieren...</li>
@@ -54,18 +54,18 @@
 	</ul>
 </div>
 
-<div id="profile-menu" class="menu">
-	<span class="triangle-up"></span>
+<div id="wbl-profileMenu" class="wbl-menu">
+	<span class="wbl-triangleUp"></span>
 	<ul>
-		<li class="settings">Einstellungen</li>
-		<li class="news">Nachrichten</li>
-		<li class="logout">Logout</li>
+		<li class="wbl-userSettings">Einstellungen</li>
+		<li class="wbl-news">Nachrichten</li>
+		<li class="wbl-logout">Logout</li>
 	</ul>
 </div>
 
-<div id="search-result">
-	<p class="section">Webseiten <span class="website">\home\schiedsrichter\</span></p>
-	<p class="section">Dokumente <span class="documents pdf">Kursaufgebot R1</span></p>
-	<p>&nbsp;<span class="documents pdf">Kursaufgebot R2</span></p>
-	<p class="footer">Weitere Resultate...</p>
+<div id="wbl-searchResult">
+	<p class="wbl-section">Webseiten <span class="wbl-website">\home\schiedsrichter\</span></p>
+	<p class="wbl-section">Dokumente <span class="wbl-documents pdf">Kursaufgebot R1</span></p>
+	<p>&nbsp;<span class="wbl-documents wbl-pdf">Kursaufgebot R2</span></p>
+	<p class="wbl-footer">Weitere Resultate...</p>
 </div>

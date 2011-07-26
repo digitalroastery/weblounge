@@ -1,15 +1,15 @@
-<div id="module_tabs">
+<div id="wbl-moduleTabs">
 	<ul>
-		<li><a id="favorites" href="#module_favorites">Favoriten</a></li>
+		<li><a id="wbl-favorites" href="#wbl-moduleFavorites">Favoriten</a></li>
 		{{each modules}}
-			<li><a id="${$value.id}" href="#tabcontent">${$value.name}</a></li>
+			<li><a id="${$value.id}" href="#wbl-tabContent">${$value.name}</a></li>
     	{{/each}}
 	</ul>
-	<a class="tab_close" href="#" role="button"></a>
-	<div id="module_favorites">
+	<a class="wbl-tabClose" href="#" role="button"></a>
+	<div id="wbl-moduleFavorites">
 	{{each favorites}}
-		<div id="${$value.name}" class="draggable ui-widget-content" module="${$value.module}" style="display: block;">${$value.name}</div>
+		<div id="${$value.name}" class="wbl-draggable ui-widget-content" module="${$value.module}" style="display: block;">${$value.name}</div>
 	{{/each}}
 	</div>
-	<div id="tabcontent"></div>
+	<div id="wbl-tabContent"></div>
 </div>

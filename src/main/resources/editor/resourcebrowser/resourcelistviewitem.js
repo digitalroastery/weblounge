@@ -12,12 +12,12 @@ steal.plugins('jquery/controller',
 
 		},
 		
-		"td.action hoverenter": function(el, ev) {
+		"td.wbl-action hoverenter": function(el, ev) {
 			el.find('img').show();
 		},
 		
-		"td.action hoverleave": function(el, ev) {
-			el.find('img').not('.settings').hide();
+		"td.wbl-action hoverleave": function(el, ev) {
+			el.find('img').not('.wbl-settings').hide();
 		}
 		
 	});

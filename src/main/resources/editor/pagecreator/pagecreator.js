@@ -29,26 +29,26 @@ steal.plugins('jquery',
 			
 			this.element.html('//editor/pagecreator/views/init.tmpl', {pages: pages, options: this.options.runtime.getSiteLayouts(), language: this.options.language});
 			
-			this.scrollView = this.find('div.thumbnailView').show();
-			this.listView = this.find('div.listView').hide();
-			this.treeView = this.find('div.treeView').hide();
+			this.scrollView = this.find('div.wbl-thumbnailView').show();
+			this.listView = this.find('div.wbl-listView').hide();
+			this.treeView = this.find('div.wbl-treeView').hide();
 			this.view = this.scrollView;
 			
-			var step1 = this.element.find('div#pagecreator_step1').show();
-			var step2 = this.element.find('div#pagecreator_step2').hide();
+			var step1 = this.element.find('div#wbl-pagecreatorStep1').show();
+			var step2 = this.element.find('div#wbl-pagecreatorStep2').hide();
 			
 			
 			// Buttons
-			this.element.find('button.list').button({
-				icons: {primary: "icon-list"},
+			this.element.find('button.wbl-list').button({
+				icons: {primary: "wbl-iconList"},
 				text: false });
-			this.element.find('button.tree').button({
-				icons: {primary: "icon-tree"},
+			this.element.find('button.wbl-tree').button({
+				icons: {primary: "wbl-iconTree"},
 				disabled: false,
 				text: false });
-			this.element.find('button.thumbnails').button({
+			this.element.find('button.wbl-thumbnails').button({
 				disabled: false,
-				icons: {primary: "icon-thumbnails"},
+				icons: {primary: "wbl-iconThumbnails"},
 				text: false });
 			
 			// TableView
@@ -63,7 +63,7 @@ steal.plugins('jquery',
 			});
 			
 			// ThumbnailView
-			var divScroll = this.element.find('#makeMeScrollablePageCreator').smoothDivScroll({
+			var divScroll = this.element.find('#wbl-makeMeScrollablePageCreator').smoothDivScroll({
 			  	autoScroll: "onstart" ,
 				autoScrollDirection: "backandforth", 
 				autoScrollStep: 1, 
@@ -72,7 +72,7 @@ steal.plugins('jquery',
 		  	});
 			
 			// TreeView
-			this.element.find("#tree").treeview({
+			this.element.find("#wbl-tree").treeview({
 				collapsed: true
 			});
 			
@@ -129,10 +129,10 @@ steal.plugins('jquery',
 							return;
 						}
 						
-						this.element.find("form#validate").submit();
-						if(!this.element.find("form#validate").valid()) return;
+						this.element.find("form#wbl-validate").submit();
+						if(!this.element.find("form#wbl-validate").valid()) return;
 						
-						$.each(this.element.find('form#validate :input'), function(i, input) {
+						$.each(this.element.find('form#wbl-validate :input'), function(i, input) {
 							pageData[$(input).attr('name')] = $(input).val();
 						});
 						
@@ -161,7 +161,7 @@ steal.plugins('jquery',
 			
 			this.step = step1;
 			this.nextButton = this.element.parent().find(".ui-dialog-buttonpane span.ui-button-text:contains('Weiter')");
-			this.element.find("form#validate").validate();
+			this.element.find("form#wbl-validate").validate();
 		},
 		
 	    update: function(options) {
@@ -181,29 +181,29 @@ steal.plugins('jquery',
 	    	step.show();
 	    },
 	    
-		"button.list click": function(el, ev) {
+		"button.wbl-list click": function(el, ev) {
 			this._showView(this.listView);
 		},
 		
-		"button.tree click": function(el, ev) {
+		"button.wbl-tree click": function(el, ev) {
 			this._showView(this.treeView);
 		},
 		
-		"button.thumbnails click": function(el, ev) {
+		"button.wbl-thumbnails click": function(el, ev) {
 			this._showView(this.scrollView);
 		},
 		
 		".filetree span.file click": function(el, ev) {
-			if(this.active) this.active.removeClass('active');
+			if(this.active) this.active.removeClass('wbl-active');
 			this.active = el;
-			el.addClass('active');
+			el.addClass('wbl-active');
 			this.parent = el.text();
 		},
 		
-		"div.page click": function(el, ev) {
-			if(this.active) this.active.removeClass('active');
+		"div.wbl-page click": function(el, ev) {
+			if(this.active) this.active.removeClass('wbl-active');
 			this.active = el;
-			el.addClass('active');
+			el.addClass('wbl-active');
 			this.parent = el.attr('id');
 		},
 		

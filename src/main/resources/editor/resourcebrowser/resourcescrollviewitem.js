@@ -9,7 +9,7 @@ steal.plugins('jquery/controller', 'jquery/event', 'jquery/controller/view')
 		},
 		
 		"click": function(el, ev) {
-			el.toggleClass('marked');
+			el.toggleClass('wbl-marked');
 		}
 		
 	});

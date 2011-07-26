@@ -22,8 +22,8 @@ steal.plugins('jquery',
 		 */
 		init: function(el) {
 			$(el).html('//editor/massuploader/views/tagger.tmpl', {map : this.options.map, language: this.options.language, runtime: this.options.runtime});
-			this.img = this.element.find('.taggerImage img:first').show();
-			this.element.find('div.buttonLeft:first').hide();
+			this.img = this.element.find('.wbl-taggerImage img:first').show();
+			this.element.find('div.wbl-buttonLeft:first').hide();
 			
 			this.index = 1;
 			
@@ -32,7 +32,7 @@ steal.plugins('jquery',
 			this._loadMetadata();
 			
 			if(this.options.map.length < 2) {
-				this.element.find('div.buttonRight:first').hide();
+				this.element.find('div.wbl-buttonRight:first').hide();
 			}
 			
 			var availableTags = ["ActionScript","Scheme"];
@@ -111,7 +111,7 @@ steal.plugins('jquery',
 	    	
 	    	// show metadata
 			$.each(this.metadata[index], $.proxy(function(key, value) {
-				this.element.find('div.metadata input[name=' + key + ']').val(value);
+				this.element.find('div.wbl-metadata input[name=' + key + ']').val(value);
 			},this));
 	    },
 	    
@@ -122,23 +122,23 @@ steal.plugins('jquery',
 	    	},this));
 	    },
 	    
-	    "div.metadata input[name=title] change": function(el, ev) {
+	    "div.wbl-metadata input[name=title] change": function(el, ev) {
 	    	this._saveMetadata(this.img.index(), {title: el.val()});
 	    },
 	    
-	    "div.metadata input[name=description] change": function(el, ev) {
+	    "div.wbl-metadata input[name=description] change": function(el, ev) {
 	    	this._saveMetadata(this.img.index(), {description: el.val()});
 	    },
 	    
-	    "div.metadata input[name=tags] change": function(el, ev, test) {
+	    "div.wbl-metadata input[name=tags] change": function(el, ev, test) {
 	    	this._saveMetadata(this.img.index(), {tags: el.val()});
 	    },
 	    
-	    "div.metadata input[name=author] change": function(el, ev) {
+	    "div.wbl-metadata input[name=author] change": function(el, ev) {
 	    	this._saveMetadata(this.img.index(), {author: el.val()});
 	    },
 	    
-	    "div.buttonLeft click": function(el, ev) {
+	    "div.wbl-buttonLeft click": function(el, ev) {
 	    	var prevImg = this.img.prev();
 	    	if(prevImg.length < 1) return;
 	    	this.img.toggle();
@@ -150,7 +150,7 @@ steal.plugins('jquery',
 	    	this.element.dialog('option', 'title', 'Metadaten eingeben: Datei ' + this.index + ' / ' + this.options.map.length);
 	    },
 	    
-	    "div.buttonRight click": function(el, ev) {
+	    "div.wbl-buttonRight click": function(el, ev) {
 	    	var nextImg = this.img.next();
 	    	if(nextImg.length < 1) return;
 	    	this.img.toggle();
@@ -162,7 +162,7 @@ steal.plugins('jquery',
 	    	this.element.dialog('option', 'title', 'Metadaten eingeben: Datei ' + this.index + ' / ' + this.options.map.length);
 	    },
 	    
-	    "img.copyMetadata click": function(el, ev) {
+	    "img.wbl-copyMetadata click": function(el, ev) {
 	    	var instance = this;
 	    	$.each(this.options.map, function(key, value) {
 	    		var name = el.prev().attr('name');

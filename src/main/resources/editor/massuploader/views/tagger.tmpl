@@ -1,13 +1,13 @@
-<div class="buttonLeft"></div>
-<div class="buttonRight"></div>
-<div class="taggerImage">
+<div class="wbl-buttonLeft"></div>
+<div class="wbl-buttonRight"></div>
+<div class="wbl-taggerImage">
 		{{each map}}
 			<img src="/system/weblounge/previews/${$value.resourceId}/locales/${language}/styles/weblounge-ui:preview" alt="" style="display:none"/>
 		{{/each}}
 </div>
-<div class="metadata">
-Title: <input type="text" name="title" /> <img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="copyMetadata"><br /><br />
-Beschreibung: <input type="text" name="description" /> <img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="copyMetadata"><br /><br />
-Tags: <input type="text" name="tags" /> <img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="copyMetadata"><br /><br />
-Ersteller: <input type="text" name="author" placeholder="${runtime.getUserName()}" /> <img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="copyMetadata">
+<div class="wbl-metadata">
+Title: <input type="text" name="title" /> <img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="wbl-copyMetadata"><br /><br />
+Beschreibung: <input type="text" name="description" /> <img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="wbl-copyMetadata"><br /><br />
+Tags: <input type="text" name="tags" /> <img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="wbl-copyMetadata"><br /><br />
+Ersteller: <input type="text" name="author" placeholder="${runtime.getUserName()}" /> <img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="wbl-copyMetadata">
 </div>

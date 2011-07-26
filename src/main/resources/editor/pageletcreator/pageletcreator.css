@@ -11,16 +11,16 @@
     z-index: 1;
 }
 
-.editor_pageletcreator div#module_tabs {
+.editor_pageletcreator div#wbl-moduleTabs {
 	height: 100%;
 }
 
-.editor_pageletcreator .tab_hover {
+.editor_pageletcreator .wbl-tabHover {
 	background: green !important;
 }
 
-.editor_pageletcreator a.tab_close {
-	background-image: url("../css/images/ui-icons_ffffff_256x240.png");
+.editor_pageletcreator a.wbl-tabClose {
+	background-image: url("../css/images/ui-icons_222222_256x240.png");
 	background-position: -96px -128px;
 	background-repeat: no-repeat;
 	height: 16px;
@@ -31,15 +31,15 @@
 	z-index: 1000;
 }
 
-.editor_pageletcreator .draggable {
+.wbl-draggable {
 	width: 100px; 
 	height: 20px; 
 	padding: 0.5em; 
 	float: left;
-	margin: 10px 10px 10px 0; 
+	margin: 10px 10px 10px 0;
 }
 
-.editor_pageletcreator .draggable_helper {
+.wbl-draggableHelper {
 	width: 100px; 
 	height: 30px; 
 	padding: 0.5em; 
