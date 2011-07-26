@@ -168,6 +168,42 @@ steal.then('jsonix')
 	    },
 	    
 	    /**
+	     * Return the page template
+	     */
+	    getTemplate: function() {
+	    	return this.value.head.template;
+	    },
+	    
+	    /**
+	     * Return the page title
+	     */
+	    getTitle: function(language) {
+	    	if($.isEmptyObject(this.value.head.metadata)) return '';
+	    	if($.isEmptyObject(this.value.head.metadata.title)) return '';
+	    	if($.isEmptyObject(this.value.head.metadata.title[language])) return '';
+	    	return this.value.head.metadata.title[language];
+	    },
+	    
+	    /**
+	     * Return the page description
+	     */
+	    getDescription: function(language) {
+	    	if($.isEmptyObject(this.value.head.metadata)) return '';
+	    	if($.isEmptyObject(this.value.head.metadata.description)) return '';
+	    	if($.isEmptyObject(this.value.head.metadata.description[language])) return '';
+	    	return this.value.head.metadata.description[language];
+	    },
+	    
+	    /**
+	     * Return the page description
+	     */
+	    getTags: function() {
+	    	if($.isEmptyObject(this.value.head.metadata)) return '';
+	    	if($.isEmptyObject(this.value.head.metadata.subject)) return '';
+	    	return this.value.head.metadata.subject;
+	    },
+	    
+	    /**
 	     * Return the specified Composer Index
 	     * @param {String} composerId
 	     */
@@ -285,7 +321,7 @@ steal.then('jsonix')
 			this.value.head.metadata.description[language] = creationData.description;
 			
 			// Filter out empty values
-			this.value.head.metadata.subject = creationData.tags.split(/,\s*/).filter(function(value) { 
+			this.value.head.metadata.subject = creationData.tags.split(/\s*,\s*/).filter(function(value) { 
 				return value != ''; 
 			});
 			

@@ -1,16 +1,101 @@
-steal.plugins('jquery/controller/view', 'jquery/view/tmpl')
+steal.plugins('jquery',
+		'jquery/controller/view',
+		'jquery/view',
+		'jquery/view/tmpl',
+		'jqueryui/widget')
 .views('//editor/pageheadeditor/views/init.tmpl')
-.models('language', 'template')
+.css('pageheadeditor')
 .then(function($) {
 
-$.Controller('Editor.Pageheadeditor', 
-	/* @static */
-	{},
-	/* @prototype */
+	/**
+	 * @class Editor.Pageheadeditor
+	 */
+	$.Controller('Editor.Pageheadeditor', 
+	/* @Static */
+	{
+		defaults : {
+		
+		}
+	},
+	/* @Prototype */
 	{
 		init: function(el) {
-			$(el).html('//editor/pageheadeditor/views/init.tmpl', {languages: Language.findAll(), templates: Template.findAll()});
+			var pageData = new Object();
+			
+			$(el).html('//editor/pageheadeditor/views/init.tmpl', {
+				page: this.options.page, 
+				language: this.options.language, 
+				options: this.options.runtime.getSiteLayouts()
+			});
+			this.element.find("select[name=layout]").val(this.options.page.getTemplate());
+			
+			// TODO Load AvailableTags
+			// Autocomplete Tags
+			var availableTags = ["ActionScript","Scheme"];
+			this.element.find("input[name=tags]").autocomplete({
+				source: function(request, response) {
+					// delegate back to autocomplete, but extract the last term
+					response($.ui.autocomplete.filter(availableTags, request.term.split(/,\s*/).pop()));
+				},
+				focus: function() {
+					// prevent value inserted on focus
+					return false;
+				},
+				select: function(ev, ui) {
+					var terms = this.value.split(/,\s*/);
+					// remove the current input
+					terms.pop();
+					// add the selected item
+					terms.push(ui.item.value);
+					// add placeholder to get the comma-and-space at the end
+					terms.push("");
+					this.value = terms.join(", ");
+					return false;
+				}
+			});
+			
+			// Dialog
+			this.element.dialog({
+				modal: true,
+				title: 'Seite bearbeiten',
+				autoOpen: true,
+				resizable: true,
+				draggable: true,
+				width: 1024,
+				height: 800,
+				buttons: {
+					Abbrechen: $.proxy(function() {
+						this.element.dialog('close');
+					}, this),
+					Speichern: $.proxy(function() {
+						$.each(this.element.find(':input'), function(i, input) {
+							pageData[$(input).attr('name')] = $(input).val();
+						});
+						
+						// update pageData
+						this.options.page.saveCreationData(pageData, this.options.language, $.proxy(function() {
+							location.href = this.options.page.getPath() + "?edit";
+						}, this));
+						
+						this.element.dialog('destroy');
+						this.destroy();
+					}, this)
+				},
+				close: $.proxy(function () {
+					this.element.dialog('destroy');
+					this.destroy();
+				},this)
+			});
+		},
+	
+	    update: function(options) {
+	    	this.options = options;
+	    	this.element.dialog('open');
+	    },
+	    
+		"input[name=url] change": function(el, ev) {
+			var url = el.val().trim();
+			el.val(encodeURI(url));
 		}
-	}
-);
+	});
 });

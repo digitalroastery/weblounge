@@ -5,7 +5,6 @@ steal.plugins('jquery',
 		'jqueryui/widget')
 .views('//editor/pagecreator/views/init.tmpl')
 .css('pagecreator')
-.models()
 .then(function($) {
 
 	/**
@@ -104,7 +103,7 @@ steal.plugins('jquery',
 			
 			// Dialog
 			this.element.dialog({
-				modal: false,
+				modal: true,
 				title: 'Neue Seite anlegen',
 				autoOpen: true,
 				resizable: true,
@@ -134,11 +133,6 @@ steal.plugins('jquery',
 						
 						$.each(this.element.find('form#wbl-validate :input'), function(i, input) {
 							pageData[$(input).attr('name')] = $(input).val();
-						});
-						
-						// Filter out empty values
-						var tags = pageData.tags.split(/,\s*/).filter(function(value) {
-							return value != ''; 
 						});
 						
 						// Create page and update pageData

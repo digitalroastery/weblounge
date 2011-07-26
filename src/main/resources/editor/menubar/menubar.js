@@ -6,6 +6,7 @@ steal.plugins(
 	'editor/massuploader',
 	'editor/pagecreator',
 	'editor/pageletcreator',
+	'editor/pageheadeditor',
 	'jqueryui/dialog',
 	'jqueryui/draggable',
 	'jqueryui/droppable',
@@ -14,8 +15,7 @@ steal.plugins(
 	'jqueryui/button')
 .views(
 	'//editor/menubar/views/menubar.tmpl')
-.css(
-	'menubar')
+.css('menubar')
 .then(function($) {
 
     $.Controller("Editor.Menubar",
@@ -153,6 +153,11 @@ steal.plugins(
 		"li.wbl-settings click": function(el, ev) {
 			$('.wbl-menu').hide();
 			this.userDialog.dialog('open');
+		},
+		
+		"li.wbl-pageSettings click": function(el, ev) {
+			$('.wbl-menu').hide();
+			$('#wbl-pageheadeditor').editor_pageheadeditor({page: this.options.page, language: this.options.language, runtime: this.options.runtime});
 		},
 		
 		"li.wbl-news click": function(el, ev) {

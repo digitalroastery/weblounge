@@ -27,11 +27,8 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
 			this._loadCurrentLanguage();
 			this._loadValidateLanguage();
 			
-			this.menuBar = this.find('#wbl-menubar').editor_menubar({runtime: this.runtime, language: this.options.language});
-            this.pagesTab = this.find('#wbl-pagebrowser');
-            this.mediaTab = this.find('#wbl-mediabrowser');
-            this._initTab();
-            this._loadPage();
+        	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
+        	Page.findOne({path: path}, this.callback('_setPage'));
         },
         
         _loadRuntime: function(runtime) {
@@ -67,14 +64,12 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         	this.update();
         },
         
-        _loadPage: function() {
-        	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
-        	Page.findOne({path: path}, this.callback('_setPage'));
-        },
-        
         _setPage: function(page) {
-        	this.page = page;
         	$('.composer').editor_composer({page: page, language: this.options.language, runtime: this.runtime});
+			this.menuBar = this.find('#wbl-menubar').editor_menubar({page: page, runtime: this.runtime, language: this.options.language});
+            this.pagesTab = this.find('#wbl-pagebrowser');
+            this.mediaTab = this.find('#wbl-mediabrowser');
+            this._initTab();
         },
         
         update: function(options) {

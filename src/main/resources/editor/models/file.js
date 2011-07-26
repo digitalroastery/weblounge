@@ -191,7 +191,7 @@ steal.then('jsonix')
 			
 			// Filter out empty values
 			if(!$.isEmptyObject(metadata.tags.split)) {
-				this.value.head.metadata.subject = metadata.tags.split(/,\s*/).filter(function(value) { 
+				this.value.head.metadata.subject = metadata.tags.split(/\s*,\s*/).filter(function(value) { 
 					return value != ''; 
 				});
 			}
