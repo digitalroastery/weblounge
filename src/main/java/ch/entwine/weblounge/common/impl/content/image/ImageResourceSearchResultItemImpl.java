@@ -18,30 +18,28 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content;
+package ch.entwine.weblounge.common.impl.content.image;
 
+import ch.entwine.weblounge.common.content.FileSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.SearchResultPageItem;
-import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.impl.content.page.LazyPageImpl;
-import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
-import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.content.file.FileResource;
+import ch.entwine.weblounge.common.impl.content.ResourceSearchResultItemImpl;
+import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.url.WebUrl;
-
 
 /**
  * Default implementation of a
  * {@link ch.entwine.weblounge.common.content.SearchResultItem}.
  */
-public class SearchResultPageItemImpl extends SearchResultItemImpl implements SearchResultPageItem {
+public class ImageResourceSearchResultItemImpl extends ResourceSearchResultItemImpl implements FileSearchResultItem {
 
-  /** The page xml */
-  protected String pageXml = null;
+  /** The image xml */
+  protected String imageXml = null;
 
-  /** The page header xml */
+  /** The image header xml */
   protected String headerXml = null;
 
-  /** The page preview xml */
+  /** The file preview xml */
   protected String previewXml = null;
 
   /**
@@ -50,10 +48,8 @@ public class SearchResultPageItemImpl extends SearchResultItemImpl implements Se
    * be the site itself but it could very well be a module that added to a
    * search result.
    * 
-   * @param site
-   *          the site
-   * @param id
-   *          the document id
+   * @param uri
+   *          the page uri
    * @param url
    *          the url to show the hit
    * @param relevance
@@ -61,79 +57,79 @@ public class SearchResultPageItemImpl extends SearchResultItemImpl implements Se
    * @param source
    *          the object that produced the result item
    */
-  public SearchResultPageItemImpl(Site site, String id, WebUrl url,
+  public ImageResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
       double relevance, Object source) {
-    super(site, id, url, Page.TYPE, relevance, source);
+    super(uri, url, relevance, source);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchResultItem#getPageURI()
+   * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem#getResourceURI()
    */
-  public ResourceURI getPageURI() {
-    return new PageURIImpl(site, url.getPath(), id);
+  public ResourceURI getResourceURI() {
+    return new FileResourceURIImpl(url.getSite(), url.getPath(), id);
   }
 
   /**
-   * Sets the page xml.
+   * Sets the file xml.
    * 
    * @param xml
    *          the xml
    */
-  public void setPageXml(String xml) {
-    this.pageXml = xml;
+  public void setImageXml(String xml) {
+    this.imageXml = xml;
   }
 
   /**
-   * Returns the xml that makes up the whole page.
+   * Returns the xml that makes up the whole file.
    * 
-   * @return the page xml
+   * @return the file xml
    */
-  public String getPageXml() {
-    return this.pageXml;
+  public String getImageXml() {
+    return this.imageXml;
   }
 
   /**
-   * Sets the page header xml.
+   * Sets the file header xml.
    * 
    * @param xml
    *          the xml
    */
-  public void setPageHeaderXml(String xml) {
+  public void setImageHeaderXml(String xml) {
     this.headerXml = xml;
   }
 
   /**
-   * Returns the xml that makes up the header portion of the page.
+   * Returns the xml that makes up the header portion of the file.
    * 
-   * @return the page header xml
+   * @return the file header xml
    */
-  public String getPageHeaderXml() {
+  public String getImageHeaderXml() {
     return this.headerXml;
   }
 
   /**
-   * Sets the page header xml.
+   * Sets the file header xml.
    * 
    * @param xml
    *          the xml
    */
-  public void setPagePreviewXml(String xml) {
+  public void setImagePreviewXml(String xml) {
     this.previewXml = xml;
   }
 
   /**
-   * Returns the page object.
+   * {@inheritDoc}
    * 
-   * @return the page
+   * @see ch.entwine.weblounge.common.content.FileSearchResultItem#getFileResource()
    */
-  public Page getPage() {
-    if (page == null) {
-      ResourceURI uri = new PageURIImpl(site, url.getPath(), id);
-      page = new LazyPageImpl(uri, pageXml, headerXml, previewXml);
+  public FileResource getFileResource() {
+    if (resource == null) {
+      ResourceURI uri = new FileResourceURIImpl(url.getSite(), url.getPath(), id);
+      resource = new LazyImageResourceImpl(uri, imageXml, headerXml, previewXml);
     }
-    return page;
+    return (FileResource) resource;
   }
 
 }

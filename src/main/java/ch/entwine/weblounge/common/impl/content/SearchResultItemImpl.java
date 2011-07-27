@@ -21,9 +21,8 @@
 package ch.entwine.weblounge.common.impl.content;
 
 import ch.entwine.weblounge.common.content.Renderer;
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 import org.slf4j.Logger;
@@ -42,14 +41,8 @@ public class SearchResultItemImpl implements SearchResultItem {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchResultImpl.class);
 
-  /** THe associated site */
-  protected Site site = null;
-
   /** The page id */
   protected String id = null;
-
-  /** The resource type */
-  protected String type = null;
 
   /** The title */
   protected String title = null;
@@ -63,8 +56,8 @@ public class SearchResultItemImpl implements SearchResultItem {
   /** The renderer used to show the preview */
   protected Renderer previewRenderer = null;
 
-  /** The page */
-  protected Page page = null;
+  /** The resource */
+  protected Resource<?> resource = null;
 
   /** Source of the search result */
   protected Object source = null;
@@ -78,27 +71,30 @@ public class SearchResultItemImpl implements SearchResultItem {
    * be the site itself but it could very well be a module that added to a
    * search result.
    * 
-   * @param site
-   *          the site
    * @param id
    *          the document id
    * @param url
    *          the url to show the hit
-   * @param type
-   *          the resource type
    * @param relevance
    *          the score inside the search result
    * @param source
    *          the object that produced the result item
    */
-  public SearchResultItemImpl(Site site, String id, WebUrl url, String type,
+  public SearchResultItemImpl(String id, WebUrl url,
       double relevance, Object source) {
-    this.site = site;
     this.id = id;
     this.url = url;
-    this.type = type;
     this.source = source;
     this.score = relevance;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchResultItem#setId(java.lang.String)
+   */
+  public void setId(String id) {
+    this.id = id;
   }
 
   /**
@@ -150,25 +146,6 @@ public class SearchResultItemImpl implements SearchResultItem {
   }
 
   /**
-   * Sets the resource type.
-   * 
-   * @param type
-   *          the type
-   */
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.SearchResultItem#getType()
-   */
-  public String getType() {
-    return type;
-  }
-
-  /**
    * Sets the result item's preview data.
    * 
    * @param preview
@@ -200,6 +177,15 @@ public class SearchResultItemImpl implements SearchResultItem {
    */
   public Renderer getPreviewRenderer() {
     return previewRenderer;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchResultItem#setRelevance(double)
+   */
+  public void setRelevance(double relevance) {
+    this.score = relevance;
   }
 
   /**

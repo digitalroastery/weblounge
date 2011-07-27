@@ -24,9 +24,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.SearchResultItemImpl;
-import ch.entwine.weblounge.common.impl.content.SearchResultPageItemImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.url.UrlUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -36,10 +36,10 @@ import org.junit.Test;
 /**
  * Test case for {@link SearchResultItemPageImpl}.
  */
-public class SearchResultItemPageImplTest extends SearchResultItemImplTest {
+public class PageSearchResultItemImplTest extends SearchResultItemImplTest {
   
   /** The specialized search result item */
-  protected SearchResultPageItemImpl pageItem = null;
+  protected PageSearchResultItemImpl pageItem = null;
   
   /** The page xml */
   protected String pageXml = null;
@@ -53,7 +53,8 @@ public class SearchResultItemPageImplTest extends SearchResultItemImplTest {
   public void setUp() throws Exception {
     setUpPrerequisites();
     pageXml = IOUtils.toString(getClass().getResourceAsStream("/page.xml"));
-    pageItem = new SearchResultPageItemImpl(site, id, url, relevance, source);
+    ResourceURI uri = new PageURIImpl(site, path, id, Resource.LIVE);
+    pageItem = new PageSearchResultItemImpl(uri, url, relevance, source);
     item = pageItem;
     item.setTitle(title);
     item.setPreview(previewData);
@@ -75,7 +76,7 @@ public class SearchResultItemPageImplTest extends SearchResultItemImplTest {
    */
   @Test
   public void testCompareToSearchResultItem() {
-    SearchResultItem nextItem = new SearchResultItemImpl(site, id, url, Page.TYPE, relevance + 1.0, source);
+    SearchResultItem nextItem = new SearchResultItemImpl(id, url, relevance + 1.0, source);
     assertTrue(item.compareTo(nextItem) > 0);
   }
 

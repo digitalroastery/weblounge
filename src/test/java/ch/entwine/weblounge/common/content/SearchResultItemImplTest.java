@@ -23,7 +23,6 @@ package ch.entwine.weblounge.common.content;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.impl.content.SearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletRendererImpl;
@@ -78,7 +77,7 @@ public class SearchResultItemImplTest {
   @Before
   public void setUp() throws Exception {
     setUpPrerequisites();
-    item = new SearchResultItemImpl(site, id, url, Page.TYPE, relevance, source);
+    item = new SearchResultItemImpl(id, url, relevance, source);
     item.setTitle(title);
     item.setPreview(previewData);
     item.setPreviewRenderer(renderer);
@@ -150,7 +149,7 @@ public class SearchResultItemImplTest {
    */
   @Test
   public void testCompareToSearchResultItem() {
-    SearchResultItem nextItem = new SearchResultItemImpl(site, id, url, Page.TYPE, relevance + 1.0, source);
+    SearchResultItem nextItem = new SearchResultItemImpl(id, url, relevance + 1.0, source);
     assertTrue(item.compareTo(nextItem) > 0);
   }
 

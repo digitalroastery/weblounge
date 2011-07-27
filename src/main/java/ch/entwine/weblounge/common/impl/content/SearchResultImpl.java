@@ -50,7 +50,7 @@ public class SearchResultImpl implements SearchResult {
 
   /** The time it took to do the search in ms */
   protected long time = 0;
-  
+
   /** Flag to indicate the sorted state */
   protected boolean sorted = true;
 
@@ -170,13 +170,13 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchResult#getHitCount()
    */
   public long getHitCount() {
     return hitCount;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -185,10 +185,10 @@ public class SearchResultImpl implements SearchResult {
   public long getDocumentCount() {
     return documentCount;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchResult#toXml()
    */
   public String toXml() {
@@ -202,7 +202,7 @@ public class SearchResultImpl implements SearchResult {
     buf.append("page=\"").append(getPage()).append("\" ");
     buf.append("pagesize=\"").append(getPageSize()).append("\"");
     buf.append(">");
-    
+
     // Query and execution time
     buf.append("<time>").append(getSearchTime()).append("</time>");
     buf.append("<query>").append(getQuery()).append("</query>");
@@ -211,7 +211,7 @@ public class SearchResultImpl implements SearchResult {
     for (SearchResultItem item : getItems()) {
       buf.append(item.toXml());
     }
-    
+
     buf.append("</searchresult>");
     return buf.toString();
   }

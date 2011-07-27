@@ -23,7 +23,6 @@ package ch.entwine.weblounge.common.content;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultItemImpl;
@@ -82,7 +81,7 @@ public class SearchResultImplTest {
     WebUrl url = new WebUrlImpl(site, "/");
     for (int i = 0; i < limit; i++) {
       double relevance = Math.random();
-      SearchResultItemImpl item = new SearchResultItemImpl(site, id, url, Page.TYPE, relevance, source);
+      SearchResultItemImpl item = new SearchResultItemImpl(id, url, relevance, source);
       result.addResultItem(item);
     }
   }
