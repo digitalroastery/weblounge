@@ -25,7 +25,7 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.SearchResultPageItem;
+import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -261,7 +261,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
           break;
 
         // Get the page
-        SearchResultPageItem pageItem = (SearchResultPageItem) item;
+        PageSearchResultItem pageItem = (PageSearchResultItem) item;
         Page page = pageItem.getPage();
         page.switchTo(language);
 
