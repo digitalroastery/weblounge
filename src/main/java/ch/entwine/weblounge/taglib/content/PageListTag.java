@@ -23,7 +23,7 @@ package ch.entwine.weblounge.taglib.content;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.SearchResultPageItem;
+import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -278,16 +278,16 @@ public class PageListTag extends WebloungeTag {
     }
 
     boolean found = false;
-    SearchResultPageItem item = null;
+    PageSearchResultItem item = null;
     Page page = null;
     WebUrl url = null;
 
     // Look for the next header
     while (!found && index < pages.getItems().length) {
       SearchResultItem candidateItem = pages.getItems()[index];
-      if (!(candidateItem instanceof SearchResultPageItem))
+      if (!(candidateItem instanceof PageSearchResultItem))
         continue;
-      item = (SearchResultPageItem) candidateItem;
+      item = (PageSearchResultItem) candidateItem;
 
       // Store the important properties
       url = item.getUrl();
