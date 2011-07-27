@@ -26,11 +26,13 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
+import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.xml.sax.SAXException;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -88,6 +90,21 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * @return the resource metadata
    */
   List<ResourceMetadata<?>> getMetadata(Resource<?> resource);
+
+  /**
+   * Returns a search result item from the resource matadata which contains the
+   * data returned by the search index.
+   * 
+   * @param site
+   *          the associated site
+   * @param relevance
+   *          the relevance of the search result
+   * @param metadata
+   *          the metadata
+   * @return the search result item
+   */
+  SearchResultItem createSearchResultItem(Site site, double relevance,
+      Map<String, ResourceMetadata<?>> metadata);
 
   /**
    * Returns a <code>ResourceContentReader</code> for the type of resources that
