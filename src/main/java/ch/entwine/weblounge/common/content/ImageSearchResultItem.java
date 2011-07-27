@@ -17,24 +17,23 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
 package ch.entwine.weblounge.common.content;
 
+import ch.entwine.weblounge.common.content.image.ImageResource;
+
 /**
- * This extended <code>SearchResultItem</code> interface is intended for
- * resources that were found in the weblounge search index.
+ * This extended <code>SearchResultResourceItem</code> interface is intended for
+ * images that were found in the weblounge search index.
  * 
- * @see ch.entwine.weblounge.common.content.SearchResultItem
+ * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem
  */
-public interface SearchResultResourceItem extends SearchResultItem {
+public interface ImageSearchResultItem extends ResourceSearchResultItem {
 
   /**
-   * Returns the resource uri.
+   * Returns the image resource.
    * 
-   * @return the resource uri
+   * @return the image resource
    */
-  // TODO Think about moving this method to SearchResultItem (and replacing
-  // getPageURI() in SearchResultPageItem)
-  ResourceURI getResourceURI();
+  ImageResource getImageResource();
 
 }

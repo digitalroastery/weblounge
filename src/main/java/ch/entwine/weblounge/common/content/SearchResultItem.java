@@ -33,6 +33,14 @@ import ch.entwine.weblounge.common.url.WebUrl;
 public interface SearchResultItem extends Comparable<SearchResultItem> {
 
   /**
+   * Sets the result item identifier.
+   * 
+   * @param id
+   *          the identifier
+   */
+  void setId(String id);
+
+  /**
    * Returns the identifier.
    * 
    * @return the identifier
@@ -45,13 +53,6 @@ public interface SearchResultItem extends Comparable<SearchResultItem> {
    * @return the hit location
    */
   WebUrl getUrl();
-
-  /**
-   * Returns the type of the result item.
-   * 
-   * @return the type
-   */
-  String getType();
 
   /**
    * Returns the title of this search result.

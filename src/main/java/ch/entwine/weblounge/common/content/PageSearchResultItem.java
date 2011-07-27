@@ -17,23 +17,24 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+
 package ch.entwine.weblounge.common.content;
 
-import ch.entwine.weblounge.common.content.file.FileResource;
+import ch.entwine.weblounge.common.content.page.Page;
 
 /**
- * This extended <code>SearchResultResourceItem</code> interface is intended for
- * files that were found in the weblounge search index.
+ * This extended <code>SearchResultItem</code> interface is intended for pages
+ * that were found in the weblounge search index.
  * 
- * @see ch.entwine.weblounge.common.content.SearchResultResourceItem
+ * @see ch.entwine.weblounge.common.content.SearchResultItem
  */
-public interface SearchResultFileItem extends SearchResultResourceItem {
-  
+public interface PageSearchResultItem extends ResourceSearchResultItem {
+
   /**
-   * Returns the file resource.
+   * Returns the page.
    * 
-   * @return the file resource
+   * @return the page
    */
-  FileResource getFileResource();
+  Page getPage();
 
 }

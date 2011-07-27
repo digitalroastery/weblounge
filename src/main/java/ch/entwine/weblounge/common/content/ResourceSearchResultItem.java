@@ -20,28 +20,19 @@
 
 package ch.entwine.weblounge.common.content;
 
-import ch.entwine.weblounge.common.content.page.Page;
-
 /**
- * This extended <code>SearchResultItem</code> interface is intended for pages
- * that were found in the weblounge search index.
+ * This extended <code>SearchResultItem</code> interface is intended for
+ * resources that were found in the weblounge search index.
  * 
  * @see ch.entwine.weblounge.common.content.SearchResultItem
  */
-public interface SearchResultPageItem extends SearchResultItem {
+public interface ResourceSearchResultItem extends SearchResultItem {
 
   /**
-   * Returns the page uri.
+   * Returns the resource uri.
    * 
-   * @return the page uri
+   * @return the resource uri
    */
-  ResourceURI getPageURI();
-
-  /**
-   * Returns the page.
-   * 
-   * @return the page
-   */
-  Page getPage();
+  ResourceURI getResourceURI();
 
 }

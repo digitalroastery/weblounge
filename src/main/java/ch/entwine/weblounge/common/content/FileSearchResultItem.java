@@ -19,21 +19,21 @@
  */
 package ch.entwine.weblounge.common.content;
 
-import ch.entwine.weblounge.common.content.image.ImageResource;
+import ch.entwine.weblounge.common.content.file.FileResource;
 
 /**
  * This extended <code>SearchResultResourceItem</code> interface is intended for
- * images that were found in the weblounge search index.
+ * files that were found in the weblounge search index.
  * 
- * @see ch.entwine.weblounge.common.content.SearchResultResourceItem
+ * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem
  */
-public interface SearchResultImageItem extends SearchResultResourceItem {
-
+public interface FileSearchResultItem extends ResourceSearchResultItem {
+  
   /**
-   * Returns the image resource.
+   * Returns the file resource.
    * 
-   * @return the image resource
+   * @return the file resource
    */
-  ImageResource getImageResource();
+  FileResource getFileResource();
 
 }
