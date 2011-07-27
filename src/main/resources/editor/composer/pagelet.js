@@ -72,7 +72,8 @@ steal.plugins('jqueryui/dialog',
     	});
     	
     	// Process Editor Template
-    	var result  = this._processTemplate(editor.text(), pagelet);
+    	var result = this._processTemplate(editor.text(), pagelet);
+    	if(result == null) return;
     	
     	// Hack to create new Dom element
     	var resultDom = $('<div></div>').html(result);
@@ -96,6 +97,7 @@ steal.plugins('jqueryui/dialog',
 					var newPagelet = this._updatePageletValues(pagelet);
 					
 					// Render site
+					var html = this._processTemplate(renderer, newPagelet);
 					this.element.html(this._processTemplate(renderer, newPagelet));
 					
 					// Save New Pagelet
@@ -118,11 +120,17 @@ steal.plugins('jqueryui/dialog',
      * Process a TrimPath template
      */
     _processTemplate: function(template, data) {
-		var templateObject = TrimPath.parseTemplate(template);
-		var result = templateObject.process(data);
-		if($.isEmptyObject(result.exception)) return result;
-		alert('TrimPath Process Error: ' + result.exception.message);
-		return null;
+    	var result = {};
+    	try {
+    		var templateObject = TrimPath.parseTemplate(template);
+    		result = templateObject.process(data);
+    	} catch(err) {
+    		result.exception = err;
+    	} finally {
+    		if($.isEmptyObject(result.exception)) return result;
+    		alert('TrimPath Process Error: ' + result.exception.message);
+    		return null;
+    	}
     },
     
     /**

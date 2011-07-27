@@ -77,8 +77,8 @@ steal.plugins('jquery',
 				onCancel: this._cancel,
 				onComplete: $.proxy(function(id, fileName, response) {
 					if($.isEmptyObject(response)) return;
-					this.map[id] = {resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag};
-					this._loadImage(response.url + '/content/' + this.options.language, id);
+					this.map.push({resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag});
+					this._loadImage(response.url + '/content/' + this.options.language);
 					this._updateUploadButton();
 			    }, this),
 			    // path to server-side upload script
@@ -123,7 +123,7 @@ steal.plugins('jquery',
 	    	$('div#wbl-tagger').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
 	    },
 	    
-        _loadImage: function(url, id) {
+        _loadImage: function(url) {
         	if (url) {
         		var divScroll = this.divScroll;
         		var image = new jsu.PreloadImage({

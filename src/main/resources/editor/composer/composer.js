@@ -89,7 +89,7 @@ steal.plugins('jquery/controller','jqueryui/sortable')
             this.update();
             
             // If pagelet is new open page editor dialog
-            if(ui.item.hasClass('draggable')) {
+            if(ui.item.hasClass('wbl-draggable')) {
             	Workbench.findOne({ id: page.value.id, composer: composerId, pagelet: pagelet.attr('index') }, $.proxy(function(pageletEditor) {
             		pagelet.editor_pagelet('_openPageEditor', pageletEditor, true);
             	}, this));
