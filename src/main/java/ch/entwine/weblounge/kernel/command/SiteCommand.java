@@ -361,10 +361,7 @@ public class SiteCommand {
       // List results
       int i = 1;
       for (SearchResultItem item : result.getItems()) {
-        if (Page.TYPE.equals(item.getType()))
-          formatter.format(format.toString(), i++, item.getUrl());
-        else
-          formatter.format(format.toString(), i++, item.getId() + "[" + item.getType() + "]");
+        formatter.format(format.toString(), i++, item.getUrl());
       }
 
       System.out.println("Found " + result.getDocumentCount() + " results (" + result.getSearchTime() + " ms)");
