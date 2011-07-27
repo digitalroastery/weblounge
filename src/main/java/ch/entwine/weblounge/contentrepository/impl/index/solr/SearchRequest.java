@@ -25,7 +25,6 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.FULLTEXT;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.HEADER_XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY;
@@ -36,7 +35,6 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER_POSITION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PARENT_PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SCORE;
@@ -45,18 +43,19 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_BOOST;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_LOCALIZED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils.clean;
 
+import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
+import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
-import ch.entwine.weblounge.common.impl.content.SearchResultPageItemImpl;
-import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.url.WebUrl;
+import ch.entwine.weblounge.contentrepository.ResourceSerializer;
+import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -69,6 +68,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -123,16 +123,16 @@ public class SearchRequest {
     if (query.getPath() != null) {
       and(solrQuery, PATH, query.getPath(), true, true);
     }
-    
+
     if (query.getPathPrefix() != null) {
       and(solrQuery, PARENT_PATH, query.getPathPrefix(), true, true);
     }
-    
+
     // Type
     if (query.getType() != null) {
       and(solrQuery, TYPE, query.getType(), true, true);
     }
-    
+
     // Without type
     if (query.getWithoutType() != null) {
       andNot(solrQuery, TYPE, query.getWithoutType(), true, true);
@@ -241,7 +241,7 @@ public class SearchRequest {
     SolrQuery q = new SolrQuery(solrQuery.toString());
     q.setStart(query.getOffset() > 0 ? query.getOffset() : 0);
     q.setRows(query.getLimit() > 0 ? query.getLimit() : Integer.MAX_VALUE);
-    
+
     // Define the fields that should be returned by the query
     List<String> fields = new ArrayList<String>();
     fields.add("*");
@@ -259,8 +259,8 @@ public class SearchRequest {
         default:
           break;
       }
-    } 
-    
+    }
+
     // Order by modification date
     else if (!SearchQuery.Order.None.equals(query.getModificationDateSortOrder())) {
       switch (query.getModificationDateSortOrder()) {
@@ -297,10 +297,10 @@ public class SearchRequest {
       q.setIncludeScore(true);
       fields.add("score");
     }
-    
+
     // Add the fields to return
     q.setFields(StringUtils.join(fields, " "));
-    
+
     // Execute the query and try to get hold of a query response
     QueryResponse solrResponse = null;
     try {
@@ -318,19 +318,30 @@ public class SearchRequest {
 
     // Walk through response and create new items with title, creator, etc:
     for (SolrDocument doc : solrResponse.getResults()) {
+
+      // Get the resource serializer
+      String type = (String) doc.getFirstValue(TYPE);
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(type);
+      if (serializer == null) {
+        logger.warn("Skipping search result due to missing serializer of type {}", type);
+        continue;
+      }
+
+      // Wrap the search result metadata
+      Map<String, ResourceMetadata<?>> metadata = new HashMap<String, ResourceMetadata<?>>(doc.size());
+      for (Map.Entry<String, Object> entry : doc.entrySet()) {
+        String name = entry.getKey();
+        ResourceMetadata<Object> m = new ResourceMetadataImpl<Object>(name);
+        // TODO: Add values with more care (localized, correct type etc.)
+        m.addValue(entry.getValue());
+        metadata.put(name, m);
+      }
+
+      // Get the score for this item
       float score = fields.contains("score") ? (Float) doc.getFieldValue(SCORE) : 0.0f;
 
-      String id = (String) doc.getFieldValue(ID);
-      String path = (String) doc.getFieldValue(PATH);
-      WebUrl url = new WebUrlImpl(site, path);
-
-      SearchResultPageItemImpl item = new SearchResultPageItemImpl(site, id, url, score, site);
-      item.setPageXml((String) doc.getFieldValue(XML));
-      item.setPageHeaderXml((String) doc.getFieldValue(HEADER_XML));
-      item.setPagePreviewXml((String) doc.getFieldValue(PREVIEW_XML));
-      item.setTitle((String) doc.getFieldValue(TITLE_LOCALIZED));
-
-      // Add the item to the result set
+      // Have the serializer in charge create a type-specific search result item
+      SearchResultItem item = serializer.createSearchResultItem(site, score, metadata);
       result.addResultItem(item);
     }
 
@@ -411,7 +422,7 @@ public class SearchRequest {
     buf.append(")");
     return buf;
   }
-  
+
   /**
    * Encodes field name and value as part of the AND clause of a solr query:
    * <tt>AND -fieldName : fieldValue</tt>.
@@ -432,7 +443,8 @@ public class SearchRequest {
   private StringBuilder andNot(StringBuilder buf, String fieldName,
       String fieldValue, boolean quote, boolean clean) {
     if (buf.length() > 0)
-      buf.append(" AND -"); // notice the minus sign
+      buf.append(" AND "); // notice the minus sign
+    buf.append("-"); // notice the minus sign
     buf.append(StringUtils.trim(fieldName));
     buf.append(":");
     if (quote)

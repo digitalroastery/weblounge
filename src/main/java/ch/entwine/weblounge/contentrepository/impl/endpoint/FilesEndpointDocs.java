@@ -58,7 +58,7 @@ public final class FilesEndpointDocs {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "files");
     docs.setTitle("Weblounge Files");
 
-    // GET /?path=
+    // GET /?path=x&...
     Endpoint getFileByPathEndpoint = new Endpoint("/", Method.GET, "getfile");
     getFileByPathEndpoint.setDescription("Returns the file that is located at the given path");
     getFileByPathEndpoint.addFormat(Format.xml());
@@ -66,7 +66,20 @@ public final class FilesEndpointDocs {
     getFileByPathEndpoint.addStatus(notFound("the file was not found or could not be loaded"));
     getFileByPathEndpoint.addStatus(badRequest("an invalid path was received"));
     getFileByPathEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
-    getFileByPathEndpoint.addRequiredParameter(new Parameter("path", Parameter.Type.String, "The resource path"));
+    getFileByPathEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The resource path"));
+    getFileByPathEndpoint.addOptionalParameter(new Parameter("subjects", Parameter.Type.String, "The page subjects, separated by a comma"));
+    getFileByPathEndpoint.addOptionalParameter(new Parameter("searchterms", Parameter.Type.String, "search terms to search the pages content"));
+    String[] sortParams = {
+        "published-asc",
+        "published-desc",
+        "created-asc",
+        "created-desc",
+        "modified-asc",
+        "modified-desc" };
+    getFileByPathEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
+    getFileByPathEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
+    getFileByPathEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
+    getFileByPathEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
     getFileByPathEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getFileByPathEndpoint);
 

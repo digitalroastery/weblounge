@@ -228,7 +228,7 @@ public class SearchIndexTest {
   public void testGetWithId() {
     populateIndex();
     try {
-      SearchQuery q = new SearchQueryImpl(site).withIdentifier(uuid1);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withIdentifier(uuid1);
       assertEquals(1, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
@@ -245,7 +245,7 @@ public class SearchIndexTest {
   public void testGetWithPath() {
     populateIndex();
     try {
-      SearchQuery q = new SearchQueryImpl(site).withPath(path1);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(path1);
       assertEquals(1, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
@@ -280,7 +280,7 @@ public class SearchIndexTest {
     }
 
     try {
-      SearchQuery q = new SearchQueryImpl(site).withPathPrefix(path1);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(path1);
       assertEquals(10, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
@@ -297,7 +297,7 @@ public class SearchIndexTest {
   public void testGetWithTemplate() {
     populateIndex();
     try {
-      SearchQuery q = new SearchQueryImpl(site).withTemplate("default");
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withTemplate("default");
       assertEquals(1, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
@@ -315,10 +315,10 @@ public class SearchIndexTest {
     populateIndex();
     try {
       User amelie = new UserImpl("amelie");
-      SearchQuery q = new SearchQueryImpl(site).withAuthor(amelie);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withAuthor(amelie);
       SearchResult result = idx.getByQuery(q);
-      assertEquals(4, result.getItems().length);
-      assertEquals(4, result.getHitCount());
+      assertEquals(pages.length, result.getItems().length);
+      assertEquals(pages.length, result.getHitCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by author");
@@ -335,10 +335,10 @@ public class SearchIndexTest {
     populateIndex();
     try {
       User hans = new UserImpl("hans");
-      SearchQuery q = new SearchQueryImpl(site).withCreator(hans);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withCreator(hans);
       SearchResult result = idx.getByQuery(q);
-      assertEquals(4, result.getItems().length);
-      assertEquals(4, result.getHitCount());
+      assertEquals(pages.length, result.getItems().length);
+      assertEquals(pages.length, result.getHitCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by creator");
@@ -355,7 +355,7 @@ public class SearchIndexTest {
     populateIndex();
     try {
       Date date = WebloungeDateFormat.parseStatic("2009-01-07T20:05:41Z");
-      SearchQuery q = new SearchQueryImpl(site).withCreationDate(date);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withCreationDate(date);
       SearchResult result = idx.getByQuery(q);
       assertEquals(1, result.getItems().length);
       assertEquals(1, result.getHitCount());
@@ -378,10 +378,10 @@ public class SearchIndexTest {
     populateIndex();
     try {
       User amelie = new UserImpl("amelie");
-      SearchQuery q = new SearchQueryImpl(site).withModifier(amelie);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withModifier(amelie);
       SearchResult result = idx.getByQuery(q);
-      assertEquals(4, result.getItems().length);
-      assertEquals(4, result.getHitCount());
+      assertEquals(pages.length, result.getItems().length);
+      assertEquals(pages.length, result.getHitCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by modifier");
@@ -398,7 +398,7 @@ public class SearchIndexTest {
     populateIndex();
     try {
       Date date = WebloungeDateFormat.parseStatic("2009-02-18T22:06:40Z");
-      SearchQuery q = new SearchQueryImpl(site).withModificationDate(date);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withModificationDate(date);
       SearchResult result = idx.getByQuery(q);
       assertEquals(1, result.getItems().length);
       assertEquals(1, result.getHitCount());
@@ -420,10 +420,10 @@ public class SearchIndexTest {
   public void testGetSortedByPublicationDate() {
     populateIndex();
     try {
-      SearchQuery q = new SearchQueryImpl(site).sortByPublishingDate(Order.Descending);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).sortByPublishingDate(Order.Descending);
       SearchResult result = idx.getByQuery(q);
-      assertEquals(4, result.getItems().length);
-      assertEquals(4, result.getHitCount());
+      assertEquals(pages.length, result.getItems().length);
+      assertEquals(pages.length, result.getHitCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying ordered by publishing date");
@@ -440,7 +440,7 @@ public class SearchIndexTest {
     populateIndex();
     try {
       User amelie = new UserImpl("amelie");
-      SearchQuery q = new SearchQueryImpl(site).withPublisher(amelie);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPublisher(amelie);
       SearchResult result = idx.getByQuery(q);
       assertEquals(1, result.getItems().length);
       assertEquals(1, result.getHitCount());
@@ -460,7 +460,7 @@ public class SearchIndexTest {
     populateIndex();
     try {
       Date date = WebloungeDateFormat.parseStatic("2006-05-05T17:58:21Z");
-      SearchQuery q = new SearchQueryImpl(site).withPublishingDate(date);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPublishingDate(date);
       SearchResult result = idx.getByQuery(q);
       assertEquals(1, result.getItems().length);
       assertEquals(1, result.getHitCount());
@@ -482,7 +482,7 @@ public class SearchIndexTest {
   public void testGetWithSubjects() {
     populateIndex();
     try {
-      SearchQuery q = new SearchQueryImpl(site);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE);
       String[] subjects = new String[] { "Other topic", "Topic a" };
       for (String subject : subjects)
         q.withSubject(subject);
@@ -502,7 +502,7 @@ public class SearchIndexTest {
   public void testGetWithContent() {
     populateIndex();
     try {
-      SearchQuery q = new SearchQueryImpl(site);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE);
       q.withElement(elementId, elementValue);
       assertEquals(2, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
@@ -520,7 +520,7 @@ public class SearchIndexTest {
   public void testGetWithProperty() {
     populateIndex();
     try {
-      SearchQuery q = new SearchQueryImpl(site);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE);
       q.withProperty("resourceid", imageid);
       assertEquals(1, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
@@ -582,7 +582,7 @@ public class SearchIndexTest {
 
     // Run a query and see if we get anything back
     try {
-      SearchQuery q = new SearchQueryImpl(site);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE);
       assertEquals(0, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
@@ -597,9 +597,9 @@ public class SearchIndexTest {
    */
   @Test
   public void testDelete() {
-    int idxSize = populateIndex();
+    populateIndex();
 
-    // Delete the page
+    // Delete a page
     try {
       idx.delete(pages[0].getURI());
     } catch (Throwable t) {
@@ -608,8 +608,8 @@ public class SearchIndexTest {
 
     // Test if we can query for the added document
     try {
-      SearchQuery q = new SearchQueryImpl(site);
-      assertEquals(idxSize - 1, idx.getByQuery(q).getItems().length);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE);
+      assertEquals(pages.length - 1, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying cleared index: " + e.getMessage());
@@ -623,10 +623,10 @@ public class SearchIndexTest {
    */
   @Test
   public void testAdd() {
-    int idxSize = populateIndex();
+    populateIndex();
     try {
-      SearchQuery q = new SearchQueryImpl(site);
-      assertEquals(idxSize, idx.getByQuery(q).getItems().length);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE);
+      assertEquals(pages.length, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying for added documents: " + e.getMessage());
@@ -655,7 +655,7 @@ public class SearchIndexTest {
 
     // Check if the index actually reflects the updated data
     try {
-      SearchQuery q = new SearchQueryImpl(site).withSubject(subject);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withSubject(subject);
       assertEquals(1, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
@@ -670,7 +670,7 @@ public class SearchIndexTest {
    */
   @Test
   public void testMove() {
-    int resources = populateIndex();
+    populateIndex();
     String newPath = "/new/path/test";
 
     // Post the update
@@ -683,12 +683,12 @@ public class SearchIndexTest {
 
     // Make sure there is a page with the new path
     try {
-      SearchQuery q = new SearchQueryImpl(site).withPath(newPath);
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(newPath);
       assertEquals(1, idx.getByQuery(q).getItems().length);
 
       // Make sure the number of pages remains the same
-      q = new SearchQueryImpl(site);
-      assertEquals(resources, idx.getByQuery(q).getItems().length);
+      q = new SearchQueryImpl(site).withType(Page.TYPE);
+      assertEquals(pages.length, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying cleared index: " + e.getMessage());

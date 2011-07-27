@@ -25,11 +25,19 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchQuery.Order;
+import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.SearchResultItem;
+import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.file.FileResource;
+import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceUtils;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
@@ -64,10 +72,12 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -109,47 +119,105 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   private String docs = null;
 
   /**
-   * Returns the resource with the given path or a <code>404</code> if the
-   * resource could not be found.
+   * Returns a collection of files which match the given criteria.
    * 
    * @param request
    *          the request
    * @param path
-   *          the resource path
-   * @return the resource
+   *          the file path (e.g. <code>/my/simple/path</code>)
+   * @param subjectstring
+   *          one ore more subjects, divided by a comma
+   * @param searchterms
+   *          fulltext search terms
+   * @param sort
+   *          sort order, possible values are
+   *          <code>created-asc, created-desc, published-asc, published-desc, modified-asc & modified-desc</code>
+   * @param limit
+   *          search result limit
+   * @param offset
+   *          search result offset (for paging in combination with limit)
+   * @param details
+   *          switch for providing files including their bodies
+   * @return a collection of matching files
    */
   @GET
-  @Produces("text/xml")
   @Path("/")
-  public Response getFileByPath(@Context HttpServletRequest request,
-      @QueryParam("path") String path) {
+  public Response getAllFiles(@Context HttpServletRequest request,
+      @QueryParam("path") String path,
+      @QueryParam("subjects") String subjectstring,
+      @QueryParam("searchterms") String searchterms,
+      @QueryParam("sort") @DefaultValue("modified-desc") String sort,
+      @QueryParam("limit") @DefaultValue("10") int limit,
+      @QueryParam("offset") @DefaultValue("0") int offset,
+      @QueryParam("details") @DefaultValue("false") boolean details) {
 
-    // Check the parameters
-    if (path == null)
-      throw new WebApplicationException(Status.BAD_REQUEST);
+    // Create search query
+    Site site = getSite(request);
+    SearchQuery q = new SearchQueryImpl(site);
+    q.withoutType(Page.TYPE);
 
-    // Get the resource
-    Resource<?> resource = loadResourceByPath(request, path, null);
-    if (resource == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
+    // Path
+    if (StringUtils.isNotBlank(path))
+      q.withPath(path);
+
+    // Subjects
+    if (StringUtils.isNotBlank(subjectstring)) {
+      StringTokenizer subjects = new StringTokenizer(subjectstring, ",");
+      while (subjects.hasMoreTokens())
+        q.withSubject(subjects.nextToken());
     }
 
-    // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(resource, request)) {
-      return Response.notModified().build();
+    // Search terms
+    if (StringUtils.isNotBlank(searchterms))
+      q.withText(searchterms);
+
+    // Limit and Offset
+    q.withLimit(limit);
+    q.withOffset(offset);
+
+    // Sort order
+    if (StringUtils.equalsIgnoreCase("modified-asc", sort)) {
+      q.sortByModificationDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("modified-desc", sort)) {
+      q.sortByModificationDate(Order.Descending);
+    } else if (StringUtils.equalsIgnoreCase("created-asc", sort)) {
+      q.sortByCreationDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("created-desc", sort)) {
+      q.sortByCreationDate(Order.Descending);
+    } else if (StringUtils.equalsIgnoreCase("published-asc", sort)) {
+      q.sortByPublishingDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("published-desc", sort)) {
+      q.sortByPublishingDate(Order.Descending);
     }
 
-    // Check the ETag
-    String eTagValue = ResourceUtils.getETagValue(resource, null);
-    if (!ResourceUtils.isMismatch(resource, null, request)) {
-      return Response.notModified(new EntityTag(eTagValue)).build();
+    // Load results
+    ContentRepository repository = getContentRepository(site, false);
+    SearchResult result = null;
+    try {
+      result = repository.find(q);
+    } catch (ContentRepositoryException e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
 
-    // Create the response
-    ResponseBuilder response = Response.ok(resource.toXml());
-    response.tag(new EntityTag(eTagValue));
-    response.lastModified(resource.getModificationDate());
-    return response.build();
+    StringBuffer buf = new StringBuffer("<files ");
+    buf.append("hits=\"").append(result.getHitCount()).append("\" ");
+    buf.append("offset=\"").append(result.getOffset()).append("\" ");
+    if (limit > 0)
+      buf.append("limit=\"").append(result.getLimit()).append("\" ");
+    buf.append("page=\"").append(result.getPage()).append("\" ");
+    buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
+    buf.append(">");
+    for (SearchResultItem item : result.getItems()) {
+      String xml = null;
+      if (details)
+        xml = ((ResourceSearchResultItem) item).toXml();
+      else
+        xml = ((ResourceSearchResultItem) item).toXml();
+      buf.append(xml);
+    }
+    buf.append("</files>");
+
+    return Response.ok(buf.toString()).build();
   }
 
   /**

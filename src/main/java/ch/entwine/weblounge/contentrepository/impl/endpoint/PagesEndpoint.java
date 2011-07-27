@@ -33,10 +33,10 @@ import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
-import ch.entwine.weblounge.common.impl.content.SearchResultPageItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
@@ -173,9 +173,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     for (SearchResultItem item : result.getItems()) {
       String xml = null;
       if (details)
-        xml = ((SearchResultPageItemImpl) item).getPageXml();
+        xml = ((PageSearchResultItemImpl) item).getPageXml();
       else
-        xml = ((SearchResultPageItemImpl) item).getPageHeaderXml();
+        xml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
       buf.append(xml);
     }
     buf.append("</pages>");
@@ -265,7 +265,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     StringBuffer buf = new StringBuffer("<pages>");
     for (SearchResultItem item : result.getItems()) {
-      String headerXml = ((SearchResultPageItemImpl) item).getPageHeaderXml();
+      String headerXml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
       buf.append(headerXml);
     }
     buf.append("</pages>");

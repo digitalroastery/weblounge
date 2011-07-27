@@ -20,23 +20,34 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.HEADER_XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
+
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
+import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.impl.content.file.FileContentReader;
 import ch.entwine.weblounge.common.impl.content.file.FilePreviewGenerator;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
+import ch.entwine.weblounge.common.impl.content.file.FileResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.FileInputDocument;
 
 import org.xml.sax.SAXException;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -104,6 +115,31 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
    */
   public List<ResourceMetadata<?>> getMetadata(Resource<?> resource) {
     return new FileInputDocument((FileResource) resource).getMetadata();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createSearchResultItem(ch.entwine.weblounge.common.site.Site,
+   *      double, java.util.Map)
+   */
+  public SearchResultItem createSearchResultItem(Site site, double relevance,
+      Map<String, ResourceMetadata<?>> metadata) {
+    String id = (String) metadata.get(ID).getValues().get(0);
+    String path = (String) metadata.get(PATH).getValues().get(0);
+
+    ResourceURI uri = new FileResourceURIImpl(site, path, id, Resource.LIVE);
+    WebUrl url = new WebUrlImpl(site, path);
+
+    FileResourceSearchResultItemImpl result = new FileResourceSearchResultItemImpl(uri, url, relevance, site);
+
+    if (metadata.get(XML) != null)
+      result.setFileXml((String) metadata.get(XML).getValues().get(0));
+    if (metadata.get(HEADER_XML) != null)
+      result.setFileHeaderXml((String) metadata.get(HEADER_XML).getValues().get(0));
+    // TODO: Add remaining metadata
+
+    return result;
   }
 
   /**
