@@ -174,9 +174,10 @@ public interface SearchQuery {
    * @return the type
    */
   String getType();
-  
+
   /**
-   * Returns the blocked resource type or <code>null</code> if no type was specified.
+   * Returns the blocked resource type or <code>null</code> if no type was
+   * specified.
    * 
    * @return the type
    */
@@ -198,6 +199,23 @@ public interface SearchQuery {
    * @return the text
    */
   String getText();
+
+  /**
+   * Returns resources that match the search query <i>and</i> and the text
+   * filter.
+   * 
+   * @param filter
+   *          the filter text
+   * @return the search query
+   */
+  SearchQuery withFilter(String filter);
+
+  /**
+   * Returns the filter expression.
+   * 
+   * @return the filter
+   */
+  String getFilter();
 
   /**
    * Specifies an element within a pagelet.
@@ -377,6 +395,24 @@ public interface SearchQuery {
    * @return the publishing end date
    */
   Date getPublishingDateEnd();
+
+  /**
+   * Return resources that have never been modified.
+   * <p>
+   * Note that this method throws an <code>IllegalStateException</code> if used
+   * in conjunction with {@link #withModificationDate(Date)},
+   * {@link #withModificationDateBetween(Date)} or {@link #and(Date)}.
+   * 
+   * @return the query extended by this criterion
+   */
+  SearchQuery withoutModification();
+
+  /**
+   * Returns <code>true</code> if resources must not have a modification date.
+   * 
+   * @return <code>true</code> if resources need to be unmodified
+   */
+  boolean getWithoutModification();
 
   /**
    * Return resources that have been modified on the given date.
