@@ -38,7 +38,7 @@ public class WorkbenchTag extends WebloungeTag {
   public static final String WORKBENCH_PARAM = "edit";
   
   /** Path to the workbench script */
-  public static final String WORKBENCH_SCRIPT = "<script src=\"/weblounge-shared/steal/steal.js?editor,development\"></script>";
+  public static final String WORKBENCH_SCRIPT = "<script src=\"/weblounge/steal/steal.js?editor,development\"></script>";
   
   /**
    * Writes the workbench script tag to the output.
