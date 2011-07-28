@@ -72,7 +72,6 @@ public class PublishingContext implements Cloneable {
    * <code>now</code> (or <code>new Date()</code>, for that matter).
    */
   public PublishingContext() {
-    startDate = new Date();
   }
 
   /**

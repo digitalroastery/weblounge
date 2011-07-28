@@ -66,7 +66,7 @@ public class ModificationContext implements Cloneable {
    * Creates a modification context with today's date and no modifier.
    */
   public ModificationContext() {
-    this(new Date(), null);
+    this(null, null);
   }
 
   /**

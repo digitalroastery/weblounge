@@ -98,6 +98,9 @@ public class SearchQueryImpl implements SearchQuery {
   /** The end of the range for the creation date */
   protected Date creationDateTo = null;
 
+  /** True if the resource must not have a modification date */
+  protected boolean withoutModificationDate = false;
+  
   /** The modification date */
   protected Date modificationDateFrom = null;
 
@@ -133,6 +136,9 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** Query terms */
   protected String text = null;
+
+  /** Filter terms */
+  protected String filter = null;
 
   /** The query offset */
   protected int offset = 0;
@@ -546,6 +552,8 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withModificationDate(java.util.Date)
    */
   public SearchQuery withModificationDate(Date date) {
+    if (withoutModificationDate)
+      throw new IllegalStateException("With modification date and without modification date are mutually exclusive");
     clearExpectations();
     modificationDateFrom = date;
     return this;
@@ -557,6 +565,8 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withModificationDateBetween(java.util.Date)
    */
   public SearchQuery withModificationDateBetween(Date date) {
+    if (withoutModificationDate)
+      throw new IllegalStateException("With modification date and without modification date are mutually exclusive");
     clearExpectations();
     configure(date);
     modificationDateFrom = date;
@@ -582,6 +592,30 @@ public class SearchQueryImpl implements SearchQuery {
     return modificationDateTo;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withoutModification()
+   */
+  public SearchQuery withoutModification() {
+    if (modificationDateFrom != null || modificationDateTo != null)
+      throw new IllegalStateException("With modification date and without modification date are mutually exclusive");
+    if (modifier  != null)
+      throw new IllegalStateException("With modifier and without modification date are mutually exclusive");
+    clearExpectations();
+    this.withoutModificationDate = true;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getWithoutModification()
+   */
+  public boolean getWithoutModification() {
+    return withoutModificationDate;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -660,6 +694,8 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withModifier(ch.entwine.weblounge.common.security.User)
    */
   public SearchQuery withModifier(User modifier) {
+    if (withoutModificationDate)
+      throw new IllegalStateException("With modifier and without modification date are mutually exclusive");
     clearExpectations();
     this.modifier = modifier;
     return this;
@@ -756,6 +792,26 @@ public class SearchQueryImpl implements SearchQuery {
     return text;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withFilter(java.lang.String)
+   */
+  public SearchQuery withFilter(String filter) {
+    clearExpectations();
+    this.filter = filter;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getFilter()
+   */
+  public String getFilter() {
+    return filter;
+  }
+  
   /**
    * {@inheritDoc}
    * 
