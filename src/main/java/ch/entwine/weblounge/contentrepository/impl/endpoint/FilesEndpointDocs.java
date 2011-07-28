@@ -111,35 +111,20 @@ public final class FilesEndpointDocs {
     getFileContentEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getFileContentEndpoint);
 
-    // GET /pending/all
-    Endpoint getPendingFilesAll = new Endpoint("/pending/all", Method.GET, "getpendingall");
-    getPendingFilesAll.setDescription("Returns all files marked as pending");
-    getPendingFilesAll.addFormat(Format.xml());
-    getPendingFilesAll.addStatus(ok("A resultset was compiled and returned as part of the response"));
-    getPendingFilesAll.addStatus(serviceUnavailable("The site or its content repository is temporarily offline"));
-    getPendingFilesAll.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
-    getPendingFilesAll.addOptionalParameter(new Parameter("type", Parameter.Type.String, "The file type, e. g. 'image'"));
-    getPendingFilesAll.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
-    getPendingFilesAll.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
-    getPendingFilesAll.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
-    getPendingFilesAll.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
-    getPendingFilesAll.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getPendingFilesAll);
-
-    // GET /pending/mine
-    Endpoint getPendingFilesMine = new Endpoint("/pending/mine", Method.GET, "getpendingmine");
-    getPendingFilesMine.setDescription("Returns all files marked as pending for the current user");
-    getPendingFilesMine.addFormat(Format.xml());
-    getPendingFilesMine.addStatus(ok("A resultset was compiled and returned as part of the response"));
-    getPendingFilesMine.addStatus(serviceUnavailable("The site or its content repository is temporarily offline"));
-    getPendingFilesMine.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
-    getPendingFilesMine.addOptionalParameter(new Parameter("type", Parameter.Type.String, "The file type, e. g. 'image'"));
-    getPendingFilesMine.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
-    getPendingFilesMine.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
-    getPendingFilesMine.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
-    getPendingFilesMine.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
-    getPendingFilesMine.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getPendingFilesMine);
+    // GET /new
+    Endpoint getNewUploadsEndpoint = new Endpoint("/new", Method.GET, "getnewuploads");
+    getNewUploadsEndpoint.setDescription("Returns all unmodified resources");
+    getNewUploadsEndpoint.addFormat(Format.xml());
+    getNewUploadsEndpoint.addStatus(ok("A resultset was compiled and returned as part of the response"));
+    getNewUploadsEndpoint.addStatus(serviceUnavailable("The site or its content repository is temporarily offline"));
+    getNewUploadsEndpoint.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
+    getNewUploadsEndpoint.addOptionalParameter(new Parameter("type", Parameter.Type.String, "The file type, e. g. 'image'"));
+    getNewUploadsEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
+    getNewUploadsEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
+    getNewUploadsEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
+    getNewUploadsEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
+    getNewUploadsEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getNewUploadsEndpoint);
 
     // POST /
     Endpoint createFileEndpoint = new Endpoint("/", Method.POST, "createfile");

@@ -234,7 +234,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    */
   @GET
   @Path("/new")
-  public Response getPendingAll(@Context HttpServletRequest request,
+  public Response getUploads(@Context HttpServletRequest request,
       @QueryParam("filter") String filter,
       @QueryParam("type") String type,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,

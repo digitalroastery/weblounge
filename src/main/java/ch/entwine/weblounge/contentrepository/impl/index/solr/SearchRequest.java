@@ -478,7 +478,7 @@ public class SearchRequest {
       buf.append(" AND "); // notice the minus sign
     buf.append("-"); // notice the minus sign
     buf.append(StringUtils.trim(fieldName));
-    buf.append(":[\"\" TO *]");
+    buf.append(":[* TO *]");
     return buf;
   }
 
