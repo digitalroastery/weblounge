@@ -1,4 +1,4 @@
-steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', 'editor/composer')
+steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', 'editor/pageheadeditor', 'editor/composer')
 .models('../../models/runtime', '../../models/page')
 .then(function($) {
 		
@@ -23,15 +23,45 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
 				return false;
 			}
 			
-			Runtime.findOne({}, this.callback('_loadRuntime'));
+			Runtime.findOne({}, this.callback('_setRuntime'));
 			this._loadCurrentLanguage();
 			this._loadValidateLanguage();
 			
         	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
-        	Page.findOne({path: path}, this.callback('_setPage'));
+        	Page.findOne({path: path}, this.callback('_initViews'));
         },
         
-        _loadRuntime: function(runtime) {
+        update: function(options) {
+        	if(options !== undefined) {
+        		this.options.mode = options.mode;
+        	}
+        	this.menuBar.editor_menubar({mode: this.options.mode});
+        	switch (this.options.mode) {
+        	case 0:
+        		this.pagesTab.hide();
+        		this.mediaTab.hide();
+        		break;
+        	case 1:
+        		this.pagesTab.show();
+        		this.mediaTab.hide();
+        		break;
+        	case 2:
+        		this.mediaTab.show();
+        		this.pagesTab.hide();
+        		break;
+        	}
+        },
+        
+        _initViews: function(page) {
+        	this.page = page;
+        	$('.composer').editor_composer({page: page, language: this.options.language, runtime: this.runtime});
+			this.menuBar = this.find('#wbl-menubar').editor_menubar({page: page, runtime: this.runtime, language: this.options.language});
+            this.pagesTab = this.find('#wbl-pagebrowser');
+            this.mediaTab = this.find('#wbl-mediabrowser');
+            this.update();
+        },
+        
+        _setRuntime: function(runtime) {
         	this.runtime = runtime;
         	this.options.language = this.runtime.getDefaultLanguage();
         },
@@ -57,39 +87,6 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         		return 'localStorage' in window && window['localStorage'] !== null;
         	} catch (e) {
         		return false;
-        	}
-        },
-        
-        _initTab: function() {
-        	this.update();
-        },
-        
-        _setPage: function(page) {
-        	$('.composer').editor_composer({page: page, language: this.options.language, runtime: this.runtime});
-			this.menuBar = this.find('#wbl-menubar').editor_menubar({page: page, runtime: this.runtime, language: this.options.language});
-            this.pagesTab = this.find('#wbl-pagebrowser');
-            this.mediaTab = this.find('#wbl-mediabrowser');
-            this._initTab();
-        },
-        
-        update: function(options) {
-        	if(options !== undefined) {
-        		this.options.mode = options.mode;
-        	}
-        	this.menuBar.editor_menubar({mode: this.options.mode});
-        	switch (this.options.mode) {
-	      	  case 0:
-	      	  	this.pagesTab.hide();
-	      	  	this.mediaTab.hide();
-	      		break;
-	      	  case 1:
-	      		this.pagesTab.show();
-	      	  	this.mediaTab.hide();
-	      	  	break;
-	      	  case 2:
-	      		this.mediaTab.show();
-	      	  	this.pagesTab.hide();
-	      		break;
         	}
         },
         

@@ -1,4 +1,4 @@
-steal.plugins('jquery/view/tmpl', 'jquery/event/key')
+steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller')
 .views('//editor/resourcebrowser/views/resourcepagessearch.tmpl', '//editor/resourcebrowser/views/resourcemediasearch.tmpl')
 .then(function($) {
 
@@ -56,10 +56,16 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key')
 	    	steal.dev.log(id + fileName);
 	    },
 	    
+	    "img.wbl-addPageImg click": function(el, ev) {
+	    	ev.stopPropagation();
+			$('.wbl-menu').hide();
+			$('#wbl-pagecreator').editor_pagecreator({language: this.options.language, runtime: this.options.runtime});
+	    },
+	    
 	    "button#wbl-tagButton click": function(el, ev) {
 	    	$('div#wbl-tagger').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
 	    }
-		
+	    		
 	});
 
 });

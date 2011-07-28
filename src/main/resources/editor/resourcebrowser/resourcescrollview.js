@@ -1,6 +1,6 @@
 steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 .views('//editor/resourcebrowser/views/resourcescrollview.tmpl')
-.resources('jquery.smoothDivScroll-1.1')
+.resources('jquery.smoothDivScroll-1.1', 'jquery.lazyload')
 .css('resources/smoothDivScroll')
 .then('resourceview', 'resourcescrollviewitem')
 .then(function($) {
@@ -29,6 +29,13 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 				autoScrollInterval: 15,
 				visibleHotSpots: "always"
 		  	});
+			
+			// Update evtl
+//			this.element.find('img.wbl-pageThumbnail').lazyload({         
+//				placeholder: "images/grey.gif",
+//				event: "mouseover",
+//				container: this.element.find("div.scrollableArea")
+//			});
 		},
 		
 		_initViewItems: function() {
