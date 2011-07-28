@@ -108,13 +108,21 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         },
         
         "a showPages": function(el, ev) {
-        	this.update({mode: 1});
-        	this.pagesTab.editor_resourcebrowser({resourceType: 'pages', language: this.options.language, runtime: this.runtime});
+        	if(this.options.mode == 1) {
+        		this.pagesTab.editor_resourcebrowser(true);
+        	} else {
+        		this.update({mode: 1});
+        		this.pagesTab.editor_resourcebrowser({resourceType: 'pages', language: this.options.language, runtime: this.runtime});
+        	}
         },
         
         "a showMedia": function(el, ev) {
-        	this.update({mode: 2});
-        	this.mediaTab.editor_resourcebrowser({resourceType: 'media', language: this.options.language, runtime: this.runtime});
+        	if(this.options.mode == 2) {
+        		this.mediaTab.editor_resourcebrowser(true);
+        	} else {
+        		this.update({mode: 2});
+        		this.mediaTab.editor_resourcebrowser({resourceType: 'media', language: this.options.language, runtime: this.runtime});
+        	}
         },
         
         "span changeLanguage": function(el, ev, language) {

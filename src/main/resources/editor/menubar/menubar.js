@@ -56,7 +56,7 @@ steal.plugins(
         _updateView: function() {
         	switch (this.options.mode) {
 	      	  case 0:
-	      		  this._toggleTab(this.find('.wbl-tab.designer'));
+	      		  this._toggleTab(this.find('.wbl-tab.wbl-designer'));
 	      		  this.toolbarMore = this.find('img.wbl-more').show();
 	      		  this.toolbarEdit = this.find('span.wbl-editmode').show();
 	      		  this.pageOptions = this.find('div#wbl-pageOptions').show();

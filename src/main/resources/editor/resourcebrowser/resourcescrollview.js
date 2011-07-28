@@ -23,10 +23,10 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		
 		_initSmoothDivScroll: function() {
 			this.find('#wbl-makeMeScrollable').smoothDivScroll({
-			  	autoScroll: "onstart" , 
-				autoScrollDirection: "backandforth", 
-				autoScrollStep: 1, 
-				autoScrollInterval: 15,	
+			  	autoScroll: "onstart",
+				autoScrollDirection: "left",
+				autoScrollStep: 1,
+				autoScrollInterval: 15,
 				visibleHotSpots: "always"
 		  	});
 		},
@@ -36,6 +36,11 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 				var scrollViewItem = this.element.find('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {page: res, language: this.options.language});
 				scrollViewItem.find('div.wbl-scrollViewItem').editor_resourcescrollviewitem({page: res});
 			}, this));
+		},
+		
+		"div.wbl-makeMeScrollable click": function(el, ev) {
+			steal.dev.log('adsf');
+			// ?? ungleich makeMeScrollable
 		},
 		
 		"button.wbl-duplicate click": function(el, ev) {

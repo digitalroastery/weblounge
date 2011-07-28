@@ -18,12 +18,22 @@ steal.plugins(
 		init: function(el) {
 			$(el).html('//editor/resourcebrowser/views/init.tmpl', {});
 			this._initViewItems();
+			this.searchFlag = true;
 //			this._loadResources();
 		},
 		
-		update: function() {
+		update: function(showSearchBox) {
 			if($.isEmptyObject(this.options.resources)) return;
-			this.searchBox.hide();
+			if(showSearchBox == true) {
+				this.searchFlag = true;
+				this.searchBox.show();
+				this.scrollView.hide();
+				this.listView.hide();
+			} 
+			else if(this.searchFlag == false) {
+				this.activeElement.show();
+				this.searchBox.hide();
+			}
 			this.scrollView.editor_resourcescrollview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
 			this.listView.editor_resourcelistview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
 		},
@@ -99,6 +109,7 @@ steal.plugins(
 		"input searchMedia": function(el, ev, searchValue) {
 			Page.findBySearch({search: searchValue}, $.proxy(function(pages) {
 				this.options.resources = pages;
+				this.searchFlag = false;
 				this.update();
 			}, this));
 		},
@@ -106,6 +117,7 @@ steal.plugins(
 		"input searchPages": function(el, ev, searchValue) {
 			Page.findBySearch({search: searchValue}, $.proxy(function(pages) {
 				this.options.resources = pages;
+				this.searchFlag = false;
 				this.update();
 			}, this));
 		},
@@ -144,6 +156,7 @@ steal.plugins(
 				case 'pages':
 					Page.findRecent({}, $.proxy(function(pages) {
 						this.options.resources = pages;
+						this.searchFlag = false;
 						this.update();
 					}, this));
 					break;
@@ -151,6 +164,7 @@ steal.plugins(
 					// TODO Replace with Files Model
 					Page.findRecent({}, $.proxy(function(media) {
 						this.options.resources = media;
+						this.searchFlag = false;
 						this.update();
 					}, this));
 					break;
@@ -159,11 +173,13 @@ steal.plugins(
 		
 		"button.wbl-favorites click": function(el, ev) {
 			steal.dev.log('favorites')
+			this.searchFlag = false;
 			this.update();
 		},
 		
 		"button.wbl-pending click": function(el, ev) {
 			steal.dev.log('show pending')
+			this.searchFlag = false;
 			this.update();
 		},
 		
@@ -172,6 +188,7 @@ steal.plugins(
 			case 'pages':
 				Page.findAll({}, $.proxy(function(pages) {
 					this.options.resources = pages;
+					this.searchFlag = false;
 					this.update();
 				}, this));
 				break;
@@ -179,6 +196,7 @@ steal.plugins(
 				// TODO Replace with Files Model
 				Page.findAll({}, $.proxy(function(media) {
 					this.options.resources = media;
+					this.searchFlag = false;
 					this.update();
 				}, this));
 				break;

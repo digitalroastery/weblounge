@@ -25,7 +25,7 @@ steal.plugins('jquery/view/tmpl')
 			this.find('table').dataTable({
 				"bPaginate": true,
 				"bLengthChange": true,
-				"bFilter": true,
+				"bFilter": false,
 				"bSort": true,
 				"bInfo": true,
 				"bAutoWidth": true,
