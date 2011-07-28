@@ -6,7 +6,7 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key')
 	{	
 		init: function(el) {
 			if(this.options.resourceType == 'pages') {
-				$(el).html('//editor/resourcebrowser/views/resourcepagessearch.tmpl', {});
+				$(el).html('//editor/resourcebrowser/views/resourcepagessearch.tmpl', {runtime: this.options.runtime});
 			}
 			else if(this.options.resourceType == 'media') {
 				$(el).html('//editor/resourcebrowser/views/resourcemediasearch.tmpl', {});

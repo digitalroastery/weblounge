@@ -8,6 +8,11 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			$.Hover.delay = 0;
 			this.element.find('img.wbl-showPage').hide();
 			this.element.find('img.wbl-trashPage').hide();
+			
+			// Load default image if error during preview loading
+            this.element.find('img.wbl-pageThumbnail').bind('error', function(event) {
+            	$(this).attr('src', '/weblounge/editor/resourcebrowser/images/empty_thumbnail.png');
+            });
 		},
 		
 		"click": function(el, ev) {

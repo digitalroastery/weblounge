@@ -392,3 +392,20 @@ img.wbl-pageThumbnail {
 	border: 1px solid black;
 	background-color: white;
 }
+
+.editor_resourcebrowser div#wbl-addPage {
+	position: relative;
+	float: left;
+    height: 400px;
+    width: 324px;
+    margin: 0 auto;
+    margin-top: 5%;
+}
+
+.editor_resourcebrowser img.wbl-add {
+	cursor: pointer;
+	position: relative;
+	top: 190px;
+	left: 150px;
+	padding: 0 30px;
+}
