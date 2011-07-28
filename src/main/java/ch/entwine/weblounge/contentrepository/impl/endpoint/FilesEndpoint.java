@@ -181,6 +181,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     if (StringUtils.isNotBlank(searchterms))
       q.withText(searchterms);
 
+    // Filter query
+    if (StringUtils.isNotBlank(filter))
+      q.withFilter(filter);
+
     // Limit and Offset
     q.withLimit(limit);
     q.withOffset(offset);
@@ -229,9 +233,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    * @return a collection of matching files
    */
   @GET
-  @Path("/pending/all")
+  @Path("/new")
   public Response getPendingAll(@Context HttpServletRequest request,
-      @QueryParam("filter") String searchterms,
+      @QueryParam("filter") String filter,
       @QueryParam("type") String type,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
       @QueryParam("limit") @DefaultValue("10") int limit,
@@ -242,86 +246,17 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
 
-    // Type
-    q.withoutType(Page.TYPE);
-    if (StringUtils.isNotBlank(type))
-      q.withType(type);
-
-    // Search terms
-    if (StringUtils.isNotBlank(searchterms))
-      q.withText(searchterms);
-
-    // Limit and Offset
-    q.withLimit(limit);
-    q.withOffset(offset);
-
-    // Sort order
-    if (StringUtils.equalsIgnoreCase("modified-asc", sort)) {
-      q.sortByModificationDate(Order.Ascending);
-    } else if (StringUtils.equalsIgnoreCase("modified-desc", sort)) {
-      q.sortByModificationDate(Order.Descending);
-    } else if (StringUtils.equalsIgnoreCase("created-asc", sort)) {
-      q.sortByCreationDate(Order.Ascending);
-    } else if (StringUtils.equalsIgnoreCase("created-desc", sort)) {
-      q.sortByCreationDate(Order.Descending);
-    } else if (StringUtils.equalsIgnoreCase("published-asc", sort)) {
-      q.sortByPublishingDate(Order.Ascending);
-    } else if (StringUtils.equalsIgnoreCase("published-desc", sort)) {
-      q.sortByPublishingDate(Order.Descending);
-    }
-
-    // Load the result
-    String result = loadResultSet(q, details);
-
-    // Return the response
-    return Response.ok(result).build();
-
-  }
-
-  /**
-   * Returns a collection of files that are defined as pending for the current
-   * user.
-   * 
-   * @param request
-   *          the request
-   * @param filter
-   *          further search result filtering
-   * @param type
-   *          the file type, e. g.
-   *          {@link ch.entwine.weblounge.common.content.image.ImageResource#TYPE}
-   * @param sort
-   *          sort order, possible values are
-   *          <code>created-asc, created-desc, published-asc, published-desc, modified-asc & modified-desc</code>
-   * @param limit
-   *          search result limit
-   * @param offset
-   *          search result offset (for paging in combination with limit)
-   * @param details
-   *          switch for providing files including their bodies
-   * @return a collection of matching files
-   */
-  @GET
-  @Path("/pending/mine")
-  public Response getPendingPersonal(@Context HttpServletRequest request,
-      @QueryParam("filter") String searchterms,
-      @QueryParam("type") String type,
-      @QueryParam("sort") @DefaultValue("modified-desc") String sort,
-      @QueryParam("limit") @DefaultValue("10") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset,
-      @QueryParam("details") @DefaultValue("false") boolean details) {
-
-    // Create search query
-    Site site = getSite(request);
-    SearchQuery q = new SearchQueryImpl(site);
+    // Only take resources that have not been modified
+    q.withoutModification();
 
     // Type
     q.withoutType(Page.TYPE);
     if (StringUtils.isNotBlank(type))
       q.withType(type);
 
-    // Search terms
-    if (StringUtils.isNotBlank(searchterms))
-      q.withText(searchterms);
+    // Filter query
+    if (StringUtils.isNotBlank(filter))
+      q.withFilter(filter);
 
     // Limit and Offset
     q.withLimit(limit);

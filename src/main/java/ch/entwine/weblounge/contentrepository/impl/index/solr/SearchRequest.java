@@ -168,6 +168,11 @@ public class SearchRequest {
       and(solrQuery, MODIFIED, SolrUtils.selectDay(query.getModificationDate()), false, false);
     }
 
+    // Without Modification
+    if (query.getWithoutModification()) {
+      andEmpty(solrQuery, MODIFIED);
+    }
+
     // Publisher
     if (query.getPublisher() != null) {
       and(solrQuery, PUBLISHED_BY, SolrUtils.serializeUser(query.getPublisher()), true, true);
@@ -455,6 +460,25 @@ public class SearchRequest {
       buf.append(StringUtils.trim(fieldValue));
     if (quote)
       buf.append("\"");
+    return buf;
+  }
+
+  /**
+   * Encodes the field name as part of the AND clause of a solr query:
+   * <tt>AND -fieldName : ["" TO *]</tt>.
+   * 
+   * @param buf
+   *          the <code>StringBuilder</code> to append to
+   * @param fieldName
+   *          the field name
+   * @return the encoded query part
+   */
+  private StringBuilder andEmpty(StringBuilder buf, String fieldName) {
+    if (buf.length() > 0)
+      buf.append(" AND "); // notice the minus sign
+    buf.append("-"); // notice the minus sign
+    buf.append(StringUtils.trim(fieldName));
+    buf.append(":[\"\" TO *]");
     return buf;
   }
 
