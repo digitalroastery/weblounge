@@ -24,12 +24,12 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceReader;
+import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
@@ -129,6 +129,11 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    *          one ore more subjects, divided by a comma
    * @param searchterms
    *          fulltext search terms
+   * @param filter
+   *          further search result filtering
+   * @param type
+   *          the file type, e. g.
+   *          {@link ch.entwine.weblounge.common.content.image.ImageResource#TYPE}
    * @param sort
    *          sort order, possible values are
    *          <code>created-asc, created-desc, published-asc, published-desc, modified-asc & modified-desc</code>
@@ -146,6 +151,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       @QueryParam("path") String path,
       @QueryParam("subjects") String subjectstring,
       @QueryParam("searchterms") String searchterms,
+      @QueryParam("filter") String filter, @QueryParam("type") String type,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
       @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset,
@@ -154,7 +160,11 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Create search query
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
+
+    // Type
     q.withoutType(Page.TYPE);
+    if (StringUtils.isNotBlank(type))
+      q.withType(type);
 
     // Path
     if (StringUtils.isNotBlank(path))
@@ -190,34 +200,154 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       q.sortByPublishingDate(Order.Descending);
     }
 
-    // Load results
-    ContentRepository repository = getContentRepository(site, false);
-    SearchResult result = null;
-    try {
-      result = repository.find(q);
-    } catch (ContentRepositoryException e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    // Load the result
+    String result = loadResultSet(q, details);
+
+    // Return the response
+    return Response.ok(result).build();
+  }
+
+  /**
+   * Returns a collection of files that are defined as pending.
+   * 
+   * @param request
+   *          the request
+   * @param filter
+   *          further search result filtering
+   * @param type
+   *          the file type, e. g.
+   *          {@link ch.entwine.weblounge.common.content.image.ImageResource#TYPE}
+   * @param sort
+   *          sort order, possible values are
+   *          <code>created-asc, created-desc, published-asc, published-desc, modified-asc & modified-desc</code>
+   * @param limit
+   *          search result limit
+   * @param offset
+   *          search result offset (for paging in combination with limit)
+   * @param details
+   *          switch for providing files including their bodies
+   * @return a collection of matching files
+   */
+  @GET
+  @Path("/pending/all")
+  public Response getPendingAll(@Context HttpServletRequest request,
+      @QueryParam("filter") String searchterms,
+      @QueryParam("type") String type,
+      @QueryParam("sort") @DefaultValue("modified-desc") String sort,
+      @QueryParam("limit") @DefaultValue("10") int limit,
+      @QueryParam("offset") @DefaultValue("0") int offset,
+      @QueryParam("details") @DefaultValue("false") boolean details) {
+
+    // Create search query
+    Site site = getSite(request);
+    SearchQuery q = new SearchQueryImpl(site);
+
+    // Type
+    q.withoutType(Page.TYPE);
+    if (StringUtils.isNotBlank(type))
+      q.withType(type);
+
+    // Search terms
+    if (StringUtils.isNotBlank(searchterms))
+      q.withText(searchterms);
+
+    // Limit and Offset
+    q.withLimit(limit);
+    q.withOffset(offset);
+
+    // Sort order
+    if (StringUtils.equalsIgnoreCase("modified-asc", sort)) {
+      q.sortByModificationDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("modified-desc", sort)) {
+      q.sortByModificationDate(Order.Descending);
+    } else if (StringUtils.equalsIgnoreCase("created-asc", sort)) {
+      q.sortByCreationDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("created-desc", sort)) {
+      q.sortByCreationDate(Order.Descending);
+    } else if (StringUtils.equalsIgnoreCase("published-asc", sort)) {
+      q.sortByPublishingDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("published-desc", sort)) {
+      q.sortByPublishingDate(Order.Descending);
     }
 
-    StringBuffer buf = new StringBuffer("<files ");
-    buf.append("hits=\"").append(result.getHitCount()).append("\" ");
-    buf.append("offset=\"").append(result.getOffset()).append("\" ");
-    if (limit > 0)
-      buf.append("limit=\"").append(result.getLimit()).append("\" ");
-    buf.append("page=\"").append(result.getPage()).append("\" ");
-    buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
-    buf.append(">");
-    for (SearchResultItem item : result.getItems()) {
-      String xml = null;
-      if (details)
-        xml = ((ResourceSearchResultItem) item).toXml();
-      else
-        xml = ((ResourceSearchResultItem) item).toXml();
-      buf.append(xml);
-    }
-    buf.append("</files>");
+    // Load the result
+    String result = loadResultSet(q, details);
 
-    return Response.ok(buf.toString()).build();
+    // Return the response
+    return Response.ok(result).build();
+
+  }
+
+  /**
+   * Returns a collection of files that are defined as pending for the current
+   * user.
+   * 
+   * @param request
+   *          the request
+   * @param filter
+   *          further search result filtering
+   * @param type
+   *          the file type, e. g.
+   *          {@link ch.entwine.weblounge.common.content.image.ImageResource#TYPE}
+   * @param sort
+   *          sort order, possible values are
+   *          <code>created-asc, created-desc, published-asc, published-desc, modified-asc & modified-desc</code>
+   * @param limit
+   *          search result limit
+   * @param offset
+   *          search result offset (for paging in combination with limit)
+   * @param details
+   *          switch for providing files including their bodies
+   * @return a collection of matching files
+   */
+  @GET
+  @Path("/pending/mine")
+  public Response getPendingPersonal(@Context HttpServletRequest request,
+      @QueryParam("filter") String searchterms,
+      @QueryParam("type") String type,
+      @QueryParam("sort") @DefaultValue("modified-desc") String sort,
+      @QueryParam("limit") @DefaultValue("10") int limit,
+      @QueryParam("offset") @DefaultValue("0") int offset,
+      @QueryParam("details") @DefaultValue("false") boolean details) {
+
+    // Create search query
+    Site site = getSite(request);
+    SearchQuery q = new SearchQueryImpl(site);
+
+    // Type
+    q.withoutType(Page.TYPE);
+    if (StringUtils.isNotBlank(type))
+      q.withType(type);
+
+    // Search terms
+    if (StringUtils.isNotBlank(searchterms))
+      q.withText(searchterms);
+
+    // Limit and Offset
+    q.withLimit(limit);
+    q.withOffset(offset);
+
+    // Sort order
+    if (StringUtils.equalsIgnoreCase("modified-asc", sort)) {
+      q.sortByModificationDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("modified-desc", sort)) {
+      q.sortByModificationDate(Order.Descending);
+    } else if (StringUtils.equalsIgnoreCase("created-asc", sort)) {
+      q.sortByCreationDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("created-desc", sort)) {
+      q.sortByCreationDate(Order.Descending);
+    } else if (StringUtils.equalsIgnoreCase("published-asc", sort)) {
+      q.sortByPublishingDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("published-desc", sort)) {
+      q.sortByPublishingDate(Order.Descending);
+    }
+
+    // Load the result
+    String result = loadResultSet(q, details);
+
+    // Return the response
+    return Response.ok(result).build();
+
   }
 
   /**
@@ -233,7 +363,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   @GET
   @Produces("text/xml")
   @Path("/{resource}")
-  public Response getFileByURI(@Context HttpServletRequest request,
+  public Response getFileById(@Context HttpServletRequest request,
       @PathParam("resource") String resourceId) {
 
     // Check the parameters
@@ -833,7 +963,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
               if (StringUtils.isBlank(fieldValue))
                 continue;
               if (OPT_PATH.equals(fieldName)) {
-                path = Streams.asString(item.openStream());
+                path = fieldValue;
               } else if (OPT_LANGUAGE.equals(fieldName)) {
                 try {
                   language = LanguageUtils.getLanguage(fieldValue);
@@ -841,7 +971,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
                   throw new WebApplicationException(Status.BAD_REQUEST);
                 }
               } else if (OPT_MIMETYPE.equals(fieldName)) {
-                mimeType = Streams.asString(item.openStream());
+                mimeType = fieldValue;
               }
             } else {
               // once the body gets read iter.hasNext must not be invoked
@@ -1052,6 +1182,51 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       docs = FilesEndpointDocs.createDocumentation(servicePath);
     }
     return docs;
+  }
+
+  /**
+   * Loads the files from the site's content repository.
+   * 
+   * @param q
+   *          the search query
+   * @param details
+   *          <code>true</code> to provide detailed output
+   * @return the files
+   * @throws WebApplicationException
+   *           if the content repository is unavailable or if the content can't
+   *           be loaded
+   */
+  private String loadResultSet(SearchQuery q, boolean details)
+      throws WebApplicationException {
+    ContentRepository repository = getContentRepository(q.getSite(), false);
+    if (repository == null)
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+
+    SearchResult result = null;
+    try {
+      result = repository.find(q);
+    } catch (ContentRepositoryException e) {
+      throw new WebApplicationException();
+    }
+
+    StringBuffer buf = new StringBuffer("<files ");
+    buf.append("hits=\"").append(result.getHitCount()).append("\" ");
+    buf.append("offset=\"").append(result.getOffset()).append("\" ");
+    if (q.getLimit() > 0)
+      buf.append("limit=\"").append(result.getLimit()).append("\" ");
+    buf.append("page=\"").append(result.getPage()).append("\" ");
+    buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
+    buf.append(">");
+    for (SearchResultItem item : result.getItems()) {
+      String xml = null;
+      if (details)
+        xml = ((ResourceSearchResultItem) item).toXml();
+      else
+        xml = ((ResourceSearchResultItem) item).toXml();
+      buf.append(xml);
+    }
+    buf.append("</files>");
+    return buf.toString();
   }
 
   /**
