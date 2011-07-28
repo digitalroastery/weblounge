@@ -38,11 +38,6 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 			}, this));
 		},
 		
-		"div.wbl-makeMeScrollable click": function(el, ev) {
-			steal.dev.log('adsf');
-			// ?? ungleich makeMeScrollable
-		},
-		
 		"button.wbl-duplicate click": function(el, ev) {
 			this.options.selectedPages = this.find('div.wbl-resourceScrollViewItem.wbl-marked');
 			if(this.options.selectedPages.length == 1) {

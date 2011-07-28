@@ -85,6 +85,16 @@ steal.plugins(
 //			}
 //		},
 		
+		/**
+		 * Unmark the scrollViewItems if you click outside of a item
+		 */
+		"div click": function(el, ev) {
+			ev.stopPropagation();
+			if(!el.is(this.element.find('div.wbl-scrollViewItem'))) {
+				this.element.find('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
+			}
+		},
+		
         _removeResource: function(id) {
 	    	var index = -1;
 	    	$.each(this.options.resources, function(i, resources) {
