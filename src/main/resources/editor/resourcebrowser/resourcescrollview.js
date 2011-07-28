@@ -33,9 +33,18 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		
 		_initViewItems: function() {
 			$.each(this.options.resources, $.proxy(function (i, res) {
-				var scrollViewItem = this.element.find('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {page: res, language: this.options.language});
-				scrollViewItem.find('div.wbl-scrollViewItem').editor_resourcescrollviewitem({page: res});
+				var scrollViewItem = this.element.find('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {
+					page: res, 
+					language: this.options.language,
+					runtime: this.options.runtime
+				});
+				scrollViewItem.find('div.wbl-scrollViewItem').editor_resourcescrollviewitem({page: res, runtime: this.options.runtime});
 			}, this));
+		},
+		
+		"img.wbl-trashPage deletePage": function(el, ev) {
+			this.options.selectedPages = el.parent();
+			this.deleteDialog.dialog('open');
 		},
 		
 		"button.wbl-duplicate click": function(el, ev) {

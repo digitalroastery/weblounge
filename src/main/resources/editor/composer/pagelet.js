@@ -185,7 +185,6 @@ steal.plugins('jqueryui/dialog',
     			$(input).find('option:selected').each(function(){
     				optionArray.push($(this).val());
     			});
-    			if($.isEmptyObject(optionArray)) return;
     			if(element[0] == 'property') {
     				pagelet.properties.property[element[1]] = optionArray.toString();
     			} 
@@ -211,7 +210,6 @@ steal.plugins('jqueryui/dialog',
     			}
     		}
     		else {
-    			if(input.value == '') return;
     			if(element[0] == 'property') {
     				pagelet.properties.property[element[1]] = input.value;
     			} 

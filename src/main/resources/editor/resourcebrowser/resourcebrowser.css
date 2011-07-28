@@ -117,14 +117,6 @@
 	color: #fff;
 }
 
-.editor_resourcebrowser td.wbl-action img {
-	display:none;
-}
-
-.editor_resourcebrowser td.wbl-action img.wbl-settings {
-	display:inline;
-}
-
 .editor_resourcebrowser tr.bg td {
 	background-color: #efefef;
 }
@@ -373,4 +365,30 @@ img.wbl-pageThumbnail {
     right: 10%;
     top: 35%;
     width: 282px;
+}
+
+.editor_resourcebrowser img.wbl-showPage {
+	cursor: pointer;
+	display: inline-block;
+	position:absolute;
+  	top: 30;
+  	left: 106;
+	height: 24px;
+	width: 24px;
+	z-index: 1000;
+	border: 1px solid black;
+	background-color: white;
+}
+
+.editor_resourcebrowser img.wbl-trashPage {
+	cursor: pointer;
+	display: inline-block;
+	position:absolute;
+  	top: 30;
+  	left: 80;
+	height: 24px;
+	width: 24px;
+	z-index: 1000;
+	border: 1px solid black;
+	background-color: white;
 }

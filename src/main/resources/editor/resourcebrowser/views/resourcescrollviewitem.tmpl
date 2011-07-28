@@ -7,4 +7,6 @@
 		Tags: {{each page.head.metadata.subject}} ${$value}, {{/each}}<br/>
 		URL: <a href="${page.path}" class="wbl-pagePath" title="Gehe zu Seite">${page.path}</a>
 	</p>
+	<img class="wbl-showPage" src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_read.png" />
+	<img class="wbl-trashPage" src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_trash.png" />
 </div>
