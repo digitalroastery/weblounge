@@ -34,6 +34,7 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         revert: true,
         start: $.proxy(function(event, ui) {
         	this.element.find('img.wbl-iconEditing').remove();
+        	this.element.find('img.wbl-iconRemove').remove();
         	
         	// add pageletData to draggable helper
         	var index = ui.item.attr('index');

@@ -246,16 +246,23 @@ steal.plugins('jqueryui/dialog',
 		if(!this.showHover) return;
 		this.element.append('<img class="wbl-iconEditing" src="' + this.options.composer.runtime.getRootPath() + 
 				'/editor/composer/resources/icon_editing.png" />');
+		this.element.append('<img class="wbl-iconRemove" src="' + this.options.composer.runtime.getRootPath() + 
+		'/editor/resourcebrowser/images/icon_trash.png" />');
     },
     
 	'hoverleave': function(ev, hover) {
 		if(!this.showHover) return;
 		this.element.find('img.wbl-iconEditing').remove();
+		this.element.find('img.wbl-iconRemove').remove();
     },
 
-	'img.wbl-iconEditing click': function(ev) {
+	'img.wbl-iconEditing click': function(el, ev) {
 		Workbench.findOne({ id: this.options.composer.page.value.id, composer: this.options.composer.id, pagelet: this.element.index() }, this.callback('_openPageEditor'));
-	}
+	},
+	
+    'img.wbl-iconRemove click': function(el, ev) {
+    	this._deletePagelet();
+    }
 
   });
 
