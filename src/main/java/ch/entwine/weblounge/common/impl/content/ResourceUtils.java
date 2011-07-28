@@ -150,7 +150,10 @@ public final class ResourceUtils {
     long etag = resource.getIdentifier().hashCode();
     if (language != null)
       etag += language.getIdentifier().hashCode();
-    etag += resource.getModificationDate().getTime();
+    if (resource.getModificationDate() != null)
+      etag += resource.getModificationDate().getTime();
+    else
+      etag += resource.getCreationDate().getTime();
     return new StringBuffer().append("\"").append(etag).append("\"").toString();
   }
 
