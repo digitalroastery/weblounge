@@ -68,7 +68,10 @@ public final class ResourceUtils {
       HttpServletRequest request) throws IllegalArgumentException {
     long cachedModificationDate = request.getDateHeader("If-Modified-Since");
     Date resourceModificationDate = resource.getModificationDate();
-    return cachedModificationDate < resourceModificationDate.getTime();
+    if (resourceModificationDate != null)
+      return cachedModificationDate < resourceModificationDate.getTime();
+    else
+      return cachedModificationDate < resource.getCreationDate().getTime();
   }
 
   /**
