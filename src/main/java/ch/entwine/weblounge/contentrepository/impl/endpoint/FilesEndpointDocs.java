@@ -111,18 +111,18 @@ public final class FilesEndpointDocs {
     docs.addEndpoint(Endpoint.Type.READ, getFileContentEndpoint);
 
     // GET /new
-    Endpoint getNewUploadsEndpoint = new Endpoint("/new", Method.GET, "getnewuploads");
-    getNewUploadsEndpoint.setDescription("Returns all unmodified resources");
-    getNewUploadsEndpoint.addFormat(Format.xml());
-    getNewUploadsEndpoint.addStatus(ok("A resultset was compiled and returned as part of the response"));
-    getNewUploadsEndpoint.addStatus(serviceUnavailable("The site or its content repository is temporarily offline"));
-    getNewUploadsEndpoint.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
-    getNewUploadsEndpoint.addOptionalParameter(new Parameter("type", Parameter.Type.String, "The file type, e. g. 'image'"));
-    getNewUploadsEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
-    getNewUploadsEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
-    getNewUploadsEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
-    getNewUploadsEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getNewUploadsEndpoint);
+    Endpoint getUploads = new Endpoint("/uploads", Method.GET, "getnewuploads");
+    getUploads.setDescription("Returns all unmodified resources");
+    getUploads.addFormat(Format.xml());
+    getUploads.addStatus(ok("A resultset was compiled and returned as part of the response"));
+    getUploads.addStatus(serviceUnavailable("The site or its content repository is temporarily offline"));
+    getUploads.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
+    getUploads.addOptionalParameter(new Parameter("type", Parameter.Type.String, "The file type, e. g. 'image'"));
+    getUploads.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
+    getUploads.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
+    getUploads.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
+    getUploads.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getUploads);
 
     // POST /
     Endpoint createFileEndpoint = new Endpoint("/", Method.POST, "createfile");

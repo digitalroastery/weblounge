@@ -228,8 +228,8 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    * @return a collection of matching files
    */
   @GET
-  @Path("/new")
-  public Response getNewFiles(@Context HttpServletRequest request,
+  @Path("/uploads")
+  public Response getUploads(@Context HttpServletRequest request,
       @QueryParam("filter") String filter, @QueryParam("type") String type,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
       @QueryParam("limit") @DefaultValue("10") int limit,
