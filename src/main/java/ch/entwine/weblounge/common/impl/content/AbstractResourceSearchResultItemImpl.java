@@ -27,7 +27,7 @@ import ch.entwine.weblounge.common.url.WebUrl;
 /**
  * Base implementation for search result items that represent resources.
  */
-public class ResourceSearchResultItemImpl extends SearchResultItemImpl implements ResourceSearchResultItem {
+public abstract class AbstractResourceSearchResultItemImpl extends SearchResultItemImpl implements ResourceSearchResultItem {
 
   /** The resource uri */
   protected ResourceURI uri = null;
@@ -44,7 +44,7 @@ public class ResourceSearchResultItemImpl extends SearchResultItemImpl implement
    * @param source
    *          the source of this search result item
    */
-  public ResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
+  public AbstractResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
       double relevance, Object source) {
     super(uri.getIdentifier(), url, relevance, source);
     this.uri = uri;

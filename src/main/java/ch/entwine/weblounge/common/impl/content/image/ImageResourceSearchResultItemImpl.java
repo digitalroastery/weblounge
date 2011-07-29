@@ -23,7 +23,7 @@ package ch.entwine.weblounge.common.impl.content.image;
 import ch.entwine.weblounge.common.content.FileSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.file.FileResource;
-import ch.entwine.weblounge.common.impl.content.ResourceSearchResultItemImpl;
+import ch.entwine.weblounge.common.impl.content.AbstractResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -31,7 +31,7 @@ import ch.entwine.weblounge.common.url.WebUrl;
  * Default implementation of a
  * {@link ch.entwine.weblounge.common.content.SearchResultItem}.
  */
-public class ImageResourceSearchResultItemImpl extends ResourceSearchResultItemImpl implements FileSearchResultItem {
+public class ImageResourceSearchResultItemImpl extends AbstractResourceSearchResultItemImpl implements FileSearchResultItem {
 
   /** The image xml */
   protected String imageXml = null;
@@ -77,16 +77,16 @@ public class ImageResourceSearchResultItemImpl extends ResourceSearchResultItemI
    * @param xml
    *          the xml
    */
-  public void setImageXml(String xml) {
+  public void setResourceXml(String xml) {
     this.imageXml = xml;
   }
 
   /**
-   * Returns the xml that makes up the whole file.
+   * {@inheritDoc}
    * 
-   * @return the file xml
+   * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem#getResourceXml()
    */
-  public String getImageXml() {
+  public String getResourceXml() {
     return this.imageXml;
   }
 

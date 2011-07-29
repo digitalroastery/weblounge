@@ -59,7 +59,7 @@ public class PageSearchResultItemImplTest extends SearchResultItemImplTest {
     item.setTitle(title);
     item.setPreview(previewData);
     item.setPreviewRenderer(renderer);
-    pageItem.setPageXml(pageXml);
+    pageItem.setResourceXml(pageXml);
   }
 
   /**

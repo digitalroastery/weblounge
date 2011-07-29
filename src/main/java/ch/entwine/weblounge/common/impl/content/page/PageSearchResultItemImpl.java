@@ -23,14 +23,14 @@ package ch.entwine.weblounge.common.impl.content.page;
 import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.impl.content.ResourceSearchResultItemImpl;
+import ch.entwine.weblounge.common.impl.content.AbstractResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 /**
  * File specific implementation of a
  * {@link ch.entwine.weblounge.common.content.SearchResultItem}.
  */
-public class PageSearchResultItemImpl extends ResourceSearchResultItemImpl implements PageSearchResultItem {
+public class PageSearchResultItemImpl extends AbstractResourceSearchResultItemImpl implements PageSearchResultItem {
 
   /** The page xml */
   protected String pageXml = null;
@@ -67,16 +67,16 @@ public class PageSearchResultItemImpl extends ResourceSearchResultItemImpl imple
    * @param xml
    *          the xml
    */
-  public void setPageXml(String xml) {
+  public void setResourceXml(String xml) {
     this.pageXml = xml;
   }
 
   /**
-   * Returns the xml that makes up the whole page.
+   * {@inheritDoc}
    * 
-   * @return the page xml
+   * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem#getResourceXml()
    */
-  public String getPageXml() {
+  public String getResourceXml() {
     return this.pageXml;
   }
 
