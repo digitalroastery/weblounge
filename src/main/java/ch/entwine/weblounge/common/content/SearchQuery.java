@@ -339,6 +339,24 @@ public interface SearchQuery {
   User getModifier();
 
   /**
+   * Return resources that have never been published.
+   * <p>
+   * Note that this method throws an <code>IllegalStateException</code> if used
+   * in conjunction with {@link #withPublishingDate(Date)},
+   * {@link #withPublishingDateBetween(Date)} or {@link #and(Date)}.
+   * 
+   * @return the query extended by this criterion
+   */
+  SearchQuery withoutPublication();
+
+  /**
+   * Returns <code>true</code> if resources must not have a publishing date.
+   * 
+   * @return <code>true</code> if resources need to be unpublished
+   */
+  boolean getWithoutPublication();
+
+  /**
    * Return only resources that have been published by the specified publisher.
    * 
    * @param publisher
