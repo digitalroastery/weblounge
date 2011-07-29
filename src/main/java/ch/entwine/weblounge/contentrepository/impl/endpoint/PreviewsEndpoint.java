@@ -119,6 +119,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Get the resource
+    final Site site = getSite(request);
     final Resource<?> resource = loadResource(request, resourceId, null);
     if (resource == null)
       throw new WebApplicationException(Status.NOT_FOUND);
@@ -130,6 +131,10 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       if (!resource.supportsLanguage(language)) {
         if (!resource.contents().isEmpty())
           language = resource.getOriginalContent().getLanguage();
+        else if (resource.supportsLanguage(site.getDefaultLanguage()))
+          language = site.getDefaultLanguage();
+        else if (resource.languages().size() == 1)
+          language = resource.languages().iterator().next();
         else
           throw new WebApplicationException(Status.NOT_FOUND);
       }
@@ -138,7 +143,6 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Search the site for the image style
-    Site site = getSite(request);
     ImageStyle style = null;
     for (Module m : site.getModules()) {
       style = m.getImageStyle(styleId);
@@ -186,12 +190,12 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     // Find a serializer
     ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceURI.getType());
     if (serializer == null)
-      throw new WebApplicationException(Status.NOT_FOUND);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
 
     // Does the serializer come with a preview generator?
     PreviewGenerator previewGenerator = serializer.getPreviewGenerator();
     if (previewGenerator == null)
-      throw new WebApplicationException(Status.NOT_FOUND);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
 
     // Load the resource contents from the repository
     InputStream resourceInputStream = null;
