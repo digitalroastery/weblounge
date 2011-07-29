@@ -1,13 +1,14 @@
 steal.plugins('jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/resourcelistview.tmpl')
-.resources('jquery.dataTables.min')
+.resources('jquery.dataTables.min', 'jquery.tablesorter.min', 'jquery.tablesorter.pager')
 .then('resourceview', 'resourcelistviewitem')
+.css('resources/images/blue/style', 'resources/jquery.tablesorter.page')
 .then(function($) {
 
 	Editor.Resourceview.extend('Editor.Resourcelistview', 
 	{	
 		init: function(el) {
-			$(el).html('//editor/resourcebrowser/views/resourcelistview.tmpl', {});
+			$(el).html('//editor/resourcebrowser/views/resourcelistview.tmpl', {runtime: this.options.runtime});
 			this._initViewItems();
 			this._initButtons();
 			this._initDialogs();
@@ -16,21 +17,59 @@ steal.plugins('jquery/view/tmpl')
 		
 		update: function(options) {
 			this.options.resources = options.resources;
+////			this.dataTable.fnClearTable();
 			this.find('tr.wbl-pageEntry').remove();
 			this._initViewItems();
+////			this.dataTable = this.dataTable.dataTable({
+//				"bPaginate": true,
+//				"bLengthChange": true,
+//				"bRetrieve": true,
+//				"bFilter": false,
+//				"bDestroy": true,
+//				"bSort": true,
+//				"bInfo": true,
+//				"bAutoWidth": true,
+//				"bJQueryUI": true
+//			});
+//			this.dataTable.fnStandingRedraw();
+//			this.dataTable.fnDataUpdate();
+//			this._initDataTable();
+			
+//			var page_size = 20;
+//			var curr_page = config.page;
+//			this.table.tablesorterPager({size: config.totalRows});
+			this.table.trigger("update");
+//			this.table.trigger("appendCache");
+//			this.table.trigger("sorton", [[0,0]]);
+//			this.table.tablesorterPager({size: page_size, page: curr_page}); 
+			
+//			var page_size = 20;
+//			var curr_page = config.page;
+//			this.table.tablesorterPager({size: page_size, page: curr_page}); 
 		},
 		
 		_initDataTable: function() {
-			// init jquery dataTable Plugin over Table
-			this.find('table').dataTable({
-				"bPaginate": true,
-				"bLengthChange": true,
-				"bFilter": false,
-				"bSort": true,
-				"bInfo": true,
-				"bAutoWidth": true,
-				"bJQueryUI": true
+			this.table = this.find('table').tablesorter({
+				sortList: [[0,0]],
+		        headers: { 
+		            4: { sorter: false }
+		        },
+		        widgets: ['zebra']
+			}).tablesorterPager({
+				container: this.element.find("#wbl-pager")
 			});
+			
+			// init jquery dataTable Plugin over Table
+//			this.dataTable = this.find('table').dataTable({
+//				"bPaginate": true,
+//				"bLengthChange": true,
+//				"bRetrieve": true,
+//				"bFilter": false,
+//				"bSort": true,
+//				"bInfo": true,
+//				"bAutoWidth": true,
+//				"bJQueryUI": true
+//			});
 		},
 		
 		_initViewItems: function() {

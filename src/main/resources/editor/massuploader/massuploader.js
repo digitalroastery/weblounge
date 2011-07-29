@@ -137,7 +137,7 @@ steal.plugins('jquery',
         				$(element).parent().append('<a class="wbl-removeButton" />');
         				$(element).parent().find('.wbl-removeButton').hide();
         				divScroll.smoothDivScroll('recalculateScrollableArea');
-        				$($(element).parent()).hover(
+        				$(element).parent().hover(
 							function () {
 								$(this).find('.wbl-removeButton').show();
 							},

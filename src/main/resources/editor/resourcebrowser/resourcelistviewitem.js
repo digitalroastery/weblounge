@@ -7,15 +7,15 @@ steal.plugins('jquery/controller',
   Editor.Resourceviewitem.extend('Editor.Resourcelistviewitem',
 	{
 		init: function(el) {
-//			$.Hover.delay = 0;
-		},
-		
-		"td.wbl-action hoverenter": function(el, ev) {
-//			el.find('img').show();
-		},
-		
-		"td.wbl-action hoverleave": function(el, ev) {
-//			el.find('img').not('.wbl-settings').hide();
+			// TODO
+			this.element.find('td.wbl-action').hover(
+				function () {
+					$(this).find('img').show();
+				},
+				function () {
+					$(this).find('img').not('.wbl-settings').hide();
+				}
+			);
 		}
 		
 	});
