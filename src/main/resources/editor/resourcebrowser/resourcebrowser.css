@@ -140,6 +140,8 @@
 }
 
 img.wbl-pageThumbnail {
+	width: 300px;
+	height: 200px;
 }
 
 .wbl-page.wbl-marked img {

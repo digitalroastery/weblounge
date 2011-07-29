@@ -63,12 +63,19 @@ steal.plugins('jquery',
 			
 			// ThumbnailView
 			var divScroll = this.element.find('#wbl-makeMeScrollablePageCreator').smoothDivScroll({
-			  	autoScroll: "onstart" ,
-				autoScrollDirection: "backandforth", 
-				autoScrollStep: 1, 
-				autoScrollInterval: 15,	
+			  	autoScroll: "onstart",
+				autoScrollDirection: "left",
+				autoScrollStep: 1,
+				autoScrollInterval: 15,
 				visibleHotSpots: "always"
 		  	});
+			
+			// Lazy loading images
+			this.element.find('img.wbl-pageThumbnail').lazyload({         
+				placeholder: this.options.runtime.getRootPath() + "/editor/resourcebrowser/images/empty_thumbnail.png",
+				event: "scroll",
+				container: this.element.find("div.scrollWrapper")
+			});
 			
 			// TreeView
 			this.element.find("#wbl-tree").treeview({

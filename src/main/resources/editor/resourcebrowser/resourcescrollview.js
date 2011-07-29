@@ -30,12 +30,12 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 				visibleHotSpots: "always"
 		  	});
 			
-			// Update evtl
-//			this.element.find('img.wbl-pageThumbnail').lazyload({         
-//				placeholder: "images/grey.gif",
-//				event: "mouseover",
-//				container: this.element.find("div.scrollableArea")
-//			});
+			// Lazy loading images
+			this.element.find('img.wbl-pageThumbnail').lazyload({         
+				placeholder: this.options.runtime.getRootPath() + "/editor/resourcebrowser/images/empty_thumbnail.png",
+				event: "scroll",
+				container: this.element.find("div.scrollWrapper")
+			});
 		},
 		
 		_initViewItems: function() {

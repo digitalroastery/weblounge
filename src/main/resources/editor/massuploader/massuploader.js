@@ -2,6 +2,7 @@ steal.plugins('jquery',
 		'jquery/controller/view',
 		'jquery/view',
 		'jquery/view/tmpl',
+		'jquery/event/hover',
 		'jqueryui/widget',
 		'jqueryui/dialog',
 		'jqueryui/draggable',
@@ -87,10 +88,10 @@ steal.plugins('jquery',
 			
 			this.divScroll = this.element.find('div#wbl-makeMeScrollableImage').smoothDivScroll({
 			  	autoScroll: "onstart" ,
-				autoScrollDirection: "backandforth", 
+				autoScrollDirection: "left", 
 				autoScrollStep: 1, 
-				scrollableArea:	"div.wbl-scrollableImageArea",
 				autoScrollInterval: 15,
+				scrollableArea:	"div.wbl-scrollableImageArea",
 				visibleHotSpots: "always"
 		  	});
 			
@@ -131,17 +132,19 @@ steal.plugins('jquery',
         			containerId: "wbl-previewImageContainer",
         			onLoad: function(img_data) {
         				var element = image.getElement();
-        				$(element).wrap('<div class="wbl-previewImage" />');
         				image.setSize(200, -1);
+        				$(element).wrap('<div class="wbl-previewImage" />');
+        				$(element).parent().append('<a class="wbl-removeButton" />');
+        				$(element).parent().find('.wbl-removeButton').hide();
         				divScroll.smoothDivScroll('recalculateScrollableArea');
-        			    $(element).bind('hoverinit', function(el, hover){
-        			    	hover.leave(500); //wait until the mouse leaves for 1/2 a second
-        			    	$(element).parent().append('<a class="wbl-removeButton" />');
-        			    }).bind('hoverleave', function(){
-        			    	if($(element).next()[0].tagName == "A") {
-        			    		$(element).next().remove();
-        			    	}
-        			    })
+        				$($(element).parent()).hover(
+							function () {
+								$(this).find('.wbl-removeButton').show();
+							},
+							function () {
+								$(this).find('.wbl-removeButton').hide();
+							}
+						);
         			}
                 });
             }

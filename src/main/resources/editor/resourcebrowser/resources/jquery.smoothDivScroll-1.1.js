@@ -102,8 +102,6 @@
 
 				// Start the scrolling interval
 				el.data("rightScrollInterval", setInterval(function() {
-					var test = el.data("scrollXPos");
-					var enabled = el.data("enabled");
 					if (el.data("scrollXPos") > 0 && el.data("enabled")) {
 						el.data("scrollWrapper").scrollLeft(el.data("scrollWrapper").scrollLeft() + (el.data("scrollXPos") * el.data("speedBooster")));
 
@@ -139,7 +137,6 @@
 			// Check the mouse X position and calculate the relative X position inside the left hotspot
 			el.data("scrollingHotSpotLeft").bind("mousemove", function(e) {
 				var x = el.data("hotSpotWidth") - e.layerX;
-				var test = Math.round((x / el.data("hotSpotWidth")) * o.scrollStep);
 				el.data("scrollXPos", Math.round((x / el.data("hotSpotWidth")) * o.scrollStep));
 				if (el.data("scrollXPos") === Infinity) {
 					el.data("scrollXPos", 0);
@@ -159,8 +156,6 @@
 				}
 
 				el.data("leftScrollInterval", setInterval(function() {
-					var test = el.data("scrollXPos");
-					var enabled = el.data("enabled");
 					if (el.data("scrollXPos") > 0 && el.data("enabled")) {
 						el.data("scrollWrapper").scrollLeft(el.data("scrollWrapper").scrollLeft() - (el.data("scrollXPos") * el.data("speedBooster")));
 
