@@ -183,6 +183,11 @@ public class SearchRequest {
       and(solrQuery, PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, false);
     }
 
+    // Without Publication
+    if (query.getWithoutPublication()) {
+      andEmpty(solrQuery, PUBLISHED_FROM);
+    }
+
     // Pagelet elements
     for (Map.Entry<String, String> entry : query.getElements().entrySet()) {
       // TODO: Language?
@@ -246,6 +251,11 @@ public class SearchRequest {
     SolrQuery q = new SolrQuery(solrQuery.toString());
     q.setStart(query.getOffset() > 0 ? query.getOffset() : 0);
     q.setRows(query.getLimit() > 0 ? query.getLimit() : Integer.MAX_VALUE);
+
+    // Filter query
+    if (query.getFilter() != null) {
+      q.addFilterQuery(clean(query.getFilter()));
+    }
 
     // Define the fields that should be returned by the query
     List<String> fields = new ArrayList<String>();

@@ -35,8 +35,8 @@ import ch.entwine.weblounge.common.impl.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
-import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
@@ -153,34 +153,78 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       q.sortByPublishingDate(Order.Descending);
     }
 
-    // Load results
-    ContentRepository repository = getContentRepository(site, false);
-    SearchResult result = null;
-    try {
-      result = repository.find(q);
-    } catch (ContentRepositoryException e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    // Load the result
+    String result = loadResultSet(q, details);
+
+    return Response.ok(result).build();
+  }
+
+  /**
+   * Returns a collection of pages that are defined as pending.
+   * 
+   * @param request
+   *          the request
+   * @param filter
+   *          further search result filtering
+   * @param sort
+   *          sort order, possible values are
+   *          <code>created-asc, created-desc, published-asc, published-desc, modified-asc & modified-desc</code>
+   * @param limit
+   *          search result limit
+   * @param offset
+   *          search result offset (for paging in combination with limit)
+   * @param details
+   *          switch for providing pages including their bodies
+   * @return a collection of matching pages
+   */
+  @GET
+  @Path("/pending")
+  public Response getPending(@Context HttpServletRequest request,
+      @QueryParam("filter") String filter,
+      @QueryParam("sort") @DefaultValue("modified-desc") String sort,
+      @QueryParam("limit") @DefaultValue("10") int limit,
+      @QueryParam("offset") @DefaultValue("0") int offset,
+      @QueryParam("details") @DefaultValue("false") boolean details) {
+
+    // Create search query
+    Site site = getSite(request);
+    SearchQuery q = new SearchQueryImpl(site);
+
+    // Only take resources that have not been modified
+    q.withoutPublication();
+
+    // Type
+    q.withType(Page.TYPE);
+
+    // Filter query
+    if (StringUtils.isNotBlank(filter))
+      q.withFilter(filter);
+
+    // Limit and Offset
+    q.withLimit(limit);
+    q.withOffset(offset);
+
+    // Sort order
+    if (StringUtils.equalsIgnoreCase("modified-asc", sort)) {
+      q.sortByModificationDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("modified-desc", sort)) {
+      q.sortByModificationDate(Order.Descending);
+    } else if (StringUtils.equalsIgnoreCase("created-asc", sort)) {
+      q.sortByCreationDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("created-desc", sort)) {
+      q.sortByCreationDate(Order.Descending);
+    } else if (StringUtils.equalsIgnoreCase("published-asc", sort)) {
+      q.sortByPublishingDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("published-desc", sort)) {
+      q.sortByPublishingDate(Order.Descending);
     }
 
-    StringBuffer buf = new StringBuffer("<pages ");
-    buf.append("hits=\"").append(result.getHitCount()).append("\" ");
-    buf.append("offset=\"").append(result.getOffset()).append("\" ");
-    if (limit > 0)
-      buf.append("limit=\"").append(result.getLimit()).append("\" ");
-    buf.append("page=\"").append(result.getPage()).append("\" ");
-    buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
-    buf.append(">");
-    for (SearchResultItem item : result.getItems()) {
-      String xml = null;
-      if (details)
-        xml = ((PageSearchResultItemImpl) item).getResourceXml();
-      else
-        xml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
-      buf.append(xml);
-    }
-    buf.append("</pages>");
+    // Load the result
+    String result = loadResultSet(q, details);
 
-    return Response.ok(buf.toString()).build();
+    // Return the response
+    return Response.ok(result).build();
+
   }
 
   /**
@@ -201,7 +245,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Check the parameters
     if (pageId == null)
       return Response.status(Status.BAD_REQUEST).build();
-    
+
     // Resolve name clash
     if ("docs".equals(pageId)) {
       return Response.ok(getDocumentation(request)).type(MediaType.TEXT_HTML).build();
@@ -220,7 +264,10 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok(page.toXml());
-    response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
+    if (page.getModificationDate() != null)
+      response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
+    else
+      response.tag(new EntityTag(Long.toString(page.getCreationDate().getTime())));
     response.lastModified(page.getModificationDate());
     return response.build();
   }
@@ -375,7 +422,10 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
+    if (page.getModificationDate() != null)
+      response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
+    else
+      response.tag(new EntityTag(Long.toString(page.getCreationDate().getTime())));
     return response.build();
   }
 
@@ -482,7 +532,10 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.created(uri);
-    response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
+    if (page.getModificationDate() != null)
+      response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
+    else
+      response.tag(new EntityTag(Long.toString(page.getCreationDate().getTime())));
     return response.build();
   }
 
@@ -659,6 +712,52 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       docs = PagesEndpointDocs.createDocumentation(servicePath);
     }
     return docs;
+  }
+
+  /**
+   * Loads the pages from the site's content repository.
+   * 
+   * @param q
+   *          the search query
+   * @param details
+   *          whether to display detailed information or just the header
+   * @return the files
+   * @throws WebApplicationException
+   *           if the content repository is unavailable or if the content can't
+   *           be loaded
+   */
+  private String loadResultSet(SearchQuery q, boolean details)
+      throws WebApplicationException {
+    ContentRepository repository = getContentRepository(q.getSite(), false);
+    if (repository == null)
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+
+    SearchResult result = null;
+    try {
+      result = repository.find(q);
+    } catch (ContentRepositoryException e) {
+      throw new WebApplicationException();
+    }
+
+    StringBuffer buf = new StringBuffer("<pages ");
+    buf.append("hits=\"").append(result.getHitCount()).append("\" ");
+    buf.append("offset=\"").append(result.getOffset()).append("\" ");
+    if (q.getLimit() > 0)
+      buf.append("limit=\"").append(result.getLimit()).append("\" ");
+    buf.append("page=\"").append(result.getPage()).append("\" ");
+    buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
+    buf.append(">");
+    for (SearchResultItem item : result.getItems()) {
+      String xml = null;
+      if (details)
+        xml = ((PageSearchResultItemImpl) item).getResourceXml();
+      else
+        xml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
+      buf.append(xml);
+    }
+    buf.append("</pages>");
+
+    return buf.toString();
   }
 
   /**

@@ -110,19 +110,19 @@ public final class FilesEndpointDocs {
     getFileContentEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getFileContentEndpoint);
 
-    // GET /new
-    Endpoint getUploads = new Endpoint("/uploads", Method.GET, "getnewuploads");
-    getUploads.setDescription("Returns all unmodified resources");
-    getUploads.addFormat(Format.xml());
-    getUploads.addStatus(ok("A resultset was compiled and returned as part of the response"));
-    getUploads.addStatus(serviceUnavailable("The site or its content repository is temporarily offline"));
-    getUploads.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
-    getUploads.addOptionalParameter(new Parameter("type", Parameter.Type.String, "The file type, e. g. 'image'"));
-    getUploads.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
-    getUploads.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
-    getUploads.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
-    getUploads.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getUploads);
+    // GET /pending
+    Endpoint getPending = new Endpoint("/pending", Method.GET, "getpending");
+    getPending.setDescription("Returns all unmodified resources");
+    getPending.addFormat(Format.xml());
+    getPending.addStatus(ok("A resultset was compiled and returned as part of the response"));
+    getPending.addStatus(serviceUnavailable("The site or its content repository is temporarily offline"));
+    getPending.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
+    getPending.addOptionalParameter(new Parameter("type", Parameter.Type.String, "The file type, e. g. 'image'"));
+    getPending.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
+    getPending.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
+    getPending.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
+    getPending.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getPending);
 
     // POST /
     Endpoint createFileEndpoint = new Endpoint("/", Method.POST, "createfile");

@@ -88,6 +88,19 @@ public final class PagesEndpointDocs {
     getPageByURIEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getPageByURIEndpoint);
 
+    // GET /pending
+    Endpoint getPending = new Endpoint("/pending", Method.GET, "getpending");
+    getPending.setDescription("Returns all unmodified or unpublished pages");
+    getPending.addFormat(Format.xml());
+    getPending.addStatus(ok("A resultset was compiled and returned as part of the response"));
+    getPending.addStatus(serviceUnavailable("The site or its content repository is temporarily offline"));
+    getPending.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
+    getPending.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
+    getPending.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
+    getPending.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
+    getPending.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getPending);
+
     // POST /{page}
     Endpoint createPageEndpoint = new Endpoint("/", Method.POST, "createpage");
     createPageEndpoint.setDescription("Creates a new page, either at the given path or at a random location and returns the REST url of the created resource.");
