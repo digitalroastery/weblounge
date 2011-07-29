@@ -56,6 +56,9 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class FileResourceSerializer extends AbstractResourceSerializer<FileContent, FileResource> {
 
+  /** Alternate uri prefix */
+  protected static final String URI_PREFIX = "/weblounge-files/";
+
   /** The preview generator */
   protected PreviewGenerator previewGenerator = null;
 
@@ -126,7 +129,13 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   public SearchResultItem createSearchResultItem(Site site, double relevance,
       Map<String, ResourceMetadata<?>> metadata) {
     String id = (String) metadata.get(ID).getValues().get(0);
-    String path = (String) metadata.get(PATH).getValues().get(0);
+
+    String path = null;
+    if (metadata.get(PATH) != null)
+      path = (String) metadata.get(PATH).getValues().get(0);
+    else {
+      path = URI_PREFIX + "/" + id;
+    }
 
     ResourceURI uri = new FileResourceURIImpl(site, path, id, Resource.LIVE);
     WebUrl url = new WebUrlImpl(site, path);

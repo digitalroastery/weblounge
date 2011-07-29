@@ -57,7 +57,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class ImageResourceSerializer extends AbstractResourceSerializer<ImageContent, ImageResource> {
 
   /** Alternate uri prefix */
-  protected static final String URI_PREFIX = "/weblounge-files/";
+  protected static final String URI_PREFIX = "/weblounge-images/";
 
   /** The preview generator */
   protected PreviewGenerator previewGenerator = null;
