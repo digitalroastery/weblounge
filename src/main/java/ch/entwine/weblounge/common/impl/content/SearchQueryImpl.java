@@ -99,13 +99,16 @@ public class SearchQueryImpl implements SearchQuery {
   protected Date creationDateTo = null;
 
   /** True if the resource must not have a modification date */
-  protected boolean withoutModificationDate = false;
+  protected boolean withoutModification = false;
   
   /** The modification date */
   protected Date modificationDateFrom = null;
 
   /** The end of the range for the modification date */
   protected Date modificationDateTo = null;
+
+  /** True if the resource must not have a publishing date */
+  protected boolean withoutPublication = false;
 
   /** The publishing date */
   protected Date publishingDateFrom = null;
@@ -552,7 +555,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withModificationDate(java.util.Date)
    */
   public SearchQuery withModificationDate(Date date) {
-    if (withoutModificationDate)
+    if (withoutModification)
       throw new IllegalStateException("With modification date and without modification date are mutually exclusive");
     clearExpectations();
     modificationDateFrom = date;
@@ -565,7 +568,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withModificationDateBetween(java.util.Date)
    */
   public SearchQuery withModificationDateBetween(Date date) {
-    if (withoutModificationDate)
+    if (withoutModification)
       throw new IllegalStateException("With modification date and without modification date are mutually exclusive");
     clearExpectations();
     configure(date);
@@ -603,7 +606,7 @@ public class SearchQueryImpl implements SearchQuery {
     if (modifier  != null)
       throw new IllegalStateException("With modifier and without modification date are mutually exclusive");
     clearExpectations();
-    this.withoutModificationDate = true;
+    this.withoutModification = true;
     return this;
   }
   
@@ -613,7 +616,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#getWithoutModification()
    */
   public boolean getWithoutModification() {
-    return withoutModificationDate;
+    return withoutModification;
   }
   
   /**
@@ -694,7 +697,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withModifier(ch.entwine.weblounge.common.security.User)
    */
   public SearchQuery withModifier(User modifier) {
-    if (withoutModificationDate)
+    if (withoutModification)
       throw new IllegalStateException("With modifier and without modification date are mutually exclusive");
     clearExpectations();
     this.modifier = modifier;
@@ -716,6 +719,8 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withPublisher(ch.entwine.weblounge.common.security.User)
    */
   public SearchQuery withPublisher(User publisher) {
+    if (withoutPublication)
+      throw new IllegalStateException("With publisher and without publication date are mutually exclusive");
     clearExpectations();
     this.publisher = publisher;
     return this;
@@ -736,6 +741,8 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withPublishingDate(java.util.Date)
    */
   public SearchQuery withPublishingDate(Date date) {
+    if (withoutPublication)
+      throw new IllegalStateException("With publishing date and without publication are mutually exclusive");
     clearExpectations();
     this.publishingDateFrom = date;
     return this;
@@ -747,6 +754,8 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withPublishingDateBetween(java.util.Date)
    */
   public SearchQuery withPublishingDateBetween(Date date) {
+    if (withoutPublication)
+      throw new IllegalStateException("With publishing date and without publication are mutually exclusive");
     clearExpectations();
     configure(date);
     this.publishingDateFrom = date;
@@ -770,6 +779,30 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public Date getPublishingDateEnd() {
     return publishingDateTo;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withoutPublication()
+   */
+  public SearchQuery withoutPublication() {
+    if (publishingDateFrom != null || publishingDateTo != null)
+      throw new IllegalStateException("With publishing date and without publishing date are mutually exclusive");
+    if (publisher  != null)
+      throw new IllegalStateException("With publisher and without modification date are mutually exclusive");
+    clearExpectations();
+    this.withoutPublication = true;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getWithoutPublication()
+   */
+  public boolean getWithoutPublication() {
+    return withoutPublication;
   }
 
   /**
