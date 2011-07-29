@@ -81,7 +81,6 @@ public final class FilesEndpointDocs {
     getFileByPathEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
     getFileByPathEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
     getFileByPathEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
-    getFileByPathEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
     getFileByPathEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getFileByPathEndpoint);
 
@@ -122,7 +121,6 @@ public final class FilesEndpointDocs {
     getNewUploadsEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
     getNewUploadsEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
     getNewUploadsEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
-    getNewUploadsEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
     getNewUploadsEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getNewUploadsEndpoint);
 

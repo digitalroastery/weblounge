@@ -149,7 +149,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
     PageSearchResultItemImpl result = new PageSearchResultItemImpl(uri, url, relevance, site);
 
     if (metadata.get(XML) != null)
-      result.setPageXml((String) metadata.get(XML).getValues().get(0));
+      result.setResourceXml((String) metadata.get(XML).getValues().get(0));
     if (metadata.get(HEADER_XML) != null)
     result.setPageHeaderXml((String) metadata.get(HEADER_XML).getValues().get(0));
     if (metadata.get(PREVIEW_XML) != null)

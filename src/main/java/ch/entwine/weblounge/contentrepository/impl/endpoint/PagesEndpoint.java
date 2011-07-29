@@ -173,7 +173,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     for (SearchResultItem item : result.getItems()) {
       String xml = null;
       if (details)
-        xml = ((PageSearchResultItemImpl) item).getPageXml();
+        xml = ((PageSearchResultItemImpl) item).getResourceXml();
       else
         xml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
       buf.append(xml);

@@ -146,7 +146,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     ImageResourceSearchResultItemImpl result = new ImageResourceSearchResultItemImpl(uri, url, relevance, site);
 
     if (metadata.get(XML) != null)
-      result.setImageXml((String) metadata.get(XML).getValues().get(0));
+      result.setResourceXml((String) metadata.get(XML).getValues().get(0));
     if (metadata.get(HEADER_XML) != null)
       result.setImageHeaderXml((String) metadata.get(HEADER_XML).getValues().get(0));
     // TODO: Add remaining metadata

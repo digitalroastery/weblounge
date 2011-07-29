@@ -141,8 +141,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    *          search result limit
    * @param offset
    *          search result offset (for paging in combination with limit)
-   * @param details
-   *          switch for providing files including their bodies
    * @return a collection of matching files
    */
   @GET
@@ -154,8 +152,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       @QueryParam("filter") String filter, @QueryParam("type") String type,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
       @QueryParam("limit") @DefaultValue("10") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset,
-      @QueryParam("details") @DefaultValue("false") boolean details) {
+      @QueryParam("offset") @DefaultValue("0") int offset) {
 
     // Create search query
     Site site = getSite(request);
@@ -205,7 +202,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Load the result
-    String result = loadResultSet(q, details);
+    String result = loadResultSet(q);
 
     // Return the response
     return Response.ok(result).build();
@@ -228,19 +225,15 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    *          search result limit
    * @param offset
    *          search result offset (for paging in combination with limit)
-   * @param details
-   *          switch for providing files including their bodies
    * @return a collection of matching files
    */
   @GET
   @Path("/new")
-  public Response getUploads(@Context HttpServletRequest request,
-      @QueryParam("filter") String filter,
-      @QueryParam("type") String type,
+  public Response getNewFiles(@Context HttpServletRequest request,
+      @QueryParam("filter") String filter, @QueryParam("type") String type,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
       @QueryParam("limit") @DefaultValue("10") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset,
-      @QueryParam("details") @DefaultValue("false") boolean details) {
+      @QueryParam("offset") @DefaultValue("0") int offset) {
 
     // Create search query
     Site site = getSite(request);
@@ -278,7 +271,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Load the result
-    String result = loadResultSet(q, details);
+    String result = loadResultSet(q);
 
     // Return the response
     return Response.ok(result).build();
@@ -1124,15 +1117,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    * 
    * @param q
    *          the search query
-   * @param details
-   *          <code>true</code> to provide detailed output
    * @return the files
    * @throws WebApplicationException
    *           if the content repository is unavailable or if the content can't
    *           be loaded
    */
-  private String loadResultSet(SearchQuery q, boolean details)
-      throws WebApplicationException {
+  private String loadResultSet(SearchQuery q) throws WebApplicationException {
     ContentRepository repository = getContentRepository(q.getSite(), false);
     if (repository == null)
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
@@ -1153,11 +1143,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
     buf.append(">");
     for (SearchResultItem item : result.getItems()) {
-      String xml = null;
-      if (details)
-        xml = ((ResourceSearchResultItem) item).toXml();
-      else
-        xml = ((ResourceSearchResultItem) item).toXml();
+      String xml = ((ResourceSearchResultItem) item).getResourceXml();
       buf.append(xml);
     }
     buf.append("</files>");
