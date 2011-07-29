@@ -250,7 +250,8 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
       // Finally serve the JSP
       logger.debug("Including jsp {}", renderer);
       dispatcher.include(siteRequest, response);
-
+      
+      response.getWriter().flush();
     } catch (IOException e) {
       logger.error("Exception while including jsp {}", renderer, e);
     } catch (Throwable t) {
