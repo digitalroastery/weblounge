@@ -35,4 +35,11 @@ public interface ResourceSearchResultItem extends SearchResultItem {
    */
   ResourceURI getResourceURI();
 
+  /**
+   * Returns the resource's <code>XML</code> representation.
+   * 
+   * @return the full resource
+   */
+  String getResourceXml();
+
 }
