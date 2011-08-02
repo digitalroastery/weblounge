@@ -37,6 +37,7 @@ SET WEBLOUNGE_OPTS=-Dweblounge.sitesdir=%WEBLOUNGE_SITESDIR% -Dweblounge.sitesda
 SET WEBLOUNGE_FILEINSTALL_OPTS=-Dfelix.fileinstall.dir=%WEBLOUNGE_HOME%/load
 SET PAX_CONFMAN_OPTS=-Dbundles.configuration.location=%WEBLOUNGE_HOME%/conf -Dweblounge.logdir=%WEBLOUNGE_LOGDIR%
 SET PAX_LOGGING_OPTS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN
+SET PAX_WEB_OPTS=-Dorg.ops4j.pax.web.config.file=%WEBLOUNGE_HOME%/conf/jetty.xml
 SET GRAPHICS_OPTS=-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit
 SET TEMPDIR_OPTS=-Djava.io.tmpdir=%WEBLOUNGE_TEMPDIR%
 
