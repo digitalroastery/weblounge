@@ -74,9 +74,6 @@ public class EndpointPublishingService implements ManagedService {
   /** The OSGi http service */
   protected HttpService httpService = null;
 
-  /** The default http context */
-  protected HttpContext httpContext = null;
-
   /** Context of this component */
   protected ComponentContext componentContext = null;
 
@@ -254,7 +251,10 @@ public class EndpointPublishingService implements ManagedService {
     try {
 
       CXFNonSpringServlet servlet = new JAXRSServlet(endpointPath, service);
-      httpService.registerServlet(contextPath, servlet, new Hashtable<String, String>(), httpContext);
+      HttpContext httpContext = httpService.createDefaultHttpContext();
+      Dictionary<String, String> initParams = new Hashtable<String, String>();
+      //initParams.put("load-on-startup", Integer.toString(10));
+      httpService.registerServlet(contextPath, servlet, initParams, httpContext);
       serviceMap.put(contextPath, service);
       servletMap.put(contextPath, servlet);
 
@@ -299,7 +299,6 @@ public class EndpointPublishingService implements ManagedService {
    */
   void setHttpService(HttpService httpService) {
     this.httpService = httpService;
-    this.httpContext = httpService.createDefaultHttpContext();
   }
 
   /**
