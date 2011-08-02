@@ -1,4 +1,4 @@
-<table>
+<table class="tablesorter">
 	<thead>
 		<tr>
 			<th>Seite</th>
@@ -11,6 +11,20 @@
 	<tbody id="wbl-listViewContent">
 	</tbody>
 </table>
+<div id="wbl-pager">
+	<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/first.png" class="first"/>
+	<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/prev.png" class="prev"/>
+	<input type="text" class="pagedisplay"/>
+	<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/next.png" class="next"/>
+	<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/last.png" class="last"/>
+	<select class="pagesize">
+		<option selected="selected"  value="10">10</option>
+	
+		<option value="20">20</option>
+		<option value="30">30</option>
+		<option  value="40">40</option>
+	</select>
+</div>
 
 <nav class="wbl-alignCenter wbl-icons">
 	<input type="text" name="filter" placeholder="Filtern..." id="wbl-filter" /> 

@@ -2,7 +2,7 @@ steal.plugins('jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/resourcelistview.tmpl')
 .resources('jquery.dataTables.min', 'jquery.tablesorter.min', 'jquery.tablesorter.pager')
 .then('resourceview', 'resourcelistviewitem')
-.css('resources/images/blue/style', 'resources/jquery.tablesorter.page')
+.css('resources/images/blue/style', 'resources/jquery.tablesorter.pager')
 .then(function($) {
 
 	Editor.Resourceview.extend('Editor.Resourcelistview', 
@@ -74,7 +74,11 @@ steal.plugins('jquery/view/tmpl')
 		
 		_initViewItems: function() {
 			$.each(this.options.resources,$.proxy(function(i, res) {
-				var listViewItem = this.element.find('#wbl-listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {page: res, runtime: this.options.runtime});
+				var listViewItem = this.element.find('#wbl-listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {
+					page: res, 
+					runtime: this.options.runtime,
+					language: this.options.language
+				});
 				listViewItem.find('tr.wbl-pageEntry').editor_resourcelistviewitem({page: res});
 			}, this));
 		},

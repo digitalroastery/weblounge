@@ -1,10 +1,19 @@
 <div class="wbl-scrollViewItem wbl-page" id="${page.id}">
 	<img src="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview" alt="" class="wbl-pageThumbnail" />
-	<h2>${page.head.metadata.title.de}</h2>
+	{{if page.head.metadata.title}}
+		<h2>${page.head.metadata.title[language]}</h2>
+	{{/if}}
 	<p>
 		Created by ${page.head.created.user.name}<br />
-		Updated by ${page.head.modified.user.name}<br />
-		Tags: {{each page.head.metadata.subject}} ${$value}, {{/each}}<br/>
+	    {{if page.head.modified}}
+			Updated by ${page.head.modified.user.name}<br />
+        	Modification Date: ${page.head.modified.date.toLocaleString()}<br />
+    	{{else}}
+    		Creation Date: ${page.head.created.date.toLocaleString()}<br />
+    	{{/if}}
+		{{if page.head.metadata.subject}}
+			Tags: {{each page.head.metadata.subject}} ${$value}, {{/each}}<br/>
+		{{/if}}
 		URL: <a href="${page.path}" class="wbl-pagePath" title="Gehe zu Seite">${page.path}</a>
 	</p>
 	<img class="wbl-showPage" src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_read.png" />

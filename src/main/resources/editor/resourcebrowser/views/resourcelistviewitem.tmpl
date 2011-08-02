@@ -1,8 +1,16 @@
 <tr class="wbl-pageEntry" id="${page.id}">
 	<td><input type="checkbox"><a href="${page.path}" class="wbl-pagePath">${page.path}</a></input></td>
-	<td>${page.head.metadata.title.de}</td>
+	{{if page.head.metadata.title}}
+		<td>${page.head.metadata.title[language]}</td>
+	{{else}}
+		<td></td>
+	{{/if}}
 	<td>${page.head.created.user.name} / ${page.head.created.date.toLocaleString()}</td>
-	<td>${page.head.modified.user.name} / ${page.head.modified.date.toLocaleString()}</td>
+	{{if page.head.modified}}
+		<td>${page.head.modified.user.name} / ${page.head.modified.date.toLocaleString()}</td>
+	{{else}}
+		<td></td>
+	{{/if}}
 	<td class="wbl-action">
 		<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_settings.png" class="wbl-settings" alt="settings">
 		<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_trash.png" class="wbl-delete" alt="trash">
