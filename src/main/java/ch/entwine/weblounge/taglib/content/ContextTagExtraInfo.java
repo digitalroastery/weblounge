@@ -32,6 +32,13 @@ import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.taglib.ParseException;
 import ch.entwine.weblounge.taglib.TagVariableDefinitionParser;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import javax.servlet.jsp.tagext.TagData;
 import javax.servlet.jsp.tagext.TagExtraInfo;
 import javax.servlet.jsp.tagext.VariableInfo;
@@ -42,6 +49,9 @@ import javax.servlet.jsp.tagext.VariableInfo;
  */
 public class ContextTagExtraInfo extends TagExtraInfo {
 
+  /** The logging facility */
+  private static Logger logger = LoggerFactory.getLogger(ContextTagExtraInfo.class);
+  
   /**
    * Returns the information on the exported tag variables.
    * 
@@ -52,42 +62,68 @@ public class ContextTagExtraInfo extends TagExtraInfo {
     if (definitions != null) {
       try {
         ContextTagVariables variables = new ContextTagVariables(TagVariableDefinitionParser.parse(definitions));
-        VariableInfo[] varinfo = new VariableInfo[variables.size()];
-        int i = 0;
+        List<VariableInfo> varinfo = new ArrayList<VariableInfo>();
 
         String name;
         // Action
         if ((name = variables.getAction()) != null)
-          varinfo[i++] = new VariableInfo(name, Action.class.getName(), true, VariableInfo.NESTED);
+          varinfo.add(new VariableInfo(name, Action.class.getName(), true, VariableInfo.NESTED));
         // Composer
         if ((name = variables.getComposer()) != null)
-          varinfo[i++] = new VariableInfo(name, Composer.class.getName(), true, VariableInfo.NESTED);
+          varinfo.add(new VariableInfo(name, Composer.class.getName(), true, VariableInfo.NESTED));
         // Language
         if ((name = variables.getLanguage()) != null)
-          varinfo[i++] = new VariableInfo(name, Language.class.getName(), true, VariableInfo.NESTED);
+          varinfo.add(new VariableInfo(name, Language.class.getName(), true, VariableInfo.NESTED));
         // User
         if ((name = variables.getUser()) != null)
-          varinfo[i++] = new VariableInfo(name, AuthenticatedUser.class.getName(), true, VariableInfo.NESTED);
+          varinfo.add(new VariableInfo(name, AuthenticatedUser.class.getName(), true, VariableInfo.NESTED));
         // Page
         if ((name = variables.getPage()) != null)
-          varinfo[i++] = new VariableInfo(name, Page.class.getName(), true, VariableInfo.NESTED);
+          varinfo.add(new VariableInfo(name, Page.class.getName(), true, VariableInfo.NESTED));
         // Pagelet
         if ((name = variables.getPagelet()) != null)
-          varinfo[i++] = new VariableInfo(name, Pagelet.class.getName(), true, VariableInfo.NESTED);
+          varinfo.add(new VariableInfo(name, Pagelet.class.getName(), true, VariableInfo.NESTED));
         // Repository
         if ((name = variables.getRepository()) != null)
-          varinfo[i++] = new VariableInfo(name, ContentRepository.class.getName(), true, VariableInfo.NESTED);
+          varinfo.add(new VariableInfo(name, ContentRepository.class.getName(), true, VariableInfo.NESTED));
         // Site
         if ((name = variables.getSite()) != null)
-          varinfo[i++] = new VariableInfo(name, Site.class.getName(), true, VariableInfo.NESTED);
+          varinfo.add(new VariableInfo(name, Site.class.getName(), true, VariableInfo.NESTED));
         // Uri
         if ((name = variables.getUri()) != null)
-          varinfo[i++] = new VariableInfo(name, String.class.getName(), true, VariableInfo.NESTED);
+          varinfo.add(new VariableInfo(name, String.class.getName(), true, VariableInfo.NESTED));
         // Url
         if ((name = variables.getUrl()) != null)
-          varinfo[i++] = new VariableInfo(name, WebUrl.class.getName(), true, VariableInfo.NESTED);
+          varinfo.add(new VariableInfo(name, WebUrl.class.getName(), true, VariableInfo.NESTED));
 
-        return varinfo;
+        // Have all variables been identified?
+        if (varinfo.size() < variables.size()) {
+          StringTokenizer tok = new StringTokenizer(definitions, " ,;");
+          while (tok.hasMoreTokens()) {
+            String varDef = tok.nextToken();
+            String[] varDefParts = varDef.split("=");
+            String v = null;
+            if (varDefParts.length > 1) {
+              v = varDefParts[1].trim();
+            } else {
+              v = varDefParts[0].trim();
+            }
+            
+            // Which one's missing?
+            boolean found = false;
+            for (VariableInfo vInfo : varinfo) {
+              if (v.equals(vInfo.getVarName())) {
+                found = true;
+                break;
+              }
+            }
+            
+            if (!found)
+              logger.warn("Context variable '" + v + "' is unknown");
+          }
+        }
+
+        return varinfo.toArray(new VariableInfo[varinfo.size()]);
       } catch (ParseException ex) {
         return new VariableInfo[0];
       }
@@ -97,8 +133,7 @@ public class ContextTagExtraInfo extends TagExtraInfo {
           new VariableInfo(ContextTagVariables.SITE, Site.class.getName(), true, VariableInfo.NESTED),
           new VariableInfo(ContextTagVariables.USER, AuthenticatedUser.class.getName(), true, VariableInfo.NESTED),
           new VariableInfo(ContextTagVariables.LANGUAGE, Language.class.getName(), true, VariableInfo.NESTED),
-          new VariableInfo(ContextTagVariables.REPOSITORY, ContentRepository.class.getName(), true, VariableInfo.NESTED)
-      };
+          new VariableInfo(ContextTagVariables.REPOSITORY, ContentRepository.class.getName(), true, VariableInfo.NESTED) };
     }
   }
 
