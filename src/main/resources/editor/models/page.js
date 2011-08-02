@@ -46,6 +46,18 @@ steal.then('jsonix')
 		},
 		
 		/**
+		 * Get Pending Pages
+		 */
+		findPending: function(params, success, error) {
+			$.ajax('/system/weblounge/pages/pending', {
+				success: function(xml) {
+					var json = Page.parseXML(xml);
+					success(json.value.page);
+				}
+			});
+		},
+		
+		/**
 		 * Get pages searched by string
 		 */
 		findBySearch: function(params, success, error) {

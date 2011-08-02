@@ -99,6 +99,10 @@ FileMappings.FilesCollection.properties = [new Jsonix.Model.ElementPropertyInfo(
 	name: 'file',
 	collection: true,
 	typeInfo: FileMappings.FileType
+}), new Jsonix.Model.ElementPropertyInfo({
+	name: 'image',
+	collection: true,
+	typeInfo: FileMappings.FileType
 })];
 
 FileMappings.FileType.properties = [new Jsonix.Model.AttributePropertyInfo({
@@ -223,6 +227,12 @@ FileMappings.Body.Content.properties = [new Jsonix.Model.AttributePropertyInfo({
 }), new Jsonix.Model.ElementPropertyInfo({
   name: 'size',
   typeInfo: Jsonix.Schema.XSD.Integer.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'width',
+  typeInfo: Jsonix.Schema.XSD.Integer.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'height',
+  typeInfo: Jsonix.Schema.XSD.Integer.INSTANCE
 })];
 
 FileMappings.typeInfos = [FileMappings.Head];
@@ -232,6 +242,10 @@ FileMappings.elementInfos = [{
 },
 {
   elementName: new Jsonix.XML.QName('file'),
+  typeInfo: FileMappings.FileType
+},
+{
+  elementName: new Jsonix.XML.QName('image'),
   typeInfo: FileMappings.FileType
 },
 {

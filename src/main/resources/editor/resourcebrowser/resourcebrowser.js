@@ -171,8 +171,7 @@ steal.plugins(
 					}, this));
 					break;
 				case 'media':
-					// TODO Replace with Files Model
-					Page.findRecent({}, $.proxy(function(media) {
+					Editor.File.findRecent({}, $.proxy(function(media) {
 						this.options.resources = media;
 						this.searchFlag = false;
 						this.update();
@@ -188,9 +187,22 @@ steal.plugins(
 		},
 		
 		"button.wbl-pending click": function(el, ev) {
-			steal.dev.log('show pending')
-			this.searchFlag = false;
-			this.update();
+			switch(this.options.resourceType) {
+			case 'pages':
+				Page.findPending({}, $.proxy(function(pages) {
+					this.options.resources = pages;
+					this.searchFlag = false;
+					this.update();
+				}, this));
+				break;
+			case 'media':
+				Editor.File.findPending({}, $.proxy(function(media) {
+					this.options.resources = media;
+					this.searchFlag = false;
+					this.update();
+				}, this));
+				break;
+			}
 		},
 		
 		"button.wbl-all click": function(el, ev) {
@@ -203,8 +215,7 @@ steal.plugins(
 				}, this));
 				break;
 			case 'media':
-				// TODO Replace with Files Model
-				Page.findAll({}, $.proxy(function(media) {
+				Editor.File.findAll({}, $.proxy(function(media) {
 					this.options.resources = media;
 					this.searchFlag = false;
 					this.update();
