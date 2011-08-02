@@ -168,7 +168,14 @@ public class PagePreviewGenerator implements PreviewGenerator {
       float screenshotScale = screenshotWidth / style.getWidth();
       int screenshotHeight = (int) screenshotScale * style.getHeight();
 
-      Java2DRenderer renderer = new Java2DRenderer(f, screenshotWidth, screenshotHeight);
+      // Create the renderer. Due to a synchronization bug in the software,
+      // this needs to be synchronized
+      Java2DRenderer renderer = null;
+      synchronized (this) {
+        renderer = new Java2DRenderer(f, screenshotWidth, screenshotHeight);
+      }
+      
+      // Configure the renderer
       renderer.getSharedContext().setBaseURL(site.getURL().toExternalForm());
       renderer.getSharedContext().setInteractive(false);
 
