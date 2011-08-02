@@ -36,7 +36,11 @@ steal.then('jsonix')
 		 * Get all Files
 		 */
 		findAll: function(params, success, error) {
-			$.ajax('/system/weblounge/files/?sort=created-asc&limit=0&offset=0', {
+			var url = "/system/weblounge/files/?sort=created-asc&limit=0&offset=0";
+			if ('filter' in params) {
+				url += "&filter=" + params.filter;
+			}
+			$.ajax(url, {
 				success: function(xml) {
 					var json = Editor.File.parseXML(xml);
 					success(Editor.File.concatFiles(json));
@@ -48,7 +52,11 @@ steal.then('jsonix')
 		 * Get Recent Files
 		 */
 		findRecent: function(params, success, error) {
-			$.ajax('/system/weblounge/files/?sort=modified-desc&limit=8&offset=0', {
+			var url = "/system/weblounge/files/?sort=modified-desc&limit=8&offset=0";
+			if ('filter' in params) {
+				url += "&filter=" + params.filter;
+			}
+			$.ajax(url, {
 				success: function(xml) {
 					var json = Editor.File.parseXML(xml);
 					success(Editor.File.concatFiles(json));
@@ -60,7 +68,27 @@ steal.then('jsonix')
 		 * Get Pending Files
 		 */
 		findPending: function(params, success, error) {
-			$.ajax('/system/weblounge/files/pending', {
+			var url = "/system/weblounge/files/pending";
+			if ('filter' in params) {
+				url += "?filter=" + params.filter;
+			}
+			$.ajax(url, {
+				success: function(xml) {
+					var json = Editor.File.parseXML(xml);
+					success(Editor.File.concatFiles(json));
+				}
+			});
+		},
+		
+		/**
+		 * Get files searched by string
+		 */
+		findBySearch: function(params, success, error) {
+			var url = '/system/weblounge/files/?searchterms=' + params.search + '&sort=modified-desc&limit=8&offset=0';
+			if ('filter' in params) {
+				url += "&filter=" + params.filter;
+			}
+			$.ajax(url, {
 				success: function(xml) {
 					var json = Editor.File.parseXML(xml);
 					success(Editor.File.concatFiles(json));

@@ -41,12 +41,7 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller')
 			$("input#wbl-resourceSearch").keypress($.proxy(function(ev) {
 				if(ev.key() == '\r') {
 					ev.preventDefault();
-					if(this.options.resourceType == 'pages') {
-						$(ev.target).trigger('searchPages', ev.target.value);
-					}
-					else if(this.options.resourceType == 'media') {
-						$(ev.target).trigger('searchMedia', ev.target.value);
-					}
+					$(ev.target).trigger('searchResources', ev.target.value);
 				}
 			}, this));
 		},

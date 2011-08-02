@@ -11,6 +11,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 			$(el).html('//editor/resourcebrowser/views/resourcescrollview.tmpl', {});
 			this._initViewItems();
 			this._initButtons();
+			this._initFilter();
 			this._initDialogs();
 			this._initSmoothDivScroll();
 		},
@@ -18,11 +19,13 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		update: function(options) {
 			this.options.resources = options.resources;
 			this.find('div.wbl-scrollviewitem').remove();
+			if($.isEmptyObject(this.options.resources)) return;
 			this._initViewItems();
+			this.divScroll.smoothDivScroll("recalculateScrollableArea");
 		},
 		
 		_initSmoothDivScroll: function() {
-			this.find('#wbl-makeMeScrollable').smoothDivScroll({
+			this.divScroll = this.find('#wbl-makeMeScrollable').smoothDivScroll({
 			  	autoScroll: "onstart",
 				autoScrollDirection: "left",
 				autoScrollStep: 1,
@@ -77,7 +80,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		"button.wbl-favorize click": function(el, ev) {
 			this.options.selectedPages = $('div.wbl-resourceScrollViewItem.wbl-marked');
 			if(this.options.selectedPages.length) {
-				this.options.selectedPages.trigger('favorizePages', [this.options.selectedPages]);
+				this.options.selectedPages.trigger('favorizeResources', [this.options.selectedPages]);
 				this._showMessage('Zu Favoriten hinzugefügt');
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');

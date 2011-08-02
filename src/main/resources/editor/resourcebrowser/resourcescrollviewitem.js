@@ -15,6 +15,8 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		},
 		
 		"img.wbl-showPage click": function(el, ev) {
+			// TODO if Media hover not show oder so ???
+			// and remove Link
 			ev.stopPropagation();
 			this.element.find('a.wbl-pagePath').click();
 		},

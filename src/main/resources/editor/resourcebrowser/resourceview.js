@@ -18,7 +18,7 @@ steal.plugins('jquery/controller',
 	},
 	{	
 		init: function(el) {
-			
+
 		},
 		
 		_initButtons: function() {
@@ -26,6 +26,15 @@ steal.plugins('jquery/controller',
 			$('button.wbl-delete').button({icons: {primary: "ui-icon-trash"}, text: false});
 			$('button.wbl-duplicate').button({icons: {primary: "ui-icon-copy"}, text: false});
 			$('button.wbl-favorize').button({icons: {primary: "ui-icon-star"}, text: false });
+		},
+		
+		_initFilter: function() {
+			this.element.find("input#wbl-filter").keypress($.proxy(function(ev) {
+				if(ev.key() == '\r') {
+					ev.preventDefault();
+					$(ev.target).trigger('filterResources', ev.target.value);
+				}
+			}, this));
 		},
 		
 		_initDialogs: function() {
@@ -41,7 +50,7 @@ steal.plugins('jquery/controller',
 						$(this).dialog('close');
 					},
 					OK: $.proxy(function () {
-						this.element.trigger('deletePages', [this.options.selectedPages]);
+						this.element.trigger('deleteResources', [this.options.selectedPages]);
 						this._showMessage('Seite(n) gelöscht!');
 						this.deleteDialog.dialog('close');
 					},this)
@@ -60,7 +69,7 @@ steal.plugins('jquery/controller',
 						$(this).dialog('close');
 					},
 					OK: $.proxy(function () {
-						this.element.trigger('duplicatePages', [this.options.selectedPages]);
+						this.element.trigger('duplicateResources', [this.options.selectedPages]);
 						this._showMessage('Seite dupliziert!');
 						this.duplicateDialog.dialog('close');
 					},this)

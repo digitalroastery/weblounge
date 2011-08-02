@@ -19,11 +19,9 @@ steal.plugins(
 			$(el).html('//editor/resourcebrowser/views/init.tmpl', {});
 			this._initViewItems();
 			this.searchFlag = true;
-//			this._loadResources();
 		},
 		
 		update: function(showSearchBox) {
-			if($.isEmptyObject(this.options.resources)) return;
 			if(showSearchBox == true) {
 				this.searchFlag = true;
 				this.searchBox.show();
@@ -34,6 +32,7 @@ steal.plugins(
 				this.activeElement.show();
 				this.searchBox.hide();
 			}
+			
 			this.scrollView.editor_resourcescrollview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
 			this.listView.editor_resourcelistview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
 		},
@@ -64,37 +63,24 @@ steal.plugins(
 		},
 		
 		_showResourceScrollView: function(resources) {
+			if(this.searchFlag == true) return;
 			this.options.resources = resources;
 			var element = this.find('div.wbl-thumbnailView');
-			this._toggleElement(element)
+			this._toggleElement(element);
 			element.editor_resourcescrollview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
 		},
 		
 		_showResourceListView: function(resources) {
+			if(this.searchFlag == true) return;
 			this.options.resources = resources;
 			var element = this.find('div.wbl-listView');
-			this._toggleElement(element)
+			this._toggleElement(element);
 			element.editor_resourcelistview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
 		},
 		
-//		_loadResources: function() {
-//			if(this.options.resourceType == 'pages') {
-//				Page.findAll({}, this.callback('_showResourceScrollView'));
-//			} else if(this.options.resourceType == 'media') {
-//				Editor.File.findAll({}, this.callback('_showResourceScrollView'));
-//			}
-//		},
-		
 		/**
-		 * Unmark the scrollViewItems if you click outside of a item
+		 * Remove deleted resource from resource array
 		 */
-		"div click": function(el, ev) {
-			ev.stopPropagation();
-			if(!el.is(this.element.find('div.wbl-scrollViewItem'))) {
-				this.element.find('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
-			}
-		},
-		
         _removeResource: function(id) {
 	    	var index = -1;
 	    	$.each(this.options.resources, function(i, resources) {
@@ -116,112 +102,146 @@ steal.plugins(
         	el.show();
         },
         
-		"input searchMedia": function(el, ev, searchValue) {
-			Page.findBySearch({search: searchValue}, $.proxy(function(pages) {
-				this.options.resources = pages;
-				this.searchFlag = false;
-				this.update();
-			}, this));
+        _loadResources: function(params, functions) {
+			switch(this.options.resourceType) {
+			case 'pages':
+				functions.page(params);
+				break;
+			case 'media':
+				functions.media(params);
+				break;
+			}
+        },
+        
+        /**
+         * Unmark the scrollViewItems if you click outside of a item
+         */
+        "div click": function(el, ev) {
+        	ev.stopPropagation();
+        	if(!el.is(this.element.find('div.wbl-scrollViewItem'))) {
+        		this.element.find('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
+        	}
+        },
+        
+		"input searchResources": function(el, ev, searchValue) {
+			if(searchValue == undefined) searchValue = '';
+        	this.lastQuery = {page: $.proxy(function(params) {
+        		Page.findBySearch(params, $.proxy(function(pages) {
+        			this.options.resources = pages;
+        			this.searchFlag = false;
+        			this.update();
+        		}, this));
+        	}, this), media: $.proxy(function(params) {
+    			Editor.File.findBySearch(params, $.proxy(function(pages) {
+    				this.options.resources = pages;
+    				this.searchFlag = false;
+    				this.update();
+    			}, this));
+        	}, this)};
+        	this.lastParams = {search: searchValue};
+        	this._loadResources(this.lastParams, this.lastQuery);
 		},
 		
-		"input searchPages": function(el, ev, searchValue) {
-			Page.findBySearch({search: searchValue}, $.proxy(function(pages) {
-				this.options.resources = pages;
-				this.searchFlag = false;
-				this.update();
-			}, this));
+		"input filterResources": function(el, ev, filterValue) {
+			if(filterValue == undefined) filterValue = '';
+			this.lastParams.filter = filterValue;
+			this._loadResources(this.lastParams, this.lastQuery);
 		},
 		
 		"button.wbl-list click": function(el, ev) {
-			if($.isEmptyObject(this.options.resources)) return;
 			this._showResourceListView(this.options.resources);
 		},
 		
 		"button.wbl-thumbnails click": function(el, ev) {
-			if($.isEmptyObject(this.options.resources)) return;
 			this._showResourceScrollView(this.options.resources);
 		},
         
         // Delete Pages
-        "div#wbl-mainContainer deletePages": function(el, ev, pages) {
-        	pages.each($.proxy(function(index, element) {
-        		Page.destroy({id: element.id}, this.callback('_removeResource', element.id));
-        	}, this))
+        "div#wbl-mainContainer deleteResources": function(el, ev, resources) {
+        	switch(this.options.resourceType) {
+        	case 'pages':
+        		resources.each($.proxy(function(index, element) {
+        			Page.destroy({id: element.id}, this.callback('_removeResource', element.id));
+        		}, this))
+        		break;
+        	case 'media':
+        		resources.each($.proxy(function(index, element) {
+        			Editor.File.destroy({id: element.id}, this.callback('_removeResource', element.id));s
+        		}, this))
+        		break;
+        	}
         },
         
         // Duplicate Pages
-        "div#wbl-mainContainer duplicatePages": function(el, ev, pages) {
-//        	Page.duplicate(pages);
+        "div#wbl-mainContainer duplicateResources": function(el, ev, resources) {
+        	// TODO
         	this.update();
         },
         
         // Favorize Pages
-        "div#wbl-mainContainer favorizePages": function(el, ev, pages) {
-//        	Page.duplicate(pages);
+        "div#wbl-mainContainer favorizeResources": function(el, ev, resources) {
+        	// TODO
         	this.update();
         },
         
 		"button.wbl-recent click": function(el, ev) {
-			switch(this.options.resourceType) {
-				case 'pages':
-					Page.findRecent({}, $.proxy(function(pages) {
-						this.options.resources = pages;
-						this.searchFlag = false;
-						this.update();
-					}, this));
-					break;
-				case 'media':
-					Editor.File.findRecent({}, $.proxy(function(media) {
-						this.options.resources = media;
-						this.searchFlag = false;
-						this.update();
-					}, this));
-					break;
-			}
+			this.lastQuery = {page: $.proxy(function(params) {
+				Page.findRecent(params, $.proxy(function(pages) {
+					this.options.resources = pages;
+					this.searchFlag = false;
+					this.update();
+				}, this));
+			}, this), media: $.proxy(function(params) {
+				Editor.File.findRecent(params, $.proxy(function(media) {
+					this.options.resources = media;
+					this.searchFlag = false;
+					this.update();
+				}, this));
+			}, this)};
+			this.lastParams = {};
+			this._loadResources(this.lastParams, this.lastQuery);
 		},
 		
 		"button.wbl-favorites click": function(el, ev) {
-			steal.dev.log('favorites')
-			this.searchFlag = false;
+			// TODO
+//			this.searchFlag = false;
 			this.update();
 		},
 		
 		"button.wbl-pending click": function(el, ev) {
-			switch(this.options.resourceType) {
-			case 'pages':
-				Page.findPending({}, $.proxy(function(pages) {
+			this.lastQuery = {page: $.proxy(function(params) {
+				Page.findPending(params, $.proxy(function(pages) {
 					this.options.resources = pages;
 					this.searchFlag = false;
 					this.update();
 				}, this));
-				break;
-			case 'media':
-				Editor.File.findPending({}, $.proxy(function(media) {
+			}, this), media: $.proxy(function(params) {
+				Editor.File.findPending(params, $.proxy(function(media) {
 					this.options.resources = media;
 					this.searchFlag = false;
 					this.update();
 				}, this));
-				break;
-			}
+			}, this)};
+			this.lastParams = {};
+			this._loadResources(this.lastParams, this.lastQuery);
 		},
 		
 		"button.wbl-all click": function(el, ev) {
-			switch(this.options.resourceType) {
-			case 'pages':
-				Page.findAll({}, $.proxy(function(pages) {
+			this.lastQuery = {page: $.proxy(function(params) {
+				Page.findAll(params, $.proxy(function(pages) {
 					this.options.resources = pages;
 					this.searchFlag = false;
 					this.update();
 				}, this));
-				break;
-			case 'media':
-				Editor.File.findAll({}, $.proxy(function(media) {
+			}, this), media: $.proxy(function(params) {
+				Editor.File.findAll(params, $.proxy(function(media) {
 					this.options.resources = media;
 					this.searchFlag = false;
 					this.update();
 				}, this));
-				break;
-			}
+			}, this)};
+			this.lastParams = {};
+			this._loadResources(this.lastParams, this.lastQuery);
 		}
 	});
 });

@@ -25,7 +25,11 @@ steal.then('jsonix')
 		 * Get all Pages
 		 */
 		findAll: function(params, success, error) {
-			$.ajax('/system/weblounge/pages/?sort=created-asc&limit=0&offset=0', {
+			var url = "/system/weblounge/pages/?sort=created-asc&limit=0&offset=0";
+			if ('filter' in params) {
+				url += "&filter=" + params.filter;
+			}
+			$.ajax(url, {
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
@@ -37,7 +41,11 @@ steal.then('jsonix')
 		 * Get Recent Pages
 		 */
 		findRecent: function(params, success, error) {
-			$.ajax('/system/weblounge/pages/?sort=modified-desc&limit=8&offset=0', {
+			var url = "/system/weblounge/pages/?sort=modified-desc&limit=8&offset=0";
+			if ('filter' in params) {
+				url += "&filter=" + params.filter;
+			}
+			$.ajax(url, {
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
@@ -49,7 +57,11 @@ steal.then('jsonix')
 		 * Get Pending Pages
 		 */
 		findPending: function(params, success, error) {
-			$.ajax('/system/weblounge/pages/pending', {
+			var url = "/system/weblounge/pages/pending";
+			if ('filter' in params) {
+				url += "?filter=" + params.filter;
+			}
+			$.ajax(url, {
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
@@ -61,7 +73,11 @@ steal.then('jsonix')
 		 * Get pages searched by string
 		 */
 		findBySearch: function(params, success, error) {
-			$.ajax('/system/weblounge/pages/?searchterms=' + params.search + '&sort=modified-desc&limit=8&offset=0', {
+			var url = '/system/weblounge/pages/?searchterms=' + params.search + '&sort=modified-desc&limit=8&offset=0';
+			if ('filter' in params) {
+				url += "&filter=" + params.filter;
+			}
+			$.ajax(url, {
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);

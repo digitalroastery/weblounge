@@ -11,6 +11,7 @@ steal.plugins('jquery/view/tmpl')
 			$(el).html('//editor/resourcebrowser/views/resourcelistview.tmpl', {runtime: this.options.runtime});
 			this._initViewItems();
 			this._initButtons();
+			this._initFilter();
 			this._initDialogs();
 			this._initDataTable();
 		},
@@ -19,6 +20,7 @@ steal.plugins('jquery/view/tmpl')
 			this.options.resources = options.resources;
 ////			this.dataTable.fnClearTable();
 			this.find('tr.wbl-pageEntry').remove();
+			if($.isEmptyObject(this.options.resources)) return;
 			this._initViewItems();
 ////			this.dataTable = this.dataTable.dataTable({
 //				"bPaginate": true,
@@ -99,7 +101,7 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		"img.wbl-favorite click": function(el, ev) {
-			this.element.trigger('favorizePages', [el.parents('tr.wbl-pageEntry')]);
+			this.element.trigger('favorizeResources', [el.parents('tr.wbl-pageEntry')]);
 			this._showMessage('Zu Favoriten hinzugefügt');
 		},
 		
@@ -126,7 +128,7 @@ steal.plugins('jquery/view/tmpl')
 		"button.wbl-favorize click": function(el, ev) {
 			this.options.selectedPages = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
 			if(this.options.selectedPages.length) {
-				this.element.trigger('favorizePages', [this.options.selectedPages]);
+				this.element.trigger('favorizeResources', [this.options.selectedPages]);
 				this._showMessage('Zu Favoriten hinzugefügt');
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');
