@@ -292,41 +292,43 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
     // Ask the registered request handler if they are willing to handle
     // the request.
-    for (RequestHandler handler : requestHandler) {
-      try {
-        logger.trace("Asking {} to serve {}", handler, request);
-        if (handler.service(request, response)) {
-          logger.debug("{} served request {}", handler, request);
+    try {
+      for (RequestHandler handler : requestHandler) {
+        try {
+          logger.trace("Asking {} to serve {}", handler, request);
+          if (handler.service(request, response)) {
+            logger.debug("{} served request {}", handler, request);
 
-          // Notify listeners about finished request
-          if (response.hasError()) {
-            logger.debug("Request processing failed on {}", request);
-            fireRequestFailed(request, response, site);
-          } else {
-            fireRequestDelivered(request, response, site);
+            // Notify listeners about finished request
+            if (response.hasError()) {
+              logger.debug("Request processing failed on {}", request);
+              fireRequestFailed(request, response, site);
+            } else {
+              fireRequestDelivered(request, response, site);
+            }
+            return;
           }
-          return;
+        } catch (Throwable t) {
+          response.invalidate();
+          String params = RequestUtils.dumpParameters(request);
+          if (t.getCause() != null) {
+            t = t.getCause();
+          }
+          logger.error("Request handler '{}' failed to handle {} {}", new Object[] {
+              handler,
+              request,
+              params });
+          logger.error(t.getMessage(), t);
+          DispatchUtils.sendInternalError(t.getMessage(), request, response);
+          break;
         }
-      } catch (Throwable t) {
-        response.invalidate();
-        String params = RequestUtils.dumpParameters(request);
-        if (t.getCause() != null) {
-          t = t.getCause();
-        }
-        logger.error("Request handler '{}' failed to handle {} {}", new Object[] {
-            handler,
-            request,
-            params });
-        logger.error(t.getMessage(), t);
-        DispatchUtils.sendInternalError(t.getMessage(), request, response);
-        break;
-      } finally {
-        if (cache != null) {
-          if (response.isValid())
-            response.endResponse();
-        }
-        logger.debug("Finished processing of {}", httpRequest.getRequestURI());
       }
+    } finally {
+      if (cache != null) {
+        if (response.isValid())
+          response.endResponse();
+      }
+      logger.debug("Finished processing of {}", httpRequest.getRequestURI());
     }
 
     // Apparently, nobody felt responsible for this request

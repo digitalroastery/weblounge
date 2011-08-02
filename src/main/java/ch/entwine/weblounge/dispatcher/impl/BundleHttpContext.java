@@ -22,6 +22,7 @@ package ch.entwine.weblounge.dispatcher.impl;
 
 import ch.entwine.weblounge.common.impl.url.UrlUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.service.http.HttpContext;
 
@@ -143,8 +144,11 @@ public class BundleHttpContext implements HttpContext {
   public URL getResource(String resourceName) {
     if (resourceName.startsWith(siteURI))
       resourceName = resourceName.substring(siteURI.length());
-    if (bundlePath != null && !resourceName.startsWith(WEB_INF))
-      resourceName = UrlUtils.concat(bundlePath, resourceName);
+    if (StringUtils.isNotBlank(bundlePath) && !resourceName.startsWith(WEB_INF))
+      if (StringUtils.isNotBlank(resourceName))
+        resourceName = UrlUtils.concat(bundlePath, resourceName);
+      else
+        resourceName = bundlePath;
     return bundle.getResource(resourceName);
   }
 
@@ -175,6 +179,39 @@ public class BundleHttpContext implements HttpContext {
         result.add(entryPath.substring(bundlePath.length()));
     }
     return result;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return bundle.hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof BundleHttpContext) {
+      return ((BundleHttpContext) o).getBundle().equals(bundle);
+    }
+    return false;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return bundle.toString();
   }
 
 }

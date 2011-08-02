@@ -413,6 +413,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     Properties initParameters = new Properties();
 
     // Prepare the init parameters
+    //initParameters.put("load-on-startup", Integer.toString(1));
     initParameters.putAll(webXml.getContextParams());
     initParameters.putAll(jasperConfig);
 

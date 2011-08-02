@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
-import java.util.Properties;
+import java.util.Hashtable;
 
 import javax.servlet.ServletException;
 
@@ -79,7 +79,8 @@ public class HttpServiceTracker extends ServiceTracker {
       httpService = (HttpService) context.getService(reference);
 
       HttpContext httpContext = httpService.createDefaultHttpContext();
-      Dictionary<?, ?> initParams = new Properties();
+      Dictionary<String, String> initParams = new Hashtable<String, String>();
+      //initParams.put("load-on-startup", Integer.toString(100));
       httpService.registerServlet(contextPath, dispatcher, initParams, httpContext);
       logger.info("Weblounge dispatcher hooked up with http service {}", httpService.getClass().getName());
 
