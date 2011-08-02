@@ -119,6 +119,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       @QueryParam("path") String path,
       @QueryParam("subjects") String subjectstring,
       @QueryParam("searchterms") String searchterms,
+      @QueryParam("filter") String filter,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
       @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset,
@@ -127,18 +128,33 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Create search query
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
+    
     q.withType(Page.TYPE);
+    
+    // Path
     if (StringUtils.isNotBlank(path))
       q.withPath(path);
+    
+    // Subjects
     if (StringUtils.isNotBlank(subjectstring)) {
       StringTokenizer subjects = new StringTokenizer(subjectstring, ",");
       while (subjects.hasMoreTokens())
         q.withSubject(subjects.nextToken());
     }
+    
+    // Search terms
     if (StringUtils.isNotBlank(searchterms))
       q.withText(searchterms);
+    
+    // Filter query
+    if (StringUtils.isNotBlank(filter))
+      q.withFilter(filter);
+    
+    // Limit and Offset
     q.withLimit(limit);
     q.withOffset(offset);
+    
+    // Sort order
     if (StringUtils.equalsIgnoreCase("modified-asc", sort)) {
       q.sortByModificationDate(Order.Ascending);
     } else if (StringUtils.equalsIgnoreCase("modified-desc", sort)) {

@@ -77,6 +77,7 @@ public final class FilesEndpointDocs {
     getFileByPathEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The resource path"));
     getFileByPathEndpoint.addOptionalParameter(new Parameter("subjects", Parameter.Type.String, "The page subjects, separated by a comma"));
     getFileByPathEndpoint.addOptionalParameter(new Parameter("searchterms", Parameter.Type.String, "search terms to search the pages content"));
+    getFileByPathEndpoint.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
     getFileByPathEndpoint.addOptionalParameter(new Parameter("type", Parameter.Type.String, "The file type, e. g. 'image'"));
     getFileByPathEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
     getFileByPathEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));

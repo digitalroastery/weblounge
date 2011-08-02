@@ -149,7 +149,8 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       @QueryParam("path") String path,
       @QueryParam("subjects") String subjectstring,
       @QueryParam("searchterms") String searchterms,
-      @QueryParam("filter") String filter, @QueryParam("type") String type,
+      @QueryParam("filter") String filter,
+      @QueryParam("type") String type,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
       @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset) {
