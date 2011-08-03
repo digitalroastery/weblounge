@@ -378,7 +378,7 @@ public class SiteCommand {
    *          the site
    */
   private void index(Site site) {
-    boolean restart = site.isOnline();
+    // boolean restart = site.isOnline();
 
     // Make sure we are in good shape before we index
     ContentRepository repository = site.getContentRepository();
@@ -388,19 +388,20 @@ public class SiteCommand {
     } else if (repository.isReadOnly()) {
       System.out.println("Site " + site + " is read only");
       return;
-    } else if (site.isOnline()) {
-      while (true) {
-        String answer = System.console().readLine("Can't index a running site! Stop now? [y/n] ");
-        if ("y".equalsIgnoreCase(answer)) {
-          stop(site);
-          System.out.println();
-          break;
-        } else if ("n".equalsIgnoreCase(answer)) {
-          return;
-        } else {
-          answer = null;
-        }
-      }
+      // } else if (site.isOnline()) {
+      // while (true) {
+      // String answer =
+      // System.console().readLine("Can't index a running site! Stop now? [y/n] ");
+      // if ("y".equalsIgnoreCase(answer)) {
+      // stop(site);
+      // System.out.println();
+      // break;
+      // } else if ("n".equalsIgnoreCase(answer)) {
+      // return;
+      // } else {
+      // answer = null;
+      // }
+      // }
     }
 
     // Finally! Let's do the work
@@ -413,10 +414,10 @@ public class SiteCommand {
 
     // Restart the site if we shut it down previously
     System.out.println("Site " + site + " indexed");
-    if (restart) {
-      System.out.println();
-      start(site);
-    }
+    // if (restart) {
+    // System.out.println();
+    // start(site);
+    // }
   }
 
   /**
