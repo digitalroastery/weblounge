@@ -112,12 +112,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
-    
+
     // Detect the filesystem root directory
     String fsRootDir = null;
     if (StringUtils.isNotBlank(System.getProperty(PROP_ROOT_DIR)))
@@ -126,7 +126,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       fsRootDir = (String) properties.get(OPT_ROOT_DIR);
     else
       fsRootDir = PathUtils.concat(System.getProperty("java.io.tmpdir"), ROOT_DIR_DEFAULT);
-    
+
     repositoryRoot = new File(fsRootDir);
     if (site != null)
       repositorySiteRoot = new File(repositoryRoot, site.getIdentifier());
@@ -138,13 +138,13 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     } catch (IOException e) {
       throw new ConfigurationException(OPT_ROOT_DIR, "Unable to create repository storage at " + repositoryRoot, e);
     }
-    
+
     logger.debug("Content repository configured");
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#connect(ch.entwine.weblounge.common.site.Site)
    */
   @Override
@@ -169,7 +169,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index()
    */
-  public void index() throws ContentRepositoryException {    
+  public void index() throws ContentRepositoryException {
     // Temporary path for rebuilt site
     boolean success = true;
 
@@ -324,6 +324,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                 resourceCount++;
                 foundResource = true;
               }
+
+              // Create the previews
+              createPreviews(resource);
 
             } catch (Throwable t) {
               logger.error("Error indexing {} {}: {}", new Object[] {
@@ -627,7 +630,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResourceContent(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.content.ResourceContent, java.io.InputStream)
+   *      ch.entwine.weblounge.common.content.ResourceContent,
+   *      java.io.InputStream)
    */
   @Override
   protected <T extends ResourceContent> T storeResourceContent(ResourceURI uri,

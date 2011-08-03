@@ -20,20 +20,38 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Module;
+import ch.entwine.weblounge.contentrepository.ResourceSerializer;
+import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Abstract base implementation of a <code>WritableContentRepository</code>.
@@ -43,15 +61,39 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractWritableContentRepository.class);
 
+  /** The list of image styles */
+  private List<ImageStyle> styles = new ArrayList<ImageStyle>();
+
   /**
    * Creates a new instance of the content repository.
    * 
-   * @param type the repository type
+   * @param type
+   *          the repository type
    */
   public AbstractWritableContentRepository(String type) {
     super(type);
   }
-  
+
+  /**
+   * Callback from the OSGi container on component activation.
+   * 
+   * @param ctx
+   *          the component context
+   */
+  void activate(ComponentContext ctx) {
+    styles.clear();
+  }
+
+  /**
+   * Callback from the OSGi container on component deactivation.
+   * 
+   * @param ctx
+   *          the component context
+   */
+  void deactivate(ComponentContext ctx) {
+    styles.clear();
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -173,7 +215,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#putContent(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.content.ResourceContent, java.io.InputStream)
+   *      ch.entwine.weblounge.common.content.ResourceContent,
+   *      java.io.InputStream)
    */
   @SuppressWarnings("unchecked")
   public <T extends ResourceContent> Resource<T> putContent(ResourceURI uri,
@@ -300,5 +343,187 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   protected abstract <T extends ResourceContent> void deleteResourceContent(
       ResourceURI uri, T content) throws IOException;
+
+  /**
+   * Creates the previews for this resource in all languages and for all known
+   * image styles.
+   * 
+   * @param resource
+   *          the resource
+   */
+  protected void createPreviews(Resource<?> resource) {
+    ResourceURI resourceURI = resource.getURI();
+    String resourceType = resourceURI.getType();
+
+    // Find the resource serializer
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+    if (serializer == null) {
+      logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
+      return;
+    }
+
+    // Does the serializer come with a preview generator?
+    PreviewGenerator previewGenerator = serializer.getPreviewGenerator();
+    if (previewGenerator == null) {
+      logger.debug("Resource type '{}' does not support previews", resourceType);
+      return;
+    }
+
+    // Compile the full list of image styles
+    List<ImageStyle> styles = new ArrayList<ImageStyle>();
+    styles.addAll(this.styles);
+    for (Module m : getSite().getModules()) {
+      styles.addAll(Arrays.asList(m.getImageStyles()));
+    }
+
+    // Create the previews for all languages.
+    for (Language language : resource.languages()) {
+      ResourceContent resourceContent = resource.getContent(language);
+
+      logger.info("Creating {} previews for {} {}", new Object[] {
+          language.getDescription(),
+          resourceType,
+          resource });
+
+      for (ImageStyle style : styles) {
+
+        // Create the target file name
+        StringBuilder filename = new StringBuilder();
+        String basename = null;
+
+        if (resourceContent != null)
+          basename = FilenameUtils.getBaseName(resourceContent.getFilename());
+        else
+          basename = resource.getIdentifier();
+        filename.append(basename);
+        filename.append("-").append(language.getIdentifier());
+
+        String suffix = previewGenerator.getSuffix(resource, language, style);
+        if (StringUtils.isNotBlank(suffix)) {
+          filename.append(".").append(suffix);
+        }
+
+        // Create the preview
+        File previewFile = createPreview(resource, style, language, filename.toString(), previewGenerator);
+
+        if (previewFile != null)
+          logger.debug("Created {} preview '{}' for {}", new Object[] {
+              language.getDescription(),
+              style.getIdentifier(),
+              resource });
+        else
+          logger.debug("Preview generation '{}' for {} failed", new Object[] {
+              style.getIdentifier(),
+              resource });
+      }
+
+      logger.debug("All {} previews created for {} {}", new Object[] {
+          language.getDescription(),
+          resourceType,
+          resource });
+    }
+  }
+
+  /**
+   * Creates a preview from the given resource and returns the preview's file or
+   * <code>null</code> if the preview could not be created.
+   * 
+   * @param resource
+   *          the resource
+   * @param style
+   *          the image style
+   * @param language
+   *          the language
+   * @param filename
+   *          the original filename
+   * @param previewGenerator
+   *          the preview generator
+   * @return the preview file
+   */
+  private File createPreview(Resource<?> resource, ImageStyle style,
+      Language language, String filename, PreviewGenerator previewGenerator) {
+    ResourceURI resourceURI = resource.getURI();
+    String resourceType = resourceURI.getType();
+
+    InputStream resourceInputStream = null;
+    InputStream contentRepositoryIs = null;
+    FileOutputStream fos = null;
+    File scaledResourceFile = null;
+
+    try {
+      scaledResourceFile = ImageStyleUtils.createScaledFile(resource, filename.toString(), language, style);
+
+      // Find the modification date
+      Date modificationDate = resource.getModificationDate();
+      if (modificationDate == null)
+        modificationDate = resource.getCreationDate();
+      long lastModified = modificationDate.getTime();
+
+      // Create the file if it doesn't exist or if it is outdated
+      if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
+        contentRepositoryIs = getContent(resourceURI, language);
+        fos = new FileOutputStream(scaledResourceFile);
+        logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
+        previewGenerator.createPreview(resource, language, style, contentRepositoryIs, fos);
+        scaledResourceFile.setLastModified(lastModified);
+      }
+
+      return scaledResourceFile;
+    } catch (ContentRepositoryException e) {
+      logger.error("Error loading {} {} '{}' from {}: {}", new Object[] {
+          language,
+          resourceType,
+          resource,
+          this,
+          e.getMessage() });
+      logger.error(e.getMessage(), e);
+      IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile.getParentFile());
+      return null;
+    } catch (IOException e) {
+      logger.warn("Error creating preview for {} '{}': {}", new Object[] {
+          resourceType,
+          resourceURI,
+          e.getMessage() });
+      IOUtils.closeQuietly(resourceInputStream);
+      if (scaledResourceFile != null)
+        FileUtils.deleteQuietly(scaledResourceFile.getParentFile());
+      return null;
+    } catch (Throwable t) {
+      logger.warn("Error creating preview for {} '{}': {}", new Object[] {
+          resourceType,
+          resourceURI,
+          t.getMessage() });
+      IOUtils.closeQuietly(resourceInputStream);
+      if (scaledResourceFile != null)
+        FileUtils.deleteQuietly(scaledResourceFile.getParentFile());
+      return null;
+    } finally {
+      IOUtils.closeQuietly(contentRepositoryIs);
+      IOUtils.closeQuietly(fos);
+    }
+  }
+
+  /**
+   * Callback from OSGi declarative services on registration of a new image
+   * style in the service registry.
+   * 
+   * @param style
+   *          the image style
+   */
+  void addImageStyle(ImageStyle style) {
+    styles.add(style);
+  }
+
+  /**
+   * Callback from OSGi declarative services on removal of an image style from
+   * the service registry.
+   * 
+   * @param style
+   *          the image style
+   */
+  void removeImageStyle(ImageStyle style) {
+    styles.remove(style);
+  }
 
 }

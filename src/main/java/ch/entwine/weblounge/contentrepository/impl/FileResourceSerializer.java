@@ -34,7 +34,6 @@ import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.impl.content.file.FileContentReader;
-import ch.entwine.weblounge.common.impl.content.file.FilePreviewGenerator;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceSearchResultItemImpl;
@@ -67,7 +66,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
    */
   public FileResourceSerializer() {
     super(FileResource.TYPE);
-    previewGenerator = new FilePreviewGenerator();
+    // previewGenerator = new FilePreviewGenerator();
   }
 
   /**
