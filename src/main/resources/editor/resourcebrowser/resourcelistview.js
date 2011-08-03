@@ -1,6 +1,6 @@
 steal.plugins('jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/resourcelistview.tmpl')
-.resources('jquery.tablesorter.min', 'jquery.tablesorter.pager')
+.resources('jquery.tablesorter', 'jquery.tablesorter.pager')
 .then('resourceview', 'resourcelistviewitem')
 .css('resources/images/blue/style', 'resources/jquery.tablesorter.pager')
 .then(function($) {
@@ -22,7 +22,7 @@ steal.plugins('jquery/view/tmpl')
 			this.table.trigger("update");
 			if($.isEmptyObject(this.options.resources)) return;
 			this._initViewItems();
-			this._initDataTable(config.size);
+			this._initDataTable();
 		},
 		
 		_initDataTable: function(pagingSize) {

@@ -184,6 +184,7 @@ steal.then('jsonix')
 				return json.value.image;
 			}
 			else {
+				if($.isEmptyObject(json.value.image)) return json.value.file;
 				return json.value.file.concat(json.value.image);
 			}
 		},

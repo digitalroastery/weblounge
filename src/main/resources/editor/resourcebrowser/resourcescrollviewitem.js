@@ -21,17 +21,9 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 				this.element.find('a.wbl-pagePath').click();
 				break;
 			case 'media':
-				
-				//TODO
-//                window.open('/system/weblounge/files/' + $(el.parent).attr('id') + 'content/' + this.options.language, "popUp", "width=300,height=400,scrollbars=yes");
-//                event.preventDefault();
-//				
-//				// Show image
-//				//Grab the href, open it in a window and cancel the click action
-//				$("a[href^='http']").click(function(){});
-//				//Add target = blant to the external link
-//				$("a[href^='http']").attr('target','_blank');
-////				this.element.find('a.wbl-pagePath').click();
+				var url = '/system/weblounge/files/' + $(el.parent()).attr('id') + '/content/' + this.options.language;
+                window.open(url, "popUp", "width=800,height=600,scrollbars=yes");
+                ev.preventDefault();
 				break;
 			}
 		},
