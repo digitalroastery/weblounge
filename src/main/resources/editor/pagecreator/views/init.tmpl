@@ -5,7 +5,7 @@
 		<button class="wbl-tree">Treeview</button>
 	</div>
 	<div class="wbl-listView">
-		<table>
+		<table class="wbl-tablesorter">
 			<thead>
 				<tr>
 					<th>Seite</th>
@@ -19,6 +19,19 @@
 	    		{{/each}}
 			</tbody>
 		</table>
+		<div id="wbl-pager">
+			<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/first.png" class="wbl-first"/>
+			<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/prev.png" class="wbl-prev"/>
+			<input type="text" class="wbl-pageDisplay"/>
+			<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/next.png" class="wbl-next"/>
+			<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/last.png" class="wbl-last"/>
+			<select class="wbl-pageSize">
+				<option selected="selected" value="10">10</option>
+				<option value="20">20</option>
+				<option value="30">30</option>
+				<option  value="40">40</option>
+			</select>
+		</div>
 	</div>
 	<div class="wbl-thumbnailView">
 		<div id="wbl-makeMeScrollablePageCreator">
@@ -57,7 +70,7 @@
 Seitentitel: <input type="text" name="title" class="required" /><br /><br />
 URL: <input type="text" name="url" class="required" /><br /><br />
 Layout: <select name="layout" >
-	{{each options}}
+	{{each runtime.getSiteLayouts()}}
 		<option value="${$value}">${$value}</option>
     {{/each}}
 </select><br /><br />

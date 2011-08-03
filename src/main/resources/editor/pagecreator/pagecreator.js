@@ -26,7 +26,11 @@ steal.plugins('jquery',
 		_initViews: function(pages) {
 			var pageData = new Object();
 			
-			this.element.html('//editor/pagecreator/views/init.tmpl', {pages: pages, options: this.options.runtime.getSiteLayouts(), language: this.options.language});
+			this.element.html('//editor/pagecreator/views/init.tmpl', {
+				pages: pages, 
+				runtime: this.options.runtime,
+				language: this.options.language
+			});
 			
 			this.scrollView = this.find('div.wbl-thumbnailView').show();
 			this.listView = this.find('div.wbl-listView').hide();
@@ -51,14 +55,18 @@ steal.plugins('jquery',
 				text: false });
 			
 			// TableView
-			this.element.find('table').dataTable({
-				"bPaginate": true,
-				"bLengthChange": true,
-				"bFilter": true,
-				"bSort": true,
-				"bInfo": true,
-				"bAutoWidth": true,
-				"bJQueryUI": true
+			this.table = this.find('table').tablesorter({
+				sortList: [[0,0]],
+		        widgets: ['zebra']
+			}).tablesorterPager({
+				container: this.element.find("#wbl-pager"),
+				positionFixed: false,
+				cssNext: '.wbl-next',
+				cssPrev: '.wbl-prev',
+				cssFirst: '.wbl-first',
+				cssLast: '.wbl-last',
+				cssPageDisplay: '.wbl-pageDisplay',
+				cssPageSize: '.wbl-pageSize'
 			});
 			
 			// ThumbnailView
@@ -71,10 +79,13 @@ steal.plugins('jquery',
 		  	});
 			
 			// Lazy loading images
+			var rootPath = this.options.runtime.getRootPath();
 			this.element.find('img.wbl-pageThumbnail').lazyload({         
-				placeholder: this.options.runtime.getRootPath() + "/editor/resourcebrowser/images/empty_thumbnail.png",
+				placeholder: rootPath + "/editor/resourcebrowser/images/empty_thumbnail.png",
 				event: "scroll",
 				container: this.element.find("div.scrollWrapper")
+			}).one("error", function() {
+				$(this).hide().attr('src', rootPath + '/editor/resourcebrowser/images/empty_thumbnail.png').show();
 			});
 			
 			// TreeView
