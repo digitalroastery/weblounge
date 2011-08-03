@@ -97,8 +97,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   @Override
   public void disconnect() throws ContentRepositoryException {
     super.disconnect();
-    imageStyleTracker.close();
-    imageStyleTracker = null;
+    if (imageStyleTracker != null) {
+      imageStyleTracker.close();
+      imageStyleTracker = null;
+    }
   }
 
   /**
