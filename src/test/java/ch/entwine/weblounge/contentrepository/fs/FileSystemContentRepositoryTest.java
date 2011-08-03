@@ -50,6 +50,7 @@ import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.url.PathUtils;
 import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
@@ -210,6 +211,7 @@ public class FileSystemContentRepositoryTest {
     EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
     EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
     EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
+    EasyMock.expect(site.getModules()).andReturn(new Module[] {}).anyTimes();
     EasyMock.replay(site);
 
     // Connect to the repository

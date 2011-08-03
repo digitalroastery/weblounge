@@ -639,7 +639,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @return the bundle
    */
   protected Bundle loadBundle(Site site) {
-    BundleContext bundleCtx = FrameworkUtil.getBundle(site.getClass()).getBundleContext();
+    Bundle bundle = FrameworkUtil.getBundle(site.getClass());
+    if (bundle == null)
+      return null;
+    BundleContext bundleCtx = bundle.getBundleContext();
     String siteClass = Site.class.getName();
     try {
       ServiceReference[] refs = bundleCtx.getServiceReferences(siteClass, null);

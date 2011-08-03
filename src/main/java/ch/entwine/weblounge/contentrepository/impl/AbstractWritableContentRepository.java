@@ -85,8 +85,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public void connect(Site site) throws ContentRepositoryException {
     super.connect(site);
     Bundle bundle = loadBundle(site);
-    imageStyleTracker = new ImageStyleTracker(bundle.getBundleContext());
-    imageStyleTracker.open();
+    if (bundle != null) {
+      imageStyleTracker = new ImageStyleTracker(bundle.getBundleContext());
+      imageStyleTracker.open();
+    }
   }
 
   /**
@@ -392,7 +394,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Compile the full list of image styles
     List<ImageStyle> styles = new ArrayList<ImageStyle>();
-    styles.addAll(imageStyleTracker.getImageStyles());
+    if (imageStyleTracker != null)
+      styles.addAll(imageStyleTracker.getImageStyles());
     for (Module m : getSite().getModules()) {
       styles.addAll(Arrays.asList(m.getImageStyles()));
     }
@@ -564,7 +567,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   protected void deletePreviews(ResourceURI uri, Language language) {
     // Compile the full list of image styles
     List<ImageStyle> styles = new ArrayList<ImageStyle>();
-    styles.addAll(imageStyleTracker.getImageStyles());
+    if (imageStyleTracker != null)
+      styles.addAll(imageStyleTracker.getImageStyles());
     for (Module m : getSite().getModules()) {
       styles.addAll(Arrays.asList(m.getImageStyles()));
     }
