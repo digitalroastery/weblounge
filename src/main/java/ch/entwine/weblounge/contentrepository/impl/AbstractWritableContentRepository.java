@@ -31,8 +31,10 @@ import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
+import ch.entwine.weblounge.common.impl.url.PathUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Module;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
@@ -40,7 +42,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,8 +63,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractWritableContentRepository.class);
 
-  /** The list of image styles */
-  private List<ImageStyle> styles = new ArrayList<ImageStyle>();
+  /** The image style tracker */
+  private ImageStyleTracker imageStyleTracker = null;
 
   /**
    * Creates a new instance of the content repository.
@@ -75,23 +77,28 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   }
 
   /**
-   * Callback from the OSGi container on component activation.
+   * {@inheritDoc}
    * 
-   * @param ctx
-   *          the component context
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#connect(ch.entwine.weblounge.common.site.Site)
    */
-  void activate(ComponentContext ctx) {
-    styles.clear();
+  @Override
+  public void connect(Site site) throws ContentRepositoryException {
+    super.connect(site);
+    Bundle bundle = loadBundle(site);
+    imageStyleTracker = new ImageStyleTracker(bundle.getBundleContext());
+    imageStyleTracker.open();
   }
 
   /**
-   * Callback from the OSGi container on component deactivation.
+   * {@inheritDoc}
    * 
-   * @param ctx
-   *          the component context
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#disconnect()
    */
-  void deactivate(ComponentContext ctx) {
-    styles.clear();
+  @Override
+  public void disconnect() throws ContentRepositoryException {
+    super.disconnect();
+    imageStyleTracker.close();
+    imageStyleTracker = null;
   }
 
   /**
@@ -145,6 +152,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     for (long revision : revisions) {
       index.delete(new ResourceURIImpl(uri, revision));
     }
+
+    // Delete previews
+    deletePreviews(uri);
 
     return true;
   }
@@ -208,6 +218,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Write the updated resource to disk
     storeResource(resource);
 
+    // Create the preview images
+    createPreviews(resource);
+
     return resource;
   }
 
@@ -252,6 +265,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     storeResource(resource);
     index.update(resource);
 
+    // Create the preview images
+    createPreviews(resource);
+
     return resource;
   }
 
@@ -288,6 +304,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     deleteResourceContent(uri, content);
     storeResource(resource);
     index.update(resource);
+
+    // Delete previews
+    deletePreviews(uri, content.getLanguage());
 
     return resource;
   }
@@ -371,7 +390,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Compile the full list of image styles
     List<ImageStyle> styles = new ArrayList<ImageStyle>();
-    styles.addAll(this.styles);
+    styles.addAll(imageStyleTracker.getImageStyles());
     for (Module m : getSite().getModules()) {
       styles.addAll(Arrays.asList(m.getImageStyles()));
     }
@@ -451,7 +470,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     File scaledResourceFile = null;
 
     try {
-      scaledResourceFile = ImageStyleUtils.createScaledFile(resource, filename.toString(), language, style);
+      scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
 
       // Find the modification date
       Date modificationDate = resource.getModificationDate();
@@ -478,7 +497,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           e.getMessage() });
       logger.error(e.getMessage(), e);
       IOUtils.closeQuietly(resourceInputStream);
-      FileUtils.deleteQuietly(scaledResourceFile.getParentFile());
+
+      File f = scaledResourceFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+
       return null;
     } catch (IOException e) {
       logger.warn("Error creating preview for {} '{}': {}", new Object[] {
@@ -486,8 +511,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           resourceURI,
           e.getMessage() });
       IOUtils.closeQuietly(resourceInputStream);
-      if (scaledResourceFile != null)
-        FileUtils.deleteQuietly(scaledResourceFile.getParentFile());
+
+      File f = scaledResourceFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+
       return null;
     } catch (Throwable t) {
       logger.warn("Error creating preview for {} '{}': {}", new Object[] {
@@ -495,8 +525,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           resourceURI,
           t.getMessage() });
       IOUtils.closeQuietly(resourceInputStream);
-      if (scaledResourceFile != null)
-        FileUtils.deleteQuietly(scaledResourceFile.getParentFile());
+
+      File f = scaledResourceFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+
       return null;
     } finally {
       IOUtils.closeQuietly(contentRepositoryIs);
@@ -505,25 +540,39 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   }
 
   /**
-   * Callback from OSGi declarative services on registration of a new image
-   * style in the service registry.
+   * Deletes the previews for this resource in all languages and for all known
+   * image styles.
    * 
-   * @param style
-   *          the image style
+   * @param uri
+   *          the resource uri
    */
-  void addImageStyle(ImageStyle style) {
-    styles.add(style);
+  protected void deletePreviews(ResourceURI uri) {
+    deletePreviews(uri, null);
   }
 
   /**
-   * Callback from OSGi declarative services on removal of an image style from
-   * the service registry.
+   * Deletes the previews for this resource in the given languages and for all
+   * known image styles.
    * 
-   * @param style
-   *          the image style
+   * @param uri
+   *          the resource uri
+   * @param language
+   *          the language
    */
-  void removeImageStyle(ImageStyle style) {
-    styles.remove(style);
+  protected void deletePreviews(ResourceURI uri, Language language) {
+    // Compile the full list of image styles
+    List<ImageStyle> styles = new ArrayList<ImageStyle>();
+    styles.addAll(imageStyleTracker.getImageStyles());
+    for (Module m : getSite().getModules()) {
+      styles.addAll(Arrays.asList(m.getImageStyles()));
+    }
+
+    for (ImageStyle style : styles) {
+      File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier(), uri.getIdentifier()));
+      if (language != null)
+        dir = new File(dir, language.getIdentifier());
+      FileUtils.deleteQuietly(dir);
+    }
   }
 
 }

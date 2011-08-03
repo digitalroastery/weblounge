@@ -220,7 +220,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     FileOutputStream fos = null;
     File scaledResourceFile = null;
     try {
-      scaledResourceFile = ImageStyleUtils.createScaledFile(resource, filename.toString(), language, style);
+      scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
       long lastModified = resource.getModificationDate().getTime();
       if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
         contentRepositoryIs = contentRepository.getContent(resourceURI, language);

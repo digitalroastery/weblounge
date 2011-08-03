@@ -37,6 +37,11 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.IOUtils;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -623,6 +628,34 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
 
     return value;
+  }
+
+  /**
+   * Tries to find the site's bundle in the OSGi service registry and returns
+   * it, <code>null</code> otherwise.
+   * 
+   * @param site
+   *          the site
+   * @return the bundle
+   */
+  protected Bundle loadBundle(Site site) {
+    BundleContext bundleCtx = FrameworkUtil.getBundle(site.getClass()).getBundleContext();
+    String siteClass = Site.class.getName();
+    try {
+      ServiceReference[] refs = bundleCtx.getServiceReferences(siteClass, null);
+      if (refs == null || refs.length == 0)
+        return null;
+      for (ServiceReference ref : refs) {
+        Site s = (Site) bundleCtx.getService(ref);
+        if (s == site)
+          return ref.getBundle();
+      }
+      return null;
+    } catch (InvalidSyntaxException e) {
+      // Can't happen
+      logger.error("Error trying to locate the site's bundle", e);
+      return null;
+    }
   }
 
 }

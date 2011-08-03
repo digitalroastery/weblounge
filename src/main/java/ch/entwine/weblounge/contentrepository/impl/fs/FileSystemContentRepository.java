@@ -249,6 +249,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       return 0;
     }
 
+    // Clear previews directory
+    logger.info("Removing cached preview images");
+    File previewsDir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images"));
+    FileUtils.deleteQuietly(previewsDir);
+
     File restructuredResources = new File(repositorySiteRoot, "." + resourceDirectory);
     long resourceCount = 0;
     long resourceVersionCount = 0;
@@ -326,6 +331,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
               }
 
               // Create the previews
+              logger.info("Creating preview images");
               createPreviews(resource);
 
             } catch (Throwable t) {
