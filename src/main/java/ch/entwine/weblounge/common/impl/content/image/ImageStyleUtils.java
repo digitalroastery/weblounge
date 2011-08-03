@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.content.image;
 
-import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.url.PathUtils;
@@ -408,8 +408,8 @@ public final class ImageStyleUtils {
    * <p>
    * If no filename is specified, the resource's identifier is used.
    * 
-   * @param resource
-   *          the resource
+   * @param uri
+   *          the resource uri
    * @param filename
    *          the file name
    * @param language
@@ -422,17 +422,17 @@ public final class ImageStyleUtils {
    *           if a file is found at the parent directory location
    * @return
    */
-  public static File createScaledFile(Resource<?> resource, String filename,
+  public static File createScaledFile(ResourceURI uri, String filename,
       Language language, ImageStyle style) throws IOException,
       IllegalStateException {
 
     if (filename == null)
-      filename = resource.getURI().getIdentifier();
+      filename = uri.getIdentifier();
     String suffix = FilenameUtils.getExtension(filename);
 
     // If needed, create the scaled file's parent directory
-    Site site = resource.getURI().getSite();
-    File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier(), resource.getIdentifier(), language.getIdentifier()));
+    Site site = uri.getSite();
+    File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier(), uri.getIdentifier(), language.getIdentifier()));
 
     if (dir.exists() && !dir.isDirectory())
       throw new IllegalStateException("Found a file at " + dir + " instead of a directory");

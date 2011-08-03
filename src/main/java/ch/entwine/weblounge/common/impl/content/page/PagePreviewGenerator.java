@@ -85,6 +85,9 @@ public class PagePreviewGenerator implements PreviewGenerator {
   /** Default width for taking screenshots */
   private static final int DEFAULT_SCREENSHOT_WIDTH = 1024;
 
+  /** Default height for taking screenshots */
+  private static final int DEFAULT_SCREENSHOT_HEIGHT = 768;
+
   /** The site servlets */
   private static Map<String, Servlet> siteServlets = new HashMap<String, Servlet>();
 
@@ -166,9 +169,17 @@ public class PagePreviewGenerator implements PreviewGenerator {
 
     // Render the page and write back to client
     try {
+      float screenshotScale = 1.0f;
       int screenshotWidth = DEFAULT_SCREENSHOT_WIDTH;
-      float screenshotScale = screenshotWidth / style.getWidth();
-      int screenshotHeight = (int) screenshotScale * style.getHeight();
+      int screenshotHeight = DEFAULT_SCREENSHOT_HEIGHT;
+
+      if (style.getWidth() > 0) {
+        screenshotScale = screenshotWidth / style.getWidth();
+        screenshotHeight = (int) screenshotScale * screenshotHeight;
+      } else {
+        screenshotScale = screenshotHeight / style.getHeight();
+        screenshotWidth = (int) screenshotScale * screenshotWidth;
+      }
 
       // Create the renderer. Due to a synchronization bug in the software,
       // this needs to be synchronized
