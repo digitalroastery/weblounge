@@ -4,17 +4,21 @@
 		<h2>${page.head.metadata.title[language]}</h2>
 	{{/if}}
 	<p>
-		Created by ${page.head.created.user.name}<br />
 	    {{if page.head.modified}}
 			Updated by ${page.head.modified.user.name}<br />
         	Modification Date: ${page.head.modified.date.toLocaleString()}<br />
     	{{else}}
+			Created by ${page.head.created.user.name}<br />
     		Creation Date: ${page.head.created.date.toLocaleString()}<br />
     	{{/if}}
 		{{if page.head.metadata.subject}}
 			Tags: {{each page.head.metadata.subject}} ${$value}, {{/each}}<br/>
 		{{/if}}
-		URL: <a href="${page.path}" class="wbl-pagePath" title="Gehe zu Seite">${page.path}</a>
+		{{if page.path}}
+			URL: <a href="${page.path}" class="wbl-pagePath" title="Gehe zu Seite">${page.path}</a>
+    	{{else}}
+    		URL: -
+		{{/if}}
 	</p>
 	<img class="wbl-showPage" src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_read.png" />
 	<img class="wbl-trashPage" src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_trash.png" />

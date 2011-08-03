@@ -142,14 +142,14 @@
 			this.construct = function(settings) {
 				
 				return this.each(function() {	
-					
 					config = $.extend(this.config, $.tablesorterPager.defaults, settings);
 					
 					var table = this, pager = config.container;
 				
+					$(pager).find('*').unbind('click');
 					$(this).trigger("appendCache");
 					
-					config.size = parseInt($(".pagesize",pager).val());
+					config.size = parseInt($(config.cssPageSize, pager).val());
 					
 					$(config.cssFirst,pager).click(function() {
 						moveToFirstPage(table);

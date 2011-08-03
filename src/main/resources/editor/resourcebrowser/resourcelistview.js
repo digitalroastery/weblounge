@@ -1,6 +1,6 @@
 steal.plugins('jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/resourcelistview.tmpl')
-.resources('jquery.dataTables.min', 'jquery.tablesorter.min', 'jquery.tablesorter.pager')
+.resources('jquery.tablesorter.min', 'jquery.tablesorter.pager')
 .then('resourceview', 'resourcelistviewitem')
 .css('resources/images/blue/style', 'resources/jquery.tablesorter.pager')
 .then(function($) {
@@ -13,44 +13,19 @@ steal.plugins('jquery/view/tmpl')
 			this._initButtons();
 			this._initFilter();
 			this._initDialogs();
-			this._initDataTable();
+			this._initDataTable(10);
 		},
 		
 		update: function(options) {
 			this.options.resources = options.resources;
-////			this.dataTable.fnClearTable();
 			this.find('tr.wbl-pageEntry').remove();
+			this.table.trigger("update");
 			if($.isEmptyObject(this.options.resources)) return;
 			this._initViewItems();
-////			this.dataTable = this.dataTable.dataTable({
-//				"bPaginate": true,
-//				"bLengthChange": true,
-//				"bRetrieve": true,
-//				"bFilter": false,
-//				"bDestroy": true,
-//				"bSort": true,
-//				"bInfo": true,
-//				"bAutoWidth": true,
-//				"bJQueryUI": true
-//			});
-//			this.dataTable.fnStandingRedraw();
-//			this.dataTable.fnDataUpdate();
-//			this._initDataTable();
-			
-//			var page_size = 20;
-//			var curr_page = config.page;
-//			this.table.tablesorterPager({size: config.totalRows});
-			this.table.trigger("update");
-//			this.table.trigger("appendCache");
-//			this.table.trigger("sorton", [[0,0]]);
-//			this.table.tablesorterPager({size: page_size, page: curr_page}); 
-			
-//			var page_size = 20;
-//			var curr_page = config.page;
-//			this.table.tablesorterPager({size: page_size, page: curr_page}); 
+			this._initDataTable(config.size);
 		},
 		
-		_initDataTable: function() {
+		_initDataTable: function(pagingSize) {
 			this.table = this.find('table').tablesorter({
 				sortList: [[0,0]],
 		        headers: { 
@@ -58,20 +33,16 @@ steal.plugins('jquery/view/tmpl')
 		        },
 		        widgets: ['zebra']
 			}).tablesorterPager({
-				container: this.element.find("#wbl-pager")
+				container: this.element.find("#wbl-pager"),
+				positionFixed: false,
+				size: pagingSize,
+				cssNext: '.wbl-next',
+				cssPrev: '.wbl-prev',
+				cssFirst: '.wbl-first',
+				cssLast: '.wbl-last',
+				cssPageDisplay: '.wbl-pageDisplay',
+				cssPageSize: '.wbl-pageSize'
 			});
-			
-			// init jquery dataTable Plugin over Table
-//			this.dataTable = this.find('table').dataTable({
-//				"bPaginate": true,
-//				"bLengthChange": true,
-//				"bRetrieve": true,
-//				"bFilter": false,
-//				"bSort": true,
-//				"bInfo": true,
-//				"bAutoWidth": true,
-//				"bJQueryUI": true
-//			});
 		},
 		
 		_initViewItems: function() {

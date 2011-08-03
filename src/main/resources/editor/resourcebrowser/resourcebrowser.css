@@ -23,6 +23,23 @@
 	position: relative;
 	left: -75px;
 }
+.editor_resourcebrowser nav.weblounge div#wbl-pendingCircle {
+    -webkit-border-radius: 999px;
+    -moz-border-radius: 999px;
+    border-radius: 999px;
+    
+    border:1px solid red;
+    background: red;
+    
+    width: 20px;
+    height: 20px;
+    padding: 4px;
+    
+    color: #fff;
+    text-align: center;
+    font: 16px Arial, sans-serif;
+    display: none;
+}
 
 .editor_resourcebrowser nav {
 	padding: 10px 0;
@@ -123,6 +140,14 @@
 
 .editor_resourcebrowser .wbl-action {
 	width: 50px;
+}
+
+.editor_resourcebrowser .wbl-delete {
+	display: none;
+}
+
+.editor_resourcebrowser .wbl-favorite {
+	display: none;
 }
 
 .editor_resourcebrowser button.wbl-lock {

@@ -27,11 +27,15 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller')
 					onCancel: this._cancel,
 					onComplete: $.proxy(function(id, fileName, response) {
 						if($.isEmptyObject(response)) return;
-						this.map[id] = {resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag};
-						// TODO Tag Button
-						if(!this.element.find('#wbl-tagButton').length) {
-							this.element.find('.qq-upload-button').after('<button id="wbl-tagButton">Tag</button>');
-						}
+						
+						// Save the uploaded file for Tagging not used now
+//						this.map[id] = {resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag};
+//						if(!this.element.find('#wbl-tagButton').length) {
+//							this.element.find('.qq-upload-button').after('<button id="wbl-tagButton">Tag</button>');
+//						}
+						
+						// Animate a Red Overlay Icon over the Pending Button (+1)
+						$("#wbl-pendingCircle").html(this.map.length).show();
 				    }, this),
 				    // path to server-side upload script
 				    action: '/system/weblounge/files/uploads'
