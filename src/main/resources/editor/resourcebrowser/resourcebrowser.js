@@ -33,8 +33,18 @@ steal.plugins(
 				this.searchBox.hide();
 			}
 			
-			this.scrollView.editor_resourcescrollview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
-			this.listView.editor_resourcelistview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
+			this.scrollView.editor_resourcescrollview({
+				resources: this.options.resources,
+				language: this.options.language,
+				resourceType: this.options.resourceType,
+				runtime: this.options.runtime
+			});
+			this.listView.editor_resourcelistview({
+				resources: this.options.resources,
+				language: this.options.language,
+				resourceType: this.options.resourceType,
+				runtime: this.options.runtime
+			});
 		},
 		
 		_initViewItems: function() {
@@ -145,7 +155,7 @@ steal.plugins(
 		"input filterResources": function(el, ev, filterValue) {
 			if(filterValue == undefined) filterValue = '';
 			this.lastParams.filter = filterValue;
-			this._loadResources(this.lastParams, this.lastQuery);
+			this._loadResources(this.lastParams, this.lastQuery)
 		},
 		
 		"button.wbl-list click": function(el, ev) {

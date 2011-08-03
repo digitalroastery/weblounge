@@ -15,10 +15,25 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		},
 		
 		"img.wbl-showPage click": function(el, ev) {
-			// TODO if Media hover not show oder so ???
-			// and remove Link
 			ev.stopPropagation();
-			this.element.find('a.wbl-pagePath').click();
+			switch(this.options.resourceType) {
+			case 'pages':
+				this.element.find('a.wbl-pagePath').click();
+				break;
+			case 'media':
+				
+				//TODO
+//                window.open('/system/weblounge/files/' + $(el.parent).attr('id') + 'content/' + this.options.language, "popUp", "width=300,height=400,scrollbars=yes");
+//                event.preventDefault();
+//				
+//				// Show image
+//				//Grab the href, open it in a window and cancel the click action
+//				$("a[href^='http']").click(function(){});
+//				//Add target = blant to the external link
+//				$("a[href^='http']").attr('target','_blank');
+////				this.element.find('a.wbl-pagePath').click();
+				break;
+			}
 		},
 		
 		"img.wbl-trashPage click": function(el, ev) {

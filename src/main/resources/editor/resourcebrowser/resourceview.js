@@ -32,9 +32,17 @@ steal.plugins('jquery/controller',
 			this.element.find("input#wbl-filter").keypress($.proxy(function(ev) {
 				if(ev.key() == '\r') {
 					ev.preventDefault();
+					clearTimeout(this.timeout);
 					$(ev.target).trigger('filterResources', ev.target.value);
+				} else {
+					clearTimeout(this.timeout);
+					this.timeout = setTimeout(function() {
+						$(ev.target).trigger('filterResources', ev.target.value);
+					}, 1000);
 				}
 			}, this));
+			
+			
 		},
 		
 		_initDialogs: function() {

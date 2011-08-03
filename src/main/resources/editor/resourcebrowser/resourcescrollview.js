@@ -14,14 +14,16 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 			this._initFilter();
 			this._initDialogs();
 			this._initSmoothDivScroll();
+			this._initLazyLoading();
 		},
 		
 		update: function(options) {
 			this.options.resources = options.resources;
-			this.find('div.wbl-scrollviewitem').remove();
+			this.find('div.wbl-scrollViewItem').remove();
 			if($.isEmptyObject(this.options.resources)) return;
 			this._initViewItems();
 			this.divScroll.smoothDivScroll("recalculateScrollableArea");
+			this._initLazyLoading();
 		},
 		
 		_initSmoothDivScroll: function() {
@@ -32,12 +34,16 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 				autoScrollInterval: 15,
 				visibleHotSpots: "always"
 		  	});
-			
-			// Lazy loading images
-			this.element.find('img.wbl-pageThumbnail').lazyload({         
-				placeholder: this.options.runtime.getRootPath() + "/editor/resourcebrowser/images/empty_thumbnail.png",
+		},
+		
+		_initLazyLoading: function() {
+			var rootPath = this.options.runtime.getRootPath();
+			this.element.find('img.wbl-pageThumbnail').lazyload({
+				placeholder: rootPath + "/editor/resourcebrowser/images/empty_thumbnail.png",
 				event: "scroll",
 				container: this.element.find("div.scrollWrapper")
+			}).one("error", function() {
+				$(this).hide().attr('src', rootPath + '/editor/resourcebrowser/images/empty_thumbnail.png').show();
 			});
 		},
 		
@@ -48,7 +54,12 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 					language: this.options.language,
 					runtime: this.options.runtime
 				});
-				scrollViewItem.find('div.wbl-scrollViewItem').editor_resourcescrollviewitem({page: res, runtime: this.options.runtime});
+				scrollViewItem.find('div.wbl-scrollViewItem').editor_resourcescrollviewitem({
+					page: res, 
+					runtime: this.options.runtime, 
+					language: this.options.language,
+					resourceType: this.options.resourceType
+				});
 			}, this));
 		},
 		

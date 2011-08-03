@@ -25,6 +25,7 @@
                 
         if(options) {
             $.extend(settings, options);
+            settings.container.unbind(settings.event);
         }
 
         /* Fire one scroll event per scroll. Not one scroll event per image. */

@@ -165,8 +165,9 @@
 }
 
 img.wbl-pageThumbnail {
-	width: 300px;
 	height: 200px;
+	width: 300px;
+	box-shadow: 5px 5px 5px #ccc;
 }
 
 .wbl-page.wbl-marked img {
@@ -177,71 +178,10 @@ img.wbl-pageThumbnail {
 	color: #ccc !important;
 }
 
-.editor_resourcebrowser .wbl-pageData {
-	display: none;
-	height: 263px;
-	width: 100%;
-}
-
-.editor_resourcebrowser .wbl-pageData label,
-.editor_resourcebrowser #wbl-editor label {
-	float: left;
-	display: block;
-	width: 70px;
-}
-
-.editor_resourcebrowser .wbl-pageData input[type="text"],
-.editor_resourcebrowser .wbl-pageData ul.token-input-list-facebook,
-.editor_resourcebrowser #wbl-editor input[type="text"],
-.editor_resourcebrowser #wbl-editor ul.token-input-list-facebook {
-	width: 280px;
-	height: 12px;
-	display: inline-block;
-	border: 1px solid #666;
-}
-
-.editor_resourcebrowser .wbl-pageData input[type="text"],
-.editor_resourcebrowser #wbl-editor input[type="text"] {
-	padding: 4px 0;
-}
-
-.editor_resourcebrowser .wbl-pageData input[type="checkbox"] {
-	position: relative;
-	top: -3px;
-}
-
-.editor_resourcebrowser input[type="checkbox"] + ul.token-input-list-facebook {
-    position: relative;
-    top: 5px;
-}
-
-.editor_resourcebrowser .wbl-pageData ul.ui-tabs-nav li {
-	width: 33%;
-}
-.editor_resourcebrowser .wbl-pageData ul.ui-tabs-nav li:first-child {
-	width: 34% !important;
-}
-
-.editor_resourcebrowser .wbl-pageData .ui-tabs-panel {
-	padding: 0 !important;
-}
-
-.editor_resourcebrowser .wbl-pageData p,
-.editor_resourcebrowser #wbl-editor p {
-    border-bottom: 1px solid #EFEFEF;
-    padding: 5px 0;
-    margin: 5px;
-}
-
 .wbl-page p,
 .wbl-page h2,
 .wbl-page a {
 	color: #fff;
-}
-
-.editor_resourcebrowser .wbl-pageData p:last-child,
-.editor_resourcebrowser #wbl-editor p:last-child {
-	border: 0;
 }
 
 /* custom button icons */
