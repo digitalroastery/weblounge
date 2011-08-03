@@ -73,6 +73,9 @@ public class PagePreviewGenerator implements PreviewGenerator {
   /** Logger factory */
   private static final Logger logger = LoggerFactory.getLogger(PagePreviewGenerator.class);
 
+  /** Page request handler path prefix */
+  protected static final String PAGE_HANDLER_PREFIX = "/weblounge-pages/";
+
   /** Format for the preview images */
   private static final String PREVIEW_FORMAT = "png";
 
@@ -132,10 +135,9 @@ public class PagePreviewGenerator implements PreviewGenerator {
 
     ResourceURI uri = resource.getURI();
     Site site = uri.getSite();
-    String path = uri.getPath();
     String html = null;
     try {
-      URL pageURL = new URL(UrlUtils.concat(site.getURL().toExternalForm(), path));
+      URL pageURL = new URL(UrlUtils.concat(site.getURL().toExternalForm(), PAGE_HANDLER_PREFIX, uri.getIdentifier()));
       html = render(pageURL, site, language);
       html = HTMLUtils.escapeHtml(HTMLUtils.unescape(html));
     } catch (ServletException e) {

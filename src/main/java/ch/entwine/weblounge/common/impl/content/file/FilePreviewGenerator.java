@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.impl.content.file;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.language.Language;
 
@@ -73,7 +74,10 @@ public class FilePreviewGenerator implements PreviewGenerator {
    */
   public String getSuffix(Resource<?> resource, Language language,
       ImageStyle style) {
-    String filename = resource.getContent(language).getFilename();
+    ResourceContent content = resource.getContent(language);
+    if (content == null)
+      return null;
+    String filename = content.getFilename();
     return FilenameUtils.getExtension(filename);
   }
 
