@@ -319,7 +319,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Create the response
     ResponseBuilder response = Response.ok(resource.toXml());
     response.tag(new EntityTag(eTagValue));
-    response.lastModified(resource.getModificationDate());
+    response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }
 
@@ -494,7 +494,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Create the response
     ResponseBuilder response = Response.ok();
     response.tag(new EntityTag(ResourceUtils.getETagValue(resource, language)));
-    response.lastModified(resource.getModificationDate());
+    response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }
 
@@ -568,7 +568,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Create the response
     ResponseBuilder response = Response.ok(resource.toXml());
     response.tag(new EntityTag(ResourceUtils.getETagValue(resource, null)));
-    response.lastModified(resource.getModificationDate());
+    response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }
 
@@ -628,7 +628,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     if (ifMatchHeader != null) {
       try {
         Resource<?> currentResource = contentRepository.get(resourceURI);
-        String etag = Long.toString(currentResource.getModificationDate().getTime());
+        String etag = Long.toString(ResourceUtils.getModificationDate(currentResource).getTime());
         if (!etag.equals(ifMatchHeader)) {
           throw new WebApplicationException(Status.PRECONDITION_FAILED);
         }

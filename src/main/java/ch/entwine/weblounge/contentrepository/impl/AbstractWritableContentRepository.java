@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.impl.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.url.PathUtils;
@@ -52,7 +53,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -478,10 +478,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
 
       // Find the modification date
-      Date modificationDate = resource.getModificationDate();
-      if (modificationDate == null)
-        modificationDate = resource.getCreationDate();
-      long lastModified = modificationDate.getTime();
+      long lastModified = ResourceUtils.getModificationDate(resource).getTime();
 
       // Create the file if it doesn't exist or if it is outdated
       if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {

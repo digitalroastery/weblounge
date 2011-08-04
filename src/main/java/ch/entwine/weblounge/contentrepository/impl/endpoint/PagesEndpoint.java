@@ -280,10 +280,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok(page.toXml());
-    if (page.getModificationDate() != null)
-      response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
-    else
-      response.tag(new EntityTag(Long.toString(page.getCreationDate().getTime())));
+    response.tag(new EntityTag(Long.toString(ResourceUtils.getModificationDate(page).getTime())));
     response.lastModified(page.getModificationDate());
     return response.build();
   }
@@ -393,7 +390,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     if (ifMatchHeader != null) {
       try {
         currentPage = (Page) contentRepository.get(pageURI);
-        String etag = Long.toString(currentPage.getModificationDate().getTime());
+        String etag = Long.toString(ResourceUtils.getModificationDate(currentPage).getTime());
         if (!etag.equals(ifMatchHeader)) {
           throw new WebApplicationException(Status.PRECONDITION_FAILED);
         }
@@ -548,10 +545,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.created(uri);
-    if (page.getModificationDate() != null)
-      response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
-    else
-      response.tag(new EntityTag(Long.toString(page.getCreationDate().getTime())));
+    response.tag(new EntityTag(Long.toString(ResourceUtils.getModificationDate(page).getTime())));
     return response.build();
   }
 
@@ -661,7 +655,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Return the composer
-    return Response.ok(composer.toXml()).lastModified(page.getModificationDate()).build();
+    return Response.ok(composer.toXml()).lastModified(ResourceUtils.getModificationDate(page)).build();
   }
 
   /**
