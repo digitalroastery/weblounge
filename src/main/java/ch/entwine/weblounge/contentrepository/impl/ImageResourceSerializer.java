@@ -25,10 +25,12 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 
+import ch.entwine.weblounge.common.content.ImageSearchResultItem;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
+import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.image.ImageContent;
@@ -44,8 +46,12 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.ImageInputDocument;
 
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +61,9 @@ import javax.xml.parsers.ParserConfigurationException;
  * Implementation of a serializer for image resources.
  */
 public class ImageResourceSerializer extends AbstractResourceSerializer<ImageContent, ImageResource> {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(ImageResourceSerializer.class);
 
   /** Alternate uri prefix */
   protected static final String URI_PREFIX = "/weblounge-images/";
@@ -89,18 +98,18 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supportsContent(java.lang.String)
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supports(java.lang.String)
    */
-  public boolean supportsContent(String mimeType) {
+  public boolean supports(String mimeType) {
     return mimeType != null && mimeType.toLowerCase().startsWith("image/");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createNewResource(ch.entwine.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
    */
-  public Resource<ImageContent> createNewResource(Site site) {
+  public Resource<ImageContent> newResource(Site site) {
     return new ImageResourceImpl(new ImageResourceURIImpl(site));
   }
 
@@ -118,19 +127,74 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMetadata(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
    */
-  public List<ResourceMetadata<?>> getMetadata(Resource<?> resource) {
+  public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
     return new ImageInputDocument((ImageResource) resource).getMetadata();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createSearchResultItem(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.SearchResultItem)
+   */
+  public List<ResourceMetadata<?>> toMetadata(SearchResultItem searchResultItem) {
+    if (!(searchResultItem instanceof ImageSearchResultItem))
+      throw new IllegalArgumentException("This serializer can only handle image search result items");
+    ImageSearchResultItem fsri = (ImageSearchResultItem) searchResultItem;
+    String resourceXml = fsri.getResourceXml();
+    ImageResource r;
+    try {
+      r = getReader().read(IOUtils.toInputStream(resourceXml), searchResultItem.getSite());
+    } catch (SAXException e) {
+      logger.warn("Error parsing image resource " + searchResultItem.getId(), e);
+      return null;
+    } catch (IOException e) {
+      logger.warn("Error parsing image resource " + searchResultItem.getId(), e);
+      return null;
+    } catch (ParserConfigurationException e) {
+      logger.warn("Error parsing image resource " + searchResultItem.getId(), e);
+      return null;
+    }
+    return toMetadata(r);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
+   *      java.util.List)
+   */
+  public Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata) {
+    for (ResourceMetadata<?> metadataItem : metadata) {
+      if (XML.equals(metadataItem.getName())) {
+        String resourceXml = (String) metadataItem.getValues().get(0);
+        try {
+          ResourceReader<ImageContent, ImageResource> reader = getReader();
+          ImageResource image = reader.read(IOUtils.toInputStream(resourceXml, "UTF-8"), site);
+          return image;
+        } catch (SAXException e) {
+          logger.warn("Error parsing image resource from metadata", e);
+          return null;
+        } catch (IOException e) {
+          logger.warn("Error parsing image resource from metadata", e);
+          return null;
+        } catch (ParserConfigurationException e) {
+          logger.warn("Error parsing image resource from metadata", e);
+          return null;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, java.util.Map)
    */
-  public SearchResultItem createSearchResultItem(Site site, double relevance,
+  public SearchResultItem toSearchResultItem(Site site, double relevance,
       Map<String, ResourceMetadata<?>> metadata) {
     String id = (String) metadata.get(ID).getValues().get(0);
     String path = null;

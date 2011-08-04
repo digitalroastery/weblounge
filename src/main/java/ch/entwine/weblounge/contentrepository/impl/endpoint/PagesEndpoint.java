@@ -255,7 +255,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    */
   @GET
   @Path("/{page}")
-  public Response getPageByURI(@Context HttpServletRequest request,
+  public Response getPageById(@Context HttpServletRequest request,
       @PathParam("page") String pageId) {
 
     // Check the parameters
@@ -766,9 +766,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Get the user
     // TODO: Change to current user
-    User currentUser = getSite(request).getAdministrator();
+    User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
     User futureLockOwner = currentUser;
-    if (userId != null) {
+    if (StringUtils.isNotBlank(userId)) {
       futureLockOwner = new UserImpl(userId);
     }
 
@@ -796,7 +796,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Create the response
-    ResponseBuilder response = Response.ok(page.toXml());
+    ResponseBuilder response = Response.ok();
     response.tag(new EntityTag(Long.toString(ResourceUtils.getModificationDate(page).getTime())));
     response.lastModified(page.getModificationDate());
     return response.build();
@@ -813,8 +813,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the page identifier
    * @return the page
    */
-  @PUT
-  @Path("/{page}/unlock")
+  @DELETE
+  @Path("/{page}/lock")
   public Response unlockPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
       @HeaderParam("If-Match") String ifMatchHeader) {
@@ -861,14 +861,14 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // If the page is locked by a different user, refuse
     // TODO: Determine site admin role
-    boolean isSiteAdmin = false;
+    boolean isSiteAdmin = true;
     if (page.isLocked() && !page.getLockOwner().equals(currentUser) && !isSiteAdmin) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
     // Finally, perform the lock operation
     try {
-      page.setLocked(null);
+      page.setUnlocked();
       contentRepository.put(page);
     } catch (SecurityException e) {
       logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);
@@ -885,7 +885,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Create the response
-    ResponseBuilder response = Response.ok(page.toXml());
+    ResponseBuilder response = Response.ok();
     response.tag(new EntityTag(Long.toString(ResourceUtils.getModificationDate(page).getTime())));
     response.lastModified(page.getModificationDate());
     return response.build();

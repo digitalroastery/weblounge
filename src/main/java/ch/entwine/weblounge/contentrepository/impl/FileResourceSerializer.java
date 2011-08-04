@@ -25,10 +25,12 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 
+import ch.entwine.weblounge.common.content.FileSearchResultItem;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
+import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.file.FileContent;
@@ -43,8 +45,12 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.FileInputDocument;
 
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +60,9 @@ import javax.xml.parsers.ParserConfigurationException;
  * Implementation of a serializer for file resources.
  */
 public class FileResourceSerializer extends AbstractResourceSerializer<FileContent, FileResource> {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(FileResourceSerializer.class);
 
   /** Alternate uri prefix */
   protected static final String URI_PREFIX = "/weblounge-files/";
@@ -81,9 +90,9 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supportsContent(java.lang.String)
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supports(java.lang.String)
    */
-  public boolean supportsContent(String mimeType) {
+  public boolean supports(String mimeType) {
     // This implementation always returns <code>false</code>, as it is the
     // default implementation anyway. Returning false here will give more
     // specialized serializers a chance to pick up the request
@@ -93,9 +102,9 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createNewResource(ch.entwine.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
    */
-  public Resource<FileContent> createNewResource(Site site) {
+  public Resource<FileContent> newResource(Site site) {
     return new FileResourceImpl(new FileResourceURIImpl(site));
   }
 
@@ -113,19 +122,74 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMetadata(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
    */
-  public List<ResourceMetadata<?>> getMetadata(Resource<?> resource) {
+  public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
     return new FileInputDocument((FileResource) resource).getMetadata();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createSearchResultItem(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.SearchResultItem)
+   */
+  public List<ResourceMetadata<?>> toMetadata(SearchResultItem searchResultItem) {
+    if (!(searchResultItem instanceof FileSearchResultItem))
+      throw new IllegalArgumentException("This serializer can only handle file search result items");
+    FileSearchResultItem fsri = (FileSearchResultItem)searchResultItem;
+    String resourceXml = fsri.getResourceXml();
+    Site site = searchResultItem.getSite();
+    try {
+      FileResource r = getReader().read(IOUtils.toInputStream(resourceXml, "UTF-8"), site);
+      return toMetadata(r);
+    } catch (SAXException e) {
+      logger.warn("Error parsing resource " + searchResultItem.getId(), e);
+      return null;
+    } catch (IOException e) {
+      logger.warn("Error parsing resource " + searchResultItem.getId(), e);
+      return null;
+    } catch (ParserConfigurationException e) {
+      logger.warn("Error parsing resource " + searchResultItem.getId(), e);
+      return null;
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
+   *      java.util.List)
+   */
+  public Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata) {
+    for (ResourceMetadata<?> metadataItem : metadata) {
+      if (XML.equals(metadataItem.getName())) {
+        String resourceXml = (String) metadataItem.getValues().get(0);
+        try {
+          ResourceReader<FileContent, FileResource> reader = getReader();
+          FileResource file = reader.read(IOUtils.toInputStream(resourceXml, "UTF-8"), site);
+          return file;
+        } catch (SAXException e) {
+          logger.warn("Error parsing file from metadata", e);
+          return null;
+        } catch (IOException e) {
+          logger.warn("Error parsing file from metadata", e);
+          return null;
+        } catch (ParserConfigurationException e) {
+          logger.warn("Error parsing file from metadata", e);
+          return null;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, java.util.Map)
    */
-  public SearchResultItem createSearchResultItem(Site site, double relevance,
+  public SearchResultItem toSearchResultItem(Site site, double relevance,
       Map<String, ResourceMetadata<?>> metadata) {
     String id = (String) metadata.get(ID).getValues().get(0);
 

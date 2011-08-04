@@ -201,8 +201,8 @@ public final class PagesEndpointDocs {
     lockPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, lockPageEndpoint);
 
-    // PUT /{page}/unlock
-    Endpoint unlockPageEndpoint = new Endpoint("/{page}/unlock", Method.PUT, "unlockpage");
+    // DELETE /{page}/unlock
+    Endpoint unlockPageEndpoint = new Endpoint("/{page}/lock", Method.DELETE, "unlockpage");
     unlockPageEndpoint.setDescription("Unlocks the specified page.");
     unlockPageEndpoint.addFormat(Format.xml());
     unlockPageEndpoint.addStatus(ok("the page was unlocked"));

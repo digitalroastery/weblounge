@@ -27,12 +27,12 @@ import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.ResourceURIInputDocument;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SearchRequest;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrRequester;
@@ -198,7 +198,7 @@ public class SearchIndex {
 
     // Post the updated data to the search index
     try {
-      List<ResourceMetadata<?>> metadata = serializer.getMetadata(resource);
+      List<ResourceMetadata<?>> metadata = serializer.toMetadata(resource);
       SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
       update(doc);
       return true;
@@ -228,7 +228,7 @@ public class SearchIndex {
 
     // Post the updated data to the search index
     try {
-      List<ResourceMetadata<?>> metadata = serializer.getMetadata(resource);
+      List<ResourceMetadata<?>> metadata = serializer.toMetadata(resource);
       SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
       update(doc);
       return true;
@@ -340,14 +340,34 @@ public class SearchIndex {
       throws ContentRepositoryException {
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
 
-    ResourceURIImpl newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getIdentifier(), uri.getVersion());
+    SearchQuery q = new SearchQueryImpl(uri.getSite()).withIdentifier(uri.getIdentifier());
+    SearchResultItem[] searchResult = getByQuery(q).getItems();
+    if (searchResult.length != 1) {
+      logger.warn("Resource to be moved not found: {}", uri);
+      return false;
+    }
+
+    // Have the serializer create an input document
+    String resourceType = uri.getType();
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+    if (serializer == null) {
+      logger.error("Unable to create an input document for {}: no serializer found", uri);
+      return false;
+    }
+
+    // Set the path
+    List<ResourceMetadata<?>> metadata = serializer.toMetadata(searchResult[0]);
+    Resource<?> resource = serializer.toResource(uri.getSite(), metadata);
+    resource.setPath(path);
+    metadata = serializer.toMetadata(resource);
+
+    // Read the current resource and post the updated data to the search index
     try {
-      List<ResourceMetadata<?>> metadata = (new ResourceURIInputDocument(newURI)).getMetadata();
       SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
       update(doc);
       return true;
     } catch (Throwable t) {
-      throw new ContentRepositoryException("Cannot update resource " + newURI + " in index", t);
+      throw new ContentRepositoryException("Cannot update resource " + uri + " in index", t);
     }
   }
 

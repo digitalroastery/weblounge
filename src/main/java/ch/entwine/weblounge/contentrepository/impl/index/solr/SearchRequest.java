@@ -356,7 +356,7 @@ public class SearchRequest {
       float score = fields.contains("score") ? (Float) doc.getFieldValue(SCORE) : 0.0f;
 
       // Have the serializer in charge create a type-specific search result item
-      SearchResultItem item = serializer.createSearchResultItem(site, score, metadata);
+      SearchResultItem item = serializer.toSearchResultItem(site, score, metadata);
       result.addResultItem(item);
     }
 

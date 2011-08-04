@@ -26,11 +26,13 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 
+import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
+import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Page;
@@ -44,9 +46,13 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.PageInputDocument;
 
+import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +62,9 @@ import javax.xml.parsers.ParserConfigurationException;
  * Resource serializer for pages.
  */
 public class PageSerializer extends AbstractResourceSerializer<ResourceContent, Page> {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(PageSerializer.class);
 
   /** The preview generator */
   protected PagePreviewGenerator previewGenerator = null;
@@ -97,18 +106,18 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supportsContent(java.lang.String)
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supports(java.lang.String)
    */
-  public boolean supportsContent(String mimeType) {
+  public boolean supports(String mimeType) {
     return false;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createNewResource(ch.entwine.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
    */
-  public Resource<ResourceContent> createNewResource(Site site) {
+  public Resource<ResourceContent> newResource(Site site) {
     return new PageImpl(new PageURIImpl(site));
   }
 
@@ -126,19 +135,73 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMetadata(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
    */
-  public List<ResourceMetadata<?>> getMetadata(Resource<?> page) {
+  public List<ResourceMetadata<?>> toMetadata(Resource<?> page) {
     return new PageInputDocument((Page) page).getMetadata();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createSearchResultItem(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.SearchResultItem)
+   */
+  public List<ResourceMetadata<?>> toMetadata(SearchResultItem searchResultItem) {
+    if (!(searchResultItem instanceof PageSearchResultItem))
+      throw new IllegalArgumentException("This serializer can only handle page search result items");
+    PageSearchResultItem pageSearchResultItem = (PageSearchResultItem) searchResultItem;
+    String resourceXml = pageSearchResultItem.getResourceXml();
+    try {
+      Page page = getReader().read(IOUtils.toInputStream(resourceXml, "UTF-8"), searchResultItem.getSite());
+      return toMetadata(page);
+    } catch (SAXException e) {
+      logger.warn("Error parsing page " + searchResultItem.getId(), e);
+      return null;
+    } catch (IOException e) {
+      logger.warn("Error parsing page " + searchResultItem.getId(), e);
+      return null;
+    } catch (ParserConfigurationException e) {
+      logger.warn("Error parsing page " + searchResultItem.getId(), e);
+      return null;
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
+   *      java.util.List)
+   */
+  public Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata) {
+    for (ResourceMetadata<?> metadataItem : metadata) {
+      if (XML.equals(metadataItem.getName())) {
+        String resourceXml = (String) metadataItem.getValues().get(0);
+        try {
+          ResourceReader<ResourceContent, Page> reader = getReader();
+          Page page = reader.read(IOUtils.toInputStream(resourceXml, "UTF-8"), site);
+          return page;
+        } catch (SAXException e) {
+          logger.warn("Error parsing page from metadata", e);
+          return null;
+        } catch (IOException e) {
+          logger.warn("Error parsing page from metadata", e);
+          return null;
+        } catch (ParserConfigurationException e) {
+          logger.warn("Error parsing page from metadata", e);
+          return null;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, java.util.Map)
    */
-  public SearchResultItem createSearchResultItem(Site site, double relevance,
+  public SearchResultItem toSearchResultItem(Site site, double relevance,
       Map<String, ResourceMetadata<?>> metadata) {
     String id = (String) metadata.get(ID).getValues().get(0);
     String path = (String) metadata.get(PATH).getValues().get(0);
@@ -151,9 +214,9 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
     if (metadata.get(XML) != null)
       result.setResourceXml((String) metadata.get(XML).getValues().get(0));
     if (metadata.get(HEADER_XML) != null)
-    result.setPageHeaderXml((String) metadata.get(HEADER_XML).getValues().get(0));
+      result.setPageHeaderXml((String) metadata.get(HEADER_XML).getValues().get(0));
     if (metadata.get(PREVIEW_XML) != null)
-    result.setPagePreviewXml((String) metadata.get(PREVIEW_XML).getValues().get(0));
+      result.setPagePreviewXml((String) metadata.get(PREVIEW_XML).getValues().get(0));
 
     return result;
   }

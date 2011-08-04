@@ -995,7 +995,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         logger.debug("No specialized resource serializer found, using regular file serializer");
         serializer = ResourceSerializerFactory.getSerializerByType(FileResource.TYPE);
       }
-      resource = serializer.createNewResource(site);
+      resource = serializer.newResource(site);
       resourceURI = resource.getURI();
 
       // Set owner and date created

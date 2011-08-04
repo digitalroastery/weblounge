@@ -143,7 +143,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
     ResourceSerializer<?, ?> serializerForMimeType = null;
     synchronized (serializers) {
       for (ResourceSerializer<?, ?> serializer : serializers.values()) {
-        if (serializer.supportsContent(mimeType)) {
+        if (serializer.supports(mimeType)) {
           serializerForMimeType = serializer;
           break;
         }

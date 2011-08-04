@@ -615,15 +615,15 @@ public class ContentRepositoryIndex {
     }
 
     // Do it this way to make sure we have identical path trimming
-    uri = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getIdentifier(), uri.getVersion());
+    ResourceURI newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getIdentifier(), uri.getVersion());
 
-    uriIdx.update(address, uri.getType(), uri.getPath());
+    uriIdx.update(address, uri.getType(), newURI.getPath());
     pathIdx.delete(oldPath, address);
-    pathIdx.set(address, uri.getPath());
+    pathIdx.set(address, newURI.getPath());
     
     for (long version : versions) {
       uri.setVersion(version);
-      searchIdx.move(uri, path);
+      searchIdx.move(uri, newURI.getPath());
     }
   }
 
