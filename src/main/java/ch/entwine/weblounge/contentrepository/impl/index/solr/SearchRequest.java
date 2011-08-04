@@ -254,7 +254,7 @@ public class SearchRequest {
 
     // Filter query
     if (query.getFilter() != null) {
-      q.addFilterQuery(clean(query.getFilter()));
+      q.addFilterQuery("*" + clean(query.getFilter()) + "*");
     }
 
     // Define the fields that should be returned by the query
