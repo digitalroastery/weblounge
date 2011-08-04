@@ -41,6 +41,7 @@ steal.plugins(
             this._updateView();
             this._initDialogs();
             this._initDragDrop();
+            this._initPageLocking();
         },
         
         update: function(options) {
@@ -127,6 +128,19 @@ steal.plugins(
     				ui.draggable.remove();
     			}, this)
     		});
+        },
+        
+        _initPageLocking: function() {
+        	var locked = this.options.page.isLocked();
+        	if(locked && this.options.page.isLockedUser(this.options.runtime.getUserLogin())) {
+        		$('input#wbl-editmode', this.element).val(['editmode']);
+        		this.element.find(".wbl-lock").click();
+        		// TODO enable page editing
+        	} else {
+        		$('input#wbl-editmode', this.element).val([]);
+        		this.element.find(".wbl-unlock").click();
+        		// TODO disable page editing
+        	}
         },
         
         _toggleTab: function(el) {
@@ -238,12 +252,20 @@ steal.plugins(
 		
 		// trigger editmode
 		"input#wbl-editmode click": function(el, ev) {
+			ev.preventDefault();
 			if(el.is(':checked')) {
-//				el.trigger('editMode', true);
+				if(this.options.page.isLocked()) {
+					// not sure
+				} else {
+					this.options.page.lock($.proxy(function() {
+						$('input#wbl-editmode', this.element).val(['editmode']);
+					}, this), $.proxy(function() {
+						$('input#wbl-editmode', this.element).val([]);
+						alert('Page is locked!');
+					}, this));
+				}
 			} else {
-//				el.trigger('editMode', false);
-				// Open Publish Dialog an reload Page in normal mode
-				steal.dev.log('editmode is disabled');
+				this.options.page.unlock();
 				this.publishDialog.dialog('open');
 			}
 		}

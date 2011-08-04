@@ -146,6 +146,46 @@ steal.then('jsonix')
 		},
 		
 		/**
+		 * Locks the specified page.
+		 *  @param {Object} params The page identifier, user (optional) and eTag (optional)
+		 */
+		lock: function(params, success, error) {
+			var headers = {};
+			var data = {};
+			if('eTag' in params) 
+				headers = {"If-Match": params.eTag};
+			if('user' in params)
+				data = {user: params.user};
+			
+			if ('id' in params) {
+				$.ajax({
+					url: '/system/weblounge/pages/' + params.id + '/lock',
+					type: 'put',
+					success: success,
+					error: error,
+					headers: headers,
+					dataType: 'xml',
+					data: data
+				});
+			}
+		},
+		
+		/**
+		 * Unlocks the specified page.
+		 *  @param {Object} params The page identifier
+		 */
+		unlock: function(params, success, error) {
+			if ('id' in params) {
+				$.ajax({
+					url: '/system/weblounge/pages/' + params.id + '/unlock',
+					type: 'put',
+					success: success,
+					dataType: 'xml'
+				});
+			}
+		},
+		
+		/**
 		 * Converts XML to JSON
 		 */
 		parseXML: function(xml) {
@@ -186,6 +226,38 @@ steal.then('jsonix')
 	    		}
     		});
 	    	return composer;
+	    },
+	    
+	    /**
+	     * Check if the page is locked
+	     */
+	    isLocked: function() {
+	    	if($.isEmptyObject(this.value.head.locked)) return false;
+	    	return true;
+	    },
+	    
+	    /**
+	     * Check if the user has locked the page
+	     * @param {String} userId
+	     */
+	    isLockedUser: function(userId) {
+	    	if($.isEmptyObject(this.value.head.locked)) return false;
+	    	if(this.value.head.locked.user.id == userId) return true;
+	    	return false;
+	    },
+	    
+	    /**
+	     * Lock this page
+	     */
+	    lock: function(success, error) {
+	    	Page.lock({id:this.value.id}, success, error);
+	    },
+	    
+	    /**
+	     * Unlock this page
+	     */
+	    unlock: function(success) {
+	    	Page.unlock({id:this.value.id}, success);
 	    },
 	    
 	    /**

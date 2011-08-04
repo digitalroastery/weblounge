@@ -24,6 +24,11 @@
     text-decoration: none;
 }
 
+.editor_menubar span.wbl-editmode {
+	display: inline-block;
+	position: relative;
+}
+
 .editor_menubar a.wbl-tab.wbl-active,
 .editor_menubar a.wbl-tab:hover {
     background-color: #2C2C2D;
