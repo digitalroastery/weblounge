@@ -722,7 +722,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the user
    * @return the page
    */
-  @GET
+  @PUT
   @Path("/{page}/lock")
   public Response lockPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId, @FormParam("user") String userId,
@@ -813,7 +813,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the page identifier
    * @return the page
    */
-  @GET
+  @PUT
   @Path("/{page}/unlock")
   public Response unlockPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
