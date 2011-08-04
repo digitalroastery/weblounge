@@ -20,9 +20,13 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		update: function(options) {
 			this.options.resources = options.resources;
 			this.find('div.wbl-scrollViewItem').remove();
+			this.divScroll.smoothDivScroll("recalculateScrollableArea");
+			this.divScroll.smoothDivScroll("hideHotSpotBackgrounds");
 			if($.isEmptyObject(this.options.resources)) return;
 			this._initViewItems();
 			this.divScroll.smoothDivScroll("recalculateScrollableArea");
+			this.divScroll.smoothDivScroll("showHotSpotBackgrounds");
+			this.divScroll.smoothDivScroll("startAutoScroll");
 			this._initLazyLoading();
 		},
 		

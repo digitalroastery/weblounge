@@ -18,6 +18,7 @@ steal.plugins(
 		init: function(el) {
 			$(el).html('//editor/resourcebrowser/views/init.tmpl', {});
 			this._initViewItems();
+			this._showPendingNotification();
 			this.searchFlag = true;
 		},
 		
@@ -34,6 +35,7 @@ steal.plugins(
 			}
 			
 			if(this.searchFlag == true) return;
+			this._showPendingNotification();
 			this.scrollView.editor_resourcescrollview({
 				resources: this.options.resources,
 				language: this.options.language,
@@ -71,6 +73,27 @@ steal.plugins(
 				disabled: false,
 				icons: {primary: "wbl-iconThumbnails"},
 				text: false });
+		},
+		
+		_showPendingNotification: function() {
+			var query = {page: $.proxy(function(params) {
+				Page.findPending(params, $.proxy(function(pages) {
+					if($.isEmptyObject(pages)) {
+						this.element.find("div#wbl-pendingCircle").html('0').fadeOut();
+					} else {
+						this.element.find("div#wbl-pendingCircle").html(pages.length).fadeIn();
+					}
+				}, this));
+			}, this), media: $.proxy(function(params) {
+				Editor.File.findPending(params, $.proxy(function(media) {
+					if($.isEmptyObject(media)) {
+						this.element.find("div#wbl-pendingCircle").html('0').fadeOut();
+					} else {
+						this.element.find("div#wbl-pendingCircle").html(media.length).fadeIn();
+					}
+				}, this));
+			}, this)};
+			this._loadResources({}, query);
 		},
 		
 		_showResourceScrollView: function(resources) {

@@ -9,6 +9,12 @@ div.DataTables_sort_wrapper span {
 	display: inline-block;
 }
 
+.ui-effects-transfer {  /* style the transfer element */
+    border: red 2px solid;
+    border-radius: 999px;
+    z-index: 9999;
+}
+
 /* make space for the menubar */
 body {
   margin-top: 45px;

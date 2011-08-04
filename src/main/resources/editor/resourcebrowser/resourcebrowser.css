@@ -24,8 +24,6 @@
 	left: -75px;
 }
 .editor_resourcebrowser nav.weblounge div#wbl-pendingCircle {
-    -webkit-border-radius: 999px;
-    -moz-border-radius: 999px;
     border-radius: 999px;
     
     position: absolute;
@@ -261,28 +259,6 @@ img.wbl-pageThumbnail {
     width: 324px;
     margin: 0 auto;
     margin-top: 5%;
-}
-
-.editor_resourcebrowser #wbl-tagButton {
-	cursor: pointer;
-	position: absolute;
-	top: 0;
-	right: 0;
-	background-color: #FF9900;
-    border: 1px solid #333333;
-    color: #000000;
-    display: block;
-    font-size: 14px;
-    text-align: center;
-    width: 105px;
-    padding: 6px;
-}
-
-.editor_resourcebrowser #wbl-tagButton:hover {
-    background: none repeat scroll 0 0 #CC0000;
-}
-.editor_resourcebrowser #wbl-tagButton:focus {
-    outline: 1px dotted black;
 }
 
 .editor_resourcebrowser #wbl-resourceSearch {

@@ -57,7 +57,7 @@ steal.then('jsonix')
 		 * Get Pending Pages
 		 */
 		findPending: function(params, success, error) {
-			var url = "/system/weblounge/pages/pending";
+			var url = "/system/weblounge/pages/pending?limit=0";
 			if ('filter' in params) {
 				url += "?filter=" + params.filter;
 			}

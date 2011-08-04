@@ -30,15 +30,12 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller', 'jque
 						
 						// Save the uploaded file for Tagging not used now
 						this.map[id] = {resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag};
-//						if(!this.element.find('#wbl-tagButton').length) {
-//							this.element.find('.qq-upload-button').after('<button id="wbl-tagButton">Tag</button>');
-//						}
 						
-						// Animate a Red Overlay Icon over the Pending Button (+1)
-						var test = $("div#wbl-pendingCircle");
-						test.html('+' + this.map.length).fadeIn();
-						// Effect is not working
-//						this.element.find('.qq-uploader').effect("transfer", { to: $("div#wbl-pendingCircle") }, 2000);
+						var pendingCircle = this.element.parent().parent().find("div#wbl-pendingCircle");
+						var count = parseInt(pendingCircle.html());
+						if(isNaN(count)) count = 0;
+						pendingCircle.html(++count).fadeIn();
+						$(this.element.find('ul.qq-upload-list li')[id]).effect("transfer", { to: this.element.parent().parent().find("div#wbl-pendingCircle") }, 1000);
 				    }, this),
 				    // path to server-side upload script
 				    action: '/system/weblounge/files/uploads'
@@ -62,12 +59,8 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller', 'jque
 	    	ev.stopPropagation();
 			$('.wbl-menu').hide();
 			$('#wbl-pagecreator').editor_pagecreator({language: this.options.language, runtime: this.options.runtime});
-	    },
-	    
-	    "button#wbl-tagButton click": function(el, ev) {
-	    	$('div#wbl-tagger').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
 	    }
-	    		
+	    
 	});
 
 });
