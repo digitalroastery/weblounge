@@ -204,24 +204,6 @@
       <version>0.9.1.2</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>1.3.149</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.9</version>
-    </dependency>
-
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.4-701.jdbc4</version>
-    </dependency>
-
     <!-- testing -->
 
     <dependency>
@@ -450,7 +432,6 @@
             <Export-Package>
               ch.entwine.weblounge.kernel;version=${project.version},
               ch.entwine.weblounge.kernel.command;version=${project.version},
-              ch.entwine.weblounge.kernel.db;version=${project.version},
               ch.entwine.weblounge.kernel.endpoint;version=${project.version},
               ch.entwine.weblounge.kernel.publisher;version=${project.version},
               ch.entwine.weblounge.kernel.runtime;version=${project.version},
@@ -467,10 +448,7 @@
             <Embed-Dependency>
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,
-              c3p0;inline=true,
-              h2;inline=true,
-              mysql-connector-java;inline=true,
-              postgresql;inline=true
+              c3p0;inline=true
             </Embed-Dependency>
             <Private-Package>
               org.json,
@@ -478,9 +456,7 @@
               org.jboss.security.xacml.core.model.policy
             </Private-Package>
             <Service-Component>
-              OSGI-INF/datasource-provider-service.xml,
               OSGI-INF/endpoint-publishing-service.xml,
-              OSGI-INF/eclipselink-bundle-sanitizer-service.xml,
               OSGI-INF/endpoint-runtime-information.xml,
               OSGI-INF/kernel-service.xml,
               OSGI-INF/language-runtime-information.xml,
