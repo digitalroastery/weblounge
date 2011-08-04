@@ -67,7 +67,7 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    *          the content mime type
    * @return <code>true</code> if the serializer supports content of this type
    */
-  boolean supportsContent(String mimeType);
+  boolean supports(String mimeType);
 
   /**
    * Returns a <code>ResourceReader</code> for the type of resources that is
@@ -89,10 +89,30 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    *          the resource
    * @return the resource metadata
    */
-  List<ResourceMetadata<?>> getMetadata(Resource<?> resource);
+  List<ResourceMetadata<?>> toMetadata(Resource<?> resource);
 
   /**
-   * Returns a search result item from the resource matadata which contains the
+   * Takes a search result item and turns it into a set of metadata.
+   * 
+   * @param searchResultItem
+   *          the search result item
+   * @return the list of metadata
+   */
+  List<ResourceMetadata<?>> toMetadata(SearchResultItem searchResultItem);
+
+  /**
+   * Takes the metadata and returns the resource representation.
+   * 
+   * @param site
+   *          the site
+   * @param metadata
+   *          the resource metadata
+   * @return the resource
+   */
+  Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata);
+
+  /**
+   * Returns a search result item from the resource metadata which contains the
    * data returned by the search index.
    * 
    * @param site
@@ -103,7 +123,7 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    *          the metadata
    * @return the search result item
    */
-  SearchResultItem createSearchResultItem(Site site, double relevance,
+  SearchResultItem toSearchResultItem(Site site, double relevance,
       Map<String, ResourceMetadata<?>> metadata);
 
   /**
@@ -126,8 +146,14 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    *          the site
    * @return the new resource
    */
-  Resource<S> createNewResource(Site site);
+  Resource<S> newResource(Site site);
 
+  /**
+   * Returns an object for preview generation or <code>null</code> if the
+   * resource type does not provide preview generation.
+   * 
+   * @return the preview generator
+   */
   PreviewGenerator getPreviewGenerator();
 
 }
