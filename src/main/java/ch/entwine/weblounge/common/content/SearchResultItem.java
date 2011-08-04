@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.content;
 
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 /**
@@ -31,6 +32,13 @@ import ch.entwine.weblounge.common.url.WebUrl;
  * what the relevance value should be for the search results that it adds.
  */
 public interface SearchResultItem extends Comparable<SearchResultItem> {
+
+  /**
+   * Returns the search result item's site.
+   * 
+   * @return the site
+   */
+  Site getSite();
 
   /**
    * Sets the result item identifier.

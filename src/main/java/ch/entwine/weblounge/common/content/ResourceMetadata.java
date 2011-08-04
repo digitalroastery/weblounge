@@ -74,6 +74,11 @@ public interface ResourceMetadata<T> {
   List<T> getValues();
 
   /**
+   * Removes all values currently in the metadata container.
+   */
+  void clear();
+
+  /**
    * Adds the metadata values to the fulltext index.
    * 
    * @param addToFulltext
