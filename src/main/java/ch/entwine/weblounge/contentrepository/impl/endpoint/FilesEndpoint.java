@@ -641,7 +641,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Parse the resource and update it in the repository
     Resource<?> resource = null;
     // TOOD: Extract resource type
-    String resourceType = null;
+    String resourceType = resourceURI.getType();
     try {
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
       ResourceReader<?, ?> resourceReader = (ResourceReader<?, ?>) serializer.getContentReader();
