@@ -8,6 +8,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			$.Hover.delay = 0;
 			this.element.find('img.wbl-showPage').hide();
 			this.element.find('img.wbl-trashPage').hide();
+			this.element.find('img.wbl-editPage').hide();
 		},
 		
 		"click": function(el, ev) {
@@ -33,14 +34,21 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			el.trigger('deletePage');
 		},
 		
+		"img.wbl-editPage click": function(el, ev) {
+			ev.stopPropagation();
+			this._openSettings(el.parent().attr('id'));
+		},
+		
 		'hoverenter': function(ev, hover) {
 			this.element.find('img.wbl-showPage').show();
 			this.element.find('img.wbl-trashPage').show();
+			this.element.find('img.wbl-editPage').show();
 	    },
 	    
 		'hoverleave': function(ev, hover) {
 			this.element.find('img.wbl-showPage').hide();
 			this.element.find('img.wbl-trashPage').hide();
+			this.element.find('img.wbl-editPage').hide();
 	    }
 		
 	});

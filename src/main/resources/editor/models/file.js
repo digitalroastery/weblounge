@@ -12,6 +12,7 @@ steal.then('jsonix')
 			if ('path' in params) {
 				$.ajax('/system/weblounge/files?path=' + params.path, {
 					success: function(data, textStatus, jqXHR) {
+						// TODO eTag
 //						var json = Editor.File.parseXML(data);
 //						var file = Editor.File.wrap(json);
 //						file.setETag(jqXHR.getResponseHeader('Etag'));

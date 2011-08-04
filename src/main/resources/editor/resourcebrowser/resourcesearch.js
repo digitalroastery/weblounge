@@ -1,4 +1,4 @@
-steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller')
+steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller', 'jqueryui/effects')
 .views('//editor/resourcebrowser/views/resourcepagessearch.tmpl', '//editor/resourcebrowser/views/resourcemediasearch.tmpl')
 .then(function($) {
 
@@ -29,13 +29,16 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller')
 						if($.isEmptyObject(response)) return;
 						
 						// Save the uploaded file for Tagging not used now
-//						this.map[id] = {resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag};
+						this.map[id] = {resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag};
 //						if(!this.element.find('#wbl-tagButton').length) {
 //							this.element.find('.qq-upload-button').after('<button id="wbl-tagButton">Tag</button>');
 //						}
 						
 						// Animate a Red Overlay Icon over the Pending Button (+1)
-						$("#wbl-pendingCircle").html(this.map.length).show();
+						var test = $("div#wbl-pendingCircle");
+						test.html('+' + this.map.length).fadeIn();
+						// Effect is not working
+//						this.element.find('.qq-uploader').effect("transfer", { to: $("div#wbl-pendingCircle") }, 2000);
 				    }, this),
 				    // path to server-side upload script
 				    action: '/system/weblounge/files/uploads'

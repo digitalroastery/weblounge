@@ -16,6 +16,11 @@ steal.plugins('jquery/controller',
 					$(this).find('img').not('.wbl-settings').hide();
 				}
 			);
+		},
+		
+		"img.wbl-settings click": function(el, ev) {
+			ev.stopPropagation();
+			this._openSettings(el.parents('tr.wbl-pageEntry').attr('id'));
 		}
 		
 	});

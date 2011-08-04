@@ -81,7 +81,7 @@ steal.plugins('jquery',
 					},
 					Fertig: $.proxy(function () {
 						$.each(this.metadata, $.proxy(function(key, value) {
-							this.file[key].saveMetadata(value, this.options.language, this.options.map[key].eTag);
+							this.file[key].saveMetadata(value, this.options.language);
 				    	},this));
 						
 						this.element.dialog('close');

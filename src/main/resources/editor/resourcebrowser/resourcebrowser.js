@@ -33,6 +33,7 @@ steal.plugins(
 				this.searchBox.hide();
 			}
 			
+			if(this.searchFlag == true) return;
 			this.scrollView.editor_resourcescrollview({
 				resources: this.options.resources,
 				language: this.options.language,
@@ -77,7 +78,12 @@ steal.plugins(
 			this.options.resources = resources;
 			var element = this.find('div.wbl-thumbnailView');
 			this._toggleElement(element);
-			element.editor_resourcescrollview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
+			element.editor_resourcescrollview({
+				resources: this.options.resources, 
+				resourceType: this.options.resourceType,
+				language: this.options.language, 
+				runtime: this.options.runtime
+			});
 		},
 		
 		_showResourceListView: function(resources) {
@@ -85,7 +91,12 @@ steal.plugins(
 			this.options.resources = resources;
 			var element = this.find('div.wbl-listView');
 			this._toggleElement(element);
-			element.editor_resourcelistview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
+			element.editor_resourcelistview({
+				resources: this.options.resources,
+				resourceType: this.options.resourceType,
+				language: this.options.language, 
+				runtime: this.options.runtime
+			});
 		},
 		
 		/**
@@ -176,7 +187,7 @@ steal.plugins(
         		break;
         	case 'media':
         		resources.each($.proxy(function(index, element) {
-        			Editor.File.destroy({id: element.id}, this.callback('_removeResource', element.id));s
+        			Editor.File.destroy({id: element.id}, this.callback('_removeResource', element.id));
         		}, this))
         		break;
         	}

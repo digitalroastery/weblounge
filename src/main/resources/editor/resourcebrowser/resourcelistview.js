@@ -26,7 +26,7 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		_initDataTable: function(pagingSize) {
-			this.table = this.find('table').tablesorter({
+			this.table = this.element.find('table.wbl-tablesorter').tablesorter({
 				sortList: [[0,0]],
 		        headers: { 
 		            4: { sorter: false }
@@ -52,26 +52,16 @@ steal.plugins('jquery/view/tmpl')
 					runtime: this.options.runtime,
 					language: this.options.language
 				});
-				listViewItem.find('tr.wbl-pageEntry').editor_resourcelistviewitem({page: res});
+				listViewItem.find('tr.wbl-pageEntry').editor_resourcelistviewitem({
+					page: res,
+					runtime: this.options.runtime, 
+					language: this.options.language,
+					resourceType: this.options.resourceType
+				});
 			}, this));
 		},
 		
-		"img.wbl-settings click": function(el, ev) {
-			this.options.selectedPages = el.parents('tr.wbl-pageEntry');
-			steal.dev.log('open settings: ' + this.options.selectedPages);
-		},
-		
-		"img.wbl-delete click": function(el, ev) {
-			this.options.selectedPages = el.parents('tr.wbl-pageEntry');
-			if(this.options.selectedPages.length) {
-				this.deleteDialog.dialog('open');
-			} else {
-				this._showMessage('Es wurde keine Seite markiert.');
-			}
-			
-		},
-		
-		"img.wbl-favorite click": function(el, ev) {
+		"img.wbl-itemFavorize click": function(el, ev) {
 			this.element.trigger('favorizeResources', [el.parents('tr.wbl-pageEntry')]);
 			this._showMessage('Zu Favoriten hinzugefügt');
 		},

@@ -38,7 +38,7 @@ steal.plugins('jquery/controller',
 					clearTimeout(this.timeout);
 					this.timeout = setTimeout(function() {
 						$(ev.target).trigger('filterResources', ev.target.value);
-					}, 1000);
+					}, 700);
 				}
 			}, this));
 			

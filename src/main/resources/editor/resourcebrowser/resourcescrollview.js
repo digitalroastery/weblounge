@@ -69,7 +69,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		},
 		
 		"button.wbl-duplicate click": function(el, ev) {
-			this.options.selectedPages = this.find('div.wbl-resourceScrollViewItem.wbl-marked');
+			this.options.selectedPages = this.find('div.wbl-scrollViewItem.wbl-marked');
 			if(this.options.selectedPages.length == 1) {
 				this.duplicateDialog.dialog('open');
 			} else if(this.options.selectedPages.length > 1) {
@@ -80,7 +80,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		},
 		
 		"button.wbl-delete click": function(el, ev) {
-			this.options.selectedPages = this.find('div.wbl-resourceScrollViewItem.wbl-marked');
+			this.options.selectedPages = this.find('div.wbl-scrollViewItem.wbl-marked');
 			if(this.options.selectedPages.length) {
 				this.deleteDialog.dialog('open');
 			} else {
@@ -89,7 +89,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		},
 		
 		"button.wbl-favorize click": function(el, ev) {
-			this.options.selectedPages = $('div.wbl-resourceScrollViewItem.wbl-marked');
+			this.options.selectedPages = $('div.wbl-scrollViewItem.wbl-marked');
 			if(this.options.selectedPages.length) {
 				this.options.selectedPages.trigger('favorizeResources', [this.options.selectedPages]);
 				this._showMessage('Zu Favoriten hinzugefügt');
