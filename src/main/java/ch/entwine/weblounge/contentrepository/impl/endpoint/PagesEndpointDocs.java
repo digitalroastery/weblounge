@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
 import static ch.entwine.weblounge.common.impl.util.doc.Status.badRequest;
 import static ch.entwine.weblounge.common.impl.util.doc.Status.conflict;
+import static ch.entwine.weblounge.common.impl.util.doc.Status.forbidden;
 import static ch.entwine.weblounge.common.impl.util.doc.Status.methodNotAllowed;
 import static ch.entwine.weblounge.common.impl.util.doc.Status.notFound;
 import static ch.entwine.weblounge.common.impl.util.doc.Status.ok;
@@ -184,6 +185,35 @@ public final class PagesEndpointDocs {
     getChildPagesByURIEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
     getChildPagesByURIEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getChildPagesByURIEndpoint);
+
+    // PUT /{page}/lock
+    Endpoint lockPageEndpoint = new Endpoint("/{page}/lock", Method.PUT, "lockpage");
+    lockPageEndpoint.setDescription("Locks the specified page.");
+    lockPageEndpoint.addFormat(Format.xml());
+    lockPageEndpoint.addStatus(ok("the page was locked"));
+    lockPageEndpoint.addStatus(badRequest("the page was not specified"));
+    lockPageEndpoint.addStatus(notFound("the page was not found"));
+    lockPageEndpoint.addStatus(forbidden("the page is already locked by another user"));
+    lockPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
+    lockPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    lockPageEndpoint.addOptionalParameter(new Parameter("user", Parameter.Type.String, "The future lock owner"));
+    lockPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    lockPageEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, lockPageEndpoint);
+
+    // PUT /{page}/unlock
+    Endpoint unlockPageEndpoint = new Endpoint("/{page}/unlock", Method.PUT, "unlockpage");
+    unlockPageEndpoint.setDescription("Unlocks the specified page.");
+    unlockPageEndpoint.addFormat(Format.xml());
+    unlockPageEndpoint.addStatus(ok("the page was unlocked"));
+    unlockPageEndpoint.addStatus(badRequest("the page was not specified"));
+    unlockPageEndpoint.addStatus(notFound("the page was not found"));
+    unlockPageEndpoint.addStatus(forbidden("the current user does not have the rights to unlock the page"));
+    unlockPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
+    unlockPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    unlockPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    unlockPageEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, unlockPageEndpoint);
 
     return EndpointDocumentationGenerator.generate(docs);
   }

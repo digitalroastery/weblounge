@@ -128,32 +128,32 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Create search query
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
-    
+
     q.withType(Page.TYPE);
-    
+
     // Path
     if (StringUtils.isNotBlank(path))
       q.withPath(path);
-    
+
     // Subjects
     if (StringUtils.isNotBlank(subjectstring)) {
       StringTokenizer subjects = new StringTokenizer(subjectstring, ",");
       while (subjects.hasMoreTokens())
         q.withSubject(subjects.nextToken());
     }
-    
+
     // Search terms
     if (StringUtils.isNotBlank(searchterms))
       q.withText(searchterms);
-    
+
     // Filter query
     if (StringUtils.isNotBlank(filter))
       q.withFilter(filter);
-    
+
     // Limit and Offset
     q.withLimit(limit);
     q.withOffset(offset);
-    
+
     // Sort order
     if (StringUtils.equalsIgnoreCase("modified-asc", sort)) {
       q.sortByModificationDate(Order.Ascending);
@@ -417,13 +417,13 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Tried to update page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
-      logger.warn("Error reading udpated page {} from request", pageURI);
+      logger.warn("Error reading updated page {} from request", pageURI);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (ParserConfigurationException e) {
-      logger.warn("Error configuring parser to read udpated page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error configuring parser to read updated page {}: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (SAXException e) {
-      logger.warn("Error parsing udpated page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error parsing updated page {}: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.BAD_REQUEST);
     } catch (IllegalStateException e) {
       logger.warn("Error updating page {}: {}", pageURI, e.getMessage());
@@ -507,10 +507,10 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         logger.warn("Error reading page {} from request", pageURI);
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       } catch (ParserConfigurationException e) {
-        logger.warn("Error configuring parser to read udpated page {}: {}", pageURI, e.getMessage());
+        logger.warn("Error configuring parser to read updated page {}: {}", pageURI, e.getMessage());
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       } catch (SAXException e) {
-        logger.warn("Error parsing udpated page {}: {}", pageURI, e.getMessage());
+        logger.warn("Error parsing updated page {}: {}", pageURI, e.getMessage());
         throw new WebApplicationException(Status.BAD_REQUEST);
       }
     } else {
@@ -704,6 +704,191 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Return the pagelet
     return Response.ok(composer.getPagelet(pageletIndex).toXml()).build();
+  }
+
+  /**
+   * Locks the page and returns with a <code>200</code> status code if the lock
+   * operation succeeds, <code>400</code> if the page is not found or
+   * <code>403</code> if another user has already locked the page.
+   * <p>
+   * If <code>user</code> is not specified, then the current user will be used
+   * for lock acquisition.
+   * 
+   * @param request
+   *          the request
+   * @param pageId
+   *          the page identifier
+   * @param userId
+   *          the user
+   * @return the page
+   */
+  @GET
+  @Path("/{page}/lock")
+  public Response lockPage(@Context HttpServletRequest request,
+      @PathParam("page") String pageId, @FormParam("user") String userId,
+      @HeaderParam("If-Match") String ifMatchHeader) {
+
+    // Check the parameters
+    if (pageId == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    // Extract the site
+    Site site = getSite(request);
+
+    // Make sure the content repository is writable
+    if (site.getContentRepository().isReadOnly()) {
+      logger.warn("Attempt to lock a page in a read-only content repository {}", site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+
+    // Does the page exist?
+    Page page = null;
+    try {
+      if (!contentRepository.exists(pageURI)) {
+        throw new WebApplicationException(Status.NOT_FOUND);
+      }
+      page = (Page) contentRepository.get(pageURI);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Check the value of the If-Match header against the etag
+    if (ifMatchHeader != null) {
+      String etag = Long.toString(ResourceUtils.getModificationDate(page).getTime());
+      if (!etag.equals(ifMatchHeader)) {
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      }
+    }
+
+    // Get the user
+    // TODO: Change to current user
+    User currentUser = getSite(request).getAdministrator();
+    User futureLockOwner = currentUser;
+    if (userId != null) {
+      futureLockOwner = new UserImpl(userId);
+    }
+
+    // If the page is locked by a different user, refuse
+    if (page.isLocked() && !page.getLockOwner().equals(futureLockOwner)) {
+      return Response.status(Status.FORBIDDEN).build();
+    }
+
+    // Finally, perform the lock operation
+    try {
+      page.setLocked(futureLockOwner);
+      contentRepository.put(page);
+    } catch (SecurityException e) {
+      logger.warn("Tried to lock page {} of site '{}' without permission", pageURI, site);
+      throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (IOException e) {
+      logger.warn("Error writing page lock {} to repository", pageURI);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Error locking page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error locking page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Create the response
+    ResponseBuilder response = Response.ok(page.toXml());
+    response.tag(new EntityTag(Long.toString(ResourceUtils.getModificationDate(page).getTime())));
+    response.lastModified(page.getModificationDate());
+    return response.build();
+  }
+
+  /**
+   * Unlocks the page and returns with a <code>200</code> status code if the
+   * unlock operation succeeds, <code>400</code> if the page is not found or
+   * <code>403</code> if the page is locked by a different user.
+   * 
+   * @param request
+   *          the request
+   * @param pageId
+   *          the page identifier
+   * @return the page
+   */
+  @GET
+  @Path("/{page}/unlock")
+  public Response unlockPage(@Context HttpServletRequest request,
+      @PathParam("page") String pageId,
+      @HeaderParam("If-Match") String ifMatchHeader) {
+
+    // Check the parameters
+    if (pageId == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    // Extract the site
+    Site site = getSite(request);
+
+    // Make sure the content repository is writable
+    if (site.getContentRepository().isReadOnly()) {
+      logger.warn("Attempt to unlock a page in a read-only content repository {}", site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+
+    // Does the page exist?
+    Page page = null;
+    try {
+      if (!contentRepository.exists(pageURI)) {
+        throw new WebApplicationException(Status.NOT_FOUND);
+      }
+      page = (Page) contentRepository.get(pageURI);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Check the value of the If-Match header against the etag
+    if (ifMatchHeader != null) {
+      String etag = Long.toString(ResourceUtils.getModificationDate(page).getTime());
+      if (!etag.equals(ifMatchHeader)) {
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      }
+    }
+
+    // Get the user
+    // TODO: Change to current user
+    User currentUser = getSite(request).getAdministrator();
+
+    // If the page is locked by a different user, refuse
+    // TODO: Determine site admin role
+    boolean isSiteAdmin = false;
+    if (page.isLocked() && !page.getLockOwner().equals(currentUser) && !isSiteAdmin) {
+      return Response.status(Status.FORBIDDEN).build();
+    }
+
+    // Finally, perform the lock operation
+    try {
+      page.setLocked(null);
+      contentRepository.put(page);
+    } catch (SecurityException e) {
+      logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);
+      throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (IOException e) {
+      logger.warn("Error removing page lock {} to repository", pageURI);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Error unlocking page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error unlocking page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Create the response
+    ResponseBuilder response = Response.ok(page.toXml());
+    response.tag(new EntityTag(Long.toString(ResourceUtils.getModificationDate(page).getTime())));
+    response.lastModified(page.getModificationDate());
+    return response.build();
   }
 
   /**
