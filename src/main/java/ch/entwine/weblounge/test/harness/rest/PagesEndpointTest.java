@@ -22,6 +22,7 @@ package ch.entwine.weblounge.test.harness.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
@@ -37,7 +38,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,11 +104,17 @@ public class PagesEndpointTest extends IntegrationTestBase {
     testGetPageById(serverUrl, pageId);
     testGetPageByPath(serverUrl, pagePath);
 
+    // Lock the page
+    testLockPage(serverUrl, pageId);
+
     // Update the page
     testUpdatePage(serverUrl, pageId);
 
     // Move the page
     testMovePage(serverUrl, pageId);
+
+    // Lock the page
+    testUnlockPage(serverUrl, pageId);
 
     // Test page deletion
     testDeletePage(serverUrl, pageId);
@@ -163,7 +169,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Requesting page at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
-      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(id, XPathHelper.valueOf(pageXml, "/page/@id"));
     } finally {
@@ -191,12 +197,103 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Requesting page by path at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
-      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageByPathXml = TestUtils.parseXMLResponse(response);
-      assertEquals(path, XPathHelper.valueOf(pageByPathXml, "/page/@path"));
+      assertNotNull(XPathHelper.valueOf(pageByPathXml, "/pages/page/@path"));
+      assertEquals(path, XPathHelper.valueOf(pageByPathXml, "/pages/page/@path"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+  }
+
+  /**
+   * Locks the page.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @param id
+   *          the page identifier
+   * @throws Exception
+   *           if updating failed
+   */
+  private void testLockPage(String serverUrl, String id) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages/");
+
+    // Lock the page
+    HttpPut lockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "lock"));
+    HttpClient httpClient = new DefaultHttpClient();
+    logger.info("Locking the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, lockPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Make sure the update was successful
+    HttpGet getUpdatedPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
+    httpClient = new DefaultHttpClient();
+    logger.info("Requesting locked page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getUpdatedPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      Document pageXml = TestUtils.parseXMLResponse(response);
+      assertNotNull(XPathHelper.valueOf(pageXml, "/page/head/locked/user/@id"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Try to relock with a different user and make sure it fails
+    HttpPut relockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "lock"));
+    String[][] params = new String[][] { { "user", "amelie" } };
+    httpClient = new DefaultHttpClient();
+    logger.info("Trying to relock the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, relockPageRequest, params);
+      assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+  }
+
+  /**
+   * Locks the page.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @param id
+   *          the page identifier
+   * @throws Exception
+   *           if updating failed
+   */
+  private void testUnlockPage(String serverUrl, String id) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages/");
+
+    // Lock the page
+    HttpPut lockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "unlock"));
+    HttpClient httpClient = new DefaultHttpClient();
+    logger.info("Unlocking the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, lockPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Make sure the update was successful
+    HttpGet getUpdatedPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
+    httpClient = new DefaultHttpClient();
+    logger.info("Requesting locked page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getUpdatedPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      Document pageXml = TestUtils.parseXMLResponse(response);
+      assertNull(XPathHelper.valueOf(pageXml, "/page/head/locked"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
   }
 
   /**
@@ -221,7 +318,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Requesting page at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
-      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
       creator = XPathHelper.valueOf(pageXml, "/page/head/created/user");
     } finally {
@@ -238,7 +335,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Updating page at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, updatePageRequest, params);
-      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -249,7 +346,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Requesting updated page at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getUpdatedPageRequest, null);
-      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(pageId, XPathHelper.valueOf(pageXml, "/page/@id"));
       assertEquals(updatedCreator, XPathHelper.valueOf(pageXml, "/page/head/created/user"));
@@ -280,7 +377,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Requesting page at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
-      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
       oldPath = XPathHelper.valueOf(pageXml, "/page/@path");
     } finally {
@@ -296,7 +393,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Moving page from {} to {}", oldPath, newPath);
     try {
       HttpResponse response = TestUtils.request(httpClient, movePageRequest, params);
-      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -309,7 +406,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Requesting page by path at {}", newPath);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
-      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(id, XPathHelper.valueOf(pageXml, "/page/@id"));
       assertEquals(newPath, XPathHelper.valueOf(pageXml, "/page/@path"));
@@ -324,7 +421,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Requesting page by path at {}", oldPath);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
-      Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -337,7 +434,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Moving page back from {} to {}", newPath, oldPath);
     try {
       HttpResponse response = TestUtils.request(httpClient, movePageRequest, params);
-      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -362,7 +459,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Sending delete request to {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, deleteRequest, null);
-      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -373,7 +470,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     httpClient = new DefaultHttpClient();
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
-      Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
