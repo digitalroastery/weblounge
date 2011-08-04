@@ -230,19 +230,6 @@ public class PagesEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
-    // Make sure the update was successful
-    HttpGet getUpdatedPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
-    httpClient = new DefaultHttpClient();
-    logger.info("Requesting locked page at {}", requestUrl);
-    try {
-      HttpResponse response = TestUtils.request(httpClient, getUpdatedPageRequest, null);
-      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      Document pageXml = TestUtils.parseXMLResponse(response);
-      assertNotNull(XPathHelper.valueOf(pageXml, "/page/head/locked/user/@id"));
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
-
     // Try to relock with a different user and make sure it fails
     HttpPut relockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "lock"));
     String[][] params = new String[][] { { "user", "amelie" } };
@@ -271,7 +258,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages/");
 
     // Lock the page
-    HttpPut lockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "unlock"));
+    HttpDelete lockPageRequest = new HttpDelete(UrlUtils.concat(requestUrl, id, "lock"));
     HttpClient httpClient = new DefaultHttpClient();
     logger.info("Unlocking the page at {}", requestUrl);
     try {
@@ -379,6 +366,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
       HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
+      assertNotNull(XPathHelper.valueOf(pageXml, "/page"));
       oldPath = XPathHelper.valueOf(pageXml, "/page/@path");
     } finally {
       httpClient.getConnectionManager().shutdown();
@@ -408,8 +396,9 @@ public class PagesEndpointTest extends IntegrationTestBase {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
-      assertEquals(id, XPathHelper.valueOf(pageXml, "/page/@id"));
-      assertEquals(newPath, XPathHelper.valueOf(pageXml, "/page/@path"));
+      assertNotNull(XPathHelper.select(pageXml, "/pages/page"));
+      assertEquals(id, XPathHelper.valueOf(pageXml, "/pages/page/@id"));
+      assertEquals(newPath, XPathHelper.valueOf(pageXml, "/pages/page/@path"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
