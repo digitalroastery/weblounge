@@ -220,7 +220,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     response.setContentType(contentType);
 
     // Add last modified header
-    response.setDateHeader("Last-Modified", fileResource.getModificationDate().getTime());
+    response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(fileResource).getTime());
 
     // Add content size
     response.setHeader("Content-Length", Long.toString(content.getSize()));

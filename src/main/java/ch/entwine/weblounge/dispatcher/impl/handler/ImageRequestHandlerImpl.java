@@ -243,7 +243,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     response.setContentType(contentType);
 
     // Add last modified header
-    response.setDateHeader("Last-Modified", imageResource.getModificationDate().getTime());
+    response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource).getTime());
 
     // Add ETag header
     response.setHeader("ETag", "\"" + eTag + "\"");
