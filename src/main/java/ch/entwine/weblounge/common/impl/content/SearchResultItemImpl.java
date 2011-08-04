@@ -23,6 +23,7 @@ package ch.entwine.weblounge.common.impl.content;
 import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchResultItem;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 import org.slf4j.Logger;
@@ -40,6 +41,9 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchResultImpl.class);
+
+  /** The associated site */
+  protected Site site = null;
 
   /** The page id */
   protected String id = null;
@@ -73,6 +77,8 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @param id
    *          the document id
+   * @param site
+   *          the site
    * @param url
    *          the url to show the hit
    * @param relevance
@@ -80,12 +86,22 @@ public class SearchResultItemImpl implements SearchResultItem {
    * @param source
    *          the object that produced the result item
    */
-  public SearchResultItemImpl(String id, WebUrl url,
+  public SearchResultItemImpl(String id, Site site, WebUrl url,
       double relevance, Object source) {
+    this.site = site;
     this.id = id;
     this.url = url;
     this.source = source;
     this.score = relevance;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchResultItem#getSite()
+   */
+  public Site getSite() {
+    return site;
   }
 
   /**

@@ -200,6 +200,11 @@ public final class TestUtils {
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "utf-8");
         ((HttpPut) request).setEntity(entity);
       }
+    } else {
+      if (request instanceof HttpPost || request instanceof HttpPut) {
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(new ArrayList<NameValuePair>(), "utf-8");
+        ((HttpPut) request).setEntity(entity);
+      }
     }
     return httpClient.execute(request);
   }

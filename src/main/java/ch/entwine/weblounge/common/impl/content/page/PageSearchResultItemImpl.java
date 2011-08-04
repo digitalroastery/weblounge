@@ -122,4 +122,14 @@ public class PageSearchResultItemImpl extends AbstractResourceSearchResultItemIm
     return (Page) resource;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Page " + uri.toString();
+  }
+
 }

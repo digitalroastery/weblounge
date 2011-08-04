@@ -77,7 +77,7 @@ public class SearchResultItemImplTest {
   @Before
   public void setUp() throws Exception {
     setUpPrerequisites();
-    item = new SearchResultItemImpl(id, url, relevance, source);
+    item = new SearchResultItemImpl(id, site, url, relevance, source);
     item.setTitle(title);
     item.setPreview(previewData);
     item.setPreviewRenderer(renderer);
@@ -149,7 +149,7 @@ public class SearchResultItemImplTest {
    */
   @Test
   public void testCompareToSearchResultItem() {
-    SearchResultItem nextItem = new SearchResultItemImpl(id, url, relevance + 1.0, source);
+    SearchResultItem nextItem = new SearchResultItemImpl(id, site, url, relevance + 1.0, source);
     assertTrue(item.compareTo(nextItem) > 0);
   }
 

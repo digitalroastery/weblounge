@@ -132,4 +132,14 @@ public class ImageResourceSearchResultItemImpl extends AbstractResourceSearchRes
     return (FileResource) resource;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Image " + uri.toString();
+  }
+
 }

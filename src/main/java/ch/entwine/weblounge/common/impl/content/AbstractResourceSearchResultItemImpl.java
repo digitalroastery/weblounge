@@ -46,7 +46,7 @@ public abstract class AbstractResourceSearchResultItemImpl extends SearchResultI
    */
   public AbstractResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
       double relevance, Object source) {
-    super(uri.getIdentifier(), url, relevance, source);
+    super(uri.getIdentifier(), uri.getSite(), url, relevance, source);
     this.uri = uri;
   }
 

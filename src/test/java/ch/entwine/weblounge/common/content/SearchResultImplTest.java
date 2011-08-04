@@ -81,7 +81,7 @@ public class SearchResultImplTest {
     WebUrl url = new WebUrlImpl(site, "/");
     for (int i = 0; i < limit; i++) {
       double relevance = Math.random();
-      SearchResultItemImpl item = new SearchResultItemImpl(id, url, relevance, source);
+      SearchResultItemImpl item = new SearchResultItemImpl(id, site, url, relevance, source);
       result.addResultItem(item);
     }
   }

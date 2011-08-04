@@ -76,7 +76,7 @@ public class PageSearchResultItemImplTest extends SearchResultItemImplTest {
    */
   @Test
   public void testCompareToSearchResultItem() {
-    SearchResultItem nextItem = new SearchResultItemImpl(id, url, relevance + 1.0, source);
+    SearchResultItem nextItem = new SearchResultItemImpl(id, site, url, relevance + 1.0, source);
     assertTrue(item.compareTo(nextItem) > 0);
   }
 

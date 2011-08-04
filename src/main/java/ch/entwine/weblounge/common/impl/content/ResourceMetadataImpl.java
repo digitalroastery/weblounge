@@ -159,7 +159,17 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
   
   /**
    * {@inheritDoc}
-   *
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceMetadata#clear()
+   */
+  public void clear() {
+    values.clear();
+    localizedValues.clear();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -178,7 +188,7 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
       return false;
     return name.equals(((ResourceMetadata<?>)obj).getName());
   }
-  
+
   /**
    * {@inheritDoc}
    *
