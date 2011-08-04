@@ -67,11 +67,8 @@ public final class ResourceUtils {
   public static boolean isModified(Resource<?> resource,
       HttpServletRequest request) throws IllegalArgumentException {
     long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-    Date resourceModificationDate = resource.getModificationDate();
-    if (resourceModificationDate != null)
-      return cachedModificationDate < resourceModificationDate.getTime();
-    else
-      return cachedModificationDate < resource.getCreationDate().getTime();
+    Date resourceModificationDate = getModificationDate(resource);
+    return cachedModificationDate < resourceModificationDate.getTime();
   }
 
   /**
@@ -153,10 +150,7 @@ public final class ResourceUtils {
     long etag = resource.getIdentifier().hashCode();
     if (language != null)
       etag += language.getIdentifier().hashCode();
-    if (resource.getModificationDate() != null)
-      etag += resource.getModificationDate().getTime();
-    else
-      etag += resource.getCreationDate().getTime();
+    etag += getModificationDate(resource).getTime();
     return new StringBuffer().append("\"").append(etag).append("\"").toString();
   }
 
@@ -181,8 +175,25 @@ public final class ResourceUtils {
     if (language != null)
       etag += language.getIdentifier().hashCode();
     etag += style.getIdentifier().hashCode();
-    etag += resource.getModificationDate().getTime();
+    etag += getModificationDate(resource).getTime();
     return new StringBuffer().append("\"").append(etag).append("\"").toString();
+  }
+
+  /**
+   * Returns the modification date. If the resource has never been modified, its
+   * creation date is returned instead.
+   * 
+   * @param resource
+   *          the resource
+   * @return the modification date
+   * @throws IllegalArgumentException
+   *           if the resource is <code>null</code>
+   */
+  public static Date getModificationDate(Resource<?> resource)
+      throws IllegalArgumentException {
+    if (resource == null)
+      throw new IllegalArgumentException("Resource cannot be null");
+    return resource.getModificationDate() != null ? resource.getModificationDate() : resource.getCreationDate();
   }
 
   /**
@@ -264,7 +275,8 @@ public final class ResourceUtils {
    * @throws IllegalArgumentException
    *           if the file size is negative
    */
-  public static String formatFileSize(long sizeInBytes) throws IllegalArgumentException {
+  public static String formatFileSize(long sizeInBytes)
+      throws IllegalArgumentException {
     return formatFileSize(sizeInBytes, null);
   }
 
@@ -284,7 +296,8 @@ public final class ResourceUtils {
    * @throws IllegalArgumentException
    *           if the file size is negative
    */
-  public static String formatFileSize(long sizeInBytes, NumberFormat format) throws IllegalArgumentException {
+  public static String formatFileSize(long sizeInBytes, NumberFormat format)
+      throws IllegalArgumentException {
     if (sizeInBytes < 0)
       throw new IllegalArgumentException("File size cannot be negative");
     int unitSelector = 0;
