@@ -151,14 +151,17 @@ public class WebloungeSharedResources implements ManagedService {
     // Mountpoint
     String currentMountpoint = resourcesMountpoint;
     String mountpoint = (String) properties.get(OPT_RESOURCES_MOUNTPOINT);
-    if (StringUtils.trimToNull(mountpoint) != null) {
+    if (StringUtils.isNotBlank(mountpoint)) {
       resourcesMountpoint = mountpoint;
       logger.debug("Configured value for the shared resource mountpoint is '{}'", mountpoint);
+    } else {
+      resourcesMountpoint = DEFAULT_RESOURCES_MOUNTPOINT;
+      logger.debug("Using default mountpoint {} for shared resources", resourcesMountpoint);
     }
 
     // Mountpoint
     String externalResources = (String) properties.get(OPT_EXT_RESOURCES);
-    if (StringUtils.trimToNull(externalResources) != null) {
+    if (StringUtils.isNotBlank(externalResources)) {
       externalResourcesDir = new File(externalResources);
       servlet = new WebloungeResourcesServlet(externalResourcesDir, bundleContext.getBundle(), RESOURCES_BUNDLE_DIR);
       logger.debug("Configured external shared resources directory at '{}'", externalResources);
