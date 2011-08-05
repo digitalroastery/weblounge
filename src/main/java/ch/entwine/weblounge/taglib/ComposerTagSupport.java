@@ -739,6 +739,7 @@ public class ComposerTagSupport extends WebloungeTag {
     super.reset();
     attributes.clear();
     contentInheritanceEnabled = false;
+    contentIsInherited = false;
     contentProvider = null;
     debug = false;
     description = null;

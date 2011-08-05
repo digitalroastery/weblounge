@@ -77,7 +77,7 @@ public class ComposerTag extends ComposerTagSupport {
     boolean isLocked = targetPage != null && targetPage.isLocked();
     boolean isLockedByCurrentUser = targetPage != null && isLocked && user.equals(targetPage.getLockOwner());
     boolean isWorkVersion = version == Resource.WORK;
-    boolean allowContentInheritance = !isLockedByCurrentUser && !isWorkVersion;
+    boolean allowContentInheritance = contentInheritanceEnabled && !isLockedByCurrentUser && !isWorkVersion;
 
     // Enable / disable content inheritance for this composer
     setInherit(allowContentInheritance);
@@ -142,6 +142,17 @@ public class ComposerTag extends ComposerTagSupport {
     }
 
     super.afterPagelet(pagelet, position, writer);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.taglib.ComposerTagSupport#reset()
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+    isLocked = false;
   }
 
 }
