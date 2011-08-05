@@ -41,6 +41,16 @@ public class FilePreviewGenerator implements PreviewGenerator {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(ch.entwine.weblounge.common.content.Resource,
+   *      ch.entwine.weblounge.common.language.Language)
+   */
+  public boolean supports(Resource<?> resource, Language language) {
+    return resource.getContent(language) != null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(ch.entwine.weblounge.common.content.Resource,
    *      ch.entwine.weblounge.common.language.Language,
    *      ch.entwine.weblounge.common.content.image.ImageStyle,
