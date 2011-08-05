@@ -33,6 +33,18 @@ import java.io.OutputStream;
 public interface PreviewGenerator {
 
   /**
+   * Returns <code>true</code> if the preview generator supports creating a
+   * preview for the given resource and language.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @return <code>true</code> if creating a preview is supported
+   */
+  boolean supports(Resource<?> resource, Language language);
+
+  /**
    * Creates a preview image for a resource and writes the content to the
    * {@link OutputStream}.
    * 
