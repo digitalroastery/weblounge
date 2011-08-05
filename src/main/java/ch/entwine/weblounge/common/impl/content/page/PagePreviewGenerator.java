@@ -179,17 +179,8 @@ public class PagePreviewGenerator implements PreviewGenerator {
 
     // Render the page and write back to client
     try {
-      float screenshotScale = 1.0f;
       int screenshotWidth = DEFAULT_SCREENSHOT_WIDTH;
       int screenshotHeight = DEFAULT_SCREENSHOT_HEIGHT;
-
-      if (style.getWidth() > 0) {
-        screenshotScale = screenshotWidth / style.getWidth();
-        screenshotHeight = (int) screenshotScale * screenshotHeight;
-      } else {
-        screenshotScale = screenshotHeight / style.getHeight();
-        screenshotWidth = (int) screenshotScale * screenshotWidth;
-      }
 
       // Create the renderer. Due to a synchronization bug in the software,
       // this needs to be synchronized
