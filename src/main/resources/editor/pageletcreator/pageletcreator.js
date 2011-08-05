@@ -22,7 +22,7 @@ steal.plugins('jquery',
 		 */
 		init: function(el) {
 			this.enabled = true;
-			$("body").css("margin-top","185px");
+			this._hide();
 			this.options.runtime.getSiteModules(this.callback('_initViews', el));
 	    },
 	    

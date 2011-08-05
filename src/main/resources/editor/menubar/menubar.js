@@ -280,7 +280,7 @@ steal.plugins(
 		"input#wbl-editmode click": function(el, ev) {
 			ev.preventDefault();
 			if(el.is(':checked')) {
-				this.options.page.lock($.proxy(function() {
+				this.options.page.lock(this.options.runtime.getUserLogin(), $.proxy(function() {
 					$('input#wbl-editmode', this.element).val(['editmode']);
 					this._enableEditing();
 				}, this), $.proxy(function() {

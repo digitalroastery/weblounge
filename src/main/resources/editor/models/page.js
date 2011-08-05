@@ -248,15 +248,21 @@ steal.then('jsonix')
 	    /**
 	     * Lock this page
 	     */
-	    lock: function(success, error) {
-	    	Page.lock({id:this.value.id}, success, error);
+	    lock: function(user, success, error) {
+	    	Page.lock({id:this.value.id}, $.proxy(function() {
+	    		this.value.head.locked = {user: {id: user}};
+	    		success();
+	    	}, this), error);
 	    },
 	    
 	    /**
 	     * Unlock this page
 	     */
 	    unlock: function(success) {
-	    	Page.unlock({id:this.value.id}, success);
+	    	Page.unlock({id:this.value.id}, $.proxy(function() {
+	    		delete this.value.head.locked;
+	    		success();
+	    	}, this));
 	    },
 	    
 	    /**

@@ -176,6 +176,8 @@ steal.plugins('jqueryui/dialog',
 		
 		if(pagelet.locale.current == undefined) {
 			pagelet = this._createNewLocale(pagelet, this.options.composer.language);
+		} else {
+			this._updateModified(pagelet);
 		}
 		
 		$.each(allInputs, function(i, input) {
@@ -225,21 +227,35 @@ steal.plugins('jqueryui/dialog',
      * Create a new locale
      */
     _createNewLocale: function(pagelet, language) {
-    	pagelet.locale.current = {};
-    	pagelet.locale.current.text = {};
-    	pagelet.locale.current.language = language;
-    	pagelet.locale.current.original = false;
-    	if($.isEmptyObject(pagelet.locale.original)) {
-    		pagelet.locale.current.original = true;
-    	}
-		pagelet.locale.current.modified = {};
-		pagelet.locale.current.modified.user = {};
-		pagelet.locale.current.modified.user.id = this.options.composer.runtime.getUserLogin();
-		pagelet.locale.current.modified.user.name = this.options.composer.runtime.getUserName();
-		pagelet.locale.current.modified.user.realm = this.options.composer.runtime.getId();
-		pagelet.locale.current.modified.date = new Date();
+    	pagelet.locale.current = {
+    		text: {},
+    		language: language,
+    		original: $.isEmptyObject(pagelet.locale.original),
+    		modified: {
+				user: {
+					id: this.options.composer.runtime.getUserLogin(),
+					name: this.options.composer.runtime.getUserName(),
+					realm: this.options.composer.runtime.getId()
+				},
+				date: new Date()
+			}
+    	};
     	pagelet.locale.push(pagelet.locale.current);
 		return pagelet;
+    },
+    
+    /**
+     * Update the locale modification info
+     */
+    _updateModified: function(pagelet) {
+		pagelet.locale.current.modified = {
+			user: {
+				id: this.options.composer.runtime.getUserLogin(),
+				name: this.options.composer.runtime.getUserName(),
+				realm: this.options.composer.runtime.getId()
+			},
+			date: new Date()
+		};
     },
     
 	'hoverenter': function(ev, hover) {

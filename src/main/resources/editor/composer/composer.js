@@ -60,18 +60,20 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         	
         	// Insert new pagelet to composer
             if(ui.item.hasClass('wbl-draggable')) {
-            	var newPagelet = {};
-            	newPagelet.id = ui.item.attr('id');
-            	newPagelet.module = ui.item.attr('module')
-            	newPagelet.locale = new Array();
-            	newPagelet.properties = {};
-            	newPagelet.properties.property = {};
-            	newPagelet.created = {};
-            	newPagelet.created.user = {};
-            	newPagelet.created.user.id = this.options.runtime.getUserLogin();
-            	newPagelet.created.user.name = this.options.runtime.getUserName();
-            	newPagelet.created.user.realm = this.options.runtime.getId();
-            	newPagelet.created.date = new Date();
+            	var newPagelet = {
+            		id: ui.item.attr('id'),
+            		module: ui.item.attr('module'),
+            		locale: new Array(),
+            		properties: {property: {}},
+            		created: {
+	    				user: {
+	    					id: this.options.runtime.getUserLogin(),
+	    					name: this.options.runtime.getUserName(),
+	    					realm: this.options.runtime.getId()
+	    				},
+	    				date: new Date()
+            		}
+            	};
             	pagelets.splice(ui.item.index(), 0, newPagelet);
             	ui.item.after('<div class="pagelet editor_pagelet" >');
             	var pagelet = ui.item.next();
