@@ -5,14 +5,14 @@
     <index>true</index>
     <metadata>
       <title language="de"><![CDATA[Ein schönes Fahrzeug]]></title>
-      <title language="fr"><![CDATA[Une voiture belle]]></title>
+      <title language="en"><![CDATA[A nice car]]></title>
       <description language="de"><![CDATA[Beschreibung]]></description>
-      <description language="fr"><![CDATA[Déscription]]></description>
+      <description language="en"><![CDATA[Description]]></description>
       <subject><![CDATA[car]]></subject>
       <subject><![CDATA[porsche]]></subject>
       <type><![CDATA[Text]]></type>
       <coverage language="de"><![CDATA[Zürich]]></coverage>
-      <coverage language="fr"><![CDATA[Zurich]]></coverage>
+      <coverage language="en"><![CDATA[Zurich]]></coverage>
       <rights language="de"><![CDATA[Copyright 2009 by T. Wunden]]></rights>
     </metadata>
     <created>
