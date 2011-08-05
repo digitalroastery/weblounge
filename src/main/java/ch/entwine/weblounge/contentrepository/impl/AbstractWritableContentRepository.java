@@ -402,12 +402,17 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Create the previews for all languages.
     for (Language language : resource.languages()) {
-      ResourceContent resourceContent = resource.getContent(language);
+
+      // Is creating a preview for the current language supported?
+      if (!previewGenerator.supports(resource, language))
+        continue;
 
       logger.info("Creating {} previews for {} {}", new Object[] {
           language.getDescription(),
           resourceType,
           resource });
+
+      ResourceContent resourceContent = resource.getContent(language);
 
       for (ImageStyle style : styles) {
 
