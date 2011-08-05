@@ -59,18 +59,21 @@ steal.plugins(
         	switch (this.options.mode) {
 	      	  case 0:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-designer'));
+	      		  this.toolbarMore = this.find('img.wbl-add').show();
 	      		  this.toolbarMore = this.find('img.wbl-more').show();
 	      		  this.toolbarEdit = this.find('span.wbl-editmode').show();
 	      		  this.pageOptions = this.find('div#wbl-pageOptions').show();
 	      		  break;
 	      	  case 1:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-pages'));
+	      		  this.toolbarMore = this.find('img.wbl-add').hide();
 	      		  this.toolbarMore = this.find('img.wbl-more').hide();
 	      		  this.toolbarEdit = this.find('span.wbl-editmode').hide();
 	      		  this.pageOptions = this.find('div#wbl-pageOptions').hide();
 	      		  break;
 	      	  case 2:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-media'));
+	      		  this.toolbarMore = this.find('img.wbl-add').hide();
 	      		  this.toolbarMore = this.find('img.wbl-more').hide();
 	      		  this.toolbarEdit = this.find('span.wbl-editmode').hide();
 	      		  this.pageOptions = this.find('div#wbl-pageOptions').hide();
