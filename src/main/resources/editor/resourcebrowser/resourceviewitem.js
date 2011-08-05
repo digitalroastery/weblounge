@@ -23,6 +23,7 @@ steal.plugins().then(function($) {
 		switch(this.options.resourceType) {
 		case 'pages':
 			Page.findOne({id: resourceId}, $.proxy(function(page) {
+				// TODO Locking
 				$('#wbl-pageheadeditor').editor_pageheadeditor({page: page, language: this.options.language, runtime: this.options.runtime});
 			}, this));
 			break;

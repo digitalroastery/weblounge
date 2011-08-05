@@ -41,6 +41,7 @@ steal.plugins(
             this._updateView();
             this._initDialogs();
             this._initDragDrop();
+            $('#wbl-pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
             this._initPageLocking();
         },
         
@@ -132,15 +133,38 @@ steal.plugins(
         
         _initPageLocking: function() {
         	var locked = this.options.page.isLocked();
-        	if(locked && this.options.page.isLockedUser(this.options.runtime.getUserLogin())) {
+        	var userLocked = this.options.page.isLockedUser(this.options.runtime.getUserLogin())
+        	
+        	if(locked && !userLocked) {
+        		$('input#wbl-editmode', this.element).attr('disabled', 'disabled');
+        		this._disableEditing();
+        	} 
+        	else if(locked && userLocked) {
+        		$('input#wbl-editmode', this.element).removeAttr('disabled');
         		$('input#wbl-editmode', this.element).val(['editmode']);
-        		this.element.find(".wbl-lock").click();
-        		// TODO enable page editing
-        	} else {
+        		this._enableEditing();
+        	} 
+        	else {
+        		$('input#wbl-editmode', this.element).removeAttr('disabled');
         		$('input#wbl-editmode', this.element).val([]);
-        		this.element.find(".wbl-unlock").click();
-        		// TODO disable page editing
+        		this._disableEditing();
         	}
+        },
+        
+        _enableEditing: function() {
+        	$('.composer').editor_composer('enable');
+        	$('#wbl-pageletcreator').editor_pageletcreator('enable');
+        	
+        	// first instanziate before enable
+//        	$('#wbl-pageheadeditor').editor_pageheadeditor('enable');
+        },
+        
+        _disableEditing: function() {
+        	$('.composer').editor_composer('disable');
+        	$('#wbl-pageletcreator').editor_pageletcreator('disable');
+        	
+        	// first instanziate before disable
+//        	$('#wbl-pageheadeditor').editor_pageheadeditor('disable');
         },
         
         _toggleTab: function(el) {
@@ -169,18 +193,21 @@ steal.plugins(
 			this.userDialog.dialog('open');
 		},
 		
+		"li.wbl-publish click": function(el, ev) {
+			$('.wbl-menu').hide();
+			this.publishDialog.dialog('open');
+		},
+		
 		"li.wbl-pageSettings click": function(el, ev) {
 			$('.wbl-menu').hide();
 			$('#wbl-pageheadeditor').editor_pageheadeditor({page: this.options.page, language: this.options.language, runtime: this.options.runtime});
 		},
 		
 		"li.wbl-news click": function(el, ev) {
-			// TODO
 			steal.dev.log('news')
 		},
 		
 		"li.wbl-logout click": function(el, ev) {
-			// TODO
 			steal.dev.log('logout')
 		},
 		
@@ -195,13 +222,12 @@ steal.plugins(
 		},
 		
 		"li.wbl-newNote click": function(el, ev) {
-			// TODO
 			steal.dev.log('note')
 		},
 		
 		"li.wbl-newPagelet click": function(el, ev) {
 			$('.wbl-menu').hide();
-			$('#wbl-pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
+			$('#wbl-pageletcreator').editor_pageletcreator();
 		},
 		
 		"span.wbl-languageMenu img click": function(el, ev) {
@@ -254,18 +280,18 @@ steal.plugins(
 		"input#wbl-editmode click": function(el, ev) {
 			ev.preventDefault();
 			if(el.is(':checked')) {
-				if(this.options.page.isLocked()) {
-					// not sure
-				} else {
-					this.options.page.lock($.proxy(function() {
-						$('input#wbl-editmode', this.element).val(['editmode']);
-					}, this), $.proxy(function() {
-						$('input#wbl-editmode', this.element).val([]);
-						alert('Page is locked!');
-					}, this));
-				}
+				this.options.page.lock($.proxy(function() {
+					$('input#wbl-editmode', this.element).val(['editmode']);
+					this._enableEditing();
+				}, this), $.proxy(function() {
+					$('input#wbl-editmode', this.element).val([]);
+					alert('Locking failed!');
+				}, this));
 			} else {
-				this.options.page.unlock();
+				this.options.page.unlock($.proxy(function() {
+					$('input#wbl-editmode', this.element).val([]);
+					this._disableEditing();
+				}, this));
 				this.publishDialog.dialog('open');
 			}
 		}

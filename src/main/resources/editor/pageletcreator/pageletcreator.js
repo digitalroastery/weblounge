@@ -21,6 +21,7 @@ steal.plugins('jquery',
 		 * Initialize a new Pageletcreator controller.
 		 */
 		init: function(el) {
+			this.enabled = true;
 			$("body").css("margin-top","185px");
 			this.options.runtime.getSiteModules(this.callback('_initViews', el));
 	    },
@@ -70,8 +71,29 @@ steal.plugins('jquery',
 	    },
 	    
 	    update: function() {
+	    	if(!this.enabled) return;
 	    	$("body").css("margin-top","185px");
 	    	this.element.show();
+	    },
+	    
+	    enable: function() {
+	    	this.enabled = true;
+	    },
+	    
+	    disable: function() {
+	    	this.enabled = false;
+	    	this._hide();
+	    },
+	    
+		_sleep: function(ms) {
+			var dt = new Date();
+			dt.setTime(dt.getTime() + ms);
+			while (new Date().getTime() < dt.getTime());
+		},
+	    
+	    _hide: function() {
+	    	this.element.hide();
+	    	$("body").css("margin-top","45px");
 	    },
 	    
 	    _updateDraggable: function() {
@@ -86,8 +108,7 @@ steal.plugins('jquery',
 					$(ui.helper).addClass('wbl-draggableHelper');
 				},
 				stop: function(e, ui) {
-			    	$('.composer').addClass('wbl-nojQuery');
-			    	$('.composer').find('div.pagelet').editor_pagelet('enable');
+					$('.composer').editor_composer('enable');
 				}
 			}).disableSelection();
 	    },
@@ -108,8 +129,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    "a.wbl-tabClose click": function(el, ev) {
-	    	this.element.hide();
-	    	$("body").css("margin-top","45px");
+	    	this._hide();
 	    }
 	    
   	});

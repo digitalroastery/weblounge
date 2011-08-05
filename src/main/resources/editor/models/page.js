@@ -151,7 +151,7 @@ steal.then('jsonix')
 		 */
 		lock: function(params, success, error) {
 			var headers = {};
-			var data = {};
+			var data = {user: ''};
 			if('eTag' in params) 
 				headers = {"If-Match": params.eTag};
 			if('user' in params)
@@ -177,10 +177,9 @@ steal.then('jsonix')
 		unlock: function(params, success, error) {
 			if ('id' in params) {
 				$.ajax({
-					url: '/system/weblounge/pages/' + params.id + '/unlock',
-					type: 'put',
-					success: success,
-					dataType: 'xml'
+					url: '/system/weblounge/pages/' + params.id + '/lock',
+					type: 'delete',
+					success: success
 				});
 			}
 		},

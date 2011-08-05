@@ -134,14 +134,24 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         });
     },
     
+	disable: function() {
+		$(this.element).removeClass('wbl-nojQuery');
+		$(this.element).sortable('disable');
+		$(this.element).find('div.pagelet').editor_pagelet('disable');
+	},
+	
+	enable: function() {
+		$(this.element).addClass('wbl-nojQuery');
+		$(this.element).sortable('enable');
+		$(this.element).find('div.pagelet').editor_pagelet('enable');
+	},
+    
     _enablePagelets: function() {
-    	$('.composer').addClass('wbl-nojQuery');
-    	$('.composer').find('div.pagelet').editor_pagelet('enable');
+    	$('.composer').editor_composer('enable');
     },
     
     _disablePagelets: function() {
-    	$('.composer').removeClass('wbl-nojQuery');
-    	$('.composer').find('div.pagelet').editor_pagelet('disable');
+    	$('.composer').editor_composer('disable');
     },
     
     "a.wbl-addPagelet click": function(el, ev) {

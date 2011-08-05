@@ -139,6 +139,21 @@ steal.plugins(
 			this.options.resources.splice(index, 1);
 			this.update();
         },
+        
+        /**
+         * Get Page from the resourceId
+         */
+	    _getPage: function(id) {
+	    	var page = null;
+	    	$.each(this.options.resources, function(i, resource) {
+	    		if(resource.id == id) {
+	    			page = resource;
+	    			return false;
+	    		}
+    		});
+	    	if(page == null) return null;
+	    	return new Page({value: page});
+	    },
 		
 		_toggleElement: function(el) {
         	this.activeElement.hide();
@@ -205,7 +220,16 @@ steal.plugins(
         	switch(this.options.resourceType) {
         	case 'pages':
         		resources.each($.proxy(function(index, element) {
-        			Page.destroy({id: element.id}, this.callback('_removeResource', element.id));
+        			var page = this._getPage(element.id);
+        			if(page == null) return;
+        			var locked = page.isLocked();
+                	var userLocked = page.isLockedUser(this.options.runtime.getUserLogin());
+                	
+                	if(!locked || (locked && userLocked)) {
+                		Page.destroy({id: element.id}, this.callback('_removeResource', element.id));
+                	} else {
+                		alert("Can't delete " + page.getPath() + ": Page is locked!");
+                	}
         		}, this))
         		break;
         	case 'media':
