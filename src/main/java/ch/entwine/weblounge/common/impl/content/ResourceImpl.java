@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.content;
 
+import static ch.entwine.weblounge.common.language.Localizable.LanguageResolution.Original;
+
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
@@ -34,8 +36,11 @@ import ch.entwine.weblounge.common.security.Permission;
 import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +56,9 @@ import java.util.Set;
  * resource URL.
  */
 public abstract class ResourceImpl<T extends ResourceContent> extends LocalizableObject implements Resource<T> {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(ResourceImpl.class);
 
   /** The uri */
   protected ResourceURI uri = null;
@@ -805,7 +813,23 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   public T removeContent(Language language) {
     if (language == null)
       throw new IllegalArgumentException("Content language must not be null");
+
+    boolean useOriginalLanguage = Original.equals(behavior);
+    disableLanguage(language);
+
+    // Fix handling of potential loss of original language. If the original
+    // language has been deleted, the underlying implementation will switch the
+    // resource to a random default language.
+    if (useOriginalLanguage && !Original.equals(behavior)) {
+      Site site = uri.getSite();
+      if (supportsLanguage(site.getDefaultLanguage())) {
+        logger.trace("Switching default language of localizable object {} to site default language {}", this, defaultLanguage);
+        setOriginalLanguage(site.getDefaultLanguage());
+      }
+    }
+
     return content.remove(language);
+
   }
 
   /**

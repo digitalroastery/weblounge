@@ -27,6 +27,9 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.language.LocalizationListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -65,6 +68,9 @@ import java.util.TreeSet;
  * @see LocalizableContent
  */
 public class LocalizableObject implements Localizable {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(LocalizableObject.class);
 
   /** list of added languages */
   protected Set<Language> languages = null;
@@ -174,14 +180,36 @@ public class LocalizableObject implements Localizable {
     if (language == null)
       throw new IllegalArgumentException("Language must not be null");
 
-    if (behavior.equals(Original) && language.equals(originalLanguage))
-      throw new IllegalStateException("Cannot disable original language!");
-    else if (behavior.equals(Default) && language.equals(defaultLanguage))
-      throw new IllegalStateException("Cannot disable default language!");
-
+    // Handle the current language
     if (language.equals(currentLanguage))
       currentLanguage = null;
+
+    // Remove the language in question
     languages.remove(language);
+
+    // Fix original language
+    if (behavior.equals(Original) && language.equals(originalLanguage)) {
+      if (languages.size() > 0) {
+        defaultLanguage = languages.iterator().next();
+        behavior = Default;
+        logger.trace("Switching localizable object {} from original language {} to default language {}", new Object[] {
+            this,
+            originalLanguage,
+            defaultLanguage });
+      }
+      originalLanguage = null;
+    }
+
+    // Fix default language
+    else if (behavior.equals(Default) && language.equals(defaultLanguage)) {
+      if (languages.size() > 0) {
+        defaultLanguage = languages.iterator().next();
+        logger.trace("Switching default language of localizable object {} to {}", this, defaultLanguage);
+      } else {
+        defaultLanguage = null;
+      }
+    }
+
   }
 
   /**

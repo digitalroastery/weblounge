@@ -24,7 +24,6 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.impl.content.ResourceImpl;
-import ch.entwine.weblounge.common.language.Language;
 
 
 /**
@@ -43,36 +42,6 @@ public class FileResourceImpl extends ResourceImpl<FileContent> implements FileR
     super(uri);
     uri.setType(TYPE);
     setLanguageResolution(LanguageResolution.Original);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.impl.content.ResourceImpl#addContent(ch.entwine.weblounge.common.content.ResourceContent)
-   */
-  @Override
-  public void addContent(FileContent content) {
-    if (content == null)
-      throw new IllegalArgumentException("Content must not be null");
-    super.addContent(content);
-    enableLanguage(content.getLanguage());
-  }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.impl.content.ResourceImpl#removeContent(ch.entwine.weblounge.common.language.Language)
-   */
-  @Override
-  public FileContent removeContent(Language language) {
-    if (content == null)
-      throw new IllegalArgumentException("Content must not be null");
-    FileContent content = super.removeContent(language);
-    FileContent originalContent = getOriginalContent();
-    if (originalContent != null) {
-      setOriginalLanguage(getOriginalContent().getLanguage());
-    }
-    return content;
   }
   
   /**

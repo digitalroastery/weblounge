@@ -25,7 +25,6 @@ import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.ResourceImpl;
 
-
 /**
  * Default implementation of an image resource.
  */
@@ -44,19 +43,7 @@ public class ImageResourceImpl extends ResourceImpl<ImageContent> implements Ima
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.impl.content.ResourceImpl#addContent(ch.entwine.weblounge.common.content.ResourceContent)
-   */
-  @Override
-  public void addContent(ImageContent content) {
-    if (content == null)
-      throw new IllegalArgumentException("Content must not be null");
-    super.addContent(content);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.impl.content.ResourceImpl#toXmlRootTag()
    */
   @Override
