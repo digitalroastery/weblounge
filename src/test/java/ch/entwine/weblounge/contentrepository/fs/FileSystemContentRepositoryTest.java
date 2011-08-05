@@ -212,6 +212,7 @@ public class FileSystemContentRepositoryTest {
     EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
     EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
     EasyMock.expect(site.getModules()).andReturn(new Module[] {}).anyTimes();
+    EasyMock.expect(site.getDefaultLanguage()).andReturn(LanguageUtils.getLanguage("de")).anyTimes();
     EasyMock.replay(site);
 
     // Connect to the repository
