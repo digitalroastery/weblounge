@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.impl.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.request.Http11Constants;
@@ -209,6 +210,13 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       if (!page.isPublished()) {
         logger.debug("Access to unpublished page {}", pageURI);
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        return true;
+      }
+
+      // Does the client already have up-to-date content?
+      if (action == null && !ResourceUtils.isModified(page, request)) {
+        logger.debug("Page {} was not modified", pageURI);
+        DispatchUtils.sendNotModified(request, response);
         return true;
       }
 
