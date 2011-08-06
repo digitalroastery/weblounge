@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.impl;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceReader;
+import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
@@ -30,6 +31,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceUtils;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
@@ -37,6 +39,7 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -227,26 +230,27 @@ public abstract class AbstractContentRepository implements ContentRepository {
       } else if (!uri.getType().equals(index.getType(uri))) {
         return null;
       }
+      if (uri.getIdentifier() == null && StringUtils.isNotBlank(uri.getPath())) {
+        uri.setIdentifier(index.getIdentifier(uri));
+      }
     } catch (IOException e) {
       logger.error("Error looking up type for {}: {}", uri, e.getMessage());
       throw new ContentRepositoryException(e);
     }
 
     // Load the resource
+    SearchQuery q = new SearchQueryImpl(site).withIdentifier(uri.getIdentifier());
+    ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) index.find(q).getItems()[0];
+
     InputStream is = null;
     try {
-      is = openStreamToResource(uri);
-      if (is == null) {
-        logger.debug("Resource {} not found, probably due to wrong resource type", uri);
-        return null;
-      }
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
       if (serializer == null) {
         logger.warn("No resource serializer for type '{}' found", uri.getType());
         throw new ContentRepositoryException("No resource serializer for type '" + uri.getType() + "' found");
       }
       ResourceReader<?, ?> reader = serializer.getReader();
-      return reader.read(is, site);
+      return reader.read(IOUtils.toInputStream(searchResultItem.getResourceXml(), "utf-8"), site);
     } catch (Throwable t) {
       logger.error("Error loading {}: {}", uri, t.getMessage());
       throw new ContentRepositoryException(t);
