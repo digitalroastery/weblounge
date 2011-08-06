@@ -195,7 +195,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     // Does the serializer come with a preview generator?
     PreviewGenerator previewGenerator = serializer.getPreviewGenerator();
     if (previewGenerator == null)
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      throw new WebApplicationException(Status.NOT_FOUND);
 
     // Load the resource contents from the repository
     InputStream resourceInputStream = null;
@@ -245,6 +245,11 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException();
     } catch (IOException e) {
       logger.error("Error scaling image '{}': {}", resourceURI, e.getMessage());
+      IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
+      throw new WebApplicationException();
+    } catch (IllegalArgumentException e) {
+      logger.error("Image '{}' is of unsupported format: {}", resourceURI, e.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
       FileUtils.deleteQuietly(scaledResourceFile);
       throw new WebApplicationException();
