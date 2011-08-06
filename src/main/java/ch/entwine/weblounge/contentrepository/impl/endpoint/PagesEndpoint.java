@@ -280,8 +280,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok(page.toXml());
-    response.tag(new EntityTag(Long.toString(ResourceUtils.getModificationDate(page).getTime())));
-    response.lastModified(page.getModificationDate());
+    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.lastModified(ResourceUtils.getModificationDate(page));
     return response.build();
   }
 
@@ -435,10 +435,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    if (page.getModificationDate() != null)
-      response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
-    else
-      response.tag(new EntityTag(Long.toString(page.getCreationDate().getTime())));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
     return response.build();
   }
 
@@ -545,7 +542,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.created(uri);
-    response.tag(new EntityTag(Long.toString(ResourceUtils.getModificationDate(page).getTime())));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
     return response.build();
   }
 
@@ -797,7 +794,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(Long.toString(ResourceUtils.getModificationDate(page).getTime())));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
     response.lastModified(page.getModificationDate());
     return response.build();
   }
@@ -886,8 +883,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(Long.toString(ResourceUtils.getModificationDate(page).getTime())));
-    response.lastModified(page.getModificationDate());
+    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.lastModified(ResourceUtils.getModificationDate(page));
     return response.build();
   }
 

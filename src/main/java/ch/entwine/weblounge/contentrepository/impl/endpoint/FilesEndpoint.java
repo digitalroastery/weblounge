@@ -567,7 +567,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok(resource.toXml());
-    response.tag(new EntityTag(ResourceUtils.getETagValue(resource, null)));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(resource)));
     response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }
@@ -670,7 +670,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(ResourceUtils.getETagValue(resource, null)));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(resource)));
     return response.build();
   }
 
@@ -780,7 +780,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.created(uri);
-    response.tag(new EntityTag(ResourceUtils.getETagValue(resource, null)));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(resource)));
     return response.build();
   }
 
@@ -1110,7 +1110,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       // Create the response
       ResponseBuilder response = Response.created(uri);
       response.type(MediaType.MEDIA_TYPE_WILDCARD);
-      response.tag(new EntityTag(ResourceUtils.getETagValue(resource, null)));
+      response.tag(new EntityTag(ResourceUtils.getETagValue(resource)));
       return response.build();
 
     } finally {
