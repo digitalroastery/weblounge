@@ -194,11 +194,31 @@ public interface SearchQuery {
   SearchQuery withText(String text);
 
   /**
+   * Return resources that contain the given text either in the page header or
+   * in one of the pagelets.
+   * 
+   * @param text
+   *          the text to look up
+   * @param wildcardSearch
+   *          <code>True</code> to perform a (much slower) wildcard search
+   * @return the query extended by this criterion
+   */
+  SearchQuery withText(String text, boolean wildcardSearch);
+
+  /**
    * Returns the search text or <code>null</code> if no text was specified.
    * 
    * @return the text
    */
   String getText();
+
+  /**
+   * Returns <code>true</code> if the current search operation should be
+   * performed using (slower) wildcard searching.
+   * 
+   * @return <code>true</code> if wildcard search should be used
+   */
+  boolean isWildcardSearch();
 
   /**
    * Returns resources that match the search query <i>and</i> and the text
