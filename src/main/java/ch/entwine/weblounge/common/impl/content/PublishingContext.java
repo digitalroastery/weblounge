@@ -358,7 +358,7 @@ public class PublishingContext implements Cloneable {
     }
 
     // End date
-    if (endDate != null && endDate.getTime() < Times.MAX_DATE) {
+    if (endDate != null) {
       b.append("<to>");
       b.append(WebloungeDateFormat.formatStatic(endDate));
       b.append("</to>");

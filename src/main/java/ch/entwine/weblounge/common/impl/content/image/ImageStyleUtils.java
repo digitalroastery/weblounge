@@ -288,13 +288,16 @@ public final class ImageStyleUtils {
    *          the image format
    * @param style
    *          the style
+   * @throws IllegalArgumentException
+   *           if the image is in an unsupported format
    * @throws IOException
    *           if reading from or writing to the stream fails
    * @throws OutOfMemoryError
    *           if the image is too large to be processed in memory
    */
   public static void style(InputStream is, OutputStream os, String format,
-      ImageStyle style) throws IOException, OutOfMemoryError {
+      ImageStyle style) throws IllegalArgumentException, IOException,
+      OutOfMemoryError {
 
     // Is an image style permitted?
     if (style == null)
@@ -387,6 +390,10 @@ public final class ImageStyleUtils {
       encodeParams.add("jpeg");
       JAI.create("encode", encodeParams);
 
+    } catch (Throwable t) {
+      if (t.getClass().getName().contains("ImageFormat")) {
+        throw new IllegalArgumentException(t.getMessage());
+      }
     } finally {
       IOUtils.closeQuietly(seekableInputStream);
       if (image != null)
