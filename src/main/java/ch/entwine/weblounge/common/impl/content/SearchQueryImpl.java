@@ -140,9 +140,12 @@ public class SearchQueryImpl implements SearchQuery {
   /** Query terms */
   protected String text = null;
 
+  /** True if the search text should be matched using wildcards */
+  protected boolean wildcardSearch = true;
+
   /** Filter terms */
   protected String filter = null;
-
+  
   /** The query offset */
   protected int offset = 0;
 
@@ -811,8 +814,18 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withText(java.lang.String)
    */
   public SearchQuery withText(String text) {
+    return withText(text, false);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withText(java.lang.String, boolean)
+   */
+  public SearchQuery withText(String text, boolean wildcardSearch) {
     clearExpectations();
     this.text = text;
+    this.wildcardSearch = wildcardSearch;
     return this;
   }
 
@@ -825,6 +838,15 @@ public class SearchQueryImpl implements SearchQuery {
     return text;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#isWildcardSearch()
+   */
+  public boolean isWildcardSearch() {
+    return wildcardSearch;
+  }
+  
   /**
    * {@inheritDoc}
    *
