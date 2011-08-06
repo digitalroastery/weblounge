@@ -239,7 +239,12 @@ public class SearchRequest {
 
     // Fulltext
     if (query.getText() != null) {
-      and(solrQuery, FULLTEXT, query.getText(), true, true);
+      // if (query.isWildcardSearch()) {
+      // and(solrQuery, FULLTEXT, "*" + clean(query.getText()) + "*", true,
+      // false);
+      // } else {
+        and(solrQuery, FULLTEXT, query.getText(), true, true);
+      // }
     }
 
     if (solrQuery.length() == 0)

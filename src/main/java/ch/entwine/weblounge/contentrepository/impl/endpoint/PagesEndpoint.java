@@ -144,7 +144,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Search terms
     if (StringUtils.isNotBlank(searchterms))
-      q.withText(searchterms);
+      q.withText(searchterms, true);
 
     // Filter query
     if (StringUtils.isNotBlank(filter))
