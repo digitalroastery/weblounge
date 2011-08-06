@@ -644,7 +644,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     String resourceType = resourceURI.getType();
     try {
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
-      ResourceReader<?, ?> resourceReader = (ResourceReader<?, ?>) serializer.getContentReader();
+      ResourceReader<?, ?> resourceReader = serializer.getReader();
       resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       // TODO: Replace this with current user
       User admin = site.getAdministrator();
