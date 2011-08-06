@@ -327,28 +327,44 @@ public final class ImageStyleUtils {
       scaleHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
       scaleHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
+      float scaledWidth = scale * image.getWidth();
+      float scaledHeight = scale * image.getHeight();
+      float cropX = 0.0f;
+      float cropY = 0.0f;
+
+      // If either one of scaledWidth or scaledHeight is < 1.0, then
+      // the scale needs to be adapted to scale to 1.0 exactly and accomplish
+      // the rest by cropping.
+
+      if (scaledWidth < 1.0f) {
+        scale = 1.0f / imageWidth;
+        scaledWidth = 1.0f;
+        cropY = imageHeight - scaledHeight;
+        scaledHeight = imageHeight * scale;
+      } else if (scaledHeight < 1.0f) {
+        scale = 1.0f / imageHeight;
+        scaledHeight = 1.0f;
+        cropX = imageWidth - scaledWidth;
+        scaledWidth = imageWidth * scale;
+      }
+
       if (scale > 1.0) {
         ParameterBlock scaleParams = new ParameterBlock();
         scaleParams.addSource(image);
         scaleParams.add(scale).add(scale).add(0.0f).add(0.0f);
         scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
-
         image = JAI.create("scale", scaleParams, scaleHints);
       } else if (scale < 1.0) {
         ParameterBlock subsampleAverageParams = new ParameterBlock();
         subsampleAverageParams.addSource(image);
         subsampleAverageParams.add(Double.valueOf(scale));
         subsampleAverageParams.add(Double.valueOf(scale));
-
         image = JAI.create("subsampleaverage", subsampleAverageParams, scaleHints);
       }
 
-      float scaledWidth = image.getWidth();
-      float scaledHeight = image.getHeight();
-
       // Cropping
-      float cropX = (float) Math.ceil(getCropX(scaledWidth, scaledHeight, style));
-      float cropY = (float) Math.ceil(getCropY(scaledWidth, scaledHeight, style));
+      cropX = Math.max(cropX, (float) Math.ceil(getCropX(scaledWidth, scaledHeight, style)));
+      cropY = Math.max(cropY, (float) Math.ceil(getCropY(scaledWidth, scaledHeight, style)));
 
       if (cropX > 0 || cropY > 0) {
 
