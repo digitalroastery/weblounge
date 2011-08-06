@@ -66,9 +66,18 @@ public final class ResourceUtils {
    */
   public static boolean isModified(Resource<?> resource,
       HttpServletRequest request) throws IllegalArgumentException {
-    long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-    Date resourceModificationDate = getModificationDate(resource);
-    return cachedModificationDate < resourceModificationDate.getTime();
+
+    if (request.getHeader("If-Modified-Since") != null) {
+      long cachedModificationDate = request.getDateHeader("If-Modified-Since");
+      Date resourceModificationDate = getModificationDate(resource);
+      return cachedModificationDate < resourceModificationDate.getTime();
+    } else if (request.getHeader("If-None-Match") != null) {
+      String eTagHeader = request.getHeader("If-None-Match");
+      String eTag = getETagValue(resource, null);
+      return !eTag.equals("\"" + eTagHeader + "\"");
+    }
+
+    return true;
   }
 
   /**
@@ -129,6 +138,19 @@ public final class ResourceUtils {
     if (StringUtils.isBlank(eTagHeader))
       return true;
     return !eTagHeader.equals("\"" + eTag + "\"");
+  }
+
+  /**
+   * Returns the value for the <code>ETag</code> header field, which is
+   * calculated from the resource identifier and the resource's modification
+   * date.
+   * 
+   * @param resource
+   *          the resource
+   * @return the <code>ETag</code> value
+   */
+  public static String getETagValue(Resource<?> resource) {
+    return getETagValue(resource, null);
   }
 
   /**
