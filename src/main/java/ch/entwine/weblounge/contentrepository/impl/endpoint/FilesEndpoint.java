@@ -1145,6 +1145,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     buf.append(">");
     for (SearchResultItem item : result.getItems()) {
       String xml = ((ResourceSearchResultItem) item).getResourceXml();
+
+      // TODO: Remove this hack once the importer is fixed
+      xml = xml.replace("292278994-08-17T07:12:55Z", "2010-08-17T07:12:55Z");
+
       buf.append(xml);
     }
     buf.append("</files>");
