@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="2.0" xmlns="http://www.entwinemedia.com/weblounge/3.0/image" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="2.0" xmlns="http://www.entwinemedia.com/weblounge/3.0/image" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs date">
   <xsl:output method="xml" omit-xml-declaration="no" indent="yes" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property filename" />
 
   <xsl:param name="fileid" />
@@ -45,14 +45,20 @@
               <xsl:with-param name="userid" select="$entry/modified/user" />
             </xsl:call-template>
           </created>
-          <filename><xsl:value-of select="$entry/filename" /></filename>
+          <filename>
+            <xsl:value-of select="$entry/filename" />
+          </filename>
           <xsl:if test="$entry/mimetype = 'image/pjpeg'">
             <mimetype>image/jpeg</mimetype>
           </xsl:if>
           <xsl:if test="$entry/mimetype != 'image/pjpeg'">
-            <mimetype><xsl:value-of select="$entry/mimetype" /></mimetype>
+            <mimetype>
+              <xsl:value-of select="$entry/mimetype" />
+            </mimetype>
           </xsl:if>
-          <size><xsl:value-of select="$entry/size" /></size>
+          <size>
+            <xsl:value-of select="$entry/size" />
+          </size>
           <width>
             <xsl:value-of select="$imgwidth" />
           </width>
@@ -76,21 +82,36 @@
         <xsl:if test="string-length(/collection/@id) > 0">
           <xsl:analyze-string select="/collection/@id" regex="^/portrait/spieler/(damen|herren)/[A-Za-z]/(\d+)/(club|nati)/$" flags="i">
             <xsl:matching-substring>
-              <subject>player:<xsl:value-of select="regex-group(2)" /></subject>
-              <subject>portrait:<xsl:value-of select="regex-group(3)" /></subject>
+              <subject>
+                player:
+                <xsl:value-of select="regex-group(2)" />
+              </subject>
+              <subject>
+                portrait:
+                <xsl:value-of select="regex-group(3)" />
+              </subject>
             </xsl:matching-substring>
           </xsl:analyze-string>
         </xsl:if>
         <xsl:if test="string-length($entry/@id) > 0">
           <xsl:analyze-string select="$entry/@id" regex="^/portrait/teams/(damen|herren)/[A-Za-z]/(\d+)/\d+\.\w+$" flags="i">
             <xsl:matching-substring>
-              <subject>clublogo:<xsl:value-of select="regex-group(2)" /></subject>
+              <subject>
+                clublogo:
+                <xsl:value-of select="regex-group(2)" />
+              </subject>
             </xsl:matching-substring>
           </xsl:analyze-string>
           <xsl:analyze-string select="$entry/@id" regex="^/portrait/teams/(damen|herren)/[A-Za-z]/(\d+)/\d+_(\d+)\.\w+$" flags="i">
             <xsl:matching-substring>
-              <subject>club:<xsl:value-of select="regex-group(2)" /></subject>
-              <subject>leaguecode:<xsl:value-of select="regex-group(3)" /></subject>
+              <subject>
+                club:
+                <xsl:value-of select="regex-group(2)" />
+              </subject>
+              <subject>
+                leaguecode:
+                <xsl:value-of select="regex-group(3)" />
+              </subject>
               <subject>portrait:team</subject>
             </xsl:matching-substring>
           </xsl:analyze-string>
@@ -136,11 +157,16 @@
             <xsl:with-param name="DateTime" select="$entry/publish/from" />
           </xsl:call-template>
         </from>
-        <to>
+        <xsl:variable name="publish-to">
           <xsl:call-template name="formatdate">
             <xsl:with-param name="DateTime" select="$entry/publish/to" />
           </xsl:call-template>
-        </to>
+        </xsl:variable>
+        <xsl:if test="xs:dateTime($publish-to) &lt; xs:dateTime(date:date-time())">
+          <to>
+            <xsl:value-of select="$publish-to" />
+          </to>
+        </xsl:if>
         <xsl:call-template name="user">
           <xsl:with-param name="userid" select="$entry/modified/user" />
         </xsl:call-template>
@@ -218,10 +244,11 @@
   </xsl:template>
 
   <xsl:template name="formatdate">
+    <!-- expected date format 2006/01/17 19:05:41 GMT -->
+    <!-- new date format 2006-01-17T19:05:41+01:00 -->
     <xsl:param name="DateTime" />
-    <xsl:if test="string-length($DateTime) != 0">
-      <!-- expected date format 2006/01/17 19:05:41 GMT -->
-      <!-- new date format 2006-01-17T19:05:41+01:00 -->
+    <xsl:variable name="now" select="date:date-time()" />
+    <xsl:if test="string-length($DateTime) &gt; 0">
       <xsl:variable name="year">
         <xsl:value-of select="substring-before($DateTime,'/')" />
       </xsl:variable>
@@ -255,25 +282,33 @@
         <xsl:value-of select="substring-after($time,' ')" />
       </xsl:variable>
 
-      <xsl:value-of select="$year" />
-      <xsl:value-of select="'-'" />
-      <xsl:value-of select="$month" />
-      <xsl:value-of select="'-'" />
-      <xsl:value-of select="$day" />
-      <xsl:value-of select="'T'" />
-      <xsl:value-of select="$hh" />
-      <xsl:value-of select="':'" />
-      <xsl:value-of select="$mm" />
-      <xsl:value-of select="':'" />
-      <xsl:value-of select="$ss" />
-      <xsl:choose>
-        <xsl:when test="$tz = 'GMT'">
-          <xsl:text>+01:00</xsl:text>
-        </xsl:when>
-      </xsl:choose>
+      <xsl:if test="string-length($year) &gt; 4">
+        <xsl:value-of select="$now" />
+      </xsl:if>
+      <xsl:if test="string-length($year) &lt; 5">
+        <xsl:value-of select="$year" />
+        <xsl:value-of select="'-'" />
+        <xsl:value-of select="$month" />
+        <xsl:value-of select="'-'" />
+        <xsl:value-of select="$day" />
+        <xsl:value-of select="'T'" />
+        <xsl:value-of select="$hh" />
+        <xsl:value-of select="':'" />
+        <xsl:value-of select="$mm" />
+        <xsl:value-of select="':'" />
+        <xsl:value-of select="$ss" />
+        <xsl:choose>
+          <xsl:when test="$tz = 'GMT'">
+            <xsl:text>+01:00</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>+00:00</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
     </xsl:if>
     <xsl:if test="string-length($DateTime) = 0">
-      <xsl:text>292278994-08-17T07:12:55+01:00</xsl:text>
+      <xsl:value-of select="$now" />
     </xsl:if>
   </xsl:template>
 
