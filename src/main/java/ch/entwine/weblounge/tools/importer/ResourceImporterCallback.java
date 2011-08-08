@@ -13,6 +13,8 @@ y * PageImporterCallback.java
 
 package ch.entwine.weblounge.tools.importer;
 
+import ch.entwine.weblounge.common.impl.util.xml.XMLDocument;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.sanselan.ImageInfo;
 import org.apache.sanselan.ImageReadException;
@@ -60,7 +62,12 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
 
     // path relative to the src directory
     String relpath = f.getPath().replaceAll(this.srcDir.getAbsolutePath(), "");
-
+    
+    // Check if collXml contains information for this file
+    XMLDocument repoXml = new XMLDocument(collXml);
+    if (repoXml.getNode("/collection/entry[@id='" + relpath + "']") == null)
+      return false;
+    
     UUID uuid = UUID.randomUUID();
     File resourceXml = null;
     ImageInfo imageInfo = null;
