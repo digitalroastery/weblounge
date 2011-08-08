@@ -169,7 +169,7 @@
 img.wbl-pageThumbnail {
 	height: 200px;
 	width: 300px;
-	box-shadow: 5px 5px 5px #ccc;
+	box-shadow: 2px 2px 2px #444;
 }
 
 .wbl-page.wbl-marked img {

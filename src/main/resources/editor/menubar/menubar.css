@@ -1,38 +1,40 @@
 .editor_menubar {
 	background-color: #242F37;
-    background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
-    border: 1px solid #333333;
-    color: #FFFFFF;
-    height: 44px;
-    line-height: 44px;
-    position: fixed;
+  background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37); 
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#4D585E), to(#242F37), color-stop(0.5, #242F37), color-stop(0.5, #242F37));
+  border: 1px solid #333333;
+  color: #FFFFFF;
+  height: 44px;
+  line-height: 44px;
+  position: fixed;
 	top: 0;
 	bottom: 0;
 	left: 0;
-    text-align: left;
-    width: 100%;
-    z-index: 99;
+  text-align: left;
+  width: 100%;
+  z-index: 99;
 }
 
 .editor_menubar a.wbl-tab {
-    border-left: 1px solid transparent;
-    border-right: 1px solid transparent;
-    color: #FFFFFF;
-    margin: 0 1px;
-    padding: 15px 15px;
-    font-size: 12px;
-    text-decoration: none;
+   border-left: 1px solid transparent;
+   border-right: 1px solid transparent;
+   color: #FFFFFF;
+   margin: 0 1px;
+   padding: 15px 15px;
+   font-size: 12px;
+   text-decoration: none;
 }
 
 .editor_menubar span.wbl-editmode {
-	display: inline-block;
-	position: relative;
+		display: inline-block;
+		position: relative;
 }
 
 .editor_menubar a.wbl-tab.wbl-active,
 .editor_menubar a.wbl-tab:hover {
     background-color: #2C2C2D;
     background-image: -moz-linear-gradient(left center , #323232 0%, #454444 50%, #323232 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#323232), to(#454444), color-stop(0.5, #454444), color-stop(0.5, #454444));
     border-left: 1px solid #464647;
     border-right: 1px solid #464647;
 }
