@@ -29,7 +29,7 @@ steal.plugins('jquery/controller',
 		},
 		
 		_initFilter: function() {
-			this.element.find("input#wbl-filter").keypress($.proxy(function(ev) {
+			this.element.find("input#wbl-filter").keydown($.proxy(function(ev) {
 				if(ev.key() == '\r') {
 					ev.preventDefault();
 					clearTimeout(this.timeout);

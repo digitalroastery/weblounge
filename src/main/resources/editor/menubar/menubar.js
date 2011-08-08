@@ -62,12 +62,14 @@ steal.plugins(
 	      		  this.toolbarMore = this.find('img.wbl-add').show();
 	      		  this.toolbarMore = this.find('img.wbl-more').show();
 	      		  this.toolbarEdit = this.find('span.wbl-editmode').show();
+	      		  this.toolbarEdit = this.find('span.wbl-language').show();
 	      		  this.pageOptions = this.find('div#wbl-pageOptions').show();
 	      		  break;
 	      	  case 1:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-pages'));
 	      		  this.toolbarMore = this.find('img.wbl-add').hide();
 	      		  this.toolbarMore = this.find('img.wbl-more').hide();
+	      		  this.toolbarEdit = this.find('span.wbl-language').hide();
 	      		  this.toolbarEdit = this.find('span.wbl-editmode').hide();
 	      		  this.pageOptions = this.find('div#wbl-pageOptions').hide();
 	      		  break;
@@ -75,6 +77,7 @@ steal.plugins(
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-media'));
 	      		  this.toolbarMore = this.find('img.wbl-add').hide();
 	      		  this.toolbarMore = this.find('img.wbl-more').hide();
+	      		  this.toolbarEdit = this.find('span.wbl-language').hide();
 	      		  this.toolbarEdit = this.find('span.wbl-editmode').hide();
 	      		  this.pageOptions = this.find('div#wbl-pageOptions').hide();
 	      		  break;
@@ -113,9 +116,8 @@ steal.plugins(
 						$(this).dialog('close');
 					},
 					Ja: $.proxy(function () {
-						//TODO Publish Site
-//						this.element.trigger('publishPage');
-						this.userDialog.dialog('close');
+//						this.options.page.publish();
+						this.publishDialog.dialog('close');
 					},this)
 				}
 			});

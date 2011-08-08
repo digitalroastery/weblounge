@@ -185,6 +185,15 @@ steal.then('jsonix')
 		},
 		
 		/**
+		 * Publish the specified page.
+		 */
+		publish: function(params, success, error) {
+			if ('id' in params) {
+				//TODO
+			}
+		},
+		
+		/**
 		 * Converts XML to JSON
 		 */
 		parseXML: function(xml) {
@@ -233,6 +242,13 @@ steal.then('jsonix')
 	    isLocked: function() {
 	    	if($.isEmptyObject(this.value.head.locked)) return false;
 	    	return true;
+	    },
+	    
+	    /**
+	     * Publish this page
+	     */
+	    publish: function() {
+//	    	Page.publish({id:this.value.id}, this);
 	    },
 	    
 	    /**
