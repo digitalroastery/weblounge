@@ -122,6 +122,10 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         	}
         },
         
+        "div#wbl-mainContainer updateLastMedia": function() {
+        	this.mediaTab.editor_resourcebrowser('_updateLast');
+        },
+        
         "span changeLanguage": function(el, ev, language) {
         	localStorage['weblounge.editor.' + this.runtime.getId() + '.language'] = language;
         	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);

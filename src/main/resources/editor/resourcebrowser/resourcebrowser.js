@@ -161,6 +161,10 @@ steal.plugins(
         	el.show();
         },
         
+        _updateLast: function() {
+        	this._loadResources(this.lastParams, this.lastQuery);
+        },
+        
         _loadResources: function(params, functions) {
 			switch(this.options.resourceType) {
 			case 'pages':

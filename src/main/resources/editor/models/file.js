@@ -214,7 +214,7 @@ steal.then('jsonix')
 			var metadata = new Object();
 			metadata.title = '';
 			metadata.description = '';
-			metadata.tags = [];
+			metadata.tags = '';
 			metadata.author = '';
 			
 			if($.isEmptyObject(this.value.head.metadata)) {
@@ -227,7 +227,7 @@ steal.then('jsonix')
 				metadata.description = this.value.head.metadata.description[language];
 			}
 			if(!$.isEmptyObject(this.value.head.metadata.subject)) {
-				metadata.description = this.value.head.metadata.subject;
+				metadata.tags = this.value.head.metadata.subject.toString();
 			}
 			if(!$.isEmptyObject(this.value.head.created)) {
 				metadata.author = this.value.head.created.user.name;
@@ -253,11 +253,9 @@ steal.then('jsonix')
 			this.value.head.metadata.description[language] = metadata.description;
 			
 			// Filter out empty values
-			if(!$.isEmptyObject(metadata.tags.split)) {
-				this.value.head.metadata.subject = metadata.tags.split(/\s*,\s*/).filter(function(value) { 
-					return value != ''; 
-				});
-			}
+			this.value.head.metadata.subject = metadata.tags.split(/\s*,\s*/).filter(function(value) { 
+				return value != ''; 
+			});
 			
 			this.value.head.created.user.name = metadata.author;
 			if(eTag == null) 

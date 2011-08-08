@@ -36,7 +36,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		
 		"img.wbl-editPage click": function(el, ev) {
 			ev.stopPropagation();
-			this._openSettings(el.parent().attr('id'));
+			this._openSettings(el.parent());
 		},
 		
 		'hoverenter': function(ev, hover) {

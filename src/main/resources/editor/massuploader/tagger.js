@@ -23,18 +23,55 @@ steal.plugins('jquery',
 		init: function(el) {
 			$(el).html('//editor/massuploader/views/tagger.tmpl', {map : this.options.map, language: this.options.language, runtime: this.options.runtime});
 			this.img = this.element.find('.wbl-taggerImage img:first').show();
+			
+			// Initialize Buttons
 			this.element.find('div.wbl-buttonLeft:first').hide();
-			
-			this.index = 1;
-			
-			this.metadata = new Array();
-			this.file = new Array();
-			this._loadMetadata();
-			
 			if(this.options.map.length < 2) {
 				this.element.find('div.wbl-buttonRight:first').hide();
 			}
 			
+			this.index = 1;
+			this.metadata = new Array();
+			this.file = new Array();
+			
+			this._initAutoComplete();
+			this._initDialog();
+			
+			this._loadMetadata($.proxy(function() {
+				this._showMetadata(0);
+			}, this));
+	    },
+	    
+	    _initDialog: function() {
+			this.element.dialog({
+				modal: true,
+				title: 'Metadaten eingeben: Datei 1 / ' + this.options.map.length,
+				autoOpen: true,
+				resizable: true,
+				buttons: this.options.buttons,
+				width: 900,
+				height: 800,
+				buttons: {
+					Abbrechen: function() {
+						$(this).dialog('close');
+					},
+					Fertig: $.proxy(function () {
+						$.each(this.metadata, $.proxy(function(key, value) {
+							this.file[key].saveMetadata(value, this.options.language);
+				    	},this));
+						
+						this.element.dialog('close');
+						if($.isFunction(this.options.success)) this.options.success();
+					},this)
+				},
+				close: $.proxy(function () {
+					this.element.dialog('destroy');
+					this.destroy();
+				},this)
+			});
+	    },
+	    
+	    _initAutoComplete: function() {
 			var availableTags = ["ActionScript","Scheme"];
 			var availableAuthors = ["Lukas","Markus", this.options.user];
 			
@@ -66,39 +103,14 @@ steal.plugins('jquery',
 					this._saveMetadata(this.img.index(), {author: ui.item.value});
 				},this)
 			});
-			
-			this.element.dialog({
-				modal: true,
-				title: 'Metadaten eingeben: Datei 1 / ' + this.options.map.length,
-				autoOpen: true,
-				resizable: true,
-				buttons: this.options.buttons,
-				width: 900,
-				height: 800,
-				buttons: {
-					Abbrechen: function() {
-						$(this).dialog('close');
-					},
-					Fertig: $.proxy(function () {
-						$.each(this.metadata, $.proxy(function(key, value) {
-							this.file[key].saveMetadata(value, this.options.language);
-				    	},this));
-						
-						this.element.dialog('close');
-					},this)
-				},
-				close: $.proxy(function () {
-					this.element.dialog('destroy');
-					this.destroy();
-				},this)
-			});
 	    },
 	    
-	    _loadMetadata: function() {
+	    _loadMetadata: function(success) {
 	    	$.each(this.options.map, $.proxy(function(key, value) {
 	    		Editor.File.findOne({id: value.resourceId}, $.proxy(function(file) {
 	    			this.file[key] = file;
 	    			this.metadata[key] = file.getMetadata(this.options.language);
+	    			success();
 	    		}, this));
 	    	}, this));
 	    },

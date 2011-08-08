@@ -20,7 +20,7 @@ steal.plugins('jquery/controller',
 		
 		"img.wbl-settings click": function(el, ev) {
 			ev.stopPropagation();
-			this._openSettings(el.parents('tr.wbl-pageEntry').attr('id'));
+			this._openSettings(el.parents('tr.wbl-pageEntry'));
 		}
 		
 	});
