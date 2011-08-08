@@ -12,6 +12,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		},
 		
 		"click": function(el, ev) {
+			if($(ev.target).is('.wbl-showPage, .wbl-trashPage, .wbl-editPage, .wbl-pagePath')) return;
 			el.toggleClass('wbl-marked');
 		},
 		
@@ -31,7 +32,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		
 		"img.wbl-trashPage click": function(el, ev) {
 			ev.stopPropagation();
-			el.trigger('deletePage');
+			el.trigger('deleteResource', el.parent());
 		},
 		
 		"img.wbl-editPage click": function(el, ev) {

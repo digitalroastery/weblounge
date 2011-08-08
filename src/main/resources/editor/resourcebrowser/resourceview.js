@@ -13,7 +13,7 @@ steal.plugins('jquery/controller',
 		defaults: {
 			resources: {},
 			resourceType: 'pages',
-			selectedPages: {}
+			selectedResources: {}
 		}
 	},
 	{	
@@ -58,7 +58,7 @@ steal.plugins('jquery/controller',
 						$(this).dialog('close');
 					},
 					OK: $.proxy(function () {
-						this.element.trigger('deleteResources', [this.options.selectedPages]);
+						this.element.trigger('deleteResources', [this.options.selectedResources]);
 						this._showMessage('Seite(n) gelöscht!');
 						this.deleteDialog.dialog('close');
 					},this)
@@ -77,7 +77,7 @@ steal.plugins('jquery/controller',
 						$(this).dialog('close');
 					},
 					OK: $.proxy(function () {
-						this.element.trigger('duplicateResources', [this.options.selectedPages]);
+						this.element.trigger('duplicateResources', [this.options.selectedResources]);
 						this._showMessage('Seite dupliziert!');
 						this.duplicateDialog.dialog('close');
 					},this)
@@ -91,6 +91,11 @@ steal.plugins('jquery/controller',
 				$(this).dequeue();
 			});
 			$('.wbl-message').text(messageText);
+		},
+		
+		"img deleteResource": function(el, ev, resource) {
+			this.options.selectedResources = resource;
+			this.deleteDialog.dialog('open');
 		}
 		
 	});

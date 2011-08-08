@@ -67,10 +67,10 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		"button.wbl-duplicate click": function(el, ev) {
-			this.options.selectedPages = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
-			if(this.options.selectedPages.length == 1) {
+			this.options.selectedResources = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
+			if(this.options.selectedResources.length == 1) {
 				this.duplicateDialog.dialog('open');
-			} else if(this.options.selectedPages.length > 1) {
+			} else if(this.options.selectedResources.length > 1) {
 				this._showMessage('Es kann nur eine Seite markiert werden.')
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');
@@ -78,8 +78,8 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		"button.wbl-delete click": function(el, ev) {
-			this.options.selectedPages = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
-			if(this.options.selectedPages.length) {
+			this.options.selectedResources = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
+			if(this.options.selectedResources.length) {
 				this.deleteDialog.dialog('open');
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');
@@ -87,9 +87,9 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		"button.wbl-favorize click": function(el, ev) {
-			this.options.selectedPages = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
-			if(this.options.selectedPages.length) {
-				this.element.trigger('favorizeResources', [this.options.selectedPages]);
+			this.options.selectedResources = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
+			if(this.options.selectedResources.length) {
+				this.element.trigger('favorizeResources', [this.options.selectedResources]);
 				this._showMessage('Zu Favoriten hinzugefügt');
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');

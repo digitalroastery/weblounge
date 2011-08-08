@@ -7,7 +7,6 @@ steal.plugins('jquery/controller',
   Editor.Resourceviewitem.extend('Editor.Resourcelistviewitem',
 	{
 		init: function(el) {
-			// TODO
 			this.element.find('td.wbl-action').hover(
 				function () {
 					$(this).find('img').show();
@@ -21,7 +20,12 @@ steal.plugins('jquery/controller',
 		"img.wbl-settings click": function(el, ev) {
 			ev.stopPropagation();
 			this._openSettings(el.parents('tr.wbl-pageEntry'));
-		}
+		},
+		
+		"img.wbl-itemDelete click": function(el, ev) {
+			ev.stopPropagation();
+			el.trigger('deleteResource', el.parent().parent());
+		},
 		
 	});
 

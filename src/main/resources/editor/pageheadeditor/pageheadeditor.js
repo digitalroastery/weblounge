@@ -58,7 +58,7 @@ steal.plugins('jquery',
 			this.element.dialog({
 				modal: true,
 				title: 'Seite bearbeiten',
-				autoOpen: false,
+				autoOpen: true,
 				resizable: true,
 				draggable: true,
 				width: 1024,

@@ -67,16 +67,11 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 			}, this));
 		},
 		
-		"img.wbl-trashPage deletePage": function(el, ev) {
-			this.options.selectedPages = el.parent();
-			this.deleteDialog.dialog('open');
-		},
-		
 		"button.wbl-duplicate click": function(el, ev) {
-			this.options.selectedPages = this.find('div.wbl-scrollViewItem.wbl-marked');
-			if(this.options.selectedPages.length == 1) {
+			this.options.selectedResources = this.find('div.wbl-scrollViewItem.wbl-marked');
+			if(this.options.selectedResources.length == 1) {
 				this.duplicateDialog.dialog('open');
-			} else if(this.options.selectedPages.length > 1) {
+			} else if(this.options.selectedResources.length > 1) {
 				this._showMessage('Es kann nur eine Seite markiert werden.')
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');
@@ -84,8 +79,8 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		},
 		
 		"button.wbl-delete click": function(el, ev) {
-			this.options.selectedPages = this.find('div.wbl-scrollViewItem.wbl-marked');
-			if(this.options.selectedPages.length) {
+			this.options.selectedResources = this.find('div.wbl-scrollViewItem.wbl-marked');
+			if(this.options.selectedResources.length) {
 				this.deleteDialog.dialog('open');
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');
@@ -93,9 +88,9 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		},
 		
 		"button.wbl-favorize click": function(el, ev) {
-			this.options.selectedPages = $('div.wbl-scrollViewItem.wbl-marked');
-			if(this.options.selectedPages.length) {
-				this.options.selectedPages.trigger('favorizeResources', [this.options.selectedPages]);
+			this.options.selectedResources = $('div.wbl-scrollViewItem.wbl-marked');
+			if(this.options.selectedResources.length) {
+				this.options.selectedResources.trigger('favorizeResources', [this.options.selectedResources]);
 				this._showMessage('Zu Favoriten hinzugefügt');
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');

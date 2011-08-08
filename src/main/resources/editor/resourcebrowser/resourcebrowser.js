@@ -223,7 +223,7 @@ steal.plugins(
         "div#wbl-mainContainer deleteResources": function(el, ev, resources) {
         	switch(this.options.resourceType) {
         	case 'pages':
-        		resources.each($.proxy(function(index, element) {
+        		$(resources).each($.proxy(function(index, element) {
         			var page = this._getPage(element.id);
         			if(page == null) return;
         			var locked = page.isLocked();
@@ -237,7 +237,7 @@ steal.plugins(
         		}, this))
         		break;
         	case 'media':
-        		resources.each($.proxy(function(index, element) {
+        		$(resources).each($.proxy(function(index, element) {
         			Editor.File.destroy({id: element.id}, this.callback('_removeResource', element.id));
         		}, this))
         		break;
