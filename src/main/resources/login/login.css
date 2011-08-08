@@ -1,10 +1,42 @@
-body {font-family: verdana;
-  font-size: 1.4em;
+body {
+	background: url('resources/bg_pattern.png') repeat;
+	font-family: Arial, Helvetica, sans-serif;
+	color:#242F37;
 }
-h1 {
-	padding: 10px;
+
+input {
+	background-color: #EEE;
+	padding: 5px;
+	border: 1px solid #CCC;
 }
-p {
-	padding: 10px;
-	margin: 10px;
+
+table.loginTable {
+	font-family: Arial, Helvetica, sans-serif;
+	background-color: #fefefe;
+	border: 1px solid #CCC;
+	color: #333;
+	box-shadow:0px 0px 8px #cccccc;
+	-moz-box-shadow:0px 0px 8px #cccccc;
+	-webkit-box-shadow:0px 0px 8px #cccccc;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	padding:10px;
+	width: 360px;
+	margin: auto auto;
+}
+
+td.error {
+	display: none;
+	color: red;
+}
+
+td.left {
+	width: 80px;
+}
+
+.loginTitle {
+	text-align: center;
+	padding: 20px;
+	font-size: 24px;
 }
