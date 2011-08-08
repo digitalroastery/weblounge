@@ -35,6 +35,8 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         start: $.proxy(function(event, ui) {
         	this.element.find('img.wbl-iconEditing').remove();
         	this.element.find('img.wbl-iconRemove').remove();
+        	this._disablePagelets();
+        	if(ui.item.hasClass('wbl-draggable')) return;
         	
         	// add pageletData to draggable helper
         	var index = ui.item.attr('index');
@@ -42,7 +44,6 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         	var pagelet = this.options.page.getPagelet(this.id, index);
         	var copyPagelet = jQuery.extend(true, {}, pagelet);
         	ui.helper.data('pagelet', copyPagelet);
-        	this._disablePagelets();
         }, this),
         stop: $.proxy(function(event, ui) {
         	this._enablePagelets();

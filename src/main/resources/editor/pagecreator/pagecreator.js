@@ -70,7 +70,7 @@ steal.plugins('jquery',
 			});
 			
 			// ThumbnailView
-			var divScroll = this.element.find('#wbl-makeMeScrollablePageCreator').smoothDivScroll({
+			this.divScroll = this.element.find('#wbl-makeMeScrollablePageCreator').smoothDivScroll({
 			  	autoScroll: "onstart",
 				autoScrollDirection: "left",
 				autoScrollStep: 1,
@@ -140,7 +140,7 @@ steal.plugins('jquery',
 					}, this),
 					Weiter: $.proxy(function() {
 						if(this.step.is(step1)) {
-							this.element.find('input[name=url]').val(this.parent);
+							this.element.find('input[name=url]').before(this.parent);
 							this.nextButton.text('Fertig');
 							this._showStep(step2);
 							return;
@@ -154,26 +154,30 @@ steal.plugins('jquery',
 						});
 						
 						// Create page and update pageData
-						Page.create({path: pageData.url}, $.proxy(function(page) {
+						Page.create({path: this.parent + pageData.url}, $.proxy(function(page) {
 							page.saveCreationData(pageData, this.options.language, function() {
 								location.href = page.getPath() + "?edit";
 							});
 						}, this));
 						
-						this.element.dialog('destroy');
 						this.destroy();
 					}, this)
 				},
 				close: $.proxy(function () {
-					divScroll.smoothDivScroll('destroy');
-					this.element.dialog('destroy');
 					this.destroy();
 				},this)
 			});
 			
+			this.divScroll.smoothDivScroll('recalculateScrollableArea');
 			this.step = step1;
 			this.nextButton = this.element.parent().find(".ui-dialog-buttonpane span.ui-button-text:contains('Weiter')");
 			this.element.find("form#wbl-validate").validate();
+		},
+		
+		destroy: function() {
+			this.divScroll.smoothDivScroll('destroy');
+			this.element.dialog('destroy');
+			this._super();
 		},
 		
 	    update: function(options) {
@@ -220,7 +224,7 @@ steal.plugins('jquery',
 		},
 		
 		"input[name=title] change": function(el, ev) {
-			this.element.find('input[name=url]').val(this.parent + encodeURI(el.val()));
+			this.element.find('input[name=url]').val(encodeURI(el.val()));
 		}
 	    
 	})

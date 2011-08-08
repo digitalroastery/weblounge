@@ -242,7 +242,8 @@ steal.plugins(
 		// trigger menus
 		"img.wbl-add click": function(el, ev) {
 			$('.wbl-menu').hide();
-			$('div#wbl-addMenu').show().hover(function() { }, function() {$(this).hide();});
+//			$('div#wbl-addMenu').show().hover(function() { }, function() {$(this).hide();});
+			$('#wbl-pageletcreator').editor_pageletcreator();
 		},
 		
 		"span.wbl-language click": function(el, ev) {
