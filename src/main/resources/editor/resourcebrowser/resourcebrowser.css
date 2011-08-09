@@ -5,7 +5,7 @@
 	left: 0px;
 	width: 100%;
 	height: 100%;
-	z-index: 2;
+	z-index: 100;
 }
 
 .editor_resourcebrowser nav.weblounge {
@@ -318,8 +318,8 @@ img.wbl-pageThumbnail {
 	cursor: pointer;
 	display: inline-block;
 	position:absolute;
-  	top: 30;
-  	left: 106;
+  	top: 30px;
+  	left: 106px;
 	height: 24px;
 	width: 24px;
 	z-index: 1000;
@@ -331,8 +331,8 @@ img.wbl-pageThumbnail {
 	cursor: pointer;
 	display: inline-block;
 	position:absolute;
-  	top: 30;
-  	left: 80;
+  	top: 30px;
+  	left: 80px;
 	height: 24px;
 	width: 24px;
 	z-index: 1000;
@@ -344,8 +344,8 @@ img.wbl-pageThumbnail {
 	cursor: pointer;
 	display: inline-block;
 	position:absolute;
-  	top: 30;
-  	left: 132;
+  	top: 30px;
+  	left: 132px;
 	height: 24px;
 	width: 24px;
 	z-index: 1000;

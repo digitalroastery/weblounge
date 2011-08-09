@@ -1,18 +1,18 @@
 .editor_menubar {
 	background-color: #242F37;
-  background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37); 
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#4D585E), to(#242F37), color-stop(0.5, #242F37), color-stop(0.5, #242F37));
-  border: 1px solid #333333;
-  color: #FFFFFF;
-  height: 44px;
-  line-height: 44px;
-  position: fixed;
+	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37); 
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#4D585E), to(#242F37), color-stop(0.5, #242F37), color-stop(0.5, #242F37));
+	border: 1px solid #333333;
+	color: #FFFFFF;
+	height: 44px;
+	line-height: 44px;
+	position: fixed;
 	top: 0;
 	bottom: 0;
 	left: 0;
-  text-align: left;
-  width: 100%;
-  z-index: 99;
+	text-align: left;
+	width: 100%;
+	z-index: 400;
 }
 
 .editor_menubar a.wbl-tab {
@@ -26,8 +26,8 @@
 }
 
 .editor_menubar span.wbl-editmode {
-		display: inline-block;
-		position: relative;
+	display: inline-block;
+	position: relative;
 }
 
 .editor_menubar a.wbl-tab.wbl-active,
@@ -112,7 +112,7 @@ div.wbl-overlayIcons span.wbl-more {
     line-height: 20px;
     padding: 20px 0;
     width: 200px;
-    z-index: 2;
+    z-index: 400;
 }
 
 .editor_menubar .wbl-menu ul {
@@ -191,7 +191,7 @@ div.wbl-overlayIcons span.wbl-more {
 	position: absolute;
 	right: 150px;
 	color: #fff;
-	z-index: 2;
+	z-index: 400;
 }
 
 .editor_menubar div#wbl-searchResult span {

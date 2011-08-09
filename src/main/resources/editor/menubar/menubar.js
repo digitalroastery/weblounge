@@ -59,27 +59,32 @@ steal.plugins(
         	switch (this.options.mode) {
 	      	  case 0:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-designer'));
-	      		  this.toolbarMore = this.find('img.wbl-add').show();
-	      		  this.toolbarMore = this.find('img.wbl-more').show();
-	      		  this.toolbarEdit = this.find('span.wbl-editmode').show();
-	      		  this.toolbarEdit = this.find('span.wbl-language').show();
-	      		  this.pageOptions = this.find('div#wbl-pageOptions').show();
+	      		  this.find('img.wbl-add').show();
+	      		  this.find('img.wbl-more').show();
+	      		  this.find('span.wbl-editmode').show();
+	      		  this.find('span.wbl-language').show();
+	      		  this.find('div#wbl-pageOptions').show();
+	      		  $(document.body).css('overflow', 'visible');
 	      		  break;
 	      	  case 1:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-pages'));
-	      		  this.toolbarMore = this.find('img.wbl-add').hide();
-	      		  this.toolbarMore = this.find('img.wbl-more').hide();
-	      		  this.toolbarEdit = this.find('span.wbl-language').hide();
-	      		  this.toolbarEdit = this.find('span.wbl-editmode').hide();
-	      		  this.pageOptions = this.find('div#wbl-pageOptions').hide();
+	      		  this.find('img.wbl-add').hide();
+	      		  this.find('img.wbl-more').hide();
+	      		  this.find('span.wbl-language').hide();
+	      		  this.find('span.wbl-editmode').hide();
+	      		  this.find('div#wbl-pageOptions').hide();
+	      		  window.scrollTo(0, 0);
+	      		  $(document.body).css('overflow', 'hidden');
 	      		  break;
 	      	  case 2:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-media'));
-	      		  this.toolbarMore = this.find('img.wbl-add').hide();
-	      		  this.toolbarMore = this.find('img.wbl-more').hide();
-	      		  this.toolbarEdit = this.find('span.wbl-language').hide();
-	      		  this.toolbarEdit = this.find('span.wbl-editmode').hide();
-	      		  this.pageOptions = this.find('div#wbl-pageOptions').hide();
+	      		  this.find('img.wbl-add').hide();
+	      		  this.find('img.wbl-more').hide();
+	      		  this.find('span.wbl-language').hide();
+	      		  this.find('span.wbl-editmode').hide();
+	      		  this.find('div#wbl-pageOptions').hide();
+	      		  window.scrollTo(0, 0);
+	      		  $(document.body).css('overflow', 'hidden');
 	      		  break;
         	}
         },
