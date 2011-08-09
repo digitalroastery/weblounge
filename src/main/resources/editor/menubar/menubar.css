@@ -79,7 +79,6 @@
 
 .editor_menubar img,
 .editor_menubar .wbl-language,
-.editor_menubar .wbl-profileMenu,
 div.wbl-overlayIcons span.wbl-more {
 	cursor: pointer;
 }
@@ -94,6 +93,12 @@ div.wbl-overlayIcons span.wbl-more {
 	position: relative;
 	top: 8px;
 	padding: 0 30px;
+}
+
+.editor_menubar img.wbl-logout {
+    position: absolute;
+    right: 5px;
+    top: 5px;
 }
 
 .editor_menubar img.wbl-more {
@@ -157,6 +162,10 @@ div.wbl-overlayIcons span.wbl-more {
 
 .editor_menubar .wbl-trashcanActive {
 	visibility: visible !important;
+}
+
+.editor_menubar .wbl-profileMenu {
+	margin-right: 40px;
 }
 
 .editor_menubar #wbl-profileMenu {

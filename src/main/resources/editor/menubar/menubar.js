@@ -230,8 +230,9 @@ steal.plugins(
 			steal.dev.log('news')
 		},
 		
-		"li.wbl-logout click": function(el, ev) {
+		"img.wbl-logout click": function(el, ev) {
 			this._delete_cookie("weblounge.editor");
+			// TODO Change to Spring logout url
 			location.href = location.pathname;
 		},
 		
