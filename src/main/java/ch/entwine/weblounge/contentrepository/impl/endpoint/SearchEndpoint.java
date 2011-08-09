@@ -30,7 +30,6 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.util.doc.Endpoint;
 import ch.entwine.weblounge.common.impl.util.doc.Endpoint.Method;
 import ch.entwine.weblounge.common.impl.util.doc.EndpointDocumentation;
@@ -39,6 +38,7 @@ import ch.entwine.weblounge.common.impl.util.doc.Format;
 import ch.entwine.weblounge.common.impl.util.doc.Parameter;
 import ch.entwine.weblounge.common.impl.util.doc.TestForm;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.SiteManager;
 
 import org.apache.commons.lang.StringUtils;

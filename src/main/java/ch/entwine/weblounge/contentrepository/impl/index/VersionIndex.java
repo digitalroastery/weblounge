@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index;
 
-import ch.entwine.weblounge.common.impl.content.ResourceUtils;
+import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 
