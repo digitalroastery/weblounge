@@ -13,8 +13,8 @@
 
 package ch.entwine.weblounge.tools.importer;
 
-import ch.entwine.weblounge.common.impl.url.PathUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.url.PathUtils;
 
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;

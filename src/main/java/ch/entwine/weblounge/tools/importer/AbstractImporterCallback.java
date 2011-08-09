@@ -13,7 +13,7 @@
 
 package ch.entwine.weblounge.tools.importer;
 
-import ch.entwine.weblounge.common.impl.url.PathUtils;
+import ch.entwine.weblounge.common.url.PathUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Node;
