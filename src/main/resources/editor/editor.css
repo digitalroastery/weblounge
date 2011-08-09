@@ -19,3 +19,28 @@ div.DataTables_sort_wrapper span {
 body {
   margin-top: 45px;
 }
+
+/* general dialog declarations */
+#wbl-pageleteditor input[type=text],
+#wbl-pageleteditor textarea {
+    width: 100%;
+    border: 1px solid #999;
+    padding: 2px;
+}
+
+#wbl-pageleteditor input[type=checkbox] {
+    margin-right: 10px
+}
+
+#wbl-pageleteditor label {
+	display: block;
+}
+
+#wbl-pageleteditor form ul {
+	list-style: none;
+	margin-left: 0;
+}
+
+#wbl-pageleteditor form ul li {
+	margin-left: 0;
+}
