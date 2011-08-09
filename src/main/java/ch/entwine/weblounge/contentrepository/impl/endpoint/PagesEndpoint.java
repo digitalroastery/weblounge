@@ -889,6 +889,231 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   }
 
   /**
+   * Publishes the page for the given date range and returns with a
+   * <code>200</code> status code if the publish operation succeeds,
+   * <code>400</code> if the page is not found or <code>403</code> if the page
+   * is currently locked by a different user.
+   * <p>
+   * If <code>startdate</code> is not specified, then the page will be published
+   * immediately. A missing <code>enddate</code> indicates to publish the page
+   * forever.
+   * 
+   * @param request
+   *          the request
+   * @param pageId
+   *          the page identifier
+   * @param startDateText
+   *          the optional publishing start date
+   * @param endDateText
+   *          the optional publishing end date
+   * @return the page
+   */
+  @PUT
+  @Path("/{page}/publish")
+  public Response publishPage(@Context HttpServletRequest request,
+      @PathParam("page") String pageId,
+      @FormParam("startdate") String startDateText,
+      @FormParam("enddate") String endDateText,
+      @HeaderParam("If-Match") String ifMatchHeader) {
+
+    // Check the parameters
+    if (pageId == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    // Extract the site
+    Site site = getSite(request);
+
+    // Make sure the content repository is writable
+    if (site.getContentRepository().isReadOnly()) {
+      logger.warn("Attempt to lock a page in a read-only content repository {}", site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+
+    // Does the page exist?
+    Page page = null;
+    try {
+      if (!contentRepository.exists(pageURI)) {
+        throw new WebApplicationException(Status.NOT_FOUND);
+      }
+      page = (Page) contentRepository.get(pageURI);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Check the value of the If-Match header against the etag
+    if (ifMatchHeader != null) {
+      String etag = Long.toString(ResourceUtils.getModificationDate(page).getTime());
+      if (!etag.equals(ifMatchHeader)) {
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      }
+    }
+
+    // Get the user
+    // TODO: Change to current user
+    User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
+    boolean isAdmin = true;
+
+    // If the page is locked by a different user, refuse
+    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
+      return Response.status(Status.FORBIDDEN).build();
+    }
+
+    // Fix the dates
+    Date startDate = null;
+    Date endDate = null;
+
+    try {
+      if (StringUtils.isNotBlank(startDateText))
+        startDate = new Date(startDateText);
+      else
+        startDate = new Date();
+      if (StringUtils.isNotBlank(endDateText)) {
+        endDate = new Date(endDateText);
+      }
+    } catch (IllegalArgumentException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    }
+
+    // Finally, perform the publish operation
+    try {
+      page.setPublished(currentUser, startDate, endDate);
+      contentRepository.put(page);
+    } catch (SecurityException e) {
+      logger.warn("Tried to publish page {} of site '{}' without permission", pageURI, site);
+      throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (IOException e) {
+      logger.warn("Error writing published page {} to repository", pageURI);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Error publishing page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error publishing page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Create the response
+    ResponseBuilder response = Response.ok();
+    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.lastModified(page.getModificationDate());
+    return response.build();
+  }
+
+  /**
+   * Unpublishes the page on the given date and returns with a <code>200</code>
+   * status code if the unlock operation succeeds, <code>400</code> if the page
+   * is not found or <code>403</code> if the page is locked by a different user.
+   * 
+   * @param request
+   *          the request
+   * @param pageId
+   *          the page identifier
+   * @param enddate
+   *          the optional publishing end date
+   * @return the page
+   */
+  @DELETE
+  @Path("/{page}/publish")
+  public Response unpublishPage(@Context HttpServletRequest request,
+      @PathParam("page") String pageId,
+      @FormParam("enddate") String endDateString,
+      @HeaderParam("If-Match") String ifMatchHeader) {
+
+    // Check the parameters
+    if (pageId == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    // Extract the site
+    Site site = getSite(request);
+
+    // Make sure the content repository is writable
+    if (site.getContentRepository().isReadOnly()) {
+      logger.warn("Attempt to unlock a page in a read-only content repository {}", site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+
+    // Does the page exist?
+    Page page = null;
+    try {
+      if (!contentRepository.exists(pageURI)) {
+        throw new WebApplicationException(Status.NOT_FOUND);
+      }
+      page = (Page) contentRepository.get(pageURI);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Check the value of the If-Match header against the etag
+    if (ifMatchHeader != null) {
+      String etag = Long.toString(ResourceUtils.getModificationDate(page).getTime());
+      if (!etag.equals(ifMatchHeader)) {
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      }
+    }
+
+    // Get the user
+    // TODO: Change to current user
+    User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
+    boolean isAdmin = true;
+
+    // If the page is locked by a different user, refuse
+    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
+      return Response.status(Status.FORBIDDEN).build();
+    }
+
+    // Fix the dates
+    Date startDate = page.getPublishFrom();
+    Date endDate = null;
+
+    try {
+      if (StringUtils.isNotBlank(endDateString))
+        endDate = new Date(endDateString);
+      else
+        endDate = new Date();
+    } catch (IllegalArgumentException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    }
+
+    if (page.getPublishFrom() == null) {
+      startDate = null;
+      endDate = null;
+      currentUser = null;
+    }
+
+    // Finally, perform the unpublish operation
+    try {
+      page.setPublished(currentUser, startDate, endDate);
+      contentRepository.put(page);
+    } catch (SecurityException e) {
+      logger.warn("Tried to unpublish page {} of site '{}' without permission", pageURI, site);
+      throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (IOException e) {
+      logger.warn("Error removing writing unpublished page {} to repository", pageURI);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Error unpublishing page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error unpublishing page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Create the response
+    ResponseBuilder response = Response.ok();
+    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.lastModified(ResourceUtils.getModificationDate(page));
+    return response.build();
+  }
+
+  /**
    * Returns the endpoint documentation.
    * 
    * @return the endpoint documentation

@@ -215,6 +215,37 @@ public final class PagesEndpointDocs {
     unlockPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, unlockPageEndpoint);
 
+    // PUT /{page}/publish
+    Endpoint publishPageEndpoint = new Endpoint("/{page}/publish", Method.PUT, "publishpage");
+    publishPageEndpoint.setDescription("Publishes the specified page.");
+    publishPageEndpoint.addFormat(Format.xml());
+    publishPageEndpoint.addStatus(ok("the page was published"));
+    publishPageEndpoint.addStatus(badRequest("the page was not specified"));
+    publishPageEndpoint.addStatus(notFound("the page was not found"));
+    publishPageEndpoint.addStatus(forbidden("the page is locked by a different user"));
+    publishPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
+    publishPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    publishPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    publishPageEndpoint.addOptionalParameter(new Parameter("startdate", Parameter.Type.String, "The start of the publishing period"));
+    publishPageEndpoint.addOptionalParameter(new Parameter("enddate", Parameter.Type.String, "The end of the publishing period"));
+    publishPageEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, publishPageEndpoint);
+
+    // DELETE /{page}/publish
+    Endpoint unpublishPageEndpoint = new Endpoint("/{page}/publish", Method.DELETE, "unpublishpage");
+    unpublishPageEndpoint.setDescription("Unpublishs the specified page.");
+    unpublishPageEndpoint.addFormat(Format.xml());
+    unpublishPageEndpoint.addStatus(ok("the page was unpublished"));
+    unpublishPageEndpoint.addStatus(badRequest("the page was not specified"));
+    unpublishPageEndpoint.addStatus(notFound("the page was not found"));
+    unpublishPageEndpoint.addStatus(forbidden("the page is locked by a different user"));
+    unpublishPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
+    unpublishPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    unpublishPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    unpublishPageEndpoint.addOptionalParameter(new Parameter("enddate", Parameter.Type.String, "The end of the publishing period"));
+    unpublishPageEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, unpublishPageEndpoint);
+
     return EndpointDocumentationGenerator.generate(docs);
   }
 
