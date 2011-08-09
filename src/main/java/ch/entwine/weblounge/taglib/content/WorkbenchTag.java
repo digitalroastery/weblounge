@@ -24,6 +24,7 @@ import ch.entwine.weblounge.taglib.WebloungeTag;
 
 import java.io.IOException;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.jsp.JspException;
 
 /**
@@ -36,6 +37,7 @@ public class WorkbenchTag extends WebloungeTag {
 
   /** Name of the request parameter that will trigger editing support */
   public static final String WORKBENCH_PARAM = "edit";
+  public static final String WORKBENCH_COOKIE_NAME = "weblounge.editor";
   
   /** Path to the workbench script */
   public static final String WORKBENCH_SCRIPT = "<script src=\"/weblounge/steal/steal.js?editor,development\"></script>";
@@ -46,14 +48,28 @@ public class WorkbenchTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    if (request.getParameter(WORKBENCH_PARAM) == null)
+    if (request.getParameter(WORKBENCH_PARAM) != null) {
+      response.addCookie(new Cookie(WORKBENCH_COOKIE_NAME, "true"));
+      writeWorkbenchScript();
       return super.doEndTag();
+    }
+    
+    for(Cookie cookie : request.getCookies()) {
+      if(cookie.getName().equals(WORKBENCH_COOKIE_NAME) && cookie.getValue().endsWith("true")) {
+         writeWorkbenchScript();
+         break;
+      }
+    }
+    
+    return super.doEndTag();
+  }
+
+  private void writeWorkbenchScript() throws JspException {
     try {
       pageContext.getOut().write(WORKBENCH_SCRIPT);
     } catch (IOException e) {
       throw new JspException(e);
     }
-    return super.doEndTag();
   }
 
 }
