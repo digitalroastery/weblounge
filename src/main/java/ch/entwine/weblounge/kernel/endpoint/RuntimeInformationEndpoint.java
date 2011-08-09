@@ -21,10 +21,10 @@
 package ch.entwine.weblounge.kernel.endpoint;
 
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.SiteManager;
 import ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider;
 

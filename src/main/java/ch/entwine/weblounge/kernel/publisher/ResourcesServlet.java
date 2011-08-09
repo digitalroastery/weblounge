@@ -22,7 +22,7 @@ package ch.entwine.weblounge.kernel.publisher;
 
 import ch.entwine.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.entwine.weblounge.common.impl.request.Http11ResponseType;
-import ch.entwine.weblounge.common.impl.url.PathUtils;
+import ch.entwine.weblounge.common.url.PathUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;

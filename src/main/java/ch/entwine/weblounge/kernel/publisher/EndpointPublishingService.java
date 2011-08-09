@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.kernel.publisher;
 
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
