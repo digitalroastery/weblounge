@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.taglib.content;
 
-import ch.entwine.weblounge.common.impl.content.ResourceUtils;
+import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
 import javax.servlet.jsp.JspException;

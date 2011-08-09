@@ -32,9 +32,9 @@ import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
 import org.apache.commons.lang.StringUtils;
