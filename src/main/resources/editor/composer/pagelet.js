@@ -83,8 +83,8 @@ steal.plugins('jqueryui/dialog',
 		this.editorDialog = $('#wbl-pageleteditor').html('<form id="wbl-validate" onsubmit="return false;">' + resultDom.html() + '</form>')
 		.dialog({
 			title: 'Pagelet bearbeiten',
-			width: 900,
-			height: 800,
+			width: 500,
+			height: 400,
 			modal: true,
 			autoOpen: true,
 			resizable: true,
