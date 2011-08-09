@@ -22,11 +22,11 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.impl.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;

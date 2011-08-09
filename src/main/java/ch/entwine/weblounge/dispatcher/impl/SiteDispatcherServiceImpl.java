@@ -21,13 +21,13 @@
 package ch.entwine.weblounge.dispatcher.impl;
 
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.impl.url.PathUtils;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteListener;
+import ch.entwine.weblounge.common.url.PathUtils;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.dispatcher.ActionRequestHandler;
 import ch.entwine.weblounge.dispatcher.DispatcherConfiguration;
 import ch.entwine.weblounge.dispatcher.SiteDispatcherService;

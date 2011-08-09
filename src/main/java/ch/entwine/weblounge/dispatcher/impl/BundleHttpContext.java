@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.dispatcher.impl;
 
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;

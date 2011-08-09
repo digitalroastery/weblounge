@@ -21,12 +21,12 @@
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.impl.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;

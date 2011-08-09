@@ -30,10 +30,10 @@ import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;

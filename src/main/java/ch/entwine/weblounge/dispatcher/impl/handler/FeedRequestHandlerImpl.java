@@ -36,12 +36,12 @@ import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
