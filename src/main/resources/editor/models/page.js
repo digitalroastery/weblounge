@@ -155,7 +155,7 @@ steal.then('jsonix')
 			if('eTag' in params) 
 				headers = {"If-Match": params.eTag};
 			if('user' in params)
-				data = {user: params.user};
+				data.user = params.user;
 			
 			if ('id' in params) {
 				$.ajax({
@@ -188,8 +188,25 @@ steal.then('jsonix')
 		 * Publish the specified page.
 		 */
 		publish: function(params, success, error) {
+			var headers = {};
+			var data = {startdate: '', enddate: ''};
+			if('eTag' in params) 
+				headers = {"If-Match": params.eTag};
+			if('startdate' in params)
+				data.startdate = params.startdate;
+			if('enddate' in params)
+				data.enddate = params.enddate;
+			
 			if ('id' in params) {
-				//TODO
+				$.ajax({
+					url: '/system/weblounge/pages/' + params.id + '/publish',
+					type: 'put',
+					success: success,
+					error: error,
+					headers: headers,
+					dataType: 'xml',
+					data: data
+				});
 			}
 		},
 		
@@ -247,8 +264,8 @@ steal.then('jsonix')
 	    /**
 	     * Publish this page
 	     */
-	    publish: function() {
-//	    	Page.publish({id:this.value.id}, this);
+	    publish: function(success, error) {
+	    	Page.publish({id:this.value.id}, success, error);
 	    },
 	    
 	    /**

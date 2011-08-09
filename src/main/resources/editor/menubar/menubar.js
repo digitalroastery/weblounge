@@ -116,7 +116,11 @@ steal.plugins(
 						$(this).dialog('close');
 					},
 					Ja: $.proxy(function () {
-//						this.options.page.publish();
+						this.options.page.publish(function() {
+							// Notification for Published.
+						}, function() {
+							alert('Publish error!');
+						});
 						this.publishDialog.dialog('close');
 					},this)
 				}

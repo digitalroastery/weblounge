@@ -148,7 +148,12 @@ steal.plugins('jqueryui/dialog',
      */
     _convertInputs: function(editor, pagelet) {
     	$(editor).find(':input').each(function(index) {
-    		var element = $(this).attr('name').split(':')
+    		var name = $(this).attr('name');
+    		if(name == undefined) {
+    			alert('Bad editor!');
+    			return false;
+    		}
+    		var element = name.split(':')
     		
     		if($(this).attr('type') == 'text' || $(this).attr('type') == 'hidden') {
     			InputConverter.convertText($(this), element, pagelet);
