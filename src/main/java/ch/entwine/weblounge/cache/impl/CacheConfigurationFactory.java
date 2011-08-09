@@ -20,9 +20,9 @@
 
 package ch.entwine.weblounge.cache.impl;
 
-import ch.entwine.weblounge.common.impl.url.PathUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.PathUtils;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
