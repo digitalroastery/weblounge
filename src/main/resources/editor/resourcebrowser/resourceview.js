@@ -59,7 +59,11 @@ steal.plugins('jquery/controller',
 					},
 					OK: $.proxy(function () {
 						this.element.trigger('deleteResources', [this.options.selectedResources]);
-						this._showMessage('Seite(n) gelöscht!');
+						if(this.options.selectedResources.length > 1) {
+							this._showMessage('Seiten gel&ouml;scht!');
+						} else {
+							this._showMessage('Seite gel&ouml;scht!');
+						}
 						this.deleteDialog.dialog('close');
 					},this)
 				}
@@ -90,7 +94,7 @@ steal.plugins('jquery/controller',
 				$(this).empty().css('visibility', 'hidden');
 				$(this).dequeue();
 			});
-			$('.wbl-message').text(messageText);
+			$('.wbl-message').html(messageText);
 		},
 		
 		"img deleteResource": function(el, ev, resource) {

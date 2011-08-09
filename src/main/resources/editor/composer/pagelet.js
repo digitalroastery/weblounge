@@ -1,4 +1,5 @@
 steal.plugins('jqueryui/dialog',
+		'jquery/event/hover',
 		'jqueryui/draggable',
 		'jqueryui/droppable',
 		'jqueryui/resizable',
@@ -266,9 +267,9 @@ steal.plugins('jqueryui/dialog',
 	'hoverenter': function(ev, hover) {
 		if(!this.showHover) return;
 		this.element.append('<img class="wbl-iconEditing" src="' + this.options.composer.runtime.getRootPath() + 
-				'/editor/composer/resources/icon_editing.png" />');
+			'/editor/composer/resources/icon_editing.png" />');
 		this.element.append('<img class="wbl-iconRemove" src="' + this.options.composer.runtime.getRootPath() + 
-		'/editor/resourcebrowser/images/icon_trash.png" />');
+			'/editor/resourcebrowser/images/icon_trash.png" />');
     },
     
 	'hoverleave': function(ev, hover) {

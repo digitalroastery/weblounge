@@ -75,7 +75,7 @@ steal.plugins('jquery',
 				// this option isn't supported in all browsers
 				sizeLimit: 0, // max size   
 				minSizeLimit: 0, // min size
-				onCancel: this._cancel,
+				// onCancel: this._cancel,
 				onComplete: $.proxy(function(id, fileName, response) {
 					if($.isEmptyObject(response)) return;
 					this.map.push({resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag});
@@ -101,11 +101,6 @@ steal.plugins('jquery',
 	    update: function(options) {
 	    	this.options = options;
 	    	this.element.dialog('open');
-	    },
-	    
-	    _cancel: function(id, fileName) {
-	    	// TODO ???
-	    	steal.dev.log(id + fileName);
 	    },
 	    
 	    _updateUploadButton: function() {

@@ -442,7 +442,7 @@ steal.then('jsonix')
 	     * @param {Object} creationData The data from the creation dialog
 	     * @param {String} language The languageId
 	     */
-	    saveCreationData: function(creationData, language, success) {
+	    saveMetadata: function(creationData, language, success) {
 			if($.isEmptyObject(this.value.head.metadata)) {
 				this.value.head.metadata = {};
 			}
@@ -456,6 +456,7 @@ steal.then('jsonix')
 				this.value.head.metadata.subject = [];
 			}
 			
+			this.value.path = creationData.url;
 			this.value.head.template = creationData.layout;
 			
 			this.value.head.metadata.title[language] = creationData.title;

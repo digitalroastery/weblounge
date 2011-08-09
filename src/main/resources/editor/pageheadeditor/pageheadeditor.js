@@ -73,7 +73,7 @@ steal.plugins('jquery',
 						});
 						
 						// update pageData
-						this.options.page.saveCreationData(pageData, this.options.language, $.proxy(function() {
+						this.options.page.saveMetadata(pageData, this.options.language, $.proxy(function() {
 							location.href = this.options.page.getPath() + "?edit";
 						}, this));
 						

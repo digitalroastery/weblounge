@@ -153,10 +153,13 @@ steal.plugins('jquery',
 							pageData[$(input).attr('name')] = $(input).val();
 						});
 						
+						pageData.url = this.parent + pageData.url;
+						
 						// Create page and update pageData
-						Page.create({path: this.parent + pageData.url}, $.proxy(function(page) {
-							page.saveCreationData(pageData, this.options.language, function() {
-								location.href = page.getPath() + "?edit";
+						Page.create({path: pageData.url}, $.proxy(function(page) {
+							var path = page.getPath(); // Let this line at this position!!
+							page.saveMetadata(pageData, this.options.language, function() {
+								location.href = path + "?edit";
 							});
 						}, this));
 						
