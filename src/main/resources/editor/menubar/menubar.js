@@ -165,6 +165,15 @@ steal.plugins(
         	}
         },
         
+        /**
+         * Delete a Cookie with setting expire to currentTime -1
+         */
+        _delete_cookie: function(cookieName) {
+          var cookieDate = new Date();
+          cookieDate.setTime(cookieDate.getTime() - 1);
+          document.cookie = cookieName += "=; expires=" + cookieDate.toGMTString();
+        },
+        
         _enableEditing: function() {
         	$('.composer').editor_composer('enable');
         	$('#wbl-pageletcreator').editor_pageletcreator('enable');
@@ -222,7 +231,8 @@ steal.plugins(
 		},
 		
 		"li.wbl-logout click": function(el, ev) {
-			steal.dev.log('logout')
+			this._delete_cookie("weblounge.editor");
+			location.href = location.pathname;
 		},
 		
 		"li.wbl-newPage click": function(el, ev) {
