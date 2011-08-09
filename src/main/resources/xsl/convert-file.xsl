@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="2.0" xmlns="http://www.entwinemedia.com/weblounge/3.0/file" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs date">
+<xsl:stylesheet version="2.0" xmlns="http://www.entwinemedia.com/weblounge/3.0/file" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xsl xs date">
   <xsl:output method="xml" omit-xml-declaration="no" indent="yes" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property filename" />
 
   <xsl:param name="fileid" />
@@ -146,10 +146,6 @@
     <subject>
       <xsl:value-of select="." />
     </subject>
-  </xsl:template>
-
-  <xsl:template match="header/title">
-    <xsl:copy-of select="." />
   </xsl:template>
 
   <xsl:template name="user">

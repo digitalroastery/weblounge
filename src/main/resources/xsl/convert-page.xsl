@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="2.0" xmlns="http://www.entwinemedia.com/weblounge/3.0/page" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:importer="ch.entwine.weblounge.tools.importer.Importer" exclude-result-prefixes="date xs importer">
+<xsl:stylesheet version="2.0" xmlns="http://www.entwinemedia.com/weblounge/3.0/page" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:importer="ch.entwine.weblounge.tools.importer.Importer" exclude-result-prefixes="xsl date xs importer">
   <xsl:output method="xml" omit-xml-declaration="no" indent="yes" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property" />
 
   <xsl:param name="uuid" />
@@ -38,7 +38,9 @@
           </xsl:otherwise>
         </xsl:choose>
       </template>
-      <xsl:copy-of select="layout"></xsl:copy-of>
+      <layout>
+        <xsl:value-of select="layout" />
+      </layout>
       <promote>true</promote>
       <index>true</index>
       <metadata>
@@ -78,11 +80,16 @@
             <xsl:with-param name="DateTime" select="publish/from" />
           </xsl:call-template>
         </from>
-        <to>
+        <xsl:variable name="publish-to">
           <xsl:call-template name="formatdate">
             <xsl:with-param name="DateTime" select="publish/to" />
           </xsl:call-template>
-        </to>
+        </xsl:variable>
+        <xsl:if test="xs:dateTime($publish-to) &lt; xs:dateTime(date:date-time())">
+          <to>
+            <xsl:value-of select="$publish-to" />
+          </to>
+        </xsl:if>
         <xsl:call-template name="user">
           <xsl:with-param name="userid" select="modified/user" />
         </xsl:call-template>
@@ -101,7 +108,10 @@
   </xsl:template>
 
   <xsl:template match="header/title">
-    <xsl:copy-of select="." />
+    <title>
+      <xsl:attribute name="language"><xsl:value-of select="./@language" /></xsl:attribute>
+      <xsl:value-of select="." />
+    </title>
   </xsl:template>
 
   <xsl:template match="body">
@@ -155,11 +165,16 @@
             <xsl:with-param name="DateTime" select="publish/from" />
           </xsl:call-template>
         </from>
-        <to>
+        <xsl:variable name="publish-to">
           <xsl:call-template name="formatdate">
             <xsl:with-param name="DateTime" select="publish/to" />
           </xsl:call-template>
-        </to>
+        </xsl:variable>
+        <xsl:if test="xs:dateTime($publish-to) &lt; xs:dateTime(date:date-time())">
+          <to>
+            <xsl:value-of select="$publish-to" />
+          </to>
+        </xsl:if>
       </published>
       <xsl:apply-templates select="./content" />
       <properties>
@@ -250,8 +265,15 @@
           </xsl:call-template>
         </date>
       </modified>
-      <xsl:copy-of select="./text" />
+      <xsl:apply-templates select="./text" />
     </locale>
+  </xsl:template>
+
+  <xsl:template match="content/text">
+    <text>
+      <xsl:attribute name="id"><xsl:value-of select="./@id" /></xsl:attribute>
+      <xsl:value-of select="." />
+    </text>
   </xsl:template>
 
   <xsl:template match="property">
