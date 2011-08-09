@@ -31,8 +31,8 @@ import static org.junit.Assert.assertTrue;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.junit.Before;
 import org.junit.BeforeClass;

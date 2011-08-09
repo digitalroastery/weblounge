@@ -26,7 +26,6 @@ import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJob;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
@@ -37,6 +36,7 @@ import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.ModuleException;
 import ch.entwine.weblounge.common.site.ModuleListener;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 import org.apache.commons.lang.StringUtils;

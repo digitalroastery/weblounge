@@ -28,7 +28,6 @@ import ch.entwine.weblounge.common.content.page.Script;
 import ch.entwine.weblounge.common.impl.content.GeneralComposeable;
 import ch.entwine.weblounge.common.impl.content.page.LinkImpl;
 import ch.entwine.weblounge.common.impl.content.page.ScriptImpl;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
@@ -41,6 +40,7 @@ import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.ActionException;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 import org.apache.commons.fileupload.FileItem;

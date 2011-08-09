@@ -31,7 +31,6 @@ import ch.entwine.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
@@ -57,6 +56,7 @@ import ch.entwine.weblounge.common.site.ModuleException;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteException;
 import ch.entwine.weblounge.common.site.SiteListener;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 import org.osgi.framework.Bundle;

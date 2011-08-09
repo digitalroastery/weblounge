@@ -25,9 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ch.entwine.weblounge.common.impl.url.PathUtils;
 import ch.entwine.weblounge.common.impl.url.UrlImpl;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 
 import org.junit.Before;
 import org.junit.Test;

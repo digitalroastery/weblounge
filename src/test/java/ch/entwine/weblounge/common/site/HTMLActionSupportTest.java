@@ -33,8 +33,8 @@ import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.entwine.weblounge.common.impl.site.HTMLActionSupport;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.easymock.EasyMock;
 import org.junit.Before;

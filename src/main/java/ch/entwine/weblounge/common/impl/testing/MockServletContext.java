@@ -23,7 +23,7 @@ package ch.entwine.weblounge.common.impl.testing;
 import ch.entwine.weblounge.common.impl.request.DefaultResourceLoader;
 import ch.entwine.weblounge.common.impl.request.Resource;
 import ch.entwine.weblounge.common.impl.request.ResourceLoader;
-import ch.entwine.weblounge.common.impl.url.PathUtils;
+import ch.entwine.weblounge.common.url.PathUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

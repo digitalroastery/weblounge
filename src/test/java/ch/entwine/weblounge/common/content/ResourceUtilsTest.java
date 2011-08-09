@@ -22,7 +22,6 @@ package ch.entwine.weblounge.common.content;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.entwine.weblounge.common.impl.content.ResourceUtils;
 
 import org.junit.Test;
 
@@ -35,7 +34,7 @@ public class ResourceUtilsTest {
   protected double fileSize = 1265389524L;
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.ResourceUtils#formatFileSize(long)}.
+   * Test method for {@link ch.entwine.weblounge.common.content.ResourceUtils#formatFileSize(long)}.
    */
   @Test
   public void testFormatFileSizeLong() {

@@ -28,9 +28,9 @@ import static org.junit.Assert.assertTrue;
 import ch.entwine.weblounge.common.content.page.Link;
 import ch.entwine.weblounge.common.impl.content.page.LinkImpl;
 import ch.entwine.weblounge.common.impl.site.ModuleImpl;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.request.RequestFlavor;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 import org.easymock.EasyMock;

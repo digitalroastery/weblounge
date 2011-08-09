@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.Path;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 import org.slf4j.Logger;

@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 import ch.entwine.weblounge.common.impl.content.SearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;

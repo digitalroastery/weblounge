@@ -20,9 +20,9 @@
 
 package ch.entwine.weblounge.common.impl.testing;
 
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;

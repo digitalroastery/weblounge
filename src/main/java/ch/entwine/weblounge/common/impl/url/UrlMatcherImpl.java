@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlMatcher;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 import java.util.Arrays;
