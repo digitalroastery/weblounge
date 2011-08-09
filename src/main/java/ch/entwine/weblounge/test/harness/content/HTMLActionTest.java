@@ -26,9 +26,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.HttpResponse;

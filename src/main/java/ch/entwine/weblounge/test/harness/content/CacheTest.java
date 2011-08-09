@@ -26,9 +26,9 @@ import static org.junit.Assert.assertTrue;
 
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
