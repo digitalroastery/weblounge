@@ -37,10 +37,10 @@ public class WorkbenchTag extends WebloungeTag {
 
   /** Name of the request parameter that will trigger editing support */
   public static final String WORKBENCH_PARAM = "edit";
-  public static final String WORKBENCH_COOKIE_NAME = "weblounge.editor";
+  public static final String WORKBENCH_COOKIE_EDITOR = "weblounge.editor";
   
   /** Path to the workbench script */
-  public static final String WORKBENCH_SCRIPT = "<script src=\"/weblounge/steal/steal.js?editor,development\"></script>";
+  public static final String WORKBENCH_SCRIPT = "<script src=\"/webloung/steal/steal.js?editor,development\"></script>";
   
   /**
    * Writes the workbench script tag to the output.
@@ -49,13 +49,14 @@ public class WorkbenchTag extends WebloungeTag {
    */
   public int doEndTag() throws JspException {
     if (request.getParameter(WORKBENCH_PARAM) != null) {
-      response.addCookie(new Cookie(WORKBENCH_COOKIE_NAME, "true"));
+      response.addCookie(new Cookie(WORKBENCH_COOKIE_EDITOR, "true"));
       writeWorkbenchScript();
       return super.doEndTag();
     }
     
+    if(request.getCookies() == null) return super.doEndTag();
     for(Cookie cookie : request.getCookies()) {
-      if(cookie.getName().equals(WORKBENCH_COOKIE_NAME) && cookie.getValue().endsWith("true")) {
+      if(!cookie.getName().equals(WORKBENCH_COOKIE_EDITOR) && cookie.getValue().equals("true")) {
          writeWorkbenchScript();
          break;
       }
