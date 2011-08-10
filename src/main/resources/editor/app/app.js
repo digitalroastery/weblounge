@@ -18,11 +18,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
 	{
 		
 		init: function(el) {
-			if (!this._supportsLocalStorage()) {
-				alert('Your browser does not support HTML5! Update your browser to the latest version.');
-				return false;
-			}
-			
+			if(!this._checkRequirements()) return;
 			Runtime.findOne({}, this.callback('_setRuntime'));
 			this._loadCurrentLanguage();
 			this._loadValidateLanguage();
@@ -50,6 +46,19 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         		this.pagesTab.hide();
         		break;
         	}
+        },
+        
+        _checkRequirements: function() {
+        	var success = true;
+			if (!this._supportsLocalStorage()) {
+				alert('Your browser does not support HTML5! Update your browser to the latest version.');
+				success = false;
+			}
+			if (!navigator.cookieEnabled) { 
+				alert('Your browser has disabled cookies! Enable your browser cookies.');
+				success = false;
+			}
+			return success;
         },
         
         _initViews: function(page) {
