@@ -158,9 +158,10 @@ steal.plugins('jquery',
 						// Create page and update pageData
 						Page.create({path: pageData.url}, $.proxy(function(page) {
 							var path = page.getPath(); // Let this line at this position!!
-							page.saveMetadata(pageData, this.options.language, function() {
+							page.saveMetadata(pageData, this.options.language, $.proxy(function() {
+								page.lock(this.options.runtime.getUserLogin());
 								location.href = path + "?edit";
-							});
+							}, this));
 						}, this));
 						
 						this.destroy();

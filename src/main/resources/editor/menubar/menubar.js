@@ -177,6 +177,8 @@ steal.plugins(
         _enableEditing: function() {
         	$('.composer').editor_composer('enable');
         	$('#wbl-pageletcreator').editor_pageletcreator('enable');
+        	this.element.find('img.wbl-add').show();
+        	this.element.find('img.wbl-more').show();
         	
         	// first instanziate before enable
 //        	$('#wbl-pageheadeditor').editor_pageheadeditor('enable');
@@ -185,6 +187,8 @@ steal.plugins(
         _disableEditing: function() {
         	$('.composer').editor_composer('disable');
         	$('#wbl-pageletcreator').editor_pageletcreator('disable');
+        	this.element.find('img.wbl-add').hide();
+        	this.element.find('img.wbl-more').hide();
         	
         	// first instanziate before disable
 //        	$('#wbl-pageheadeditor').editor_pageheadeditor('disable');
