@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="2.0" xmlns="http://www.entwinemedia.com/weblounge/3.0/image" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xsl xs date">
-  <xsl:output method="xml" omit-xml-declaration="no" indent="yes" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property filename" />
+  <xsl:output method="xml" omit-xml-declaration="no" indent="yes" encoding="utf-8" standalone="yes" cdata-section-elements="title subject description type coverage rights text property filename" />
 
   <xsl:param name="fileid" />
   <xsl:param name="uuid" />
@@ -79,15 +79,19 @@
           <xsl:value-of select="$entry/name"></xsl:value-of>
         </title>
         <xsl:apply-templates select="$entry/keywords" />
+        <subject>
+          <xsl:text>set:</xsl:text>
+          <xsl:value-of select="//collection/@id" />
+        </subject>
         <xsl:if test="string-length(/collection/@id) > 0">
           <xsl:analyze-string select="/collection/@id" regex="^/portrait/spieler/(damen|herren)/[A-Za-z]/(\d+)/(club|nati)/$" flags="i">
             <xsl:matching-substring>
               <subject>
-                player:
+                <xsl:text>player:</xsl:text>
                 <xsl:value-of select="regex-group(2)" />
               </subject>
               <subject>
-                portrait:
+                <xsl:text>portrait:</xsl:text>
                 <xsl:value-of select="regex-group(3)" />
               </subject>
             </xsl:matching-substring>
@@ -97,7 +101,7 @@
           <xsl:analyze-string select="$entry/@id" regex="^/portrait/teams/(damen|herren)/[A-Za-z]/(\d+)/\d+\.\w+$" flags="i">
             <xsl:matching-substring>
               <subject>
-                clublogo:
+                <xsl:text>clublogo:</xsl:text>
                 <xsl:value-of select="regex-group(2)" />
               </subject>
             </xsl:matching-substring>
@@ -105,11 +109,11 @@
           <xsl:analyze-string select="$entry/@id" regex="^/portrait/teams/(damen|herren)/[A-Za-z]/(\d+)/\d+_(\d+)\.\w+$" flags="i">
             <xsl:matching-substring>
               <subject>
-                club:
+                <xsl:text>club:</xsl:text>
                 <xsl:value-of select="regex-group(2)" />
               </subject>
               <subject>
-                leaguecode:
+                <xsl:text>leaguecode:</xsl:text>
                 <xsl:value-of select="regex-group(3)" />
               </subject>
               <subject>portrait:team</subject>
@@ -201,7 +205,7 @@
   <xsl:template name="user">
     <xsl:param name="userid"></xsl:param>
     <xsl:choose>
-      <xsl:when test="$userid = 'www' or $userid = 'guest'">
+      <xsl:when test="$userid = 'www' or $userid = 'rivellagames' or $userid = 'guest'">
         <user>
           <xsl:attribute name="id"><xsl:value-of select="$adminuserid" /></xsl:attribute>
           <xsl:attribute name="realm">weblounge</xsl:attribute>

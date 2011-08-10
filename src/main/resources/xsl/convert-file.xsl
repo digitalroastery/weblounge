@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="2.0" xmlns="http://www.entwinemedia.com/weblounge/3.0/file" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xsl xs date">
-  <xsl:output method="xml" omit-xml-declaration="no" indent="yes" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property filename" />
+  <xsl:output method="xml" omit-xml-declaration="no" indent="yes" encoding="utf-8" standalone="yes" cdata-section-elements="title subject description type coverage rights text property filename" />
 
   <xsl:param name="fileid" />
   <xsl:param name="uuid" />
@@ -66,6 +66,10 @@
           <xsl:value-of select="$entry/name"></xsl:value-of>
         </title>
         <xsl:apply-templates select="$entry/keywords" />
+        <subject>
+          <xsl:text>set:</xsl:text>
+          <xsl:value-of select="//collection/@id" />
+        </subject>
       </metadata>
       <security>
         <owner>
@@ -151,7 +155,7 @@
   <xsl:template name="user">
     <xsl:param name="userid"></xsl:param>
     <xsl:choose>
-      <xsl:when test="$userid = 'www' or $userid = 'guest'">
+      <xsl:when test="$userid = 'www' or $userid = 'rivellagames' or $userid = 'guest'">
         <user>
           <xsl:attribute name="id"><xsl:value-of select="$adminuserid" /></xsl:attribute>
           <xsl:attribute name="realm">weblounge</xsl:attribute>
