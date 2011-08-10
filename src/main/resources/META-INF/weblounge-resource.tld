@@ -45,4 +45,16 @@
     <attribute><name>altimage</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>imagestyle</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
   </tag>
+  
+  <tag>
+    <description>Load images for a gallery</description>
+    <display-name>Image Gallery Tag</display-name>
+    <name>gallery</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.ImageGalleryTag</tag-class>
+    <body-content>JSP</body-content>
+    <attribute><name>subjects</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>normalstyle</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>bigstyle</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>thumbstyle</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
+  </tag>
 </taglib>
