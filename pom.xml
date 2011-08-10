@@ -103,9 +103,7 @@
         <module>modules/weblounge-contentrepository</module>
         <module>modules/weblounge-dispatcher-api</module>
         <module>modules/weblounge-dispatcher</module>
-        <!--
         <module>modules/weblounge-i18n-mygengo</module>
-        -->
         <module>modules/weblounge-kernel</module>
         <module>modules/weblounge-system</module>
         <module>modules/weblounge-taglib</module>
