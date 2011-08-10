@@ -1,0 +1,313 @@
+<i18n>
+
+	<!-- address-->	
+	<message name="module.text.adress.tab.personalia">
+		<value>Personalia</value>
+	</message>
+	<message name="module.text.adress.tab.adress">
+		<value>Adress</value>
+	</message>		
+	<message name="module.text.adress.salutation">
+		<value>Title</value>
+	</message>
+	<message name="module.text.adress.Herr">
+		<value>Mr.</value>
+	</message>
+	<message name="module.text.adress.Frau">
+		<value>Ms.</value>
+	</message>
+	<message name="module.text.adress.name">
+		<value>Name</value>
+	</message>
+	<message name="module.text.adress.company">
+		<value>Firm</value>
+	</message>
+	<message name="module.text.adress.position">
+		<value>Position</value>
+	</message>
+	<message name="module.text.adress.email">
+		<value>Email</value>
+	</message>
+	<message name="module.text.adress.phone">
+		<value>Phone</value>
+	</message>
+	<message name="module.text.adress.celular">
+		<value>Mobile</value>
+	</message>
+	<message name="module.text.adress.adress">
+		<value>Adress</value>
+	</message>
+	<message name="module.text.adress.pob">
+		<value>P.O. Box</value>
+	</message>
+	<message name="module.text.adress.zip">
+		<value>Zip</value>
+	</message>
+	<message name="module.text.adress.city">
+		<value>City</value>
+	</message>
+	<message name="module.text.adress.country">
+		<value>Country</value>
+	</message>	
+	<message name="module.text.adress.country.CH">
+		<value>Switzerland</value>
+	</message>
+	<message name="module.text.adress.country.DE">
+		<value>Germany</value>
+	</message>
+	<message name="module.text.adress.country.AT">
+		<value>Austria</value>
+	</message>
+	<message name="module.text.adress.country.AU">
+		<value>Australia</value>
+	</message>
+	<message name="module.text.adress.country.BE">
+		<value>Belgium</value>
+	</message>
+	<message name="module.text.adress.country.CA">
+		<value>Canada</value>
+	</message>
+	<message name="module.text.adress.country.CZ">
+		<value>Czech Republic</value>
+	</message>
+	<message name="module.text.adress.country.DK">
+		<value>Denmark</value>
+	</message>
+	<message name="module.text.adress.country.EE">
+		<value>Estonia</value>
+	</message>
+	<message name="module.text.adress.country.FI">
+		<value>Finland</value>
+	</message>
+	<message name="module.text.adress.country.FR">
+		<value>France</value>
+	</message>
+	<message name="module.text.adress.country.GE">
+		<value>Georgia</value>
+	</message>
+	<message name="module.text.adress.country.GB">
+		<value>United Kingdom</value>
+	</message>
+	<message name="module.text.adress.country.HU">
+		<value>Hungary</value>
+	</message>
+	<message name="module.text.adress.country.IT">
+		<value>Italy</value>
+	</message>
+	<message name="module.text.adress.country.IS">
+		<value>Iceland</value>
+	</message>
+	<message name="module.text.adress.country.JP">
+		<value>Japan</value>
+	</message>
+	<message name="module.text.adress.country.KR">
+		<value>Korea (South Korea)</value>
+	</message>
+	<message name="module.text.adress.country.LV">
+		<value>Latvia</value>
+	</message>
+	<message name="module.text.adress.country.LI">
+		<value>Liechtenstein</value>
+	</message>
+	<message name="module.text.adress.country.MY">
+		<value>Malaysia</value>
+	</message>
+	<message name="module.text.adress.country.NL">
+		<value>Netherlands</value>
+	</message>
+	<message name="module.text.adress.country.NO">
+		<value>Norway</value>
+	</message>
+	<message name="module.text.adress.country.PK">
+		<value>Pakistan</value>
+	</message>
+	<message name="module.text.adress.country.PL">
+		<value>Poland</value>
+	</message>
+	<message name="module.text.adress.country.RU">
+		<value>Russia</value>
+	</message>
+	<message name="module.text.adress.country.SG">
+		<value>Singapore</value>
+	</message>
+	<message name="module.text.adress.country.SK">
+		<value>Slovakia</value>
+	</message>
+	<message name="module.text.adress.country.SI">
+		<value>Slovenia</value>
+	</message>
+	<message name="module.text.adress.country.ES">
+		<value>Spain</value>
+	</message>
+	<message name="module.text.adress.country.SE">
+		<value>Sweden</value>
+	</message>
+	<message name="module.text.adress.country.US">
+		<value>United States</value>
+	</message>
+
+	<!-- title -->
+	<message name="module.text.title.keyword">
+		<value>Keyword</value>
+	</message>
+	<message name="module.text.title.keyword.sample">
+		<value>International</value>
+	</message>
+	<message name="module.text.title.title">
+		<value>Title</value>
+	</message>
+	<message name="module.text.title.title.sample">
+		<value>International challenge for...</value>
+	</message>
+	<message name="module.text.title.lead">
+		<value>Lead</value>
+	</message>
+	<message name="module.text.title.lead.sample">
+		<value>Yesterday, the referee committee nominated the two referees...</value>
+	</message>
+	<message name="module.text.title.showdate">
+		<value>Show date</value>
+	</message>
+	<message name="module.text.title.showauthor">
+		<value>Show author / translator</value>
+	</message>
+	
+	<!-- subtitle -->
+	<message name="module.text.subtitle.title">
+		<value>Title</value>
+	</message>
+	<message name="module.text.subtitle.title.sample">
+		<value>International challenge for...</value>
+	</message>
+	<message name="module.text.subtitle.anchor">
+		<value>Anchor</value>
+	</message>
+	<message name="module.text.subtitle.anchor.sample">
+		<value>International</value>
+	</message>
+	
+	<!-- faq -->
+	<message name="module.text.faq.question">
+		<value>Question</value>
+	</message>
+	<message name="module.text.faq.question.sample">
+		<value>What do you think of...?</value>
+	</message>
+	<message name="module.text.faq.answer">
+		<value>Answer</value>
+	</message>
+	<message name="module.text.faq.answer.sample">
+		<value>I think, this was the best thing I ever saw!</value>
+	</message>
+	
+	<!-- author -->
+	<message name="module.text.author.source">
+		<value>Source</value>
+	</message>
+	<message name="module.text.author.source.sample">
+		<value>Grasshopper-Club Z&#252;rich</value>
+	</message>	
+	<message name="module.text.author.author">
+		<value>Author</value>
+	</message>
+	<message name="module.text.author.author.sample">
+		<value>Tobias Wunden</value>
+	</message>
+	<message name="module.text.author.email">
+		<value>E-Mail</value>
+	</message>
+	<message name="module.text.author.email.sample">
+		<value>tobias.wunden&#064;o2it.ch</value>
+	</message>
+	<message name="module.text.author.position">
+		<value>Position</value>
+	</message>
+	<message name="module.text.author.position.sample">
+		<value>Developer</value>
+	</message>
+	
+	<!-- paragraph -->
+	<message name="module.text.paragraph.tab.default">
+		<value>Default</value>
+	</message>
+	<message name="module.text.paragraph.tab.extended">
+		<value>Extended</value>
+	</message>	
+	<message name="module.text.paragraph.title">
+		<value>Title</value>
+	</message>
+	<message name="module.text.paragraph.title.sample">
+		<value>International challenge...</value>
+	</message>
+	<message name="module.text.paragraph.paragraph">
+		<value>Paragraph</value>
+	</message>
+	<message name="module.text.paragraph.paragraph.sample">
+		<value>Yesterday, the referee committee nominated the two referees...</value>
+	</message>
+	<message name="module.text.paragraph.quote">
+		<value>Quote</value>
+	</message>
+	
+	<!-- enumeration -->
+	<message name="module.text.enumeration.type">
+		<value>Type of Enumeration</value>
+	</message>
+	<message name="module.text.enumeration.enumeration">
+		<value>Enumeration</value>
+	</message>
+	<message name="module.text.enumeration.numbered">
+		<value>Numbered</value>
+	</message>
+	<message name="module.text.enumeration.unnumbered">
+		<value>Not numbered</value>
+	</message>
+	<message name="module.text.enumeration.add">
+		<value>Add</value>
+	</message>
+	<message name="module.text.enumeration.remove">
+		<value>Remove</value>
+	</message>
+
+	<!-- categorie -->
+	<message name="module.text.categorie.title">
+		<value>Title</value>
+	</message>
+	<message name="module.text.categorie.title.sample">
+		<value>Addressbook</value>
+	</message>
+
+	<!-- code -->
+	<message name="module.text.code.type">
+		<value>Language</value>
+	</message>
+	<message name="module.text.code.code">
+		<value>Code</value>
+	</message>
+	<message name="module.text.code.code.sample">
+		<value>public void helloWorld() { System.out.println("Hello World"); } </value>
+	</message>
+	
+
+	<!-- email -->
+	<message name="module.text.email">
+		<value>Name</value>
+	</message>
+	<message name="module.text.email.sample">
+		<value>Gerhard Zingg</value>
+	</message>
+	<message name="module.text.email.description">
+		<value>Beschreibung</value>
+	</message>
+	<message name="module.text.email.description.sample">
+		<value>Zentralpr&#228;sident</value>
+	</message>
+	<message name="module.text.email.link">
+		<value>E-Mailadresse</value>
+	</message>
+	<message name="module.text.email.link.sample">
+		<value>gerhard.zingg@swissunihockey.ch</value>
+	</message>
+
+
+</i18n>

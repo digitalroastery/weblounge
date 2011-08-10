@@ -1,0 +1,97 @@
+/*
+ * Style sheet for the syntax highlighter.
+ *
+ * (c) Copyright 2005 Daniel Steiner.
+ * All Rights Reserved.
+ *
+ * $Id: code.css,v 1.1 2005/11/16 00:59:55 steiner Exp $
+ */
+
+
+.code {
+	border:1px solid #a0a0a0;
+	background-color:#f3f3f3;
+	white-space:pre;
+	font-family:monospace;
+	padding:10pt;
+}
+
+
+.code .NULL {
+}
+
+.code .COMMENT1 {
+	color:#008080;
+}
+
+.code .COMMENT2 {
+	color:#c0c0c0;
+}
+
+.code .COMMENT3 {
+	color:#3f5fbf;
+}
+
+.code .COMMENT4 {
+	color:#3F7F5F;
+}
+
+.code .DIGIT {
+	color:#00aaff;
+}
+
+.code .FUNCTION {
+	color:#7121a9;
+}
+
+.code .INVALID {
+	color:#ffff80;
+}
+
+.code .KEYWORD1 {
+	color:#8080ff;
+	font-weight:bold;
+}
+
+.code .KEYWORD2 {
+	color:#ff0080;
+	font-weight:bold;
+}
+
+.code .KEYWORD3 {
+	color:#ff8000;
+	font-weight:bold;
+}
+
+.code .KEYWORD4 {
+	color:#8000ff;
+	font-weight:bold;
+}
+
+.code .LABEL {
+	color:#ff8000;
+}
+
+.code .LITERAL1 {
+	color:#0000ff;
+}
+
+.code .LITERAL2 {
+	color:#d5eaff;
+}
+
+.code .LITERAL3 {
+	color:#ffeaff;
+}
+
+.code .LITERAL4 {
+	color:#ff0000;
+}
+
+.code .MARKUP {
+	color:#008040;
+}
+
+.code .OPERATOR {
+	color:#ff33ff;
+}
