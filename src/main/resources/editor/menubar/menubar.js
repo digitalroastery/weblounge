@@ -59,8 +59,10 @@ steal.plugins(
         	switch (this.options.mode) {
 	      	  case 0:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-designer'));
-	      		  this.find('img.wbl-add').show();
-	      		  this.find('img.wbl-more').show();
+	      		  if(!this.disabled) {
+	      			  this.find('img.wbl-add').show();
+	      			  this.find('img.wbl-more').show();
+	      		  }
 	      		  this.find('span.wbl-editmode').show();
 	      		  this.find('span.wbl-language').show();
 	      		  this.find('div#wbl-pageOptions').show();
@@ -175,6 +177,7 @@ steal.plugins(
         },
         
         _enableEditing: function() {
+        	this.disabled = false;
         	$('.composer').editor_composer('enable');
         	$('#wbl-pageletcreator').editor_pageletcreator('enable');
         	this.element.find('img.wbl-add').show();
@@ -185,6 +188,7 @@ steal.plugins(
         },
         
         _disableEditing: function() {
+        	this.disabled = true;
         	$('.composer').editor_composer('disable');
         	$('#wbl-pageletcreator').editor_pageletcreator('disable');
         	this.element.find('img.wbl-add').hide();

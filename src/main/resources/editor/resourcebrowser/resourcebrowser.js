@@ -228,9 +228,16 @@ steal.plugins(
         			if(page == null) return;
         			var locked = page.isLocked();
                 	var userLocked = page.isLockedUser(this.options.runtime.getUserLogin());
+                	var currentPath = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
                 	
-                	if(!locked || (locked && userLocked)) {
+                	if(currentPath == '/') {
+                		alert("Can't delete root page");
+                	} else if(!locked || (locked && userLocked)) {
                 		Page.destroy({id: element.id}, this.callback('_removeResource', element.id));
+                		// Relocate to Root if current page was deleted
+                		if(currentPath == page.getPath()) {
+                			location.href = '/?edit';
+                		}
                 	} else {
                 		alert("Can't delete " + page.getPath() + ": Page is locked!");
                 	}

@@ -68,6 +68,9 @@ steal.plugins('jquery',
 						this.element.dialog('close');
 					}, this),
 					Speichern: $.proxy(function() {
+						this.element.find("form#wbl-validatePageSettings").submit();
+						if(!this.element.find("form#wbl-validatePageSettings").valid()) return;
+						
 						$.each(this.element.find(':input'), function(i, input) {
 							pageData[$(input).attr('name')] = $(input).val();
 						});
@@ -86,6 +89,8 @@ steal.plugins('jquery',
 					this.destroy();
 				},this)
 			});
+			
+			this.element.find("form#wbl-validatePageSettings").validate();
 		},
 	
 	    update: function(options) {
