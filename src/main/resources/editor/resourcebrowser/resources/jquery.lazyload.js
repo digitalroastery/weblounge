@@ -118,6 +118,7 @@
     /* Use as  $.belowthefold(element, {threshold : 100, container : window}) */
 
     $.belowthefold = function(element, settings) {
+    	if(!$(element).is(":visible")) return true;
         if (settings.container === undefined || settings.container === window) {
             var fold = $(window).height() + $(window).scrollTop();
         } else {
@@ -127,6 +128,7 @@
     };
     
     $.rightoffold = function(element, settings) {
+    	if(!$(element).is(":visible")) return true;
         if (settings.container === undefined || settings.container === window) {
             var fold = $(window).width() + $(window).scrollLeft();
         } else {
@@ -136,6 +138,7 @@
     };
         
     $.abovethetop = function(element, settings) {
+    	if(!$(element).is(":visible")) return true;
         if (settings.container === undefined || settings.container === window) {
             var fold = $(window).scrollTop();
         } else {
@@ -145,6 +148,7 @@
     };
     
     $.leftofbegin = function(element, settings) {
+    	if(!$(element).is(":visible")) return true;
         if (settings.container === undefined || settings.container === window) {
             var fold = $(window).scrollLeft();
         } else {

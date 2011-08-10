@@ -140,13 +140,13 @@ steal.plugins('jquery/controller','jqueryui/sortable')
 	disable: function() {
 		$(this.element).removeClass('wbl-nojQuery');
 		$(this.element).sortable('disable');
-		$(this.element).find('div.pagelet').editor_pagelet('disable');
+		$(this.element).find('div.pagelet').editor_pagelet('disable').css('min-height', '');
 	},
 	
 	enable: function() {
 		$(this.element).addClass('wbl-nojQuery');
 		$(this.element).sortable('enable');
-		$(this.element).find('div.pagelet').editor_pagelet('enable');
+		$(this.element).find('div.pagelet').editor_pagelet('enable').css('min-height', '35px');
 	},
     
     _enablePagelets: function() {
