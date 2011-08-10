@@ -311,6 +311,42 @@ public class SearchIndexTest {
    * .
    */
   @Test
+  public void testGetWithText() {
+    populateIndex();
+    try {
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withText("Technik");
+      assertEquals(2, idx.getByQuery(q).getItems().length);
+    } catch (ContentRepositoryException e) {
+      e.printStackTrace();
+      fail("Error querying by text");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithWildcardText() {
+    populateIndex();
+    try {
+      SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withText("Tec", false);
+      assertEquals(2, idx.getByQuery(q).getItems().length);
+      q = new SearchQueryImpl(site).withType(Page.TYPE).withText("/a", false);
+      assertEquals(1, idx.getByQuery(q).getItems().length);
+    } catch (ContentRepositoryException e) {
+      e.printStackTrace();
+      fail("Error querying by wildcard text");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
   public void testGetWithAuthor() {
     populateIndex();
     try {

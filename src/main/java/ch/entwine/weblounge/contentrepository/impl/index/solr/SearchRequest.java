@@ -239,12 +239,14 @@ public class SearchRequest {
 
     // Fulltext
     if (query.getText() != null) {
+      // TODO: Wildcard searches are not yet working. Retry when switching
+      // over to Solr 4
       // if (query.isWildcardSearch()) {
-      // and(solrQuery, FULLTEXT, "*" + clean(query.getText()) + "*", true,
-      // false);
+      // and(solrQuery, FULLTEXT, clean(query.getText()) + "*", false, false);
       // } else {
-        and(solrQuery, FULLTEXT, query.getText(), true, true);
+      // and(solrQuery, FULLTEXT, query.getText(), true, true);
       // }
+      and(solrQuery, FULLTEXT, query.getText(), true, true);
     }
 
     if (solrQuery.length() == 0)
