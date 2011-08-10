@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- address-->
+
+
+	<!-- title -->
+	<string name="module.text.title.keyword">
+		Parola chiave
+	</string>
+	<string name="module.text.title.keyword.sample">
+		Internazionale
+	</string>
+	<string name="module.text.title.title">
+		Titolo
+	</string>
+	<string name="module.text.title.title.sample">
+		Impiego internazionale per...
+	</string>
+	<string name="module.text.title.lead">
+		Tracciante
+	</string>
+	<string name="module.text.title.lead.sample">
+		La Commissione arbitri ha nominato i due arbitri...
+	</string>
+	<string name="module.text.title.showdate">
+		Mostra data
+	</string>
+	<string name="module.text.title.showauthor">
+		Mostra autore / traduttore
+	</string>
+	
+	<!-- subtitle -->
+	<string name="module.text.subtitle.title">
+		Titolo
+	</string>
+	<string name="module.text.subtitle.title.sample">
+		Impiego internazionale per...
+	</string>
+	<string name="module.text.subtitle.anchor">
+		Ancora
+	</string>
+	<string name="module.text.subtitle.anchor.sample">
+		Internazionale
+	</string>
+	
+	<!-- faq -->
+	<string name="module.text.faq.question">
+		Domanda
+	</string>
+	<string name="module.text.faq.question.sample">
+		Cosa ne pensate...?
+	</string>
+	<string name="module.text.faq.answer">
+		Risposta
+	</string>
+	<string name="module.text.faq.answer.sample">
+		Credo che sia stata la miglior partita...
+	</string>
+	
+	<!-- author -->
+	<string name="module.text.author.source">
+		Fonte
+	</string>
+	<string name="module.text.author.source.sample">
+		Grasshopper-Club Z&#252;rich
+	</string>
+	<string name="module.text.author.author">
+		Autore
+	</string>
+	<string name="module.text.author.author.sample">
+		Tobias Wunden
+	</string>
+	<string name="module.text.author.email">
+		E-Mail
+	</string>
+	<string name="module.text.author.email.sample">
+		tobias.wunden&#064;o2it.ch
+	</string>
+	<string name="module.text.author.position">
+		Posizione
+	</string>
+	<string name="module.text.author.position.sample">
+		Responsabile sviluppo
+	</string>
+	
+	<!-- paragraph -->
+	<string name="module.text.paragraph.title">
+		Titolo
+	</string>
+	<string name="module.text.paragraph.title.sample">
+		Primo impiego internazionale per...
+	</string>
+	<string name="module.text.paragraph.paragraph">
+		Paragrafo
+	</string>
+	<string name="module.text.paragraph.paragraph.sample">
+		La Commissione arbitri ha nominato i due arbitri...
+	</string>
+	
+	<!-- enumeration -->
+	<string name="module.text.enumeration.type">
+		Tipo di elenco
+	</string>
+	<string name="module.text.enumeration.enumeration">
+		Elenco
+	</string>
+	<string name="module.text.enumeration.numbered">
+		Numerato
+	</string>
+	<string name="module.text.enumeration.unnumbered">
+		Non numerato
+	</string>
+	<string name="module.text.enumeration.add">
+		Aggiungere
+	</string>
+	<string name="module.text.enumeration.remove">
+		Eliminare
+	</string>
+
+	<!-- categorie -->
+	<string name="module.text.categorie.title">
+		Titolo del box
+	</string>
+	<string name="module.text.categorie.title.sample">
+		Indirizzi arbitri
+	</string>
+
+	<!-- code -->
+	<string name="module.text.code.type">
+		Sprache
+	</string>
+	<string name="module.text.code.code">
+		Code
+	</string>
+	<string name="module.text.code.code.sample">
+		public void helloWorld() { System.out.println("Hello World"); } 
+	</string>
+	
+
+	<!-- email -->
+	<string name="module.text.email">
+		Name
+	</string>
+	<string name="module.text.email.sample">
+		Gerhard Zingg
+	</string>
+	<string name="module.text.email.description">
+		Beschreibung
+	</string>
+	<string name="module.text.email.description.sample">
+		Zentralpr&#228;sident
+	</string>
+	<string name="module.text.email.link">
+		E-Mailadresse
+	</string>
+	<string name="module.text.email.link.sample">
+		gerhard.zingg@swissunihockey.ch
+	</string>
+</resources>
