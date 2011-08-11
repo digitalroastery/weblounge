@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
+import ch.entwine.weblounge.contentrepository.impl.index.solr.SuggestRequest;
 import ch.entwine.weblounge.workbench.suggest.PageSuggestion;
 import ch.entwine.weblounge.workbench.suggest.SubjectSuggestion;
 import ch.entwine.weblounge.workbench.suggest.UserSuggestion;
@@ -156,16 +157,16 @@ public class WorkbenchService {
   public List<SubjectSuggestion> suggestTags(Site site, String text, int limit)
       throws IllegalStateException {
     List<SubjectSuggestion> tags = new ArrayList<SubjectSuggestion>();
-    SearchQuery search = new SearchQueryImpl(site);
-    search.withSubject(text + "*");
-    search.withSubjectFacet();
-
-    // Get hold of the site's content repository
-    ContentRepository contentRepository = site.getContentRepository();
-    if (contentRepository == null) {
-      throw new IllegalStateException("No content repository found for site '" + site + "'");
+    List<String> suggestions;
+    try {
+      suggestions = site.suggest(SuggestRequest.Dictionary.Subject.toString(), text, limit);
+      for (String s : suggestions) {
+        tags.add(new SubjectSuggestion(limit, s));
+      }
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error loading tag suggestions for '" + text + "'", e);
+      return null;
     }
-    
     return tags;
   }
 
