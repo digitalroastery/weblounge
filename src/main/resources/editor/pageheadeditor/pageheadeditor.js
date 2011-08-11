@@ -99,7 +99,7 @@ steal.plugins('jquery',
 	    },
 	    
 		"input[name=url] change": function(el, ev) {
-			var url = el.val().trim();
+			var url = el.val().trim().toLowerCase();
 			el.val(encodeURI(url));
 		}
 	});

@@ -13,27 +13,31 @@ steal.plugins('jquery/view/tmpl')
 			this._initButtons();
 			this._initFilter();
 			this._initDialogs();
+			this.table = this.element.find('table.wbl-tablesorter');
+			this.pager = this.element.find("#wbl-pager");
 			this._initDataTable(10);
 		},
 		
 		update: function(options) {
 			this.options.resources = options.resources;
 			this.find('tr.wbl-pageEntry').remove();
-			this.table.trigger("update");
-			if($.isEmptyObject(this.options.resources)) return;
 			this._initViewItems();
-			this._initDataTable();
+			this._initDataTable(this.element.find(".wbl-pageSize").val());
 		},
 		
 		_initDataTable: function(pagingSize) {
-			this.table = this.element.find('table.wbl-tablesorter').tablesorter({
+			if($.isEmptyObject(this.options.resources)) {
+				this.pager.find('*').unbind();
+				return;
+			}
+			this.table.tablesorter({
 				sortList: [[0,0]],
 		        headers: { 
 		            4: { sorter: false }
 		        },
 		        widgets: ['zebra']
 			}).tablesorterPager({
-				container: this.element.find("#wbl-pager"),
+				container: this.pager,
 				positionFixed: false,
 				size: pagingSize,
 				cssNext: '.wbl-next',
@@ -46,6 +50,7 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		_initViewItems: function() {
+			if($.isEmptyObject(this.options.resources)) return;
 			$.each(this.options.resources,$.proxy(function(i, res) {
 				var listViewItem = this.element.find('#wbl-listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {
 					page: res, 

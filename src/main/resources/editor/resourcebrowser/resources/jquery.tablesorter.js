@@ -608,6 +608,7 @@
                 }
 
                 // if value is the same keep orignal order
+                // undefined!!!!
                 var orgOrderCol = cache.normalized[0].length - 1;
                 dynamicExp += "return a[" + orgOrderCol + "]-b[" + orgOrderCol + "];";
 
@@ -712,9 +713,7 @@
                     // apply event handling to headers
                     // this is to big, perhaps break it out?
                     $headers.unbind();
-                    $headers.click(
-
-                    function (e) {
+                    $headers.click(function (e) {
                         var totalRows = ($this[0].tBodies[0] && $this[0].tBodies[0].rows.length) || 0;
                         if (!this.sortDisabled && totalRows > 0) {
                             // Only call sortStart if sorting is
@@ -786,6 +785,7 @@
                         }
                     });
                     // apply easy methods that trigger binded events
+                    $this.unbind();
                     $this.bind("update", function () {
                         var me = this;
                         setTimeout(function () {
