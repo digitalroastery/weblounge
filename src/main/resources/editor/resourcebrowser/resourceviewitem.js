@@ -24,6 +24,12 @@ steal.plugins().then(function($) {
 		case 'pages':
 			Page.findOne({id: resourceItem.attr('id')}, $.proxy(function(page) {
 				// TODO Locking
+    			var locked = page.isLocked();
+            	var userLocked = page.isLockedUser(this.options.runtime.getUserLogin());
+            	if(locked && !userLocked) {
+            		this.element.trigger('showErrorMessage', "Can't edite page settings " + page.getPath() + ": Page is locked!");
+            		return;
+            	} 
 				$('#wbl-pageheadeditor').editor_pageheadeditor({page: page, language: this.options.language, runtime: this.options.runtime});
 			}, this));
 			break;

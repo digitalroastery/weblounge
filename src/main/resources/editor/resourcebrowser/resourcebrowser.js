@@ -165,6 +165,22 @@ steal.plugins(
         	this._loadResources(this.lastParams, this.lastQuery);
         },
         
+		_showMessage: function(messageText) {
+			$('.wbl-message').removeClass('wbl-error').addClass('wbl-success').css('visibility', 'visible').delay(3000).queue(function() {
+				$(this).empty().css('visibility', 'hidden');
+				$(this).dequeue();
+			});
+			$('.wbl-message').html(messageText);
+		},
+		
+		_showErrorMessage: function(messageText) {
+			$('.wbl-message').removeClass('wbl-success').addClass('wbl-error').css('visibility', 'visible').delay(3000).queue(function() {
+				$(this).empty().css('visibility', 'hidden');
+				$(this).dequeue();
+			});
+			$('.wbl-message').html(messageText);
+		},
+        
         _loadResources: function(params, functions) {
 			switch(this.options.resourceType) {
 			case 'pages':
@@ -230,20 +246,22 @@ steal.plugins(
                 	var userLocked = page.isLockedUser(this.options.runtime.getUserLogin());
                 	
                 	if(page.getPath() == '/') {
-                		alert("Can't delete root page");
+                		this._showErrorMessage("Can't delete root page");
                 	} else if(!locked || (locked && userLocked)) {
+                		this._showMessage('Seite gel&ouml;scht!');
                 		Page.destroy({id: element.id}, this.callback('_removeResource', element.id));
                 		// Relocate to Root if current page was deleted
                 		if(page.getPath() == location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1)) {
                 			location.href = '/?edit';
                 		}
                 	} else {
-                		alert("Can't delete " + page.getPath() + ": Page is locked!");
+                		this._showErrorMessage("Can't delete " + page.getPath() + ": Page is locked!");
                 	}
         		}, this))
         		break;
         	case 'media':
         		$(resources).each($.proxy(function(index, element) {
+        			this._showMessage('Media gel&ouml;scht!');
         			Editor.File.destroy({id: element.id}, this.callback('_removeResource', element.id));
         		}, this))
         		break;
@@ -253,12 +271,26 @@ steal.plugins(
         // Duplicate Pages
         "div#wbl-mainContainer duplicateResources": function(el, ev, resources) {
         	// TODO
+        	this._showMessage('Seite dupliziert!');
         	this.update();
+        },
+        
+        "div#wbl-mainContainer showMessage": function(el, ev, message) {
+        	this._showMessage(message);
+        },
+        
+        "div#wbl-mainContainer showErrorMessage": function(el, ev, errorMessage) {
+        	this._showErrorMessage(errorMessage);
         },
         
         // Favorize Pages
         "div#wbl-mainContainer favorizeResources": function(el, ev, resources) {
         	// TODO
+			if(resources.length) {
+				this._showMessage('Zu Favoriten hinzugefügt');
+			} else {
+				this._showErrorMessage('Es wurde keine Seite markiert.');
+			}
         	this.update();
         },
         
