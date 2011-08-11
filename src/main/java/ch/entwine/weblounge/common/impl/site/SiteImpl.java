@@ -23,6 +23,7 @@ package ch.entwine.weblounge.common.impl.site;
 import ch.entwine.weblounge.common.content.page.PageLayout;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJob;
@@ -635,8 +636,10 @@ public class SiteImpl implements Site {
     ContentRepository oldRepository = contentRepository;
     this.contentRepository = repository;
     if (repository != null) {
+      logger.info("Content repository {} connected to site '{}'", repository, this);
       fireRepositoryConnected(repository);
     } else {
+      logger.info("Content repository {} disconnected from site '{}'", oldRepository, this);
       fireRepositoryDisconnected(oldRepository);
     }
   }
@@ -650,6 +653,19 @@ public class SiteImpl implements Site {
     if (!isOnline)
       return null;
     return contentRepository;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#suggest(java.lang.String,
+   *      java.lang.String, int)
+   */
+  public List<String> suggest(String dictionary, String seed, int count)
+      throws ContentRepositoryException {
+    if (contentRepository == null)
+      throw new IllegalStateException("Cannot suggest while site without a content repository");
+    return contentRepository.suggest(dictionary, seed, count);
   }
 
   /**
@@ -1190,30 +1206,6 @@ public class SiteImpl implements Site {
     } finally {
       isShutdownInProgress = false;
     }
-  }
-
-  /**
-   * Callback from the OSGi environment to set the site's content repository.
-   * 
-   * @param repository
-   *          the repository
-   */
-  protected void setContenRepository(ContentRepository repository) {
-    this.contentRepository = repository;
-    logger.info("Content repository {} connected to site '{}'", repository, this);
-    fireRepositoryConnected(repository);
-  }
-
-  /**
-   * Callback from the OSGi environment to set the site's content repository.
-   * 
-   * @param repository
-   *          the repository
-   */
-  protected void removeContenRepository(ContentRepository repository) {
-    this.contentRepository = null;
-    logger.info("Content repository {} disconnected from site '{}'", repository, this);
-    fireRepositoryDisconnected(repository);
   }
 
   /**
