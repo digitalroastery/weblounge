@@ -280,7 +280,12 @@ steal.plugins('jqueryui/dialog',
     },
 
 	'img.wbl-iconEditing click': function(el, ev) {
-		Workbench.findOne({ id: this.options.composer.page.value.id, composer: this.options.composer.id, pagelet: this.element.index() }, this.callback('_openPageEditor'));
+		Workbench.getPageletEditor({
+			id: this.options.composer.page.value.id, 
+			composer: this.options.composer.id, 
+			language: this.options.composer.language,
+			pagelet: this.element.index() 
+		}, this.callback('_openPageEditor'));
 	},
 	
     'img.wbl-iconRemove click': function(el, ev) {

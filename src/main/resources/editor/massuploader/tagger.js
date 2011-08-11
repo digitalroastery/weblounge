@@ -7,6 +7,7 @@ steal.plugins('jquery',
 		'jqueryui/draggable',
 		'jqueryui/resizable',
 		'jqueryui/mouse')
+.models('../../models/workbench')
 .views('//editor/massuploader/views/tagger.tmpl')
 .css('tagger')
 .then(function($) {
@@ -73,36 +74,42 @@ steal.plugins('jquery',
 	    
 	    _initAutoComplete: function() {
 			var availableTags = ["ActionScript","Scheme"];
-			var availableAuthors = ["Lukas","Markus", this.options.user];
+			Workbench({'tag'}, function(tags) {
+				if(tags == null || tags == undefined) return;
+				var inputTags = this.element.find("input[name=tags]").autocomplete({
+					source: function(request, response) {
+						// delegate back to autocomplete, but extract the last term
+						response($.ui.autocomplete.filter(tags, request.term.split(/,\s*/).pop()));
+					},
+					focus: function() {
+						// prevent value inserted on focus
+						return false;
+					},
+					select: $.proxy(function(ev, ui) {
+						var terms = inputTags.val().split(/,\s*/);
+						// remove the current input
+						terms.pop();
+						// add the selected item
+						terms.push(ui.item.value);
+						this._saveMetadata(this.img.index(), {inputTags: terms.toString()});
+						// add placeholder to get the comma-and-space at the end
+						terms.push("");
+						inputTags.val(terms.join(", "));
+						return false;
+					},this)
+				});
+			}
 			
-			var tags = this.element.find("input[name=tags]").autocomplete({
-				source: function(request, response) {
-					// delegate back to autocomplete, but extract the last term
-					response($.ui.autocomplete.filter(availableTags, request.term.split(/,\s*/).pop()));
-				},
-				focus: function() {
-					// prevent value inserted on focus
-					return false;
-				},
-				select: $.proxy(function(ev, ui) {
-					var terms = tags.val().split(/,\s*/);
-					// remove the current input
-					terms.pop();
-					// add the selected item
-					terms.push(ui.item.value);
-					this._saveMetadata(this.img.index(), {tags: terms.toString()});
-					// add placeholder to get the comma-and-space at the end
-					terms.push("");
-					tags.val(terms.join(", "));
-					return false;
-				},this)
-			});
-			this.element.find("input[name=author]").autocomplete({
-				source: availableAuthors,
-				select: $.proxy(function(ev, ui) {
-					this._saveMetadata(this.img.index(), {author: ui.item.value});
-				},this)
-			});
+			var availableAuthors = ["Lukas","Markus", this.options.user];
+			Workbench({'user'}, function(userTags) {
+				if(userTags == null || userTags == undefined) return;
+				this.element.find("input[name=author]").autocomplete({
+					source: userTags,
+					select: $.proxy(function(ev, ui) {
+						this._saveMetadata(this.img.index(), {author: ui.item.value});
+					},this)
+				});
+			}
 	    },
 	    
 	    _loadMetadata: function(success) {

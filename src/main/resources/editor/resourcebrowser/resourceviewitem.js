@@ -23,7 +23,6 @@ steal.plugins().then(function($) {
 		switch(this.options.resourceType) {
 		case 'pages':
 			Page.findOne({id: resourceItem.attr('id')}, $.proxy(function(page) {
-				// TODO Locking
     			var locked = page.isLocked();
             	var userLocked = page.isLockedUser(this.options.runtime.getUserLogin());
             	if(locked && !userLocked) {

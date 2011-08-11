@@ -172,12 +172,10 @@ img.wbl-pageThumbnail {
 	box-shadow: 2px 2px 2px #444;
 }
 
-.wbl-page.wbl-marked img {
-	opacity: 0.3;
-}
-
-.wbl-page.wbl-marked * {
-	color: #ccc !important;
+.wbl-page.wbl-marked img.wbl-pageThumbnail {
+	background-color: #ddccb5;
+	border-radius: 5px;
+	border: 2px solid red;
 }
 
 .wbl-page p,

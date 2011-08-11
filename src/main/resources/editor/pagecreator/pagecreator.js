@@ -3,6 +3,7 @@ steal.plugins('jquery',
 		'jquery/view',
 		'jquery/view/tmpl',
 		'jqueryui/widget')
+.models('../../models/workbench')
 .views('//editor/pagecreator/views/init.tmpl')
 .css('pagecreator')
 .then(function($) {
@@ -94,30 +95,31 @@ steal.plugins('jquery',
 			});
 			
 			// TODO Load AvailableTags
-			// Autocomplete Tags
-			var availableTags = ["ActionScript","Scheme"];
-			this.element.find("input[name=tags]").autocomplete({
-				source: function(request, response) {
-					// delegate back to autocomplete, but extract the last term
-					response($.ui.autocomplete.filter(availableTags, request.term.split(/,\s*/).pop()));
-				},
-				focus: function() {
-					// prevent value inserted on focus
-					return false;
-				},
-				select: function(ev, ui) {
-					var terms = this.value.split(/,\s*/);
-					// remove the current input
-					terms.pop();
-					// add the selected item
-					terms.push(ui.item.value);
-					// add placeholder to get the comma-and-space at the end
-					terms.push("");
-					this.value = terms.join(", ");
-					return false;
-				}
+			Workbench.suggestTags({}, function(tags) {
+				if(tags == null || tags == undefined) return;
+//				var availableTags = ["ActionScript","Scheme"];
+				this.element.find("input[name=tags]").autocomplete({
+					source: function(request, response) {
+						// delegate back to autocomplete, but extract the last term
+						response($.ui.autocomplete.filter(tags, request.term.split(/,\s*/).pop()));
+					},
+					focus: function() {
+						// prevent value inserted on focus
+						return false;
+					},
+					select: function(ev, ui) {
+						var terms = this.value.split(/,\s*/);
+						// remove the current input
+						terms.pop();
+						// add the selected item
+						terms.push(ui.item.value);
+						// add placeholder to get the comma-and-space at the end
+						terms.push("");
+						this.value = terms.join(", ");
+						return false;
+					}
+				});
 			});
-			
 			
 			// Dialog
 			this.element.dialog({

@@ -24,7 +24,7 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller', 'jque
 					// this option isn't supported in all browsers
 					sizeLimit: 0, // max size   
 					minSizeLimit: 0, // min size
-					onCancel: this._cancel,
+//					onCancel: this._cancel,
 					onComplete: $.proxy(function(id, fileName, response) {
 						if($.isEmptyObject(response)) return;
 						
@@ -50,11 +50,6 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller', 'jque
 			}, this));
 		},
 		
-	    _cancel: function(id, fileName) {
-	    	// TODO ???
-	    	steal.dev.log(id + fileName);
-	    },
-	    
 	    "img.wbl-addPageImg click": function(el, ev) {
 	    	ev.stopPropagation();
 			$('.wbl-menu').hide();
