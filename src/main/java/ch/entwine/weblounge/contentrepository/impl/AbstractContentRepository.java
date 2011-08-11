@@ -56,6 +56,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.CharBuffer;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -111,10 +112,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
   public String getType() {
     return type;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#isReadOnly()
    */
   public boolean isReadOnly() {
@@ -126,14 +127,13 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#connect(ch.entwine.weblounge.common.site.Site)
    */
-  public void connect(Site site)
-      throws ContentRepositoryException {
+  public void connect(Site site) throws ContentRepositoryException {
     if (connected)
       throw new IllegalStateException("Content repository has already been started");
     if (site == null)
       throw new ContentRepositoryException("Site must not be null");
     this.site = site;
-    
+
     try {
       index = loadIndex();
     } catch (IOException e) {
@@ -173,10 +173,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throw new ContentRepositoryException(e);
     }
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getResourceURI(java.lang.String)
    */
   public ResourceURI getResourceURI(String resourceId)
@@ -202,6 +202,21 @@ public abstract class AbstractContentRepository implements ContentRepository {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
     return index.find(query);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @throws ContentRepositoryException
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#suggest(java.lang.String,
+   *      java.lang.String, int)
+   */
+  public List<String> suggest(String dictionary, String seed, int count)
+      throws ContentRepositoryException {
+    if (!isStarted())
+      throw new IllegalStateException("Content repository is not connected");
+    return index.suggest(dictionary, seed, false, count, false);
   }
 
   /**

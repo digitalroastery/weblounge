@@ -372,12 +372,20 @@ public class SearchIndex {
   }
 
   /**
-   * Returns the suggestions as returned from the selected dictionary.
+   * Returns the suggestions as returned from the selected dictionary based on
+   * <code>seed</code>.
    * 
    * @param dictionary
    *          the dictionary
    * @param seed
    *          the seed used for suggestions
+   * @param onlyMorePopular
+   *          whether to return only more popular results
+   * @param count
+   *          the maximum number of suggestions
+   * @param collate
+   *          whether to provide a query collated with the first matching
+   *          suggestion
    */
   public List<String> suggest(String dictionary, String seed,
       boolean onlyMorePopular, int count, boolean collate)

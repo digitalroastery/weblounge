@@ -28,12 +28,14 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.language.Language;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -620,7 +622,7 @@ public class ContentRepositoryIndex {
     uriIdx.update(address, uri.getType(), newURI.getPath());
     pathIdx.delete(oldPath, address);
     pathIdx.set(address, newURI.getPath());
-    
+
     for (long version : versions) {
       uri.setVersion(version);
       searchIdx.move(uri, newURI.getPath());
@@ -723,6 +725,34 @@ public class ContentRepositoryIndex {
   }
 
   /**
+   * Returns the suggestions as returned from the selected dictionary based on
+   * <code>seed</code>.
+   * 
+   * @param dictionary
+   *          the dictionary
+   * @param seed
+   *          the seed used for suggestions
+   * @param onlyMorePopular
+   *          whether to return only more popular results
+   * @param count
+   *          the maximum number of suggestions
+   * @param collate
+   *          whether to provide a query collated with the first matching
+   *          suggestion
+   * @throws ContentRepositoryException
+   *           if suggesting fails
+   */
+  public List<String> suggest(String dictionary, String seed,
+      boolean onlyMorePopular, int count, boolean collate)
+      throws ContentRepositoryException {
+    if (StringUtils.isBlank(dictionary))
+      throw new IllegalArgumentException("Dictionary cannot be null");
+    if (StringUtils.isBlank(seed))
+      throw new IllegalArgumentException("Seed cannot be null");
+    return searchIdx.suggest(dictionary, seed, onlyMorePopular, count, collate);
+  }
+
+  /**
    * Returns the number of entries in this index.
    * 
    * @return the number of indexed entries
@@ -747,9 +777,9 @@ public class ContentRepositoryIndex {
    *           if accessing the index fails
    */
   protected long toURIEntry(ResourceURI uri) throws IOException {
-    if (uri == null) 
+    if (uri == null)
       throw new IllegalArgumentException("Uri must not be null");
-    
+
     String id = uri.getIdentifier();
     String path = uri.getPath();
 

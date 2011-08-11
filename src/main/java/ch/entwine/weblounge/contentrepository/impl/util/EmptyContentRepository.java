@@ -31,7 +31,9 @@ import ch.entwine.weblounge.common.site.Site;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This is a place holder implementation for sites that have no content
@@ -100,6 +102,17 @@ public class EmptyContentRepository implements ContentRepository {
    */
   public SearchResult find(SearchQuery query) throws ContentRepositoryException {
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#suggest(java.lang.String,
+   *      java.lang.String, int)
+   */
+  public List<String> suggest(String dictionary, String seed, int count)
+      throws ContentRepositoryException {
+    return new ArrayList<String>();
   }
 
   /**
