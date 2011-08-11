@@ -75,7 +75,8 @@ public class WorkbenchEndpoint {
   public Response getPageletEditor(@Context HttpServletRequest request,
       @PathParam("page") String pageURI,
       @PathParam("composer") String composerId,
-      @PathParam("pageletindex") int pagelet) {
+      @PathParam("pageletindex") int pagelet,
+      @QueryParam("language") String language) {
 
     // Load the site
     Site site = getSite(request);
@@ -87,7 +88,7 @@ public class WorkbenchEndpoint {
     ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.LIVE);
     PageletEditor editor;
     try {
-      editor = workbench.getEditor(site, uri, composerId, pagelet);
+      editor = workbench.getEditor(site, uri, composerId, pagelet, language);
     } catch (IOException e) {
       throw new WebApplicationException(e);
     }
@@ -98,30 +99,22 @@ public class WorkbenchEndpoint {
   }
 
   /**
-   * Returns a list of suggested tags based on an initial hint. The number of
-   * suggestions returned can be specified using the <code>limit</code>
+   * Returns a list of suggested subjects based on an initial hint. The number
+   * of suggestions returned can be specified using the <code>limit</code>
    * parameter.
    * 
-   * @param request
-   *          the request
-   * @param seed
-   *          the text to base the suggestions on
-   * @param highlightTag
-   *          name of the tag used for highlighting
-   * @param limit
-   *          maximum number of suggestions
    * @return the endpoint documentation
    */
   @GET
   @Produces(MediaType.TEXT_XML)
-  @Path("/suggest/tags/{seed}")
-  public Response suggestTags(@Context HttpServletRequest request,
-      @PathParam("seed") String seed,
+  @Path("/suggest/subjects/{hint}")
+  public Response suggestSubjects(@Context HttpServletRequest request,
+      @PathParam("hint") String hint,
       @QueryParam("highlight") String highlightTag,
       @QueryParam("limit") int limit) {
-    SuggestionList<SubjectSuggestion> list = new SuggestionList<SubjectSuggestion>("subjects", seed, highlightTag);
+    SuggestionList<SubjectSuggestion> list = new SuggestionList<SubjectSuggestion>("subjects", hint, highlightTag);
     try {
-      list.addAll(workbench.suggestTags(getSite(request), seed, limit));
+      list.addAll(workbench.suggestTags(getSite(request), hint, limit));
       return Response.ok(list.toXml()).build();
     } catch (IllegalStateException e) {
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);

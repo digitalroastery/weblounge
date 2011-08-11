@@ -49,25 +49,26 @@ public final class WorkbenchEndpointDocs {
     docs.setTitle("Weblounge Workbench");
 
     // GET /edit/{page}/{composer}/{pageletindex}
-    Endpoint getImageMetadata = new Endpoint("/edit/{page}/{composer}/{pageletindex}", Method.GET, "getpageleteditor");
-    getImageMetadata.setDescription("Returns the editor for the given pagelet");
-    getImageMetadata.addFormat(new Format("xml", null, null));
-    getImageMetadata.addStatus(ok("the pagelet was found and it's editing information is returned"));
-    getImageMetadata.addStatus(notFound("the page, the composer or the pagelet were not found"));
-    getImageMetadata.addStatus(serviceUnavailable("the site is temporarily offline"));
-    getImageMetadata.addPathParameter(new Parameter("page", Parameter.Type.String, "The page uri"));
-    getImageMetadata.addPathParameter(new Parameter("composer", Parameter.Type.String, "The composer identifier"));
-    getImageMetadata.addPathParameter(new Parameter("pageletindex", Parameter.Type.String, "The pagelet's index within the composer (0 based)"));
-    getImageMetadata.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getImageMetadata);
+    Endpoint getPageletEditor = new Endpoint("/edit/{page}/{composer}/{pageletindex}", Method.GET, "getpageleteditor");
+    getPageletEditor.setDescription("Returns the editor for the given pagelet");
+    getPageletEditor.addFormat(new Format("xml", null, null));
+    getPageletEditor.addStatus(ok("the pagelet was found and it's editing information is returned"));
+    getPageletEditor.addStatus(notFound("the page, the composer or the pagelet were not found"));
+    getPageletEditor.addStatus(serviceUnavailable("the site is temporarily offline"));
+    getPageletEditor.addPathParameter(new Parameter("page", Parameter.Type.String, "The page uri"));
+    getPageletEditor.addPathParameter(new Parameter("composer", Parameter.Type.String, "The composer identifier"));
+    getPageletEditor.addPathParameter(new Parameter("pageletindex", Parameter.Type.String, "The pagelet's index within the composer (0 based)"));
+    getPageletEditor.addOptionalParameter(new Parameter("language", Parameter.Type.String, "The language id"));
+    getPageletEditor.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getPageletEditor);
 
     // GET /suggest/subjects/{hint}
-    Endpoint suggestSubjects = new Endpoint("/suggest/tags/{hint}", Method.GET, "suggestsubjects");
+    Endpoint suggestSubjects = new Endpoint("/suggest/subjects/{hint}", Method.GET, "suggestsubjects");
     suggestSubjects.setDescription("Returns suggestions for subjects based on the given hint");
     suggestSubjects.addFormat(new Format("xml", null, null));
     suggestSubjects.addStatus(ok("suggestions based on the hint are returned"));
     suggestSubjects.addStatus(serviceUnavailable("the site is temporarily offline"));
-    suggestSubjects.addPathParameter(new Parameter("seed", Parameter.Type.String, "The hint on which suggestions are based"));
+    suggestSubjects.addPathParameter(new Parameter("hint", Parameter.Type.String, "The hint on which suggestions are based"));
     suggestSubjects.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "The maximum number of suggestions"));
     suggestSubjects.addOptionalParameter(new Parameter("highlight", Parameter.Type.String, "The tag name used to highlight matches"));
     suggestSubjects.setTestForm(new TestForm());

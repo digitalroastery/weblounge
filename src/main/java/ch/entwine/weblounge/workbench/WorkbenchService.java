@@ -33,7 +33,6 @@ import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SuggestRequest;
 import ch.entwine.weblounge.workbench.suggest.PageSuggestion;
 import ch.entwine.weblounge.workbench.suggest.SubjectSuggestion;
 import ch.entwine.weblounge.workbench.suggest.UserSuggestion;
@@ -54,6 +53,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.Servlet;
@@ -157,16 +157,16 @@ public class WorkbenchService {
   public List<SubjectSuggestion> suggestTags(Site site, String text, int limit)
       throws IllegalStateException {
     List<SubjectSuggestion> tags = new ArrayList<SubjectSuggestion>();
-    List<String> suggestions;
-    try {
-      suggestions = site.suggest(SuggestRequest.Dictionary.Subject.toString(), text, limit);
-      for (String s : suggestions) {
-        tags.add(new SubjectSuggestion(limit, s));
-      }
-    } catch (ContentRepositoryException e) {
-      logger.warn("Error loading tag suggestions for '" + text + "'", e);
-      return null;
+    SearchQuery search = new SearchQueryImpl(site);
+    search.withSubject(text + "*");
+    search.withSubjectFacet();
+
+    // Get hold of the site's content repository
+    ContentRepository contentRepository = site.getContentRepository();
+    if (contentRepository == null) {
+      throw new IllegalStateException("No content repository found for site '" + site + "'");
     }
+    
     return tags;
   }
 
@@ -208,12 +208,13 @@ public class WorkbenchService {
    *          the composer id
    * @param pageletIndex
    *          the pagelet index
+   * @param language 
    * @return the pagelet editor
    * @throws IOException
    *           if reading the pagelet fails
    */
   public PageletEditor getEditor(Site site, ResourceURI pageURI,
-      String composerId, int pageletIndex) throws IOException {
+      String composerId, int pageletIndex, String language) throws IOException {
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
     if (composerId == null)
@@ -264,7 +265,7 @@ public class WorkbenchService {
     if (rendererURL != null) {
       String rendererContent = null;
       try {
-        rendererContent = loadContents(rendererURL, site, page, composer, pagelet);
+        rendererContent = loadContents(rendererURL, site, page, composer, pagelet, language);
         pageletEditor.setRenderer(rendererContent);
       } catch (ServletException e) {
         logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
@@ -276,7 +277,7 @@ public class WorkbenchService {
     if (editorURL != null) {
       String rendererContent = null;
       try {
-        rendererContent = loadContents(editorURL, site, page, composer, pagelet);
+        rendererContent = loadContents(editorURL, site, page, composer, pagelet, language);
         pageletEditor.setEditor(rendererContent);
       } catch (ServletException e) {
         logger.warn("Error processing the pagelet renderer at {}: {}", editorURL, e.getMessage());
@@ -301,6 +302,7 @@ public class WorkbenchService {
    *          the composer
    * @param pagelet
    *          the pagelet
+   * @param language 
    * @return the servlet response, serialized to a string
    * @throws IOException
    *           if the servlet fails to create the response
@@ -308,7 +310,7 @@ public class WorkbenchService {
    *           if an exception occurs while processing
    */
   private String loadContents(URL rendererURL, Site site, Page page,
-      Composer composer, Pagelet pagelet) throws IOException, ServletException {
+      Composer composer, Pagelet pagelet, String language) throws IOException, ServletException {
 
     Servlet servlet = siteServlets.get(site.getIdentifier());
 
@@ -323,6 +325,8 @@ public class WorkbenchService {
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
       request.setLocalAddr(site.getURL().toExternalForm());
+      if(language != null)
+        request.addPreferredLocale(new Locale(language));
       request.setAttribute(WebloungeRequest.PAGE, page);
       request.setAttribute(WebloungeRequest.COMPOSER, composer);
       request.setAttribute(WebloungeRequest.PAGELET, pagelet);
