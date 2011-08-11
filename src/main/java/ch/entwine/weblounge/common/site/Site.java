@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.Customizable;
 import ch.entwine.weblounge.common.content.page.PageLayout;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.RequestListener;
 import ch.entwine.weblounge.common.security.AuthenticationModule;
@@ -33,6 +34,7 @@ import ch.entwine.weblounge.common.security.WebloungeUser;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.util.List;
 
 /**
  * The site interface defines the method that may be called on weblounge site
@@ -438,6 +440,23 @@ public interface Site extends Customizable, RequestListener, Serializable {
   ContentRepository getContentRepository();
 
   /**
+   * Suggests a maximum of <code>count</code> entries using <code>seed</code>
+   * from the specified dictionary.
+   * 
+   * @param dictionary
+   *          the dictionary
+   * @param seed
+   *          the seed
+   * @param count
+   *          the maximum number of suggestions
+   * @return the suggestions
+   * @throws ContentRepositoryException
+   *           if creating the suggestions fails
+   */
+  List<String> suggest(String dictionary, String seed, int count)
+      throws ContentRepositoryException;
+
+  /**
    * Sets the site administrator.
    * 
    * @param administrator
@@ -448,8 +467,9 @@ public interface Site extends Customizable, RequestListener, Serializable {
   /**
    * Returns the administrator user.
    * <p>
-   * Preferably, the {@link ch.entwine.weblounge.common.security.SecurityService}
-   * is used instead of this method.
+   * Preferably, the
+   * {@link ch.entwine.weblounge.common.security.SecurityService} is used
+   * instead of this method.
    * 
    * @return the site administrator user
    */
@@ -460,8 +480,9 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * Returns the user with the given login name or <code>null</code> if no such
    * user exists.
    * <p>
-   * Preferably, the {@link ch.entwine.weblounge.common.security.SecurityService}
-   * is used instead of this method.
+   * Preferably, the
+   * {@link ch.entwine.weblounge.common.security.SecurityService} is used
+   * instead of this method.
    * 
    * @param login
    *          the user's login name
@@ -475,8 +496,9 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * context or <code>null</code> if no such role was found.
    * 
    * <p>
-   * Preferably, the {@link ch.entwine.weblounge.common.security.SecurityService}
-   * is used instead of this method.
+   * Preferably, the
+   * {@link ch.entwine.weblounge.common.security.SecurityService} is used
+   * instead of this method.
    * 
    * @param role
    *          the role identifier

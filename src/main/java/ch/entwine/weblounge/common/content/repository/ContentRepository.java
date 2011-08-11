@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.site.Site;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A content repository stores resources and resources that represent the
@@ -141,7 +142,8 @@ public interface ContentRepository {
    * @throws ContentRepositoryException
    *           if looking up the resource from the repository fails
    */
-  ResourceURI getResourceURI(String resourceId) throws ContentRepositoryException;
+  ResourceURI getResourceURI(String resourceId)
+      throws ContentRepositoryException;
 
   /**
    * Returns a resource uri for every available revision of the resource.
@@ -246,6 +248,23 @@ public interface ContentRepository {
    *           if performing the search query fails
    */
   SearchResult find(SearchQuery query) throws ContentRepositoryException;
+
+  /**
+   * Suggests a maximum of <code>count</code> entries using <code>seed</code>
+   * from the specified dictionary.
+   * 
+   * @param dictionary
+   *          the dictionary
+   * @param seed
+   *          the seed
+   * @param count
+   *          the maximum number of suggestions
+   * @return the suggestions
+   * @throws ContentRepositoryException
+   *           if suggesting fails
+   */
+  List<String> suggest(String dictionary, String seed, int count)
+      throws ContentRepositoryException;
 
   /**
    * Returns the number of resources in this index.
