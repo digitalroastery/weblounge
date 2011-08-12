@@ -330,10 +330,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                 foundResource = true;
               }
 
-              // Create the previews
-              logger.debug("Creating preview images");
-              createPreviews(resource);
-
             } catch (Throwable t) {
               logger.error("Error indexing {} {}: {}", new Object[] {
                   resourceType,
