@@ -21,8 +21,16 @@
 package ch.entwine.weblounge.common.security;
 
 /**
- * Provides access to users and roles.
+ * A directory provider provides user and role information along with an
+ * identifier.
  */
-public interface SiteDirectory extends DirectoryProvider {
+public interface DirectoryProvider extends DirectoryService {
+
+  /**
+   * Returns this directory provider's identifier.
+   * 
+   * @return the provider id
+   */
+  String getIdentifier();
 
 }

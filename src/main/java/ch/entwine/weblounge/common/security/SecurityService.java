@@ -27,6 +27,9 @@ import ch.entwine.weblounge.common.site.Site;
  */
 public interface SecurityService {
 
+  /** Security context identifier */
+  String HTTP_CONTEXT_ID = "ch.entwine.weblounge.security.hhtpcontext";
+
   /**
    * Gets the current user, or the local organization's anonymous user if the
    * user has not been authenticated.
