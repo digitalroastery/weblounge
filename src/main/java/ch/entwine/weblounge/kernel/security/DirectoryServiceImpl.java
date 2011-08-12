@@ -22,10 +22,10 @@ package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryService;
+import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.Password;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.SecurityService;
-import ch.entwine.weblounge.common.security.SiteDirectory;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -56,7 +56,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
   private static final Logger logger = LoggerFactory.getLogger(DirectoryServiceImpl.class);
 
   /** The list of directories */
-  protected Map<String, List<SiteDirectory>> directories = new HashMap<String, List<SiteDirectory>>();
+  protected Map<String, List<DirectoryProvider>> directories = new HashMap<String, List<DirectoryProvider>>();
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -72,7 +72,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     if (site == null)
       throw new IllegalStateException("No site set in security context");
 
-    List<SiteDirectory> siteDirectories = directories.get(site.getIdentifier());
+    List<DirectoryProvider> siteDirectories = directories.get(site.getIdentifier());
     if (siteDirectories == null) {
       logger.debug("No directories found for '{}'", site.getIdentifier());
       return new Role[] {};
@@ -80,7 +80,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
 
     // Collect roles from all directories registered for this site
     SortedSet<Role> roles = new TreeSet<Role>();
-    for (SiteDirectory directory : siteDirectories) {
+    for (DirectoryProvider directory : siteDirectories) {
       for (Role role : directory.getRoles()) {
         roles.add(role);
       }
@@ -98,7 +98,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     if (site == null)
       throw new IllegalStateException("No site set in security context");
 
-    List<SiteDirectory> siteDirectories = directories.get(site.getIdentifier());
+    List<DirectoryProvider> siteDirectories = directories.get(site.getIdentifier());
     if (siteDirectories == null) {
       logger.debug("No directories found for '{}'", site.getIdentifier());
       return null;
@@ -106,7 +106,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
 
     // Collect all of the roles from each of the directories for this user
     User user = null;
-    for (SiteDirectory directory : siteDirectories) {
+    for (DirectoryProvider directory : siteDirectories) {
       User u = directory.loadUser(login);
       if (u == null) {
         continue;
@@ -138,12 +138,12 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     } else {
       Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
       for (Object role : user.getPublicCredentials(Role.class)) {
-        authorities.add(new GrantedAuthorityImpl(((Role)role).getIdentifier()));
+        authorities.add(new GrantedAuthorityImpl(((Role) role).getIdentifier()));
       }
       Set<Object> passwords = user.getPrivateCredentials(Password.class);
       String password = null;
       for (Object o : passwords) {
-        Password p = (Password)o;
+        Password p = (Password) o;
         if (DigestType.plain.equals(p.getDigestType())) {
           password = p.getPassword();
           break;
@@ -164,13 +164,13 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     if (site == null)
       throw new IllegalStateException("No site set in security context");
 
-    List<SiteDirectory> siteDirectories = directories.get(site.getIdentifier());
+    List<DirectoryProvider> siteDirectories = directories.get(site.getIdentifier());
     if (siteDirectories == null) {
       logger.debug("No directories registered for site '{}'", site.getIdentifier());
       return null;
     }
 
-    for (SiteDirectory directory : siteDirectories) {
+    for (DirectoryProvider directory : siteDirectories) {
       Role localRole = directory.getLocalRole(role);
       if (localRole != null) {
         return localRole;
@@ -196,29 +196,29 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
    * @param directory
    *          the site directory
    */
-  void addUserProvider(SiteDirectory directory) {
+  void addDirectoryProvider(DirectoryProvider directory) {
     logger.debug("Adding {} to the list of site directories", directory);
-    List<SiteDirectory> siteDirectories = directories.get(directory.getSite());
-    if (siteDirectories == null) {
-      siteDirectories = new ArrayList<SiteDirectory>();
-      directories.put(directory.getSite(), siteDirectories);
+    List<DirectoryProvider> directoryProvider = directories.get(directory.getIdentifier());
+    if (directoryProvider == null) {
+      directoryProvider = new ArrayList<DirectoryProvider>();
+      directories.put(directory.getIdentifier(), directoryProvider);
     }
-    siteDirectories.add(directory);
+    directoryProvider.add(directory);
   }
 
   /**
-   * Removes the site directory from the list of directories for the site.
+   * Removes the directory service provider from the list of providers.
    * 
    * @param directory
-   *          the site directory
+   *          the directory service provider
    */
-  void removeSiteDirectory(SiteDirectory directory) {
+  void removeDirectoryProvidery(DirectoryProvider directory) {
     logger.debug("Removing site directory {}", directory);
-    List<SiteDirectory> siteDirectories = directories.get(directory.getSite());
+    List<DirectoryProvider> siteDirectories = directories.get(directory.getIdentifier());
     if (siteDirectories != null) {
       siteDirectories.remove(directory);
       if (siteDirectories.size() == 0) {
-        directories.remove(directory.getSite());
+        directories.remove(directory.getIdentifier());
       }
     }
   }

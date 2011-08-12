@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge Directory Service">
+
+  <implementation class="ch.entwine.weblounge.kernel.security.DirectoryServiceImpl" />
+  <property name="service.description" value="Weblounge Directory Service" />
+  <service>
+    <provide interface="ch.entwine.weblounge.common.security.DirectoryService" />
+    <provide interface="org.springframework.security.core.userdetails.UserDetailsService" />
+  </service>
+  <reference name="directoryprovider" interface="ch.entwine.common.security.DirectoryProvider" cardinality="0..n" policy="dynamic" bind="addDirectoryProvider" unbind="removeDirectoryProvider" />
+</scr:component>

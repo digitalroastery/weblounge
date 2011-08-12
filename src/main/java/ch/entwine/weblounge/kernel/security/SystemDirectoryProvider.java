@@ -24,11 +24,14 @@ import static ch.entwine.weblounge.common.security.SecurityConstants.DEFAULT_ORG
 
 import ch.entwine.weblounge.common.impl.security.AuthenticatedUserImpl;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.Role;
-import ch.entwine.weblounge.common.security.SiteDirectory;
 import ch.entwine.weblounge.common.security.User;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +42,10 @@ import java.util.Set;
  * An in-memory user directory containing the users and roles used by the
  * system.
  */
-public class InMemoryUserAndRoleProvider implements SiteDirectory {
+public class SystemDirectoryProvider implements DirectoryProvider {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(SystemDirectoryProvider.class);
 
   /** The known roles */
   private static final Set<Role> SYSTEM_ROLES = new HashSet<Role>(4);
@@ -76,30 +82,24 @@ public class InMemoryUserAndRoleProvider implements SiteDirectory {
     internalAccounts = new HashMap<String, User>();
 
     // Admin
-    String adminUsername = cc.getBundleContext().getProperty("org.opencastproject.security.demo.admin.user");
-    String adminUserPass = cc.getBundleContext().getProperty("org.opencastproject.security.demo.admin.pass");
-    User administrator = new AuthenticatedUserImpl(adminUsername);
-    internalAccounts.put(adminUsername, administrator);
-    administrator.addPrivateCredentials(adminUserPass);
-    for (Role role : SYSTEM_ROLES) {
-      administrator.addPublicCredentials(role);
-    }
+    String adminUsername = cc.getBundleContext().getProperty("ch.entwine.weblounge.security.demo.admin.user");
+    String adminUserPass = cc.getBundleContext().getProperty("ch.entwine.weblounge.security.demo.admin.pass");
 
-    // Digest user
-    String digestUsername = cc.getBundleContext().getProperty("org.opencastproject.security.digest.user");
-    String digestUserPass = cc.getBundleContext().getProperty("org.opencastproject.security.digest.pass");
-    User systemAccount = new AuthenticatedUserImpl(digestUsername);
-    internalAccounts.put(digestUsername, systemAccount);
-    systemAccount.addPrivateCredentials(digestUserPass);
-    for (Role role : SYSTEM_ROLES) {
-      systemAccount.addPublicCredentials(role);
+    if (StringUtils.isNotBlank(adminUserPass)) {
+      logger.info("Activating demo admin user '{}'");
+      User administrator = new AuthenticatedUserImpl(adminUsername);
+      internalAccounts.put(adminUsername, administrator);
+      administrator.addPrivateCredentials(StringUtils.trimToEmpty(adminUserPass));
+      for (Role role : SYSTEM_ROLES) {
+        administrator.addPublicCredentials(role);
+      }
     }
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
+   * @see ch.entwine.weblounge.common.security.DirectoryService#getRoles()
    */
   public Role[] getRoles() {
     return SYSTEM_ROLES.toArray(new Role[SYSTEM_ROLES.size()]);
@@ -108,7 +108,7 @@ public class InMemoryUserAndRoleProvider implements SiteDirectory {
   /**
    * {@inheritDoc}
    * 
-   * @see org.SiteDirectory.security.api.UserProvider#loadUser(java.lang.String)
+   * @see ch.entwine.weblounge.common.security.DirectoryService#loadUser(java.lang.String)
    */
   public User loadUser(String userName) {
     return internalAccounts.get(userName);
@@ -130,9 +130,9 @@ public class InMemoryUserAndRoleProvider implements SiteDirectory {
   /**
    * {@inheritDoc}
    * 
-   * @see org.SiteDirectory.security.api.UserProvider#getSite()
+   * @see ch.entwine.weblounge.common.security.DirectoryProvider#getIdentifier()
    */
-  public String getSite() {
+  public String getIdentifier() {
     return DEFAULT_ORGANIZATION_ID;
   }
 

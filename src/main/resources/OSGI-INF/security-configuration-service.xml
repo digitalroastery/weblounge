@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.kernel.security.SecurityConfigurationService"
+  immediate="true"
+  activate="activate"
+  deactivate="deactivate"
+  name="Weblounge Security Configuration Service">
+  
+  <implementation class="ch.entwine.weblounge.kernel.security.SecurityConfigurationService" />
+  <property name="service.description" value="Weblounge Security Configuration Service" />
+  <service>
+    <provide interface="ch.entwine.weblounge.kernel.security.SecurityConfigurationService" />
+  </service>
+
+</scr:component>

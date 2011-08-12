@@ -43,7 +43,7 @@ import java.util.Set;
 /**
  * Tests the combined user and role directory service.
  */
-public class UserAndRoleDirectoryServiceImplTest {
+public class DirectoryServiceImplTest {
 
   /** The user and role directory */
   protected DirectoryServiceImpl directory = null;
@@ -88,12 +88,12 @@ public class UserAndRoleDirectoryServiceImplTest {
     johnAlterEgo.addPublicCredentials(roleC);
 
     SiteDirectory directoryA = EasyMock.createNiceMock(SiteDirectory.class);
-    EasyMock.expect(directoryA.getSite()).andReturn(site.getIdentifier()).anyTimes();
+    EasyMock.expect(directoryA.getIdentifier()).andReturn(site.getIdentifier()).anyTimes();
     EasyMock.expect(directoryA.loadUser((String) EasyMock.anyObject())).andReturn(john).anyTimes();
     EasyMock.replay(directoryA);
 
     SiteDirectory directoryB = EasyMock.createNiceMock(SiteDirectory.class);
-    EasyMock.expect(directoryB.getSite()).andReturn(site.getIdentifier()).anyTimes();
+    EasyMock.expect(directoryB.getIdentifier()).andReturn(site.getIdentifier()).anyTimes();
     EasyMock.expect(directoryB.loadUser((String) EasyMock.anyObject())).andReturn(johnAlterEgo).anyTimes();
     EasyMock.replay(directoryB);
 
@@ -103,8 +103,8 @@ public class UserAndRoleDirectoryServiceImplTest {
 
     directory = new DirectoryServiceImpl();
     directory.setSecurityService(securityService);
-    directory.addUserProvider(directoryA);
-    directory.addUserProvider(directoryB);
+    directory.addDirectoryProvider(directoryA);
+    directory.addDirectoryProvider(directoryB);
   }
 
   /**
