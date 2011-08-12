@@ -113,5 +113,17 @@ public class GreeterHTMLAction extends HTMLActionSupport {
     }
     return language;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.impl.site.HTMLActionSupport#passivate()
+   */
+  @Override
+  public void passivate() {
+    greeting = null;
+    language = null;
+    super.passivate();
+  }
 
 }
