@@ -245,7 +245,7 @@ public class SiteManager {
       String hostName = url.getHost();
       Site registeredFirst = sitesByServerName.get(hostName);
       if (registeredFirst != null && !site.equals(registeredFirst)) {
-        logger.error("Another site is already registered to " + url);
+        logger.warn("Another site is already registered to " + url);
         continue;
       }
       sitesByServerName.put(hostName, site);
@@ -363,9 +363,11 @@ public class SiteManager {
    *          the site identifier
    * @param repository
    *          the content repository
+   * @throws ContentRepositoryException
+   *           if connecting the content repository to the site fails
    */
   synchronized void addContentRepository(String siteIdentifier,
-      ContentRepository repository) {
+      ContentRepository repository) throws ContentRepositoryException {
     if (StringUtils.isBlank(siteIdentifier))
       throw new IllegalArgumentException("Site identifier must not be null");
     if (repository == null)
@@ -379,6 +381,7 @@ public class SiteManager {
         site.setContentRepository(repository);
       } catch (ContentRepositoryException e) {
         logger.warn("Error connecting content repository " + repository + " to site '" + site + "'", e);
+        throw e;
       }
     }
 
@@ -518,7 +521,11 @@ public class SiteManager {
 
       // Register the content repository
       ContentRepository repository = (ContentRepository) super.addingService(reference);
-      siteManager.addContentRepository(siteIdentifier, repository);
+      try {
+        siteManager.addContentRepository(siteIdentifier, repository);
+      } catch (ContentRepositoryException e) {
+        return null;
+      }
 
       return repository;
     }
