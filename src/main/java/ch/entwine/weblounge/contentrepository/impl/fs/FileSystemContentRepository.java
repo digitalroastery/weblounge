@@ -331,7 +331,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
               }
 
               // Create the previews
-              logger.info("Creating preview images");
+              logger.debug("Creating preview images");
               createPreviews(resource);
 
             } catch (Throwable t) {
