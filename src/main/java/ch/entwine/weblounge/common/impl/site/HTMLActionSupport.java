@@ -129,7 +129,6 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   public void passivate() {
     super.passivate();
     page = null;
-    stageRenderer = null;
     infoMessages = null;
     warningMessages = null;
     errorMessages = null;
