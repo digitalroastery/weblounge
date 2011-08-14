@@ -87,7 +87,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   protected Page page = null;
 
   /** The renderer used for this request */
-  protected PageletRenderer renderer = null;
+  protected PageletRenderer stageRenderer = null;
 
   /** The information messages */
   protected List<String> infoMessages = null;
@@ -129,7 +129,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   public void passivate() {
     super.passivate();
     page = null;
-    renderer = null;
+    stageRenderer = null;
     infoMessages = null;
     warningMessages = null;
     errorMessages = null;
@@ -161,9 +161,9 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   public void setModule(Module module) {
     super.setModule(module);
     if (StringUtils.isNotBlank(stageRendererId)) {
-      this.renderer = getModule().getRenderer(stageRendererId);
-      if (this.renderer == null) {
-        logger.warn("Stage renderer '{}' for action {} not found", renderer, this);
+      this.stageRenderer = getModule().getRenderer(stageRendererId);
+      if (this.stageRenderer == null) {
+        logger.warn("Stage renderer '{}' for action {} not found", stageRenderer, this);
       }
     }
   }
@@ -279,7 +279,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public void setStageRenderer(PageletRenderer renderer) {
     this.stageRendererId = (renderer != null) ? renderer.getIdentifier() : null;
-    this.renderer = renderer;
+    this.stageRenderer = renderer;
   }
 
   /**
@@ -291,18 +291,18 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * @return the renderer
    */
   public PageletRenderer getStageRenderer() {
-    if (renderer == null) {
+    if (stageRenderer == null) {
       if (StringUtils.isNotBlank(stageRendererId)) {
         if (module == null) {
           throw new IllegalStateException("Module was not set");
         }
-        renderer = getModule().getRenderer(stageRendererId);
-        if (renderer != null) {
+        stageRenderer = getModule().getRenderer(stageRendererId);
+        if (stageRenderer == null) {
           logger.warn("Stage renderer '{}' not found in module '{}'", stageRendererId, module.getIdentifier());
         }
       }
     }
-    return renderer;
+    return stageRenderer;
   }
 
   /**
@@ -408,8 +408,8 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public int startStage(WebloungeRequest request, WebloungeResponse response,
       Composer composer) throws IOException, ActionException {
-    if (renderer != null) {
-      include(request, response, renderer);
+    if (stageRenderer != null) {
+      include(request, response, stageRenderer);
       return SKIP_COMPOSER;
     }
     return EVAL_COMPOSER;
