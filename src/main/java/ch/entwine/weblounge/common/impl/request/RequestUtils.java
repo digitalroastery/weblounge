@@ -133,9 +133,7 @@ public final class RequestUtils {
     String actionMountpoint = action.getPath();
     String[] params = path.substring(actionMountpoint.length()).split("/");
 
-    // first param is empty (because of leading slash), therefore start with
-    // index 1
-    for (int i = 1; i < params.length; i++) {
+    for (int i = 0; i < params.length; i++) {
       urlparams.add(params[i]);
     }
 
