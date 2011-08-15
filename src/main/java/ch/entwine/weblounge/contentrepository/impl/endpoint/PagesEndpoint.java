@@ -201,7 +201,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset,
       @QueryParam("details") @DefaultValue("false") boolean details) {
-
+    
     // Create search query
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
@@ -272,7 +272,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-
+    
     // Is there an up-to-date, cached version on the client side?
     if (!ResourceUtils.isModified(page, request)) {
       return Response.notModified().build();

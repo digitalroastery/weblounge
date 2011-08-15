@@ -310,15 +310,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       return Response.notModified().build();
     }
 
-    // Check the ETag
-    String eTagValue = ResourceUtils.getETagValue(resource, null);
-    if (!ResourceUtils.isMismatch(resource, null, request)) {
-      return Response.notModified(new EntityTag(eTagValue)).build();
-    }
-
     // Create the response
     ResponseBuilder response = Response.ok(resource.toXml());
-    response.tag(new EntityTag(eTagValue));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(resource)));
     response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }
