@@ -20,6 +20,10 @@
 
 package ch.entwine.weblounge.common.impl.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpResponse;
@@ -32,8 +36,10 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
@@ -44,6 +50,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -82,6 +89,74 @@ public final class TestUtils {
       throw new RuntimeException("Error reading test resource at " + path);
     }
     return template;
+  }
+  
+  /**
+   * Test for the correct response when etag header is set
+   * 
+   * @param request
+   * @param eTagValue
+   * @param logger
+   * @throws Exception
+   */
+  public static void testETagHeader(HttpUriRequest request, String eTagValue, Logger logger) throws Exception {
+    DefaultHttpClient httpClient = new DefaultHttpClient();
+    try {
+      request.removeHeaders("If-Modified-Since");
+      request.setHeader("If-None-Match", eTagValue);
+      logger.info("Sending 'If-None-Match' request to {}", request.getURI());
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+    
+    httpClient = new DefaultHttpClient();
+    try {
+      request.removeHeaders("If-Modified-Since");
+      request.setHeader("If-None-Match", "\"abcdefghijklmt\"");
+      logger.info("Sending 'If-None-Match' request to {}", request.getURI());
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertNotNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+  }
+  
+  /**
+   * Test for the correct response when modified since header is set
+   * 
+   * @param request
+   * @param eTagValue
+   * @param logger
+   * @throws Exception
+   */
+  public static void testModifiedHeader(HttpUriRequest request, Logger logger) throws Exception {
+    DefaultHttpClient httpClient = new DefaultHttpClient();
+    try {
+      request.removeHeaders("If-None-Match");
+      request.setHeader("If-Modified-Since", "Wed, 16 Feb 2011 21:06:40 GMT");
+      logger.info("Sending 'If-Modified-Since' request to {}", request.getURI());
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+    
+    httpClient = new DefaultHttpClient();
+    try {
+      request.removeHeaders("If-None-Match");
+      request.setHeader("If-Modified-Since", "Wed, 10 Feb 1999 21:06:40 GMT");
+      logger.info("Sending 'If-Modified-Since' request to {}", request.getURI());
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertNotNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
   }
 
   /**
