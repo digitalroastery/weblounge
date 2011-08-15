@@ -65,17 +65,38 @@ public final class ResourceUtils {
    */
   public static boolean isModified(Resource<?> resource,
       HttpServletRequest request) throws IllegalArgumentException {
-
+    return isModified(resource, null, request);
+  }
+  
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * 
+   * @param resource
+   *          the resource
+   * @param langugae
+   *          the language
+   * @param request
+   *          the client request
+   * @return <code>true</code> if the page is more recent than the version that
+   *         is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean isModified(Resource<?> resource, Language language,
+      HttpServletRequest request) throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
       long cachedModificationDate = request.getDateHeader("If-Modified-Since");
       Date resourceModificationDate = getModificationDate(resource);
       return cachedModificationDate < resourceModificationDate.getTime();
     } else if (request.getHeader("If-None-Match") != null) {
       String eTagHeader = request.getHeader("If-None-Match");
-      String eTag = getETagValue(resource, null);
-      return !eTag.equals("\"" + eTagHeader + "\"");
+      String eTag = getETagValue(resource, language);
+      return !eTag.equals(eTagHeader);
     }
-
+    
     return true;
   }
 
@@ -107,7 +128,7 @@ public final class ResourceUtils {
     if (StringUtils.isBlank(eTagHeader))
       return true;
     String eTag = getETagValue(resource, language);
-    return !eTagHeader.equals("\"" + eTag + "\"");
+    return !eTagHeader.equals(eTag);
   }
 
   /**
@@ -136,7 +157,7 @@ public final class ResourceUtils {
     String eTagHeader = request.getHeader("If-None-Match");
     if (StringUtils.isBlank(eTagHeader))
       return true;
-    return !eTagHeader.equals("\"" + eTag + "\"");
+    return !eTagHeader.equals(eTag);
   }
 
   /**
