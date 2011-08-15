@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -166,15 +167,25 @@ public class PagesEndpointTest extends IntegrationTestBase {
     HttpGet getPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
     HttpClient httpClient = new DefaultHttpClient();
     Document pageXml = null;
+    String eTagValue;
     logger.info("Requesting page at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(id, XPathHelper.valueOf(pageXml, "/page/@id"));
+      
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+    
+    TestUtils.testETagHeader(getPageRequest, eTagValue, logger);
+    TestUtils.testModifiedHeader(getPageRequest, logger);
   }
 
   /**

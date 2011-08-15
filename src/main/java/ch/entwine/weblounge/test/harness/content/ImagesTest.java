@@ -23,7 +23,6 @@ package ch.entwine.weblounge.test.harness.content;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -466,19 +465,9 @@ public class ImagesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      request.setHeader("If-None-Match", eTagValue);
-
-      logger.info("Sending 'If-None-Match' request to {}", request.getURI());
-      HttpResponse response = TestUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+    
+    TestUtils.testETagHeader(request, eTagValue, logger);
+    TestUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -516,19 +505,9 @@ public class ImagesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      request.setHeader("If-None-Match", eTagValue);
-
-      logger.info("Sending 'If-None-Match' request to {}", request.getURI());
-      HttpResponse response = TestUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+    
+    TestUtils.testETagHeader(request, eTagValue, logger);
+    TestUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -585,19 +564,9 @@ public class ImagesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      request.setHeader("If-None-Match", eTagValue);
-
-      logger.info("Sending 'If-None-Match' request to {}", request.getURI());
-      HttpResponse response = TestUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+    
+    TestUtils.testETagHeader(request, eTagValue, logger);
+    TestUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -654,19 +623,9 @@ public class ImagesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      request.setHeader("If-None-Match", eTagValue);
-
-      logger.info("Sending 'If-None-Match' request to {}", request.getURI());
-      HttpResponse response = TestUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+    
+    TestUtils.testETagHeader(request, eTagValue, logger);
+    TestUtils.testModifiedHeader(request, logger);
   }
 
 }

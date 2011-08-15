@@ -2,7 +2,6 @@ package ch.entwine.weblounge.test.harness.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
@@ -102,17 +101,8 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      getPreviewRequest.setHeader("If-None-Match", eTagValue);
-      logger.info("Sending 'If-None-Match' request to {}", getPreviewRequest.getURI());
-      HttpResponse response = TestUtils.request(httpClient, getPreviewRequest, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+    TestUtils.testETagHeader(getPreviewRequest, eTagValue, logger);
+    TestUtils.testModifiedHeader(getPreviewRequest, logger);
   }
 
   private void testNoneExist(String serverUrl, ImageStyleImpl imageStyle) throws Exception {

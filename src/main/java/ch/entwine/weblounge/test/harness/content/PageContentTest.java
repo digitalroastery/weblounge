@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -109,6 +110,7 @@ public class PageContentTest extends IntegrationTestBase {
           "language",
           language.getIdentifier() } };
 
+      String eTagValue;
       // Send and the request and examine the response
       logger.debug("Sending request to {}", request.getURI());
       HttpClient httpClient = new DefaultHttpClient();
@@ -143,10 +145,19 @@ public class PageContentTest extends IntegrationTestBase {
         // Test for template replacement
         assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${module.root}')]"));
         assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${site.root}')]"));
+        
+        // Test ETag header
+        Header eTagHeader = response.getFirstHeader("Etag");
+        assertNotNull(eTagHeader);
+        assertNotNull(eTagHeader.getValue());
+        eTagValue = eTagHeader.getValue();
 
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
+      
+      TestUtils.testETagHeader(request, eTagValue, logger);
+      TestUtils.testModifiedHeader(request, logger);
     }
   }
 

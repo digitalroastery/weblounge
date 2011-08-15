@@ -22,7 +22,6 @@ package ch.entwine.weblounge.test.harness.content;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -242,22 +241,9 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      request = new HttpGet(url);
-      request.setHeader("Accept-Language", "de");
-      request.addHeader("If-None-Match", eTagValue);
-
-      logger.info("Sending 'If-None-Match' request to {}", url);
-      HttpResponse response = TestUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
-
+    
+    TestUtils.testETagHeader(request, eTagValue, logger);
+    TestUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -300,22 +286,9 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      request = new HttpGet(url);
-      request.addHeader("If-None-Match", eTagValue);
-      request.setHeader("Accept-Language", "de");
-
-      logger.info("Sending 'If-None-Match' request to {}", url);
-      HttpResponse response = TestUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
-
+    
+    TestUtils.testETagHeader(request, eTagValue, logger);
+    TestUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -399,21 +372,10 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      request = new HttpGet(englishUrl);
-      request.addHeader("If-None-Match", eTagValue);
-
-      logger.info("Sending 'If-None-Match' request to {}", englishUrl);
-      HttpResponse response = TestUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
-
+    
+    TestUtils.testETagHeader(request, eTagValue, logger);
+    TestUtils.testModifiedHeader(request, logger);
+    
     // German
     String germanUrl = UrlUtils.concat(serverUrl, path, "de");
     request = new HttpGet(germanUrl);
@@ -442,21 +404,9 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      request = new HttpGet(germanUrl);
-      request.addHeader("If-None-Match", eTagValue);
-
-      logger.info("Sending 'If-None-Match' request to {}", germanUrl);
-      HttpResponse response = TestUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
-
+    
+    TestUtils.testETagHeader(request, eTagValue, logger);
+    TestUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -502,21 +452,10 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      request = new HttpGet(englishUrl);
-      request.addHeader("If-None-Match", eTagValue);
-
-      logger.info("Sending 'If-None-Match' request to {}", englishUrl);
-      HttpResponse response = TestUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
-
+    
+    TestUtils.testETagHeader(request, eTagValue, logger);
+    TestUtils.testModifiedHeader(request, logger);
+    
     // German
     String germanUrl = UrlUtils.concat(serverUrl, path);
     request = new HttpGet(germanUrl);
@@ -546,22 +485,9 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Test ETag support
-    httpClient = new DefaultHttpClient();
-    try {
-      request = new HttpGet(germanUrl);
-      request.addHeader("If-None-Match", eTagValue);
-      request.setHeader("Accept-Language", "de");
-
-      logger.info("Sending 'If-None-Match' request to {}", germanUrl);
-      HttpResponse response = TestUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
-      assertNull(response.getEntity());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
-
+    
+    TestUtils.testETagHeader(request, eTagValue, logger);
+    TestUtils.testModifiedHeader(request, logger);
   }
 
 }
