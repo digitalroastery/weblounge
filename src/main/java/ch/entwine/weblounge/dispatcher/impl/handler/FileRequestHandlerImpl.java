@@ -198,20 +198,13 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       fileResource.switchTo(request.getLanguage());
     }
 
-    // Check the ETag value
-    if (!ResourceUtils.isMismatch(fileResource, language, request)) {
-      logger.debug("File {} was not modified", fileURI);
-      DispatchUtils.sendNotModified(request, response);
-      return true;
-    }
-
     // Check the modified headers
-    if (!ResourceUtils.isModified(fileResource, request)) {
+    if (!ResourceUtils.isModified(fileResource, language, request)) {
       logger.debug("File {} was not modified", fileURI);
       DispatchUtils.sendNotModified(request, response);
       return true;
     }
-
+    
     // Add mime type header
     FileContent content = fileResource.getContent(language);
     String contentType = content.getMimetype();

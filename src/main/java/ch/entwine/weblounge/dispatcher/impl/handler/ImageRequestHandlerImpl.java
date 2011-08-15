@@ -224,14 +224,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       }
     }
 
-    // Check the ETag value
-    String eTag = ResourceUtils.getETagValue(imageResource, language, style);
-    if (!ResourceUtils.isMismatch(eTag, request)) {
-      logger.debug("Image {} was not modified", imageURI);
-      DispatchUtils.sendNotModified(request, response);
-      return true;
-    }
-
     // Load the image contents from the repository
     ImageContent imageContents = imageResource.getContent(language);
     InputStream imageInputStream = null;
@@ -246,6 +238,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource).getTime());
 
     // Add ETag header
+    String eTag = ResourceUtils.getETagValue(imageResource, language, style);
     response.setHeader("ETag", "\"" + eTag + "\"");
 
     // Get the mime type

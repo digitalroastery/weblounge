@@ -250,7 +250,12 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         DispatchUtils.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, request, response);
         return true;
       }
-
+      
+      // Add last modified header
+      response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(page).getTime());
+      // Add ETag header
+      String eTag = ResourceUtils.getETagValue(page, request.getLanguage());
+      response.setHeader("ETag", "\"" + eTag + "\"");
       // Set the content type
       response.setContentType("text/html");
 
