@@ -1,7 +1,7 @@
 <div class="wbl-scrollViewItem wbl-page" id="${page.id}">
 	<img src="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview" alt="" class="wbl-pageThumbnail" />
 	{{if !$.isEmptyObject(page.head.metadata.title) && !$.isEmptyObject(page.head.metadata.title[language])}}
-		<h2>${page.head.metadata.title[language]}</h2>
+		<h2>${page.getTitle(language)}</h2>
 	{{else}}
 		<h2>&nbsp;</h2>
 	{{/if}}

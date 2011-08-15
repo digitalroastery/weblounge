@@ -7,7 +7,7 @@
 	{{/if}}
 	</input></td>
 	{{if page.head.metadata.title}}
-		<td>${page.head.metadata.title[language]}</td>
+		<td>${page.getTitle(language)}</td>
 	{{else}}
 		<td>-</td>
 	{{/if}}

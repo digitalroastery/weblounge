@@ -268,6 +268,7 @@ PageMappings.Body.Composer.Pagelet.Locale.properties = [new Jsonix.Model.Attribu
   typeInfo: PageMappings.CreatedModified
 }), new Jsonix.Model.ElementMapPropertyInfo({
 	name: 'text',
+	collection : true,
 	key: new Jsonix.Model.AttributePropertyInfo({
 		name: 'id',
 		typeInfo: Jsonix.Schema.XSD.String.INSTANCE
@@ -280,6 +281,7 @@ PageMappings.Body.Composer.Pagelet.Locale.properties = [new Jsonix.Model.Attribu
 
 PageMappings.Body.Composer.Pagelet.Property.properties = [new Jsonix.Model.ElementMapPropertyInfo({
 	name: 'property',
+	collection : true,
 	key: new Jsonix.Model.AttributePropertyInfo({
 		name: 'id',
 		typeInfo: Jsonix.Schema.XSD.String.INSTANCE

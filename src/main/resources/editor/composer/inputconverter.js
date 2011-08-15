@@ -76,20 +76,20 @@ $.Class.extend('InputConverter',
 		$(select).find('option').each(function(){
 			InputConverter.convert(element, pagelet,
 			$.proxy(function () {
-				var array = pagelet.locale.current.text[element[1]].split(',');
+				var array = pagelet.locale.current.text[element[1]];
 				
 				if($.inArray($(this).val(), array) == -1) 
 					$(this).removeAttr('selected');
 				else $(this).attr('selected', 'selected');
 			}, this),
 			$.proxy(function () {
-				var array = pagelet.locale.original.text[element[1]].split(',');
+				var array = pagelet.locale.original.text[element[1]];
 				if($.inArray($(this).val(), array) == -1) 
 					$(this).removeAttr('selected');
 				else $(this).attr('selected', 'selected');
 			}, this),
 			$.proxy(function () {
-				var array = pagelet.properties.property[element[1]].split(',');
+				var array = pagelet.properties.property[element[1]];
 				if($.inArray($(this).val(), array) == -1) 
 					$(this).removeAttr('selected');
 				else $(this).attr('selected', 'selected');

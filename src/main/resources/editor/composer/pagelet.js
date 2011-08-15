@@ -195,10 +195,10 @@ steal.plugins('jqueryui/dialog',
     				optionArray.push($(this).val());
     			});
     			if(element[0] == 'property') {
-    				pagelet.properties.property[element[1]] = optionArray.toString();
+    				pagelet.properties.property[element[1]] = optionArray;
     			} 
     			else if(element[0] == 'element') {
-    				pagelet.locale.current.text[element[1]] = optionArray.toString();
+    				pagelet.locale.current.text[element[1]] = optionArray;
     			}
     		}
     		else if(input.type == 'checkbox') {
