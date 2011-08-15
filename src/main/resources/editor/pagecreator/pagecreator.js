@@ -95,7 +95,7 @@ steal.plugins('jquery',
 			});
 			
 			// TODO Load AvailableTags
-			Workbench.suggestTags({}, function(tags) {
+			Workbench.suggestTags({}, $.proxy(function(tags) {
 				if(tags == null || tags == undefined) return;
 //				var availableTags = ["ActionScript","Scheme"];
 				this.element.find("input[name=tags]").autocomplete({
@@ -119,7 +119,7 @@ steal.plugins('jquery',
 						return false;
 					}
 				});
-			});
+			}, this));
 			
 			// Dialog
 			this.element.dialog({

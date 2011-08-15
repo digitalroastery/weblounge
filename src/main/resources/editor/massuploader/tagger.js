@@ -73,8 +73,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    _initAutoComplete: function() {
-			var availableTags = ["ActionScript","Scheme"];
-			Workbench({'tag'}, function(tags) {
+	    	Workbench.suggestTags({test: 'tag'}, $.proxy(function(tags) {
 				if(tags == null || tags == undefined) return;
 				var inputTags = this.element.find("input[name=tags]").autocomplete({
 					source: function(request, response) {
@@ -98,18 +97,17 @@ steal.plugins('jquery',
 						return false;
 					},this)
 				});
-			}
+			}, this));
 			
-			var availableAuthors = ["Lukas","Markus", this.options.user];
-			Workbench({'user'}, function(userTags) {
+			Workbench.suggestTags({test: 'user'}, $.proxy(function(userTags) {
 				if(userTags == null || userTags == undefined) return;
 				this.element.find("input[name=author]").autocomplete({
 					source: userTags,
 					select: $.proxy(function(ev, ui) {
 						this._saveMetadata(this.img.index(), {author: ui.item.value});
-					},this)
+					}, this)
 				});
-			}
+			}, this));
 	    },
 	    
 	    _loadMetadata: function(success) {

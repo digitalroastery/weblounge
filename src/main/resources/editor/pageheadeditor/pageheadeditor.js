@@ -31,7 +31,7 @@ steal.plugins('jquery',
 			this.element.find("select[name=layout]").val(this.options.page.getTemplate());
 			
 			// TODO Load AvailableTags
-			Workbench({}, function(tags) {
+			Workbench.suggestTags({}, $.proxy(function(tags) {
 				if(tags == null || tags == undefined) return;
 //				var availableTags = ["ActionScript","Scheme"];
 				this.element.find("input[name=tags]").autocomplete({
@@ -55,7 +55,7 @@ steal.plugins('jquery',
 						return false;
 					}
 				});
-			});
+			}, this));
 			
 			// Dialog
 			this.element.dialog({
