@@ -28,6 +28,7 @@ import static org.junit.Assert.fail;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
+import ch.entwine.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -242,8 +243,8 @@ public class FilesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(request, eTagValue, logger);
-    TestUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -287,8 +288,8 @@ public class FilesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(request, eTagValue, logger);
-    TestUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -373,8 +374,8 @@ public class FilesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(request, eTagValue, logger);
-    TestUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(request, logger);
     
     // German
     String germanUrl = UrlUtils.concat(serverUrl, path, "de");
@@ -405,8 +406,8 @@ public class FilesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(request, eTagValue, logger);
-    TestUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -453,8 +454,8 @@ public class FilesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(request, eTagValue, logger);
-    TestUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(request, logger);
     
     // German
     String germanUrl = UrlUtils.concat(serverUrl, path);
@@ -486,8 +487,8 @@ public class FilesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(request, eTagValue, logger);
-    TestUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(request, logger);
   }
 
 }

@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
+import ch.entwine.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -184,8 +185,8 @@ public class PagesEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(getPageRequest, eTagValue, logger);
-    TestUtils.testModifiedHeader(getPageRequest, logger);
+    TestSiteUtils.testETagHeader(getPageRequest, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(getPageRequest, logger);
   }
 
   /**

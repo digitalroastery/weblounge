@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.common.url.UrlUtils;
+import ch.entwine.weblounge.test.util.TestSiteUtils;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
@@ -466,8 +467,8 @@ public class ImagesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(request, eTagValue, logger);
-    TestUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -506,8 +507,8 @@ public class ImagesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(request, eTagValue, logger);
-    TestUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -565,8 +566,8 @@ public class ImagesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(request, eTagValue, logger);
-    TestUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(request, logger);
   }
 
   /**
@@ -624,8 +625,8 @@ public class ImagesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(request, eTagValue, logger);
-    TestUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(request, logger);
   }
 
 }

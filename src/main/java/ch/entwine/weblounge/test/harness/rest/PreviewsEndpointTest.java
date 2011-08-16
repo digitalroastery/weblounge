@@ -9,6 +9,7 @@ import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.common.url.UrlUtils;
+import ch.entwine.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -101,8 +102,8 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
     
-    TestUtils.testETagHeader(getPreviewRequest, eTagValue, logger);
-    TestUtils.testModifiedHeader(getPreviewRequest, logger);
+    TestSiteUtils.testETagHeader(getPreviewRequest, eTagValue, logger);
+    TestSiteUtils.testModifiedHeader(getPreviewRequest, logger);
   }
 
   private void testNoneExist(String serverUrl, ImageStyleImpl imageStyle) throws Exception {
