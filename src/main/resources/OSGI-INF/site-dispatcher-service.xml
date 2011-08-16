@@ -12,7 +12,6 @@
     <provide interface="ch.entwine.weblounge.dispatcher.SiteDispatcherService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
-  <reference name="httpservice" interface="org.ops4j.pax.web.service.WebContainer" cardinality="1..1" policy="static" bind="setHttpService" unbind="removeHttpService" />
   <reference name="actionrequesthandler" interface="ch.entwine.weblounge.dispatcher.ActionRequestHandler" cardinality="0..1" policy="dynamic" bind="setActionRequestHandler" unbind="removeActionRequestHandler" />
   <reference name="sitemanager" interface="ch.entwine.weblounge.kernel.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" unbind="removeSiteManager" />
 

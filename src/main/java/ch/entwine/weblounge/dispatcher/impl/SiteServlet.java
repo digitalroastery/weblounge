@@ -25,8 +25,6 @@ import ch.entwine.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.entwine.weblounge.common.impl.request.Http11ResponseType;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
-import ch.entwine.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
-import ch.entwine.weblounge.common.impl.util.classloader.JasperClassLoader;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -45,7 +43,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -67,11 +64,13 @@ public class SiteServlet extends HttpServlet {
   private static final Logger logger = LoggerFactory.getLogger(SiteServlet.class);
 
   /** The supported formats */
-  public enum Format { Processed, Raw };
-  
+  public enum Format {
+    Processed, Raw
+  };
+
   /** Parameter name for the output format */
   public static final String PARAM_FORMAT = "format";
-  
+
   /** The site */
   private final Site site;
 
@@ -81,11 +80,11 @@ public class SiteServlet extends HttpServlet {
   /** The Jasper servlet */
   protected final Servlet jasperServlet;
 
-  /** Jasper specific class loader */
-  private final JasperClassLoader jasperClassLoader;
-
   /** Path rules */
   private List<ResourceSet> resourceSets = null;
+
+  /** Flag to reflect servlet initialization */
+  private boolean initialized = false;
 
   /**
    * Creates a new site servlet for the given bundle and context.
@@ -101,7 +100,6 @@ public class SiteServlet extends HttpServlet {
     this.site = site;
     this.siteHttpContext = httpContext;
     this.jasperServlet = new JspServletWrapper(httpContext.getBundle());
-    this.jasperClassLoader = new JasperClassLoader(httpContext.getBundle(), JasperClassLoader.class.getClassLoader());
     this.resourceSets = new ArrayList<ResourceSet>();
     this.resourceSets.add(new SiteResourceSet());
     this.resourceSets.add(new ModuleResourceSet());
@@ -113,18 +111,17 @@ public class SiteServlet extends HttpServlet {
    * @see JspServletWrapper#init(ServletConfig)
    */
   public void init(final ServletConfig config) throws ServletException {
-    try {
-      ContextClassLoaderUtils.doWithClassLoader(jasperClassLoader, new Callable<Void>() {
-        public Void call() throws Exception {
-          jasperServlet.init(config);
-          return null;
-        }
-      });
-    } catch (ServletException e) {
-      throw e;
-    } catch (Throwable ignore) {
-      logger.error("Ignored exception", ignore);
-    }
+    jasperServlet.init(config);
+    initialized = true;
+  }
+
+  /**
+   * Returns <code>true</code> if the servlet has been initialized.
+   * 
+   * @return <code>true</code> if the servlet has been initialized
+   */
+  public boolean isInitialized() {
+    return initialized;
   }
 
   /**
@@ -174,7 +171,7 @@ public class SiteServlet extends HttpServlet {
   public void service(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
     String filename = FilenameUtils.getName(request.getPathInfo());
-    
+
     // Don't allow listing the root directory?
     if (StringUtils.isBlank(filename)) {
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -194,7 +191,7 @@ public class SiteServlet extends HttpServlet {
         return;
       }
     }
-    
+
     if (Format.Processed.equals(format) && filename.endsWith(".jsp")) {
       serviceJavaServerPage(request, response);
     } else {
@@ -228,12 +225,7 @@ public class SiteServlet extends HttpServlet {
     // Configure request and response objects
 
     try {
-      ContextClassLoaderUtils.doWithClassLoader(jasperClassLoader, new Callable<Void>() {
-        public Void call() throws Exception {
-          jasperServlet.service(request, response);
-          return null;
-        }
-      });
+      jasperServlet.service(request, response);
     } catch (ServletException e) {
       // re-thrown
       throw e;
@@ -352,21 +344,12 @@ public class SiteServlet extends HttpServlet {
    * @see JspServletWrapper#destroy()
    */
   public void destroy() {
-    try {
-      ContextClassLoaderUtils.doWithClassLoader(jasperClassLoader, new Callable<Void>() {
-        public Void call() throws Exception {
-          jasperServlet.destroy();
-          return null;
-        }
-      });
-    } catch (Throwable t) {
-      logger.error("Wow, certainly didn't expect this to happen!", t);
-    }
+    jasperServlet.destroy();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

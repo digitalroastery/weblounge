@@ -25,6 +25,7 @@ import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.SiteDispatcherService;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -32,6 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
+import java.util.Hashtable;
+
+import javax.servlet.Servlet;
 
 /**
  * The dispatcher coordinates dispatching of requests in weblounge. It first
@@ -49,9 +53,9 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
 
   /** The main dispatcher servlet */
   private WebloungeDispatcherServlet dispatcher = null;
-
-  /** Tracker for the http service */
-  private HttpServiceTracker httpTracker = null;
+  
+  /** Service registration for the main dispatcher servlet */
+  private ServiceRegistration dispatcherServiceRegistration = null;
 
   /**
    * Creates a new instance of the dispatcher service.
@@ -82,16 +86,19 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     BundleContext bundleContext = context.getBundleContext();
     logger.debug("Activating weblounge dispatcher");
 
-    // Create an http tracker and make sure it forwards to our servlet
-    logger.trace("Start looking for http service implementations");
-    httpTracker = new HttpServiceTracker(bundleContext, dispatcher);
-    httpTracker.open();
+    Dictionary<String, String> initParams = new Hashtable<String, String>();
+    initParams.put("alias", "/");
+    initParams.put("servlet-name", "default");
+    //initParams.put("servlet-name", "weblounge.dispatcher");
+    //initParams.put("urlPatterns", "/*");
+    initParams.put("load-on-startup", Integer.toString(-1));
+    dispatcherServiceRegistration = bundleContext.registerService(Servlet.class.getName(), dispatcher, initParams);
 
     logger.debug("Weblounge dispatcher activated");
   }
 
   /**
-   * Callback for OSGi's declarative services component dactivation.
+   * Callback for OSGi's declarative services component inactivation.
    * 
    * @param context
    *          the component context
@@ -101,9 +108,10 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   void deactivate(ComponentContext context) throws Exception {
     logger.debug("Deactivating weblounge dispatcher");
 
-    // Get rid of the http tracker
-    httpTracker.close();
-    httpTracker = null;
+    if (dispatcherServiceRegistration != null) {
+      logger.debug("Unregistering weblounge dispatcher");
+      dispatcherServiceRegistration.unregister();
+    }
 
     logger.debug("Weblounge dispatcher deactivated");
   }

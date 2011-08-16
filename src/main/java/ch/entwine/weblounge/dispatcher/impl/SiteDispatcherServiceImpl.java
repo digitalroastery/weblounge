@@ -32,30 +32,26 @@ import ch.entwine.weblounge.dispatcher.ActionRequestHandler;
 import ch.entwine.weblounge.dispatcher.DispatcherConfiguration;
 import ch.entwine.weblounge.dispatcher.SiteDispatcherService;
 import ch.entwine.weblounge.dispatcher.impl.http.WebXml;
-import ch.entwine.weblounge.dispatcher.impl.http.WebXmlFilter;
-import ch.entwine.weblounge.dispatcher.impl.http.WebXmlServlet;
 import ch.entwine.weblounge.kernel.SiteManager;
 import ch.entwine.weblounge.kernel.SiteServiceListener;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.ops4j.pax.web.service.WebContainer;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.http.NamespaceException;
+import org.osgi.service.http.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -66,7 +62,6 @@ import java.util.Properties;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 
-import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 
@@ -106,9 +101,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /** Default value for jasper's <code>scratchDir</code> compiler context */
   public static final String DEFAULT_JASPER_SCRATCH_DIR = "jasper";
 
-  /** The http service */
-  private WebContainer paxHttpService = null;
-
   /** The action request handler */
   private ActionRequestHandler actionRequestHandler = null;
 
@@ -121,17 +113,11 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /** Maps sites to site servlets */
   private Map<Site, SiteServlet> siteServlets = new HashMap<Site, SiteServlet>();
 
-  /** The site registrations */
-  private Map<Site, WebXml> httpRegistrations = null;
+  /** The site servlet registrations */
+  private Map<Site, ServiceRegistration> servletRegistrations = null;
 
-  private TreeMap<String, Properties> filterInitParamsMap = new TreeMap<String, Properties>();
-
-  private TreeMap<String, Filter> filterNameInstances = new TreeMap<String, Filter>();
-
-  private TreeMap<String, ArrayList<String>> filterNameMappings = new TreeMap<String, ArrayList<String>>();
-
-  /** The OSGi component context */
-  private ComponentContext componentContext = null;
+  /** The http bundle context registrations */
+  private Map<Site, ServiceRegistration> contextRegistrations = null;
 
   /** The precompiler for java server pages */
   private boolean precompile = true;
@@ -155,7 +141,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   void activate(ComponentContext context) throws IOException,
       ConfigurationException {
 
-    componentContext = context;
     BundleContext bundleContext = context.getBundleContext();
     logger.info("Starting site dispatcher");
 
@@ -190,7 +175,8 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       }
     }
 
-    httpRegistrations = new HashMap<Site, WebXml>();
+    servletRegistrations = new HashMap<Site, ServiceRegistration>();
+    contextRegistrations = new HashMap<Site, ServiceRegistration>();
 
     logger.debug("Site dispatcher activated");
 
@@ -302,26 +288,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   }
 
   /**
-   * Callback from the OSGi environment when the http service is activated.
-   * 
-   * @param paxHttpService
-   *          the site locator
-   */
-  void setHttpService(WebContainer paxHttpService) {
-    this.paxHttpService = paxHttpService;
-  }
-
-  /**
-   * Callback from the OSGi environment when the http service is deactivated.
-   * 
-   * @param paxHttpService
-   *          the http service
-   */
-  void removeHttpService(WebContainer paxHttpService) {
-    this.paxHttpService = null;
-  }
-
-  /**
    * Callback from the OSGi environment which registers the request handler with
    * the site observer.
    * 
@@ -413,7 +379,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     Properties initParameters = new Properties();
 
     // Prepare the init parameters
-    //initParameters.put("load-on-startup", Integer.toString(1));
+    // initParameters.put("load-on-startup", Integer.toString(1));
     initParameters.putAll(webXml.getContextParams());
     initParameters.putAll(jasperConfig);
 
@@ -422,39 +388,34 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     String bundleEntry = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ENTRY, DEFAULT_BUNDLE_ENTRY);
     String bundleURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_URI, site.getIdentifier());
     String siteContextURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI, DEFAULT_BUNDLE_CONTEXT_ROOT_URI);
-    String siteContextRoot = UrlUtils.concat(contextRoot, siteContextURI);
-    String siteRoot = UrlUtils.concat(siteContextRoot, bundleURI);
+    String siteRoot = UrlUtils.concat(contextRoot, siteContextURI, bundleURI);
 
     try {
-      // Create the common http context
+      // Create and register the bundle http context
       BundleHttpContext bundleHttpContext = new BundleHttpContext(siteBundle, siteRoot, bundleEntry);
-
-      // Setup the servlet filters
-      buildFilters(webXml);
-
-      // Register the site using jsp support (for tag libraries) and the site
-      // servlet.
+      Dictionary<String, String> contextRegistrationProperties = new Hashtable<String, String>();
+      contextRegistrationProperties.put("httpContext.id", "weblounge." + site.getIdentifier());
+      ServiceRegistration contextRegistration = siteBundle.getBundleContext().registerService(HttpContext.class.getName(), bundleHttpContext, contextRegistrationProperties);
+      contextRegistrations.put(site, contextRegistration);
+      
+      // Create and register the site servlet
       SiteServlet siteServlet = new SiteServlet(site, bundleHttpContext);
-      try {
-        paxHttpService.registerServlet(siteRoot, siteServlet, initParameters, bundleHttpContext);
-      } catch (NamespaceException e) {
-        logger.error("The alias '{}' is already in use", siteRoot);
-        return;
-      } catch (Throwable t) {
-        logger.error("Error registering resources for site '{}' at {}: {}", new Object[] {
-            site,
-            siteRoot,
-            t.getMessage() });
-        logger.error(t.getMessage(), t);
+      Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
+      servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
+      servletRegistrationProperties.put("alias", siteRoot);
+      servletRegistrationProperties.put("servlet-name", site.getIdentifier());
+      servletRegistrationProperties.put("httpContext.id", "weblounge." + site.getIdentifier());
+      ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
+      servletRegistrations.put(site, servletRegistration);
+
+      // We are using the whiteboard pattern to register servlets. Wait for the
+      // http service to pick up the servlet and initialize it
+      while (!siteServlet.isInitialized()) {
+        logger.debug("Waiting for http service to pick up {}", siteServlet);
+        Thread.sleep(500);
       }
 
       siteServlets.put(site, siteServlet);
-      httpRegistrations.put(site, webXml);
-
-      // Register the site servlet as a service
-      Dictionary<String, String> registrationProperties = new Hashtable<String, String>();
-      registrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
-      componentContext.getBundleContext().registerService(Servlet.class.getName(), siteServlet, registrationProperties);
 
       logger.info("Site '{}' registered under site://{}", site, siteRoot);
 
@@ -491,30 +452,17 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   private void removeSite(Site site) {
     // Remove site dispatcher servlet
-    WebXml webXml = httpRegistrations.remove(site);
-    String siteRoot = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ROOT);
-    paxHttpService.unregister(siteRoot);
-    Map<String, WebXmlServlet> webXmlServlets = webXml.getServlets();
-    for (String name : webXmlServlets.keySet()) {
-      for (String mapping : webXmlServlets.get(name).getServletMappings()) {
-        paxHttpService.unregister(UrlUtils.concat(siteRoot, mapping));
-      }
-    }
+    ServiceRegistration servletRegistration = servletRegistrations.remove(site);
+    servletRegistration.unregister();
+
+    // Remove site http context
+    ServiceRegistration contextRegistration = contextRegistrations.remove(site);
+    contextRegistration.unregister();
 
     // We are no longer interested in site events
     site.removeSiteListener(this);
 
     siteServlets.remove(site);
-
-    // Remote the site servlet from the OSGi registry
-    String filterProperties = "(" + Servlet.class.getName().toLowerCase() + "=" + site.getIdentifier() + ")";
-    try {
-      ServiceReference[] refs = componentContext.getBundleContext().getServiceReferences(Servlet.class.getName(), filterProperties);
-      // TODO: Unregister the servlet
-    } catch (InvalidSyntaxException e) {
-      logger.error("Error in site servlet lookup: {}", e.getMessage());
-      // Should not happen, we created it ourselves
-    }
 
     // TODO: unregister site dispatcher
 
@@ -550,20 +498,24 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       }
     }
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.site.SiteListener#repositoryConnected(ch.entwine.weblounge.common.site.Site, ch.entwine.weblounge.common.content.repository.ContentRepository)
+   * 
+   * @see ch.entwine.weblounge.common.site.SiteListener#repositoryConnected(ch.entwine.weblounge.common.site.Site,
+   *      ch.entwine.weblounge.common.content.repository.ContentRepository)
    */
-  public void repositoryConnected(Site site, ContentRepository repository) { }
-  
+  public void repositoryConnected(Site site, ContentRepository repository) {
+  }
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.site.SiteListener#repositoryDisconnected(ch.entwine.weblounge.common.site.Site, ch.entwine.weblounge.common.content.repository.ContentRepository)
+   * 
+   * @see ch.entwine.weblounge.common.site.SiteListener#repositoryDisconnected(ch.entwine.weblounge.common.site.Site,
+   *      ch.entwine.weblounge.common.content.repository.ContentRepository)
    */
-  public void repositoryDisconnected(Site site, ContentRepository repository) { }
+  public void repositoryDisconnected(Site site, ContentRepository repository) {
+  }
 
   /**
    * {@inheritDoc}
@@ -582,35 +534,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   public void siteDisappeared(Site site) {
     removeSite(site);
-  }
-
-  /**
-   * Creates a list of filters from the given web xml.
-   * 
-   * @param webXml
-   *          the web xml
-   * @throws IllegalAccessException
-   *           if accessing the filter implementation fails
-   * @throws InstantiationException
-   *           if creating an instance of the filter implementation fails
-   */
-  public void buildFilters(WebXml webXml) throws IllegalAccessException,
-      InstantiationException {
-    for (WebXmlFilter filter : webXml.getFilters().values()) {
-      Filter filterInstance = (Filter) (filter.getFilterClass()).newInstance();
-      filterNameInstances.put(filter.getFilterName(), filterInstance);
-      for (String mapping : filter.getFilterMappings()) {
-        if (!filterNameMappings.containsKey(filter.getFilterName())) {
-          filterNameMappings.put(filter.getFilterName(), new ArrayList<String>());
-        }
-        filterNameMappings.get(filter.getFilterName()).add(mapping);
-
-        // build a list of filterInitParams
-        Properties filterInitParamProperties = new Properties();
-        filterInitParamProperties.putAll(filter.getInitParams());
-        filterInitParamsMap.put(filterInstance.getClass().getName(), filterInitParamProperties);
-      }
-    }
   }
 
   /**
