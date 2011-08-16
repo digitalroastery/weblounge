@@ -9,7 +9,7 @@ steal.then(function($) {
 		getPageletEditor: function(params, success, error) {
 			var url = '/system/weblounge/workbench/edit/' + params.id + '/' + params.composer + '/' + params.pagelet;
 			if ('language' in params) {
-				url += "&language=" + params.language;
+				url += "?language=" + params.language;
 			}
 			
 			if ('id' in params) {

@@ -4,36 +4,36 @@ $.Class.extend('InputConverter',
 	convertText: function(input, element, pagelet) {
 		if(element[0] == 'element') {
 			if(InputConverter.existsCurrent(pagelet, element[1])) {
-				input.attr('value', pagelet.locale.current.text[element[1]]);
+				input.attr('value', pagelet.locale.current.text[element[1]].toString());
 			}
 			if(InputConverter.existsOriginal(pagelet, element[1])) {
-				input.attr('placeholder', pagelet.locale.original.text[element[1]]);
+				input.attr('placeholder', pagelet.locale.original.text[element[1]].toString());
 			}
 		} 
 		else if(element[0] == 'property') {
 			if(!InputConverter.existsProperty(pagelet, element[1])) return;
-			input.attr('value', pagelet.properties.property[element[1]]);
+			input.attr('value', pagelet.properties.property[element[1]].toString());
 		}
 	},
 	
 	convertCheckbox: function(input, element, pagelet) {
 		InputConverter.convert(element, pagelet,
 		function() {
-			if(pagelet.locale.current.text[element[1]] == "true")
+			if(pagelet.locale.current.text[element[1]].toString() == "true")
 				input.attr('checked', 'checked');
-			else if(pagelet.locale.current.text[element[1]] == "false")
+			else if(pagelet.locale.current.text[element[1]].toString() == "false")
 				input.removeAttr('checked');
 		}, 
 		function() {
-			if(pagelet.locale.original.text[element[1]] == "true")
+			if(pagelet.locale.original.text[element[1]].toString() == "true")
 				input.attr('checked', 'checked');
-			else if(pagelet.locale.original.text[element[1]] == "false")
+			else if(pagelet.locale.original.text[element[1]].toString() == "false")
 				input.removeAttr('checked');
 		},
 		function() {
-			if(pagelet.properties.property[element[1]] == "true") 
+			if(pagelet.properties.property[element[1]].toString() == "true") 
 				input.attr('checked', 'checked');
-			else if(pagelet.properties.property[element[1]] == "false")
+			else if(pagelet.properties.property[element[1]].toString() == "false")
 				input.removeAttr('checked');
 		});
 	},
@@ -41,19 +41,19 @@ $.Class.extend('InputConverter',
 	convertRadio: function(input, element, pagelet) {
 		InputConverter.convert(element, pagelet,
 		function() {
-			var value = pagelet.locale.original.text[element[1]];
+			var value = pagelet.locale.original.text[element[1]].toString();
 			if(input.val() == value)
 				input.attr('checked', 'checked');
 			else input.removeAttr('checked');
 		}, 
 		function() {
-			var value = pagelet.locale.original.text[element[1]];
+			var value = pagelet.locale.original.text[element[1]].toString();
 			if(input.val() == value) 
 				input.attr('checked', 'checked');
 			else input.removeAttr('checked');
 		},
 		function() {
-			if(input.val() == pagelet.properties.property[element[1]]) 
+			if(input.val() == pagelet.properties.property[element[1]].toString()) 
 				input.attr('checked', 'checked');
 			else input.removeAttr('checked');
 		});
@@ -62,13 +62,13 @@ $.Class.extend('InputConverter',
 	convertTextarea: function(textarea, element, pagelet) {
 		InputConverter.convert(element, pagelet,
 		function() {
-			textarea.html('Current: ' + pagelet.locale.original.text[element[1]]);
+			textarea.html('Current: ' + pagelet.locale.original.text[element[1]].toString());
 		}, 
 		function() {
-			textarea.html('Original: ' + pagelet.locale.original.text[element[1]]);
+			textarea.html('Original: ' + pagelet.locale.original.text[element[1]].toString());
 		},
 		function() {
-			textarea.html(pagelet.properties.property[element[1]]);
+			textarea.html(pagelet.properties.property[element[1]].toString());
 		});
 	},
 	

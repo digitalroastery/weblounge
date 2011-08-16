@@ -203,27 +203,27 @@ steal.plugins('jqueryui/dialog',
     		}
     		else if(input.type == 'checkbox') {
     			if(element[0] == 'property') {
-					pagelet.properties.property[element[1]] = input.checked ? "true" : "false";
+					pagelet.properties.property[element[1]] = input.checked ? ["true"] : ["false"];
     			} 
     			else if(element[0] == 'element') {
-					pagelet.locale.current.text[element[1]] = input.checked ? "true" : "false";
+					pagelet.locale.current.text[element[1]] = input.checked ? ["true"] : ["false"];
     			}
     		}
     		else if(input.type == 'radio') {
     			if(input.checked == false) return;
     			if(element[0] == 'property') {
-    				pagelet.properties.property[element[1]] = input.value;
+    				pagelet.properties.property[element[1]] = [input.value];
     			} 
     			else if(element[0] == 'element') {
-    				pagelet.locale.current.text[element[1]] = input.value;
+    				pagelet.locale.current.text[element[1]] = [input.value];
     			}
     		}
     		else {
     			if(element[0] == 'property') {
-    				pagelet.properties.property[element[1]] = input.value;
+    				pagelet.properties.property[element[1]] = [input.value];
     			} 
     			else if(element[0] == 'element') {
-    				pagelet.locale.current.text[element[1]] = input.value;
+    				pagelet.locale.current.text[element[1]] = [input.value];
     			}
     		}
 		});
