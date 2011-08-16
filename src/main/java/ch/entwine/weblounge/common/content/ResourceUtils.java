@@ -47,57 +47,83 @@ public final class ResourceUtils {
   private ResourceUtils() {
     // Nothing to do here
   }
-
-  /**
-   * Returns <code>true</code> if the resource either is more recent than the
-   * cached version on the client side or the request does not contain caching
-   * information.
-   * 
-   * @param resource
-   *          the resource
-   * @param request
-   *          the client request
-   * @return <code>true</code> if the page is more recent than the version that
-   *         is cached at the client.
-   * @throws IllegalArgumentException
-   *           if the <code>If-Modified-Since</code> header cannot be converted
-   *           to a date.
-   */
-  public static boolean isModified(Resource<?> resource,
-      HttpServletRequest request) throws IllegalArgumentException {
-    return isModified(resource, null, request);
-  }
   
   /**
    * Returns <code>true</code> if the resource either is more recent than the
    * cached version on the client side or the request does not contain caching
    * information.
    * 
-   * @param resource
-   *          the resource
-   * @param langugae
-   *          the language
    * @param request
    *          the client request
+   * @param resource
+   *          the resource
    * @return <code>true</code> if the page is more recent than the version that
    *         is cached at the client.
    * @throws IllegalArgumentException
    *           if the <code>If-Modified-Since</code> header cannot be converted
    *           to a date.
    */
-  public static boolean isModified(Resource<?> resource, Language language,
-      HttpServletRequest request) throws IllegalArgumentException {
+  public static boolean isModified(HttpServletRequest request,
+      Resource<?> resource) throws IllegalArgumentException {
+    return isModified(request, resource, null);
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * 
+   * @param request
+   *          the client request
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @param style
+   *          the imagestyle
+   * @return <code>true</code> if the page is more recent than the version that
+   *         is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean isModified(HttpServletRequest request,
+      Resource<?> resource, Language language, ImageStyle style)
+      throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
       long cachedModificationDate = request.getDateHeader("If-Modified-Since");
       Date resourceModificationDate = getModificationDate(resource);
       return cachedModificationDate < resourceModificationDate.getTime();
     } else if (request.getHeader("If-None-Match") != null) {
       String eTagHeader = request.getHeader("If-None-Match");
-      String eTag = getETagValue(resource, language);
+      String eTag = getETagValue(resource, language, style);
       return !eTag.equals(eTagHeader);
     }
-    
+
     return true;
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * 
+   * @param request
+   *          the client request
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @return <code>true</code> if the page is more recent than the version that
+   *         is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean isModified(HttpServletRequest request,
+      Resource<?> resource, Language language)
+      throws IllegalArgumentException {
+    return isModified(request, resource, language, null);
   }
 
   /**
