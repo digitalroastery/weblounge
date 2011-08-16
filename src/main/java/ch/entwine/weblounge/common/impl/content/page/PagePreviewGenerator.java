@@ -265,6 +265,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
     } else {
       InputStream is = null;
       try {
+        rendererURL = new URL(UrlUtils.concat(rendererURL.toExternalForm(), "index_" + language.getIdentifier() + ".html"));
         is = rendererURL.openStream();
         return IOUtils.toString(is, "utf-8");
       } finally {
