@@ -35,6 +35,7 @@ import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.test.util.TestSiteUtils;
 
+import com.sun.media.jai.codec.FileCacheSeekableStream;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
 
@@ -101,7 +102,7 @@ public class ImagesTest extends IntegrationTestBase {
 
   /** The style's height */
   private static final int BOX_HEIGHT = 250;
-
+  
   /** Image resource identifier */
   private static final String imageId = "5bc19990-8f99-4873-a813-71b6dfac22ad";
 
@@ -374,64 +375,6 @@ public class ImagesTest extends IntegrationTestBase {
   }
 
   /**
-   * Checks the given image for the correct size.
-   * 
-   * @param image
-   *          the image
-   * @param mode
-   *          the scaling mode
-   * @return <code>true</code> if the image size is in line with the scaling
-   *         mode
-   */
-  private boolean checkSize(HttpResponse response, ImageScalingMode mode) {
-    SeekableStream imageInputStream = null;
-    try {
-      imageInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
-      RenderedOp image = JAI.create("stream", imageInputStream);
-      if (mode == null) {
-        assertEquals(originalWidth, image.getWidth());
-        assertEquals(originalHeight, image.getHeight());
-      } else {
-        switch (mode) {
-          case Box:
-            assertTrue(BOX_WIDTH == image.getWidth() || BOX_HEIGHT == image.getHeight());
-            assertTrue("Image width is too large", image.getWidth() <= BOX_WIDTH);
-            assertTrue("Image height is too large", image.getHeight() <= BOX_HEIGHT);
-            break;
-          case Cover:
-            assertTrue(BOX_WIDTH == image.getWidth() || BOX_HEIGHT == image.getHeight());
-            assertTrue("Image width is too small", image.getWidth() >= BOX_WIDTH);
-            assertTrue("Image height is too small", image.getHeight() >= BOX_HEIGHT);
-            break;
-          case Fill:
-            assertEquals("Image width is wrong", BOX_WIDTH, image.getWidth());
-            assertEquals("Image height is wrong", BOX_HEIGHT, image.getHeight());
-            break;
-          case Height:
-            assertEquals("Image height is wrong", BOX_HEIGHT, image.getHeight());
-            break;
-          case None:
-            assertEquals("Image width is wrong", originalWidth, image.getWidth());
-            assertEquals("Image height is wrong", originalHeight, image.getHeight());
-            break;
-          case Width:
-            assertEquals("Image width is wrong", BOX_WIDTH, image.getWidth());
-            break;
-          default:
-            fail("Unknown image style detected");
-            break;
-        }
-      }
-    } catch (IOException e) {
-      fail("Unable to read " + mode + " image from response");
-    } finally {
-      IOUtils.closeQuietly(imageInputStream);
-    }
-
-    return true;
-  }
-
-  /**
    * Tests for the correctness of the English original image response.
    * 
    * @param response
@@ -533,20 +476,38 @@ public class ImagesTest extends IntegrationTestBase {
       assertEquals(1, response.getHeaders("Content-Type").length);
       assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
+      
+      SeekableStream seekableInputStream = null;
+      StringBuilder fileName = new StringBuilder(FilenameUtils.getBaseName(filenameEnglish));
+      try{
+        // Test file size
+        if (!ImageScalingMode.None.equals(style.getScalingMode())) {
+          float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
+          float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
+          float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
+          
+          // Load the image from the given input stream
+          seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
+          RenderedOp image = JAI.create("stream", seekableInputStream);
+          if (image == null)
+            throw new IOException("Error reading image from input stream");
 
-      // Test filename
-      StringBuffer fileName = new StringBuffer(FilenameUtils.getBaseName(filenameEnglish));
-      StringBuffer fileNamePrefix = new StringBuffer(fileName);
-      if (!ImageScalingMode.None.equals(style.getScalingMode())) {
-        float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
-        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
-        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
-        fileName.append("_").append((int) scaledWidth).append("x").append((int) scaledHeight);
-        fileNamePrefix.append("_").append((int) scaledWidth).append("x");
+          // Get the original image size
+          int imageWidth = image.getWidth();
+          int imageHeight = image.getHeight();
+          
+          assertTrue((int)(scaledHeight) == imageHeight || (int)(scaledHeight) + 1 == imageHeight || (int)(scaledHeight) - 1 == imageHeight);
+          assertTrue((int)(scaledWidth) == imageWidth || (int)(scaledWidth) + 1 == imageWidth || (int)(scaledWidth) - 1 == imageWidth);
+          fileName.append("-").append(style.getIdentifier());
+        }
+      } finally {
+        IOUtils.closeQuietly(seekableInputStream);
       }
+      
+      // Test filename
       fileName.append(".").append(FilenameUtils.getExtension(filenameEnglish));
       String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
-      assertTrue(contentDisposition.startsWith("inline; filename=" + fileNamePrefix.toString()));
+      assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
 
       // Test ETag header
       Header eTagHeader = response.getFirstHeader("Etag");
@@ -560,8 +521,6 @@ public class ImagesTest extends IntegrationTestBase {
         eTags.add(eTagValue);
       }
 
-      // Test content
-      assertTrue("Image size mismatch", checkSize(response, style.getScalingMode()));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -593,19 +552,37 @@ public class ImagesTest extends IntegrationTestBase {
       assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
 
-      // Test filename
-      StringBuffer fileName = new StringBuffer(FilenameUtils.getBaseName(filenameGerman));
-      StringBuffer fileNamePrefix = new StringBuffer(fileName);
-      if (!ImageScalingMode.None.equals(style.getScalingMode())) {
-        float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
-        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
-        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
-        fileName.append("_").append((int) scaledWidth).append("x").append((int) scaledHeight);
-        fileNamePrefix.append("_").append((int) scaledWidth).append("x");
+      SeekableStream seekableInputStream = null;
+      StringBuilder fileName = new StringBuilder(FilenameUtils.getBaseName(filenameGerman));
+      try{
+        // Test file size
+        if (!ImageScalingMode.None.equals(style.getScalingMode())) {
+          float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
+          float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
+          float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
+          
+          // Load the image from the given input stream
+          seekableInputStream = new FileCacheSeekableStream(response.getEntity().getContent());
+          RenderedOp image = JAI.create("stream", seekableInputStream);
+          if (image == null)
+            throw new IOException("Error reading image from input stream");
+
+          // Get the original image size
+          int imageWidth = image.getWidth();
+          int imageHeight = image.getHeight();
+          
+          assertTrue((int)(scaledHeight) == imageHeight || (int)(scaledHeight) + 1 == imageHeight || (int)(scaledHeight) - 1 == imageHeight);
+          assertTrue((int)(scaledWidth) == imageWidth || (int)(scaledWidth) + 1 == imageWidth || (int)(scaledWidth) - 1 == imageWidth);
+          fileName.append("-").append(style.getIdentifier());
+        }
+      } finally {
+        IOUtils.closeQuietly(seekableInputStream);
       }
+      
+      // Test filename
       fileName.append(".").append(FilenameUtils.getExtension(filenameGerman));
       String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
-      assertTrue(contentDisposition.startsWith("inline; filename=" + fileNamePrefix.toString()));
+      assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
 
       // Test ETag header
       Header eTagHeader = response.getFirstHeader("Etag");
@@ -619,8 +596,6 @@ public class ImagesTest extends IntegrationTestBase {
         eTags.add(eTagValue);
       }
 
-      // Test content
-      assertTrue("Image size mismatch", checkSize(response, style.getScalingMode()));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
