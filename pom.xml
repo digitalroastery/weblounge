@@ -232,6 +232,7 @@
         </plugin>
         
         <!-- Attach sources to build artifacts -->
+        <!--
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
@@ -247,6 +248,7 @@
              </execution>
           </executions>
         </plugin>
+        -->
 
         <!-- Create class documentation -->        
         <plugin>
