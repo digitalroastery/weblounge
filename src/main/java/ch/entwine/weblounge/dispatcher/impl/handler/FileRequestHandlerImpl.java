@@ -189,7 +189,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     } else {
       language = LanguageUtils.getPreferredLanguage(fileResource, request, site);
     }
-
+    
     if (language == null) {
       logger.warn("File {} does not exist in any supported language", fileURI);
       DispatchUtils.sendNotFound(request, response);
@@ -199,7 +199,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     }
 
     // Check the modified headers
-    if (!ResourceUtils.isModified(fileResource, language, request)) {
+    if (!ResourceUtils.isModified(request, fileResource, language)) {
       logger.debug("File {} was not modified", fileURI);
       DispatchUtils.sendNotModified(request, response);
       return true;

@@ -183,13 +183,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return true;
     }
 
-    // Check the modified headers
-    if (!ResourceUtils.isModified(imageResource, request)) {
-      logger.debug("Image {} was not modified", imageURI);
-      DispatchUtils.sendNotModified(request, response);
-      return true;
-    }
-
     // Determine the response language
     Language language = null;
     if (StringUtils.isNotBlank(fileName)) {
@@ -212,7 +205,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       DispatchUtils.sendNotFound(request, response);
       return true;
     }
-
+    
     // Extract the image style and scale the image
     ImageStyle style = null;
     String styleId = StringUtils.trimToNull(request.getParameter(OPT_IMAGE_STYLE));
@@ -222,6 +215,13 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
         DispatchUtils.sendBadRequest("Image style '" + styleId + "' not found", request, response);
         return true;
       }
+    }
+    
+    // Check the modified headers
+    if (!ResourceUtils.isModified(request, imageResource, language, style)) {
+      logger.debug("Image {} was not modified", imageURI);
+      DispatchUtils.sendNotModified(request, response);
+      return true;
     }
 
     // Load the image contents from the repository

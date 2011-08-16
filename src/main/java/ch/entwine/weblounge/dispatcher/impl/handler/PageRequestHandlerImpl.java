@@ -214,7 +214,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       }
 
       // Does the client already have up-to-date content?
-      if (action == null && !ResourceUtils.isModified(page, request)) {
+      if (action == null && !ResourceUtils.isModified(request, page)) {
         logger.debug("Page {} was not modified", pageURI);
         DispatchUtils.sendNotModified(request, response);
         return true;
@@ -254,7 +254,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       // Add last modified header
       response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(page).getTime());
       // Add ETag header
-      String eTag = ResourceUtils.getETagValue(page, request.getLanguage());
+      String eTag = ResourceUtils.getETagValue(page);
       response.setHeader("ETag", eTag);
       // Set the content type
       response.setContentType("text/html");
