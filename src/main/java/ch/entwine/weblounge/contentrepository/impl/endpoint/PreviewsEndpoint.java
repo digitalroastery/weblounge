@@ -60,7 +60,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -166,7 +165,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(resource, request)) {
+    if (!ResourceUtils.isModified(request, resource)) {
       return Response.notModified().build();
     }
 
@@ -176,7 +175,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     // Check the ETag
     String eTag = ResourceUtils.getETagValue(resource, language, style);
     if (!ResourceUtils.isMismatch(eTag, request)) {
-      return Response.notModified(new EntityTag(eTag)).build();
+      return Response.notModified(eTag).build();
     }
 
     ResourceURI resourceURI = resource.getURI();
@@ -287,7 +286,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     response.lastModified(resource.getModificationDate());
 
     // Add ETag header
-    response.tag(new EntityTag(eTag));
+    response.tag(eTag);
 
     // Add filename header
     response.header("Content-Disposition", "inline; filename=" + filename);

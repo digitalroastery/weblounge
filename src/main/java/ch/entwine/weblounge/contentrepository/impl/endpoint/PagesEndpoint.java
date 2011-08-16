@@ -71,7 +71,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -274,13 +273,13 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
     
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(page, request)) {
+    if (!ResourceUtils.isModified(request, page)) {
       return Response.notModified().build();
     }
 
     // Create the response
     ResponseBuilder response = Response.ok(page.toXml());
-    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.tag(ResourceUtils.getETagValue(page));
     response.lastModified(ResourceUtils.getModificationDate(page));
     return response.build();
   }
@@ -435,7 +434,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.tag(ResourceUtils.getETagValue(page));
     return response.build();
   }
 
@@ -542,7 +541,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.created(uri);
-    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.tag(ResourceUtils.getETagValue(page));
     return response.build();
   }
 
@@ -641,7 +640,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(page, request)) {
+    if (!ResourceUtils.isModified(request, page)) {
       return Response.notModified().build();
     }
 
@@ -689,7 +688,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(page, request)) {
+    if (!ResourceUtils.isModified(request, page)) {
       return Response.notModified().build();
     }
 
@@ -794,7 +793,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.tag(ResourceUtils.getETagValue(page));
     response.lastModified(page.getModificationDate());
     return response.build();
   }
@@ -883,7 +882,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.tag(ResourceUtils.getETagValue(page));
     response.lastModified(ResourceUtils.getModificationDate(page));
     return response.build();
   }
@@ -998,7 +997,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.tag(ResourceUtils.getETagValue(page));
     response.lastModified(page.getModificationDate());
     return response.build();
   }
@@ -1108,7 +1107,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(ResourceUtils.getETagValue(page)));
+    response.tag(ResourceUtils.getETagValue(page));
     response.lastModified(ResourceUtils.getModificationDate(page));
     return response.build();
   }

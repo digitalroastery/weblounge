@@ -48,7 +48,6 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -89,7 +88,7 @@ public class ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(resource, request)) {
+    if (!ResourceUtils.isModified(request, resource)) {
       return Response.notModified().build();
     }
 
@@ -102,7 +101,7 @@ public class ContentRepositoryEndpoint {
     // Check the ETag
     String eTagValue = ResourceUtils.getETagValue(resource, language);
     if (!ResourceUtils.isMismatch(resource, language, request)) {
-      return Response.notModified(new EntityTag(eTagValue)).build();
+      return Response.notModified(eTagValue).build();
     }
 
     Site site = getSite(request);
@@ -150,7 +149,7 @@ public class ContentRepositoryEndpoint {
 
     // Add an e-tag and send the response
     response.header("Content-Disposition", "inline; filename=" + resource.getContent(selectedLanguage).getFilename());
-    response.tag(new EntityTag(eTagValue));
+    response.tag(eTagValue);
     response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }

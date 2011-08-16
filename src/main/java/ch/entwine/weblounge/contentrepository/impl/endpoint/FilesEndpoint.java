@@ -89,7 +89,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -306,13 +305,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(resource, request)) {
+    if (!ResourceUtils.isModified(request, resource)) {
       return Response.notModified().build();
     }
 
     // Create the response
     ResponseBuilder response = Response.ok(resource.toXml());
-    response.tag(new EntityTag(ResourceUtils.getETagValue(resource)));
+    response.tag(ResourceUtils.getETagValue(resource));
     response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }
@@ -487,7 +486,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(ResourceUtils.getETagValue(resource, language)));
+    response.tag(ResourceUtils.getETagValue(resource, language));
     response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }
@@ -561,7 +560,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok(resource.toXml());
-    response.tag(new EntityTag(ResourceUtils.getETagValue(resource)));
+    response.tag(ResourceUtils.getETagValue(resource));
     response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }
@@ -664,7 +663,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(ResourceUtils.getETagValue(resource)));
+    response.tag(ResourceUtils.getETagValue(resource));
     return response.build();
   }
 
@@ -774,7 +773,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.created(uri);
-    response.tag(new EntityTag(ResourceUtils.getETagValue(resource)));
+    response.tag(ResourceUtils.getETagValue(resource));
     return response.build();
   }
 
@@ -1104,7 +1103,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       // Create the response
       ResponseBuilder response = Response.created(uri);
       response.type(MediaType.MEDIA_TYPE_WILDCARD);
-      response.tag(new EntityTag(ResourceUtils.getETagValue(resource)));
+      response.tag(ResourceUtils.getETagValue(resource));
       return response.build();
 
     } finally {
