@@ -29,12 +29,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.http.HttpContext;
-import org.osgi.service.http.HttpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +43,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.GenericServlet;
+import javax.servlet.Servlet;
 import javax.ws.rs.Path;
 
 /**
@@ -71,9 +70,6 @@ public class EndpointPublishingService implements ManagedService {
   /** The context path option used to override the default context path */
   public static final String OPT_CONTEXTPATH = "rest.path";
 
-  /** The OSGi http service */
-  protected HttpService httpService = null;
-
   /** Context of this component */
   protected ComponentContext componentContext = null;
 
@@ -87,17 +83,13 @@ public class EndpointPublishingService implements ManagedService {
   protected String defaultContextPathPrefix = DEFAULT_PATH;
 
   /** Mapping of registered endpoints */
-  protected Map<String, Object> serviceMap = null;
-
-  /** Mapping of registered endpoints */
-  protected Map<String, GenericServlet> servletMap = null;
+  protected Map<String, ServiceRegistration> endpointRegistrations = null;
 
   /**
    * Creates a new publishing service for JSR 311 annotated classes.
    */
   public EndpointPublishingService() {
-    serviceMap = new ConcurrentHashMap<String, Object>();
-    servletMap = new ConcurrentHashMap<String, GenericServlet>();
+    endpointRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
     jsr311ServiceListener = new JSR311AnnotatedServiceListener();
   }
 
@@ -146,7 +138,7 @@ public class EndpointPublishingService implements ManagedService {
   }
 
   /**
-   * Callback for OSGi's declarative services component dactivation.
+   * Callback for OSGi's declarative services component inactivation.
    * 
    * @param context
    *          the component context
@@ -159,11 +151,10 @@ public class EndpointPublishingService implements ManagedService {
     }
 
     // Unregister the current jsr311 servlets
-    for (String path : serviceMap.keySet()) {
+    for (String path : endpointRegistrations.keySet()) {
       unregisterEndpoint(path);
     }
-    serviceMap.clear();
-    servletMap.clear();
+    endpointRegistrations.clear();
   }
 
   /**
@@ -181,7 +172,7 @@ public class EndpointPublishingService implements ManagedService {
       return;
 
     // Unregister all current endpoints
-    for (String path : serviceMap.keySet()) {
+    for (String path : endpointRegistrations.keySet()) {
       unregisterEndpoint(path);
     }
 
@@ -204,8 +195,8 @@ public class EndpointPublishingService implements ManagedService {
    * @return the service paths
    */
   public Map<String, Object> getEndpoints() {
-    Map<String, Object> services = new HashMap<String, Object>(serviceMap.size());
-    services.putAll(serviceMap);
+    Map<String, Object> services = new HashMap<String, Object>(endpointRegistrations.size());
+    services.putAll(endpointRegistrations);
     return services;
   }
 
@@ -246,25 +237,17 @@ public class EndpointPublishingService implements ManagedService {
    */
   protected void registerEndpoint(Object service, String contextPath,
       String endpointPath) {
-
-    // Register a new servlet with the http service
     try {
-
       CXFNonSpringServlet servlet = new JAXRSServlet(endpointPath, service);
-      HttpContext httpContext = httpService.createDefaultHttpContext();
       Dictionary<String, String> initParams = new Hashtable<String, String>();
-      //initParams.put("load-on-startup", Integer.toString(10));
-      httpService.registerServlet(contextPath, servlet, initParams, httpContext);
-      serviceMap.put(contextPath, service);
-      servletMap.put(contextPath, servlet);
-
+      initParams.put("alias", contextPath);
+      ServiceRegistration reg = bundleContext.registerService(Servlet.class.getName(), servlet, initParams);
+      endpointRegistrations.put(contextPath, reg);
       logger.debug("Registering {} at {}", service, contextPath);
-
     } catch (Throwable t) {
       logger.error("Error registering rest service at " + contextPath, t);
       return;
     }
-
   }
 
   /**
@@ -278,27 +261,14 @@ public class EndpointPublishingService implements ManagedService {
 
     // Remove the servlet from the http service
     try {
-      httpService.unregister(contextPath);
+      ServiceRegistration reg = endpointRegistrations.get(contextPath);
+      reg.unregister();
     } catch (Throwable t) {
       logger.error("Unable to unregister rest endpoint " + contextPath, t);
     }
 
     // Destroy the servlet
-    serviceMap.remove(contextPath);
-    GenericServlet servlet = servletMap.remove(contextPath);
-    if (servlet != null) {
-      servlet.destroy();
-    }
-  }
-
-  /**
-   * OSGi callback to set a reference to the <code>HttpService</code>.
-   * 
-   * @param httService
-   *          the http service
-   */
-  void setHttpService(HttpService httpService) {
-    this.httpService = httpService;
+    endpointRegistrations.remove(contextPath);
   }
 
   /**

@@ -22,15 +22,17 @@ package ch.entwine.weblounge.kernel.publisher;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpContext;
-import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -62,15 +64,15 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
 
   /** The bundle header identifying the welcome file */
   public static final String HTTP_WELCOME = "Http-Welcome";
-
-  /** The OSGi http service */
-  protected HttpService httpService = null;
+  
+  /** The bundle context */
+  protected BundleContext bundleCtx = null;
 
   /** The default http context */
   protected HttpContext httpContext = null;
 
   /** Mapping of registered endpoints */
-  protected Map<String, Servlet> servletMap = new HashMap<String, Servlet>();
+  protected Map<String, ServiceRegistration> servletRegistrations = new HashMap<String, ServiceRegistration>();
 
   /**
    * OSGi callback on component activation.
@@ -79,22 +81,22 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
    *          the component context
    */
   protected void activate(ComponentContext ctx) {
+    this.bundleCtx = ctx.getBundleContext();
     int stateMask = Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING;
     bundleTracker = new BundleTracker(ctx.getBundleContext(), stateMask, this);
     bundleTracker.open();
   }
 
   /**
-   * OSGi callback on component deactivation.
+   * OSGi callback on component inactivation.
    */
   protected void deactivate() {
     bundleTracker.close();
-    for (Map.Entry<String, Servlet> entry : servletMap.entrySet()) {
+    for (Map.Entry<String, ServiceRegistration> entry : servletRegistrations.entrySet()) {
+      ServiceRegistration servlet = entry.getValue();
       String contextPath = entry.getKey();
-      Servlet servlet = entry.getValue();
       logger.debug("Unpublishing resources at {}", contextPath);
-      httpService.unregister(contextPath);
-      servlet.destroy();
+      servlet.unregister();
     }
   }
 
@@ -116,21 +118,23 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
     }
 
     // Make sure nothing is mounted there already
-    if (servletMap.containsKey(contextPath)) {
+    if (servletRegistrations.containsKey(contextPath)) {
       logger.warn("Unable to publish resources from bundle {} at {}: context path is already in use", bundle.getSymbolicName(), contextPath);
       return bundle;
     }
     
     Servlet servlet = new ResourcesServlet(bundle, resourcePath, welcomeFile);
-
+    Dictionary<String, String> props = new Hashtable<String, String>();
+    props.put("alias", contextPath);
+    
     // We use the newly added bundle's context to register this service, so
     // when that bundle shuts down, it brings
     // down this servlet with it
     logger.info("Publishing resources from bundle://{} at {}", bundle.getSymbolicName(), contextPath);
     
     try {
-      httpService.registerServlet(contextPath, servlet, new Hashtable<String, String>(), httpContext);
-      servletMap.put(contextPath, servlet);
+      ServiceRegistration reg = bundleCtx.registerService(Servlet.class.getName(), servlet, props);
+      servletRegistrations.put(contextPath, reg);
     } catch (Throwable t) {
       logger.error("Error publishing resources service at " + contextPath, t);
     }      
@@ -156,7 +160,7 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
    */
   public void removedBundle(Bundle bundle, BundleEvent event, Object object) {
     String contextPath = (String) bundle.getHeaders().get(HTTP_CONTEXT);
-    Servlet servlet = servletMap.remove(contextPath);
+    ServiceRegistration servlet = servletRegistrations.remove(contextPath);
 
     if (StringUtils.isBlank(contextPath) || servlet == null)
       return;
@@ -165,24 +169,10 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
 
     // Remove the servlet from the http service
     try {
-      httpService.unregister(contextPath);
+      servlet.unregister();
     } catch (Throwable t) {
       logger.error("Unable to unregister rest endpoint " + contextPath, t);
     }
-
-    // Destroy the servlet
-    servlet.destroy();
-  }
-
-  /**
-   * OSGi callback to set a reference to the <code>HttpService</code>.
-   * 
-   * @param httService
-   *          the http service
-   */
-  void setHttpService(HttpService httpService) {
-    this.httpService = httpService;
-    this.httpContext = httpService.createDefaultHttpContext();
   }
 
 }

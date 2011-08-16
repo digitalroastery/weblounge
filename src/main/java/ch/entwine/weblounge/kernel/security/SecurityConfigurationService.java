@@ -20,8 +20,6 @@
 
 package ch.entwine.weblounge.kernel.security;
 
-import ch.entwine.weblounge.common.security.SecurityService;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
@@ -55,7 +53,7 @@ public class SecurityConfigurationService {
   protected ConfigurableOsgiBundleApplicationContext springContext = null;
 
   /** The security filter registration */
-  protected ServiceRegistration filterRegistration = null;
+  protected ServiceRegistration securityFilterRegistration = null;
 
   /**
    * Callback from the OSGi environment on service activation.
@@ -68,31 +66,32 @@ public class SecurityConfigurationService {
 
     // Load the configuration and create a spring security context
     URL securityConfig = bundleCtx.getBundle().getResource(SECURITY_CONFIG_FILE);
-    // springContext = new OsgiBundleXmlApplicationContext(new String[] {
-    // "file:" + new File(securityConfig).getAbsolutePath() });
     springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfig.toExternalForm() });
     springContext.setBundleContext(bundleCtx);
 
-    logger.info("Spring security context {} registered", springContext);
+    logger.info("Spring security context '{}' registered", springContext.getId());
 
     // Refresh the spring application context
     springContext.refresh();
+    
+    // Get the security filter chain from the spring context
+    Object securityFilterChain = springContext.getBean("springSecurityFilterChain");
 
     // Register the filter as an OSGi service
     Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put("contextId", SecurityService.HTTP_CONTEXT_ID);
+    props.put("context", "weblounge");
     props.put("pattern", ".*");
     props.put("service.ranking", "1");
-    filterRegistration = bundleCtx.registerService(Filter.class.getName(), springContext.getBean("springSecurityFilterChain"), props);
+    securityFilterRegistration = bundleCtx.registerService(Filter.class.getName(), securityFilterChain, props);
   }
 
   /**
    * Callback from OSGi environment on service inactivation.
    */
   void deactivate() {
-    if (filterRegistration != null) {
-      filterRegistration.unregister();
-      filterRegistration = null;
+    if (securityFilterRegistration != null) {
+      securityFilterRegistration.unregister();
+      securityFilterRegistration = null;
     }
     if (springContext != null && springContext.isRunning()) {
       springContext.close();

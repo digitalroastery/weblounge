@@ -12,6 +12,4 @@
     <provide interface="ch.entwine.weblounge.kernel.publisher.EndpointPublishingService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
-  <reference name="httpservice" interface="org.osgi.service.http.HttpService" cardinality="1..1" policy="static" bind="setHttpService" />
-
 </scr:component>
