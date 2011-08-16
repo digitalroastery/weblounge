@@ -255,7 +255,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(page).getTime());
       // Add ETag header
       String eTag = ResourceUtils.getETagValue(page, request.getLanguage());
-      response.setHeader("ETag", "\"" + eTag + "\"");
+      response.setHeader("ETag", eTag);
       // Set the content type
       response.setContentType("text/html");
 

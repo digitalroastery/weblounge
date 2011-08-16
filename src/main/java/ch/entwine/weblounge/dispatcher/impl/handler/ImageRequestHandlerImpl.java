@@ -239,7 +239,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // Add ETag header
     String eTag = ResourceUtils.getETagValue(imageResource, language, style);
-    response.setHeader("ETag", "\"" + eTag + "\"");
+    response.setHeader("ETag", eTag);
 
     // Get the mime type
     final String mimetype = imageContents.getMimetype();

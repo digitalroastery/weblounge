@@ -220,7 +220,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
 
     // Add ETag header
     String eTag = ResourceUtils.getETagValue(fileResource, language);
-    response.setHeader("ETag", "\"" + eTag + "\"");
+    response.setHeader("ETag", eTag);
 
     // Add content disposition header
     response.setHeader("Content-Disposition", "inline; filename=" + content.getFilename());
