@@ -95,6 +95,9 @@ public class MockHttpServletResponse implements HttpServletResponse {
 
   /** The response status, default to {@link HttpServletResponse#SC_OK} */
   private int status = HttpServletResponse.SC_OK;
+  
+  /** Number of errors that occured during this response */
+  private int errorCount = 0;
 
   /** The error message */
   private String errorMessage = null;
@@ -494,9 +497,10 @@ public class MockHttpServletResponse implements HttpServletResponse {
    *      java.lang.String)
    */
   public void sendError(int status, String errorMessage) throws IOException {
-    if (isCommitted()) {
+    if (isCommitted() && errorCount == 0) {
       throw new IllegalStateException("Cannot set error status - response is already committed");
     }
+    this.errorCount ++;
     this.status = status;
     this.errorMessage = errorMessage;
     setCommitted(true);
@@ -508,9 +512,10 @@ public class MockHttpServletResponse implements HttpServletResponse {
    * @see javax.servlet.http.HttpServletResponse#sendError(int)
    */
   public void sendError(int status) throws IOException {
-    if (isCommitted()) {
+    if (isCommitted() && errorCount == 0) {
       throw new IllegalStateException("Cannot set error status - response is already committed");
     }
+    this.errorCount ++;
     this.status = status;
     setCommitted(true);
   }
