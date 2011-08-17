@@ -94,6 +94,11 @@
       <artifactId>commons-httpclient</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-bundle</artifactId>
+    </dependency>
+
     <!-- apache solr -->
 
     <dependency>
@@ -232,12 +237,6 @@
       <groupId>javax.jcr</groupId>
       <artifactId>jcr</artifactId>
       <version>1.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-bundle</artifactId>
-      <version>0.9</version>
     </dependency>
 
     <!-- testing -->
