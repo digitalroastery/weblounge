@@ -205,6 +205,8 @@ public class ResourcePublishingService implements BundleListener {
       case BundleEvent.STOPPED:
         unregisterResources(event.getBundle());
         break;
+      default:
+        break;
     }
   }
 
