@@ -21,7 +21,6 @@
 package ch.entwine.weblounge.common.content;
 
 import ch.entwine.weblounge.common.content.image.ImageStyle;
-import ch.entwine.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -47,7 +46,7 @@ public final class ResourceUtils {
   private ResourceUtils() {
     // Nothing to do here
   }
-  
+
   /**
    * Returns <code>true</code> if the resource either is more recent than the
    * cached version on the client side or the request does not contain caching
@@ -57,15 +56,15 @@ public final class ResourceUtils {
    *          the client request
    * @param resource
    *          the resource
-   * @return <code>true</code> if the page is more recent than the version that
-   *         is cached at the client.
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
    * @throws IllegalArgumentException
    *           if the <code>If-Modified-Since</code> header cannot be converted
    *           to a date.
    */
-  public static boolean isModified(HttpServletRequest request,
+  public static boolean hasChanged(HttpServletRequest request,
       Resource<?> resource) throws IllegalArgumentException {
-    return isModified(request, resource, null);
+    return hasChanged(request, resource, null);
   }
 
   /**
@@ -77,29 +76,21 @@ public final class ResourceUtils {
    *          the client request
    * @param resource
    *          the resource
-   * @param language
-   *          the language
    * @param style
-   *          the imagestyle
-   * @return <code>true</code> if the page is more recent than the version that
-   *         is cached at the client.
+   *          the imageStle
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
    * @throws IllegalArgumentException
    *           if the <code>If-Modified-Since</code> header cannot be converted
    *           to a date.
    */
-  public static boolean isModified(HttpServletRequest request,
-      Resource<?> resource, Language language, ImageStyle style)
-      throws IllegalArgumentException {
+  public static boolean hasChanged(HttpServletRequest request,
+      Resource<?> resource, ImageStyle style) throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
-      long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-      Date resourceModificationDate = getModificationDate(resource);
-      return cachedModificationDate < resourceModificationDate.getTime();
+      return isModified(request, resource);
     } else if (request.getHeader("If-None-Match") != null) {
-      String eTagHeader = request.getHeader("If-None-Match");
-      String eTag = getETagValue(resource, language, style);
-      return !eTag.equals(eTagHeader);
+      return isMismatch(request, resource, style);
     }
-
     return true;
   }
 
@@ -112,18 +103,20 @@ public final class ResourceUtils {
    *          the client request
    * @param resource
    *          the resource
-   * @param language
-   *          the language
-   * @return <code>true</code> if the page is more recent than the version that
+   * @return <code>true</code> if the resource is more recent than the version that
    *         is cached at the client.
    * @throws IllegalArgumentException
    *           if the <code>If-Modified-Since</code> header cannot be converted
    *           to a date.
    */
   public static boolean isModified(HttpServletRequest request,
-      Resource<?> resource, Language language)
-      throws IllegalArgumentException {
-    return isModified(request, resource, language, null);
+      Resource<?> resource) throws IllegalArgumentException {
+    if (request.getHeader("If-Modified-Since") != null) {
+      long cachedModificationDate = request.getDateHeader("If-Modified-Since");
+      long resourceModificationDate = getModificationDate(resource).getTime();
+      return cachedModificationDate < resourceModificationDate;
+    }
+    return true;
   }
 
   /**
@@ -134,26 +127,24 @@ public final class ResourceUtils {
    * The decision is based on the availability and value of the
    * <code>If-None-Match</code> header (called <code>ETag</code>).
    * <p>
-   * Note that if <code>language</code> is <code>null</code>, the
-   * <code>ETag</code> calculation will be performed on the resource level
-   * rather than the resource content.
-   * 
-   * @param resource
-   *          the resource
    * @param request
    *          the client request
+   * @param resource
+   *          the resource
+   * @param style
+   *          the imagestyle
    * @return <code>true</code> if the resource's calculated eTag matches the one
    *         specified
    * @throws IllegalArgumentException
    *           if the <code>If-Modified-Since</code> cannot be converted to a
    *           date.
    */
-  public static boolean isMismatch(Resource<?> resource, Language language,
-      HttpServletRequest request) throws IllegalArgumentException {
+  public static boolean isMismatch(HttpServletRequest request,
+      Resource<?> resource, ImageStyle style) throws IllegalArgumentException {
     String eTagHeader = request.getHeader("If-None-Match");
     if (StringUtils.isBlank(eTagHeader))
       return true;
-    String eTag = getETagValue(resource, language);
+    String eTag = getETagValue(resource, style);
     return !eTagHeader.equals(eTag);
   }
 
@@ -178,7 +169,7 @@ public final class ResourceUtils {
    *           if the <code>If-Modified-Since</code> cannot be converted to a
    *           date.
    */
-  public static boolean isMismatch(String eTag, HttpServletRequest request)
+  public static boolean isMismatch(HttpServletRequest request, String eTag)
       throws IllegalArgumentException {
     String eTagHeader = request.getHeader("If-None-Match");
     if (StringUtils.isBlank(eTagHeader))
@@ -188,7 +179,7 @@ public final class ResourceUtils {
 
   /**
    * Returns the value for the <code>ETag</code> header field, which is
-   * calculated from the resource identifier and the resource's modification
+   * calculated from the resource identifier and the resource's modification 
    * date.
    * 
    * @param resource
@@ -201,48 +192,19 @@ public final class ResourceUtils {
 
   /**
    * Returns the value for the <code>ETag</code> header field, which is
-   * calculated from the resource identifier, the language identifier and the
-   * resource's modification date.
-   * <p>
-   * Note that if <code>language</code> is <code>null</code>, the
-   * <code>ETag</code> calculation will be performed on the resource level
-   * rather than the resource content.
+   * calculated from the resource identifier and the resource's modification
+   * date.
    * 
    * @param resource
    *          the resource
-   * @param language
-   *          the requested language
-   * @return the <code>ETag</code> value
-   */
-  public static String getETagValue(Resource<?> resource, Language language) {
-    long etag = resource.getIdentifier().hashCode();
-    if (language != null)
-      etag += language.getIdentifier().hashCode();
-    etag += getModificationDate(resource).getTime();
-    return new StringBuffer().append("\"").append(etag).append("\"").toString();
-  }
-
-  /**
-   * Returns the value for the <code>ETag</code> header field, which is
-   * calculated from the resource identifier, the language identifier and the
-   * resource's modification date.
-   * 
-   * @param resource
-   *          the resource
-   * @param language
-   *          the requested language
    * @param style
    *          the image style
    * @return the <code>ETag</code> value
    */
-  public static String getETagValue(Resource<?> resource, Language language,
-      ImageStyle style) {
-    if (style == null)
-      return getETagValue(resource, language);
+  public static String getETagValue(Resource<?> resource, ImageStyle style) {
     long etag = resource.getIdentifier().hashCode();
-    if (language != null)
-      etag += language.getIdentifier().hashCode();
-    etag += style.getIdentifier().hashCode();
+    if (style != null)
+      etag += style.getIdentifier().hashCode();
     etag += getModificationDate(resource).getTime();
     return new StringBuffer().append("\"").append(etag).append("\"").toString();
   }
