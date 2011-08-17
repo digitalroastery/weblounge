@@ -165,24 +165,48 @@ public class ContentRepositoryEndpoint {
    */
   protected Resource<?> loadResource(HttpServletRequest request,
       String resourceId, String resourceType) {
+    return loadResource(request, resourceId, resourceType, Resource.LIVE);
+  }
+  
+  
+  /**
+   * Returns the resource identified by the given request and resource
+   * identifier or <code>null</code> if either one of the site, the site's
+   * content repository or the resource itself is not available.
+   * <p>
+   * If <code>resourceType</code> is not <code>null</code>, the loaded resource
+   * is only returned if the resource type matches.
+   * 
+   * @param request
+   *          the servlet request
+   * @param resourceId
+   *          the resource identifier
+   * @param resourceType
+   *          the resource type
+   * @param version
+   *          the version
+   * @return the resource
+   */
+  protected Resource<?> loadResource(HttpServletRequest request,
+      String resourceId, String resourceType, long version) {
     if (sites == null) {
       logger.debug("Unable to load resource '{}': no sites registered", resourceId);
       return null;
     }
-
+    
     // Extract the site
     Site site = getSite(request);
-
+    
     // Look for the content repository
     ContentRepository contentRepository = site.getContentRepository();
     if (contentRepository == null) {
       logger.warn("No content repository found for site '{}'", site);
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
     }
-
+    
     // Load the resource and return it
     try {
-      ResourceURI resourceURI = new ResourceURIImpl(resourceType, site, null, resourceId);
+      ResourceURI resourceURI = new ResourceURIImpl(resourceType, site, null, resourceId, version);
       Resource<?> resource = contentRepository.get(resourceURI);
       if (resource == null)
         return null;

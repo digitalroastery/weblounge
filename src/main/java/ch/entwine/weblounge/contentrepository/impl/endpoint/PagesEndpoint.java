@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.SearchQuery;
@@ -200,7 +201,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset,
       @QueryParam("details") @DefaultValue("false") boolean details) {
-    
+
     // Create search query
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
@@ -255,7 +256,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @GET
   @Path("/{page}")
   public Response getPageById(@Context HttpServletRequest request,
-      @PathParam("page") String pageId) {
+      @PathParam("page") String pageId,
+      @QueryParam("version") @DefaultValue("0") long version) {
 
     // Check the parameters
     if (pageId == null)
@@ -267,11 +269,11 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Load the page
-    Page page = (Page) loadResource(request, pageId, Page.TYPE);
+    Page page = (Page) loadResource(request, pageId, Page.TYPE, version);
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    
+
     // Is there an up-to-date, cached version on the client side?
     if (!ResourceUtils.hasChanged(request, page)) {
       return Response.notModified().build();
@@ -371,7 +373,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+    ResourceURI pageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
 
     // Does the page exist?
     Page currentPage = null;
@@ -387,15 +389,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
-      try {
-        currentPage = (Page) contentRepository.get(pageURI);
-        String etag = Long.toString(ResourceUtils.getModificationDate(currentPage).getTime());
-        if (!etag.equals(ifMatchHeader)) {
-          throw new WebApplicationException(Status.PRECONDITION_FAILED);
-        }
-      } catch (ContentRepositoryException e) {
-        logger.warn("Error reading current page {} from repository: {}", pageURI, e.getMessage());
-        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      String etag = ResourceUtils.getETagValue(currentPage);
+      if (!etag.equals(ifMatchHeader)) {
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
     }
 
@@ -407,7 +403,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       // TODO: Replace this with current user
       User admin = site.getAdministrator();
       User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-      page.setModified(modifier, new Date());
+      Date date = new Date();
+      page.setModified(modifier, date);
+      page.setVersion(Resource.WORK);
       contentRepository.put(page);
       if (!page.getURI().getPath().equals(currentPage.getURI().getPath())) {
         contentRepository.move(currentPage.getURI(), page.getURI());
@@ -473,7 +471,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         if (!path.startsWith("/"))
           path = "/" + path;
         WebUrl url = new WebUrlImpl(site, path);
-        pageURI = new PageURIImpl(site, url.getPath(), uuid);
+        pageURI = new PageURIImpl(site, url.getPath(), uuid, Resource.WORK);
 
         // Make sure the page doesn't exist
         if (contentRepository.exists(new PageURIImpl(site, url.getPath()))) {
@@ -571,36 +569,46 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
-    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+    ResourceURI livePageURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
+    ResourceURI workPageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Make sure the page doesn't exist
+    boolean liveVersionExists = false;
+    boolean workVerisonExists = false;
     try {
-      if (!contentRepository.exists(pageURI)) {
-        logger.warn("Tried to delete non existing page {} in site '{}'", pageURI, site);
+      liveVersionExists = contentRepository.exists(livePageURI);
+      workVerisonExists = contentRepository.exists(workPageURI);
+      
+      if (!liveVersionExists && !workVerisonExists) {
+        logger.warn("Tried to delete non existing page {} in site '{}'", livePageURI, site);
         throw new WebApplicationException(Status.NOT_FOUND);
       }
     } catch (ContentRepositoryException e) {
-      logger.warn("Page lookup {} failed for site '{}'", pageURI, site);
+      logger.warn("Page lookup {} failed for site '{}'", livePageURI, site);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Delete the page
     try {
-      // TODO: Versions?
-      contentRepository.delete(pageURI);
+      if(liveVersionExists) {
+        contentRepository.delete(livePageURI);
+      }
+      if(workVerisonExists) {
+        contentRepository.delete(workPageURI);
+      }
     } catch (SecurityException e) {
-      logger.warn("Tried to delete page {} of site '{}' without permission", pageURI, site);
+      logger.warn("Tried to delete page {} of site '{}' without permission", livePageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
       logger.warn("Error deleting page {} from site '{}': {}", new Object[] {
-          pageURI,
+          livePageURI,
           site,
           e.getMessage() });
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (ContentRepositoryException e) {
       logger.warn("Error deleting page {} from site '{}': {}", new Object[] {
-          pageURI,
+          livePageURI,
           site,
           e.getMessage() });
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -625,7 +633,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @GET
   @Path("/{page}/composers/{composer}")
   public Response getComposer(@Context HttpServletRequest request,
-      @PathParam("page") String pageId, @PathParam("composer") String composerId) {
+      @PathParam("page") String pageId,
+      @PathParam("composer") String composerId,
+      @QueryParam("version") @DefaultValue("0") long version) {
 
     // Check the parameters
     if (pageId == null)
@@ -634,7 +644,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Load the page
-    Page page = (Page) loadResource(request, pageId, Page.TYPE);
+    Page page = (Page) loadResource(request, pageId, Page.TYPE, version);
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -674,7 +684,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   public Response getPagelet(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
       @PathParam("composer") String composerId,
-      @PathParam("pageletindex") int pageletIndex) {
+      @PathParam("pageletindex") int pageletIndex,
+      @QueryParam("version") @DefaultValue("0") long version) {
 
     if (pageId == null)
       return Response.status(Status.BAD_REQUEST).build();
@@ -682,7 +693,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Load the page
-    Page page = (Page) loadResource(request, pageId, Page.TYPE);
+    Page page = (Page) loadResource(request, pageId, Page.TYPE, version);
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -738,23 +749,35 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+    ResourceURI pageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
 
     // Does the page exist?
     Page page = null;
     try {
       if (!contentRepository.exists(pageURI)) {
-        throw new WebApplicationException(Status.NOT_FOUND);
+        pageURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
+        if (!contentRepository.exists(pageURI))
+          throw new WebApplicationException(Status.NOT_FOUND);
       }
       page = (Page) contentRepository.get(pageURI);
+      if (page.getVersion() == Resource.LIVE) {
+        page.setVersion(Resource.WORK);
+        page = (Page) contentRepository.put(page);
+      }
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Error putting a page work copy {} to repository: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (IOException e) {
+      logger.warn("Error putting a page work copy {} to repository: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
-      String etag = Long.toString(ResourceUtils.getModificationDate(page).getTime());
+      String etag = ResourceUtils.getETagValue(page);
       if (!etag.equals(ifMatchHeader)) {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
@@ -829,7 +852,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+    ResourceURI pageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
 
     // Does the page exist?
     Page page = null;
@@ -845,7 +868,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
-      String etag = Long.toString(ResourceUtils.getModificationDate(page).getTime());
+      String etag = ResourceUtils.getETagValue(page);
       if (!etag.equals(ifMatchHeader)) {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
@@ -929,7 +952,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+    ResourceURI pageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
 
     // Does the page exist?
     Page page = null;
@@ -945,7 +968,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
-      String etag = Long.toString(ResourceUtils.getModificationDate(page).getTime());
+      String etag = ResourceUtils.getETagValue(page);
       if (!etag.equals(ifMatchHeader)) {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
@@ -980,7 +1003,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Finally, perform the publish operation
     try {
       page.setPublished(currentUser, startDate, endDate);
-      contentRepository.put(page);
+      page.setVersion(Resource.LIVE);
+      page = (Page) contentRepository.put(page);
     } catch (SecurityException e) {
       logger.warn("Tried to publish page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
@@ -1019,7 +1043,6 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @Path("/{page}/publish")
   public Response unpublishPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
-      @FormParam("enddate") String endDateString,
       @HeaderParam("If-Match") String ifMatchHeader) {
 
     // Check the parameters
@@ -1036,23 +1059,36 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+    ResourceURI livePageURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
 
     // Does the page exist?
     Page page = null;
     try {
-      if (!contentRepository.exists(pageURI)) {
+      if (!contentRepository.exists(livePageURI)) {
         throw new WebApplicationException(Status.NOT_FOUND);
       }
-      page = (Page) contentRepository.get(pageURI);
+      ResourceURI workPageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
+      if (!contentRepository.exists(workPageURI)) {
+        page = (Page) contentRepository.get(livePageURI);
+        page.setVersion(Resource.WORK);
+        page = (Page) contentRepository.put(page);
+      } else {
+        page = (Page) contentRepository.get(workPageURI);
+      }
     } catch (ContentRepositoryException e) {
-      logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
+      logger.warn("Error lookup up page {} from repository: {}", livePageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Error unpublishing page {}: {}", livePageURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (IOException e) {
+      logger.warn("Error writing new page {}: {}", livePageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
-      String etag = Long.toString(ResourceUtils.getModificationDate(page).getTime());
+      String etag = ResourceUtils.getETagValue(page);
       if (!etag.equals(ifMatchHeader)) {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
@@ -1068,40 +1104,22 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.FORBIDDEN).build();
     }
 
-    // Fix the dates
-    Date startDate = page.getPublishFrom();
-    Date endDate = null;
-
-    try {
-      if (StringUtils.isNotBlank(endDateString))
-        endDate = new Date(endDateString);
-      else
-        endDate = new Date();
-    } catch (IllegalArgumentException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST);
-    }
-
-    if (page.getPublishFrom() == null) {
-      startDate = null;
-      endDate = null;
-      currentUser = null;
-    }
-
     // Finally, perform the unpublish operation
     try {
-      page.setPublished(currentUser, startDate, endDate);
+      contentRepository.delete(livePageURI);
+      page.setPublished(null, null, null);
       contentRepository.put(page);
     } catch (SecurityException e) {
-      logger.warn("Tried to unpublish page {} of site '{}' without permission", pageURI, site);
+      logger.warn("Tried to unpublish page {} of site '{}' without permission", livePageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
-      logger.warn("Error removing writing unpublished page {} to repository", pageURI);
+      logger.warn("Error removing writing unpublished page {} to repository", livePageURI);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (IllegalStateException e) {
-      logger.warn("Error unpublishing page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error unpublishing page {}: {}", livePageURI, e.getMessage());
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     } catch (ContentRepositoryException e) {
-      logger.warn("Error unpublishing page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error unpublishing page {}: {}", livePageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 

@@ -254,23 +254,32 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
 
     // Load the resource
-    SearchQuery q = new SearchQueryImpl(site).withIdentifier(uri.getIdentifier());
-    ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) index.find(q).getItems()[0];
-
-    InputStream is = null;
-    try {
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
-      if (serializer == null) {
-        logger.warn("No resource serializer for type '{}' found", uri.getType());
-        throw new ContentRepositoryException("No resource serializer for type '" + uri.getType() + "' found");
+    if (uri.getVersion() == Resource.LIVE) {
+      SearchQuery q = new SearchQueryImpl(site).withIdentifier(uri.getIdentifier());
+      ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) index.find(q).getItems()[0];
+  
+      InputStream is = null;
+      try {
+        ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+        if (serializer == null) {
+          logger.warn("No resource serializer for type '{}' found", uri.getType());
+          throw new ContentRepositoryException("No resource serializer for type '" + uri.getType() + "' found");
+        }
+        ResourceReader<?, ?> reader = serializer.getReader();
+        return reader.read(IOUtils.toInputStream(searchResultItem.getResourceXml(), "utf-8"), site);
+      } catch (Throwable t) {
+        logger.error("Error loading {}: {}", uri, t.getMessage());
+        throw new ContentRepositoryException(t);
+      } finally {
+        IOUtils.closeQuietly(is);
       }
-      ResourceReader<?, ?> reader = serializer.getReader();
-      return reader.read(IOUtils.toInputStream(searchResultItem.getResourceXml(), "utf-8"), site);
-    } catch (Throwable t) {
-      logger.error("Error loading {}: {}", uri, t.getMessage());
-      throw new ContentRepositoryException(t);
-    } finally {
-      IOUtils.closeQuietly(is);
+    } else {
+      try {
+        return loadResource(uri);
+      } catch (IOException e) {
+        logger.error("Error loading {}: {}", uri, e.getMessage());
+        throw new ContentRepositoryException(e);
+      }
     }
   }
 
