@@ -273,7 +273,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
     
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(request, page)) {
+    if (!ResourceUtils.hasChanged(request, page)) {
       return Response.notModified().build();
     }
 
@@ -640,7 +640,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(request, page)) {
+    if (!ResourceUtils.hasChanged(request, page)) {
       return Response.notModified().build();
     }
 
@@ -688,7 +688,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(request, page)) {
+    if (!ResourceUtils.hasChanged(request, page)) {
       return Response.notModified().build();
     }
 

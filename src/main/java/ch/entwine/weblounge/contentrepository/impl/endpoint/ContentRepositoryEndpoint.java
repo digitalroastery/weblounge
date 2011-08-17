@@ -88,7 +88,7 @@ public class ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(request, resource)) {
+    if (!ResourceUtils.hasChanged(request, resource)) {
       return Response.notModified().build();
     }
 
@@ -98,20 +98,13 @@ public class ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
-    // Check the ETag
-    String eTagValue = ResourceUtils.getETagValue(resource, language);
-    if (!ResourceUtils.isMismatch(resource, language, request)) {
-      return Response.notModified(eTagValue).build();
-    }
-
     Site site = getSite(request);
     final ContentRepository contentRepository = getContentRepository(site, false);
-    final Language selectedLanguage = language;
 
     // Create the response
     final InputStream is;
     try {
-      is = contentRepository.getContent(resource.getURI(), selectedLanguage);
+      is = contentRepository.getContent(resource.getURI(), language);
     } catch (IOException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (ContentRepositoryException e) {
@@ -148,8 +141,8 @@ public class ContentRepositoryEndpoint {
     }
 
     // Add an e-tag and send the response
-    response.header("Content-Disposition", "inline; filename=" + resource.getContent(selectedLanguage).getFilename());
-    response.tag(eTagValue);
+    response.header("Content-Disposition", "inline; filename=" + resource.getContent(language).getFilename());
+    response.tag(ResourceUtils.getETagValue(resource));
     response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }

@@ -305,7 +305,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(request, resource)) {
+    if (!ResourceUtils.hasChanged(request, resource)) {
       return Response.notModified().build();
     }
 
@@ -433,7 +433,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Check the ETag
-    if (ResourceUtils.isMismatch(resource, language, request)) {
+    if (ResourceUtils.isMismatch(request, resource, null)) {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
@@ -486,7 +486,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(ResourceUtils.getETagValue(resource, language));
+    response.tag(ResourceUtils.getETagValue(resource));
     response.lastModified(ResourceUtils.getModificationDate(resource));
     return response.build();
   }

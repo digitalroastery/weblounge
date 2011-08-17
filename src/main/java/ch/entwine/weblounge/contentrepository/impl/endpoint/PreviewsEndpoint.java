@@ -165,18 +165,12 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(request, resource)) {
+    if (!ResourceUtils.hasChanged(request, resource, style)) {
       return Response.notModified().build();
     }
 
     // Load the content
     ResourceContent resourceContent = resource.getContent(language);
-
-    // Check the ETag
-    String eTag = ResourceUtils.getETagValue(resource, language, style);
-    if (!ResourceUtils.isMismatch(eTag, request)) {
-      return Response.notModified(eTag).build();
-    }
 
     ResourceURI resourceURI = resource.getURI();
     final ContentRepository contentRepository = getContentRepository(site, false);
@@ -286,6 +280,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     response.lastModified(resource.getModificationDate());
 
     // Add ETag header
+    String eTag = ResourceUtils.getETagValue(resource, style);
     response.tag(eTag);
 
     // Add filename header
