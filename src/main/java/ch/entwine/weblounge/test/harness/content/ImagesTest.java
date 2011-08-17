@@ -102,7 +102,7 @@ public class ImagesTest extends IntegrationTestBase {
 
   /** The style's height */
   private static final int BOX_HEIGHT = 250;
-  
+
   /** Image resource identifier */
   private static final String imageId = "5bc19990-8f99-4873-a813-71b6dfac22ad";
 
@@ -168,7 +168,7 @@ public class ImagesTest extends IntegrationTestBase {
    *           if an exception occurs
    */
   private void testGetOriginalImage(String serverUrl) throws Exception {
-    
+
     logger.info("");
     logger.info("Testing original, (header-based) localized image by path");
     logger.info("");
@@ -180,8 +180,8 @@ public class ImagesTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests for the special <code>/weblounge-images</code> uri prefix that is provided by
-   * the file request handler.
+   * Tests for the special <code>/weblounge-images</code> uri prefix that is
+   * provided by the file request handler.
    * 
    * @param serverUrl
    *          the base url
@@ -189,7 +189,7 @@ public class ImagesTest extends IntegrationTestBase {
    *           if an exception occurs
    */
   private void testGetOriginalImageById(String serverUrl) throws Exception {
-    
+
     logger.info("");
     logger.info("Testing original, (header-based) localized image by id");
     logger.info("");
@@ -205,9 +205,9 @@ public class ImagesTest extends IntegrationTestBase {
    * the file request handler. The handler should be able to respond to these
    * requests:
    * <ul>
-   *  <li>/files/&lt;id&gt;</li>
-   *  <li>/files/&lt;id&gt;/</li>
-   *  <li>/files/&lt;id&gt;/&lt;filename&gt;</li>
+   * <li>/files/&lt;id&gt;</li>
+   * <li>/files/&lt;id&gt;/</li>
+   * <li>/files/&lt;id&gt;/&lt;filename&gt;</li>
    * </ul>
    * 
    * @param serverUrl
@@ -215,7 +215,8 @@ public class ImagesTest extends IntegrationTestBase {
    * @throws Exception
    *           if an exception occurs
    */
-  private void testGetOriginalImageByIdAndName(String serverUrl) throws Exception {
+  private void testGetOriginalImageByIdAndName(String serverUrl)
+      throws Exception {
     logger.info("");
     logger.info("Testing original, (header-based) localized image by id and name");
     logger.info("");
@@ -282,8 +283,8 @@ public class ImagesTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests for the special <code>/weblounge-images</code> uri prefix that is provided by
-   * the file request handler.
+   * Tests for the special <code>/weblounge-images</code> uri prefix that is
+   * provided by the file request handler.
    * 
    * @param serverUrl
    *          the base url
@@ -291,7 +292,7 @@ public class ImagesTest extends IntegrationTestBase {
    *           if an exception occurs
    */
   private void testGetStyledImageById(String serverUrl) throws Exception {
-    
+
     logger.info("");
     logger.info("Testing styled, (header-based) localized images by id");
     logger.info("");
@@ -357,7 +358,7 @@ public class ImagesTest extends IntegrationTestBase {
     logger.info("");
     logger.info("Testing styled, (header-based) localized images by path");
     logger.info("");
-    
+
     List<String> eTags = new ArrayList<String>();
     for (ImageStyle style : styles) {
       String url = UrlUtils.concat(serverUrl, imagePath);
@@ -409,7 +410,7 @@ public class ImagesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     TestSiteUtils.testETagHeader(request, eTagValue, logger);
     TestSiteUtils.testModifiedHeader(request, logger);
   }
@@ -434,7 +435,7 @@ public class ImagesTest extends IntegrationTestBase {
       assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
       assertEquals(sizeGerman, response.getEntity().getContentLength());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
-      
+
       // Test filename
       assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
 
@@ -443,13 +444,13 @@ public class ImagesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
-            
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     TestSiteUtils.testETagHeader(request, eTagValue, logger);
     TestSiteUtils.testModifiedHeader(request, logger);
   }
@@ -476,16 +477,16 @@ public class ImagesTest extends IntegrationTestBase {
       assertEquals(1, response.getHeaders("Content-Type").length);
       assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
-      
+
       SeekableStream seekableInputStream = null;
       StringBuilder fileName = new StringBuilder(FilenameUtils.getBaseName(filenameEnglish));
-      try{
+      try {
         // Test file size
         if (!ImageScalingMode.None.equals(style.getScalingMode())) {
           float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
           float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
           float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
-          
+
           // Load the image from the given input stream
           seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
           RenderedOp image = JAI.create("stream", seekableInputStream);
@@ -495,15 +496,15 @@ public class ImagesTest extends IntegrationTestBase {
           // Get the original image size
           int imageWidth = image.getWidth();
           int imageHeight = image.getHeight();
-          
-          assertTrue((int)(scaledHeight) == imageHeight || (int)(scaledHeight) + 1 == imageHeight || (int)(scaledHeight) - 1 == imageHeight);
-          assertTrue((int)(scaledWidth) == imageWidth || (int)(scaledWidth) + 1 == imageWidth || (int)(scaledWidth) - 1 == imageWidth);
+
+          assertTrue((int) (scaledHeight) == imageHeight || (int) (scaledHeight) + 1 == imageHeight || (int) (scaledHeight) - 1 == imageHeight);
+          assertTrue((int) (scaledWidth) == imageWidth || (int) (scaledWidth) + 1 == imageWidth || (int) (scaledWidth) - 1 == imageWidth);
           fileName.append("-").append(style.getIdentifier());
         }
       } finally {
         IOUtils.closeQuietly(seekableInputStream);
       }
-      
+
       // Test filename
       fileName.append(".").append(FilenameUtils.getExtension(filenameEnglish));
       String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
@@ -524,7 +525,7 @@ public class ImagesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     TestSiteUtils.testETagHeader(request, eTagValue, logger);
     TestSiteUtils.testModifiedHeader(request, logger);
   }
@@ -554,13 +555,13 @@ public class ImagesTest extends IntegrationTestBase {
 
       SeekableStream seekableInputStream = null;
       StringBuilder fileName = new StringBuilder(FilenameUtils.getBaseName(filenameGerman));
-      try{
+      try {
         // Test file size
         if (!ImageScalingMode.None.equals(style.getScalingMode())) {
           float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
           float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
           float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
-          
+
           // Load the image from the given input stream
           seekableInputStream = new FileCacheSeekableStream(response.getEntity().getContent());
           RenderedOp image = JAI.create("stream", seekableInputStream);
@@ -570,15 +571,15 @@ public class ImagesTest extends IntegrationTestBase {
           // Get the original image size
           int imageWidth = image.getWidth();
           int imageHeight = image.getHeight();
-          
-          assertTrue((int)(scaledHeight) == imageHeight || (int)(scaledHeight) + 1 == imageHeight || (int)(scaledHeight) - 1 == imageHeight);
-          assertTrue((int)(scaledWidth) == imageWidth || (int)(scaledWidth) + 1 == imageWidth || (int)(scaledWidth) - 1 == imageWidth);
+
+          assertTrue((int) (scaledHeight) == imageHeight || (int) (scaledHeight) + 1 == imageHeight || (int) (scaledHeight) - 1 == imageHeight);
+          assertTrue((int) (scaledWidth) == imageWidth || (int) (scaledWidth) + 1 == imageWidth || (int) (scaledWidth) - 1 == imageWidth);
           fileName.append("-").append(style.getIdentifier());
         }
       } finally {
         IOUtils.closeQuietly(seekableInputStream);
       }
-      
+
       // Test filename
       fileName.append(".").append(FilenameUtils.getExtension(filenameGerman));
       String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
@@ -599,7 +600,7 @@ public class ImagesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     TestSiteUtils.testETagHeader(request, eTagValue, logger);
     TestSiteUtils.testModifiedHeader(request, logger);
   }
