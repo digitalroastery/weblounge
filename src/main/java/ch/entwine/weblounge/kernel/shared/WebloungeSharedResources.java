@@ -20,25 +20,23 @@
 
 package ch.entwine.weblounge.kernel.shared;
 
-
 import org.apache.commons.lang.StringUtils;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.http.HttpContext;
-import org.osgi.service.http.HttpService;
-import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Dictionary;
+import java.util.Hashtable;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import javax.servlet.Servlet;
 
 /**
  * This component registers this bundle's <code>/html</code> resource directory
@@ -67,24 +65,18 @@ public class WebloungeSharedResources implements ManagedService {
 
   /** Directory with external resources */
   private File externalResourcesDir = null;
-  
+
   /** Actual mountpoint for the shared resources */
   private String resourcesMountpoint = null;
 
-  /** The http service */
-  private HttpService httpService = null;
+  /** The http servlet registration */
+  private ServiceRegistration servletRegistration = null;
 
-  /** The http context */
-  private HttpContext httpContext = null;
-  
-  /** The servlet used to serve both bundle and external resources */
-  private HttpServlet servlet = null;
-  
   /** Bundle context */
   private BundleContext bundleContext = null;
 
   /**
-   * Callback for OSGi's declarative services component dactivation.
+   * Callback for OSGi's declarative services component inactivation.
    * 
    * @param context
    *          the component context
@@ -109,23 +101,13 @@ public class WebloungeSharedResources implements ManagedService {
       logger.debug("No configuration admin service found while looking for content repository configuration");
     }
 
-    logger.info("Starting to serve shared weblounge resources at {}", resourcesMountpoint);
-    
-    try {
-      httpContext = httpService.createDefaultHttpContext();
-      if (servlet != null) {
-        httpService.registerServlet(resourcesMountpoint, servlet, null, httpContext);
-        logger.info("Added {} to shared weblounge resources", externalResourcesDir);
-      } else {
-        httpService.registerResources(resourcesMountpoint, RESOURCES_BUNDLE_DIR, httpContext);
-      }
-    } catch (ServletException e) {
-      logger.error("Error registering shared resources servlet at " + resourcesMountpoint, e);
+    if (servletRegistration == null) {
+      register(resourcesMountpoint, externalResourcesDir, bundleContext.getBundle());
     }
   }
 
   /**
-   * Callback for OSGi's declarative services component dactivation.
+   * Callback for OSGi's declarative services component inactivation.
    * 
    * @param context
    *          the component context
@@ -134,8 +116,10 @@ public class WebloungeSharedResources implements ManagedService {
    */
   void deactivate(ComponentContext context) throws Exception {
     logger.info("Stopping serving of shared weblounge resources", this);
-    httpService.unregister(resourcesMountpoint);
-    httpContext = null;
+    if (servletRegistration != null) {
+      servletRegistration.unregister();
+      servletRegistration = null;
+    }
   }
 
   /**
@@ -149,7 +133,6 @@ public class WebloungeSharedResources implements ManagedService {
       return;
 
     // Mountpoint
-    String currentMountpoint = resourcesMountpoint;
     String mountpoint = (String) properties.get(OPT_RESOURCES_MOUNTPOINT);
     if (StringUtils.isNotBlank(mountpoint)) {
       resourcesMountpoint = mountpoint;
@@ -159,33 +142,21 @@ public class WebloungeSharedResources implements ManagedService {
       logger.debug("Using default mountpoint {} for shared resources", resourcesMountpoint);
     }
 
-    // Mountpoint
+    // Optional external resources directory
     String externalResources = (String) properties.get(OPT_EXT_RESOURCES);
     if (StringUtils.isNotBlank(externalResources)) {
       externalResourcesDir = new File(externalResources);
-      servlet = new WebloungeResourcesServlet(externalResourcesDir, bundleContext.getBundle(), RESOURCES_BUNDLE_DIR);
       logger.debug("Configured external shared resources directory at '{}'", externalResources);
     } else {
-      servlet = null;
+      logger.debug("Shared resources will be served from bundle '{}'", bundleContext.getBundle().getSymbolicName());
     }
 
-    // Update the registration
-    if (currentMountpoint != null) {
-      try {
-        httpService.unregister(currentMountpoint);
-        logger.info("Serving shared weblounge resources at {}", resourcesMountpoint);
-        if (servlet != null) {
-          httpService.registerServlet(resourcesMountpoint, servlet, null, httpContext);
-          logger.info("Added {} to shared weblounge resources", externalResourcesDir);
-        } else {
-          httpService.registerResources(resourcesMountpoint, RESOURCES_BUNDLE_DIR, httpContext);
-        }
-      } catch (NamespaceException e) {
-        logger.error("Error registering shared resources at " + resourcesMountpoint, e);
-      } catch (ServletException e) {
-        logger.error("Error registering shared resources servlet at " + resourcesMountpoint, e);
-      }
+    // Register the new servlet
+    if (servletRegistration != null) {
+      servletRegistration.unregister();
     }
+    servletRegistration = register(resourcesMountpoint, externalResourcesDir, bundleContext.getBundle());
+    logger.info("Serving shared weblounge resources at {}", resourcesMountpoint);
   }
 
   /**
@@ -198,14 +169,22 @@ public class WebloungeSharedResources implements ManagedService {
   }
 
   /**
-   * Callback for OSGi's declarative services to set a reference to the OSGi
-   * <code>HttpService</code>.
+   * Registers the shared resources directory under the given context.
    * 
-   * @param httpService
-   *          the http service
+   * @param context
+   *          the context path
+   * @param resourcesDir
+   *          directory containing the resources to serve
+   * @param the
+   *          contextual bundle
    */
-  void setHttpService(HttpService httpService) {
-    this.httpService = httpService;
+  private ServiceRegistration register(String context, File resourcesDir,
+      Bundle bundle) {
+    Dictionary<String, String> registrationProperties = new Hashtable<String, String>();
+    registrationProperties.put("alias", context);
+    registrationProperties.put("servlet-name", "weblounge.sharedresources");
+    Servlet servlet = new WebloungeResourcesServlet(resourcesDir, bundle, RESOURCES_BUNDLE_DIR);
+    return bundleContext.registerService(Servlet.class.getName(), servlet, registrationProperties);
   }
 
 }
