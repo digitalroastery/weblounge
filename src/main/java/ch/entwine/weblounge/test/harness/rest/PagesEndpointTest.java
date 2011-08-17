@@ -169,6 +169,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     HttpClient httpClient = new DefaultHttpClient();
     Document pageXml = null;
     String eTagValue;
+    String modifiedValue;
     logger.info("Requesting page at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
@@ -181,12 +182,40 @@ public class PagesEndpointTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
+      
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      assertNotNull(modifiedHeader.getValue());
+      modifiedValue = modifiedHeader.getValue();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
     
     TestSiteUtils.testETagHeader(getPageRequest, eTagValue, logger);
-    TestSiteUtils.testModifiedHeader(getPageRequest, logger);
+    
+    httpClient = new DefaultHttpClient();
+    try {
+      getPageRequest.removeHeaders("If-None-Match");
+      getPageRequest.setHeader("If-Modified-Since", modifiedValue);
+      logger.info("Sending 'If-Modified-Since' request to {}", getPageRequest.getURI());
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+    
+    httpClient = new DefaultHttpClient();
+    try {
+      getPageRequest.removeHeaders("If-None-Match");
+      getPageRequest.setHeader("If-Modified-Since", "Wed, 10 Feb 1999 21:06:40 GMT");
+      logger.info("Sending 'If-Modified-Since' request to {}", getPageRequest.getURI());
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertNotNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
   }
 
   /**
@@ -407,10 +436,10 @@ public class PagesEndpointTest extends IntegrationTestBase {
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      pageXml = TestUtils.parseXMLResponse(response);
-      assertNotNull(XPathHelper.select(pageXml, "/pages/page"));
-      assertEquals(id, XPathHelper.valueOf(pageXml, "/pages/page/@id"));
-      assertEquals(newPath, XPathHelper.valueOf(pageXml, "/pages/page/@path"));
+      Document pagesXml = TestUtils.parseXMLResponse(response);
+      assertNotNull(XPathHelper.select(pagesXml, "/pages/page"));
+      assertEquals(id, XPathHelper.valueOf(pagesXml, "/pages/page/@id"));
+      assertEquals(newPath, XPathHelper.valueOf(pagesXml, "/pages/page/@path"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -422,7 +451,8 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Requesting page by path at {}", oldPath);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
-      assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertNull(XPathHelper.select(TestUtils.parseXMLResponse(response), "/pages/page"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }

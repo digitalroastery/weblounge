@@ -523,6 +523,7 @@ public class ImagesTest extends IntegrationTestBase {
       }
 
     } finally {
+      eTags.clear();
       httpClient.getConnectionManager().shutdown();
     }
 
@@ -598,6 +599,7 @@ public class ImagesTest extends IntegrationTestBase {
       }
 
     } finally {
+      eTags.clear();
       httpClient.getConnectionManager().shutdown();
     }
 
