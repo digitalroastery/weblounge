@@ -218,7 +218,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     }
     
     // Check the modified headers
-    if (!ResourceUtils.isModified(request, imageResource, language, style)) {
+    if (!ResourceUtils.hasChanged(request, imageResource, style)) {
       logger.debug("Image {} was not modified", imageURI);
       DispatchUtils.sendNotModified(request, response);
       return true;
@@ -238,8 +238,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource).getTime());
 
     // Add ETag header
-    String eTag = ResourceUtils.getETagValue(imageResource, language, style);
-    response.setHeader("ETag", eTag);
+    response.setHeader("ETag", ResourceUtils.getETagValue(imageResource, style));
 
     // Get the mime type
     final String mimetype = imageContents.getMimetype();

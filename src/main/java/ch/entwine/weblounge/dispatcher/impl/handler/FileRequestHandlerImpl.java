@@ -199,7 +199,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     }
 
     // Check the modified headers
-    if (!ResourceUtils.isModified(request, fileResource, language)) {
+    if (!ResourceUtils.hasChanged(request, fileResource)) {
       logger.debug("File {} was not modified", fileURI);
       DispatchUtils.sendNotModified(request, response);
       return true;
@@ -219,7 +219,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     response.setHeader("Content-Length", Long.toString(content.getSize()));
 
     // Add ETag header
-    String eTag = ResourceUtils.getETagValue(fileResource, language);
+    String eTag = ResourceUtils.getETagValue(fileResource);
     response.setHeader("ETag", eTag);
 
     // Add content disposition header

@@ -214,7 +214,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       }
 
       // Does the client already have up-to-date content?
-      if (action == null && !ResourceUtils.isModified(request, page)) {
+      if (action == null && !ResourceUtils.hasChanged(request, page)) {
         logger.debug("Page {} was not modified", pageURI);
         DispatchUtils.sendNotModified(request, response);
         return true;
