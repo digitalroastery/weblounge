@@ -386,6 +386,7 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
+  @Ignore
   public void testMoveChildren() throws Exception {
     String root = "/root";
     String newRoot = "/new-root";
