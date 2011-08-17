@@ -114,6 +114,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(FilesEndpoint.class);
 
+  /** Mime type detector */
+  private Tika mimeTypeDetector = new Tika();
+
   /** The endpoint documentation */
   private String docs = null;
 
@@ -955,6 +958,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       if (fileName == null && uploadedFile != null) {
         logger.warn("No filename found for upload, request header 'X-File-Name' not specified");
         fileName = uploadedFile.getName();
+        mimeType = mimeTypeDetector.detect(fileName);
       }
 
       // Make sure there is a language
@@ -967,8 +971,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         InputStream is = null;
         try {
           is = new FileInputStream(uploadedFile);
-          Tika tika = new Tika();
-          mimeType = tika.detect(is);
+          mimeType = mimeTypeDetector.detect(is);
         } catch (IOException e) {
           logger.warn("Error detecting mime type: {}", e.getMessage());
         } finally {
