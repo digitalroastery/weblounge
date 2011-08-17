@@ -67,9 +67,6 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
   /** The bundle header identifying the welcome file */
   public static final String HTTP_WELCOME = "Http-Welcome";
 
-  /** The bundle context */
-  protected BundleContext bundleCtx = null;
-
   /** Mapping of registered endpoints */
   protected Map<String, ServiceRegistration> resourceRegistrations = new HashMap<String, ServiceRegistration>();
 
@@ -83,7 +80,6 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
    *          the component context
    */
   protected void activate(ComponentContext ctx) {
-    this.bundleCtx = ctx.getBundleContext();
     int stateMask = Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING;
     bundleTracker = new BundleTracker(ctx.getBundleContext(), stateMask, this);
     bundleTracker.open();
@@ -125,14 +121,15 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
       return bundle;
     }
 
-    String contextName = "weblounge." + bundle.getSymbolicName().toLowerCase() + "-static";
+    BundleContext bundleCtx = bundle.getBundleContext();
+    String httpContextId = "weblounge." + bundle.getSymbolicName().toLowerCase() + "-static";
 
     // Create and register the bundle http context
     try {
-      BundleResourceHttpContext bundleHttpContext = new BundleResourceHttpContext(bundle, contextPath, resourcePath);
+      BundleResourceHttpContext bundleHttpContext = new BundleResourceHttpContext(bundle, resourcePath);
       Dictionary<String, String> contextRegistrationProperties = new Hashtable<String, String>();
-      contextRegistrationProperties.put("httpContext.id", contextName);
-      ServiceRegistration contextRegistration = bundle.getBundleContext().registerService(HttpContext.class.getName(), bundleHttpContext, contextRegistrationProperties);
+      contextRegistrationProperties.put("httpContext.id", httpContextId);
+      ServiceRegistration contextRegistration = bundleCtx.registerService(HttpContext.class.getName(), bundleHttpContext, contextRegistrationProperties);
       contextRegistrations.put(bundle.getSymbolicName(), contextRegistration);
     } catch (Throwable t) {
       logger.error("Error publishing resources service at " + contextPath, t);
@@ -148,8 +145,8 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
       Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
       servletRegistrationProperties.put("alias", contextPath);
       servletRegistrationProperties.put("servlet-name", bundle.getSymbolicName() + "-static");
-      servletRegistrationProperties.put("httpContext.id", contextName);
-      ServiceRegistration servletRegistration = bundle.getBundleContext().registerService(Servlet.class.getName(), servlet, servletRegistrationProperties);
+      servletRegistrationProperties.put("httpContext.id", httpContextId);
+      ServiceRegistration servletRegistration = bundleCtx.registerService(Servlet.class.getName(), servlet, servletRegistrationProperties);
       resourceRegistrations.put(bundle.getSymbolicName(), servletRegistration);
     } catch (Throwable t) {
       logger.error("Error publishing resources service at " + contextPath, t);

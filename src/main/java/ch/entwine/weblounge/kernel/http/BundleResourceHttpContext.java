@@ -47,9 +47,6 @@ public class BundleResourceHttpContext implements HttpContext {
   /** The bundle */
   private Bundle bundle = null;
 
-  /** The site uri */
-  private String siteURI = null;
-
   /** Root path inside the bundle */
   private String bundlePath = null;
 
@@ -60,7 +57,7 @@ public class BundleResourceHttpContext implements HttpContext {
    * @param bundle
    */
   public BundleResourceHttpContext(Bundle bundle) {
-    this(bundle, null, null);
+    this(bundle, null);
   }
 
   /**
@@ -70,12 +67,10 @@ public class BundleResourceHttpContext implements HttpContext {
    * 
    * @param bundle
    *          the bundle
-   * @param siteURI
-   *          the site's mountpoint, e. g. <code>/weblounge-sites/mysite</code>
    * @param bundlePath
    *          the context path inside the bundle
    */
-  public BundleResourceHttpContext(Bundle bundle, String siteURI, String bundlePath) {
+  public BundleResourceHttpContext(Bundle bundle, String bundlePath) {
     if (bundle == null)
       throw new IllegalArgumentException("Bundle must not be null");
     this.bundle = bundle;
@@ -86,7 +81,6 @@ public class BundleResourceHttpContext implements HttpContext {
         bundlePath = null;
     }
     this.bundlePath = bundlePath;
-    this.siteURI = siteURI;
   }
 
   /**
@@ -105,15 +99,6 @@ public class BundleResourceHttpContext implements HttpContext {
    */
   public String getBundlePath() {
     return bundlePath;
-  }
-
-  /**
-   * Returns the uri that is mapped to the bundle content.
-   * 
-   * @return the uri
-   */
-  public String getSiteURI() {
-    return siteURI;
   }
 
   /**
@@ -142,8 +127,6 @@ public class BundleResourceHttpContext implements HttpContext {
    * @see org.osgi.service.http.HttpContext#getResource(java.lang.String)
    */
   public URL getResource(String resourceName) {
-    if (resourceName.startsWith(siteURI))
-      resourceName = resourceName.substring(siteURI.length());
     if (StringUtils.isNotBlank(bundlePath) && !resourceName.startsWith(WEB_INF))
       if (StringUtils.isNotBlank(resourceName))
         resourceName = UrlUtils.concat(bundlePath, resourceName);
@@ -203,10 +186,10 @@ public class BundleResourceHttpContext implements HttpContext {
     }
     return false;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
