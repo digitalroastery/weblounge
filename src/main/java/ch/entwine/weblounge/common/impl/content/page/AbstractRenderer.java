@@ -238,12 +238,12 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
       }
 
       // Prepare a request to site resources
+      String servletPath = "/weblounge-sites/" + site.getIdentifier();
       String requestPath = renderer.getPath();
-      if (!StringUtils.isBlank(request.getContextPath()))
-        requestPath = requestPath.substring(request.getContextPath().length());
+      requestPath = requestPath.substring(servletPath.length());
       SiteRequestWrapper siteRequest = new SiteRequestWrapper(request, requestPath, false);
 
-      RequestDispatcher dispatcher = request.getRequestDispatcher(siteRequest.getServletPath());
+      RequestDispatcher dispatcher = request.getRequestDispatcher(servletPath);
       if (dispatcher == null)
         throw new IllegalStateException("No dispatcher found for site '" + site + "'");
 

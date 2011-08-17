@@ -97,7 +97,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
 
   /** The site */
   private final Site site;
-  
+
   /** The url */
   private final WebUrl url;
 
@@ -113,12 +113,13 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
    *          the attributes of the new request
    */
   @SuppressWarnings("unchecked")
-  public SiteRequestWrapper(WebloungeRequest request, String url, boolean include) {
+  public SiteRequestWrapper(WebloungeRequest request, String url,
+      boolean include) {
     super(request);
 
     this.site = request.getSite();
     this.include = include;
-    
+
     int index = url.indexOf('?');
     params = request.getParameterMap();
     if (index > -1) {
@@ -127,10 +128,10 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
 
     // Set the context path, servlet path and request uri
     String contextPath = request.getContextPath();
-    String servletPath = "/weblounge-sites/" + site.getIdentifier();
+    String servletPath = "";
     String pathInfo = url.substring(contextPath.length() + servletPath.length());
-    String requestURI = servletPath + pathInfo;
-    
+    String requestURI = pathInfo;
+
     // Adjust the url
     this.url = new WebUrlImpl(request.getUrl(), url);
 
@@ -340,38 +341,38 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getFlavor()
    */
   public RequestFlavor getFlavor() {
-    return ((WebloungeRequest)getRequest()).getFlavor();
+    return ((WebloungeRequest) getRequest()).getFlavor();
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getLanguage()
    */
   public Language getLanguage() {
-    return ((WebloungeRequest)getRequest()).getLanguage();
+    return ((WebloungeRequest) getRequest()).getLanguage();
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getRequestedUrl()
    */
   public WebUrl getRequestedUrl() {
     ServletRequest request = getRequest();
     while (request instanceof HttpServletRequestWrapper && !(request instanceof WebloungeRequestImpl)) {
-      request = ((HttpServletRequestWrapper)request).getRequest();
+      request = ((HttpServletRequestWrapper) request).getRequest();
     }
-    return ((WebloungeRequest)request).getUrl();
+    return ((WebloungeRequest) request).getUrl();
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getSite()
    */
   public Site getSite() {
@@ -380,7 +381,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getUrl()
    */
   public WebUrl getUrl() {
@@ -389,25 +390,25 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getUser()
    */
   public User getUser() {
-    return ((WebloungeRequest)getRequest()).getUser();
+    return ((WebloungeRequest) getRequest()).getUser();
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getVersion()
    */
   public long getVersion() {
-    return ((WebloungeRequest)getRequest()).getVersion();
+    return ((WebloungeRequest) getRequest()).getVersion();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
