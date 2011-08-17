@@ -686,6 +686,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-bundle</artifactId>
+        <version>0.9</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>1.6.1</version>
