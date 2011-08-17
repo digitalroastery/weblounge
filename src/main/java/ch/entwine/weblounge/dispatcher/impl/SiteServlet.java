@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.kernel.http.BundleResourceHttpContext;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -75,7 +76,7 @@ public class SiteServlet extends HttpServlet {
   private final Site site;
 
   /** The http context */
-  private final BundleHttpContext siteHttpContext;
+  private final BundleResourceHttpContext siteHttpContext;
 
   /** The Jasper servlet */
   protected final Servlet jasperServlet;
@@ -96,7 +97,8 @@ public class SiteServlet extends HttpServlet {
    * @param httpContext
    *          the http context
    */
-  public SiteServlet(final Site site, final BundleHttpContext httpContext) {
+  public SiteServlet(final Site site,
+      final BundleResourceHttpContext httpContext) {
     this.site = site;
     this.siteHttpContext = httpContext;
     this.jasperServlet = new JspServletWrapper(httpContext.getBundle());
@@ -148,7 +150,7 @@ public class SiteServlet extends HttpServlet {
    * 
    * @return the bundle context
    */
-  public BundleHttpContext getBundleContext() {
+  public BundleResourceHttpContext getBundleContext() {
     return siteHttpContext;
   }
 

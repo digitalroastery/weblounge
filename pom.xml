@@ -176,6 +176,7 @@
               ch.entwine.weblounge.common.url;version=${project.version},
               ch.entwine.weblounge.dispatcher;version=${project.version},
               ch.entwine.weblounge.kernel;version=${project.version},
+              ch.entwine.weblounge.kernel.http;version=${project.version},
               javax.el;version="2.0.0",
               javax.servlet;version="2.5.0",
               javax.servlet.http;version="2.5.0",

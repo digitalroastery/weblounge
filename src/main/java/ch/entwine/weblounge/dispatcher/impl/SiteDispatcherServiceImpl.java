@@ -34,6 +34,7 @@ import ch.entwine.weblounge.dispatcher.SiteDispatcherService;
 import ch.entwine.weblounge.dispatcher.impl.http.WebXml;
 import ch.entwine.weblounge.kernel.SiteManager;
 import ch.entwine.weblounge.kernel.SiteServiceListener;
+import ch.entwine.weblounge.kernel.http.BundleResourceHttpContext;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -392,9 +393,10 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     try {
       // Create and register the bundle http context
-      BundleHttpContext bundleHttpContext = new BundleHttpContext(siteBundle, siteRoot, bundleEntry);
+      BundleResourceHttpContext bundleHttpContext = new BundleResourceHttpContext(siteBundle, siteRoot, bundleEntry);
+      String contextName = "weblounge." + siteBundle.getSymbolicName().toLowerCase() + "-" + bundleEntry;
       Dictionary<String, String> contextRegistrationProperties = new Hashtable<String, String>();
-      contextRegistrationProperties.put("httpContext.id", "weblounge." + site.getIdentifier());
+      contextRegistrationProperties.put("httpContext.id", contextName);
       ServiceRegistration contextRegistration = siteBundle.getBundleContext().registerService(HttpContext.class.getName(), bundleHttpContext, contextRegistrationProperties);
       contextRegistrations.put(site, contextRegistration);
       
@@ -404,7 +406,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
       servletRegistrationProperties.put("alias", siteRoot);
       servletRegistrationProperties.put("servlet-name", site.getIdentifier());
-      servletRegistrationProperties.put("httpContext.id", "weblounge." + site.getIdentifier());
+      servletRegistrationProperties.put("httpContext.id", contextName);
       ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
       servletRegistrations.put(site, servletRegistration);
 
