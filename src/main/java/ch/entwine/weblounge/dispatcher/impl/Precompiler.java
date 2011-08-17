@@ -33,7 +33,6 @@ import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
@@ -127,12 +126,11 @@ public class Precompiler {
       Site site = servlet.getSite();
       Bundle bundle = servlet.getBundle();
       String bundlePath = servlet.getBundleContext().getBundlePath();
-      String httpContextURI = servlet.getBundleContext().getSiteURI();
 
       // Prepare the mock request and response objects
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
       request.setLocalAddr(site.getURL().toExternalForm());
-      request.setServletPath(httpContextURI);
+      request.setServletPath("");
       MockHttpServletResponse response = new MockHttpServletResponse();
 
       // Prepare a fake page in order to prevent erratic behavior during
@@ -161,7 +159,7 @@ public class Precompiler {
         String path = entry.getPath();
         String pathInfo = path.substring(path.indexOf(bundlePath) + bundlePath.length());
         request.setPathInfo(pathInfo);
-        request.setRequestURI(UrlUtils.concat(httpContextURI, pathInfo));
+        request.setRequestURI(pathInfo);
 
         request.setAttribute(WebloungeRequest.PAGE, page);
         request.setAttribute(WebloungeRequest.COMPOSER, page.getComposer(PageTemplate.DEFAULT_STAGE));

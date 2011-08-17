@@ -23,6 +23,7 @@ package ch.entwine.weblounge.dispatcher.impl;
 import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.entwine.weblounge.common.impl.request.Http11ResponseType;
+import ch.entwine.weblounge.common.impl.request.SiteRequestWrapper;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -214,14 +215,18 @@ public class SiteServlet extends HttpServlet {
     final HttpServletResponse response;
 
     // Wrap request and response if necessary
-    if (httpRequest instanceof WebloungeRequest) {
+    if (httpRequest instanceof SiteRequestWrapper) {
       request = httpRequest;
       response = httpResponse;
+    } else if (httpRequest instanceof WebloungeRequest) {
+      request = new SiteRequestWrapper((WebloungeRequest)httpRequest, httpRequest.getPathInfo(), false);
+      response = httpResponse;
     } else {
-      request = new WebloungeRequestImpl(httpRequest);
+      WebloungeRequestImpl webloungeRequest = new WebloungeRequestImpl(httpRequest);
+      webloungeRequest.init(site);
+      request = new SiteRequestWrapper(webloungeRequest, httpRequest.getPathInfo(), false);
       response = new WebloungeResponseImpl(httpResponse);
-      ((WebloungeRequestImpl) request).init(site);
-      ((WebloungeResponseImpl) response).setRequest((WebloungeRequestImpl) request);
+      ((WebloungeResponseImpl) response).setRequest(webloungeRequest);
     }
 
     // Configure request and response objects

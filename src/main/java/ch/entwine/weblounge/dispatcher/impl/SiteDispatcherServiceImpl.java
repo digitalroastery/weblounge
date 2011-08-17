@@ -393,8 +393,8 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     try {
       // Create and register the bundle http context
-      BundleResourceHttpContext bundleHttpContext = new BundleResourceHttpContext(siteBundle, siteRoot, bundleEntry);
-      String contextName = "weblounge." + siteBundle.getSymbolicName().toLowerCase() + "-" + bundleEntry;
+      BundleResourceHttpContext bundleHttpContext = new BundleResourceHttpContext(siteBundle, bundleEntry);
+      String contextName = "weblounge." + siteBundle.getSymbolicName().toLowerCase() + "-site";
       Dictionary<String, String> contextRegistrationProperties = new Hashtable<String, String>();
       contextRegistrationProperties.put("httpContext.id", contextName);
       ServiceRegistration contextRegistration = siteBundle.getBundleContext().registerService(HttpContext.class.getName(), bundleHttpContext, contextRegistrationProperties);
