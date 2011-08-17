@@ -284,6 +284,7 @@ steal.then('jsonix')
 	    lock: function(user, success, error) {
 	    	Page.lock({id:this.value.id}, $.proxy(function() {
 	    		this.value.head.locked = {user: {id: user}};
+	    		this.value.version = 'work';
 	    		success();
 	    	}, this), error);
 	    },
