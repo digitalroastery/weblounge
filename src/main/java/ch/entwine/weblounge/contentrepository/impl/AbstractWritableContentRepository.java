@@ -131,7 +131,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // See if the resource exists
-    if (allRevisions && !index.existsInAnyVersion(uri) || !index.exists(uri)) {
+    if (allRevisions && !index.existsInAnyVersion(uri)) {
       logger.warn("Resource '{}' not found in repository index", uri);
       return false;
     }

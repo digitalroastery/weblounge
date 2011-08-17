@@ -84,7 +84,7 @@ import javax.xml.parsers.ParserConfigurationException;
 @Path("/")
 @Produces(MediaType.APPLICATION_XML)
 public class PagesEndpoint extends ContentRepositoryEndpoint {
-
+  
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(PagesEndpoint.class);
 
@@ -592,10 +592,10 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Delete the page
     try {
       if(liveVersionExists) {
-        contentRepository.delete(livePageURI);
+        contentRepository.delete(livePageURI, true);
       }
-      if(workVerisonExists) {
-        contentRepository.delete(workPageURI);
+      else if(workVerisonExists) {
+        contentRepository.delete(workPageURI, true);
       }
     } catch (SecurityException e) {
       logger.warn("Tried to delete page {} of site '{}' without permission", livePageURI, site);
