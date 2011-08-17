@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.url.PathUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.tika.Tika;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,7 +197,22 @@ public class WebloungeResourcesServlet extends HttpServlet {
     URLConnection conn = url.openConnection();
     contentLength = conn.getContentLength();
     lastModified = conn.getLastModified();
+    
+    // A mime type would be nice as well
     String mimeType = servletConfig.getServletContext().getMimeType(requestPath);
+    if (StringUtils.isBlank(mimeType)) {
+      InputStream is = null;
+      try {
+        is = url.openStream();
+        Tika tika = new Tika();
+        mimeType = tika.detect(is);
+      } catch (IOException e) {
+        logger.warn("Error detecting mime type: {}", e.getMessage());
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+    }
+
     String encoding = null;
 
     // Try to get mime type and content encoding from resource
