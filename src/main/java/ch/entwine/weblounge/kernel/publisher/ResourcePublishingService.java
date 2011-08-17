@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.kernel.publisher;
 
+import ch.entwine.weblounge.kernel.http.BundleResourceHttpContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -49,9 +51,9 @@ import javax.servlet.Servlet;
  * </ul>
  */
 public class ResourcePublishingService implements BundleTrackerCustomizer {
-  
+
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(ResourcePublishingService.class); 
+  private static final Logger logger = LoggerFactory.getLogger(ResourcePublishingService.class);
 
   /** The bundle tracker */
   protected BundleTracker bundleTracker = null;
@@ -64,15 +66,15 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
 
   /** The bundle header identifying the welcome file */
   public static final String HTTP_WELCOME = "Http-Welcome";
-  
+
   /** The bundle context */
   protected BundleContext bundleCtx = null;
 
-  /** The default http context */
-  protected HttpContext httpContext = null;
-
   /** Mapping of registered endpoints */
-  protected Map<String, ServiceRegistration> servletRegistrations = new HashMap<String, ServiceRegistration>();
+  protected Map<String, ServiceRegistration> resourceRegistrations = new HashMap<String, ServiceRegistration>();
+
+  /** Mapping of http context for endpoints */
+  protected Map<String, ServiceRegistration> contextRegistrations = new HashMap<String, ServiceRegistration>();
 
   /**
    * OSGi callback on component activation.
@@ -92,11 +94,16 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
    */
   protected void deactivate() {
     bundleTracker.close();
-    for (Map.Entry<String, ServiceRegistration> entry : servletRegistrations.entrySet()) {
-      ServiceRegistration servlet = entry.getValue();
-      String contextPath = entry.getKey();
-      logger.debug("Unpublishing resources at {}", contextPath);
-      servlet.unregister();
+    synchronized (resourceRegistrations) {
+      for (Map.Entry<String, ServiceRegistration> entry : resourceRegistrations.entrySet()) {
+        String bundleSymbolicName = entry.getKey();
+        ServiceRegistration context = contextRegistrations.get(bundleSymbolicName);
+        ServiceRegistration servlet = entry.getValue();
+        logger.debug("Unpublishing resources at {}", bundleSymbolicName);
+        context.unregister();
+        servlet.unregister();
+      }
+      resourceRegistrations.clear();
     }
   }
 
@@ -107,37 +114,46 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
    *      org.osgi.framework.BundleEvent)
    */
   public Object addingBundle(Bundle bundle, BundleEvent event) {
+
     String resourcePath = (String) bundle.getHeaders().get(HTTP_RESOURCE);
     String contextPath = (String) bundle.getHeaders().get(HTTP_CONTEXT);
     String welcomeFile = (String) bundle.getHeaders().get(HTTP_WELCOME);
-    
+
     // Are there any relevant manifest headers?
     if (StringUtils.isBlank(resourcePath) || StringUtils.isBlank(contextPath)) {
       logger.debug("No resource manifest headers found in bundle {}", bundle.getSymbolicName());
       return bundle;
     }
 
-    // Make sure nothing is mounted there already
-    if (servletRegistrations.containsKey(contextPath)) {
-      logger.warn("Unable to publish resources from bundle {} at {}: context path is already in use", bundle.getSymbolicName(), contextPath);
-      return bundle;
-    }
-    
-    Servlet servlet = new ResourcesServlet(bundle, resourcePath, welcomeFile);
-    Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put("alias", contextPath);
-    
-    // We use the newly added bundle's context to register this service, so
-    // when that bundle shuts down, it brings
-    // down this servlet with it
-    logger.info("Publishing resources from bundle://{} at {}", bundle.getSymbolicName(), contextPath);
-    
+    String contextName = "weblounge." + bundle.getSymbolicName().toLowerCase() + "-static";
+
+    // Create and register the bundle http context
     try {
-      ServiceRegistration reg = bundleCtx.registerService(Servlet.class.getName(), servlet, props);
-      servletRegistrations.put(contextPath, reg);
+      BundleResourceHttpContext bundleHttpContext = new BundleResourceHttpContext(bundle, contextPath, resourcePath);
+      Dictionary<String, String> contextRegistrationProperties = new Hashtable<String, String>();
+      contextRegistrationProperties.put("httpContext.id", contextName);
+      ServiceRegistration contextRegistration = bundle.getBundleContext().registerService(HttpContext.class.getName(), bundleHttpContext, contextRegistrationProperties);
+      contextRegistrations.put(bundle.getSymbolicName(), contextRegistration);
     } catch (Throwable t) {
       logger.error("Error publishing resources service at " + contextPath, t);
-    }      
+    }
+
+    // We use the newly added bundle's context to register this service, so
+    // when that bundle shuts down, it brings down this servlet with it
+    logger.info("Publishing resources from bundle://{} at {}", bundle.getSymbolicName(), contextPath);
+
+    // Create and register the resource servlet
+    try {
+      Servlet servlet = new ResourcesServlet(bundle, resourcePath, welcomeFile);
+      Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
+      servletRegistrationProperties.put("alias", contextPath);
+      servletRegistrationProperties.put("servlet-name", bundle.getSymbolicName() + "-static");
+      servletRegistrationProperties.put("httpContext.id", contextName);
+      ServiceRegistration servletRegistration = bundle.getBundleContext().registerService(Servlet.class.getName(), servlet, servletRegistrationProperties);
+      resourceRegistrations.put(bundle.getSymbolicName(), servletRegistration);
+    } catch (Throwable t) {
+      logger.error("Error publishing resources service at " + contextPath, t);
+    }
 
     return bundle;
   }
@@ -160,18 +176,24 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
    */
   public void removedBundle(Bundle bundle, BundleEvent event, Object object) {
     String contextPath = (String) bundle.getHeaders().get(HTTP_CONTEXT);
-    ServiceRegistration servlet = servletRegistrations.remove(contextPath);
-
-    if (StringUtils.isBlank(contextPath) || servlet == null)
+    if (StringUtils.isBlank(contextPath))
       return;
 
-    logger.debug("Unpublishing resources at {}", contextPath);
+    synchronized (resourceRegistrations) {
+      ServiceRegistration context = contextRegistrations.remove(bundle.getSymbolicName());
+      ServiceRegistration servlet = resourceRegistrations.remove(bundle.getSymbolicName());
+      if (servlet == null)
+        return;
 
-    // Remove the servlet from the http service
-    try {
-      servlet.unregister();
-    } catch (Throwable t) {
-      logger.error("Unable to unregister rest endpoint " + contextPath, t);
+      logger.info("Unpublishing resources at {}", contextPath);
+
+      // Remove the servlet from the http service
+      try {
+        context.unregister();
+        servlet.unregister();
+      } catch (Throwable t) {
+        logger.error("Unable to unregister bundle resources at " + contextPath, t);
+      }
     }
   }
 
