@@ -368,20 +368,63 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  public void testMove() {
+  public void testMove() throws Exception {
     int resources = populateRepository();
     String oldPath = page1URI.getPath();
     String newPath = "/new/path";
     ResourceURI newURI = new PageURIImpl(site, newPath, page1URI.getIdentifier());
-    try {
-      repository.move(page1URI, newURI);
-      assertEquals(resources, repository.getResourceCount());
-      assertNull(repository.get(new PageURIImpl(site, oldPath)));
-      assertNotNull(repository.get(new PageURIImpl(site, newPath)));
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error moving resource");
+
+    repository.move(page1URI, newURI);
+    assertEquals(resources, repository.getResourceCount());
+    assertNull(repository.get(new PageURIImpl(site, oldPath)));
+    assertNotNull(repository.get(new PageURIImpl(site, newPath)));
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#move(ch.entwine.weblounge.common.content.ResourceURI, ch.entwine.weblounge.common.content.ResourceURI)}
+   * .
+   */
+  @Test
+  public void testMoveChildren() throws Exception {
+    String root = "/root";
+    String newRoot = "/new-root";
+    ResourceURI rootURI = null;
+    String subpath = null;
+    int pages = 10;
+
+    // Add 10 sub pages
+    for (int i = 0; i < pages; i++) {
+      String id = UUID.randomUUID().toString();
+      ResourceURI uri = null;
+      if (subpath != null) {
+        subpath = PathUtils.concat(subpath, id);
+        uri = new PageURIImpl(site, subpath, id);
+      } else {
+        subpath = root;
+        rootURI = new PageURIImpl(site, root, id);
+        uri = new PageURIImpl(site, root, id);
+      }
+      Page p = new PageImpl(uri);
+      p.setTemplate(template.getIdentifier());
+      repository.put(p);
     }
+
+    // Move the resources
+    repository.move(rootURI, new PageURIImpl(site, newRoot));
+
+    // Make sure everything is gone from /root
+    SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(root);
+    assertEquals(0, repository.find(q).getItems().length);
+    q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(root);
+    assertEquals(0, repository.find(q).getItems().length);
+
+    // Make sure everything can be found in the new place
+    q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(newRoot);
+    assertEquals(1, repository.find(q).getItems().length);
+    q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(newRoot);
+    assertEquals(pages - 1, repository.find(q).getItems().length);
+
   }
 
   /**

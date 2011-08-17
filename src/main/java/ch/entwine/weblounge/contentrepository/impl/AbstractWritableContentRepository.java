@@ -26,7 +26,10 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
+import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
@@ -36,6 +39,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
@@ -174,7 +178,51 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
-    index.move(uri, target.getPath());
+    List<SearchResultItem> documentsToMove = new ArrayList<SearchResultItem>();
+    String path = uri.getPath();
+
+    // Move the resource itself
+    SearchQuery q = new SearchQueryImpl(site).withPath(path);
+    SearchResult result = index.find(q);
+    if (result.getDocumentCount() == 0) {
+      logger.warn("Trying to move non existing resource {}", uri);
+      return;
+    }
+    documentsToMove.add(result.getItems()[0]);
+
+    // Get child resources
+    q = new SearchQueryImpl(site).withPathPrefix(path);
+    result = index.find(q);
+    for (SearchResultItem searchResult : result.getItems()) {
+      documentsToMove.add(searchResult);
+    }
+
+    // Finally, move all resources
+    for (SearchResultItem searchResult : documentsToMove) {
+      String id = searchResult.getId();
+      for (long version : index.getRevisions(uri)) {
+        Resource<?> r = get(new ResourceURIImpl(Page.TYPE, site, null, id, version));
+        String originalPath = r.getURI().getPath();
+        if (originalPath == null)
+          continue;
+
+        String newPath = originalPath.substring(path.length());
+        if (StringUtils.isNotBlank(newPath))
+          newPath = UrlUtils.concat(target.getPath(), newPath);
+        else
+          newPath = "/";
+        r.getURI().setPath(newPath);
+
+        // Update the index
+        index.move(uri, target.getPath());
+
+        // Write the updated resource to disk
+        storeResource(r);
+
+        // Create the preview images
+        createPreviews(r);
+      }
+    }
   }
 
   /**
