@@ -43,7 +43,6 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
  * Utility class used to facilitate testing.
  */
@@ -61,16 +60,21 @@ public final class TestSiteUtils {
   private TestSiteUtils() {
     // Nothing to be done here.
   }
-  
+
   /**
-   * Test for the correct response when etag header is set
+   * Test for the correct response when etag header is set.
    * 
    * @param request
+   *          the http request
    * @param eTagValue
+   *          the expected etag value
    * @param logger
+   *          used to log test output
    * @throws Exception
+   *           if processing the request fails
    */
-  public static void testETagHeader(HttpUriRequest request, String eTagValue, Logger logger) throws Exception {
+  public static void testETagHeader(HttpUriRequest request, String eTagValue,
+      Logger logger) throws Exception {
     DefaultHttpClient httpClient = new DefaultHttpClient();
     try {
       request.removeHeaders("If-Modified-Since");
@@ -82,7 +86,7 @@ public final class TestSiteUtils {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     httpClient = new DefaultHttpClient();
     try {
       request.removeHeaders("If-Modified-Since");
@@ -91,20 +95,26 @@ public final class TestSiteUtils {
       HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertNotNull(response.getEntity());
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
   }
-  
+
   /**
-   * Test for the correct response when modified since header is set
+   * Test for the correct response when modified since header is set.
    * 
    * @param request
+   *          the http request
    * @param eTagValue
+   *          the expected etag value
    * @param logger
+   *          used to log test output
    * @throws Exception
+   *           if processing the request fails
    */
-  public static void testModifiedHeader(HttpUriRequest request, Logger logger) throws Exception {
+  public static void testModifiedHeader(HttpUriRequest request, Logger logger)
+      throws Exception {
     DefaultHttpClient httpClient = new DefaultHttpClient();
     try {
       request.removeHeaders("If-None-Match");
@@ -116,7 +126,7 @@ public final class TestSiteUtils {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     httpClient = new DefaultHttpClient();
     try {
       request.removeHeaders("If-None-Match");
@@ -125,6 +135,7 @@ public final class TestSiteUtils {
       HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertNotNull(response.getEntity());
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }

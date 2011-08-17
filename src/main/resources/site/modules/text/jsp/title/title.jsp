@@ -9,10 +9,18 @@
 <webl:context define="p=page, language">
 	<%
 	Locale l = new Locale(language.getIdentifier());
+	String modifier = null;
 	DateFormat df = new SimpleDateFormat("dd. MMMM yyyy, HH:mm", l);
-	Date publishingStartDate = p.getPublishFrom();
-	if (publishingStartDate == null) {
-		publishingStartDate = ResourceUtils.getModificationDate(p);
+	Date publishingStartDate = null;
+	if (p != null) {
+		if (publishingStartDate == null) {
+			publishingStartDate = ResourceUtils.getModificationDate(p);
+		}
+		publishingStartDate = p.getPublishFrom();
+		modifier = p.getModifier().getName();
+	} else {
+	  publishingStartDate = new Date();
+	  modifier = "";
 	}
 	%>
 	
@@ -26,7 +34,7 @@
 	</webl:ifproperty>
 	<webl:ifproperty name="author">
 		<span class="DateAndAuthor">
-			<%= p.getModifier().getName() %>
+			<%= modifier %>
 		</span>
 	</webl:ifproperty>
 	<webl:ifelement name="lead">

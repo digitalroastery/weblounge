@@ -239,6 +239,8 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
           assertTrue((int)(scaledHeight) == imageHeight || (int)(scaledHeight) + 1 == imageHeight || (int)(scaledHeight) - 1 == imageHeight);
           assertTrue((int)(scaledWidth) == imageWidth || (int)(scaledWidth) + 1 == imageWidth || (int)(scaledWidth) - 1 == imageWidth);
           fileName.append("-en");
+        } else {
+          response.getEntity().consumeContent();
         }
       } finally {
         IOUtils.closeQuietly(seekableInputStream);
@@ -274,6 +276,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       if (ImageScalingMode.None.equals(imageStyle.getScalingMode())) {
         assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
         assertTrue("No content received", response.getEntity().getContentLength() < 1);
+        response.getEntity().consumeContent();
       } else {
         try {
           assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
