@@ -74,6 +74,9 @@ public class WebloungeResourcesServlet extends HttpServlet {
   /** The servlet configuration */
   private ServletConfig servletConfig = null;
 
+  /** Mime type detector */
+  private Tika mimeTypeDetector = new Tika();
+
   /**
    * Creates a new servlet that serves resources from the bundle's classpath.
    * The resources are exposed in such a way that <code>bundlePath</code> will
@@ -197,19 +200,21 @@ public class WebloungeResourcesServlet extends HttpServlet {
     URLConnection conn = url.openConnection();
     contentLength = conn.getContentLength();
     lastModified = conn.getLastModified();
-    
+
     // A mime type would be nice as well
     String mimeType = servletConfig.getServletContext().getMimeType(requestPath);
+    InputStream is = null;
     if (StringUtils.isBlank(mimeType)) {
-      InputStream is = null;
-      try {
-        is = url.openStream();
-        Tika tika = new Tika();
-        mimeType = tika.detect(is);
-      } catch (IOException e) {
-        logger.warn("Error detecting mime type: {}", e.getMessage());
-      } finally {
-        IOUtils.closeQuietly(is);
+      mimeType = mimeTypeDetector.detect(requestPath);
+      if (mimeType == null) {
+        try {
+          is = url.openStream();
+          mimeType = mimeTypeDetector.detect(is);
+        } catch (IOException e) {
+          logger.warn("Error detecting mime type: {}", e.getMessage());
+        } finally {
+          IOUtils.closeQuietly(is);
+        }
       }
     }
 
@@ -229,7 +234,7 @@ public class WebloungeResourcesServlet extends HttpServlet {
     }
 
     // Send the response back to the client
-    InputStream is = url.openStream();
+    is = url.openStream();
     try {
       logger.debug("Serving {}", url);
       responseType = Http11ProtocolHandler.analyzeRequest(request, lastModified, 0, contentLength);

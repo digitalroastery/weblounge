@@ -26,11 +26,10 @@ import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpContext;
-import org.osgi.util.tracker.BundleTracker;
-import org.osgi.util.tracker.BundleTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,13 +49,10 @@ import javax.servlet.Servlet;
  * <li><code>Http-Welcome</code> the welcome file</li>
  * </ul>
  */
-public class ResourcePublishingService implements BundleTrackerCustomizer {
+public class ResourcePublishingService implements BundleListener {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ResourcePublishingService.class);
-
-  /** The bundle tracker */
-  protected BundleTracker bundleTracker = null;
 
   /** The bundle header identifying the alias to mount the static resource to */
   public static final String HTTP_CONTEXT = "Http-Context";
@@ -80,16 +76,26 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
    *          the component context
    */
   protected void activate(ComponentContext ctx) {
-    int stateMask = Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING;
-    bundleTracker = new BundleTracker(ctx.getBundleContext(), stateMask, this);
-    bundleTracker.open();
+    BundleContext bundleCtx = ctx.getBundleContext();
+
+    // Process bundles that have already been started
+    for (Bundle bundle : bundleCtx.getBundles()) {
+      if (bundle.getState() == Bundle.ACTIVE)
+        registerResources(bundle);
+    }
+
+    bundleCtx.addBundleListener(this);
   }
 
   /**
    * OSGi callback on component inactivation.
+   * 
+   * @param ctx
+   *          the component context
    */
-  protected void deactivate() {
-    bundleTracker.close();
+  protected void deactivate(ComponentContext ctx) {
+    ctx.getBundleContext().removeBundleListener(this);
+
     synchronized (resourceRegistrations) {
       for (Map.Entry<String, ServiceRegistration> entry : resourceRegistrations.entrySet()) {
         String bundleSymbolicName = entry.getKey();
@@ -104,12 +110,13 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
   }
 
   /**
-   * {@inheritDoc}
+   * Registers any static resources that are declared in the bundle's manifest
+   * as a servlet.
    * 
-   * @see org.osgi.util.tracker.BundleTrackerCustomizer#addingBundle(org.osgi.framework.Bundle,
-   *      org.osgi.framework.BundleEvent)
+   * @param bundle
+   *          the active bundle
    */
-  public Object addingBundle(Bundle bundle, BundleEvent event) {
+  public void registerResources(Bundle bundle) {
 
     String resourcePath = (String) bundle.getHeaders().get(HTTP_RESOURCE);
     String contextPath = (String) bundle.getHeaders().get(HTTP_CONTEXT);
@@ -118,7 +125,7 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
     // Are there any relevant manifest headers?
     if (StringUtils.isBlank(resourcePath) || StringUtils.isBlank(contextPath)) {
       logger.debug("No resource manifest headers found in bundle {}", bundle.getSymbolicName());
-      return bundle;
+      return;
     }
 
     BundleContext bundleCtx = bundle.getBundleContext();
@@ -152,29 +159,20 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
       logger.error("Error publishing resources service at " + contextPath, t);
     }
 
-    return bundle;
   }
 
   /**
-   * {@inheritDoc}
+   * Removes any resource registrations associated with this bundle.
    * 
-   * @see org.osgi.util.tracker.BundleTrackerCustomizer#modifiedBundle(org.osgi.framework.Bundle,
-   *      org.osgi.framework.BundleEvent, java.lang.Object)
+   * @param bundle
+   *          the stopped bundle
    */
-  public void modifiedBundle(Bundle bundle, BundleEvent event, Object object) {
-    // Nothing to do
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.util.tracker.BundleTrackerCustomizer#removedBundle(org.osgi.framework.Bundle,
-   *      org.osgi.framework.BundleEvent, java.lang.Object)
-   */
-  public void removedBundle(Bundle bundle, BundleEvent event, Object object) {
+  public void unregisterResources(Bundle bundle) {
     String contextPath = (String) bundle.getHeaders().get(HTTP_CONTEXT);
-    if (StringUtils.isBlank(contextPath))
+    if (StringUtils.isBlank(contextPath)) {
+      logger.debug("Bundle '{}' does not expose static resources", bundle.getSymbolicName());
       return;
+    }
 
     synchronized (resourceRegistrations) {
       ServiceRegistration context = contextRegistrations.remove(bundle.getSymbolicName());
@@ -191,6 +189,22 @@ public class ResourcePublishingService implements BundleTrackerCustomizer {
       } catch (Throwable t) {
         logger.error("Unable to unregister bundle resources at " + contextPath, t);
       }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.osgi.framework.BundleListener#bundleChanged(org.osgi.framework.BundleEvent)
+   */
+  public void bundleChanged(BundleEvent event) {
+    switch (event.getType()) {
+      case BundleEvent.STARTED:
+        registerResources(event.getBundle());
+        break;
+      case BundleEvent.STOPPED:
+        unregisterResources(event.getBundle());
+        break;
     }
   }
 

@@ -115,7 +115,7 @@ public class WebloungeSharedResources implements ManagedService {
    *           if component inactivation fails
    */
   void deactivate(ComponentContext context) throws Exception {
-    logger.info("Stopping serving of shared weblounge resources", this);
+    logger.info("Stopping serving of shared resources", this);
     if (servletRegistration != null) {
       servletRegistration.unregister();
       servletRegistration = null;
@@ -156,7 +156,7 @@ public class WebloungeSharedResources implements ManagedService {
       servletRegistration.unregister();
     }
     servletRegistration = register(resourcesMountpoint, externalResourcesDir, bundleContext.getBundle());
-    logger.info("Serving shared weblounge resources at {}", resourcesMountpoint);
+    logger.info("Serving shared resources at {}", resourcesMountpoint);
   }
 
   /**
