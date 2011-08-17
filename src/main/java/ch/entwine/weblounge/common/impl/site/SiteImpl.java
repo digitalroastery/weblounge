@@ -1353,8 +1353,12 @@ public class SiteImpl implements Site {
    *          the job
    */
   private void unscheduleJob(QuartzJob job) {
-    if (scheduler == null)
-      return;
+    try {
+      if (scheduler == null || scheduler.isShutdown())
+        return;
+    } catch (SchedulerException e1) {
+      // Ignore
+    }
 
     String groupName = "site " + this.getIdentifier();
     String jobIdentifier = job.getIdentifier();
