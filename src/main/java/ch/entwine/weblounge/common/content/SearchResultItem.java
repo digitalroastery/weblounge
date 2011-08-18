@@ -41,13 +41,6 @@ public interface SearchResultItem extends Comparable<SearchResultItem> {
   Site getSite();
 
   /**
-   * Returns the resource type.
-   * 
-   * @return the type
-   */
-  String getType();
-
-  /**
    * Sets the result item identifier.
    * 
    * @param id
