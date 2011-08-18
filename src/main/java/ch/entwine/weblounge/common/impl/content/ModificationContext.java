@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.security.User;
 import org.w3c.dom.Node;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.xml.xpath.XPath;
@@ -83,6 +84,7 @@ public class ModificationContext implements Cloneable {
   /**
    * Creates a modification context reflecting a modification by the specified
    * user and at the given date.
+   * <p>Note that this method will cut off the millisecond portion of the date.</p>
    * 
    * @param date
    *          the modification date
@@ -90,8 +92,8 @@ public class ModificationContext implements Cloneable {
    *          the modifying user
    */
   public ModificationContext(Date date, User modifier) {
-    this.modificationDate = date;
     this.modifier = modifier;
+    this.modificationDate = cutOffMillis(date);
   }
 
   /**
@@ -130,7 +132,7 @@ public class ModificationContext implements Cloneable {
    *         <code>date</code>
    */
   public boolean isModifiedAfter(Date date) {
-    return modificationDate != null && modificationDate.after(date);
+    return modificationDate != null && modificationDate.after(cutOffMillis(date));
   }
 
   /**
@@ -140,11 +142,12 @@ public class ModificationContext implements Cloneable {
    *         <code>date</code>
    */
   public boolean isModifiedBefore(Date date) {
-    return modificationDate != null && modificationDate.before(date);
+    return modificationDate != null && modificationDate.before(cutOffMillis(date));
   }
 
   /**
    * Sets the modifier along with the modification date.
+   * <p>Note that this method will cut off the millisecond portion of the date.</p>
    * 
    * @param user
    *          the modifier
@@ -153,17 +156,31 @@ public class ModificationContext implements Cloneable {
    */
   public void setModified(User user, Date date) {
     this.modifier = user;
-    this.modificationDate = date;
+    this.modificationDate = cutOffMillis(date);
+  }
+
+  /**
+   * Cut off the milliseconds from the date.
+   * @param date with milliseconds
+   * @return date without milliseconds
+   */
+  private Date cutOffMillis(Date date) {
+    if(date == null) return null;
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(date);
+    calendar.set(Calendar.MILLISECOND, 0);
+    return calendar.getTime();
   }
 
   /**
    * Sets the modification date.
+   * <p>Note that this method will cut off the millisecond portion of the date.</p>
    * 
    * @param date
    *          the modification date
    */
   public void setModificationDate(Date date) {
-    this.modificationDate = date;
+    this.modificationDate = cutOffMillis(date);
   }
 
   /**

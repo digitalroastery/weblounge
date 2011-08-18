@@ -103,7 +103,7 @@ public class ModificationContextImplTest {
       // TODO: Redo this test using dayBefore and dayAfter
       assertTrue(date.before(modificationDate) || ctx.isModified());
       // Sleep, since date.before() needs a significant difference
-      Thread.sleep(100);
+      Thread.sleep(1000);
       assertTrue(date.before(modificationDate) || ctxWithModifier.isModified());
     } catch (InterruptedException e) {
       // Should not happen, we are not doing anything dangerous

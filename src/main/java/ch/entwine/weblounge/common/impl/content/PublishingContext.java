@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.security.User;
 import org.w3c.dom.Node;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.xml.xpath.XPath;
@@ -84,7 +85,7 @@ public class PublishingContext implements Cloneable {
    */
   public PublishingContext(User publisher) {
     this.publisher = publisher;
-    startDate = new Date();
+    startDate = cutOffMillis(new Date());
   }
 
   /**
@@ -100,8 +101,21 @@ public class PublishingContext implements Cloneable {
    */
   public PublishingContext(User publisher, Date startDate, Date endDate) {
     this.publisher = publisher;
-    this.startDate = startDate;
-    this.endDate = endDate;
+    this.startDate = cutOffMillis(startDate);
+    this.endDate = cutOffMillis(endDate);
+  }
+  
+  /**
+   * Cut off the milliseconds from the date.
+   * @param date with milliseconds
+   * @return date without milliseconds
+   */
+  private Date cutOffMillis(Date date) {
+    if(date == null) return null;
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(date);
+    calendar.set(Calendar.MILLISECOND, 0);
+    return calendar.getTime();
   }
 
   /**
@@ -123,8 +137,8 @@ public class PublishingContext implements Cloneable {
     if (endDate != null && startDate.after(endDate))
       throw new IllegalArgumentException("Start date is after end date");
     this.publisher = publisher;
-    this.startDate = startDate;
-    this.endDate = endDate;
+    this.startDate = cutOffMillis(startDate);
+    this.endDate = cutOffMillis(endDate);
   }
 
   /**
@@ -162,7 +176,7 @@ public class PublishingContext implements Cloneable {
   public void setPublishFrom(Date startDate) {
     if (startDate != null && endDate != null && startDate.after(endDate))
       throw new IllegalArgumentException("Start date is after end date");
-    this.startDate = startDate;
+    this.startDate = cutOffMillis(startDate);
   }
 
   /**
@@ -192,7 +206,7 @@ public class PublishingContext implements Cloneable {
   public void setPublishTo(Date endDate) {
     if (startDate != null && endDate != null && endDate.before(startDate))
       throw new IllegalArgumentException("End date is before start date");
-    this.endDate = endDate;
+    this.endDate = cutOffMillis(endDate);
   }
 
   /**
@@ -225,6 +239,7 @@ public class PublishingContext implements Cloneable {
    * @return <code>true</code> if the object is published on the indicated date
    */
   public boolean isPublished(Date date) {
+    date = cutOffMillis(date);
     if (date == null)
       throw new IllegalArgumentException("Date cannot be null");
     boolean checkFrom = startDate == null || startDate.before(date);

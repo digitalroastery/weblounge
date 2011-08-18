@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.security.User;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -86,9 +87,10 @@ public class CreationContextImplTest {
    */
   @Test
   public void testSetCreationDate() {
-    Date newDate = new Date();
-    ctx.setCreationDate(newDate);
-    assertTrue(newDate.equals(ctx.getCreationDate()));
+    Calendar calendar = Calendar.getInstance();
+    ctx.setCreationDate(calendar.getTime());
+    calendar.set(Calendar.MILLISECOND, 0);
+    assertTrue(calendar.getTime().equals(ctx.getCreationDate()));
   }
 
   /**

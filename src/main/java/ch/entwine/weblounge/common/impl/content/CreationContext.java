@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.security.User;
 import org.w3c.dom.Node;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.xml.xpath.XPath;
@@ -66,7 +67,7 @@ public class CreationContext implements Cloneable {
    * Creates a new and empty modification context.
    */
   public CreationContext() {
-    this.creationDate = new Date();
+    this.creationDate = cutOffMillis(new Date());
   }
 
   /**
@@ -89,6 +90,7 @@ public class CreationContext implements Cloneable {
 
   /**
    * Sets the creation date and the user who created the object.
+   * <p>Note that this method will cut off the millisecond portion of the date.</p>
    * 
    * @param creator
    *          the user creating the object
@@ -97,17 +99,18 @@ public class CreationContext implements Cloneable {
    */
   public void setCreated(User user, Date date) {
     this.creator = user;
-    this.creationDate = date;
+    this.creationDate = cutOffMillis(date);
   }
 
   /**
    * Sets the creation date.
+   * <p>Note that this method will cut off the millisecond portion of the date.</p>
    * 
    * @param date
    *          the creation date
    */
   public void setCreationDate(Date date) {
-    this.creationDate = date;
+    this.creationDate = cutOffMillis(date);
   }
 
   /**
@@ -128,7 +131,7 @@ public class CreationContext implements Cloneable {
    * @return <code>true</code> is this context was created after the given date
    */
   public boolean isCreatedAfter(Date date) {
-    return creationDate != null && creationDate.after(date);
+    return creationDate != null && creationDate.after(cutOffMillis(date));
   }
 
   /**
@@ -143,6 +146,19 @@ public class CreationContext implements Cloneable {
     if (creationDate != null)
       ctxt.creationDate = (Date) creationDate.clone();
     return ctxt;
+  }
+  
+  /**
+   * Cut off the milliseconds from the date.
+   * @param date with milliseconds
+   * @return date without milliseconds
+   */
+  private Date cutOffMillis(Date date) {
+    if(date == null) return null;
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(date);
+    calendar.set(Calendar.MILLISECOND, 0);
+    return calendar.getTime();
   }
 
   /**
