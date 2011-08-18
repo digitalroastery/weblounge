@@ -58,6 +58,8 @@ public final class PagesEndpointDocs {
   public static String createDocumentation(String endpointUrl) {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "pages");
     docs.setTitle("Weblounge Pages");
+    
+    String[] versions = {"0", "1"};
 
     // GET /
     Endpoint getAllPagesEndpoint = new Endpoint("/", Method.GET, "getallpages");
@@ -79,16 +81,17 @@ public final class PagesEndpointDocs {
     docs.addEndpoint(Endpoint.Type.READ, getAllPagesEndpoint);
 
     // GET /{page}
-    Endpoint getPageByURIEndpoint = new Endpoint("/{page}", Method.GET, "getpagebyuri");
-    getPageByURIEndpoint.setDescription("Returns the page with the given id");
-    getPageByURIEndpoint.addFormat(Format.xml());
-    getPageByURIEndpoint.addStatus(ok("the page was found and is returned as part of the response"));
-    getPageByURIEndpoint.addStatus(notFound("the page was not found or could not be loaded"));
-    getPageByURIEndpoint.addStatus(badRequest("an invalid page identifier was received"));
-    getPageByURIEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
-    getPageByURIEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
-    getPageByURIEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getPageByURIEndpoint);
+    Endpoint getPageByIdEndpoint = new Endpoint("/{page}", Method.GET, "getpagebyid");
+    getPageByIdEndpoint.setDescription("Returns the page with the given id");
+    getPageByIdEndpoint.addFormat(Format.xml());
+    getPageByIdEndpoint.addStatus(ok("the page was found and is returned as part of the response"));
+    getPageByIdEndpoint.addStatus(notFound("the page was not found or could not be loaded"));
+    getPageByIdEndpoint.addStatus(badRequest("an invalid page identifier was received"));
+    getPageByIdEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    getPageByIdEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    getPageByIdEndpoint.addOptionalParameter(new Parameter("version", Parameter.Type.String, "The version", "0", versions));
+    getPageByIdEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getPageByIdEndpoint);
 
     // GET /pending
     Endpoint getPending = new Endpoint("/pending", Method.GET, "getpending");
@@ -157,6 +160,7 @@ public final class PagesEndpointDocs {
     composerEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     composerEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
     composerEndpoint.addPathParameter(new Parameter("composer", Parameter.Type.String, "The composer identifier"));
+    composerEndpoint.addOptionalParameter(new Parameter("version", Parameter.Type.String, "The version", "0", versions));
     composerEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, composerEndpoint);
 
@@ -171,6 +175,7 @@ public final class PagesEndpointDocs {
     pageletEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
     pageletEndpoint.addPathParameter(new Parameter("composer", Parameter.Type.String, "The composer identifier"));
     pageletEndpoint.addPathParameter(new Parameter("pageletindex", Parameter.Type.String, "The zero-based pagelet index"));
+    pageletEndpoint.addOptionalParameter(new Parameter("version", Parameter.Type.String, "The version", "0", versions));
     pageletEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, pageletEndpoint);
     
@@ -188,10 +193,11 @@ public final class PagesEndpointDocs {
 
     // PUT /{page}/lock
     Endpoint lockPageEndpoint = new Endpoint("/{page}/lock", Method.PUT, "lockpage");
-    lockPageEndpoint.setDescription("Locks the specified page.");
+    lockPageEndpoint.setDescription("Locks the specified page. If the client supplies an If-Match header, the lock is processed only if the header value matches the page's ETag");
     lockPageEndpoint.addFormat(Format.xml());
     lockPageEndpoint.addStatus(ok("the page was locked"));
     lockPageEndpoint.addStatus(badRequest("the page was not specified"));
+    lockPageEndpoint.addStatus(preconditionFailed("the page's etag does not match the value specified in the If-Match header"));
     lockPageEndpoint.addStatus(notFound("the page was not found"));
     lockPageEndpoint.addStatus(forbidden("the page is already locked by another user"));
     lockPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
@@ -203,10 +209,11 @@ public final class PagesEndpointDocs {
 
     // DELETE /{page}/unlock
     Endpoint unlockPageEndpoint = new Endpoint("/{page}/lock", Method.DELETE, "unlockpage");
-    unlockPageEndpoint.setDescription("Unlocks the specified page.");
+    unlockPageEndpoint.setDescription("Unlocks the specified page. If the client supplies an If-Match header, the unlock is processed only if the header value matches the page's ETag");
     unlockPageEndpoint.addFormat(Format.xml());
     unlockPageEndpoint.addStatus(ok("the page was unlocked"));
     unlockPageEndpoint.addStatus(badRequest("the page was not specified"));
+    unlockPageEndpoint.addStatus(preconditionFailed("the page's etag does not match the value specified in the If-Match header"));
     unlockPageEndpoint.addStatus(notFound("the page was not found"));
     unlockPageEndpoint.addStatus(forbidden("the current user does not have the rights to unlock the page"));
     unlockPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
@@ -217,10 +224,11 @@ public final class PagesEndpointDocs {
 
     // PUT /{page}/publish
     Endpoint publishPageEndpoint = new Endpoint("/{page}/publish", Method.PUT, "publishpage");
-    publishPageEndpoint.setDescription("Publishes the specified page.");
+    publishPageEndpoint.setDescription("Publishes the specified page. If the client supplies an If-Match header, the publish is processed only if the header value matches the page's ETag");
     publishPageEndpoint.addFormat(Format.xml());
     publishPageEndpoint.addStatus(ok("the page was published"));
     publishPageEndpoint.addStatus(badRequest("the page was not specified"));
+    publishPageEndpoint.addStatus(preconditionFailed("the page's etag does not match the value specified in the If-Match header"));
     publishPageEndpoint.addStatus(notFound("the page was not found"));
     publishPageEndpoint.addStatus(forbidden("the page is locked by a different user"));
     publishPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
@@ -233,16 +241,16 @@ public final class PagesEndpointDocs {
 
     // DELETE /{page}/publish
     Endpoint unpublishPageEndpoint = new Endpoint("/{page}/publish", Method.DELETE, "unpublishpage");
-    unpublishPageEndpoint.setDescription("Unpublishs the specified page.");
+    unpublishPageEndpoint.setDescription("Unpublishs the specified page. If the client supplies an If-Match header, the unpublish is processed only if the header value matches the page's ETag");
     unpublishPageEndpoint.addFormat(Format.xml());
     unpublishPageEndpoint.addStatus(ok("the page was unpublished"));
     unpublishPageEndpoint.addStatus(badRequest("the page was not specified"));
+    unpublishPageEndpoint.addStatus(preconditionFailed("the page's etag does not match the value specified in the If-Match header"));
     unpublishPageEndpoint.addStatus(notFound("the page was not found"));
     unpublishPageEndpoint.addStatus(forbidden("the page is locked by a different user"));
     unpublishPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     unpublishPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     unpublishPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
-    unpublishPageEndpoint.addOptionalParameter(new Parameter("enddate", Parameter.Type.String, "The end of the publishing period"));
     unpublishPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, unpublishPageEndpoint);
 

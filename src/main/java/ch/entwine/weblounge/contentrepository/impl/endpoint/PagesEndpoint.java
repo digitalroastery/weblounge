@@ -394,6 +394,16 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
     }
+    
+    // Get the user
+    // TODO: Change to current user
+    User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
+    boolean isAdmin = true;
+    
+    // If the page is locked by a different user, refuse
+    if (currentPage.isLocked() && (!currentPage.getLockOwner().equals(currentUser) && !isAdmin)) {
+      return Response.status(Status.FORBIDDEN).build();
+    }
 
     // Parse the page and update it in the repository
     Page page = null;
@@ -403,8 +413,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       // TODO: Replace this with current user
       User admin = site.getAdministrator();
       User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-      Date date = new Date();
-      page.setModified(modifier, date);
+      page.setModified(modifier, new Date());
       page.setVersion(Resource.WORK);
       contentRepository.put(page);
       if (!page.getURI().getPath().equals(currentPage.getURI().getPath())) {
@@ -588,7 +597,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Page lookup {} failed for site '{}'", livePageURI, site);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
-
+    
     // Delete the page
     try {
       if(liveVersionExists) {
@@ -762,7 +771,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       page = (Page) contentRepository.get(pageURI);
       if (page.getVersion() == Resource.LIVE) {
         page.setVersion(Resource.WORK);
-        page = (Page) contentRepository.put(page);
+        contentRepository.put(page);
       }
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
@@ -790,9 +799,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     if (StringUtils.isNotBlank(userId)) {
       futureLockOwner = new UserImpl(userId);
     }
-
+    
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && !page.getLockOwner().equals(futureLockOwner)) {
+    if (page.isLocked() && !page.getLockOwner().getLogin().equals(futureLockOwner)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
@@ -1004,7 +1013,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     try {
       page.setPublished(currentUser, startDate, endDate);
       page.setVersion(Resource.LIVE);
-      page = (Page) contentRepository.put(page);
+      contentRepository.put(page);
+      contentRepository.delete(pageURI);
     } catch (SecurityException e) {
       logger.warn("Tried to publish page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
@@ -1071,7 +1081,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       if (!contentRepository.exists(workPageURI)) {
         page = (Page) contentRepository.get(livePageURI);
         page.setVersion(Resource.WORK);
-        page = (Page) contentRepository.put(page);
+        contentRepository.put(page);
       } else {
         page = (Page) contentRepository.get(workPageURI);
       }
