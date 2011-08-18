@@ -33,7 +33,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PARENT_PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PARENT_ELEMENTS;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
@@ -125,7 +125,7 @@ public class SearchRequest {
     }
 
     if (query.getPathPrefix() != null) {
-      and(solrQuery, PARENT_PATH, query.getPathPrefix(), true, true);
+      and(solrQuery, PARENT_ELEMENTS, query.getPathPrefix(), true, true);
     }
 
     // Type

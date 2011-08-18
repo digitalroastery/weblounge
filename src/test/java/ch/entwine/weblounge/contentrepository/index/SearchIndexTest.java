@@ -281,7 +281,7 @@ public class SearchIndexTest {
 
     try {
       SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(path1);
-      assertEquals(10, idx.getByQuery(q).getItems().length);
+      assertEquals(21, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by path");

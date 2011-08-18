@@ -183,17 +183,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     String path = uri.getPath();
 
     // Move the resource itself
-    SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(path);
+    SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(path);
     SearchResult result = index.find(q);
     if (result.getDocumentCount() == 0) {
       logger.warn("Trying to move non existing resource {}", uri);
       return;
-    }
-    documentsToMove.add(result.getItems()[0]);
-
-    // Get child resources
-    q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(path);
-    result = index.find(q);
+    }    
     for (SearchResultItem searchResult : result.getItems()) {
       documentsToMove.add(searchResult);
     }

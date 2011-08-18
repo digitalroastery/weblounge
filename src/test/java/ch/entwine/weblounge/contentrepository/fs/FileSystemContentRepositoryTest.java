@@ -386,10 +386,9 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testMoveChildren() throws Exception {
-    String root = "/root";
-    String newRoot = "/new-root";
+    String root = "/root/";
+    String newRoot = "/new-root/";
     ResourceURI rootURI = null;
     String subpath = null;
     int pages = 10;
@@ -415,7 +414,7 @@ public class FileSystemContentRepositoryTest {
     SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(root);
     assertEquals(1, repository.find(q).getItems().length);
     q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(root);
-    assertEquals(pages - 1, repository.find(q).getItems().length);
+    assertEquals(pages, repository.find(q).getItems().length);
 
     // Move the resources
     repository.move(rootURI, new PageURIImpl(site, newRoot));
@@ -430,7 +429,7 @@ public class FileSystemContentRepositoryTest {
     q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(newRoot);
     assertEquals(1, repository.find(q).getItems().length);
     q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(newRoot);
-    assertEquals(pages - 1, repository.find(q).getItems().length);
+    assertEquals(pages, repository.find(q).getItems().length);
 
   }
 
