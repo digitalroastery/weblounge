@@ -15,7 +15,7 @@ steal.then('jsonix')
 				});
 			} 
 			else if ('id' in params) {
-				$.ajax('/system/weblounge/pages/' + params.id, {
+				$.ajax('/system/weblounge/pages/' + params.id + '?version=1', {
 					success: this.callback(['parseXMLPage','wrap', success])
 				});
 			}
@@ -125,6 +125,7 @@ steal.then('jsonix')
 					success: function(data, status, xhr){
 						var url = xhr.getResponseHeader('Location');
 						Page.findOne({id : url.substring(url.lastIndexOf('/') + 1)}, success);
+						// Wird gar nicht gefunden weil nicht im searchindex
 					}
 
 				});
@@ -211,6 +212,19 @@ steal.then('jsonix')
 		},
 		
 		/**
+		 * Unpublish the specified page.
+		 */
+		unpublish: function(params, success, error) {
+			if ('id' in params) {
+				$.ajax({
+					url: '/system/weblounge/pages/' + params.id + '/publish',
+					type: 'delete',
+					success: success
+				});
+			}
+		},
+		
+		/**
 		 * Converts XML to JSON
 		 */
 		parseXML: function(xml) {
@@ -266,6 +280,13 @@ steal.then('jsonix')
 	     */
 	    publish: function(success, error) {
 	    	Page.publish({id:this.value.id}, success, error);
+	    },
+	    
+	    /**
+	     * Publish this page
+	     */
+	    unpublish: function(success, error) {
+	    	Page.unpublish({id:this.value.id}, success, error);
 	    },
 	    
 	    /**

@@ -123,9 +123,9 @@ steal.plugins(
 						$(this).dialog('close');
 					},
 					Ja: $.proxy(function () {
-						this.options.page.publish(function() {
-							// Notification for Published.
-						}, function() {
+						this.options.page.publish($.proxy(function() {
+							this._disableEditing();
+						}, this), function() {
 							alert('Publish error!');
 						});
 						this.publishDialog.dialog('close');
