@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
@@ -182,7 +183,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     String path = uri.getPath();
 
     // Move the resource itself
-    SearchQuery q = new SearchQueryImpl(site).withPath(path);
+    SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(path);
     SearchResult result = index.find(q);
     if (result.getDocumentCount() == 0) {
       logger.warn("Trying to move non existing resource {}", uri);
@@ -191,7 +192,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     documentsToMove.add(result.getItems()[0]);
 
     // Get child resources
-    q = new SearchQueryImpl(site).withPathPrefix(path);
+    q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(path);
     result = index.find(q);
     for (SearchResultItem searchResult : result.getItems()) {
       documentsToMove.add(searchResult);
@@ -199,8 +200,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Finally, move all resources
     for (SearchResultItem searchResult : documentsToMove) {
+      ResourceURI u = ((PageSearchResultItem) searchResult).getResourceURI();
       String id = searchResult.getId();
-      for (long version : index.getRevisions(uri)) {
+
+      for (long version : index.getRevisions(u)) {
         Resource<?> r = get(new ResourceURIImpl(Page.TYPE, site, null, id, version));
         String originalPath = r.getURI().getPath();
         if (originalPath == null)
@@ -210,13 +213,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         if (StringUtils.isNotBlank(newPath))
           newPath = UrlUtils.concat(target.getPath(), newPath);
         else
-          newPath = "/";
-        r.getURI().setPath(newPath);
+          newPath = target.getPath();
 
         // Update the index
-        index.move(uri, target.getPath());
+        index.move(u, newPath);
 
         // Write the updated resource to disk
+        r.getURI().setPath(newPath);
         storeResource(r);
 
         // Create the preview images

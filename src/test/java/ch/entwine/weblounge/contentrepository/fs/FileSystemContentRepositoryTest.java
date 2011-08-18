@@ -411,11 +411,17 @@ public class FileSystemContentRepositoryTest {
       repository.put(p);
     }
 
+    // Make sure everything is the way we set it up
+    SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(root);
+    assertEquals(1, repository.find(q).getItems().length);
+    q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(root);
+    assertEquals(pages - 1, repository.find(q).getItems().length);
+
     // Move the resources
     repository.move(rootURI, new PageURIImpl(site, newRoot));
 
     // Make sure everything is gone from /root
-    SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(root);
+    q = new SearchQueryImpl(site).withType(Page.TYPE).withPath(root);
     assertEquals(0, repository.find(q).getItems().length);
     q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(root);
     assertEquals(0, repository.find(q).getItems().length);
