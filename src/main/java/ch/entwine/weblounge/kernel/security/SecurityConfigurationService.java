@@ -69,7 +69,7 @@ public class SecurityConfigurationService {
     springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfig.toExternalForm() });
     springContext.setBundleContext(bundleCtx);
 
-    logger.info("Spring security context '{}' registered", springContext.getId());
+    logger.info("Spring security context registered");
 
     // Refresh the spring application context
     springContext.refresh();
@@ -79,8 +79,8 @@ public class SecurityConfigurationService {
 
     // Register the filter as an OSGi service
     Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put("context", "weblounge");
-    props.put("pattern", ".*");
+    // props.put("context", "weblounge");
+    props.put("urlPatterns", "*");
     props.put("service.ranking", "1");
     securityFilterRegistration = bundleCtx.registerService(Filter.class.getName(), securityFilterChain, props);
   }
