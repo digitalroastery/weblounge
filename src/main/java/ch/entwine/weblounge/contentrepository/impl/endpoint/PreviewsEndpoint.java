@@ -277,7 +277,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     response.type(mimetype);
 
     // Add last modified header
-    response.lastModified(resource.getModificationDate());
+    response.lastModified(ResourceUtils.getModificationDate(resource));
 
     // Add ETag header
     String eTag = ResourceUtils.getETagValue(resource, style);

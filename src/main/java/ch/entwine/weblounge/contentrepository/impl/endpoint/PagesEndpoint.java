@@ -332,8 +332,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     buf.append("</pages>");
 
     // Create the response
-    ResponseBuilder response = Response.ok(buf.toString());
-    return response.build();
+    return Response.ok(buf.toString()).build();
   }
 
   /**
@@ -442,6 +441,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Create the response
     ResponseBuilder response = Response.ok();
     response.tag(ResourceUtils.getETagValue(page));
+    response.lastModified(ResourceUtils.getModificationDate(page));
     return response.build();
   }
 
@@ -549,6 +549,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Create the response
     ResponseBuilder response = Response.created(uri);
     response.tag(ResourceUtils.getETagValue(page));
+    response.lastModified(ResourceUtils.getModificationDate(page));
     return response.build();
   }
 
@@ -719,7 +720,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Return the pagelet
-    return Response.ok(composer.getPagelet(pageletIndex).toXml()).build();
+    ResponseBuilder response = Response.ok(composer.getPagelet(pageletIndex).toXml());
+    response.lastModified(ResourceUtils.getModificationDate(page));
+    return response.build();
   }
 
   /**
