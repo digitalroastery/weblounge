@@ -206,6 +206,17 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.impl.url.UrlImpl#setPath(java.lang.String)
+   */
+  @Override
+  public void setPath(String path) {
+    super.setPath(path);
+    external = null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.ResourceURI#getSite()
    */
   public Site getSite() throws MalformedResourceURIException {

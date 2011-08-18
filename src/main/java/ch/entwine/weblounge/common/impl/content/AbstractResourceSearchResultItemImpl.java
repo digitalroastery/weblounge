@@ -59,4 +59,13 @@ public abstract class AbstractResourceSearchResultItemImpl extends SearchResultI
     return uri;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchResultItem#getType()
+   */
+  public String getType() {
+    return uri.getType();
+  }
+
 }
