@@ -236,6 +236,19 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see javax.servlet.ServletResponseWrapper#flushBuffer()
+   */
+  @Override
+  public void flushBuffer() throws IOException {
+    if (tx != null && out != null)
+      out.flush();
+    else
+      super.flushBuffer();
+  }
+  
+  /**
    * @see javax.servlet.http.HttpServletResponse#addHeader(java.lang.String,
    *      java.lang.String)
    */

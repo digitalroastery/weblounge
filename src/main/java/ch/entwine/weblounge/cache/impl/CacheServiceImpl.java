@@ -715,6 +715,12 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         transactions.notifyAll();
       }
 
+      try {
+        if (!response.isCommitted())
+          response.flushBuffer();
+      } catch (IOException e) {
+        logger.warn("Error flusing response: " + e.getMessage());
+      }
     }
   }
 
