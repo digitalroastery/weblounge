@@ -23,6 +23,7 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 import static ch.entwine.weblounge.common.request.RequestFlavor.ANY;
 import static ch.entwine.weblounge.common.request.RequestFlavor.HTML;
 
+import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
@@ -265,6 +266,15 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       // Configure valid and recheck time according to the template
       response.setMaximumRecheckTime(template.getRecheckTime());
       response.setMaximumValidTime(template.getValidTime());
+
+      // Set the Expires header
+      long expires = response.getMaxiumValidTime();
+      if (expires > 0) {
+        expires = System.currentTimeMillis() + expires;
+      } else {
+        expires = System.currentTimeMillis() + Times.MS_PER_MIN;
+      }
+      response.setDateHeader("Expires", expires);
 
       // Select the actual renderer by method and have it render the
       // request. Since renderers are being pooled by the bundle, we

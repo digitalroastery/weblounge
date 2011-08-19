@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -286,6 +287,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     response.setRequest(request);
     response.setResponseCache(cache);
     response.setHeader("X-Powered-By", poweredBy);
+    response.setDateHeader("Date", Calendar.getInstance().getTimeInMillis());
 
     // Notify listeners about starting request
     fireRequestStarted(request, response, site);
@@ -502,10 +504,10 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     WebloungeResponseImpl resp = ((WebloungeResponseImpl) response);
     for (int i = 0; i < requestListeners.size(); i++) {
       RequestListener listener = requestListeners.get(i);
-      listener.requestFailed(request, response, resp.getResponseStatus());
+      listener.requestFailed(request, response, resp.getStatus());
     }
     if (site != null)
-      site.requestFailed(request, response, resp.getResponseStatus());
+      site.requestFailed(request, response, resp.getStatus());
   }
 
   /**
