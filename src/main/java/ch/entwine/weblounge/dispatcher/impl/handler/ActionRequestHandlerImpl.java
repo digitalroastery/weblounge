@@ -395,6 +395,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           ((XMLAction) action).startXML(request, response);
         }
       }
+      response.setContentType("text/xml");
     } catch (EOFException e) {
       logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
     } catch (IOException e) {
@@ -431,6 +432,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           ((JSONAction) action).startJSON(request, response);
         }
       }
+      response.setContentType("text/json");
     } catch (EOFException e) {
       logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
     } catch (IOException e) {
