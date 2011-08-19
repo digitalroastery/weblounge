@@ -1,0 +1,189 @@
+<i18n>
+
+	<!-- audio -->
+	<message name="module.repository.audio.tab.default">
+		<value>Default</value>
+	</message>
+	<message name="module.repository.audio.audio">
+		<value>Audio file</value>
+	</message>
+	<message name="module.repository.audio">
+		<value>Please choose the audiofile for wich a mini-player will be included.</value>
+	</message>
+	<message name="module.repository.audio.description">
+		<value>Description</value>
+	</message>
+	<message name="module.repository.audio.description.sample">
+		<value>Interview with Matthias Hofbauer after the efc-final.</value>
+	</message>
+	<message name="module.repository.audio.producer">
+		<value>Author</value>
+	</message>
+	<message name="module.repository.audio.producer.sample">
+		<value>Giovanni Marti</value>
+	</message>		
+	
+	<!-- download -->
+	<message name="module.repository.download.download">
+		<value>Download</value>
+	</message>
+	<message name="module.repository.download.title">
+		<value>Title</value>
+	</message>
+	<message name="module.repository.download.title.sample">
+		<value>Meeting report</value>
+	</message>
+	<message name="module.repository.download.description">
+		<value>Description</value>
+	</message>
+	<message name="module.repository.download.description.sample">
+		<value>Annual meeting report</value>
+	</message>
+	
+	<!-- image -->
+	<message name="module.repository.image.image">
+		<value>Image</value>
+	</message>
+	<message name="module.repository.image.border">
+		<value>Border</value>
+	</message>
+	<message name="module.repository.image.enlarge">
+		<value>Enlarge</value>
+	</message>
+	<message name="module.repository.image.description_preview">
+		<value>Do not Show description at thumbnail</value>
+	</message>
+	<message name="module.repository.image.slideshow">
+		<value>Show image in slideshow</value>
+	</message>	
+	<message name="module.repository.image.style">
+		<value>Style</value>
+	</message>
+	<message name="module.repository.image.alignment">
+		<value>Alignment</value>
+	</message>
+	<message name="module.repository.image.alt">
+		<value>Alternate Description</value>
+	</message>
+	<message name="module.repository.image.alt.sample">
+		<value>Our logo</value>
+	</message>
+	<message name="module.repository.image.link">
+		<value>Link behind image</value>
+	</message>
+	<message name="module.repository.image.link.sample">
+		<value>http://weblounge.o2it.ch</value>
+	</message>
+	<message name="module.repository.image.photographer">
+		<value>Photographer</value>
+	</message>
+	<message name="module.repository.image.photographer.sample">
+		<value>Markus Jauss</value>
+	</message>
+	<message name="module.repository.image.description">
+		<value>Image description</value>
+	</message>
+	<message name="module.repository.image.description.sample">
+		<value>Matthias Hofbauer scores the 1:0</value>
+	</message>
+	<message name="module.repository.image.center">
+		<value>center</value>
+	</message>
+	<message name="module.repository.image.left">
+		<value>left</value>
+	</message>
+	<message name="module.repository.image.right">
+		<value>right</value>
+	</message>
+	<message name="module.repository.image.left_floated">
+		<value>left floated</value>
+	</message>
+	<message name="module.repository.image.right_floated">
+		<value>right floated</value>
+	</message>
+
+	<!-- movie -->
+	<message name="module.repository.movie.tab.default">
+		<value>Default</value>
+	</message>
+	<message name="module.repository.movie.tab.extended">
+		<value>Extended</value>
+	</message>		
+	<message name="module.repository.movie.movie">
+		<value>Movie</value>
+	</message>
+	<message name="module.repository.movie.border"> <!-- andere Sprachen noch aendern -->
+		<value>Border</value>
+	</message>
+	<message name="module.repository.movie.link">
+		<value>Link behind movie</value>
+	</message>
+	<message name="module.repository.movie.link.sample">
+		<value>http://weblounge.o2it.ch</value>
+	</message>
+	<message name="module.repository.movie.producer">
+		<value>Source</value>
+	</message>
+	<message name="module.repository.movie.producer.sample">
+		<value>Steven Spielberg</value>
+	</message>
+	<message name="module.repository.movie.description">
+		<value>Description</value>
+	</message>
+	<message name="module.repository.movie.description.sample">
+		<value>Matthias Hofbauer scores</value>
+	</message>
+	<message name="module.repository.movie.type">
+		<value>Type</value>
+	</message>
+	<message name="module.repository.movie.size">
+		<value>Size</value>
+	</message>
+	<message name="module.repository.movie.external">
+		<value>Play in external player</value>
+	</message>
+	<message name="module.repository.movie.width">
+		<value>Width</value>
+	</message>
+	<message name="module.repository.movie.height">
+		<value>Height</value>
+	</message>
+	<message name="module.repository.movie.display.movie">
+		<value>Show movie and link</value>
+	</message>
+	<message name="module.repository.movie.display.link">
+		<value>Show only link</value>
+	</message>
+	
+	
+	<!-- gallery -->
+	<message name="module.repository.gallery.frontimage">
+		<value>Gallery / Title image</value>
+	</message>
+	<message name="module.repository.gallery.preview">
+		<value>Preview</value>
+	</message>
+	<message name="module.repository.gallery.layout">
+		<value>Layout</value>
+	</message>
+	<message name="module.repository.gallery.layout.3x3">
+		<value>3 by 3 images</value>
+	</message>
+	<message name="module.repository.gallery.layout.1x1">
+		<value>One by one image</value>
+	</message>
+	<message name="module.repository.gallery.title">
+		<value>Title</value>
+	</message>
+	<message name="module.repository.gallery.title.sample">
+		<value>Holiday images</value>
+	</message>
+	<message name="module.repository.gallery.description">
+		<value>Description</value>
+	</message>
+	<message name="module.repository.gallery.description.sample">
+		<value>Holiday Impressions</value>
+	</message>
+
+
+</i18n>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module id="navigation" xmlns="http://www.entwinemedia.com/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
+
+  <enable>true</enable>
+  <name>Navigation</name>
+
+  <pagelets>
+    <pagelet id="link" composeable="true">
+      <name>Link</name>
+      <renderer>file://${module.root}/jsp/link/link.jsp</renderer>
+      <editor>file://${module.root}/jsp/link/link_editor.jsp</editor>
+      <includes>
+        <link use="editor" href="/weblounge-sites/weblounge-test/modules/navigation/jsp/link.css" type="text/css"></link>
+        <script use="editor" src="/weblounge-sites/weblounge-test/modules/navigation/jsp/link.js" type="javascript"></script>
+      </includes>
+    </pagelet>
+  </pagelets>
+
+</module>

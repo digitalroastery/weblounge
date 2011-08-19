@@ -1,0 +1,11 @@
+label {
+    display: inline-block;
+    width: 160px
+}
+
+span.search_result {
+    border: 1px solid red;
+    width: 400px;
+    height: 100px;
+    display: block;
+}
