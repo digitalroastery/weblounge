@@ -83,6 +83,13 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
   void setMaximumRecheckTime(long recheckTime);
 
   /**
+   * Returns the maximum recheck time.
+   * 
+   * @return the maximum recheck time
+   */
+  long getMaxiumRecheckTime();
+
+  /**
    * Sets the maximum valid time on the current response or response part.
    * <p>
    * The implementation will consider the minimum of any existing valid time and
@@ -92,6 +99,13 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
    *          the valid time in milliseconds
    */
   void setMaximumValidTime(long validTime);
+
+  /**
+   * Returns the maximum valid time.
+   * 
+   * @return the maximum valid time
+   */
+  long getMaxiumValidTime();
 
   /**
    * Tells the cache to not cache this response. This method should be called in
@@ -107,6 +121,13 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
    * @see #invalidate()
    */
   boolean isValid();
+
+  /**
+   * Returns the response status.
+   * 
+   * @return the status
+   */
+  int getStatus();
 
   /**
    * Method to be called when an error is detected while processing the request.
