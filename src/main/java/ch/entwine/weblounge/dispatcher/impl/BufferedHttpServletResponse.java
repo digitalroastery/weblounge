@@ -43,7 +43,7 @@ class BufferedHttpServletResponse extends HttpServletResponseWrapper {
    * the cache.
    */
   private PrintWriter out = null;
-  
+
   /** The output stream */
   private BufferedServletOutputStream os = null;
 
@@ -114,24 +114,40 @@ class BufferedHttpServletResponse extends HttpServletResponseWrapper {
     osCalled = true;
     return os;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see javax.servlet.ServletResponseWrapper#flushBuffer()
    */
   @Override
   public void flushBuffer() throws IOException {
-    byte[] content = os.getContent();
-    setContentLength(content.length);
-    setCharacterEncoding(encoding);
     if (out != null) {
       out.flush();
       out.close();
       out = null;
     }
-    super.getOutputStream().write(content);
-    super.flushBuffer();
+
+    try {
+      if (isCommitted())
+        return;
+
+      // Get the buffered content
+      byte[] content = os.getContent();
+
+      // Set content-related headers
+      setContentLength(content.length);
+      setCharacterEncoding(encoding);
+
+      // Write the buffered content to the underlying output stream
+      super.getOutputStream().write(content);
+
+      // Flush the underlying buffer
+      super.flushBuffer();
+
+    } finally {
+      os = null;
+    }
   }
 
 }

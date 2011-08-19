@@ -329,10 +329,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         }
       }
     } finally {
-      if (cache != null) {
-        if (response.isValid())
-          response.endResponse();
-      }
+      response.endResponse();
       logger.debug("Finished processing of {}", httpRequest.getRequestURI());
     }
 
