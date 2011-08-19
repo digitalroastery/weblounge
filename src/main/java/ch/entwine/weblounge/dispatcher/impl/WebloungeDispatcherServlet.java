@@ -260,6 +260,9 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
       missingRepositoryWarnings.remove(site);
     }
 
+    // Make sure the response is buffered
+    httpResponse = new BufferedHttpServletResponse(httpResponse);
+    
     // Get the servlet that is responsible for the site's content
     Servlet siteServlet = sites.getSiteServlet(site);
 
