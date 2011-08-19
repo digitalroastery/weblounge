@@ -115,12 +115,12 @@ public class CacheEntryTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.cache.impl.CacheEntry#getCreationDate()}.
+   * Test method for {@link ch.entwine.weblounge.cache.impl.CacheEntry#getLastModified()}.
    */
   @Test
   public void testGetCreationDate() throws Exception {
     Thread.sleep(100);
-    assertTrue(System.currentTimeMillis() >= entry.getCreationDate());
+    assertTrue(System.currentTimeMillis() >= entry.getLastModified());
   }
 
   /**

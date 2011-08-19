@@ -589,8 +589,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     }
 
     // Apparently, we need to get it done ourselves
-    response.setHeader("Etag", CacheEntry.createETag(handle.getCreationDate()));
-    response.setDateHeader("Expires", handle.getCreationDate() + Times.MS_PER_MIN);
     return handle;
   }
 
@@ -617,16 +615,22 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     long validTimeInSeconds = (element.getExpirationTime() - System.currentTimeMillis()) / 1000;
     String eTag = request.getHeader("If-None-Match");
 
+    boolean isModified = !entry.notModified(clientCacheDate) && !entry.matches(eTag);
+
     // Write the response headers
-    response.setContentType(entry.getContentType());
-    response.setContentLength(entry.getContent().length);
+    if (isModified) {
+      response.setHeader("Cache-Control", "max-age=" + validTimeInSeconds + ", must-revalidate");
+      response.setContentType(entry.getContentType());
+      response.setContentLength(entry.getContent().length);
+      entry.getHeaders().apply(response);
+    }
 
-    entry.getHeaders().apply(response);
-
-    // Add cache control headers
+    // Set the current date
     response.setDateHeader("Date", System.currentTimeMillis());
+
+    // This header must be set, otherwise it defaults to
+    // "Thu, 01-Jan-1970 00:00:00 GMT"
     response.setDateHeader("Expires", element.getExpirationTime());
-    response.setHeader("Cache-Control", "max-age=" + validTimeInSeconds + ", must-revalidate");
     response.setHeader("Etag", entry.getETag());
 
     // Add the X-Cache-Key header
@@ -636,10 +640,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Check the headers first. Maybe we don't need to send anything but
     // a not-modified back
-    if (entry.notModified(clientCacheDate) && entry.matches(eTag)) {
-      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-    } else {
+    if (isModified) {
       response.getOutputStream().write(entry.getContent());
+    } else {
+      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
     }
 
     response.flushBuffer();
@@ -681,26 +685,37 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       return false;
     }
 
-    // Is the response ready to be cached?
-    if (tx.isValid() && response.isValid()) {
-      // Write the entry to the cache
-      logger.trace("Writing response for {} to the cache", response);
-      CacheEntry entry = new CacheEntry(tx.getHandle(), tx.getContent(), tx.getHeaders());
-      Element element = new Element(entry.getKey(), entry);
-      cache.put(element);
-    } else {
-      logger.debug("Response to {} was invalid and is not being cached", response);
-    }
+    // Important note: Do not return prior to this try block if there is a
+    // transaction associated with the request.
+    try {
 
-    // Mark the current transaction as finished and notify anybody who was
-    // waiting for it to be finished
-    synchronized (transactions) {
-      transactions.remove(tx.getHandle().getKey());
-      logger.debug("Caching of {} finished", response);
-      transactions.notifyAll();
-    }
+      // Is the response ready to be cached?
+      if (tx.isValid() && response.isValid() && response.getStatus() == HttpServletResponse.SC_OK) {
+        logger.trace("Writing response for {} to the cache", response);
+        CacheEntry entry = new CacheEntry(tx.getHandle(), tx.getContent(), tx.getHeaders());
+        Element element = new Element(entry.getKey(), entry);
+        cache.put(element);
+        response.setDateHeader("Expires", System.currentTimeMillis() + tx.getHandle().getExpireTime());
+      } else if (tx.isValid() && response.isValid()) {
+        logger.trace("Skip caching of response for {} to the cache: {}", response, response.getStatus());
+        response.setDateHeader("Expires", System.currentTimeMillis() + tx.getHandle().getExpireTime());
+      } else {
+        logger.debug("Response to {} was invalid and is not being cached", response);
+      }
 
-    return tx.isValid() && response.isValid();
+      return tx.isValid() && response.isValid();
+
+    } finally {
+
+      // Mark the current transaction as finished and notify anybody who was
+      // waiting for it to be finished
+      synchronized (transactions) {
+        transactions.remove(tx.getHandle().getKey());
+        logger.debug("Caching of {} finished", response);
+        transactions.notifyAll();
+      }
+
+    }
   }
 
   /**

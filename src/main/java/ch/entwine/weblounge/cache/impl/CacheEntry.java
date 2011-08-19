@@ -24,20 +24,29 @@ import ch.entwine.weblounge.common.request.CacheHandle;
 import ch.entwine.weblounge.common.request.CacheTag;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 /**
  * This class implements an entry into the cache.
  */
 public final class CacheEntry implements Serializable {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(CacheEntry.class);
+  
   /** Serial version uid */
   private static final long serialVersionUID = 5694887351734158681L;
 
   /** The key for this cache entry */
   private String key = null;
-  
+
   /** The content buffer */
   private byte[] content;
 
@@ -45,13 +54,16 @@ public final class CacheEntry implements Serializable {
   private CacheableHttpServletResponseHeaders headers = null;
 
   /** Date where the entry was added to the cache */
-  private long entryCreationDate = 0L;
+  private long lastModified = 0L;
 
   /** The etag */
   private String eTag = null;
 
   /**
    * Creates a new cache entry for the given handle, content and metadata.
+   * <p>
+   * Note that some cache information, such as the etag and the last
+   * modification dates will be gathered from the response headers if available.
    * 
    * @param content
    *          the content
@@ -70,9 +82,9 @@ public final class CacheEntry implements Serializable {
       throw new IllegalArgumentException("Headers cannot be null");
     this.key = handle.getKey();
     this.content = content;
-    this.headers = headers;
-    this.entryCreationDate = handle.getCreationDate();
-    this.eTag = createETag(entryCreationDate);
+    this.eTag = createETag(lastModified);
+    this.lastModified = handle.getCreationDate();
+    setHeaders(headers);
   }
 
   /**
@@ -90,8 +102,6 @@ public final class CacheEntry implements Serializable {
    * @return the etag
    */
   public String getETag() {
-    if (headers.containsHeader("ETag"))
-      return (String)headers.getHeaders().get("ETag");
     return eTag;
   }
 
@@ -100,8 +110,8 @@ public final class CacheEntry implements Serializable {
    * 
    * @return the creation date
    */
-  public long getCreationDate() {
-    return entryCreationDate;
+  public long getLastModified() {
+    return lastModified;
   }
 
   /**
@@ -114,6 +124,28 @@ public final class CacheEntry implements Serializable {
   public boolean containsTag(CacheTag tag) {
     String keyPart = tag.getName() + "=" + tag.getValue();
     return key.contains(keyPart);
+  }
+
+  /**
+   * Sets the response headers, which will be used to extract certain common
+   * information such as the etag or the last-modified date.
+   * 
+   * @param headers
+   *          the response headers
+   */
+  public void setHeaders(CacheableHttpServletResponseHeaders headers) {
+    this.headers = headers;
+    if (headers.containsHeader("ETag"))
+      eTag = (String) headers.getHeaders().get("ETag");
+    if (headers.containsHeader("Last-Modified")) {
+      DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+      String lastModifiedHeader = (String)headers.getHeaders().get("Last-Modified");
+      try {
+        lastModified = df.parse(lastModifiedHeader).getTime();
+      } catch (ParseException e) {
+        logger.error("Unexpected date format for 'Last-Modified' header: {}", lastModifiedHeader);
+      }
+    }
   }
 
   /**
@@ -157,7 +189,7 @@ public final class CacheEntry implements Serializable {
    * @return <code>true</code> if this entry is older or equally old
    */
   public boolean notModified(long date) {
-    return date >= entryCreationDate;
+    return date >= lastModified;
   }
 
   /**
@@ -169,7 +201,7 @@ public final class CacheEntry implements Serializable {
    * @return <code>true</code> if the etag is either empty or matches
    */
   public boolean matches(String eTag) {
-    return StringUtils.isBlank(eTag) || this.eTag.equals(eTag);
+    return StringUtils.isNotBlank(eTag) && this.eTag.equals(eTag);
   }
 
   /**
