@@ -35,6 +35,12 @@ import ch.entwine.weblounge.common.request.CacheTag;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * Test case for the implementation at {@link CacheEntry}.
  */
@@ -146,6 +152,33 @@ public class CacheEntryTest {
     assertEquals(contentType, h.getHeaders().get("Content-Type"));
   }
 
+  /**
+   * Test method for {@link ch.entwine.weblounge.cache.impl.CacheEntry#setHeaders(CacheableHttpServletResponseHeaders)}.
+   */
+  @Test
+  public void testPassEtag() {
+    String eTag = "\"0123456789\""; 
+    CacheableHttpServletResponseHeaders h = entry.getHeaders();
+    h.addHeader("ETag", eTag);
+    entry.setHeaders(h);
+    assertEquals(eTag, entry.getETag());
+  }
+
+  /**
+   * Test method for {@link ch.entwine.weblounge.cache.impl.CacheEntry#setHeaders(CacheableHttpServletResponseHeaders)}.
+   */
+  @Test
+  public void testPassModificationDate() throws Exception {
+    Calendar c = Calendar.getInstance();
+    c.set(Calendar.MILLISECOND, 0);
+    Date modificationDate = c.getTime();
+    DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+    CacheableHttpServletResponseHeaders h = entry.getHeaders();
+    h.addHeader("Last-Modified", df.format(modificationDate));
+    entry.setHeaders(h);
+    assertEquals(modificationDate.getTime(), entry.getLastModified());
+  }
+  
   /**
    * Test method for {@link ch.entwine.weblounge.cache.impl.CacheEntry#getContent()}.
    */

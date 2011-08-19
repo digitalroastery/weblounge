@@ -82,8 +82,8 @@ public final class CacheEntry implements Serializable {
       throw new IllegalArgumentException("Headers cannot be null");
     this.key = handle.getKey();
     this.content = content;
-    this.eTag = createETag(lastModified);
     this.lastModified = handle.getCreationDate();
+    this.eTag = createETag(lastModified);
     setHeaders(headers);
   }
 
