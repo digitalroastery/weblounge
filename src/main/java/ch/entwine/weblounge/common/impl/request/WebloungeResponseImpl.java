@@ -71,7 +71,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see javax.servlet.http.HttpServletResponseWrapper#sendRedirect(java.lang.String)
    */
   @Override
@@ -79,7 +79,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     super.sendRedirect(location);
     responseStatus = HttpServletResponse.SC_MOVED_PERMANENTLY;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -110,10 +110,10 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   public boolean hasError() {
     return hasError;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see javax.servlet.http.HttpServletResponseWrapper#setStatus(int)
    */
   @Override
@@ -344,17 +344,25 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.entwine.weblounge.common.request.WebloungeResponse#endResponse()
    */
   public void endResponse() throws IllegalStateException {
-    if (!isValid || cache == null)
-      return;
-    ResponseCache cache = this.cache.get();
-    if (cache == null)
-      return;
-    if (cacheHandle == null || cacheHandle.get() == null)
-      return;
+    try {
+      if (cache == null)
+        return;
+      ResponseCache cache = this.cache.get();
+      if (cache == null)
+        return;
+      if (cacheHandle == null || cacheHandle.get() == null)
+        return;
 
-    // End the response and have the output sent back to the client
-    cache.endResponse(this);
-    cacheHandle = null;
+      // End the response and have the output sent back to the client
+      cache.endResponse(this);
+    } finally {
+      try {
+        flushBuffer();
+      } catch (IOException e) {
+        // The client closed the connection
+      }
+      cacheHandle = null;
+    }
   }
 
   /**
@@ -370,10 +378,10 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
       return;
     hdl.setRecheckTime(Math.min(recheckTime, hdl.getRecheckTime()));
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeResponse#getMaxiumRecheckTime()
    */
   public long getMaxiumRecheckTime() {
@@ -404,7 +412,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeResponse#getMaxiumValidTime()
    */
   public long getMaxiumValidTime() {
@@ -415,7 +423,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
       return 0;
     return hdl.getExpireTime();
   }
-  
+
   /**
    * {@inheritDoc}
    * 
