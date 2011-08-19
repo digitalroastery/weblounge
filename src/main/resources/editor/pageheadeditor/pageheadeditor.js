@@ -83,11 +83,13 @@ steal.plugins('jquery',
 							location.href = this.options.page.getPath() + "?edit";
 						}, this));
 						
+						this.element.trigger('closeeditor');
 						this.element.dialog('destroy');
 						this.destroy();
 					}, this)
 				},
 				close: $.proxy(function () {
+					this.element.trigger('closeeditor');
 					this.element.dialog('destroy');
 					this.destroy();
 				},this)

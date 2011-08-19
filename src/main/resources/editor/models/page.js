@@ -15,8 +15,17 @@ steal.then('jsonix')
 				});
 			} 
 			else if ('id' in params) {
-				$.ajax('/system/weblounge/pages/' + params.id + '?version=1', {
-					success: this.callback(['parseXMLPage','wrap', success])
+				// work version is default
+				var version = 1;
+				if ('version' in params) {
+					version = params.version;
+				}
+				
+				$.ajax('/system/weblounge/pages/' + params.id + '?version=' + version, {
+					success: this.callback(['parseXMLPage','wrap', success]),
+					error: function() {
+						Page.findOne({id: params.id, version: 0}, success);
+					}
 				});
 			}
 		},
@@ -332,6 +341,20 @@ steal.then('jsonix')
 	     */
 	    getTemplate: function() {
 	    	return this.value.head.template;
+	    },
+	    
+	    /**
+	     * Return the page version
+	     */
+	    getVersion: function() {
+	    	return this.value.version;
+	    },
+	    
+	    /**
+	     * Return true if this page is the work version
+	     */
+	    isWorkVersion: function() {
+	    	return this.value.version == 'work';
 	    },
 	    
 	    /**
