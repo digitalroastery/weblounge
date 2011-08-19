@@ -242,10 +242,11 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    */
   @Override
   public void flushBuffer() throws IOException {
+    if (isCommitted())
+      return;
     if (tx != null && out != null)
       out.flush();
-    else
-      super.flushBuffer();
+    super.flushBuffer();
   }
   
   /**
