@@ -71,6 +71,17 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
   /**
    * {@inheritDoc}
+   *
+   * @see javax.servlet.http.HttpServletResponseWrapper#sendRedirect(java.lang.String)
+   */
+  @Override
+  public void sendRedirect(String location) throws IOException {
+    super.sendRedirect(location);
+    responseStatus = HttpServletResponse.SC_MOVED_PERMANENTLY;
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see javax.servlet.http.HttpServletResponseWrapper#sendError(int,
    *      java.lang.String)
@@ -99,14 +110,24 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   public boolean hasError() {
     return hasError;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see javax.servlet.http.HttpServletResponseWrapper#setStatus(int)
+   */
+  @Override
+  public void setStatus(int sc) {
+    super.setStatus(sc);
+    responseStatus = sc;
+  }
 
   /**
-   * Returns the value of the response status. The value will match
-   * <code>SC_OK</code> as long as no error has been reported.
+   * {@inheritDoc}
    * 
-   * @return the status code
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#getStatus()
    */
-  public int getResponseStatus() {
+  public int getStatus() {
     return responseStatus;
   }
 
@@ -311,7 +332,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     CacheHandle hdl = cache.startResponse(tags, request.get(), this, validTime, recheckTime);
     if (hdl == null)
       return true;
-    
+
     // It's not, meaning we need to do the processing ourselves
     cacheHandle = new WeakReference<CacheHandle>(hdl);
     return false;
@@ -349,6 +370,20 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
       return;
     hdl.setRecheckTime(Math.min(recheckTime, hdl.getRecheckTime()));
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#getMaxiumRecheckTime()
+   */
+  public long getMaxiumRecheckTime() {
+    if (cacheHandle == null)
+      return 0;
+    CacheHandle hdl = cacheHandle.get();
+    if (hdl == null)
+      return 0;
+    return hdl.getRecheckTime();
+  }
 
   /**
    * {@inheritDoc}
@@ -362,11 +397,25 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     if (hdl == null)
       return;
     hdl.setExpireTime(Math.min(validTime, hdl.getExpireTime()));
-    
+
     // The recheck time can't be longer than the valid time
     setMaximumRecheckTime(validTime);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#getMaxiumValidTime()
+   */
+  public long getMaxiumValidTime() {
+    if (cacheHandle == null)
+      return 0;
+    CacheHandle hdl = cacheHandle.get();
+    if (hdl == null)
+      return 0;
+    return hdl.getExpireTime();
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -390,10 +439,10 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   public boolean isValid() {
     return isValid;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
