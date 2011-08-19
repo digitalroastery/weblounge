@@ -170,7 +170,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     Document pageXml = null;
     String eTagValue;
     String modifiedValue;
-    logger.info("Requesting page at {}", requestUrl);
+    logger.info("Requesting page at {}", getPageRequest.getURI());
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
