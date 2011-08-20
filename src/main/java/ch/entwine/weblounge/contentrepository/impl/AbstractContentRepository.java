@@ -177,6 +177,22 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#existsInAnyVersion(ch.entwine.weblounge.common.content.ResourceURI)
+   */
+  public boolean existsInAnyVersion(ResourceURI uri)
+      throws ContentRepositoryException {
+    if (!isStarted())
+      throw new IllegalStateException("Content repository is not connected");
+    try {
+      return index.existsInAnyVersion(uri);
+    } catch (IOException e) {
+      throw new ContentRepositoryException(e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getResourceURI(java.lang.String)
    */
   public ResourceURI getResourceURI(String resourceId)

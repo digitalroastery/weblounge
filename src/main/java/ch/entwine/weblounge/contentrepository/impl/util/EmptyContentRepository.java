@@ -87,14 +87,24 @@ public class EmptyContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#existsInAnyVersion(ch.entwine.weblounge.common.content.ResourceURI)
+   */
+  public boolean existsInAnyVersion(ResourceURI uri)
+      throws ContentRepositoryException {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getResourceURI(java.lang.String)
    */
   public ResourceURI getResourceURI(String resourceId)
       throws ContentRepositoryException {
     return null;
   }
-  
+
   /**
    * {@inheritDoc}
    * 

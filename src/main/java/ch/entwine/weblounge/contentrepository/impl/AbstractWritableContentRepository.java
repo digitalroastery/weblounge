@@ -118,8 +118,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *      ch.entwine.weblounge.common.security.User)
    */
   public Resource<?> lock(ResourceURI uri, User user)
-      throws IllegalStateException,
-      ContentRepositoryException, IOException {
+      throws IllegalStateException, ContentRepositoryException, IOException {
     Resource<?> resource = null;
     for (ResourceURI u : getVersions(uri)) {
       Resource<?> r = get(u);
@@ -229,10 +228,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     List<SearchResultItem> documentsToMove = new ArrayList<SearchResultItem>();
-    String path = uri.getPath();
+    String originalPathPrefix = uri.getPath();
 
     // Move the resource itself
-    SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(path);
+    // TODO: Replace with search in path index. Like this, moving non-published
+    // resources will fail
+    SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(originalPathPrefix);
     SearchResult result = index.find(q);
     if (result.getDocumentCount() == 0) {
       logger.warn("Trying to move non existing resource {}", uri);
@@ -246,25 +247,29 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     for (SearchResultItem searchResult : documentsToMove) {
       ResourceURI u = ((PageSearchResultItem) searchResult).getResourceURI();
       String id = searchResult.getId();
+      String originalPath = u.getPath();
+      if (originalPath == null)
+        continue;
+      String newPath = originalPath.substring(originalPathPrefix.length());
+      if (StringUtils.isNotBlank(newPath))
+        newPath = UrlUtils.concat(target.getPath(), newPath);
+      else
+        newPath = target.getPath();
 
+      boolean first = true;
       for (long version : index.getRevisions(u)) {
-        Resource<?> r = get(new ResourceURIImpl(Page.TYPE, site, null, id, version));
-        String originalPath = r.getURI().getPath();
-        if (originalPath == null)
-          continue;
+        ResourceURI movedURI = new ResourceURIImpl(Page.TYPE, site, null, id, version);
 
-        String newPath = originalPath.substring(path.length());
-        if (StringUtils.isNotBlank(newPath))
-          newPath = UrlUtils.concat(target.getPath(), newPath);
-        else
-          newPath = target.getPath();
+        // Load the resource, adjust the path and store it again
+        Resource<?> r = get(movedURI);
+        movedURI.setPath(newPath);
+        storeResource(r);
 
         // Update the index
-        index.move(u, newPath);
-
-        // Write the updated resource to disk
-        r.getURI().setPath(newPath);
-        storeResource(r);
+        if (first) {
+          index.move(u, newPath);
+          first = false;
+        }
 
         // Create the preview images
         createPreviews(r);

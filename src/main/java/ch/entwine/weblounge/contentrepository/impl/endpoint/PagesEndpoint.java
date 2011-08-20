@@ -481,21 +481,26 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
           path = "/" + path;
         WebUrl url = new WebUrlImpl(site, path);
         pageURI = new PageURIImpl(site, url.getPath(), uuid, Resource.WORK);
-
-        // Make sure the page doesn't exist
-        if (contentRepository.exists(new PageURIImpl(site, url.getPath()))) {
-          logger.warn("Tried to create already existing page {} in site '{}'", pageURI, site);
-          throw new WebApplicationException(Status.CONFLICT);
-        }
       } catch (IllegalArgumentException e) {
         logger.warn("Tried to create a page with an invalid path '{}': {}", path, e.getMessage());
         throw new WebApplicationException(Status.BAD_REQUEST);
-      } catch (ContentRepositoryException e) {
-        logger.warn("Page lookup {} failed for site '{}'", pageURI, site);
-        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
     } else {
-      pageURI = new PageURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
+      pageURI = new PageURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid, Resource.WORK);
+    }
+
+    // Make sure the page doesn't exist
+    try {
+      if (contentRepository.existsInAnyVersion(pageURI)) {
+        logger.warn("Tried to create already existing page {} in site '{}'", pageURI, site);
+        throw new WebApplicationException(Status.CONFLICT);
+      }
+    } catch (IllegalArgumentException e) {
+      logger.warn("Tried to create a page with an invalid path '{}': {}", path, e.getMessage());
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Page lookup {} failed for site '{}'", pageURI, site);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Parse the page and store it
@@ -760,29 +765,38 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI pageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
+    ResourceURI workURI = new PageURIImpl(site, null, pageId, Resource.WORK);
 
-    // Does the page exist?
+    // Does the page exist at all?
     Page page = null;
     try {
-      if (!contentRepository.exists(pageURI)) {
-        pageURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
-        if (!contentRepository.exists(pageURI))
-          throw new WebApplicationException(Status.NOT_FOUND);
-      }
-      page = (Page) contentRepository.get(pageURI);
-      if (page.getVersion() == Resource.LIVE) {
+      if (!contentRepository.existsInAnyVersion(workURI))
+        throw new WebApplicationException(Status.NOT_FOUND);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error looking up page {} from repository: {}", workURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Make sure we have a work page. If it doesn't exist yet, it needs
+    // to be created as a result of the lock operation
+    try {
+      ResourceURI liveURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
+      if (!contentRepository.exists(workURI)) {
+        logger.debug("Creating work version of {}", liveURI);
+        page = (Page) contentRepository.get(liveURI);
         page.setVersion(Resource.WORK);
         contentRepository.put(page);
+      } else {
+        page = (Page) contentRepository.get(workURI);
       }
     } catch (ContentRepositoryException e) {
-      logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
+      logger.warn("Error lookup up page {} from repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (IllegalStateException e) {
-      logger.warn("Error putting a page work copy {} to repository: {}", pageURI, e.getMessage());
+      logger.warn("Error putting a page work copy {} to repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     } catch (IOException e) {
-      logger.warn("Error putting a page work copy {} to repository: {}", pageURI, e.getMessage());
+      logger.warn("Error putting a page work copy {} to repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
@@ -809,18 +823,19 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Finally, perform the lock operation (on all resource versions)
     try {
-      contentRepository.lock(pageURI, currentUser);
+      contentRepository.lock(workURI, currentUser);
+      logger.info("Page {} has been locked by {}", workURI, currentUser);
     } catch (SecurityException e) {
-      logger.warn("Tried to lock page {} of site '{}' without permission", pageURI, site);
+      logger.warn("Tried to lock page {} of site '{}' without permission", workURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
-      logger.warn("Error writing page lock {} to repository", pageURI);
+      logger.warn("Error writing page lock {} to repository", workURI);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (IllegalStateException e) {
-      logger.warn("Error locking page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error locking page {}: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     } catch (ContentRepositoryException e) {
-      logger.warn("Error locking page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error locking page {}: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
@@ -867,10 +882,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Does the page exist?
     Page page = null;
     try {
-      if (!contentRepository.exists(pageURI)) {
+      if (!contentRepository.existsInAnyVersion(pageURI))
         throw new WebApplicationException(Status.NOT_FOUND);
-      }
-      page = (Page) contentRepository.get(pageURI);
+      page = (Page) contentRepository.get(contentRepository.getVersions(pageURI)[0]);
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -898,6 +912,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Finally, perform the lock operation (on all resource versions)
     try {
       contentRepository.unlock(pageURI);
+      logger.info("Page {} has been unlocked by {}", pageURI, currentUser);
     } catch (SecurityException e) {
       logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
@@ -956,22 +971,23 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Make sure the content repository is writable
     if (site.getContentRepository().isReadOnly()) {
-      logger.warn("Attempt to lock a page in a read-only content repository {}", site);
+      logger.warn("Attempt to publish a page in a read-only content repository {}", site);
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI pageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
+    ResourceURI workURI = new PageURIImpl(site, null, pageId, Resource.WORK);
 
-    // Does the page exist?
+    // Does the work page exist?
     Page page = null;
     try {
-      if (!contentRepository.exists(pageURI)) {
+      if (!contentRepository.existsInAnyVersion(workURI))
         throw new WebApplicationException(Status.NOT_FOUND);
-      }
-      page = (Page) contentRepository.get(pageURI);
+      if (!contentRepository.exists(workURI))
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      page = (Page) contentRepository.get(workURI);
     } catch (ContentRepositoryException e) {
-      logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
+      logger.warn("Error looking up page {} from repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
@@ -989,14 +1005,13 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     boolean isAdmin = true;
 
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
+    if (!page.isLocked() || (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
     // Fix the dates
     Date startDate = null;
     Date endDate = null;
-
     try {
       if (StringUtils.isNotBlank(startDateText))
         startDate = new Date(startDateText);
@@ -1014,18 +1029,19 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       page.setPublished(currentUser, startDate, endDate);
       page.setVersion(Resource.LIVE);
       contentRepository.put(page);
-      contentRepository.delete(pageURI);
+      contentRepository.delete(workURI);
+      logger.info("Page {} has been published by {}", workURI, currentUser);
     } catch (SecurityException e) {
-      logger.warn("Tried to publish page {} of site '{}' without permission", pageURI, site);
+      logger.warn("Tried to publish page {} of site '{}' without permission", workURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
-      logger.warn("Error writing published page {} to repository", pageURI);
+      logger.warn("Error writing published page {} to repository", workURI);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (IllegalStateException e) {
-      logger.warn("Error publishing page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error publishing page {}: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     } catch (ContentRepositoryException e) {
-      logger.warn("Error publishing page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error publishing page {}: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
@@ -1069,30 +1085,30 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI livePageURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
+    ResourceURI liveURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
 
     // Does the page exist?
     Page page = null;
     try {
-      if (!contentRepository.exists(livePageURI)) {
+      if (!contentRepository.exists(liveURI)) {
         throw new WebApplicationException(Status.NOT_FOUND);
       }
-      ResourceURI workPageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
-      if (!contentRepository.exists(workPageURI)) {
-        page = (Page) contentRepository.get(livePageURI);
+      ResourceURI workURI = new PageURIImpl(site, null, pageId, Resource.WORK);
+      if (!contentRepository.exists(workURI)) {
+        page = (Page) contentRepository.get(liveURI);
         page.setVersion(Resource.WORK);
         contentRepository.put(page);
       } else {
-        page = (Page) contentRepository.get(workPageURI);
+        page = (Page) contentRepository.get(workURI);
       }
     } catch (ContentRepositoryException e) {
-      logger.warn("Error lookup up page {} from repository: {}", livePageURI, e.getMessage());
+      logger.warn("Error lookup up page {} from repository: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (IllegalStateException e) {
-      logger.warn("Error unpublishing page {}: {}", livePageURI, e.getMessage());
+      logger.warn("Error unpublishing page {}: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     } catch (IOException e) {
-      logger.warn("Error writing new page {}: {}", livePageURI, e.getMessage());
+      logger.warn("Error writing new page {}: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
@@ -1110,26 +1126,27 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     boolean isAdmin = true;
 
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
+    if (!page.isLocked() || (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
     // Finally, perform the unpublish operation
     try {
-      contentRepository.delete(livePageURI);
+      contentRepository.delete(liveURI);
       page.setPublished(null, null, null);
       contentRepository.put(page);
+      logger.info("Page {} has been unpublished by {}", liveURI, currentUser);
     } catch (SecurityException e) {
-      logger.warn("Tried to unpublish page {} of site '{}' without permission", livePageURI, site);
+      logger.warn("Tried to unpublish page {} of site '{}' without permission", liveURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
-      logger.warn("Error removing writing unpublished page {} to repository", livePageURI);
+      logger.warn("Error removing writing unpublished page {} to repository", liveURI);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (IllegalStateException e) {
-      logger.warn("Error unpublishing page {}: {}", livePageURI, e.getMessage());
+      logger.warn("Error unpublishing page {}: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     } catch (ContentRepositoryException e) {
-      logger.warn("Error unpublishing page {}: {}", livePageURI, e.getMessage());
+      logger.warn("Error unpublishing page {}: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 

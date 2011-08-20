@@ -151,8 +151,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       @QueryParam("path") String path,
       @QueryParam("subjects") String subjectstring,
       @QueryParam("searchterms") String searchterms,
-      @QueryParam("filter") String filter,
-      @QueryParam("type") String type,
+      @QueryParam("filter") String filter, @QueryParam("type") String type,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
       @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset) {
@@ -726,15 +725,18 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Parse the resource and store it
     Resource<?> resource = null;
-    String resourceType = getResourceType(resourceXml);
-    if (resourceType == null) {
-      logger.warn("Tried to create a resource without a type");
-      throw new WebApplicationException(Status.BAD_REQUEST);
-    }
 
     URI uri = null;
     if (!StringUtils.isBlank(resourceXml)) {
       logger.debug("Adding resource to {}", resourceURI);
+
+      // Determine the resource type
+      String resourceType = getResourceType(resourceXml);
+      if (resourceType == null) {
+        logger.warn("Tried to create a resource without a type");
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
+
       try {
         ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
         ResourceReader<?, ?> resourceReader = serializer.getReader();
