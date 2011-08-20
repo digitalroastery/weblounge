@@ -132,6 +132,17 @@ public interface ContentRepository {
   boolean exists(ResourceURI uri) throws ContentRepositoryException;
 
   /**
+   * Returns <code>true</code> if the requested resource exists in any version.
+   * 
+   * @param uri
+   *          the resource uri
+   * @return <code>true</code> if the resource exists
+   * @throws ContentRepositoryException
+   *           if looking up the resource from the repository fails
+   */
+  boolean existsInAnyVersion(ResourceURI uri) throws ContentRepositoryException;
+
+  /**
    * Returns the resource uri for the resource specified by
    * <code>resourceId</code> or <code>null</code> if the resource does not
    * exist.
