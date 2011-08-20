@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.impl.content.ResourceImpl;
+import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 
 
 /**
@@ -39,8 +40,7 @@ public class FileResourceImpl extends ResourceImpl<FileContent> implements FileR
    *          the file uri
    */
   public FileResourceImpl(ResourceURI uri) {
-    super(uri);
-    uri.setType(TYPE);
+    super(new ResourceURIImpl(TYPE, uri.getSite(), uri.getPath(), uri.getIdentifier(), uri.getVersion()));
     setLanguageResolution(LanguageResolution.Original);
   }
   

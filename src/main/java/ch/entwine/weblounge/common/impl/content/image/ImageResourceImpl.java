@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.ResourceImpl;
+import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 
 /**
  * Default implementation of an image resource.
@@ -37,8 +38,7 @@ public class ImageResourceImpl extends ResourceImpl<ImageContent> implements Ima
    *          the image uri
    */
   public ImageResourceImpl(ResourceURI uri) {
-    super(uri);
-    uri.setType(TYPE);
+    super(new ResourceURIImpl(TYPE, uri.getSite(), uri.getPath(), uri.getIdentifier(), uri.getVersion()));
   }
 
   /**

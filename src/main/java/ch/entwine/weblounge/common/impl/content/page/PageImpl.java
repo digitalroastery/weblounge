@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.ResourceImpl;
+import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -75,8 +76,7 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
    *          the page uri
    */
   public PageImpl(ResourceURI uri) {
-    super(uri);
-    uri.setType(TYPE);
+    super(new ResourceURIImpl(TYPE, uri.getSite(), uri.getPath(), uri.getIdentifier(), uri.getVersion()));
     this.composers = new HashMap<String, List<Pagelet>>();
   }
 
@@ -134,7 +134,7 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Page#getStage()
    */
   public Composer getStage() {
@@ -157,10 +157,10 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
       c = new ComposerImpl(stage, pagelets);
       composers.put(stage, pagelets);
     }
-      
+
     return c;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -401,17 +401,17 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.impl.content.ResourceImpl#toXmlRootTag()
    */
   @Override
   protected String toXmlRootTag() {
     return "page";
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.impl.content.ResourceImpl#toXmlHead(java.lang.StringBuffer)
    */
   @Override
@@ -427,10 +427,10 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
       buffer.append("</layout>");
     }
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.impl.content.ResourceImpl#toXmlBody(java.lang.StringBuffer)
    */
   @Override
