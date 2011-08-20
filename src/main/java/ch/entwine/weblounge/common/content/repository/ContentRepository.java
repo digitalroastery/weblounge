@@ -278,6 +278,6 @@ public interface ContentRepository {
    * 
    * @return the number of versions
    */
-  long getRevisionCount();
+  long getVersionCount();
 
 }

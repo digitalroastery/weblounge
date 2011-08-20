@@ -23,6 +23,7 @@ package ch.entwine.weblounge.common.content.repository;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.security.User;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -163,5 +164,53 @@ public interface WritableContentRepository extends ContentRepository {
    *           if the index operation fails
    */
   void index() throws ContentRepositoryException;
+
+  /**
+   * Returns <code>true</code> if the resource identified by the given uri is
+   * locked. A resource is locked if an editor is currently editing the resource
+   * and therefore holding the lock.
+   * 
+   * @param uri
+   *          the resource uri
+   * @return <code>true</code> if the resource is locked
+   * @throws ContentRepositoryException
+   *           if the resource can't be accessed
+   */
+  boolean isLocked(ResourceURI uri) throws ContentRepositoryException;
+
+  /**
+   * Locks the resource for editing by <code>user</code>. This method will throw
+   * an <code>IllegalStateException</code> if the resource is already locked by
+   * a different user.
+   * 
+   * @param uri
+   *          the resource uri
+   * @param user
+   *          the user locking the resource
+   * @return the locked resource
+   * @throws IllegalStateException
+   *           if the resource is already locked by a different user
+   * @throws IOException
+   *           if locking fails due to a database error
+   * @throws ContentRepositoryException
+   *           if the resource can't be accessed
+   */
+  Resource<?> lock(ResourceURI uri, User user) throws IOException,
+      ContentRepositoryException, IllegalStateException;
+
+  /**
+   * Removes the editing lock from the resource and returns the user if the
+   * resource was locked prior to this call, <code>null</code> otherwise.
+   * 
+   * @param uri
+   *          the resource uri
+   * @return the unlocked resource
+   * @throws IOException
+   *           if unlocking fails due to a database error
+   * @throws ContentRepositoryException
+   *           if the resource can't be accessed
+   */
+  Resource<?> unlock(ResourceURI uri) throws IOException,
+      ContentRepositoryException;
 
 }

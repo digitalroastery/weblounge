@@ -182,7 +182,7 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
    * @throws IllegalStateException
    *           if the resource is already locked by a different user
    */
-  void setLocked(User user) throws IllegalStateException;
+  void lock(User user) throws IllegalStateException;
 
   /**
    * Removes the editing lock from this resource and returns the user if the
@@ -190,7 +190,7 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
    * 
    * @return the user that had locked the resource
    */
-  User setUnlocked();
+  User unlock();
 
   /**
    * Adds <code>subject</code> to the set of subjects if it is not already
