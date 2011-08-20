@@ -37,6 +37,7 @@ import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
@@ -108,6 +109,54 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       imageStyleTracker.close();
       imageStyleTracker = null;
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#lock(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.security.User)
+   */
+  public Resource<?> lock(ResourceURI uri, User user)
+      throws IllegalStateException,
+      ContentRepositoryException, IOException {
+    Resource<?> resource = null;
+    for (ResourceURI u : getVersions(uri)) {
+      Resource<?> r = get(u);
+      r.lock(user);
+      put(r);
+      if (r.getVersion() == uri.getVersion())
+        resource = r;
+    }
+    return resource;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#unlock(ch.entwine.weblounge.common.content.ResourceURI)
+   */
+  public Resource<?> unlock(ResourceURI uri) throws ContentRepositoryException,
+      IllegalStateException, IOException {
+    Resource<?> resource = null;
+    for (ResourceURI u : getVersions(uri)) {
+      Resource<?> r = get(u);
+      r.unlock();
+      put(r);
+      if (r.getVersion() == uri.getVersion())
+        resource = r;
+    }
+    return resource;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#isLocked(ch.entwine.weblounge.common.content.ResourceURI)
+   */
+  public boolean isLocked(ResourceURI uri) throws ContentRepositoryException {
+    Resource<?> r = get(uri);
+    return r.isLocked();
   }
 
   /**
@@ -188,7 +237,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     if (result.getDocumentCount() == 0) {
       logger.warn("Trying to move non existing resource {}", uri);
       return;
-    }    
+    }
     for (SearchResultItem searchResult : result.getItems()) {
       documentsToMove.add(searchResult);
     }

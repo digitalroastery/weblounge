@@ -47,7 +47,9 @@ import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
@@ -144,7 +146,7 @@ public class FileSystemContentRepositoryTest {
 
   /** The jpeg image content path */
   protected static final String jpegContentPath = "/image.jpg";
-  
+
   /** The size of the jpeg image */
   protected final long jpegFileSize = 73642L;
 
@@ -159,7 +161,7 @@ public class FileSystemContentRepositoryTest {
 
   /** The png content url */
   protected static URL pngContentURL = null;
-  
+
   /** The size of the png image */
   protected final long pngFileSize = 543037L;
 
@@ -254,7 +256,7 @@ public class FileSystemContentRepositoryTest {
     InputStream imageIs = this.getClass().getResourceAsStream("/image.xml");
     jpeg = imageReader.read(imageIs, site);
     IOUtils.closeQuietly(imageIs);
-    
+
     jpegContent = new ImageContentImpl(jpegContentURL.getFile(), german, "image/jpeg", 1000, 666);
     pngContent = new ImageContentImpl(pngContentURL.getFile(), english, "text/pdf", 1000, 666);
   }
@@ -345,7 +347,7 @@ public class FileSystemContentRepositoryTest {
       repository.put(workPage);
       revisions++;
       assertEquals(resources, repository.getResourceCount());
-      assertEquals(revisions, repository.getRevisionCount());
+      assertEquals(revisions, repository.getVersionCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail("Error adding documents to the repository");
@@ -355,7 +357,7 @@ public class FileSystemContentRepositoryTest {
     try {
       repository.delete(workURI, true);
       assertEquals(resources - 1, repository.getResourceCount());
-      assertEquals(revisions - 2, repository.getRevisionCount());
+      assertEquals(revisions - 2, repository.getVersionCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail("Error deleting document from the repository");
@@ -473,7 +475,7 @@ public class FileSystemContentRepositoryTest {
   @Test
   public void testPutContent() {
     populateRepository();
-    
+
     // Add content items
     try {
       Resource<?> r = repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
@@ -521,22 +523,22 @@ public class FileSystemContentRepositoryTest {
   @Test
   public void testDeleteContent() {
     populateRepository();
-    
+
     // Add content items
     try {
       repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
       repository.putContent(imageURI, pngContent, pngContentURL.openStream());
       assertEquals(2, repository.get(imageURI).contents().size());
-      
+
       // Does not exist
       assertEquals(0, repository.deleteContent(documentURI, jpegContent).contents().size());
 
       // Should exist
       assertEquals(1, repository.deleteContent(imageURI, jpegContent).contents().size());
-      
+
       // Try that again, should not change anything
       assertEquals(1, repository.deleteContent(imageURI, jpegContent).contents().size());
-      
+
       assertEquals(0, repository.deleteContent(imageURI, pngContent).contents().size());
       assertEquals(0, repository.get(imageURI).contents().size());
     } catch (Throwable t) {
@@ -547,7 +549,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI)}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
    */
   @Test
@@ -577,7 +579,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#find(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#find(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -595,7 +597,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
    */
   @Test
@@ -617,23 +619,23 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#getContent(ch.entwine.weblounge.common.content.ResourceURI, ch.entwine.weblounge.common.language.Language)}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#getContent(ch.entwine.weblounge.common.content.ResourceURI, ch.entwine.weblounge.common.language.Language)}
    * .
    */
   @Test
   public void testGetContent() {
     populateRepository();
-    
+
     // Add content items
     try {
       repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
       repository.putContent(imageURI, pngContent, pngContentURL.openStream());
-      
+
       assertEquals(2, repository.get(imageURI).contents().size());
       assertNotNull(repository.getContent(imageURI, german));
       assertNotNull(repository.getContent(imageURI, english));
       assertNull(repository.getContent(imageURI, french));
-      assertNull(repository.getContent(documentURI, german));      
+      assertNull(repository.getContent(documentURI, german));
     } catch (Throwable t) {
       t.printStackTrace();
       fail("Error adding content");
@@ -642,7 +644,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#getVersions(ch.entwine.weblounge.common.content.ResourceURI)}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#getVersions(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
    */
   @Test
@@ -673,7 +675,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#getLanguages(ch.entwine.weblounge.common.content.ResourceURI)}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#getLanguages(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
    */
   @Test
@@ -717,7 +719,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI)}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
    */
   @Test
@@ -728,7 +730,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI, long)}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI, long)}
    * .
    */
   @Test
@@ -739,7 +741,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI, int)}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI, int)}
    * .
    */
   @Test
@@ -750,7 +752,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI, int, long)}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI, int, long)}
    * .
    */
   @Test
@@ -761,7 +763,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#getResourceCount()}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#getResourceCount()}
    * .
    */
   @Test
@@ -772,27 +774,115 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#getRevisionCount()}
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#getVersionCount()}
    * .
    */
   @Test
   public void testGetRevisionCount() {
     int count = populateRepository();
-    assertEquals(count, repository.getRevisionCount());
+    assertEquals(count, repository.getVersionCount());
 
     ResourceURI page1WorkURI = new PageURIImpl(page1URI, Resource.WORK);
     Page page2Work = new PageImpl(page1WorkURI);
 
     try {
       repository.put(page2Work);
-      assertEquals(count + 1, repository.getRevisionCount());
+      assertEquals(count + 1, repository.getVersionCount());
       repository.delete(page1URI, true);
-      assertEquals(count - 1, repository.getRevisionCount());
+      assertEquals(count - 1, repository.getVersionCount());
       repository.delete(page2URI);
-      assertEquals(count - 2, repository.getRevisionCount());
+      assertEquals(count - 2, repository.getVersionCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
+    }
+
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#lock(ResourceURI, ch.entwine.weblounge.common.security.User)
+   * .
+   */
+  @Test
+  public void testLock() throws Exception {
+
+    // Create pages and uris
+    ResourceURI uriLive = new PageURIImpl(site, "/etc/weblounge");
+    ResourceURI uriWork = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+
+    // Add the pages to the index
+    repository.put(new PageImpl(uriLive));
+    repository.put(new PageImpl(uriWork));
+
+    // Create the users
+    User editor1 = new UserImpl("editor1");
+    User editor2 = new UserImpl("editor2");
+
+    // Make sure resources are unlocked initially
+    for (ResourceURI uri : repository.getVersions(uriLive)) {
+      assertFalse(repository.isLocked(uri));
+      assertFalse(repository.get(uri).isLocked());
+      assertNull(repository.get(uri).getLockOwner());
+    }
+
+    // Lock the page (using live uri)
+    Resource<?> r = repository.lock(uriLive, editor1);
+    assertTrue(r.isLocked());
+    assertEquals(editor1, r.getLockOwner());
+
+    // Re-lock the page (using work uri)
+    repository.lock(uriWork, editor1);
+
+    // Re-lock the page as a different user
+    try {
+      repository.lock(uriLive, editor2);
+      fail("Managed to lock an already locked resource ");
+    } catch (IllegalStateException e) {
+      // just what we expected
+    }
+
+    // Make sure resources are unlocked initially
+    for (ResourceURI uri : repository.getVersions(uriLive)) {
+      assertTrue(repository.isLocked(uri));
+      assertTrue(repository.get(uri).isLocked());
+      assertEquals(editor1, repository.get(uri).getLockOwner());
+    }
+
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#unlock(ResourceURI, ch.entwine.weblounge.common.security.User)
+   * .
+   */
+  @Test
+  public void testUnlock() throws Exception {
+
+    // Create pages and uris
+    ResourceURI uriLive = new PageURIImpl(site, "/etc/weblounge");
+    ResourceURI uriWork = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+
+    // Add the pages to the index
+    repository.put(new PageImpl(uriLive));
+    repository.put(new PageImpl(uriWork));
+
+    // Create the users
+    User editor1 = new UserImpl("editor1");
+
+    // Lock the page (using live uri)
+    repository.lock(uriLive, editor1);
+
+    // Unlock the page
+    Resource<?> r = repository.unlock(uriWork);
+    assertFalse(r.isLocked());
+    assertNull(r.getLockOwner());
+
+    // Make sure resources are unlocked again
+    for (ResourceURI uri : repository.getVersions(uriLive)) {
+      assertFalse(repository.isLocked(uri));
+      assertFalse(repository.get(uri).isLocked());
+      assertNull(repository.get(uri).getLockOwner());
     }
 
   }

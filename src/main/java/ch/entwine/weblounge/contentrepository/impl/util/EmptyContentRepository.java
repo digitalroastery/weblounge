@@ -210,9 +210,9 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getRevisionCount()
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getVersionCount()
    */
-  public long getRevisionCount() {
+  public long getVersionCount() {
     return 0;
   }
 

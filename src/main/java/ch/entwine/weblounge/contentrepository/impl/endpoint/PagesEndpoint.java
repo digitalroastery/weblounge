@@ -84,7 +84,7 @@ import javax.xml.parsers.ParserConfigurationException;
 @Path("/")
 @Produces(MediaType.APPLICATION_XML)
 public class PagesEndpoint extends ContentRepositoryEndpoint {
-  
+
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(PagesEndpoint.class);
 
@@ -393,12 +393,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
     }
-    
+
     // Get the user
     // TODO: Change to current user
     User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
     boolean isAdmin = true;
-    
+
     // If the page is locked by a different user, refuse
     if (currentPage.isLocked() && (!currentPage.getLockOwner().equals(currentUser) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
@@ -589,7 +589,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     try {
       liveVersionExists = contentRepository.exists(livePageURI);
       workVerisonExists = contentRepository.exists(workPageURI);
-      
+
       if (!liveVersionExists && !workVerisonExists) {
         logger.warn("Tried to delete non existing page {} in site '{}'", livePageURI, site);
         throw new WebApplicationException(Status.NOT_FOUND);
@@ -598,13 +598,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Page lookup {} failed for site '{}'", livePageURI, site);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
-    
+
     // Delete the page
     try {
-      if(liveVersionExists) {
+      if (liveVersionExists) {
         contentRepository.delete(livePageURI, true);
-      }
-      else if(workVerisonExists) {
+      } else if (workVerisonExists) {
         contentRepository.delete(workPageURI, true);
       }
     } catch (SecurityException e) {
@@ -802,16 +801,15 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     if (StringUtils.isNotBlank(userId)) {
       futureLockOwner = new UserImpl(userId);
     }
-    
+
     // If the page is locked by a different user, refuse
     if (page.isLocked() && !page.getLockOwner().getLogin().equals(futureLockOwner)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
-    // Finally, perform the lock operation
+    // Finally, perform the lock operation (on all resource versions)
     try {
-      page.setLocked(futureLockOwner);
-      contentRepository.put(page);
+      contentRepository.lock(pageURI, currentUser);
     } catch (SecurityException e) {
       logger.warn("Tried to lock page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
@@ -897,15 +895,14 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.FORBIDDEN).build();
     }
 
-    // Finally, perform the lock operation
+    // Finally, perform the lock operation (on all resource versions)
     try {
-      page.setUnlocked();
-      contentRepository.put(page);
+      contentRepository.unlock(pageURI);
     } catch (SecurityException e) {
       logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
-      logger.warn("Error removing page lock {} to repository", pageURI);
+      logger.warn("Error removing page lock {} from repository", pageURI);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (IllegalStateException e) {
       logger.warn("Error unlocking page {}: {}", pageURI, e.getMessage());
