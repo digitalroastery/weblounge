@@ -731,12 +731,12 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#setLocked(ch.entwine.weblounge.common.security.User)
+   * @see ch.entwine.weblounge.common.content.file.Page#lock(ch.entwine.weblounge.common.security.User)
    */
-  public void setLocked(User user) throws IllegalStateException {
+  public void lock(User user) throws IllegalStateException {
     if (!isHeaderLoaded)
       loadPageHeader();
-    file.setLocked(user);
+    file.lock(user);
   }
 
   /**
@@ -835,12 +835,12 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#setUnlocked()
+   * @see ch.entwine.weblounge.common.content.file.Page#unlock()
    */
-  public User setUnlocked() {
+  public User unlock() {
     if (!isHeaderLoaded)
       loadPageHeader();
-    return file.setUnlocked();
+    return file.unlock();
   }
 
   /**

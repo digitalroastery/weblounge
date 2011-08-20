@@ -386,7 +386,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
       else if ("locked".equals(raw)) {
         User user = (User) clipboard.remove("user");
         if (user != null)
-          resource.setLocked(user);
+          resource.lock(user);
       }
 
     }

@@ -745,7 +745,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @param user
    *          the locking user
    */
-  public void setLocked(User user) throws IllegalStateException {
+  public void lock(User user) throws IllegalStateException {
     if (lockOwner != null && !lockOwner.equals(user))
       throw new IllegalStateException("The page is already locked by " + lockOwner);
     lockOwner = user;
@@ -754,9 +754,9 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Resource#setUnlocked()
+   * @see ch.entwine.weblounge.common.content.Resource#unlock()
    */
-  public User setUnlocked() {
+  public User unlock() {
     User previousLockOwner = lockOwner;
     lockOwner = null;
     return previousLockOwner;

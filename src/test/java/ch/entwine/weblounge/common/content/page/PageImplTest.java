@@ -160,7 +160,7 @@ public class PageImplTest {
     page.setDescription(germanDescription, german);
     page.setDescription(frenchDescription, french);
     page.setLayout(layout);
-    page.setLocked(amelie);
+    page.lock(amelie);
     page.setModified(amelie, frenchModificationDate);
     page.setOwner(hans);
     page.setPublished(hans, publishingStartDate, publishingEndDate);
@@ -576,11 +576,11 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#setUnlocked()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#unlock()}.
    */
   @Test
   public void testSetUnlocked() {
-    page.setUnlocked();
+    page.unlock();
     assertFalse(page.isLocked());
   }
 

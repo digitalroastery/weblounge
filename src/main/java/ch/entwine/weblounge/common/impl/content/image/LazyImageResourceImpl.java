@@ -731,12 +731,12 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setLocked(ch.entwine.weblounge.common.security.User)
+   * @see ch.entwine.weblounge.common.content.image.Page#lock(ch.entwine.weblounge.common.security.User)
    */
-  public void setLocked(User user) throws IllegalStateException {
+  public void lock(User user) throws IllegalStateException {
     if (!isHeaderLoaded)
       loadPageHeader();
-    image.setLocked(user);
+    image.lock(user);
   }
 
   /**
@@ -835,12 +835,12 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setUnlocked()
+   * @see ch.entwine.weblounge.common.content.image.Page#unlock()
    */
-  public User setUnlocked() {
+  public User unlock() {
     if (!isHeaderLoaded)
       loadPageHeader();
-    return image.setUnlocked();
+    return image.unlock();
   }
 
   /**

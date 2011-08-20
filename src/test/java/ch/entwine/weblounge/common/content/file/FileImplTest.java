@@ -166,7 +166,7 @@ public class FileImplTest {
     ((FileResourceImpl) file).setCreated(hans, creationDate);
     file.setDescription(germanDescription, german);
     file.setDescription(frenchDescription, french);
-    file.setLocked(amelie);
+    file.lock(amelie);
     file.setModified(amelie, modificationDate);
     file.setOwner(hans);
     file.setPublished(hans, publishingStartDate, publishingEndDate);
@@ -645,12 +645,12 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#setUnlocked()}
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#unlock()}
    * .
    */
   @Test
   public void testSetUnlocked() {
-    file.setUnlocked();
+    file.unlock();
     assertFalse(file.isLocked());
   }
 

@@ -725,12 +725,12 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.Page#setLocked(ch.entwine.weblounge.common.security.User)
+   * @see ch.entwine.weblounge.common.content.page.Page#lock(ch.entwine.weblounge.common.security.User)
    */
-  public void setLocked(User user) throws IllegalStateException {
+  public void lock(User user) throws IllegalStateException {
     if (!isHeaderLoaded)
       loadPageHeader();
-    page.setLocked(user);
+    page.lock(user);
   }
 
   /**
@@ -829,12 +829,12 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.Page#setUnlocked()
+   * @see ch.entwine.weblounge.common.content.page.Page#unlock()
    */
-  public User setUnlocked() {
+  public User unlock() {
     if (!isHeaderLoaded)
       loadPageHeader();
-    return page.setUnlocked();
+    return page.unlock();
   }
 
   /**

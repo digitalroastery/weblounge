@@ -221,18 +221,18 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Resource#setLocked(ch.entwine.weblounge.common.security.User)
+   * @see ch.entwine.weblounge.common.content.Resource#lock(ch.entwine.weblounge.common.security.User)
    */
-  public void setLocked(User user) throws IllegalStateException {
+  public void lock(User user) throws IllegalStateException {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Resource#setUnlocked()
+   * @see ch.entwine.weblounge.common.content.Resource#unlock()
    */
-  public User setUnlocked() {
+  public User unlock() {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 

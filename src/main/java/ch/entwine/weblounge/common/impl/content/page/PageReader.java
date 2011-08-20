@@ -440,7 +440,7 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
       else if ("locked".equals(raw)) {
         User user = (User) clipboard.get("user");
         if (user != null)
-          page.setLocked(user);
+          page.lock(user);
       }
 
     }
