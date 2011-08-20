@@ -411,8 +411,8 @@ public class ImagesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
-    TestSiteUtils.testETagHeader(request, eTagValue, logger);
-    TestSiteUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
+    TestSiteUtils.testModifiedHeader(request, logger, null);
   }
 
   /**
@@ -451,8 +451,8 @@ public class ImagesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
-    TestSiteUtils.testETagHeader(request, eTagValue, logger);
-    TestSiteUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
+    TestSiteUtils.testModifiedHeader(request, logger, null);
   }
 
   /**
@@ -527,8 +527,8 @@ public class ImagesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
-    TestSiteUtils.testETagHeader(request, eTagValue, logger);
-    TestSiteUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
+    TestSiteUtils.testModifiedHeader(request, logger, null);
   }
 
   /**
@@ -603,8 +603,8 @@ public class ImagesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
-    TestSiteUtils.testETagHeader(request, eTagValue, logger);
-    TestSiteUtils.testModifiedHeader(request, logger);
+    TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
+    TestSiteUtils.testModifiedHeader(request, logger, null);
   }
 
 }

@@ -261,8 +261,8 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
-    TestSiteUtils.testETagHeader(getPreviewRequest, eTagValue, logger);
-    TestSiteUtils.testModifiedHeader(getPreviewRequest, logger);
+    TestSiteUtils.testETagHeader(getPreviewRequest, eTagValue, logger, null);
+    TestSiteUtils.testModifiedHeader(getPreviewRequest, logger, null);
   }
   
   private void testPagePreview(String serverUrl, String resourceId,
@@ -300,8 +300,8 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
-      TestSiteUtils.testETagHeader(getPreviewRequest, eTagValue, logger);
-      TestSiteUtils.testModifiedHeader(getPreviewRequest, logger);
+      TestSiteUtils.testETagHeader(getPreviewRequest, eTagValue, logger, null);
+      TestSiteUtils.testModifiedHeader(getPreviewRequest, logger, null);
     }
   }
 

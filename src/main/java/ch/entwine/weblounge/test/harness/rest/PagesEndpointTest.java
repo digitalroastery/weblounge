@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
@@ -102,9 +103,8 @@ public class PagesEndpointTest extends IntegrationTestBase {
     // Create a new page
     testCreate(serverUrl);
 
-    // Make sure the page can be retrieved both by its id and path
-    testGetPageById(serverUrl, pageId);
-    testGetPageByPath(serverUrl, pagePath);
+    // Test retrieving the work version of the page through the rest endpoint
+    testGetPageById(serverUrl, Resource.WORK, pageId);
 
     // Lock the page
     testLockPage(serverUrl, pageId);
@@ -112,11 +112,21 @@ public class PagesEndpointTest extends IntegrationTestBase {
     // Update the page
     testUpdatePage(serverUrl, pageId);
 
+    // Lock the page
+    testUnlockPage(serverUrl, pageId);
+
+    // Publish the page
+    testPublishPage(serverUrl, pageId);
+
+    // Test retrieving the page through the rest endpoint
+    testGetPageById(serverUrl, Resource.LIVE, pageId);
+    testGetPageByPath(serverUrl, pagePath);
+
     // Move the page
     testMovePage(serverUrl, pageId);
 
-    // Lock the page
-    testUnlockPage(serverUrl, pageId);
+    // Unpublish the page
+    testUnpublishPage(serverUrl, pageId);
 
     // Test page deletion
     testDeletePage(serverUrl, pageId);
@@ -151,6 +161,19 @@ public class PagesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+
+    // Make sure the page is not yet publicly reachable
+    String requestByIdUrl = UrlUtils.concat(serverUrl, "/weblounge-pages/", pageId);
+    HttpGet getPageRequest = new HttpGet(requestByIdUrl);
+    httpClient = new DefaultHttpClient();
+    logger.info("Requesting published page at {}", requestByIdUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
   }
 
   /**
@@ -158,31 +181,35 @@ public class PagesEndpointTest extends IntegrationTestBase {
    * 
    * @param serverUrl
    *          the server url
+   * @param version
+   *          the page version
    * @param id
    *          the page identifier
    * @throws Exception
    *           if retrieval failed
    */
-  private void testGetPageById(String serverUrl, String id) throws Exception {
-    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
-    HttpGet getPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
+  private void testGetPageById(String serverUrl, long version, String id)
+      throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages", id);
+    HttpGet getPageRequest = new HttpGet(requestUrl);
+    String[][] params = new String[][] { { "version", Long.toString(version) } };
     HttpClient httpClient = new DefaultHttpClient();
     Document pageXml = null;
     String eTagValue;
     String modifiedValue;
-    logger.info("Requesting page at {}", getPageRequest.getURI());
+    logger.info("Requesting page at {}", requestUrl);
     try {
-      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(id, XPathHelper.valueOf(pageXml, "/page/@id"));
-      
+
       // Test ETag header
       Header eTagHeader = response.getFirstHeader("Etag");
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
-      
+
       Header modifiedHeader = response.getFirstHeader("Last-Modified");
       assertNotNull(modifiedHeader);
       assertNotNull(modifiedHeader.getValue());
@@ -190,27 +217,27 @@ public class PagesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
-    TestSiteUtils.testETagHeader(getPageRequest, eTagValue, logger);
-    
+
+    TestSiteUtils.testETagHeader(getPageRequest, eTagValue, logger, params);
+
     httpClient = new DefaultHttpClient();
     try {
       getPageRequest.removeHeaders("If-None-Match");
       getPageRequest.setHeader("If-Modified-Since", modifiedValue);
-      logger.info("Sending 'If-Modified-Since' request to {}", getPageRequest.getURI());
-      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      logger.info("Sending 'If-Modified-Since' request to {}", requestUrl);
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, params);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     httpClient = new DefaultHttpClient();
     try {
       getPageRequest.removeHeaders("If-None-Match");
       getPageRequest.setHeader("If-Modified-Since", "Wed, 10 Feb 1999 21:06:40 GMT");
-      logger.info("Sending 'If-Modified-Since' request to {}", getPageRequest.getURI());
-      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      logger.info("Sending 'If-Modified-Since' request to {}", requestUrl);
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertNotNull(response.getEntity());
     } finally {
@@ -258,21 +285,21 @@ public class PagesEndpointTest extends IntegrationTestBase {
    *           if updating failed
    */
   private void testLockPage(String serverUrl, String id) throws Exception {
-    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages/");
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages/", id);
 
     // Lock the page
-    HttpPut lockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "lock"));
+    HttpPut lockRequest = new HttpPut(UrlUtils.concat(requestUrl, "lock"));
     HttpClient httpClient = new DefaultHttpClient();
     logger.info("Locking the page at {}", requestUrl);
     try {
-      HttpResponse response = TestUtils.request(httpClient, lockPageRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, lockRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
 
     // Try to relock with a different user and make sure it fails
-    HttpPut relockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "lock"));
+    HttpPut relockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, "lock"));
     String[][] params = new String[][] { { "user", "amelie" } };
     httpClient = new DefaultHttpClient();
     logger.info("Trying to relock the page at {}", requestUrl);
@@ -296,25 +323,27 @@ public class PagesEndpointTest extends IntegrationTestBase {
    *           if updating failed
    */
   private void testUnlockPage(String serverUrl, String id) throws Exception {
-    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages/");
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages/", id);
 
-    // Lock the page
-    HttpDelete lockPageRequest = new HttpDelete(UrlUtils.concat(requestUrl, id, "lock"));
+    // Unlock the page
+    HttpDelete unlockRequest = new HttpDelete(UrlUtils.concat(requestUrl, "lock"));
     HttpClient httpClient = new DefaultHttpClient();
     logger.info("Unlocking the page at {}", requestUrl);
     try {
-      HttpResponse response = TestUtils.request(httpClient, lockPageRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, unlockRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
 
     // Make sure the update was successful
-    HttpGet getUpdatedPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
+    HttpGet getUpdatedPageRequest = new HttpGet(requestUrl);
     httpClient = new DefaultHttpClient();
+    String[][] params = null;
+    params = new String[][] { { "version", Long.toString(Resource.WORK) } };
     logger.info("Requesting locked page at {}", requestUrl);
     try {
-      HttpResponse response = TestUtils.request(httpClient, getUpdatedPageRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, getUpdatedPageRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       Document pageXml = TestUtils.parseXMLResponse(response);
       assertNull(XPathHelper.valueOf(pageXml, "/page/head/locked"));
@@ -339,13 +368,15 @@ public class PagesEndpointTest extends IntegrationTestBase {
 
     HttpGet getPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
     HttpClient httpClient = new DefaultHttpClient();
+    String[][] params = null;
+    params = new String[][] { { "version", Long.toString(Resource.WORK) } };
     Document pageXml = null;
     String creator = null;
 
     // Read what's currently stored
     logger.info("Requesting page at {}", requestUrl);
     try {
-      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
       creator = XPathHelper.valueOf(pageXml, "/page/head/created/user");
@@ -358,7 +389,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     String updatedCreator = creator + " (updated)";
     NodeList creatorElements = pageXml.getElementsByTagName("created");
     creatorElements.item(0).getFirstChild().setTextContent(updatedCreator);
-    String[][] params = new String[][] { { "content", serializeDoc(pageXml) } };
+    params = new String[][] { { "content", serializeDoc(pageXml) } };
     httpClient = new DefaultHttpClient();
     logger.info("Updating page at {}", requestUrl);
     try {
@@ -371,9 +402,10 @@ public class PagesEndpointTest extends IntegrationTestBase {
     // Make sure the update was successful
     HttpGet getUpdatedPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
     httpClient = new DefaultHttpClient();
+    params = new String[][] { { "version", Long.toString(Resource.WORK) } };
     logger.info("Requesting updated page at {}", requestUrl);
     try {
-      HttpResponse response = TestUtils.request(httpClient, getUpdatedPageRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, getUpdatedPageRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(pageId, XPathHelper.valueOf(pageXml, "/page/@id"));
@@ -413,8 +445,19 @@ public class PagesEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
+    // Lock the page
+    HttpPut lockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "lock"));
+    httpClient = new DefaultHttpClient();
+    logger.info("Locking the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, lockPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
     // Move the page
-    HttpPut movePageRequest = new HttpPut(UrlUtils.concat(requestUrl, pageId));
+    HttpPut movePageRequest = new HttpPut(UrlUtils.concat(requestUrl, id));
     String newPath = PathUtils.concat(oldPath, "/new/");
     pageXml.getFirstChild().getAttributes().getNamedItem("path").setNodeValue(newPath);
     String[][] params = new String[][] { { "content", serializeDoc(pageXml) } };
@@ -422,6 +465,17 @@ public class PagesEndpointTest extends IntegrationTestBase {
     logger.info("Moving page from {} to {}", oldPath, newPath);
     try {
       HttpResponse response = TestUtils.request(httpClient, movePageRequest, params);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Unlock the page
+    HttpDelete unlockRequest = new HttpDelete(UrlUtils.concat(requestUrl, id, "lock"));
+    httpClient = new DefaultHttpClient();
+    logger.info("Unlocking the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, unlockRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
@@ -437,7 +491,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       Document pagesXml = TestUtils.parseXMLResponse(response);
-      assertNotNull(XPathHelper.select(pagesXml, "/pages/page"));
+      assertNotNull(XPathHelper.selectList(pageXml, "/pages/page"));
       assertEquals(id, XPathHelper.valueOf(pagesXml, "/pages/page/@id"));
       assertEquals(newPath, XPathHelper.valueOf(pagesXml, "/pages/page/@path"));
     } finally {
@@ -469,6 +523,130 @@ public class PagesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+  }
+
+  /**
+   * Publishes the page.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @param id
+   *          the page identifier
+   * @throws Exception
+   *           if publishing failed
+   */
+  private void testPublishPage(String serverUrl, String id) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages/");
+
+    // Lock the page
+    HttpPut lockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "lock"));
+    HttpClient httpClient = new DefaultHttpClient();
+    logger.info("Locking the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, lockPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Publish it
+    HttpPut publishPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "publish"));
+    httpClient = new DefaultHttpClient();
+    logger.info("Publishing the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, publishPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Unlock the page
+    HttpDelete unlockRequest = new HttpDelete(UrlUtils.concat(requestUrl, id, "lock"));
+    httpClient = new DefaultHttpClient();
+    logger.info("Unlocking the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, unlockRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Make sure the published page is reachable
+
+    // Wait a second, since when publishing the page, we cut off the millisecond
+    // portion of the publishing start date
+    Thread.sleep(1000);
+
+    String requestByIdUrl = UrlUtils.concat(serverUrl, "/weblounge-pages/", id);
+    HttpGet getPageRequest = new HttpGet(requestByIdUrl);
+    httpClient = new DefaultHttpClient();
+    logger.info("Requesting published page at {}", requestByIdUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+  }
+
+  /**
+   * Publishes the page.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @param id
+   *          the page identifier
+   * @throws Exception
+   *           if publishing failed
+   */
+  private void testUnpublishPage(String serverUrl, String id) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages/");
+
+    // Lock the page
+    HttpPut lockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, id, "lock"));
+    HttpClient httpClient = new DefaultHttpClient();
+    logger.info("Locking the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, lockPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Unpublish it
+    HttpDelete unpublishPageRequest = new HttpDelete(UrlUtils.concat(requestUrl, id, "publish"));
+    httpClient = new DefaultHttpClient();
+    logger.info("Unpublishing the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, unpublishPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Unlock the page
+    HttpDelete unlockRequest = new HttpDelete(UrlUtils.concat(requestUrl, id, "lock"));
+    httpClient = new DefaultHttpClient();
+    logger.info("Unlocking the page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, unlockRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    String requestByIdUrl = UrlUtils.concat(serverUrl, "/weblounge-pages/", id);
+    HttpGet getPageRequest = new HttpGet(requestByIdUrl);
+    httpClient = new DefaultHttpClient();
+    logger.info("Requesting published page at {}", requestByIdUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
   }
 
   /**
