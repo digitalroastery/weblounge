@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.taglib.content;
 
+import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
 import java.io.IOException;
@@ -34,10 +35,6 @@ public class WorkbenchTag extends WebloungeTag {
 
   /** Serial version uid */
   private static final long serialVersionUID = -498800954917968929L;
-
-  /** Name of the request parameter that will trigger editing support */
-  public static final String WORKBENCH_PARAM = "edit";
-  public static final String WORKBENCH_COOKIE_EDITOR = "weblounge.editor";
   
   /** Path to the workbench script */
   public static final String WORKBENCH_SCRIPT = "<script src=\"/weblounge/steal/steal.js?editor,development\"></script>";
@@ -48,8 +45,8 @@ public class WorkbenchTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    if (request.getParameter(WORKBENCH_PARAM) != null) {
-      Cookie cookie = new Cookie(WORKBENCH_COOKIE_EDITOR, "true");
+    if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
+      Cookie cookie = new Cookie(EditingState.STATE_COOKIE, "true");
       cookie.setPath("/");
       response.addCookie(cookie);
       writeWorkbenchScript();
@@ -58,7 +55,7 @@ public class WorkbenchTag extends WebloungeTag {
     
     if(request.getCookies() == null) return super.doEndTag();
     for(Cookie cookie : request.getCookies()) {
-      if(cookie.getName().equals(WORKBENCH_COOKIE_EDITOR) && cookie.getValue().equals("true")) {
+      if(cookie.getName().equals(EditingState.STATE_COOKIE) && cookie.getValue().equals("true")) {
          writeWorkbenchScript();
          break;
       }
