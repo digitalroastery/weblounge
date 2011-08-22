@@ -41,6 +41,16 @@ public class CacheEntryKey implements Serializable {
   protected String tags = null;
 
   /**
+   * Creates a new cache entry key object.
+   * 
+   * @param primaryKey
+   *          the primary key
+   */
+  public CacheEntryKey(String primaryKey) {
+    this.primaryKey = primaryKey;
+  }
+
+  /**
    * Creates a new key element for the cache.
    * 
    * @param hdl
@@ -68,7 +78,6 @@ public class CacheEntryKey implements Serializable {
   String getTags() {
     return tags;
   }
-
 
   /**
    * Creates the key out of the set of tags. Note that the <code>site</code> tag
@@ -114,19 +123,17 @@ public class CacheEntryKey implements Serializable {
    */
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof CacheEntryKey))
-      return false;
     return primaryKey.equals(o.toString());
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     return primaryKey;
   }
-  
+
 }

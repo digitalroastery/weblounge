@@ -81,6 +81,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** Name of the weblounge cache header */
   private static final String CACHE_KEY_HEADER = "X-Cache-Key";
 
+  /** Name of the weblounge cache tags header */
+  private static final String CACHE_TAGS_HEADER = "X-Cache-Tags";
+
   /** Configuration key prefix for content repository configuration */
   public static final String OPT_PREFIX = "cache";
 
@@ -532,7 +535,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       throw new IllegalStateException("No cache found for site '" + id + "'");
 
     // Try to load the content from the cache
-    Element element = cache.get(handle.getKey());
+    Element element = cache.get(new CacheEntryKey(handle.getKey()));
 
     // If it exists, write the contents back to the response
     if (element != null && element.getValue() != null) {
@@ -637,6 +640,12 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     StringBuffer cacheKeyHeader = new StringBuffer(name);
     cacheKeyHeader.append(" (").append(handle.getKey()).append(")");
     response.addHeader(CACHE_KEY_HEADER, cacheKeyHeader.toString());
+
+    // Add the X-Cache-Tags header
+    CacheEntryKey key = (CacheEntryKey) element.getKey();
+    StringBuffer cacheTagsHeader = new StringBuffer(name);
+    cacheTagsHeader.append(" (").append(key.getTags()).append(")");
+    response.addHeader(CACHE_TAGS_HEADER, cacheTagsHeader.toString());
 
     // Check the headers first. Maybe we don't need to send anything but
     // a not-modified back
@@ -782,7 +791,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // Collect those keys that contain all relevant parts
     Collection<Object> keys = new ArrayList<Object>();
     key: for (Object k : cache.getKeys()) {
-      String key = ((CacheEntryKey)k).tags;
+      String key = ((CacheEntryKey) k).tags;
       for (String keyPart : keyParts) {
         if (!key.contains(keyPart))
           continue key;
