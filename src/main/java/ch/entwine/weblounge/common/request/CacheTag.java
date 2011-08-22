@@ -31,6 +31,7 @@ public interface CacheTag extends Tag {
   /** Special object representing the "any" value */
   String ANY = "*";
 
+  String Resource = "resource";
   String Url = "url";
   String Language = "language";
   String User = "user";
