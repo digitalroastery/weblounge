@@ -246,7 +246,9 @@ public class SearchRequest {
       // } else {
       // and(solrQuery, FULLTEXT, query.getText(), true, true);
       // }
-      and(solrQuery, FULLTEXT, query.getText(), true, true);
+      for (String s : StringUtils.split(query.getText())) {
+        and(solrQuery, FULLTEXT, s, true, true);
+      }
     }
 
     if (solrQuery.length() == 0)
