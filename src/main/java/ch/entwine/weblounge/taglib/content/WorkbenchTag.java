@@ -49,14 +49,16 @@ public class WorkbenchTag extends WebloungeTag {
    */
   public int doEndTag() throws JspException {
     if (request.getParameter(WORKBENCH_PARAM) != null) {
-      response.addCookie(new Cookie(WORKBENCH_COOKIE_EDITOR, "true"));
+      Cookie cookie = new Cookie(WORKBENCH_COOKIE_EDITOR, "true");
+      cookie.setPath("/");
+      response.addCookie(cookie);
       writeWorkbenchScript();
       return super.doEndTag();
     }
     
     if(request.getCookies() == null) return super.doEndTag();
     for(Cookie cookie : request.getCookies()) {
-      if(!cookie.getName().equals(WORKBENCH_COOKIE_EDITOR) && cookie.getValue().equals("true")) {
+      if(cookie.getName().equals(WORKBENCH_COOKIE_EDITOR) && cookie.getValue().equals("true")) {
          writeWorkbenchScript();
          break;
       }
