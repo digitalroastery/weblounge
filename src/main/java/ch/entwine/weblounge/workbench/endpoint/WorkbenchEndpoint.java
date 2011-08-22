@@ -84,8 +84,7 @@ public class WorkbenchEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
 
     // Return the editor
-    // TODO: Work on work page instead of live
-    ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.LIVE);
+    ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.WORK);
     PageletEditor editor;
     try {
       editor = workbench.getEditor(site, uri, composerId, pagelet, language);
@@ -94,7 +93,6 @@ public class WorkbenchEndpoint {
     }
     if (editor == null)
       throw new WebApplicationException(Status.NOT_FOUND);
-
     return Response.ok(editor.toXml()).build();
   }
 
