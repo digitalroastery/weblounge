@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.request.Http11Constants;
@@ -60,6 +61,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Enumeration;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -99,6 +101,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     WebUrl url = request.getUrl();
     String path = url.getPath();
     RequestFlavor contentFlavor = request.getFlavor();
+    boolean isEditing = false;
 
     if (contentFlavor == null || contentFlavor.equals(ANY))
       contentFlavor = RequestFlavor.HTML;
@@ -117,6 +120,10 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       logger.debug("Page handler answered head request for {}", request.getUrl());
       return true;
     }
+    
+    // Determine the editing state
+    Cookie editingState = getEditingInformation(request);
+    isEditing = editingState != null;
 
     // Create the set of tags that identify the page
     CacheTagSet cacheTags = createCacheTags(request);
@@ -126,7 +133,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
     // Check if the page is already part of the cache. If so, our task is
     // already done!
-    if (request.getVersion() == Resource.LIVE && action == null) {
+    if (request.getVersion() == Resource.LIVE && !isEditing && action == null) {
       long validTime = Renderer.DEFAULT_VALID_TIME;
       long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
 
@@ -185,15 +192,22 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
             pageURI = new PageURIImpl(site, null, uriSuffix);
           } else {
             pageURI = new PageURIImpl(request);
+            if (isEditing)
+              pageURI.setVersion(Resource.WORK);
           }
 
-          // Does the page
-          if (contentRepository.existsInAnyVersion(pageURI)) {
-            page = (Page) contentRepository.get(pageURI);
-            if (page == null) {
-              DispatchUtils.sendNotFound(request, response);
-              return true;
-            }
+          // Does the page exist?
+          if (!contentRepository.existsInAnyVersion(pageURI))
+            return false;
+          else if (!isEditing && !contentRepository.exists(pageURI))
+            DispatchUtils.sendNotFound(request, response);
+          else if (isEditing && !contentRepository.exists(pageURI))
+            pageURI.setVersion(Resource.LIVE);
+          
+          page = (Page) contentRepository.get(pageURI);
+          if (page == null) {
+            DispatchUtils.sendNotFound(request, response);
+            return true;
           }
         } catch (ContentRepositoryException e) {
           logger.error("Unable to load page {} from {}: {}", new Object[] {
@@ -203,12 +217,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
               e });
           DispatchUtils.sendInternalError(request, response);
           return true;
-        }
-
-        // Does it exist at all?
-        if (page == null) {
-          logger.debug("No page found for {}", pageURI);
-          return false;
         }
       }
 
@@ -256,7 +264,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         DispatchUtils.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, request, response);
         return true;
       }
-      
+
       // Add last modified header
       response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(page).getTime());
       // Add ETag header
@@ -321,6 +329,25 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         }
       }
     }
+  }
+
+  /**
+   * Returns the cookie containing the current editing state or
+   * <code>null</code> if no such cookie exists.
+   * 
+   * @param request
+   *          the request
+   * @return the editing state
+   */
+  private Cookie getEditingInformation(WebloungeRequest request) {
+    if (request.getCookies() == null)
+      return null;
+    for (Cookie cookie : request.getCookies()) {
+      if (EditingState.STATE_COOKIE.equals(cookie.getName())) {
+        return cookie;
+      }
+    }
+    return null;
   }
 
   /**
