@@ -62,6 +62,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -144,6 +145,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     for (ResourceURI u : getVersions(uri)) {
       Resource<?> r = get(u);
       r.lock(user);
+      r.setModified(user, new Date());
       put(r);
       if (r.getVersion() == uri.getVersion())
         resource = r;
@@ -156,12 +158,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#unlock(ch.entwine.weblounge.common.content.ResourceURI)
    */
-  public Resource<?> unlock(ResourceURI uri) throws ContentRepositoryException,
+  public Resource<?> unlock(ResourceURI uri, User user) throws ContentRepositoryException,
       IllegalStateException, IOException {
     Resource<?> resource = null;
     for (ResourceURI u : getVersions(uri)) {
       Resource<?> r = get(u);
       r.unlock();
+      r.setModified(user, new Date());
       put(r);
       if (r.getVersion() == uri.getVersion())
         resource = r;

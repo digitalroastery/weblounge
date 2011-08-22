@@ -874,7 +874,7 @@ public class FileSystemContentRepositoryTest {
     repository.lock(uriLive, editor1);
 
     // Unlock the page
-    Resource<?> r = repository.unlock(uriWork);
+    Resource<?> r = repository.unlock(uriWork, editor1);
     assertFalse(r.isLocked());
     assertNull(r.getLockOwner());
 

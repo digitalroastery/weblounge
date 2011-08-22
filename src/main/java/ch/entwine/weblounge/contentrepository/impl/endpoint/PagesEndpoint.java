@@ -911,7 +911,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Finally, perform the lock operation (on all resource versions)
     try {
-      contentRepository.unlock(pageURI);
+      contentRepository.unlock(pageURI, currentUser);
       logger.info("Page {} has been unlocked by {}", pageURI, currentUser);
     } catch (SecurityException e) {
       logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);
@@ -1027,6 +1027,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Finally, perform the publish operation
     try {
       page.setPublished(currentUser, startDate, endDate);
+      page.setModified(currentUser, new Date());
       page.setVersion(Resource.LIVE);
       contentRepository.put(page);
       contentRepository.delete(workURI);
@@ -1128,6 +1129,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         logger.debug("Creating work version of {}", workURI);
         page.setVersion(Resource.WORK);
         page.setPublished(null, null, null);
+        page.setModified(currentUser, new Date());
         contentRepository.put(page);
       }
       logger.info("Page {} has been unpublished by {}", liveURI, currentUser);
