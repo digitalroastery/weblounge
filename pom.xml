@@ -55,6 +55,7 @@
               ch.entwine.weblounge.common.content.image;version=${project.version},
               ch.entwine.weblounge.common.content.page;version=${project.version},
               ch.entwine.weblounge.common.content.repository;version=${project.version},
+              ch.entwine.weblounge.common.editor;version=${project.version},
               ch.entwine.weblounge.common.language;version=${project.version},
               ch.entwine.weblounge.common.request;version=${project.version},
               ch.entwine.weblounge.common.scheduler;version=${project.version},
