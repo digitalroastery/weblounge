@@ -75,14 +75,27 @@ public class SearchEndpointTest extends IntegrationTestBase {
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
+    searchExisting(serverUrl);
+    searchNonExisting(serverUrl);
+  }
+
+  /**
+   * Performs a search request for existing content.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @throws Exception
+   *           if the test fails
+   */
+  private void searchExisting(String serverUrl) throws Exception {
     logger.info("Preparing test of search rest api");
 
     String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/search");
-    
+
     // Prepare the request
     logger.info("Searching for a page");
     HttpGet searchRequest = new HttpGet(requestUrl);
-    
+
     // Send the request. The response should be a 400 (bad request)
     logger.debug("Sending empty get request to {}", searchRequest.getURI());
     HttpClient httpClient = new DefaultHttpClient();
@@ -93,7 +106,7 @@ public class SearchEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     // Check for search terms that don't yield a result
     String searchTerms = "xyz";
     httpClient = new DefaultHttpClient();
@@ -117,7 +130,7 @@ public class SearchEndpointTest extends IntegrationTestBase {
     searchTerms = "Friedrich Nietzsche Suchresultat";
     httpClient = new DefaultHttpClient();
     searchRequest = new HttpGet(UrlUtils.concat(requestUrl, URLEncoder.encode(searchTerms, "utf-8")));
-    String[][] params = new String[][] {{"limit", "5"}};
+    String[][] params = new String[][] { { "limit", "5" } };
     logger.info("Sending search request for '{}' to {}", searchTerms, requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, searchRequest, params);
@@ -134,6 +147,54 @@ public class SearchEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
+  }
+
+  /**
+   * Performs a search request for non-existing content.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @throws Exception
+   *           if the test fails
+   */
+  private void searchNonExisting(String serverUrl) throws Exception {
+    logger.info("Preparing test of search rest api");
+
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/search");
+
+    // Prepare the request
+    logger.info("Searching for a page");
+    HttpGet searchRequest = new HttpGet(requestUrl);
+
+    // Send the request. The response should be a 400 (bad request)
+    logger.debug("Sending empty get request to {}", searchRequest.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, searchRequest, null);
+      assertEquals(HttpServletResponse.SC_BAD_REQUEST, response.getStatusLine().getStatusCode());
+      assertEquals(0, response.getEntity().getContentLength());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Check for search terms that don't yield a result
+    String searchTerms = "xyz";
+    httpClient = new DefaultHttpClient();
+    searchRequest = new HttpGet(UrlUtils.concat(requestUrl, searchTerms));
+    logger.info("Sending search request for '{}' to {}", searchTerms, requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, searchRequest, null);
+      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      Document xml = TestUtils.parseXMLResponse(response);
+      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@documents"));
+      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@hits"));
+      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@offset"));
+      assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@page"));
+      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@pagesize"));
+      assertEquals("0", XPathHelper.valueOf(xml, "count(/searchresult/result)"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
   }
 
 }

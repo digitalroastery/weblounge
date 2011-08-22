@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -85,8 +86,38 @@ public class CacheTest extends IntegrationTestBase {
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
-    logger.info("Preparing test of response caching");
+    logger.info("Testing if response cache is activated");
+
+    boolean responseCacheIsActivated = false;
+
+    HttpGet request = new HttpGet(serverUrl);
+    HttpClient httpClient = null;
+    HttpResponse response = null;
+    for (int i = 0; i < 2; i++) {
+      try {
+        httpClient = new DefaultHttpClient();
+        response = TestUtils.request(httpClient, request, null);
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+    }
+
+    // Test the Cache header
+    Header[] cacheHeaders = response.getHeaders("X-Cache-Key");
+    responseCacheIsActivated = cacheHeaders != null && cacheHeaders.length > 0;
+
+    // Is the cache active?
+    if (!responseCacheIsActivated) {
+      logger.warn("Response cache is not available and won't be tested");
+      return;
+    }
     
+    testCacheHeaders(serverUrl);
+  }
+
+  private void testCacheHeaders(String serverUrl) throws Exception {
+    logger.info("Preparing test of response caching");
+
     DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
     df.setTimeZone(TimeZone.getTimeZone("GMT"));
 
@@ -97,9 +128,7 @@ public class CacheTest extends IntegrationTestBase {
 
     logger.info("Sending request to the {} version of {}", language.getLocale().getDisplayName(), requestUrl);
     HttpGet request = new HttpGet(requestUrl);
-    String[][] params = new String[][] { {
-        "language",
-        language.getIdentifier() } };
+    String[][] params = new String[][] { { "language", language.getIdentifier() } };
 
     // Send and the request and examine the response. The first request might
     // not come out of the cache
@@ -124,22 +153,23 @@ public class CacheTest extends IntegrationTestBase {
       // Prepare the second request
       response.getEntity().consumeContent();
       httpClient.getConnectionManager().shutdown();
-      
+
       // Give the cache time to persist the entry
       Thread.sleep(1000);
-      
+
       httpClient = new DefaultHttpClient();
-      
+
       request.setHeader("If-None-Match", eTag);
       request.setHeader("If-Modified-Since", df.format(System.currentTimeMillis()));
-      
+
       response = TestUtils.request(httpClient, request, params);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
 
       // Get the Expires header
       assertNotNull(response.getHeaders("Expires"));
       assertEquals(1, response.getHeaders("Expires").length);
-      // We are explicitly not checking for equality with the previously received
+      // We are explicitly not checking for equality with the previously
+      // received
       // value, since on first request, that value is not yet correct
 
       // Get the Etag header
@@ -149,14 +179,14 @@ public class CacheTest extends IntegrationTestBase {
 
       // Test the Cache header
       assertNotNull(response.getHeaders("X-Cache-Key"));
-      assertEquals(1, response.getHeaders("X-Cache-Key").length);       
+      assertEquals(1, response.getHeaders("X-Cache-Key").length);
       String cacheKey = response.getHeaders("X-Cache-Key")[0].getValue();
       assertNotNull(cacheKey);
 
       // Test the expires header
       Date newExpires = df.parse(response.getHeaders("Expires")[0].getValue());
       assertTrue(expires.before(newExpires) || expires.equals(newExpires));
-      
+
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
