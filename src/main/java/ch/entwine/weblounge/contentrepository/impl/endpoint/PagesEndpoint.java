@@ -1090,26 +1090,15 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Does the page exist?
     Page page = null;
     try {
-      if (!contentRepository.exists(liveURI)) {
+      page = (Page) contentRepository.get(liveURI);
+      if (page == null)
         throw new WebApplicationException(Status.NOT_FOUND);
-      }
-      ResourceURI workURI = new PageURIImpl(site, null, pageId, Resource.WORK);
-      if (!contentRepository.exists(workURI)) {
-        page = (Page) contentRepository.get(liveURI);
-        page.setVersion(Resource.WORK);
-        contentRepository.put(page);
-      } else {
-        page = (Page) contentRepository.get(workURI);
-      }
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (IllegalStateException e) {
       logger.warn("Error unpublishing page {}: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    } catch (IOException e) {
-      logger.warn("Error writing new page {}: {}", liveURI, e.getMessage());
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Check the value of the If-Match header against the etag
@@ -1130,11 +1119,17 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.FORBIDDEN).build();
     }
 
-    // Finally, perform the unpublish operation
+    // Finally, perform the unpublish operation, including saving the current
+    // live version of the page as the new work version.
     try {
       contentRepository.delete(liveURI);
-      page.setPublished(null, null, null);
-      contentRepository.put(page);
+      ResourceURI workURI = new ResourceURIImpl(liveURI, Resource.WORK);
+      if (!contentRepository.exists(workURI)) {
+        logger.debug("Creating work version of {}", workURI);
+        page.setVersion(Resource.WORK);
+        page.setPublished(null, null, null);
+        contentRepository.put(page);
+      }
       logger.info("Page {} has been unpublished by {}", liveURI, currentUser);
     } catch (SecurityException e) {
       logger.warn("Tried to unpublish page {} of site '{}' without permission", liveURI, site);

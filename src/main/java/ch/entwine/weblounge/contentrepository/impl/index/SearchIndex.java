@@ -168,8 +168,8 @@ public class SearchIndex {
     UpdateRequest solrRequest = new UpdateRequest();
     StringBuilder query = new StringBuilder();
     query.append("id:").append(uri.getIdentifier()).append(" AND version:").append(uri.getVersion());
-    solrRequest.deleteByQuery(query.toString());
     solrRequest.setAction(ACTION.COMMIT, true, true);
+    solrRequest.deleteByQuery(query.toString());
     try {
       solrConnection.update(solrRequest);
       return true;
