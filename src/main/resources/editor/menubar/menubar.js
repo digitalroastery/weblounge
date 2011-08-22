@@ -171,9 +171,7 @@ steal.plugins(
          * Delete a Cookie with setting expire to currentTime -1
          */
         _delete_cookie: function(cookieName) {
-          var cookieDate = new Date();
-          cookieDate.setTime(cookieDate.getTime() - 1);
-          document.cookie = cookieName += "=; expires=" + cookieDate.toGMTString();
+        	$.cookie(cookieName, null, { path: '/' });
         },
         
         _enableEditing: function() {
@@ -240,8 +238,7 @@ steal.plugins(
 		
 		"img.wbl-logout click": function(el, ev) {
 			this._delete_cookie("weblounge.editor");
-			// TODO Change to Spring logout url
-			location.href = location.pathname;
+			location.href = location.pathname + '?logout';
 		},
 		
 		"li.wbl-newPage click": function(el, ev) {
