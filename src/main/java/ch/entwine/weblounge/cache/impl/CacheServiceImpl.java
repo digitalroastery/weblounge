@@ -434,7 +434,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     Cache cache = cacheManager.getCache(DEFAULT_CACHE);
 
     // Get the matching keys and load the elements into the cache
-    Collection<Object> keys = getKeys(cache, tags);
+    Collection<Object> keys = getKeysForPrimaryTags(cache, tags);
     for (Object key : keys) {
       cache.load(key);
     }
@@ -451,7 +451,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *          the set of tags
    * @return the collection of matching keys
    */
-  private Collection<Object> getKeys(Cache cache, CacheTag[] tags) {
+  private Collection<Object> getKeysForPrimaryTags(Cache cache, CacheTag[] tags) {
     // Create the parts of the key to look for
     List<String> keyParts = new ArrayList<String>(tags.length);
     for (CacheTag tag : tags) {
@@ -693,7 +693,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       if (tx.isValid() && response.isValid() && response.getStatus() == HttpServletResponse.SC_OK) {
         logger.trace("Writing response for {} to the cache", response);
         CacheEntry entry = new CacheEntry(tx.getHandle(), tx.getContent(), tx.getHeaders());
-        Element element = new Element(entry.getKey(), entry);
+        Element element = new Element(new CacheEntryKey(tx.getHandle()), entry);
         cache.put(element);
         response.setDateHeader("Expires", System.currentTimeMillis() + tx.getHandle().getExpireTime());
       } else if (tx.isValid() && response.isValid()) {
@@ -753,12 +753,44 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Remove the objects matched by the tags
     long removed = 0;
-    for (Object key : getKeys(cache, tags)) {
+    for (Object key : getKeysForTags(cache, tags)) {
       if (cache.remove(key))
         removed++;
     }
 
     logger.debug("Removed {} elements from cache '{}'", removed, id);
+  }
+
+  /**
+   * Returns those keys from the given cache that contain at least all the tags
+   * as defined in the <code>tags</code> array.
+   * 
+   * @param cache
+   *          the cache
+   * @param tags
+   *          the set of tags
+   * @return the collection of matching keys
+   */
+  private Collection<Object> getKeysForTags(Cache cache, CacheTag[] tags) {
+    // Create the parts of the key to look for
+    List<String> keyParts = new ArrayList<String>(tags.length);
+    for (CacheTag tag : tags) {
+      StringBuffer b = new StringBuffer(tag.getName()).append("=").append(tag.getValue());
+      keyParts.add(b.toString());
+    }
+
+    // Collect those keys that contain all relevant parts
+    Collection<Object> keys = new ArrayList<Object>();
+    key: for (Object k : cache.getKeys()) {
+      String key = ((CacheEntryKey)k).tags;
+      for (String keyPart : keyParts) {
+        if (!key.contains(keyPart))
+          continue key;
+      }
+      keys.add(k);
+    }
+
+    return keys;
   }
 
   /**
