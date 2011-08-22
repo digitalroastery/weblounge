@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
@@ -96,6 +97,20 @@ public class PageContentTest extends IntegrationTestBase {
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
+    testPage(serverUrl);
+    testWorkPage(serverUrl);
+    testPageAsEditor(serverUrl);
+  }
+
+  /**
+   * Tests the regular delivery of page content.
+   * 
+   * @param serverUrl
+   *          the base server url
+   * @throws Exception
+   *           if the test fails
+   */
+  private void testPage(String serverUrl) throws Exception {
     logger.info("Preparing test of regular page content");
 
     // Prepare the request
@@ -146,7 +161,7 @@ public class PageContentTest extends IntegrationTestBase {
         // Test for template replacement
         assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${module.root}')]"));
         assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${site.root}')]"));
-        
+
         // Test ETag header
         Header eTagHeader = response.getFirstHeader("Etag");
         assertNotNull(eTagHeader);
@@ -156,10 +171,94 @@ public class PageContentTest extends IntegrationTestBase {
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
-      
+
       TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
       TestSiteUtils.testModifiedHeader(request, logger, null);
     }
+  }
+
+  /**
+   * Tests that the work version of a page is returned.
+   * 
+   * @param serverUrl
+   *          the base server url
+   * @throws Exception
+   *           if the test fails
+   */
+  private void testWorkPage(String serverUrl) throws Exception {
+    logger.info("Preparing test of regular page content");
+
+    // Prepare the request
+    logger.info("Testing regular page output as an editor");
+
+    String requestUrl = UrlUtils.concat(serverUrl, requestPath, "work.html");
+
+    logger.info("Sending request to the work version of {}", requestUrl);
+    HttpGet request = new HttpGet(requestUrl);
+
+    // Send and the request and examine the response
+    logger.debug("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+      // Get the document contents
+      Document xml = TestUtils.parseXMLResponse(response);
+
+      // Look for included pagelet's properties
+      String property = XPathHelper.valueOf(xml, "/html/body/div[@id='main']//span[@id='property']");
+      assertNotNull("Content of pagelet property 'headline' not found", property);
+      assertEquals("Element property does not match", "false", property);
+
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+  }
+
+  /**
+   * Tests that the work version of a page is returned if it exists when the
+   * corresponding cookie is passed in.
+   * 
+   * @param serverUrl
+   *          the base server url
+   * @throws Exception
+   *           if the test fails
+   */
+  private void testPageAsEditor(String serverUrl) throws Exception {
+    logger.info("Preparing test of regular page content");
+
+    // Prepare the request
+    logger.info("Testing regular page output as an editor");
+
+    String requestUrl = UrlUtils.concat(serverUrl, requestPath);
+
+    logger.info("Sending request to the work version of {}", requestUrl);
+    HttpGet request = new HttpGet(requestUrl);
+
+    // Send and the request and examine the response
+    logger.debug("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+
+      request.setHeader("Cookie", EditingState.STATE_COOKIE + "=true");
+      
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+      // Get the document contents
+      Document xml = TestUtils.parseXMLResponse(response);
+
+      // Look for included pagelet's properties
+      String property = XPathHelper.valueOf(xml, "/html/body/div[@id='main']//span[@id='property']");
+      assertNotNull("Content of pagelet property 'headline' not found", property);
+      assertEquals("Element property does not match", "false", property);
+
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
   }
 
 }
