@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
+import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
@@ -221,6 +222,9 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     // Add ETag header
     String eTag = ResourceUtils.getETagValue(fileResource);
     response.setHeader("ETag", eTag);
+    
+    // Set Expires header
+    response.setMaximumRecheckTime(Times.MS_PER_HOUR);
 
     // Add content disposition header
     response.setHeader("Content-Disposition", "inline; filename=" + content.getFilename());

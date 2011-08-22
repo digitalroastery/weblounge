@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
+import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.image.ImageContent;
@@ -236,6 +237,9 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // Add last modified header
     response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource).getTime());
+    
+    // Set Expires header
+    response.setMaximumRecheckTime(Times.MS_PER_HOUR);
 
     // Add ETag header
     response.setHeader("ETag", ResourceUtils.getETagValue(imageResource, style));
