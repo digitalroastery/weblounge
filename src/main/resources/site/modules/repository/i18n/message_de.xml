@@ -1,211 +1,210 @@
-<i18n>
-
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 	<!-- audio -->
-	<message name="module.repository.audio.tab.default">
-		<value>Standard</value>
-	</message>
-	<message name="module.repository.audio.audio">
-		<value>Audio-Datei</value>
-	</message>
-	<message name="module.repository.audio">
-		<value>Bitte wählen Sie die gewünschte Audio-Datei aus, für welche ein Mini-Player eingefügt werden soll.</value>
-	</message>
-	<message name="module.repository.audio.description">
-		<value>Beschreibung</value>
-	</message>
-	<message name="module.repository.audio.description.sample">
-		<value>Interview mit Matthias Hofbauer nach dem Sieg gegen Schweden.</value>
-	</message>
-	<message name="module.repository.audio.producer">
-		<value>Autor</value>
-	</message>
-	<message name="module.repository.audio.producer.sample">
-		<value>Giovanni Marti</value>
-	</message>		
+	<string name="module.repository.audio.tab.default">
+		Standard
+	</string>
+	<string name="module.repository.audio.audio">
+		Audio-Datei
+	</string>
+	<string name="module.repository.audio">
+		Bitte wählen Sie die gewünschte Audio-Datei aus, für welche ein Mini-Player eingefügt werden soll.
+	</string>
+	<string name="module.repository.audio.description">
+		Beschreibung
+	</string>
+	<string name="module.repository.audio.description.sample">
+		Interview mit Matthias Hofbauer nach dem Sieg gegen Schweden.
+	</string>
+	<string name="module.repository.audio.producer">
+		Autor
+	</string>
+	<string name="module.repository.audio.producer.sample">
+		Giovanni Marti
+	</string>		
 
 	<!-- download -->
-	<message name="module.repository.download.download">
-		<value>Download</value>
-	</message>
-	<message name="module.repository.download.title">
-		<value>Titel</value>
-	</message>
-	<message name="module.repository.download.title.sample">
-		<value>Protokoll Vorstandsitzung</value>
-	</message>
-	<message name="module.repository.download.description">
-		<value>Beschreibung</value>
-	</message>
-	<message name="module.repository.download.description.sample">
-		<value>Protokoll der Vorstandsitzung vom 1. Juli</value>
-	</message>
+	<string name="module.repository.download.download">
+		Download
+	</string>
+	<string name="module.repository.download.title">
+		Titel
+	</string>
+	<string name="module.repository.download.title.sample">
+		Protokoll Vorstandsitzung
+	</string>
+	<string name="module.repository.download.description">
+		Beschreibung
+	</string>
+	<string name="module.repository.download.description.sample">
+		Protokoll der Vorstandsitzung vom 1. Juli
+	</string>
 	
 	<!-- image -->
-	<message name="module.repository.image.image">
-		<value>Bild</value>
-	</message>
-	<message name="module.repository.image.border">
-		<value>Rahmen</value>
-	</message>
-	<message name="module.repository.image.enlarge">
-		<value>Vergr&#246;ssern</value>
-	</message>
-	<message name="module.repository.image.description_preview">
-		<value>Beschreibung beim Vorschaubild nicht anzeigen</value>
-	</message>
-	<message name="module.repository.image.slideshow">
-		<value>Bild in Gruppe anzeigen</value>
-	</message>
-	<message name="module.repository.image.style">
-		<value>Gr&#246;sse</value>
-	</message>
-	<message name="module.repository.image.alignment">
-		<value>Ausrichtung</value>
-	</message>
-	<message name="module.repository.image.alt">
-		<value>Alternative Beschreibung</value>
-	</message>
-	<message name="module.repository.image.alt.sample">
-		<value>Portait: Peter Muster</value>
-	</message>
-	<message name="module.repository.image.link">
-		<value>Link hinter dem Bild</value>
-	</message>
-	<message name="module.repository.image.link.sample">
-		<value>http://weblounge.o2it.ch</value>
-	</message>
-	<message name="module.repository.image.photographer">
-		<value>Fotograf</value>
-	</message>
-	<message name="module.repository.image.photographer.sample">
-		<value>Markus Jauss</value>
-	</message>
-	<message name="module.repository.image.description">
-		<value>Bild-Beschreibung</value>
-	</message>
-	<message name="module.repository.image.description.sample">
-		<value>Matthias Hofbauer beim 1:0</value>
-	</message>
-	<message name="module.repository.image.center">
-		<value>zentriert</value>
-	</message>
-	<message name="module.repository.image.left">
-		<value>links</value>
-	</message>
-	<message name="module.repository.image.right">
-		<value>rechts</value>
-	</message>
-	<message name="module.repository.image.left_floated">
-		<value>links mit Textumfluss</value>
-	</message>
-	<message name="module.repository.image.right_floated">
-		<value>rechts mit Textumfluss</value>
-	</message>
+	<string name="module.repository.image.image">
+		Bild
+	</string>
+	<string name="module.repository.image.border">
+		Rahmen
+	</string>
+	<string name="module.repository.image.enlarge">
+		Vergr&#246;ssern
+	</string>
+	<string name="module.repository.image.description_preview">
+		Beschreibung beim Vorschaubild nicht anzeigen
+	</string>
+	<string name="module.repository.image.slideshow">
+		Bild in Gruppe anzeigen
+	</string>
+	<string name="module.repository.image.style">
+		Gr&#246;sse
+	</string>
+	<string name="module.repository.image.alignment">
+		Ausrichtung
+	</string>
+	<string name="module.repository.image.alt">
+		Alternative Beschreibung
+	</string>
+	<string name="module.repository.image.alt.sample">
+		Portait: Peter Muster
+	</string>
+	<string name="module.repository.image.link">
+		Link hinter dem Bild
+	</string>
+	<string name="module.repository.image.link.sample">
+		http://weblounge.o2it.ch
+	</string>
+	<string name="module.repository.image.photographer">
+		Fotograf
+	</string>
+	<string name="module.repository.image.photographer.sample">
+		Markus Jauss
+	</string>
+	<string name="module.repository.image.description">
+		Bild-Beschreibung
+	</string>
+	<string name="module.repository.image.description.sample">
+		Matthias Hofbauer beim 1:0
+	</string>
+	<string name="module.repository.image.center">
+		zentriert
+	</string>
+	<string name="module.repository.image.left">
+		links
+	</string>
+	<string name="module.repository.image.right">
+		rechts
+	</string>
+	<string name="module.repository.image.left_floated">
+		links mit Textumfluss
+	</string>
+	<string name="module.repository.image.right_floated">
+		rechts mit Textumfluss
+	</string>
 
 	<!-- movie -->
-	<message name="module.repository.movie.tab.default">
-		<value>Standard</value>
-	</message>
-	<message name="module.repository.movie.tab.extended">
-		<value>Erweitert</value>
-	</message>		
-	<message name="module.repository.movie.movie">
-		<value>Film</value>
-	</message>
-	<message name="module.repository.movie.width.sample">
-		<value>225</value>
-	</message>
-	<message name="module.repository.movie.height.sample">
-		<value>175</value>
-	</message>
-	<message name="module.repository.movie.producer">
-		<value>Quelle</value>
-	</message>
-	<message name="module.repository.movie.producer.sample">
-		<value>Steven Spielberg</value>
-	</message>
-	<message name="module.repository.movie.description">
-		<value>Film-Beschreibung</value>
-	</message>
-	<message name="module.repository.movie.description.sample">
-		<value>Matthias Hofbauer beim 1-0</value>
-	</message>
-	<message name="module.repository.movie.type">
-		<value>Typ</value>
-	</message>
-	<message name="module.repository.movie.size">
-		<value>Grösse</value>
-	</message>
-	<message name="module.repository.movie.external">
-		<value>In externem Player abspielen</value>
-	</message>
-	<message name="module.repository.movie.width">
-		<value>Breite</value>
-	</message>
-	<message name="module.repository.movie.height">
-		<value>H&#246;he</value>
-	</message>
-	<message name="module.repository.movie.display.movie">
-		<value>Film und Link anzeigen</value>
-	</message>
-	<message name="module.repository.movie.display.link">
-		<value>Nur Link anzeigen</value>
-	</message>
-	<message name="module.repository.movie.cover">
-		<value>Cover</value>
-	</message>	
+	<string name="module.repository.movie.tab.default">
+		Standard
+	</string>
+	<string name="module.repository.movie.tab.extended">
+		Erweitert
+	</string>		
+	<string name="module.repository.movie.movie">
+		Film
+	</string>
+	<string name="module.repository.movie.width.sample">
+		225
+	</string>
+	<string name="module.repository.movie.height.sample">
+		175
+	</string>
+	<string name="module.repository.movie.producer">
+		Quelle
+	</string>
+	<string name="module.repository.movie.producer.sample">
+		Steven Spielberg
+	</string>
+	<string name="module.repository.movie.description">
+		Film-Beschreibung
+	</string>
+	<string name="module.repository.movie.description.sample">
+		Matthias Hofbauer beim 1-0
+	</string>
+	<string name="module.repository.movie.type">
+		Typ
+	</string>
+	<string name="module.repository.movie.size">
+		Grösse
+	</string>
+	<string name="module.repository.movie.external">
+		In externem Player abspielen
+	</string>
+	<string name="module.repository.movie.width">
+		Breite
+	</string>
+	<string name="module.repository.movie.height">
+		H&#246;he
+	</string>
+	<string name="module.repository.movie.display.movie">
+		Film und Link anzeigen
+	</string>
+	<string name="module.repository.movie.display.link">
+		Nur Link anzeigen
+	</string>
+	<string name="module.repository.movie.cover">
+		Cover
+	</string>	
 	
 	<!-- gallery -->
-	<message name="module.repository.gallery">
-		<value>Gallery</value>
-	</message>	
-	<message name="module.repository.gallery.frontimage">
-		<value>Gallery und Titelbild</value>
-	</message>
-	<message name="module.repository.gallery.preview">
-		<value>Gr&#246;sse Vorschaubild</value>
-	</message>
-	<message name="module.repository.gallery.layout">
-		<value>Gallery-Layout</value>
-	</message>
-	<message name="module.repository.gallery.layout.3x3">
-		<value>3 x 3 Bilder</value>
-	</message>
-	<message name="module.repository.gallery.layout.1x1">
-		<value>Einzelbilder</value>
-	</message>
-	<message name="module.repository.gallery.title">
-		<value>Titel</value>
-	</message>
-	<message name="module.repository.gallery.title.sample">
-		<value>Ferienbilder</value>
-	</message>
-	<message name="module.repository.gallery.description">
-		<value>Beschreibung</value>
-	</message>
-	<message name="module.repository.gallery.description.sample">
-		<value>Impressionen aus den Ferien</value>
-	</message>
-	<message name="module.repository.gallery.resize">
-		<value>Hochskallieren</value>
-	</message>
-	<message name="module.repository.gallery.description_alignment">
-		<value>Beschreibung</value>
-	</message>	
-	<message name="module.repository.gallery.left">
-		<value>Links neben dem Vorschaubild</value>
-	</message>	
-	<message name="module.repository.gallery.bottom">
-		<value>Unter dem Vorschaubild</value>
-	</message>
-	<message name="module.repository.gallery.right">
-		<value>Rechts neben dem Vorschaubild</value>
-	</message>
-	<message name="module.repository.gallery.prev">
-		<value>Zur&#252;ck</value>
-	</message>
-	<message name="module.repository.gallery.next">
-		<value>Weiter</value>
-	</message>
-	
-</i18n>
+	<string name="module.repository.gallery">
+		Gallery
+	</string>	
+	<string name="module.repository.gallery.frontimage">
+		Gallery und Titelbild
+	</string>
+	<string name="module.repository.gallery.preview">
+		Gr&#246;sse Vorschaubild
+	</string>
+	<string name="module.repository.gallery.layout">
+		Gallery-Layout
+	</string>
+	<string name="module.repository.gallery.layout.3x3">
+		3 x 3 Bilder
+	</string>
+	<string name="module.repository.gallery.layout.1x1">
+		Einzelbilder
+	</string>
+	<string name="module.repository.gallery.title">
+		Titel
+	</string>
+	<string name="module.repository.gallery.title.sample">
+		Ferienbilder
+	</string>
+	<string name="module.repository.gallery.description">
+		Beschreibung
+	</string>
+	<string name="module.repository.gallery.description.sample">
+		Impressionen aus den Ferien
+	</string>
+	<string name="module.repository.gallery.resize">
+		Hochskallieren
+	</string>
+	<string name="module.repository.gallery.description_alignment">
+		Beschreibung
+	</string>	
+	<string name="module.repository.gallery.left">
+		Links neben dem Vorschaubild
+	</string>	
+	<string name="module.repository.gallery.bottom">
+		Unter dem Vorschaubild
+	</string>
+	<string name="module.repository.gallery.right">
+		Rechts neben dem Vorschaubild
+	</string>
+	<string name="module.repository.gallery.prev">
+		Zur&#252;ck
+	</string>
+	<string name="module.repository.gallery.next">
+		Weiter
+	</string>
+</resources>

@@ -11,8 +11,8 @@
       <renderer>file://${module.root}/jsp/link/link.jsp</renderer>
       <editor>file://${module.root}/jsp/link/link_editor.jsp</editor>
       <includes>
-        <link use="editor" href="/weblounge-sites/weblounge-test/modules/navigation/jsp/link.css" type="text/css"></link>
-        <script use="editor" src="/weblounge-sites/weblounge-test/modules/navigation/jsp/link.js" type="javascript"></script>
+        <link use="editor" href="file://${module.root}/jsp/link/link.css" rel="stylesheet" type="text/css"></link>
+        <script use="editor" src="file://${module.root}/jsp/link/link.js" type="javascript"></script>
       </includes>
     </pagelet>
   </pagelets>

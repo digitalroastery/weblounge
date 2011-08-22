@@ -1,110 +1,108 @@
-<i18n>
-
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 	<!-- download -->
-	<message name="module.repository.download.download">
-		<value>Download</value>
-	</message>
-	<message name="module.repository.download.title">
-		<value>Titre</value>
-	</message>
-	<message name="module.repository.download.title.sample">
-		<value>Rapport annuel</value>
-	</message>
-	<message name="module.repository.download.description">
-		<value>Description</value>
-	</message>
-	<message name="module.repository.download.description.sample">
-		<value>Rapport annuel de notre division</value>
-	</message>
+	<string name="module.repository.download.download">
+		Download
+	</string>
+	<string name="module.repository.download.title">
+		Titre
+	</string>
+	<string name="module.repository.download.title.sample">
+		Rapport annuel
+	</string>
+	<string name="module.repository.download.description">
+		Description
+	</string>
+	<string name="module.repository.download.description.sample">
+		Rapport annuel de notre division
+	</string>
 	
 	<!-- image -->
-	<message name="module.repository.image.image">
-		<value>Image</value>
-	</message>
-	<message name="module.repository.image.border">
-		<value>Bordure</value>
-	</message>
-	<message name="module.repository.image.enlarge">
-		<value>agrandir</value>
-	</message>
-	<message name="module.repository.image.description_preview">
-		<value>Ne pas afficher l&#233;gende sous l&#39;aper&#231;u</value>
-	</message>
-	<message name="module.repository.image.style">
-		<value>Style</value>
-	</message>
-	<message name="module.repository.image.alignment">
-		<value>Alignement</value>
-	</message>
-	<message name="module.repository.image.alt">
-		<value>Description alternative</value>
-	</message>
-	<message name="module.repository.image.alt.sample">
-		<value>Logo</value>
-	</message>
-	<message name="module.repository.image.link">
-		<value>Lien arri&#232;re l&#39;image</value>
-	</message>
-	<message name="module.repository.image.link.sample">
-		<value>http://weblounge.o2it.ch</value>
-	</message>
-		<message name="module.repository.image.photographer">
-		<value>Photographe</value>
-	</message>
-	<message name="module.repository.image.photographer.sample">
-		<value>Markus Jauss</value>
-	</message>
-	<message name="module.repository.image.description">
-		<value>Description de l&#39;image</value>
-	</message>
-	<message name="module.repository.image.description.sample">
-		<value>Matthias Hofbauer</value>
-	</message>
-	<message name="module.repository.image.center">
-		<value>centr&#233;</value>
-	</message>
-	<message name="module.repository.image.left">
-		<value>&#192; gauche</value>
-	</message>
-	<message name="module.repository.image.right">
-		<value>&#192; droite</value>
-	</message>
-	<message name="module.repository.image.left_floated">
-		<value>&#192; gauche, avec texte</value>
-	</message>
-	<message name="module.repository.image.right_floated">
-		<value>&#192; droite, avec texte</value>
-	</message>
+	<string name="module.repository.image.image">
+		Image
+	</string>
+	<string name="module.repository.image.border">
+		Bordure
+	</string>
+	<string name="module.repository.image.enlarge">
+		agrandir
+	</string>
+	<string name="module.repository.image.description_preview">
+		Ne pas afficher l&#233;gende sous l&#39;aper&#231;u
+	</string>
+	<string name="module.repository.image.style">
+		Style
+	</string>
+	<string name="module.repository.image.alignment">
+		Alignement
+	</string>
+	<string name="module.repository.image.alt">
+		Description alternative
+	</string>
+	<string name="module.repository.image.alt.sample">
+		Logo
+	</string>
+	<string name="module.repository.image.link">
+		Lien arri&#232;re l&#39;image
+	</string>
+	<string name="module.repository.image.link.sample">
+		http://weblounge.o2it.ch
+	</string>
+		<string name="module.repository.image.photographer">
+		Photographe
+	</string>
+	<string name="module.repository.image.photographer.sample">
+		Markus Jauss
+	</string>
+	<string name="module.repository.image.description">
+		Description de l&#39;image
+	</string>
+	<string name="module.repository.image.description.sample">
+		Matthias Hofbauer
+	</string>
+	<string name="module.repository.image.center">
+		centr&#233;
+	</string>
+	<string name="module.repository.image.left">
+		&#192; gauche
+	</string>
+	<string name="module.repository.image.right">
+		&#192; droite
+	</string>
+	<string name="module.repository.image.left_floated">
+		&#192; gauche, avec texte
+	</string>
+	<string name="module.repository.image.right_floated">
+		&#192; droite, avec texte
+	</string>
 
 
 	<!-- gallery -->
-	<message name="module.repository.gallery.frontimage">
-		<value>Gallery / Titelbild</value>
-	</message>
-	<message name="module.repository.gallery.preview">
-		<value>Vorschau</value>
-	</message>
-	<message name="module.repository.gallery.layout">
-		<value>Layout</value>
-	</message>
-	<message name="module.repository.gallery.layout.3x3">
-		<value>3 x 3 Bilder</value>
-	</message>
-	<message name="module.repository.gallery.layout.1x1">
-		<value>Einzelbilder</value>
-	</message>
-	<message name="module.repository.gallery.title">
-		<value>Titel</value>
-	</message>
-	<message name="module.repository.gallery.title.sample">
-		<value>Ferienbilder</value>
-	</message>
-	<message name="module.repository.gallery.description">
-		<value>Beschreibung</value>
-	</message>
-	<message name="module.repository.gallery.description.sample">
-		<value>Impressionen aus den Ferien</value>
-	</message>
-
-
-</i18n>
+	<string name="module.repository.gallery.frontimage">
+		Gallery / Titelbild
+	</string>
+	<string name="module.repository.gallery.preview">
+		Vorschau
+	</string>
+	<string name="module.repository.gallery.layout">
+		Layout
+	</string>
+	<string name="module.repository.gallery.layout.3x3">
+		3 x 3 Bilder
+	</string>
+	<string name="module.repository.gallery.layout.1x1">
+		Einzelbilder
+	</string>
+	<string name="module.repository.gallery.title">
+		Titel
+	</string>
+	<string name="module.repository.gallery.title.sample">
+		Ferienbilder
+	</string>
+	<string name="module.repository.gallery.description">
+		Beschreibung
+	</string>
+	<string name="module.repository.gallery.description.sample">
+		Impressionen aus den Ferien
+	</string>
+</resources>

@@ -1,126 +1,125 @@
-<i18n>
-
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 	<!-- backlink -->
-	<message name="module.navigation.backlink">
-		<value>Retour</value>
-	</message>
+	<string name="module.navigation.backlink">
+		Retour
+	</string>
 	
 	<!-- anchor -->
-	<message name="module.navigation.anchor">
-		<value>Ancre</value>
-	</message>
-	<message name="module.navigation.anchor.sample">
-		<value>top</value>
-	</message>
+	<string name="module.navigation.anchor">
+		Ancre
+	</string>
+	<string name="module.navigation.anchor.sample">
+		top
+	</string>
 
 	<!-- linkanchor -->
-	<message name="module.navigation.linkanchor.title">
-		<value>Titre</value>
-	</message>
-	<message name="module.navigation.linkanchor.title.sample">
-		<value>International</value>
-	</message>
-	<message name="module.navigation.linkanchor.description">
-		<value>Description</value>
-	</message>
-	<message name="module.navigation.linkanchor.description.sample">
-		<value>International missions for our two refrees...</value>
-	</message>
-	<message name="module.navigation.linkanchor.anchor">
-		<value>Anchor</value>
-	</message>
-	<message name="module.navigation.linkanchor.anchor.sample">
-		<value>bottom</value>
-	</message>
+	<string name="module.navigation.linkanchor.title">
+		Titre
+	</string>
+	<string name="module.navigation.linkanchor.title.sample">
+		International
+	</string>
+	<string name="module.navigation.linkanchor.description">
+		Description
+	</string>
+	<string name="module.navigation.linkanchor.description.sample">
+		International missions for our two refrees...
+	</string>
+	<string name="module.navigation.linkanchor.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkanchor.anchor.sample">
+		bottom
+	</string>
 
 	<!-- linkexternal -->
-	<message name="module.navigation.linkexternal.title">
-		<value>Title</value>
-	</message>
-	<message name="module.navigation.linkexternal.title.sample">
-		<value>International Floorball Federation (IFF)</value>
-	</message>
-	<message name="module.navigation.linkexternal.description">
-		<value>Description</value>
-	</message>
-	<message name="module.navigation.linkexternal.description.sample">
-		<value>The IFF is the international floorball federation.</value>
-	</message>
-	<message name="module.navigation.linkexternal.anchor">
-		<value>Anchor</value>
-	</message>
-	<message name="module.navigation.linkexternal.anchor.sample">
-		<value>bottom</value>
-	</message>
-	<message name="module.navigation.linkexternal.link">
-		<value>Link (incl. http://)</value>
-	</message>
-	<message name="module.navigation.linkexternal.link.sample">
-		<value>http://www.floorball.com</value>
-	</message>
+	<string name="module.navigation.linkexternal.title">
+		Title
+	</string>
+	<string name="module.navigation.linkexternal.title.sample">
+		International Floorball Federation (IFF)
+	</string>
+	<string name="module.navigation.linkexternal.description">
+		Description
+	</string>
+	<string name="module.navigation.linkexternal.description.sample">
+		The IFF is the international floorball federation.
+	</string>
+	<string name="module.navigation.linkexternal.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkexternal.anchor.sample">
+		bottom
+	</string>
+	<string name="module.navigation.linkexternal.link">
+		Link (incl. http://)
+	</string>
+	<string name="module.navigation.linkexternal.link.sample">
+		http://www.floorball.com
+	</string>
 
 	<!-- linkinternal -->
-	<message name="module.navigation.linkinternal.title">
-		<value>Titre</value>
-	</message>
-	<message name="module.navigation.linkinternal.title.sample">
-		<value>Rapport mai 05</value>
-	</message>
-	<message name="module.navigation.linkinternal.description">
-		<value>Description</value>
-	</message>
-	<message name="module.navigation.linkinternal.description.sample">
-		<value>Rapport mensuel du mai 2005</value>
-	</message>
-	<message name="module.navigation.linkinternal.anchor">
-		<value>Anchor</value>
-	</message>
-	<message name="module.navigation.linkinternal.anchor.sample">
-		<value>bottom</value>
-	</message>
+	<string name="module.navigation.linkinternal.title">
+		Titre
+	</string>
+	<string name="module.navigation.linkinternal.title.sample">
+		Rapport mai 05
+	</string>
+	<string name="module.navigation.linkinternal.description">
+		Description
+	</string>
+	<string name="module.navigation.linkinternal.description.sample">
+		Rapport mensuel du mai 2005
+	</string>
+	<string name="module.navigation.linkinternal.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkinternal.anchor.sample">
+		bottom
+	</string>
 
 	<!-- linklist -->
-	<message name="module.navigation.linklist.sitetyp">
-		<value>Seitentyp</value>
-	</message>
-	<message name="module.navigation.linklist.sitetyp.sample">
-		<value>news, interwiev</value>
-	</message>
-	<message name="module.navigation.linklist.keyword">
-		<value>Keyword</value>
-	</message>
-	<message name="module.navigation.linklist.keyword.sample">
-		<value>top, sk</value>
-	</message>
-	<message name="module.navigation.linklist.size">
-		<value>Anzahl</value>
-	</message>
-	<message name="module.navigation.linklist.showlead">
-		<value>Anreisser anzeigen</value>
-	</message>
+	<string name="module.navigation.linklist.sitetyp">
+		Seitentyp
+	</string>
+	<string name="module.navigation.linklist.sitetyp.sample">
+		news, interwiev
+	</string>
+	<string name="module.navigation.linklist.keyword">
+		Keyword
+	</string>
+	<string name="module.navigation.linklist.keyword.sample">
+		top, sk
+	</string>
+	<string name="module.navigation.linklist.size">
+		Anzahl
+	</string>
+	<string name="module.navigation.linklist.showlead">
+		Anreisser anzeigen
+	</string>
 
 	<!-- linkmore -->
-	<message name="module.navigation.linkmore">
-		<value>Plus</value>
-	</message>
+	<string name="module.navigation.linkmore">
+		Plus
+	</string>
 	
 	<!-- linktop -->
-	<message name="module.navigation.linktop">
-		<value>Top</value>
-	</message>
+	<string name="module.navigation.linktop">
+		Top
+	</string>
 
 	<!-- preview -->
-	<message name="module.navigation.preview.stop">
-		<value>Vorschau Beenden</value>
-	</message>
-	<message name="module.navigation.preview.stop.never">
-		<value>Nie (Alles anzeigen)</value>
-	</message>
-	<message name="module.navigation.preview.stop.lead">
-		<value>Nach Titel und Anreisser</value>
-	</message>
-	<message name="module.navigation.preview.stop.marker">
-		<value>Nach Preview-Markierung</value>
-	</message>
-
-</i18n>
+	<string name="module.navigation.preview.stop">
+		Vorschau Beenden
+	</string>
+	<string name="module.navigation.preview.stop.never">
+		Nie (Alles anzeigen)
+	</string>
+	<string name="module.navigation.preview.stop.lead">
+		Nach Titel und Anreisser
+	</string>
+	<string name="module.navigation.preview.stop.marker">
+		Nach Preview-Markierung
+	</string>
+</resources>

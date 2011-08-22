@@ -1,155 +1,154 @@
-<i18n>
-
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 	<!-- anchorlist -->
-	<message name="module.navigation.anchorlist.choose">
-		<value>Please choose...</value>
-	</message>
+	<string name="module.navigation.anchorlist.choose">
+		Please choose...
+	</string>
 
 	<!-- backlink -->
-	<message name="module.navigation.backlink">
-		<value>back</value>
-	</message>
+	<string name="module.navigation.backlink">
+		back
+	</string>
 	
 	<!-- anchor -->
-	<message name="module.navigation.anchor">
-		<value>Anchor</value>
-	</message>
-	<message name="module.navigation.anchor.sample">
-		<value>top</value>
-	</message>
+	<string name="module.navigation.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.anchor.sample">
+		top
+	</string>
 
 	<!-- linkanchor -->
-	<message name="module.navigation.linkanchor.title">
-		<value>Title</value>
-	</message>
-	<message name="module.navigation.linkanchor.title.sample">
-		<value>International</value>
-	</message>
-	<message name="module.navigation.linkanchor.description">
-		<value>Description</value>
-	</message>
-	<message name="module.navigation.linkanchor.description.sample">
-		<value>Internationaler challange for...</value>
-	</message>
-	<message name="module.navigation.linkanchor.anchor">
-		<value>Anchor</value>
-	</message>
-	<message name="module.navigation.linkanchor.anchor.sample">
-		<value>bottom</value>
-	</message>
+	<string name="module.navigation.linkanchor.title">
+		Title
+	</string>
+	<string name="module.navigation.linkanchor.title.sample">
+		International
+	</string>
+	<string name="module.navigation.linkanchor.description">
+		Description
+	</string>
+	<string name="module.navigation.linkanchor.description.sample">
+		Internationaler challange for...
+	</string>
+	<string name="module.navigation.linkanchor.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkanchor.anchor.sample">
+		bottom
+	</string>
 
 	<!-- linkexternal -->
-	<message name="module.navigation.linkexternal.title">
-		<value>Title</value>
-	</message>
-	<message name="module.navigation.linkexternal.title.sample">
-		<value>International Floorball Federation (IFF)</value>
-	</message>
-	<message name="module.navigation.linkexternal.description">
-		<value>Description</value>
-	</message>
-	<message name="module.navigation.linkexternal.description.sample">
-		<value>The IFF is umbrella group of floorball.</value>
-	</message>
-	<message name="module.navigation.linkexternal.anchor">
-		<value>Anchor</value>
-	</message>
-	<message name="module.navigation.linkexternal.anchor.sample">
-		<value>bottom</value>
-	</message>
-	<message name="module.navigation.linkexternal.link">
-		<value>Link (incl. http://)</value>
-	</message>
-	<message name="module.navigation.linkexternal.link.sample">
-		<value>http://www.floorball.com</value>
-	</message>
+	<string name="module.navigation.linkexternal.title">
+		Title
+	</string>
+	<string name="module.navigation.linkexternal.title.sample">
+		International Floorball Federation (IFF)
+	</string>
+	<string name="module.navigation.linkexternal.description">
+		Description
+	</string>
+	<string name="module.navigation.linkexternal.description.sample">
+		The IFF is umbrella group of floorball.
+	</string>
+	<string name="module.navigation.linkexternal.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkexternal.anchor.sample">
+		bottom
+	</string>
+	<string name="module.navigation.linkexternal.link">
+		Link (incl. http://)
+	</string>
+	<string name="module.navigation.linkexternal.link.sample">
+		http://www.floorball.com
+	</string>
 
 	<!-- linkinternal -->
-	<message name="module.navigation.linkinternal.title">
-		<value>Title</value>
-	</message>
-	<message name="module.navigation.linkinternal.title.sample">
-		<value>Repport May 2005</value>
-	</message>
-	<message name="module.navigation.linkinternal.description">
-		<value>Description</value>
-	</message>
-	<message name="module.navigation.linkinternal.description.sample">
-		<value>Monthly report from May 2005</value>
-	</message>
-	<message name="module.navigation.linkinternal.anchor">
-		<value>Anchor</value>
-	</message>
-	<message name="module.navigation.linkinternal.anchor.sample">
-		<value>bottom</value>
-	</message>
+	<string name="module.navigation.linkinternal.title">
+		Title
+	</string>
+	<string name="module.navigation.linkinternal.title.sample">
+		Repport May 2005
+	</string>
+	<string name="module.navigation.linkinternal.description">
+		Description
+	</string>
+	<string name="module.navigation.linkinternal.description.sample">
+		Monthly report from May 2005
+	</string>
+	<string name="module.navigation.linkinternal.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkinternal.anchor.sample">
+		bottom
+	</string>
 
 	<!-- linklist -->
-	<message name="module.navigation.linklist.sitetyp">
-		<value>Sitetyp</value>
-	</message>
-	<message name="module.navigation.linklist.sitetyp.sample">
-		<value>news, interwiev</value>
-	</message>
-	<message name="module.navigation.linklist.keyword">
-		<value>Keywords</value>
-	</message>
-	<message name="module.navigation.linklist.keyword.sample">
-		<value>top, sk</value>
-	</message>
-	<message name="module.navigation.linklist.size">
-		<value>Size</value>
-	</message>
-	<message name="module.navigation.linklist.showlead">
-		<value>Show lead</value>
-	</message>
-	<message name="module.navigation.linklist.showkeyword">
-		<value>Show keyword</value>
-	</message>
-	<message name="module.navigation.linklist.showrss">
-		<value>Show RSS feed</value>
-	</message>
-	<message name="module.navigation.linklist.rss">
-		<value>RSS-Feed</value>
-	</message>
+	<string name="module.navigation.linklist.sitetyp">
+		Sitetyp
+	</string>
+	<string name="module.navigation.linklist.sitetyp.sample">
+		news, interwiev
+	</string>
+	<string name="module.navigation.linklist.keyword">
+		Keywords
+	</string>
+	<string name="module.navigation.linklist.keyword.sample">
+		top, sk
+	</string>
+	<string name="module.navigation.linklist.size">
+		Size
+	</string>
+	<string name="module.navigation.linklist.showlead">
+		Show lead
+	</string>
+	<string name="module.navigation.linklist.showkeyword">
+		Show keyword
+	</string>
+	<string name="module.navigation.linklist.showrss">
+		Show RSS feed
+	</string>
+	<string name="module.navigation.linklist.rss">
+		RSS-Feed
+	</string>
 
 	<!-- linkmore -->
-	<message name="module.navigation.linkmore">
-		<value>more</value>
-	</message>
+	<string name="module.navigation.linkmore">
+		more
+	</string>
 	
 	<!-- linktop -->
-	<message name="module.navigation.linktop">
-		<value>top</value>
-	</message>
+	<string name="module.navigation.linktop">
+		top
+	</string>
 
 	<!-- local navigation -->
-	<message name="module.navigation.localnavigation.showroots">
-		<value>Show pages on same level</value>
-	</message>
-	<message name="module.navigation.localnavigation.showchildren">
-		<value>Show child pages</value>
-	</message>
+	<string name="module.navigation.localnavigation.showroots">
+		Show pages on same level
+	</string>
+	<string name="module.navigation.localnavigation.showchildren">
+		Show child pages
+	</string>
 
 	<!-- preview -->
-	<message name="module.navigation.preview.stop">
-		<value>End Preview</value>
-	</message>
-	<message name="module.navigation.preview.stop.never">
-		<value>Nenver (Show all)</value>
-	</message>
-	<message name="module.navigation.preview.stop.lead">
-		<value>After Title and Lead</value>
-	</message>
-	<message name="module.navigation.preview.stop.marker">
-		<value>After Preview Marker</value>
-	</message>
+	<string name="module.navigation.preview.stop">
+		End Preview
+	</string>
+	<string name="module.navigation.preview.stop.never">
+		Nenver (Show all)
+	</string>
+	<string name="module.navigation.preview.stop.lead">
+		After Title and Lead
+	</string>
+	<string name="module.navigation.preview.stop.marker">
+		After Preview Marker
+	</string>
 
-	<message name="module.navigation.pagepreview.boxed">
-		<value>Embed in box</value>
-	</message>
-	<message name="module.navigation.pagepreview.box.title">
-		<value>Box title</value>
-	</message>
-
-</i18n>
+	<string name="module.navigation.pagepreview.boxed">
+		Embed in box
+	</string>
+	<string name="module.navigation.pagepreview.box.title">
+		Box title
+	</string>
+</resources>

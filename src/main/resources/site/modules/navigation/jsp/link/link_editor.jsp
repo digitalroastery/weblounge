@@ -1,5 +1,6 @@
+<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
 <p>
-    <label for="linktitle">Linktitel:</label> <input id="linktitle" type="text" name="element:linktitle" />
+    <label for="linktitle"><webl:i18n key="module.navigation.linkanchor.title"/></label> <input id="linktitle" type="text" name="element:linktitle" />
 </p>
 <p>
     <label for="desc">Beschreibung:</label> <input id="desc" type="text" name="element:description" />

@@ -1,232 +1,231 @@
-<i18n>
-
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 	<!-- topstories -->
-	<message name="module.navigation.topstories.tab.default">
-		<value>Standard</value>
-	</message>
-	<message name="module.navigation.topstories.tab.extended">
-		<value>Erweitert</value>
-	</message>
-	<message name="module.navigation.topstories.sitetyp">
-		<value>Seitentyp</value>
-	</message>
-	<message name="module.navigation.topstories.keyword">
-		<value>Schlüsselwörter</value>
-	</message>
-	<message name="module.navigation.topstories.keyword.sample">
-		<value>top,sk</value>
-	</message>
-	<message name="module.navigation.topstories.size">
-		<value>Anzahl</value>
-	</message>
-	<message name="module.navigation.topstories.auto">
-		<value>Zeit zwischen den Wechseln</value>
-	</message>
-	<message name="module.navigation.topstories.speed">
-		<value>Dauer des Wechsels</value>
-	</message>
-	<message name="module.navigation.topstories.circular">
-		<value>Nach der letzten Meldung wiederholen</value>
-	</message>
-	<message name="module.navigation.topstories.circular.true">
-		<value>Ja</value>
-	</message>
-	<message name="module.navigation.topstories.circular.false">
-		<value>Nein</value>
-	</message>	
+	<string name="module.navigation.topstories.tab.default">
+		Standard
+	</string>
+	<string name="module.navigation.topstories.tab.extended">
+		Erweitert
+	</string>
+	<string name="module.navigation.topstories.sitetyp">
+		Seitentyp
+	</string>
+	<string name="module.navigation.topstories.keyword">
+		Schlüsselwörter
+	</string>
+	<string name="module.navigation.topstories.keyword.sample">
+		top,sk
+	</string>
+	<string name="module.navigation.topstories.size">
+		Anzahl
+	</string>
+	<string name="module.navigation.topstories.auto">
+		Zeit zwischen den Wechseln
+	</string>
+	<string name="module.navigation.topstories.speed">
+		Dauer des Wechsels
+	</string>
+	<string name="module.navigation.topstories.circular">
+		Nach der letzten Meldung wiederholen
+	</string>
+	<string name="module.navigation.topstories.circular.true">
+		Ja
+	</string>
+	<string name="module.navigation.topstories.circular.false">
+		Nein
+	</string>	
 		
 			
 	<!-- anchorlist -->
-	<message name="module.navigation.anchorlist.choose">
-		<value>Bitte wählen...</value>
-	</message>
+	<string name="module.navigation.anchorlist.choose">
+		Bitte wählen...
+	</string>
 
 	<!-- backlink -->
-	<message name="module.navigation.backlink">
-		<value>Zur&#252;ck</value>
-	</message>
+	<string name="module.navigation.backlink">
+		Zur&#252;ck
+	</string>
 	
 	<!-- anchor -->
-	<message name="module.navigation.anchor">
-		<value>Anker</value>
-	</message>
-	<message name="module.navigation.anchor.sample">
-		<value>top</value>
-	</message>
+	<string name="module.navigation.anchor">
+		Anker
+	</string>
+	<string name="module.navigation.anchor.sample">
+		top
+	</string>
 
 	<!-- linkanchor -->
-	<message name="module.navigation.linkanchor.title">
-		<value>Titel</value>
-	</message>
-	<message name="module.navigation.linkanchor.title.sample">
-		<value>International</value>
-	</message>
-	<message name="module.navigation.linkanchor.description">
-		<value>Beschreibung</value>
-	</message>
-	<message name="module.navigation.linkanchor.description.sample">
-		<value>Internationaler Einsatz f&#252;r die Schiedsrichter...</value>
-	</message>
-	<message name="module.navigation.linkanchor.anchor">
-		<value>Anker</value>
-	</message>
-	<message name="module.navigation.linkanchor.anchor.sample">
-		<value>bottom</value>
-	</message>
+	<string name="module.navigation.linkanchor.title">
+		Titel
+	</string>
+	<string name="module.navigation.linkanchor.title.sample">
+		International
+	</string>
+	<string name="module.navigation.linkanchor.description">
+		Beschreibung
+	</string>
+	<string name="module.navigation.linkanchor.description.sample">
+		Internationaler Einsatz f&#252;r die Schiedsrichter...
+	</string>
+	<string name="module.navigation.linkanchor.anchor">
+		Anker
+	</string>
+	<string name="module.navigation.linkanchor.anchor.sample">
+		bottom
+	</string>
 
 	<!-- linkexternal -->
-	<message name="module.navigation.linkexternal.title">
-		<value>Titel</value>
-	</message>
-	<message name="module.navigation.linkexternal.title.sample">
-		<value>International Floorball Federation (IFF)</value>
-	</message>
-	<message name="module.navigation.linkexternal.description">
-		<value>Beschreibung</value>
-	</message>
-	<message name="module.navigation.linkexternal.description.sample">
-		<value>Der IFF ist die internationale Dachorganisation der Sportart Unihockey</value>
-	</message>
-	<message name="module.navigation.linkexternal.anchor">
-		<value>Anker</value>
-	</message>
-	<message name="module.navigation.linkexternal.anchor.sample">
-		<value>bottom</value>
-	</message>
-	<message name="module.navigation.linkexternal.link">
-		<value>Link (inkl. http://)</value>
-	</message>
-	<message name="module.navigation.linkexternal.link.sample">
-		<value>http://www.floorball.com</value>
-	</message>
+	<string name="module.navigation.linkexternal.title">
+		Titel
+	</string>
+	<string name="module.navigation.linkexternal.title.sample">
+		International Floorball Federation (IFF)
+	</string>
+	<string name="module.navigation.linkexternal.description">
+		Beschreibung
+	</string>
+	<string name="module.navigation.linkexternal.description.sample">
+		Der IFF ist die internationale Dachorganisation der Sportart Unihockey
+	</string>
+	<string name="module.navigation.linkexternal.anchor">
+		Anker
+	</string>
+	<string name="module.navigation.linkexternal.anchor.sample">
+		bottom
+	</string>
+	<string name="module.navigation.linkexternal.link">
+		Link (inkl. http://)
+	</string>
+	<string name="module.navigation.linkexternal.link.sample">
+		http://www.floorball.com
+	</string>
 
 	<!-- linkinternal -->
-	<message name="module.navigation.linkinternal.title">
-		<value>Titel</value>
-	</message>
-	<message name="module.navigation.linkinternal.title.sample">
-		<value>Bericht Mai 05</value>
-	</message>
-	<message name="module.navigation.linkinternal.description">
-		<value>Beschreibung</value>
-	</message>
-	<message name="module.navigation.linkinternal.description.sample">
-		<value>Monatsbericht vom Mai 2005</value>
-	</message>
-	<message name="module.navigation.linkinternal.anchor">
-		<value>Anker</value>
-	</message>
-	<message name="module.navigation.linkinternal.anchor.sample">
-		<value>bottom</value>
-	</message>
+	<string name="module.navigation.linkinternal.title">
+		Titel
+	</string>
+	<string name="module.navigation.linkinternal.title.sample">
+		Bericht Mai 05
+	</string>
+	<string name="module.navigation.linkinternal.description">
+		Beschreibung
+	</string>
+	<string name="module.navigation.linkinternal.description.sample">
+		Monatsbericht vom Mai 2005
+	</string>
+	<string name="module.navigation.linkinternal.anchor">
+		Anker
+	</string>
+	<string name="module.navigation.linkinternal.anchor.sample">
+		bottom
+	</string>
 
 	<!-- linklist -->
-	<message name="module.navigation.linklist.extended">
-		<value>Erweiterte Liste</value>
-	</message>
-	<message name="module.navigation.linklist.title">
-		<value>Titel</value>
-	</message>
-	<message name="module.navigation.linklist.tab.default">
-		<value>Standard</value>
-	</message>
-	<message name="module.navigation.linklist.sitetyp.default">
-		<value>Standard</value>
-	</message>
-	<message name="module.navigation.linklist.sitetyp.news">
-		<value>News</value>
-	</message>
-	<message name="module.navigation.linklist.sitetyp.feature">
-		<value>Bericht</value>
-	</message>
-	<message name="module.navigation.linklist.sitetyp.interview">
-		<value>Interview</value>
-	</message>
-	<message name="module.navigation.linklist.sitetyp.editorial">
-		<value>Kolummne</value>
-	</message>	
-	<message name="module.navigation.linklist.sitetyp">
-		<value>Seitentyp</value>
-	</message>
-	<message name="module.navigation.linklist.keyword">
-		<value>Schlüsselwörter</value>
-	</message>
-	<message name="module.navigation.linklist.keyword.sample">
-		<value>top,sk</value>
-	</message>
-	<message name="module.navigation.linklist.size">
-		<value>Anzahl</value>
-	</message>
-	<message name="module.navigation.linklist.showlead">
-		<value>Anreisser anzeigen</value>
-	</message>
-	<message name="module.navigation.linklist.showkeyword">
-		<value>Keyword anzeigen</value>
-	</message>
-	<message name="module.navigation.linklist.showrss">
-		<value>RSS-Feed anzeigen</value>
-	</message>
-	<message name="module.navigation.linklist.rss">
-		<value>RSS-Feed</value>
-	</message>
+	<string name="module.navigation.linklist.extended">
+		Erweiterte Liste
+	</string>
+	<string name="module.navigation.linklist.title">
+		Titel
+	</string>
+	<string name="module.navigation.linklist.tab.default">
+		Standard
+	</string>
+	<string name="module.navigation.linklist.sitetyp.default">
+		Standard
+	</string>
+	<string name="module.navigation.linklist.sitetyp.news">
+		News
+	</string>
+	<string name="module.navigation.linklist.sitetyp.feature">
+		Bericht
+	</string>
+	<string name="module.navigation.linklist.sitetyp.interview">
+		Interview
+	</string>
+	<string name="module.navigation.linklist.sitetyp.editorial">
+		Kolummne
+	</string>	
+	<string name="module.navigation.linklist.sitetyp">
+		Seitentyp
+	</string>
+	<string name="module.navigation.linklist.keyword">
+		Schlüsselwörter
+	</string>
+	<string name="module.navigation.linklist.keyword.sample">
+		top,sk
+	</string>
+	<string name="module.navigation.linklist.size">
+		Anzahl
+	</string>
+	<string name="module.navigation.linklist.showlead">
+		Anreisser anzeigen
+	</string>
+	<string name="module.navigation.linklist.showkeyword">
+		Keyword anzeigen
+	</string>
+	<string name="module.navigation.linklist.showrss">
+		RSS-Feed anzeigen
+	</string>
+	<string name="module.navigation.linklist.rss">
+		RSS-Feed
+	</string>
 
 	<!-- linkmore -->
-	<message name="module.navigation.linkmore">
-		<value>Mehr</value>
-	</message>
+	<string name="module.navigation.linkmore">
+		Mehr
+	</string>
 	
 	<!-- linktop -->
-	<message name="module.navigation.linktop">
-		<value>Seitenanfang</value>
-	</message>
+	<string name="module.navigation.linktop">
+		Seitenanfang
+	</string>
 
 	<!-- local navigation -->
-	<message name="module.navigation.localnavigation.showroots">
-		<value>Seiten auf gleicher Ebene anzeigen</value>
-	</message>
-	<message name="module.navigation.localnavigation.showchildren">
-		<value>Seiten auf nächster Ebene anzeigen</value>
-	</message>
+	<string name="module.navigation.localnavigation.showroots">
+		Seiten auf gleicher Ebene anzeigen
+	</string>
+	<string name="module.navigation.localnavigation.showchildren">
+		Seiten auf nächster Ebene anzeigen
+	</string>
 
 	<!-- preview -->
-	<message name="module.navigation.pagepreview.tab.default">
-		<value>Standard</value>
-	</message>
-	<message name="module.navigation.pagepreview.tab.extended">
-		<value>Erweitert</value>
-	</message>		
-	<message name="module.navigation.preview.start">
-		<value>Vorschau Anfang</value>
-	</message>
-	<message name="module.navigation.preview.start.top">
-		<value>Alles anzeigen</value>
-	</message>
-	<message name="module.navigation.preview.start.lead">
-		<value>Nach Titel und Anreisser</value>
-	</message>
-	<message name="module.navigation.preview.start.marker">
-		<value>Nach Start-Markierung</value>
-	</message>
-		<message name="module.navigation.preview.stop">
-		<value>Vorschau Beenden</value>
-	</message>
-	<message name="module.navigation.preview.stop.never">
-		<value>Nie (Alles anzeigen)</value>
-	</message>
-	<message name="module.navigation.preview.stop.lead">
-		<value>Nach Titel und Anreisser</value>
-	</message>
-	<message name="module.navigation.preview.stop.marker">
-		<value>Nach Preview-Markierung</value>
-	</message>
-	<message name="module.navigation.pagepreview.nomorelink">
-		<value>[mehr]-Link ausblenden</value>
-	</message>
-	<message name="module.navigation.pagepreview.boxed">
-		<value>In Box anzeigen</value>
-	</message>
-	<message name="module.navigation.pagepreview.box.title">
-		<value>Box Titel</value>
-	</message>
-
-</i18n>
+	<string name="module.navigation.pagepreview.tab.default">
+		Standard
+	</string>
+	<string name="module.navigation.pagepreview.tab.extended">
+		Erweitert
+	</string>		
+	<string name="module.navigation.preview.start">
+		Vorschau Anfang
+	</string>
+	<string name="module.navigation.preview.start.top">
+		Alles anzeigen
+	</string>
+	<string name="module.navigation.preview.start.lead">
+		Nach Titel und Anreisser
+	</string>
+	<string name="module.navigation.preview.start.marker">
+		Nach Start-Markierung
+	</string>
+		<string name="module.navigation.preview.stop">
+		Vorschau Beenden
+	</string>
+	<string name="module.navigation.preview.stop.never">
+		Nie (Alles anzeigen)
+	</string>
+	<string name="module.navigation.preview.stop.lead">
+		Nach Titel und Anreisser
+	</string>
+	<string name="module.navigation.preview.stop.marker">
+		Nach Preview-Markierung
+	</string>
+	<string name="module.navigation.pagepreview.nomorelink">
+		[mehr]-Link ausblenden
+	</string>
+	<string name="module.navigation.pagepreview.boxed">
+		In Box anzeigen
+	</string>
+	<string name="module.navigation.pagepreview.box.title">
+		Box Titel
+	</string>
+</resources>
