@@ -455,7 +455,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // Create the parts of the key to look for
     List<String> keyParts = new ArrayList<String>(tags.length);
     for (CacheTag tag : tags) {
-      StringBuffer b = new StringBuffer(tag.getName()).append(":").append(tag.getValue());
+      StringBuffer b = new StringBuffer(tag.getName()).append("=").append(tag.getValue());
       keyParts.add(b.toString());
     }
 
