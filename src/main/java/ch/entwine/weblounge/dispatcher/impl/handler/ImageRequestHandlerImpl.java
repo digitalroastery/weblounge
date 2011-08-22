@@ -239,7 +239,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource).getTime());
     
     // Set Expires header
-    response.setMaximumRecheckTime(Times.MS_PER_HOUR);
+    response.setDateHeader("Expires", System.currentTimeMillis() + Times.MS_PER_HOUR);
 
     // Add ETag header
     response.setHeader("ETag", ResourceUtils.getETagValue(imageResource, style));

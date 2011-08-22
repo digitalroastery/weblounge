@@ -223,8 +223,8 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     String eTag = ResourceUtils.getETagValue(fileResource);
     response.setHeader("ETag", eTag);
     
-    // Set Expires header
-    response.setMaximumRecheckTime(Times.MS_PER_HOUR);
+    // Set the Expires header
+    response.setDateHeader("Expires", System.currentTimeMillis() + Times.MS_PER_HOUR);
 
     // Add content disposition header
     response.setHeader("Content-Disposition", "inline; filename=" + content.getFilename());
