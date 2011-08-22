@@ -701,10 +701,12 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       // Is the response ready to be cached?
       if (tx.isValid() && response.isValid() && response.getStatus() == HttpServletResponse.SC_OK) {
         logger.trace("Writing response for {} to the cache", response);
-        CacheEntry entry = new CacheEntry(tx.getHandle(), tx.getContent(), tx.getHeaders());
-        Element element = new Element(new CacheEntryKey(tx.getHandle()), entry);
+        CacheHandle cacheHdl = tx.getHandle();
+        CacheEntry entry = new CacheEntry(cacheHdl, tx.getContent(), tx.getHeaders());
+        Element element = new Element(new CacheEntryKey(cacheHdl), entry);
+        element.setTimeToLive((int) (cacheHdl.getExpireTime() / 1000));
         cache.put(element);
-        response.setDateHeader("Expires", System.currentTimeMillis() + tx.getHandle().getExpireTime());
+        response.setDateHeader("Expires", System.currentTimeMillis() + cacheHdl.getExpireTime());
       } else if (tx.isValid() && response.isValid()) {
         logger.trace("Skip caching of response for {} to the cache: {}", response, response.getStatus());
         response.setDateHeader("Expires", System.currentTimeMillis() + tx.getHandle().getExpireTime());
