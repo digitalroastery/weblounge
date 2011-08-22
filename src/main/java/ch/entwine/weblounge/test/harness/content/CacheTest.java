@@ -97,8 +97,11 @@ public class CacheTest extends IntegrationTestBase {
       try {
         httpClient = new DefaultHttpClient();
         response = TestUtils.request(httpClient, request, null);
+      } catch (Exception e) {
+        throw e;
       } finally {
-        httpClient.getConnectionManager().shutdown();
+        if (httpClient != null)
+          httpClient.getConnectionManager().shutdown();
       }
     }
 
