@@ -210,7 +210,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ContentRepositoryException
    *           if the resource can't be accessed
    */
-  Resource<?> unlock(ResourceURI uri) throws IOException,
+  Resource<?> unlock(ResourceURI uri, User user) throws IOException,
       ContentRepositoryException;
 
 }
