@@ -84,7 +84,9 @@ public class ModificationContext implements Cloneable {
   /**
    * Creates a modification context reflecting a modification by the specified
    * user and at the given date.
-   * <p>Note that this method will cut off the millisecond portion of the date.</p>
+   * <p>
+   * Note that this method will cut off the millisecond portion of the date.
+   * </p>
    * 
    * @param date
    *          the modification date
@@ -147,7 +149,9 @@ public class ModificationContext implements Cloneable {
 
   /**
    * Sets the modifier along with the modification date.
-   * <p>Note that this method will cut off the millisecond portion of the date.</p>
+   * <p>
+   * Note that this method will cut off the millisecond portion of the date.
+   * </p>
    * 
    * @param user
    *          the modifier
@@ -161,11 +165,14 @@ public class ModificationContext implements Cloneable {
 
   /**
    * Cut off the milliseconds from the date.
-   * @param date with milliseconds
+   * 
+   * @param date
+   *          with milliseconds
    * @return date without milliseconds
    */
   private Date cutOffMillis(Date date) {
-    if(date == null) return null;
+    if (date == null)
+      return null;
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(date);
     calendar.set(Calendar.MILLISECOND, 0);
@@ -174,7 +181,9 @@ public class ModificationContext implements Cloneable {
 
   /**
    * Sets the modification date.
-   * <p>Note that this method will cut off the millisecond portion of the date.</p>
+   * <p>
+   * Note that this method will cut off the millisecond portion of the date.
+   * </p>
    * 
    * @param date
    *          the modification date

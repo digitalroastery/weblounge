@@ -90,7 +90,9 @@ public class CreationContext implements Cloneable {
 
   /**
    * Sets the creation date and the user who created the object.
-   * <p>Note that this method will cut off the millisecond portion of the date.</p>
+   * <p>
+   * Note that this method will cut off the millisecond portion of the date.
+   * </p>
    * 
    * @param creator
    *          the user creating the object
@@ -104,7 +106,9 @@ public class CreationContext implements Cloneable {
 
   /**
    * Sets the creation date.
-   * <p>Note that this method will cut off the millisecond portion of the date.</p>
+   * <p>
+   * Note that this method will cut off the millisecond portion of the date.
+   * </p>
    * 
    * @param date
    *          the creation date
@@ -147,14 +151,17 @@ public class CreationContext implements Cloneable {
       ctxt.creationDate = (Date) creationDate.clone();
     return ctxt;
   }
-  
+
   /**
    * Cut off the milliseconds from the date.
-   * @param date with milliseconds
+   * 
+   * @param date
+   *          with milliseconds
    * @return date without milliseconds
    */
   private Date cutOffMillis(Date date) {
-    if(date == null) return null;
+    if (date == null)
+      return null;
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(date);
     calendar.set(Calendar.MILLISECOND, 0);
