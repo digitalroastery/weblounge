@@ -104,14 +104,17 @@ public class PublishingContext implements Cloneable {
     this.startDate = cutOffMillis(startDate);
     this.endDate = cutOffMillis(endDate);
   }
-  
+
   /**
    * Cut off the milliseconds from the date.
-   * @param date with milliseconds
+   * 
+   * @param date
+   *          with milliseconds
    * @return date without milliseconds
    */
   private Date cutOffMillis(Date date) {
-    if(date == null) return null;
+    if (date == null)
+      return null;
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(date);
     calendar.set(Calendar.MILLISECOND, 0);

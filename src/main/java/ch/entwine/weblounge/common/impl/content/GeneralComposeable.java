@@ -102,6 +102,8 @@ public class GeneralComposeable implements Composeable {
       throw new IllegalArgumentException("Recheck time must be greater than or equal to zero");
     if (validTime < 0)
       throw new IllegalArgumentException("Valid time must be greater than or equal to zero");
+    this.recheckTime = recheckTime;
+    this.validTime = validTime;
     this.identifier = identifier;
   }
 

@@ -19,10 +19,10 @@
       <email>weboffice@nowhere.com</email>
     </administrator>
     <authentication>
-    	<loginmodule>
-			  <class>ch.entwine.weblounge.common.impl.security.jaas.AdminLoginModule</class>
-			  <relevance>sufficient</relevance>
-    	</loginmodule>
+    <loginmodule>
+      <class>ch.entwine.weblounge.common.impl.security.jaas.AdminLoginModule</class>
+      <relevance>sufficient</relevance>
+    </loginmodule>
     </authentication>
   </security>
   <templates>
@@ -35,8 +35,8 @@
     </template>
     <template id="mobile" composeable="true">
       <name><![CDATA[Mobile]]></name>
-    	<renderer>file://template/mobile.jsp</renderer>
-      <recheck>1d</recheck>
+      <renderer>file://template/mobile.jsp</renderer>
+      <recheck>1H</recheck>
       <valid>1w</valid>
     </template>
   </templates>
