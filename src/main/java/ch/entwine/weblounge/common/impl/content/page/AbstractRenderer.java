@@ -67,7 +67,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
    * week.
    */
   public AbstractRenderer() {
-    super(Times.MS_PER_DAY, Times.MS_PER_WEEK);
+    super(Times.MS_PER_HOUR, Times.MS_PER_WEEK);
   }
 
   /**
@@ -91,7 +91,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
    *          url of the renderer
    */
   public AbstractRenderer(String identifier, URL renderer) {
-    super(identifier, Times.MS_PER_DAY, Times.MS_PER_WEEK);
+    super(identifier, Times.MS_PER_HOUR, Times.MS_PER_WEEK);
     this.renderers.put(RendererType.Page.toString().toLowerCase(), renderer);
   }
 

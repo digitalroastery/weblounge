@@ -40,7 +40,7 @@ public class GeneralComposeable implements Composeable {
   protected boolean composeable = true;
 
   /** Milliseconds until validity check is recommended */
-  protected long recheckTime = Times.MS_PER_DAY;
+  protected long recheckTime = Times.MS_PER_HOUR;
 
   /** Milliseconds until content using this object becomes invalid */
   protected long validTime = Times.MS_PER_WEEK;
@@ -56,7 +56,7 @@ public class GeneralComposeable implements Composeable {
    * time of a week.
    */
   protected GeneralComposeable() {
-    this(null, Times.MS_PER_DAY, Times.MS_PER_WEEK);
+    this(null, Times.MS_PER_HOUR, Times.MS_PER_WEEK);
   }
 
   /**
@@ -67,7 +67,7 @@ public class GeneralComposeable implements Composeable {
    *          the identifier
    */
   protected GeneralComposeable(String identifier) {
-    this(identifier, Times.MS_PER_DAY, Times.MS_PER_WEEK);
+    this(identifier, Times.MS_PER_HOUR, Times.MS_PER_WEEK);
   }
 
   /**
