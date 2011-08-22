@@ -55,6 +55,10 @@ steal.plugins('jqueryui/dialog',
     		return;
     	}
     	
+    	// Process Editor Template
+    	var result = this._processTemplate(editor.text(), pagelet);
+    	if(result == null) return;
+    	
     	// Load Pagelet CSS
     	$(pageletEditor).find('link').each(function(index) {
     		var test = $('head link[href="' + $(this).attr('href') + '"][rel="stylesheet"]');
@@ -67,15 +71,6 @@ steal.plugins('jqueryui/dialog',
     	      href: $(this).attr('href')
     	    });
     	});
-    	
-    	// Load Pagelet Javascript
-    	$(pageletEditor).find('script').each(function(index) {
-    		$.getScript($(this).attr('src'));
-    	});
-    	
-    	// Process Editor Template
-    	var result = this._processTemplate(editor.text(), pagelet);
-    	if(result == null) return;
     	
     	// Hack to create new Dom element
     	var resultDom = $('<div></div>').html(result);
@@ -113,7 +108,13 @@ steal.plugins('jqueryui/dialog',
 					this._deletePagelet();
 				}
 				this.editorDialog.dialog('destroy');
-			}, this)
+			}, this),
+			open: function(event, ui) {
+		    	// Load Pagelet Javascript
+		    	$(pageletEditor).find('script').each(function(index) {
+		    		$.getScript($(this).attr('src'));
+		    	});
+			}
 		});
 		this.editorDialog.find("form#wbl-validate").validate();
     },
