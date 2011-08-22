@@ -1097,9 +1097,11 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Does the page exist?
     Page page = null;
     try {
+      if (!contentRepository.existsInAnyVersion(liveURI))
+        throw new WebApplicationException(Status.NOT_FOUND);
       page = (Page) contentRepository.get(liveURI);
       if (page == null)
-        throw new WebApplicationException(Status.NOT_FOUND);
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
