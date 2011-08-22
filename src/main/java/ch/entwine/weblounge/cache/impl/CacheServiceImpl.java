@@ -619,7 +619,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Write the response headers
     if (isModified) {
-      response.setHeader("Cache-Control", "max-age=" + validTimeInSeconds + ", must-revalidate");
+      response.setHeader("Cache-Control", "private, max-age=" + validTimeInSeconds + ", must-revalidate");
       response.setContentType(entry.getContentType());
       response.setContentLength(entry.getContent().length);
       entry.getHeaders().apply(response);
