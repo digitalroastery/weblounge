@@ -469,9 +469,6 @@ public class ContentRepositoryIndex {
   public String getIdentifier(ResourceURI uri) throws IOException,
       IllegalArgumentException {
 
-    if (uri.getVersion() != Resource.LIVE)
-      throw new IllegalArgumentException("The id index only works for live resources");
-
     String path = uri.getPath();
     if (path == null)
       throw new IllegalArgumentException("ResourceURI must contain a path");
@@ -512,9 +509,6 @@ public class ContentRepositoryIndex {
    */
   public String getPath(ResourceURI uri) throws IOException,
       IllegalArgumentException {
-
-    if (uri.getVersion() != Resource.LIVE)
-      throw new IllegalArgumentException("The path index only works for live resources");
 
     String id = uri.getIdentifier();
     if (id == null)
