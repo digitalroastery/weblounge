@@ -142,10 +142,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public Resource<?> lock(ResourceURI uri, User user)
       throws IllegalStateException, ContentRepositoryException, IOException {
     Resource<?> resource = null;
+    Date date = new Date();
     for (ResourceURI u : getVersions(uri)) {
       Resource<?> r = get(u);
       r.lock(user);
-      r.setModified(user, new Date());
+      r.setModified(user, date);
       put(r);
       if (r.getVersion() == uri.getVersion())
         resource = r;
@@ -161,10 +162,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public Resource<?> unlock(ResourceURI uri, User user) throws ContentRepositoryException,
       IllegalStateException, IOException {
     Resource<?> resource = null;
+    Date date = new Date();
     for (ResourceURI u : getVersions(uri)) {
       Resource<?> r = get(u);
       r.unlock();
-      r.setModified(user, new Date());
+      r.setModified(user, date);
       put(r);
       if (r.getVersion() == uri.getVersion())
         resource = r;

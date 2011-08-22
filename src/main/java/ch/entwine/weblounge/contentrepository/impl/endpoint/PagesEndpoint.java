@@ -823,7 +823,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Finally, perform the lock operation (on all resource versions)
     try {
-      contentRepository.lock(workURI, currentUser);
+      User admin = site.getAdministrator();
+      User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
+      contentRepository.lock(workURI, modifier);
       logger.info("Page {} has been locked by {}", workURI, currentUser);
     } catch (SecurityException e) {
       logger.warn("Tried to lock page {} of site '{}' without permission", workURI, site);
@@ -911,7 +913,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Finally, perform the lock operation (on all resource versions)
     try {
-      contentRepository.unlock(pageURI, currentUser);
+      User admin = site.getAdministrator();
+      User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
+      contentRepository.unlock(pageURI, modifier);
       logger.info("Page {} has been unlocked by {}", pageURI, currentUser);
     } catch (SecurityException e) {
       logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);
@@ -1027,7 +1031,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Finally, perform the publish operation
     try {
       page.setPublished(currentUser, startDate, endDate);
-      page.setModified(currentUser, new Date());
+      User admin = site.getAdministrator();
+      User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
+      page.setModified(modifier, new Date());
       page.setVersion(Resource.LIVE);
       contentRepository.put(page);
       contentRepository.delete(workURI);
@@ -1129,7 +1135,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         logger.debug("Creating work version of {}", workURI);
         page.setVersion(Resource.WORK);
         page.setPublished(null, null, null);
-        page.setModified(currentUser, new Date());
+        User admin = site.getAdministrator();
+        User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
+        page.setModified(modifier, new Date());
         contentRepository.put(page);
       }
       logger.info("Page {} has been unpublished by {}", liveURI, currentUser);
