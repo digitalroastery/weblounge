@@ -11,7 +11,16 @@ steal.then('jsonix')
 		findOne: function(params, success, error) {
 			if ('path' in params) {
 				$.ajax('/system/weblounge/pages?details=true&path=' + params.path, {
-					success: this.callback(['parseXMLPage', 'wrap', success])
+					success: $.proxy(function(pageXML) {
+						var liveJson = Page.parseXMLPage(pageXML);
+						$.ajax('/system/weblounge/pages/' + liveJson.value.id + '?version=1', {
+							success: this.callback(['parseXMLPage','wrap', success]),
+							error: $.proxy(function() {
+								var livePage = this.wrap(liveJson);
+								success(livePage);
+							}, this)
+						});
+					}, this)
 				});
 			} 
 			else if ('id' in params) {
@@ -134,7 +143,6 @@ steal.then('jsonix')
 					success: function(data, status, xhr){
 						var url = xhr.getResponseHeader('Location');
 						Page.findOne({id : url.substring(url.lastIndexOf('/') + 1)}, success);
-						// Wird gar nicht gefunden weil nicht im searchindex
 					}
 
 				});
@@ -312,10 +320,11 @@ steal.then('jsonix')
 	     * Lock this page
 	     */
 	    lock: function(user, success, error) {
-	    	Page.lock({id:this.value.id}, $.proxy(function() {
-	    		this.value.head.locked = {user: {id: user}};
-	    		this.value.version = 'work';
-	    		success();
+	    	Page.lock({id:this.value.id, user: user}, $.proxy(function() {
+	    		Page.findOne({id: this.value.id}, $.proxy(function(page) {
+					this.value = page.value;
+					success();
+				}, this));
 	    	}, this), error);
 	    },
 	    

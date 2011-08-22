@@ -153,17 +153,17 @@ steal.plugins(
         	
         	if(locked && !userLocked) {
         		$('input#wbl-editmode', this.element).attr('disabled', 'disabled');
-        		this._disableEditing();
+//        		this._disableEditing();
         	} 
         	else if(locked && userLocked) {
         		$('input#wbl-editmode', this.element).removeAttr('disabled');
         		$('input#wbl-editmode', this.element).val(['editmode']);
-        		this._enableEditing();
+//        		this._enableEditing();
         	} 
         	else {
         		$('input#wbl-editmode', this.element).removeAttr('disabled');
         		$('input#wbl-editmode', this.element).val([]);
-        		this._disableEditing();
+//        		this._disableEditing();
         	}
         },
         
@@ -180,9 +180,6 @@ steal.plugins(
         	$('#wbl-pageletcreator').editor_pageletcreator('enable');
         	this.element.find('img.wbl-add').show();
         	this.element.find('img.wbl-more').show();
-        	
-        	// first instanziate before enable
-//        	$('#wbl-pageheadeditor').editor_pageheadeditor('enable');
         },
         
         _disableEditing: function() {
@@ -191,9 +188,6 @@ steal.plugins(
         	$('#wbl-pageletcreator').editor_pageletcreator('disable');
         	this.element.find('img.wbl-add').hide();
         	this.element.find('img.wbl-more').hide();
-        	
-        	// first instanziate before disable
-//        	$('#wbl-pageheadeditor').editor_pageheadeditor('disable');
         },
         
         _toggleTab: function(el) {
@@ -311,8 +305,13 @@ steal.plugins(
 		"input#wbl-editmode click": function(el, ev) {
 			ev.preventDefault();
 			if(el.is(':checked')) {
+				var isWorkVersion = this.options.page.isWorkVersion();
 				this.options.page.lock(this.options.runtime.getUserLogin(), $.proxy(function() {
 					$('input#wbl-editmode', this.element).val(['editmode']);
+					// if version is life set page to work and init composer
+					if(!isWorkVersion) {
+						$('#weblounge-editor').editor_app('_initComposer', this.options.page);
+					}
 					this._enableEditing();
 				}, this), $.proxy(function() {
 					$('input#wbl-editmode', this.element).val([]);

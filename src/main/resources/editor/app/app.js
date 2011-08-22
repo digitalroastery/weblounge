@@ -62,12 +62,15 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         },
         
         _initViews: function(page) {
-        	this.page = page;
-        	$('.composer').editor_composer({page: page, language: this.options.language, runtime: this.runtime});
+        	if(page.isWorkVersion()) this._initComposer(page);
 			this.menuBar = this.find('#wbl-menubar').editor_menubar({page: page, runtime: this.runtime, language: this.options.language});
             this.pagesTab = this.find('#wbl-pagebrowser');
             this.mediaTab = this.find('#wbl-mediabrowser');
             this.update();
+        },
+        
+        _initComposer: function(page) {
+        	$('.composer').editor_composer({page: page, language: this.options.language, runtime: this.runtime});
         },
         
         _setRuntime: function(runtime) {
