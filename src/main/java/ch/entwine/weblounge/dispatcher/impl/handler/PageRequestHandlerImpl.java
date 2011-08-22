@@ -219,6 +219,9 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
           return true;
         }
       }
+      
+      // Add the resource id to the cache
+      response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
 
       // Is it published?
       if (!page.isPublished()) {
