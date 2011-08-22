@@ -36,7 +36,10 @@ import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
+import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
@@ -72,6 +75,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** The image style tracker */
   private ImageStyleTracker imageStyleTracker = null;
 
+  /** The response cache tracker */
+  private ResponseCacheTracker responseCacheTracker = null;
+
   /**
    * Creates a new instance of the content repository.
    * 
@@ -94,6 +100,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     if (bundle != null) {
       imageStyleTracker = new ImageStyleTracker(bundle.getBundleContext());
       imageStyleTracker.open();
+      responseCacheTracker = new ResponseCacheTracker(bundle.getBundleContext(), site.getIdentifier());
+      responseCacheTracker.open();
     }
   }
 
@@ -108,7 +116,20 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     if (imageStyleTracker != null) {
       imageStyleTracker.close();
       imageStyleTracker = null;
+      responseCacheTracker.close();
+      responseCacheTracker = null;
     }
+  }
+
+  /**
+   * Returns the site's response cache.
+   * 
+   * @return the cache
+   */
+  protected ResponseCache getCache() {
+    if (responseCacheTracker == null)
+      return null;
+    return responseCacheTracker.getCache();
   }
 
   /**
@@ -213,6 +234,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Delete previews
     deletePreviews(uri);
 
+    // Make sure related stuff gets thrown out of the cache
+    ResponseCache cache = getCache();
+    if (cache != null) {
+      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) });
+    }
+
     return true;
   }
 
@@ -275,6 +302,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         createPreviews(r);
       }
     }
+    
+    // Make sure related stuff gets thrown out of the cache
+    ResponseCache cache = getCache();
+    if (cache != null) {
+      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) });
+    }
   }
 
   /**
@@ -317,6 +350,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           throw new IllegalStateException("Cannot modify content metadata without content");
         index.add(resource);
       }
+    }
+    
+    // Make sure related stuff gets thrown out of the cache
+    ResponseCache cache = getCache();
+    if (cache != null) {
+      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, resource.getURI().getIdentifier()) });
     }
 
     // Write the updated resource to disk
@@ -372,6 +411,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Create the preview images
     createPreviews(resource);
 
+    // Make sure related stuff gets thrown out of the cache
+    ResponseCache cache = getCache();
+    if (cache != null) {
+      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) });
+    }
+
     return resource;
   }
 
@@ -411,6 +456,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Delete previews
     deletePreviews(uri, content.getLanguage());
+
+    // Make sure related stuff gets thrown out of the cache
+    ResponseCache cache = getCache();
+    if (cache != null) {
+      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) });
+    }
 
     return resource;
   }

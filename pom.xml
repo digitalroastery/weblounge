@@ -35,6 +35,12 @@
 
     <dependency>
       <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-cache-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-common</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -275,6 +281,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.contentrepository</Bundle-SymbolicName>
             <Import-Package>
+              ch.entwine.weblounge.cache;version=${project.version},
               ch.entwine.weblounge.common.content;version=${project.version},
               ch.entwine.weblounge.common.content.file;version=${project.version},
               ch.entwine.weblounge.common.content.image;version=${project.version},
@@ -285,11 +292,13 @@
               ch.entwine.weblounge.common.impl.content.image;version=${project.version},
               ch.entwine.weblounge.common.impl.content.page;version=${project.version},
               ch.entwine.weblounge.common.impl.language;version=${project.version},
+              ch.entwine.weblounge.common.impl.request;version=${project.version},
               ch.entwine.weblounge.common.impl.security;version=${project.version},
               ch.entwine.weblounge.common.impl.url;version=${project.version},
               ch.entwine.weblounge.common.impl.util.config;version=${project.version},
               ch.entwine.weblounge.common.impl.util.doc;version=${project.version},
               ch.entwine.weblounge.common.language;version=${project.version},
+              ch.entwine.weblounge.common.request;version=${project.version},
               ch.entwine.weblounge.common.security;version=${project.version},
               ch.entwine.weblounge.common.site;version=${project.version},
               ch.entwine.weblounge.common.url;version=${project.version},
