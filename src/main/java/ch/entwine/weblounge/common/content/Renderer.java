@@ -37,7 +37,7 @@ public interface Renderer extends Composeable {
   long DEFAULT_VALID_TIME = Times.MS_PER_WEEK;
 
   /** The default recheck time for a renderer */
-  long DEFAULT_RECHECK_TIME = Times.MS_PER_DAY;
+  long DEFAULT_RECHECK_TIME = Times.MS_PER_HOUR;
 
   /** Enumeration of well-known renderer types */
   public enum RendererType {
