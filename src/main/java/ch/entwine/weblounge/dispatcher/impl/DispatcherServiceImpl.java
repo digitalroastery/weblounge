@@ -87,11 +87,9 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     logger.debug("Activating weblounge dispatcher");
 
     Dictionary<String, String> initParams = new Hashtable<String, String>();
-    initParams.put("alias", "/");
-    initParams.put("servlet-name", "default");
-    //initParams.put("servlet-name", "weblounge.dispatcher");
-    //initParams.put("urlPatterns", "/*");
-    initParams.put("load-on-startup", Integer.toString(-1));
+    //initParams.put("alias", "/");
+    //initParams.put("servlet-name", "default");
+    initParams.put("urlPatterns", "/*");
     dispatcherServiceRegistration = bundleContext.registerService(Servlet.class.getName(), dispatcher, initParams);
 
     logger.debug("Weblounge dispatcher activated");
