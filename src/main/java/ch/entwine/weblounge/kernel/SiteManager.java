@@ -478,7 +478,9 @@ public class SiteManager {
     public void removedService(ServiceReference reference, Object service) {
       Site site = (Site) service;
       siteManager.removeSite(site);
-      super.removedService(reference, service);
+      if (reference.getBundle() != null) {
+        super.removedService(reference, service);
+      }
     }
 
   }

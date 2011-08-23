@@ -41,10 +41,10 @@ import javax.servlet.Filter;
  * After the configuration is read, the service registers a {@link Filter} which
  * enforces the security policy at runtime.
  */
-public class SecurityConfigurationService {
+public class SpringSecurityConfigurationService {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(SecurityConfigurationService.class);
+  private static final Logger logger = LoggerFactory.getLogger(SpringSecurityConfigurationService.class);
 
   /** Name of the configuration file */
   public static final String SECURITY_CONFIG_FILE = "/security/security.xml";
@@ -69,20 +69,37 @@ public class SecurityConfigurationService {
     springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfig.toExternalForm() });
     springContext.setBundleContext(bundleCtx);
 
-    logger.info("Spring security context registered");
-
     // Refresh the spring application context
     springContext.refresh();
     
     // Get the security filter chain from the spring context
     Object securityFilterChain = springContext.getBean("springSecurityFilterChain");
 
-    // Register the filter as an OSGi service
-    Dictionary<String, String> props = new Hashtable<String, String>();
-    // props.put("context", "weblounge");
-    props.put("urlPatterns", "*");
-    props.put("service.ranking", "1");
-    securityFilterRegistration = bundleCtx.registerService(Filter.class.getName(), securityFilterChain, props);
+    registerDeferred(bundleCtx, securityFilterChain);
+  }
+
+  /**
+   * @param securityFilterChain
+   */
+  private void registerDeferred(final BundleContext bundleCtx, final Object securityFilterChain) {
+    Thread t = new Thread(new Runnable() {
+      public void run() {
+//        try {
+//          Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//          e.printStackTrace();
+//        }
+        // Register the filter as an OSGi service
+        Dictionary<String, String> props = new Hashtable<String, String>();
+        // props.put("context", "weblounge");
+        props.put("urlPatterns", "/*");
+        props.put("pattern", ".*");
+        props.put("service.ranking", "1");
+        securityFilterRegistration = bundleCtx.registerService(Filter.class.getName(), securityFilterChain, props);
+        logger.info("Spring security context registered");
+      };
+    });
+    t.start();    
   }
 
   /**

@@ -174,21 +174,13 @@ public class ResourcePublishingService implements BundleListener {
       return;
     }
 
+    // The services were registered using the bundle's context. Since that
+    // bundle has been stopped now, the services have been unregistered by the
+    // OSGi service registry already
     synchronized (resourceRegistrations) {
-      ServiceRegistration context = contextRegistrations.remove(bundle.getSymbolicName());
-      ServiceRegistration servlet = resourceRegistrations.remove(bundle.getSymbolicName());
-      if (servlet == null)
-        return;
-
+      contextRegistrations.remove(bundle.getSymbolicName());
+      resourceRegistrations.remove(bundle.getSymbolicName());
       logger.info("Unpublishing resources at {}", contextPath);
-
-      // Remove the servlet from the http service
-      try {
-        context.unregister();
-        servlet.unregister();
-      } catch (Throwable t) {
-        logger.error("Unable to unregister bundle resources at " + contextPath, t);
-      }
     }
   }
 

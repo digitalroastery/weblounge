@@ -11,8 +11,15 @@
     entry-point-ref="userEntryPoint">
 
     <!-- URL SECURITY -->
+
+    <sec:intercept-url pattern="/**" filters="none"/>
+    
+    <!--
+    <sec:intercept-url pattern="/**" access="ROLE_USER"/>
+    -->
     
     <!-- Some resources are open to everybody -->
+    <!--
     <sec:intercept-url pattern="/weblounge/favicon.ico" filters="none"/>
     <sec:intercept-url pattern="/weblounge/documentjs/**" filters="none"/>
     <sec:intercept-url pattern="/weblounge/funcunit/**" filters="none"/>
@@ -20,6 +27,7 @@
     <sec:intercept-url pattern="/weblounge/jqueryui/**" filters="none"/>
     <sec:intercept-url pattern="/weblounge/steal/**" filters="none"/>
     <sec:intercept-url pattern="/favicon.ico" filters="none"/>
+    -->
 
     <!-- Secure the editor application -->
     <!--
@@ -45,8 +53,14 @@
     <!-- LOGIN / LOGOUT MECHANISMS -->
 
     <!-- Enable and configure the failure URL for form-based logins -->
-    <sec:form-login authentication-failure-url="/weblounge/login/login.html?error"/>
-    <!-- 
+
+    <!-- Handle form authentication -->
+    <!--
+    <sec:custom-filter position="FORM_LOGIN_FILTER" ref="formAuthenticationFilter" />
+    -->
+    <sec:form-login login-page="/weblounge/login/login.html" login-processing-url="/system/weblounge/login/form" authentication-failure-url="/weblounge/login/error.html"/>
+    
+    <!--
     <sec:form-login authentication-failure-url="/weblounge/login/login.html?error" authentication-success-handler-ref="authSuccessHandler"/>
     -->
 
@@ -70,7 +84,7 @@
     <sec:anonymous/>
 
     <!-- Enables log out -->
-    <sec:logout/>
+    <sec:logout logout-url="/system/weblounge/logout"/>
 
   </sec:http>
 
@@ -93,6 +107,11 @@
     </property>
   </bean>
   -->
+  
+  <bean name="formAuthenticationFilter" class="ch.entwine.weblounge.kernel.security.SpringSecurityFormAuthentication">
+    <constructor-arg index="0" ref="userDetailsService"/>
+    <property name="authenticationManager" ref="authenticationManager"/>
+  </bean>
  
   <!-- OSGI Integration -->
  
@@ -105,9 +124,11 @@
   <!-- Spring Security Internals -->
 
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
-  <sec:authentication-manager>
+  <sec:authentication-manager alias="authenticationManager">
     <sec:authentication-provider user-service-ref="userDetailsService">
-      <sec:password-encoder hash="md5"><sec:salt-source user-property="username"/></sec:password-encoder>
+      <sec:password-encoder hash="md5">
+        <sec:salt-source user-property="username"/>
+      </sec:password-encoder>
     </sec:authentication-provider>
   </sec:authentication-manager>
 
