@@ -101,7 +101,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     WebUrl url = request.getUrl();
     String path = url.getPath();
     RequestFlavor contentFlavor = request.getFlavor();
-    boolean isEditing = false;
 
     if (contentFlavor == null || contentFlavor.equals(ANY))
       contentFlavor = RequestFlavor.HTML;
@@ -122,8 +121,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     }
     
     // Determine the editing state
-    Cookie editingState = getEditingInformation(request);
-    isEditing = editingState != null;
+    boolean isEditing = getEditingInformation(request);
 
     // Create the set of tags that identify the page
     CacheTagSet cacheTags = createCacheTags(request);
@@ -342,15 +340,17 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
    *          the request
    * @return the editing state
    */
-  private Cookie getEditingInformation(WebloungeRequest request) {
-    if (request.getCookies() == null)
-      return null;
-    for (Cookie cookie : request.getCookies()) {
-      if (EditingState.STATE_COOKIE.equals(cookie.getName())) {
-        return cookie;
+  private boolean getEditingInformation(WebloungeRequest request) {
+    if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
+      return true;
+    } else if (request.getCookies() != null) {
+      for (Cookie cookie : request.getCookies()) {
+        if (EditingState.STATE_COOKIE.equals(cookie.getName())) {
+          return true;
+        }
       }
     }
-    return null;
+    return false;
   }
 
   /**
