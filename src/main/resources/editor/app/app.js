@@ -109,10 +109,10 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         "a openDesigner": function(el, ev) {
             var language = localStorage['weblounge.editor.' + this.runtime.getId() + '.language'];
             if (!language) {
-            	location.href = el.attr('href') + "?edit";
+            	location.href = el.attr('href') + "?edit&_=" + new Date().getTime();
             }
             else {
-            	location.href = el.attr('href') + language + "?edit";
+            	location.href = el.attr('href') + language + "?edit&_=" + new Date().getTime();
             }
         },
         
@@ -141,7 +141,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         "span changeLanguage": function(el, ev, language) {
         	localStorage['weblounge.editor.' + this.runtime.getId() + '.language'] = language;
         	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
-        	location.href = path + language + "?edit";
+        	location.href = path + language + "?edit&_=" + new Date().getTime();
         }
         
 	});

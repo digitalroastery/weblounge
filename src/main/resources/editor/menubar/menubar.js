@@ -233,7 +233,7 @@ steal.plugins(
 		
 		"img.wbl-logout click": function(el, ev) {
 			this._delete_cookie("weblounge.editor");
-			location.href = location.pathname + '?logout';
+			location.href = location.pathname + '?_=' + new Date().getTime();
 		},
 		
 		"li.wbl-newPage click": function(el, ev) {
@@ -322,8 +322,8 @@ steal.plugins(
 				this.options.page.unlock($.proxy(function() {
 					$('input#wbl-editmode', this.element).val([]);
 					this._disableEditing();
+					this.publishDialog.dialog('open');
 				}, this));
-				this.publishDialog.dialog('open');
 			}
 		}
 		
