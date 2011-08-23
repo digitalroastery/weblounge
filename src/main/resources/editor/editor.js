@@ -2,7 +2,7 @@ steal.plugins(
 'jquery/view/tmpl', 
 'editor/app')
 .css('editor', 'css/jquery-ui', 'css/token-input-facebook', 'css/token-input', 'css/validation')
-.resources('jquery.validate.min')
+.resources('jquery.validate.min', 'jquery.cookie')
 .then(function($) {
 
   $(document).ready(function() {

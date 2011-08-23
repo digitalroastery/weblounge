@@ -150,20 +150,19 @@ steal.plugins(
         _initPageLocking: function() {
         	var locked = this.options.page.isLocked();
         	var userLocked = this.options.page.isLockedUser(this.options.runtime.getUserLogin())
-        	
         	if(locked && !userLocked) {
         		$('input#wbl-editmode', this.element).attr('disabled', 'disabled');
-//        		this._disableEditing();
+        		this._disableEditing();
         	} 
         	else if(locked && userLocked) {
         		$('input#wbl-editmode', this.element).removeAttr('disabled');
         		$('input#wbl-editmode', this.element).val(['editmode']);
-//        		this._enableEditing();
+        		this._enableEditing();
         	} 
         	else {
         		$('input#wbl-editmode', this.element).removeAttr('disabled');
         		$('input#wbl-editmode', this.element).val([]);
-//        		this._disableEditing();
+        		this._disableEditing();
         	}
         },
         
@@ -176,7 +175,8 @@ steal.plugins(
         
         _enableEditing: function() {
         	this.disabled = false;
-        	$('.composer').editor_composer('enable');
+        	if(this.options.page.isWorkVersion())
+        		$('.composer').editor_composer('enable');
         	$('#wbl-pageletcreator').editor_pageletcreator('enable');
         	this.element.find('img.wbl-add').show();
         	this.element.find('img.wbl-more').show();
@@ -184,7 +184,8 @@ steal.plugins(
         
         _disableEditing: function() {
         	this.disabled = true;
-        	$('.composer').editor_composer('disable');
+        	if(this.options.page.isWorkVersion())
+        		$('.composer').editor_composer('disable');
         	$('#wbl-pageletcreator').editor_pageletcreator('disable');
         	this.element.find('img.wbl-add').hide();
         	this.element.find('img.wbl-more').hide();
