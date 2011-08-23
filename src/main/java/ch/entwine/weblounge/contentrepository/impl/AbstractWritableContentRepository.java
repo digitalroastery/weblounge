@@ -647,7 +647,15 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         fos = new FileOutputStream(scaledResourceFile);
         logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
         previewGenerator.createPreview(resource, language, style, contentRepositoryIs, fos);
-        scaledResourceFile.setLastModified(lastModified);
+        if (scaledResourceFile.length() > 0) {
+          scaledResourceFile.setLastModified(lastModified);
+        } else {
+          File f = scaledResourceFile;
+          while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+            FileUtils.deleteQuietly(f);
+            f = f.getParentFile();
+          }
+        }
       }
 
       return scaledResourceFile;
