@@ -162,7 +162,7 @@ steal.plugins('jquery',
 							var path = page.getPath(); // Let this line at this position!!
 							page.saveMetadata(pageData, this.options.language, $.proxy(function() {
 								page.lock(this.options.runtime.getUserLogin());
-								location.href = path + "?edit";
+								location.href = path + "?edit&_=" + new Date().getTime();
 							}, this));
 						}, this));
 						

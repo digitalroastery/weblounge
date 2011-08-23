@@ -252,7 +252,7 @@ steal.plugins(
                 		Page.destroy({id: element.id}, this.callback('_removeResource', element.id));
                 		// Relocate to Root if current page was deleted
                 		if(page.getPath() == location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1)) {
-                			location.href = '/?edit';
+                			location.href = '/?edit&_=' + new Date().getTime();
                 		}
                 	} else {
                 		this._showErrorMessage("Can't delete " + page.getPath() + ": Page is locked!");
