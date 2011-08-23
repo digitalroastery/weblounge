@@ -108,10 +108,12 @@
   </bean>
   -->
   
+  <!-- 
   <bean name="formAuthenticationFilter" class="ch.entwine.weblounge.kernel.security.SpringSecurityFormAuthentication">
     <constructor-arg index="0" ref="userDetailsService"/>
     <property name="authenticationManager" ref="authenticationManager"/>
   </bean>
+  -->
  
   <!-- OSGI Integration -->
  

@@ -50,8 +50,7 @@ public class SpringSecurityFormAuthentication extends AbstractAuthenticationProc
   private boolean postOnly = true;
 
   /**
-   * Creates a new filter implementation which will use the given
-   * {@link UserDetailsService} for authentication.
+   * Creates a new filter implementation.
    */
   protected SpringSecurityFormAuthentication() {
     super(DEFAULT_FILTER_PROCESSES_URL);
