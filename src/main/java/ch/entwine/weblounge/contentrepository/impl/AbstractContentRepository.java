@@ -85,6 +85,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /** Flag indicating the connected state */
   protected boolean connected = false;
 
+  /** Flag indicating the initializing state */
+  protected boolean initializing = false;
+
   /** The document builder factory */
   protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 

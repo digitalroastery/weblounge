@@ -304,7 +304,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         }
 
         // Create the preview images
-        createPreviews(r);
+        if (connected && !initializing)
+          createPreviews(r);
       }
     }
     
@@ -366,8 +367,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Write the updated resource to disk
     storeResource(resource);
 
-    // Create the preview images
-    createPreviews(resource);
+    // Create the preview images. Don't if the site is currently being created.
+    if (connected && !initializing)
+      createPreviews(resource);
 
     return resource;
   }
@@ -414,7 +416,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     index.update(resource);
 
     // Create the preview images
-    createPreviews(resource);
+    if (connected && !initializing)
+      createPreviews(resource);
 
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();

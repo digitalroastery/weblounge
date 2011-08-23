@@ -93,19 +93,26 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
   public void connect(Site site) throws ContentRepositoryException {
     super.connect(site);
 
-    // Find the site's bundle
-    bundle = loadBundle(site);
-    if (bundle == null)
-      throw new ContentRepositoryException("Unable to locate bundle for site '" + site + "'");
+    try {
+      initializing = true;
 
-    // Add the bundle contents to the index
-    if (getResourceCount() == 0)
-      indexBundleContents();
+      // Find the site's bundle
+      bundle = loadBundle(site);
+      if (bundle == null)
+        throw new ContentRepositoryException("Unable to locate bundle for site '" + site + "'");
+
+      // Add the bundle contents to the index
+      if (getResourceCount() == 0)
+        indexBundleContents();
+
+    } finally {
+      initializing = false;
+    }
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
