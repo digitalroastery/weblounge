@@ -588,14 +588,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     ResourceURI workPageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
-    // Make sure the page doesn't exist
-    boolean liveVersionExists = false;
-    boolean workVerisonExists = false;
     try {
-      liveVersionExists = contentRepository.exists(livePageURI);
-      workVerisonExists = contentRepository.exists(workPageURI);
-
-      if (!liveVersionExists && !workVerisonExists) {
+      if (!contentRepository.existsInAnyVersion(livePageURI)) {
         logger.warn("Tried to delete non existing page {} in site '{}'", livePageURI, site);
         throw new WebApplicationException(Status.NOT_FOUND);
       }
@@ -603,14 +597,32 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Page lookup {} failed for site '{}'", livePageURI, site);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+    
+    Page page = null;
+    try {
+      if (contentRepository.exists(livePageURI)) {
+        page = (Page) contentRepository.get(livePageURI);
+      } else {
+        page = (Page) contentRepository.get(workPageURI);
+      }
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error lookup up page {} from repository: {}", livePageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+    
+    // Get the user
+    // TODO: Change to current user
+    User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
+    boolean isAdmin = false;
+    
+    // If the page is locked by a different user, refuse
+    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
+      return Response.status(Status.FORBIDDEN).build();
+    }
 
     // Delete the page
     try {
-      if (liveVersionExists) {
-        contentRepository.delete(livePageURI, true);
-      } else if (workVerisonExists) {
-        contentRepository.delete(workPageURI, true);
-      }
+      contentRepository.delete(page.getURI(), true);
     } catch (SecurityException e) {
       logger.warn("Tried to delete page {} of site '{}' without permission", livePageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
