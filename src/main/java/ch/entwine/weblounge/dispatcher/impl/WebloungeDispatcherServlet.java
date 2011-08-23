@@ -32,6 +32,7 @@ import ch.entwine.weblounge.dispatcher.DispatchListener;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.SiteDispatcherService;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,12 +239,13 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
     // Get the site dispatcher
     Site site = getSiteByRequest(httpRequest);
+    boolean isSpecial = StringUtils.isNotBlank(httpRequest.getHeader("X-Weblounge-Special"));
     if (site == null) {
       if (!wellknownFiles.contains(httpRequest.getRequestURI()))
         logger.warn("No site found to handle {}", httpRequest.getRequestURL());
       httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
       return;
-    } else if (!site.isOnline()) {
+    } else if (!site.isOnline() && !isSpecial) {
       if (site.getContentRepository() == null) {
         if (!missingRepositoryWarnings.contains(site)) {
           logger.warn("No content repository connected to site '{}'", site);
@@ -279,7 +281,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
 
     // See if a site dispatcher was found, and if so, if it's enabled
-    if (!site.isOnline()) {
+    if (!site.isOnline() && !isSpecial) {
       logger.warn("Dispatcher for site {} is temporarily not available", site);
       DispatchUtils.sendServiceUnavailable("Site is temporarily unavailable", request, response);
       return;
