@@ -110,6 +110,7 @@
         <module>modules/weblounge-test</module>
         <module>modules/weblounge-ui</module>
         <module>modules/weblounge-workbench</module>
+        <module>modules/weblounge-security-sql</module>
       </modules>
     </profile>
 
