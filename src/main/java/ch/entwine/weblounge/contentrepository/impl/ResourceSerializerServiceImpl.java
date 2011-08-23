@@ -209,7 +209,9 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
     @Override
     public void removedService(ServiceReference reference, Object service) {
       serializerService.unregisterSerializer((ResourceSerializer<?, ?>) service);
-      super.removedService(reference, service);
+      if (reference.getBundle() != null) {
+        super.removedService(reference, service);
+      }
     }
 
   }

@@ -85,7 +85,9 @@ public class ResponseCacheTracker extends ServiceTracker {
     if (siteId.equals(cache.getIdentifier())) {
       this.cache = null;
     }
-    super.removedService(reference, service);
+    if (reference.getBundle() != null) {
+      super.removedService(reference, service);
+    }
   }
 
   /**

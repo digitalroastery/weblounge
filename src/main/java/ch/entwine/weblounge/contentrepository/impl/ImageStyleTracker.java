@@ -79,7 +79,9 @@ public class ImageStyleTracker extends ServiceTracker {
     ImageStyle style = (ImageStyle) service;
     logger.debug("Image style '{}' went away", style.getIdentifier());
     styles.remove(style);
-    super.removedService(reference, service);
+    if (reference.getBundle() != null) {
+      super.removedService(reference, service);
+    }
   }
 
   /**
