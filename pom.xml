@@ -41,7 +41,11 @@
     
     <!-- thirdparty -->
     
-
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>javax.persistence</artifactId>
+    </dependency>
+    
     <!-- testing -->
     
 
@@ -55,12 +59,14 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.security-sql</Bundle-SymbolicName>
             <Import-Package>
-                          </Import-Package>
+              javax.persistence
+            </Import-Package>
             <Export-Package>
+              ch.entwine.weblounge.security.sql.entities
             </Export-Package>
-            <Service-Component>
-            
-            </Service-Component>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>
