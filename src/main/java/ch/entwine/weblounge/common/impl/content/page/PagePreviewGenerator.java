@@ -36,6 +36,13 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -64,6 +71,7 @@ import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * A <code>PreviewGenerator</code> that will generate previews for pages.
@@ -152,6 +160,10 @@ public class PagePreviewGenerator implements PreviewGenerator {
     try {
       URL pageURL = new URL(UrlUtils.concat(site.getURL().toExternalForm(), PAGE_HANDLER_PREFIX, uri.getIdentifier()));
       html = render(pageURL, site, language);
+      if (StringUtils.isBlank(html)) {
+        logger.warn("Error rendering preview of page " + uri.getPath());
+        return;
+      }
       html = HTMLUtils.escapeHtml(HTMLUtils.unescape(html));
     } catch (ServletException e) {
       logger.warn("Error rendering page " + uri.getPath(), e);
@@ -263,13 +275,18 @@ public class PagePreviewGenerator implements PreviewGenerator {
       servlet.service(request, response);
       return response.getContentAsString();
     } else {
-      InputStream is = null;
+      HttpClient httpClient = new DefaultHttpClient();
       try {
         rendererURL = new URL(UrlUtils.concat(rendererURL.toExternalForm(), "index_" + language.getIdentifier() + ".html"));
-        is = rendererURL.openStream();
-        return IOUtils.toString(is, "utf-8");
+        HttpGet getRequest = new HttpGet(rendererURL.toExternalForm());
+        getRequest.addHeader(new BasicHeader("X-Weblounge-Special", "Page-Preview"));
+        HttpResponse response = httpClient.execute(getRequest);
+        if (response.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK)
+          return null;
+        String responseText = EntityUtils.toString(response.getEntity(), "utf-8");
+        return responseText;
       } finally {
-        IOUtils.closeQuietly(is);
+        httpClient.getConnectionManager().shutdown();
       }
     }
   }
