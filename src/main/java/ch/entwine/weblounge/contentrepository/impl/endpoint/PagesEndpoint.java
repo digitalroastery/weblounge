@@ -919,7 +919,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // If the page is locked by a different user, refuse
     // TODO: Determine site admin role
     boolean isSiteAdmin = true;
-    if (page.isLocked() && !page.getLockOwner().equals(currentUser) && !isSiteAdmin) {
+    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isSiteAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
@@ -1021,7 +1021,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     boolean isAdmin = true;
 
     // If the page is locked by a different user, refuse
-    if (!page.isLocked() || (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
+    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
@@ -1136,7 +1136,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     boolean isAdmin = true;
 
     // If the page is locked by a different user, refuse
-    if (!page.isLocked() || (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
+    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
