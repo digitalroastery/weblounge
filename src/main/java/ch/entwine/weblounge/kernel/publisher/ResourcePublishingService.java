@@ -20,8 +20,6 @@
 
 package ch.entwine.weblounge.kernel.publisher;
 
-import ch.entwine.weblounge.kernel.http.BundleResourceHttpContext;
-
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -29,7 +27,6 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.http.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +64,7 @@ public class ResourcePublishingService implements BundleListener {
   protected Map<String, ServiceRegistration> resourceRegistrations = new HashMap<String, ServiceRegistration>();
 
   /** Mapping of http context for endpoints */
-  protected Map<String, ServiceRegistration> contextRegistrations = new HashMap<String, ServiceRegistration>();
+//  protected Map<String, ServiceRegistration> contextRegistrations = new HashMap<String, ServiceRegistration>();
 
   /**
    * OSGi callback on component activation.
@@ -99,10 +96,10 @@ public class ResourcePublishingService implements BundleListener {
     synchronized (resourceRegistrations) {
       for (Map.Entry<String, ServiceRegistration> entry : resourceRegistrations.entrySet()) {
         String bundleSymbolicName = entry.getKey();
-        ServiceRegistration context = contextRegistrations.get(bundleSymbolicName);
+//        ServiceRegistration context = contextRegistrations.get(bundleSymbolicName);
         ServiceRegistration servlet = entry.getValue();
         logger.debug("Unpublishing resources at {}", bundleSymbolicName);
-        context.unregister();
+//        context.unregister();
         servlet.unregister();
       }
       resourceRegistrations.clear();
@@ -129,18 +126,18 @@ public class ResourcePublishingService implements BundleListener {
     }
 
     BundleContext bundleCtx = bundle.getBundleContext();
-    String httpContextId = "weblounge." + bundle.getSymbolicName().toLowerCase() + "-static";
+//    String httpContextId = "weblounge." + bundle.getSymbolicName().toLowerCase() + "-static";
 
     // Create and register the bundle http context
-    try {
-      BundleResourceHttpContext bundleHttpContext = new BundleResourceHttpContext(bundle, resourcePath);
-      Dictionary<String, String> contextRegistrationProperties = new Hashtable<String, String>();
-      contextRegistrationProperties.put("httpContext.id", httpContextId);
-      ServiceRegistration contextRegistration = bundleCtx.registerService(HttpContext.class.getName(), bundleHttpContext, contextRegistrationProperties);
-      contextRegistrations.put(bundle.getSymbolicName(), contextRegistration);
-    } catch (Throwable t) {
-      logger.error("Error publishing resources service at " + contextPath, t);
-    }
+//    try {
+//      BundleResourceHttpContext bundleHttpContext = new BundleResourceHttpContext(bundle, resourcePath);
+//      Dictionary<String, String> contextRegistrationProperties = new Hashtable<String, String>();
+//      contextRegistrationProperties.put("httpContext.id", httpContextId);
+//      ServiceRegistration contextRegistration = bundleCtx.registerService(HttpContext.class.getName(), bundleHttpContext, contextRegistrationProperties);
+//      contextRegistrations.put(bundle.getSymbolicName(), contextRegistration);
+//    } catch (Throwable t) {
+//      logger.error("Error publishing resources service at " + contextPath, t);
+//    }
 
     // We use the newly added bundle's context to register this service, so
     // when that bundle shuts down, it brings down this servlet with it
@@ -152,7 +149,7 @@ public class ResourcePublishingService implements BundleListener {
       Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
       servletRegistrationProperties.put("alias", contextPath);
       servletRegistrationProperties.put("servlet-name", bundle.getSymbolicName() + "-static");
-      servletRegistrationProperties.put("httpContext.id", httpContextId);
+      //servletRegistrationProperties.put("httpContext.id", httpContextId);
       ServiceRegistration servletRegistration = bundleCtx.registerService(Servlet.class.getName(), servlet, servletRegistrationProperties);
       resourceRegistrations.put(bundle.getSymbolicName(), servletRegistration);
     } catch (Throwable t) {
@@ -178,7 +175,7 @@ public class ResourcePublishingService implements BundleListener {
     // bundle has been stopped now, the services have been unregistered by the
     // OSGi service registry already
     synchronized (resourceRegistrations) {
-      contextRegistrations.remove(bundle.getSymbolicName());
+//      contextRegistrations.remove(bundle.getSymbolicName());
       resourceRegistrations.remove(bundle.getSymbolicName());
       logger.info("Unpublishing resources at {}", contextPath);
     }
