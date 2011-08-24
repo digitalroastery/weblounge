@@ -115,7 +115,9 @@ public class SpringSecurityConfigurationService implements BundleListener {
    *          the stopped bundle
    */
   private void unregisterSecurityFilter(Bundle bundle) {
-    securityFilterRegistrations.remove(bundle);
+    ServiceRegistration r = securityFilterRegistrations.remove(bundle);
+    if (r == null)
+      return;
     logger.info("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
   }
 
@@ -130,6 +132,8 @@ public class SpringSecurityConfigurationService implements BundleListener {
     ConfigurableOsgiBundleApplicationContext springContext = null;
     
     if (securityFilterRegistrations.containsKey(bundle))
+      return;
+    else if (!bundle.getSymbolicName().startsWith("ch.entwine.weblounge"))
       return;
 
     // Create a new spring security context
