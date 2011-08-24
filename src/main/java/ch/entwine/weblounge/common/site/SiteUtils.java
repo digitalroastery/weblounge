@@ -18,45 +18,19 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.security;
-
-import ch.entwine.weblounge.common.site.Site;
+package ch.entwine.weblounge.common.site;
 
 /**
- * Provides access to the current user's username and roles, if any.
+ * <code>SiteUtils</code> is a helper class to deal with sites.
  */
-public interface SecurityService {
+public final class SiteUtils {
 
   /**
-   * Gets the current user, or the local organization's anonymous user if the
-   * user has not been authenticated.
-   * 
-   * @return the user
+   * This class should not be instantiated, since it provides static utility
+   * methods only.
    */
-  User getUser();
-
-  /**
-   * Gets the site associated with the current thread context.
-   * 
-   * @return the site
-   */
-  Site getSite();
-
-  /**
-   * Sets the site for the calling thread.
-   * 
-   * @param site
-   *          the site
-   */
-  void setSite(Site organization);
-
-  /**
-   * Sets the current thread's user context to another user. This is useful when
-   * spawning new threads that must contain the parent thread's user context.
-   * 
-   * @param user
-   *          the user to set for the current user context
-   */
-  void setUser(User user);
+  private SiteUtils() {
+    // Nothing to be done here
+  }
 
 }

@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.security;
 
+import ch.entwine.weblounge.common.site.Site;
+
 /**
  * A directory provides user and role information. Note that more than one
  * directory can be registered in the system.
@@ -27,14 +29,16 @@ package ch.entwine.weblounge.common.security;
 public interface DirectoryService {
 
   /**
-   * Loads a user by its login name or returns <code>null</code> if this user is
-   * not known.
+   * Loads a user by its login name for the given site or returns
+   * <code>null</code> if this user is not known.
    * 
    * @param login
    *          the login
+   * @param site
+   *          the site to load the user for
    * @return the user
    */
-  User loadUser(String login);
+  User loadUser(String login, Site site);
 
   /**
    * Return all roles.
