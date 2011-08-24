@@ -222,7 +222,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
 
       // Is it published?
-      if (!page.isPublished()) {
+      if (!page.isPublished() && !(page.getVersion() == Resource.WORK)) {
         logger.debug("Access to unpublished page {}", pageURI);
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
         return true;
