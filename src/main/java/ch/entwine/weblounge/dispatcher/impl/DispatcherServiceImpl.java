@@ -84,12 +84,12 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    */
   void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
-    logger.debug("Activating weblounge dispatcher");
+    logger.info("Activating weblounge dispatcher");
 
     Dictionary<String, String> initParams = new Hashtable<String, String>();
-    //initParams.put("alias", "/");
-    //initParams.put("servlet-name", "default");
-    initParams.put("urlPatterns", "/*");
+    initParams.put("alias", "/");
+    initParams.put("servlet-name", "default");
+    //initParams.put("urlPatterns", "/*");
     dispatcherServiceRegistration = bundleContext.registerService(Servlet.class.getName(), dispatcher, initParams);
 
     logger.debug("Weblounge dispatcher activated");
@@ -104,7 +104,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    *           if component inactivation fails
    */
   void deactivate(ComponentContext context) throws Exception {
-    logger.debug("Deactivating weblounge dispatcher");
+    logger.info("Deactivating weblounge dispatcher");
 
     if (dispatcherServiceRegistration != null) {
       logger.debug("Unregistering weblounge dispatcher");
