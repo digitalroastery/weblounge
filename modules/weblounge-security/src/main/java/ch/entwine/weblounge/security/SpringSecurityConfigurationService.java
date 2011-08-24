@@ -20,7 +20,10 @@
 
 package ch.entwine.weblounge.security;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -30,7 +33,9 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 import java.net.URL;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.servlet.Filter;
 
@@ -41,7 +46,7 @@ import javax.servlet.Filter;
  * After the configuration is read, the service registers a {@link Filter} which
  * enforces the security policy at runtime.
  */
-public class SpringSecurityConfigurationService {
+public class SpringSecurityConfigurationService implements BundleListener {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SpringSecurityConfigurationService.class);
@@ -49,11 +54,14 @@ public class SpringSecurityConfigurationService {
   /** Name of the configuration file */
   public static final String SECURITY_CONFIG_FILE = "/security/security.xml";
 
-  /** The spring context */
-  protected ConfigurableOsgiBundleApplicationContext springContext = null;
+  /** URL to the security configuration */
+  protected URL securityConfig = null;
+
+  /** The spring security filter */
+  protected Filter securityFilter = null;
 
   /** The security filter registration */
-  protected ServiceRegistration securityFilterRegistration = null;
+  protected Map<Bundle, ServiceRegistration> securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
 
   /**
    * Callback from the OSGi environment on service activation.
@@ -62,56 +70,82 @@ public class SpringSecurityConfigurationService {
    *          the component context
    */
   void activate(ComponentContext ctx) {
-    BundleContext bundleCtx = ctx.getBundleContext();
-
-    // Load the configuration and create a spring security context
-    URL securityConfig = bundleCtx.getBundle().getResource(SECURITY_CONFIG_FILE);
-    springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfig.toExternalForm() });
-    springContext.setBundleContext(bundleCtx);
-
-    // Refresh the spring application context
-    springContext.refresh();
-    
-    // Get the security filter chain from the spring context
-    Object securityFilterChain = springContext.getBean("springSecurityFilterChain");
-
-    registerDeferred(bundleCtx, securityFilterChain);
-  }
-
-  /**
-   * @param securityFilterChain
-   */
-  private void registerDeferred(final BundleContext bundleCtx, final Object securityFilterChain) {
-    Thread t = new Thread(new Runnable() {
-      public void run() {
-//        try {
-//          Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//          e.printStackTrace();
-//        }
-        // Register the filter as an OSGi service
-        Dictionary<String, String> props = new Hashtable<String, String>();
-        // props.put("context", "weblounge");
-        props.put("urlPatterns", "/*");
-        props.put("pattern", ".*");
-        props.put("service.ranking", "1");
-        securityFilterRegistration = bundleCtx.registerService(Filter.class.getName(), securityFilterChain, props);
-        logger.info("Spring security context registered");
-      };
-    });
-    t.start();    
+    securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
+    securityConfig = ctx.getBundleContext().getBundle().getResource(SECURITY_CONFIG_FILE);
   }
 
   /**
    * Callback from OSGi environment on service inactivation.
    */
   void deactivate() {
-    if (securityFilterRegistration != null) {
-      securityFilterRegistration.unregister();
-      securityFilterRegistration = null;
+    if (securityFilterRegistrations != null) {
+      for (Map.Entry<Bundle, ServiceRegistration> entry : securityFilterRegistrations.entrySet()) {
+        Bundle bundle = entry.getKey();
+        ServiceRegistration r = entry.getValue();
+        r.unregister();
+        logger.info("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
+      }
     }
-    if (springContext != null && springContext.isRunning()) {
-      springContext.close();
+  }
+
+  /**
+   * Removes the registered filter from our list of filter registrations. As
+   * this method is called only if the bundle is unregistered, all the services
+   * associated with it will have been unregistered already, so there is no work
+   * for us to do.
+   * 
+   * @param bundle
+   *          the stopped bundle
+   */
+  private void unregisterSecurityFilter(Bundle bundle) {
+    securityFilterRegistrations.remove(bundle);
+    logger.info("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
+  }
+
+  /**
+   * Registers a new security filter instance for the bundle that just started.
+   * 
+   * @param bundle
+   *          the bundle
+   */
+  private void registerSecurityFilter(Bundle bundle) {
+    BundleContext ctx = bundle.getBundleContext();
+    ConfigurableOsgiBundleApplicationContext springContext = null;
+
+    // Create a new spring security context
+    springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfig.toExternalForm() });
+    springContext.setBundleContext(ctx);
+
+    // Refresh the spring application context
+    springContext.refresh();
+
+    // Get the security filter chain from the spring context
+    Object securityFilterChain = springContext.getBean("springSecurityFilterChain");
+
+    Dictionary<String, String> props = new Hashtable<String, String>();
+    props.put("urlPatterns", "/*");
+    props.put("pattern", ".*");
+    props.put("service.ranking", "1");
+    ServiceRegistration registration = ctx.registerService(Filter.class.getName(), securityFilterChain, props);
+    securityFilterRegistrations.put(bundle, registration);
+    logger.info("Spring security context registered for bundle '{}'", bundle.getSymbolicName());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.osgi.framework.BundleListener#bundleChanged(org.osgi.framework.BundleEvent)
+   */
+  public void bundleChanged(BundleEvent event) {
+    switch (event.getType()) {
+      case BundleEvent.STARTED:
+        registerSecurityFilter(event.getBundle());
+        break;
+      case BundleEvent.STOPPED:
+        unregisterSecurityFilter(event.getBundle());
+        break;
+      default:
+        break;
     }
   }
 
