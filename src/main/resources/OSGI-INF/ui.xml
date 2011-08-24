@@ -7,5 +7,6 @@
   
   <implementation class="ch.entwine.weblounge.ui.WebloungeUI" />
   <property name="service.description" value="Weblounge UI" />
+  <reference name="security" interface="ch.entwine.weblounge.common.security.SecurityService" cardinality="1..1" policy="static" />
 
 </scr:component>
