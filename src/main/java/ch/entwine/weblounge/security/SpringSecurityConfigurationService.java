@@ -76,7 +76,15 @@ public class SpringSecurityConfigurationService implements BundleListener {
     bundleCtx = ctx.getBundleContext();
     securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
     securityConfig = bundleCtx.getBundle().getResource(SECURITY_CONFIG_FILE);
-    //bundleCtx.addBundleListener(this);
+
+    // Process existing bundles
+    for (Bundle b : ctx.getBundleContext().getBundles()) {
+      if (b.getState() == Bundle.ACTIVE)
+        registerSecurityFilter(b);
+    }
+    
+    // Register for new ones
+    bundleCtx.addBundleListener(this);
   }
 
   /**
@@ -120,6 +128,9 @@ public class SpringSecurityConfigurationService implements BundleListener {
   private void registerSecurityFilter(Bundle bundle) {
     BundleContext ctx = bundle.getBundleContext();
     ConfigurableOsgiBundleApplicationContext springContext = null;
+    
+    if (securityFilterRegistrations.containsKey(bundle))
+      return;
 
     // Create a new spring security context
     springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfig.toExternalForm() });
