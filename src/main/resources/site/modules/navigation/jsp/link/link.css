@@ -1,11 +1,25 @@
-label {
+div#wbl-linkEditor label {
     display: inline-block;
     width: 160px
 }
 
-span.search_result {
-    border: 1px solid red;
-    width: 400px;
+head:first-child + body div.tableContainer[class] {
     height: 100px;
+    overflow: hidden;
+    width: 100%;
+}
+
+head:first-child + body tbody.wbl-linkSearchResult[class] {
     display: block;
+    height: 100px;
+    overflow: auto;
+    width: 100%;
+}
+
+div#wbl-linkEditor table {
+    width: 100%;
+}
+
+div#wbl-linkEditor .wbl-linkMarked {
+    background-color: green;
 }
