@@ -12,11 +12,11 @@
 
     <!-- URL SECURITY -->
 
-    <!-- 
     <sec:intercept-url pattern="/**" filters="none"/>
-    -->
     
+    <!-- 
     <sec:intercept-url pattern="/**" access="ROLE_USER"/>
+    -->
     
     <!-- Some resources are open to everybody -->
     <!--

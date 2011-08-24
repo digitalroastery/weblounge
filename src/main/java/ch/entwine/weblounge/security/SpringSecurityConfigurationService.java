@@ -134,7 +134,7 @@ public class SpringSecurityConfigurationService implements BundleListener {
     ServiceRegistration r = securityFilterRegistrations.remove(bundle);
     if (r == null)
       return;
-    logger.info("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
+    logger.debug("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
   }
 
   /**
