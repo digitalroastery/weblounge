@@ -59,6 +59,9 @@ public class SpringSecurityConfigurationService implements BundleListener {
 
   /** The spring security filter */
   protected Filter securityFilter = null;
+  
+  /** The bundle context */
+  protected BundleContext bundleCtx = null;
 
   /** The security filter registration */
   protected Map<Bundle, ServiceRegistration> securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
@@ -70,14 +73,20 @@ public class SpringSecurityConfigurationService implements BundleListener {
    *          the component context
    */
   void activate(ComponentContext ctx) {
+    bundleCtx = ctx.getBundleContext();
     securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
-    securityConfig = ctx.getBundleContext().getBundle().getResource(SECURITY_CONFIG_FILE);
+    securityConfig = bundleCtx.getBundle().getResource(SECURITY_CONFIG_FILE);
+    //bundleCtx.addBundleListener(this);
   }
 
   /**
    * Callback from OSGi environment on service inactivation.
+   * 
+   * @param ctx
+   *          the component context
    */
-  void deactivate() {
+  void deactivate(ComponentContext ctx) {
+    ctx.getBundleContext().removeBundleListener(this);
     if (securityFilterRegistrations != null) {
       for (Map.Entry<Bundle, ServiceRegistration> entry : securityFilterRegistrations.entrySet()) {
         Bundle bundle = entry.getKey();
@@ -114,7 +123,7 @@ public class SpringSecurityConfigurationService implements BundleListener {
 
     // Create a new spring security context
     springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfig.toExternalForm() });
-    springContext.setBundleContext(ctx);
+    springContext.setBundleContext(this.bundleCtx);
 
     // Refresh the spring application context
     springContext.refresh();
@@ -124,8 +133,6 @@ public class SpringSecurityConfigurationService implements BundleListener {
 
     Dictionary<String, String> props = new Hashtable<String, String>();
     props.put("urlPatterns", "/*");
-    props.put("pattern", ".*");
-    props.put("service.ranking", "1");
     ServiceRegistration registration = ctx.registerService(Filter.class.getName(), securityFilterChain, props);
     securityFilterRegistrations.put(bundle, registration);
     logger.info("Spring security context registered for bundle '{}'", bundle.getSymbolicName());
