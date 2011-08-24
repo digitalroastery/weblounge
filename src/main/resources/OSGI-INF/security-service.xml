@@ -5,7 +5,7 @@
   <implementation class="ch.entwine.weblounge.security.SpringSecurityServiceImpl" />
   <property name="service.description" value="Weblounge Security Service" />
   <service>
-    <provide interface="ch.entwine.weblounge.security.api.SecurityService" />
+    <provide interface="ch.entwine.weblounge.common.security.SecurityService" />
   </service>
 
 </scr:component>
