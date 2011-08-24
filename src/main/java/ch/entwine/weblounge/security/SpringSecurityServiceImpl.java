@@ -27,6 +27,8 @@ import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,17 +43,17 @@ import java.util.TreeSet;
  */
 public class SpringSecurityServiceImpl implements SecurityService {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(SpringSecurityServiceImpl.class);
+
   /** Name of the anonymous user */
   public static final String ANONYMOUS_USER = "anonymous";
 
-  /**
-   * Holds delegates users for new threads that have been spawned from
-   * authenticated threads
-   */
-  private static final ThreadLocal<User> delegatedUserHolder = new ThreadLocal<User>();
-
   /** Holds the site associated with the current thread */
-  private static final ThreadLocal<Site> site = new ThreadLocal<Site>();
+  private static final ThreadLocal<Site> siteHolder = new ThreadLocal<Site>();
+
+  /** Holds the user associated with the current thread */
+  private static final ThreadLocal<User> userHolder = new ThreadLocal<User>();
 
   /**
    * {@inheritDoc}
@@ -59,7 +61,7 @@ public class SpringSecurityServiceImpl implements SecurityService {
    * @see ch.entwine.weblounge.common.security.SecurityService#getSite()
    */
   public Site getSite() {
-    return site.get();
+    return siteHolder.get();
   }
 
   /**
@@ -68,7 +70,16 @@ public class SpringSecurityServiceImpl implements SecurityService {
    * @see ch.entwine.weblounge.common.security.SecurityService#setSite(ch.entwine.weblounge.common.site.Site)
    */
   public void setSite(Site site) {
-    SpringSecurityServiceImpl.site.set(site);
+    siteHolder.set(site);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.SecurityService#setUser(ch.entwine.weblounge.common.security.User)
+   */
+  public void setUser(User user) {
+    userHolder.set(user);
   }
 
   /**
@@ -78,21 +89,24 @@ public class SpringSecurityServiceImpl implements SecurityService {
    */
   public User getUser() {
     Site site = getSite();
-    User delegatedUser = delegatedUserHolder.get();
+    User delegatedUser = userHolder.get();
     if (delegatedUser != null) {
       return delegatedUser;
     }
 
+    logger.trace("Looking up user from spring security context");
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     User user = null;
     Set<Role> roles = new TreeSet<Role>();
 
     if (auth == null) {
+      logger.warn("No spring security context available, setting current user to anonymous");
       user = new UserImpl(ANONYMOUS_USER, site.getIdentifier());
       roles.add(new RoleImpl(site.getAnonymousRole()));
     } else {
       Object principal = auth.getPrincipal();
       if (principal == null) {
+        logger.warn("No principal found in spring security context, setting current user to anonymous");
         user = new UserImpl(ANONYMOUS_USER, site.getIdentifier());
         roles.add(new RoleImpl(site.getAnonymousRole()));
       } else if (principal instanceof UserDetails) {
@@ -105,26 +119,19 @@ public class SpringSecurityServiceImpl implements SecurityService {
             roles.add(new RoleImpl(ga.getAuthority()));
           }
         }
+        logger.debug("Principal was identified as '{}'", user.getLogin());
       } else {
+        logger.warn("Principal was not compatible with spring security, setting current user to anonymous");
         user = new UserImpl(ANONYMOUS_USER, site.getIdentifier());
         roles.add(new RoleImpl(site.getAnonymousRole()));
       }
     }
-    
+
     for (Role role : roles) {
       user.addPublicCredentials(role);
     }
-    
-    return user;
-  }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.SecurityService#setUser(ch.entwine.weblounge.common.security.User)
-   */
-  public void setUser(User user) {
-    delegatedUserHolder.set(user);
+    return user;
   }
 
 }

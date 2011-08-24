@@ -54,14 +54,11 @@ public class SpringSecurityConfigurationService implements BundleListener {
   /** Name of the configuration file */
   public static final String SECURITY_CONFIG_FILE = "/security/security.xml";
 
-  /** URL to the security configuration */
-  protected URL securityConfig = null;
+  /** The current bundle */
+  protected Bundle bundle = null;
 
   /** The spring security filter */
   protected Filter securityFilter = null;
-  
-  /** The bundle context */
-  protected BundleContext bundleCtx = null;
 
   /** The security filter registration */
   protected Map<Bundle, ServiceRegistration> securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
@@ -73,16 +70,28 @@ public class SpringSecurityConfigurationService implements BundleListener {
    *          the component context
    */
   void activate(ComponentContext ctx) {
-    bundleCtx = ctx.getBundleContext();
+    BundleContext bundleCtx = ctx.getBundleContext();
+    bundle = ctx.getBundleContext().getBundle();
     securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
-    securityConfig = bundleCtx.getBundle().getResource(SECURITY_CONFIG_FILE);
+
+    // Create the spring security context
+    URL securityConfig = bundleCtx.getBundle().getResource(SECURITY_CONFIG_FILE);
+    ConfigurableOsgiBundleApplicationContext springContext = null;
+    springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfig.toExternalForm() });
+    springContext.setBundleContext(bundleCtx);
+    springContext.refresh();
+
+    // Get the security filter chain from the spring context
+    securityFilter = (Filter) springContext.getBean("springSecurityFilterChain");
+
+    logger.info("Activating spring security");
 
     // Process existing bundles
     for (Bundle b : ctx.getBundleContext().getBundles()) {
       if (b.getState() == Bundle.ACTIVE)
         registerSecurityFilter(b);
     }
-    
+
     // Register for new ones
     bundleCtx.addBundleListener(this);
   }
@@ -95,12 +104,19 @@ public class SpringSecurityConfigurationService implements BundleListener {
    */
   void deactivate(ComponentContext ctx) {
     ctx.getBundleContext().removeBundleListener(this);
+
+    logger.info("Tearing down spring security");
+
     if (securityFilterRegistrations != null) {
       for (Map.Entry<Bundle, ServiceRegistration> entry : securityFilterRegistrations.entrySet()) {
         Bundle bundle = entry.getKey();
         ServiceRegistration r = entry.getValue();
-        r.unregister();
-        logger.info("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
+        try {
+          r.unregister();
+          logger.debug("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
+        } catch (Throwable t) {
+          logger.error("Unregistering security context for bundle '{}' failed: {}", bundle.getSymbolicName(), t.getMessage());
+        }
       }
     }
   }
@@ -129,28 +145,20 @@ public class SpringSecurityConfigurationService implements BundleListener {
    */
   private void registerSecurityFilter(Bundle bundle) {
     BundleContext ctx = bundle.getBundleContext();
-    ConfigurableOsgiBundleApplicationContext springContext = null;
-    
-    if (securityFilterRegistrations.containsKey(bundle))
+
+    // Only care about other weblounge bundles
+    if (bundle == this.bundle || !bundle.getSymbolicName().startsWith("ch.entwine.weblounge"))
       return;
-    else if (!bundle.getSymbolicName().startsWith("ch.entwine.weblounge"))
-      return;
-
-    // Create a new spring security context
-    springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfig.toExternalForm() });
-    springContext.setBundleContext(this.bundleCtx);
-
-    // Refresh the spring application context
-    springContext.refresh();
-
-    // Get the security filter chain from the spring context
-    Object securityFilterChain = springContext.getBean("springSecurityFilterChain");
 
     Dictionary<String, String> props = new Hashtable<String, String>();
     props.put("urlPatterns", "/*");
-    ServiceRegistration registration = ctx.registerService(Filter.class.getName(), securityFilterChain, props);
-    securityFilterRegistrations.put(bundle, registration);
-    logger.info("Spring security context registered for bundle '{}'", bundle.getSymbolicName());
+    try {
+      ServiceRegistration registration = ctx.registerService(Filter.class.getName(), securityFilter, props);
+      securityFilterRegistrations.put(bundle, registration);
+      logger.debug("Spring security context registered for bundle '{}'", bundle.getSymbolicName());
+    } catch (Throwable t) {
+      logger.error("Error registering security context for bundle '{}': {}", bundle.getSymbolicName(), t.getMessage());
+    }
   }
 
   /**

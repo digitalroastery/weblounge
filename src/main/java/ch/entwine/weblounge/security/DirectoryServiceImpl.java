@@ -21,8 +21,8 @@
 package ch.entwine.weblounge.security;
 
 import ch.entwine.weblounge.common.security.DigestType;
-import ch.entwine.weblounge.common.security.DirectoryService;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
+import ch.entwine.weblounge.common.security.DirectoryService;
 import ch.entwine.weblounge.common.security.Password;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.SecurityService;
@@ -68,7 +68,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
    */
   public Role[] getRoles() throws IllegalStateException {
     Site site = securityService.getSite();
-
+    
     if (site == null)
       throw new IllegalStateException("No site set in security context");
 
@@ -91,13 +91,9 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.DirectoryService#loadUser(java.lang.String)
+   * @see ch.entwine.weblounge.common.security.DirectoryService#loadUser(java.lang.String, Site)
    */
-  public User loadUser(String login) throws IllegalStateException {
-    Site site = securityService.getSite();
-    if (site == null)
-      throw new IllegalStateException("No site set in security context");
-
+  public User loadUser(String login, Site site) throws IllegalStateException {
     List<DirectoryProvider> siteDirectories = directories.get(site.getIdentifier());
     if (siteDirectories == null) {
       logger.debug("No directories found for '{}'", site.getIdentifier());
@@ -107,7 +103,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     // Collect all of the roles from each of the directories for this user
     User user = null;
     for (DirectoryProvider directory : siteDirectories) {
-      User u = directory.loadUser(login);
+      User u = directory.loadUser(login, null);
       if (u == null) {
         continue;
       } else if (user == null) {
@@ -132,7 +128,12 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
   public UserDetails loadUserByUsername(String name)
       throws UsernameNotFoundException,
       org.springframework.dao.DataAccessException {
-    User user = loadUser(name);
+    
+    Site site = securityService.getSite();
+    if (site == null)
+      throw new UsernameNotFoundException("No site context available");
+    
+    User user = loadUser(name, null);
     if (user == null) {
       throw new UsernameNotFoundException(name);
     } else {
@@ -197,7 +198,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
    *          the site directory
    */
   void addDirectoryProvider(DirectoryProvider directory) {
-    logger.debug("Adding {} to the list of site directories", directory);
+    logger.info("Registering user directory {}", directory);
     List<DirectoryProvider> directoryProvider = directories.get(directory.getIdentifier());
     if (directoryProvider == null) {
       directoryProvider = new ArrayList<DirectoryProvider>();
@@ -212,8 +213,8 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
    * @param directory
    *          the directory service provider
    */
-  void removeDirectoryProvidery(DirectoryProvider directory) {
-    logger.debug("Removing site directory {}", directory);
+  void removeDirectoryProvider(DirectoryProvider directory) {
+    logger.info("Unregistering user directory {}", directory);
     List<DirectoryProvider> siteDirectories = directories.get(directory.getIdentifier());
     if (siteDirectories != null) {
       siteDirectories.remove(directory);

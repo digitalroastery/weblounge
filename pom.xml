@@ -219,8 +219,7 @@
             <Service-Component>
               OSGI-INF/directory-service.xml,
               OSGI-INF/security-configuration-service.xml,
-              OSGI-INF/security-service.xml,
-              OSGI-INF/systemdirectory-provider.xml,
+              OSGI-INF/security-service.xml
             </Service-Component>
           </instructions>
         </configuration>
