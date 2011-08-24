@@ -14,5 +14,6 @@
   <reference name="sitedispatcher" interface="ch.entwine.weblounge.dispatcher.SiteDispatcherService" cardinality="0..1" policy="dynamic" bind="setSiteDispatcher" unbind="removeSiteDispatcher" />
   <reference name="requesthandler" interface="ch.entwine.weblounge.dispatcher.RequestHandler" cardinality="0..n" policy="dynamic" bind="addRequestHandler" unbind="removeRequestHandler" />
   <reference name="cacheservice" interface="ch.entwine.weblounge.cache.CacheService" cardinality="0..n" policy="dynamic" bind="addCacheService" unbind="removeCacheService" />
+  <reference name="security" interface="ch.entwine.weblounge.common.security.SecurityService" cardinality="1..1" policy="static" />
 
 </scr:component>

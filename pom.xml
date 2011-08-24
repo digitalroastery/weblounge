@@ -157,6 +157,7 @@
               ch.entwine.weblounge.common.content.image;version=${project.version},
               ch.entwine.weblounge.common.content.page;version=${project.version},
               ch.entwine.weblounge.common.content.repository;version=${project.version},
+              ch.entwine.weblounge.common.security;version=${project.version},
               ch.entwine.weblounge.common.impl.content;version=${project.version},
               ch.entwine.weblounge.common.impl.content.file;version=${project.version},
               ch.entwine.weblounge.common.impl.content.image;version=${project.version},
