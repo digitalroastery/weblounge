@@ -89,12 +89,12 @@ public class DirectoryServiceImplTest {
 
     SiteDirectory directoryA = EasyMock.createNiceMock(SiteDirectory.class);
     EasyMock.expect(directoryA.getIdentifier()).andReturn(site.getIdentifier()).anyTimes();
-    EasyMock.expect(directoryA.loadUser((String) EasyMock.anyObject(), null)).andReturn(john).anyTimes();
+    EasyMock.expect(directoryA.loadUser((String) EasyMock.anyObject(), (Site) EasyMock.anyObject())).andReturn(john).anyTimes();
     EasyMock.replay(directoryA);
 
     SiteDirectory directoryB = EasyMock.createNiceMock(SiteDirectory.class);
     EasyMock.expect(directoryB.getIdentifier()).andReturn(site.getIdentifier()).anyTimes();
-    EasyMock.expect(directoryB.loadUser((String) EasyMock.anyObject(), null)).andReturn(johnAlterEgo).anyTimes();
+    EasyMock.expect(directoryB.loadUser((String) EasyMock.anyObject(), (Site) EasyMock.anyObject())).andReturn(johnAlterEgo).anyTimes();
     EasyMock.replay(directoryB);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -114,7 +114,7 @@ public class DirectoryServiceImplTest {
    */
   @Test
   public void testUserMerge() throws Exception {
-    User mergedUser = directory.loadUser(login, null);
+    User mergedUser = directory.loadUser(login, site);
 
     Set<Object> roles = mergedUser.getPublicCredentials(Role.class);
     assertTrue(roles.contains(roleA));
