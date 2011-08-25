@@ -23,8 +23,8 @@ package ch.entwine.weblounge.security;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ import javax.servlet.Filter;
  * After the configuration is read, the service registers a {@link Filter} which
  * enforces the security policy at runtime.
  */
-public class SpringSecurityConfigurationService implements BundleListener {
+public class SpringSecurityConfigurationService implements SynchronousBundleListener {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SpringSecurityConfigurationService.class);
@@ -88,7 +88,7 @@ public class SpringSecurityConfigurationService implements BundleListener {
 
     // Process existing bundles
     for (Bundle b : ctx.getBundleContext().getBundles()) {
-      if (b.getState() == Bundle.ACTIVE)
+      if (b.getState() == Bundle.ACTIVE || b.getState() == Bundle.STARTING)
         registerSecurityFilter(b);
     }
 
@@ -152,6 +152,7 @@ public class SpringSecurityConfigurationService implements BundleListener {
 
     Dictionary<String, String> props = new Hashtable<String, String>();
     props.put("urlPatterns", "/*");
+    props.put("security", "Weblounge");
     try {
       ServiceRegistration registration = ctx.registerService(Filter.class.getName(), securityFilter, props);
       securityFilterRegistrations.put(bundle, registration);
@@ -168,7 +169,7 @@ public class SpringSecurityConfigurationService implements BundleListener {
    */
   public void bundleChanged(BundleEvent event) {
     switch (event.getType()) {
-      case BundleEvent.STARTED:
+      case BundleEvent.STARTING:
         registerSecurityFilter(event.getBundle());
         break;
       case BundleEvent.STOPPED:
