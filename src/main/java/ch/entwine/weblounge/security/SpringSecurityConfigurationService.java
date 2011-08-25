@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.security;
 
+import ch.entwine.weblounge.common.security.Security;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -60,6 +62,9 @@ public class SpringSecurityConfigurationService implements SynchronousBundleList
   /** The spring security filter */
   protected Filter securityFilter = null;
 
+  /** Reference to the security marker */
+  protected ServiceRegistration securityMarker = null;
+
   /** The security filter registration */
   protected Map<Bundle, ServiceRegistration> securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
 
@@ -94,6 +99,10 @@ public class SpringSecurityConfigurationService implements SynchronousBundleList
 
     // Register for new ones
     bundleCtx.addBundleListener(this);
+
+    // Register the security marker
+    securityMarker = bundleCtx.registerService(Security.class.getName(), new Security() {
+    }, null);
   }
 
   /**
@@ -107,6 +116,7 @@ public class SpringSecurityConfigurationService implements SynchronousBundleList
 
     logger.info("Tearing down spring security");
 
+    // Unregister the security filters
     if (securityFilterRegistrations != null) {
       for (Map.Entry<Bundle, ServiceRegistration> entry : securityFilterRegistrations.entrySet()) {
         Bundle bundle = entry.getKey();
@@ -119,6 +129,16 @@ public class SpringSecurityConfigurationService implements SynchronousBundleList
         }
       }
     }
+
+    // Remove the security marker
+    if (securityMarker != null) {
+      try {
+        securityMarker.unregister();
+      } catch (Throwable t) {
+        logger.error("Unregistering security context for bundle '{}' failed: {}", bundle.getSymbolicName(), t.getMessage());
+      }
+    }
+
   }
 
   /**
