@@ -39,6 +39,11 @@
       <artifactId>org.osgi.core</artifactId>
     </dependency>
     
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.enterprise</artifactId>
+    </dependency>
+    
     <!-- thirdparty -->
     
     <dependency>
@@ -59,7 +64,12 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.security-sql</Bundle-SymbolicName>
             <Import-Package>
-              javax.persistence
+              ch.entwine.weblounge.common.security,
+              ch.entwine.weblounge.common.site,
+              javax.persistence,
+              org.osgi.framework,
+              org.osgi.service.component,
+              org.slf4j
             </Import-Package>
             <Export-Package>
               ch.entwine.weblounge.security.sql.entities
