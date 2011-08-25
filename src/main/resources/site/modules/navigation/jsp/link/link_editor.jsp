@@ -21,21 +21,8 @@
 
 <!-- internal -->
 <div class="wbl-linkInternal">
-    <label for="wbl-linkInternal">Interne Seite suchen:</label> <input id="wbl-linkInternalSearch" type="text" name="property:internalsearch" />
-    <input id="wbl-linkInternal" type="hidden" name="property:internal" /><br /><br />
-     <table border="1" cellspacing="0" cellpadding="0">
-         <thead>
-            <tr>
-                <th>Seite</th>
-                <!--  
-                <th>Seitentitel</th>
-                <th>Erstellt</th>
-                <th>Zuletzt editiert</th>
-                -->
-            </tr>
-        </thead>
-        <tbody id="wbl-linkInternalSearchResult" class="wbl-linkSearchResult"></tbody>
-    </table>
+    <input id="wbl-linkInternal" type="text" name="property:internal" readonly="readonly" /><br /><br />
+	<button id="wbl-linkInternalButton" type="button">Select Page</button>
 </div>
 
 </div>
