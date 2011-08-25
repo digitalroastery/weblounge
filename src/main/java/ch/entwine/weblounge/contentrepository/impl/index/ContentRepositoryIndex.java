@@ -776,6 +776,7 @@ public class ContentRepositoryIndex {
 
     String id = uri.getIdentifier();
     String path = uri.getPath();
+    String type = uri.getType();
 
     if (id == null && path == null)
       throw new IllegalArgumentException("Uri must contain either id or path");
@@ -795,10 +796,10 @@ public class ContentRepositoryIndex {
     // Locate the entry in question
     for (long a : addresses) {
       if (id != null) {
-        if (id.equals(uriIdx.getId(a)))
+        if (id.equals(uriIdx.getId(a)) && (type == null || type.equals(uriIdx.getType(a))))
           return a;
       } else {
-        if (path.equals(uriIdx.getPath(a)))
+        if (path.equals(uriIdx.getPath(a)) && (type == null || type.equals(uriIdx.getType(a))))
           return a;
       }
     }
