@@ -379,6 +379,7 @@
               ch.entwine.weblounge.kernel.http;version=${project.version},
               ch.entwine.weblounge.kernel.publisher;version=${project.version},
               ch.entwine.weblounge.kernel.runtime;version=${project.version},
+              ch.entwine.weblounge.kernel.security;version=${project.version},
               ch.entwine.weblounge.kernel.shared;version=${project.version},
               ch.entwine.weblounge.kernel.webconsole;version=${project.version}
             </Export-Package>
@@ -400,6 +401,7 @@
               OSGI-INF/site-manager-service.xml,
               OSGI-INF/site-rest-service.xml,
               OSGI-INF/site-runtime-information.xml,
+              OSGI-INF/systemdirectory-provider.xml,
               OSGI-INF/test-command.xml,
               OSGI-INF/user-runtime-information.xml,
               OSGI-INF/webconsole-plugin.xml,

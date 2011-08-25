@@ -20,20 +20,25 @@
 
 package ch.entwine.weblounge.kernel.security;
 
-import static ch.entwine.weblounge.common.security.SecurityConstants.DEFAULT_ORGANIZATION_ID;
+import static ch.entwine.weblounge.common.security.SecurityConstants.SYSTEM_ID;
 
 import ch.entwine.weblounge.common.impl.security.AuthenticatedUserImpl;
+import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
+import ch.entwine.weblounge.common.security.Password;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,10 +48,19 @@ import java.util.Set;
  * An in-memory user directory containing the users and roles used by the
  * system.
  */
-public class SystemDirectoryProvider implements DirectoryProvider {
+public class SystemDirectoryProvider implements DirectoryProvider, ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SystemDirectoryProvider.class);
+
+  /** Service pid, used to look up the service configuration */
+  public static final String SERVICE_PID = "ch.entwine.weblounge.systemdirectory";
+
+  /** Configuration key for the system username */
+  public static final String OPT_ADMIN_LOGIN = "systemdirectory.login";
+
+  /** Configuration key for the system user's password */
+  public static final String OPT_ADMIN_PASSWORD = "systemdirectory.password";
 
   /** The known roles */
   private static final Set<Role> SYSTEM_ROLES = new HashSet<Role>(4);
@@ -60,40 +74,47 @@ public class SystemDirectoryProvider implements DirectoryProvider {
   /** Spring user role */
   private static final Role USER_ROLE = new RoleImpl("system", "ROLE_USER");
 
-  /** Spring oauth role */
-  private static final Role OAUTH_USER_ROLE = new RoleImpl("system", "ROLE_OAUTH_USER");
+  /** Spring user role */
+  private static final Role ANONYMOUS_ROLE = new RoleImpl("system", "ROLE_ANONYMOUS");
 
   static {
     SYSTEM_ROLES.add(DOMAIN_ADMIN_ROLE);
     SYSTEM_ROLES.add(SITE_ADMIN_ROLE);
     SYSTEM_ROLES.add(USER_ROLE);
-    SYSTEM_ROLES.add(OAUTH_USER_ROLE);
+    SYSTEM_ROLES.add(ANONYMOUS_ROLE);
   }
 
   /** Well-known accounts */
-  protected Map<String, User> internalAccounts = null;
+  protected Map<String, User> internalAccounts = new HashMap<String, User>();
 
   /**
-   * Callback to activate the component.
+   * {@inheritDoc}
    * 
-   * @param cc
-   *          the declarative services component context
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  void activate(ComponentContext cc) {
-    internalAccounts = new HashMap<String, User>();
+  @SuppressWarnings("rawtypes")
+  public void updated(Dictionary properties) throws ConfigurationException {
+    String login = StringUtils.trimToNull((String)properties.get(OPT_ADMIN_LOGIN));
+    String pass = StringUtils.trimToEmpty((String)properties.get(OPT_ADMIN_PASSWORD));
 
-    // Admin
-    String adminUsername = cc.getBundleContext().getProperty("ch.entwine.weblounge.security.admin.user");
-    String adminUserPass = cc.getBundleContext().getProperty("ch.entwine.weblounge.security.admin.pass");
+    if (login == null || "".equals(pass)) {
+      if (internalAccounts.size() > 0)
+        logger.info("Deactivating system admin account");
+      internalAccounts.clear();
+      return;
+    }
 
-    if (StringUtils.isNotBlank(adminUserPass)) {
-      logger.info("Activating demo admin user '{}'");
-      User administrator = new AuthenticatedUserImpl(adminUsername);
-      internalAccounts.put(adminUsername, administrator);
-      administrator.addPrivateCredentials(StringUtils.trimToEmpty(adminUserPass));
-      for (Role role : SYSTEM_ROLES) {
-        administrator.addPublicCredentials(role);
-      }
+    // Remove previous administrators
+    internalAccounts.clear();
+
+    // Register the new one
+    logger.info("Activating system admin user '{}'", login);
+    User administrator = new AuthenticatedUserImpl(login);
+    internalAccounts.put(login, administrator);
+    Password password = new PasswordImpl(StringUtils.trimToEmpty(pass), DigestType.plain);
+    administrator.addPrivateCredentials(password);
+    for (Role role : SYSTEM_ROLES) {
+      administrator.addPublicCredentials(role);
     }
   }
 
@@ -109,7 +130,8 @@ public class SystemDirectoryProvider implements DirectoryProvider {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.DirectoryService#loadUser(java.lang.String, Site)
+   * @see ch.entwine.weblounge.common.security.DirectoryService#loadUser(java.lang.String,
+   *      Site)
    */
   public User loadUser(String userName, Site site) {
     return internalAccounts.get(userName);
@@ -134,7 +156,7 @@ public class SystemDirectoryProvider implements DirectoryProvider {
    * @see ch.entwine.weblounge.common.security.DirectoryProvider#getIdentifier()
    */
   public String getIdentifier() {
-    return DEFAULT_ORGANIZATION_ID;
+    return SYSTEM_ID;
   }
 
   /**
