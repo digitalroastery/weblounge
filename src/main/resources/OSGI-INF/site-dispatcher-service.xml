@@ -14,8 +14,6 @@
   </service>
   <reference name="actionrequesthandler" interface="ch.entwine.weblounge.dispatcher.ActionRequestHandler" cardinality="0..1" policy="dynamic" bind="setActionRequestHandler" unbind="removeActionRequestHandler" />
   <reference name="sitemanager" interface="ch.entwine.weblounge.kernel.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" unbind="removeSiteManager" />
-  <!--
-  <reference name="security" interface="ch.entwine.weblounge.common.security.SecurityService" cardinality="1..1" policy="static" />
-  -->
+  <reference name="security" interface="ch.entwine.weblounge.common.security.Security" cardinality="1..1" policy="static" />
 
 </scr:component>
