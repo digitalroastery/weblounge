@@ -7,14 +7,20 @@ steal.plugins('jquery/controller',
   Editor.Resourceviewitem.extend('Editor.Resourcelistviewitem',
 	{
 		init: function(el) {
-			this.element.find('td.wbl-action').hover(
-				function () {
-					$(this).find('img').show();
-				},
-				function () {
-					$(this).find('img').not('.wbl-settings').hide();
-				}
-			);
+			if(this.options.mode == 'editorSelection') {
+				this.element.find('img.wbl-settings').hide();
+			} else {
+				this.element.find('img.wbl-settings').show();
+				this.element.find('td.wbl-action').hover(
+						function () {
+							$(this).find('img').show();
+						},
+						function () {
+							$(this).find('img').not('.wbl-settings').hide();
+						}
+				);
+			}
+			
 		},
 		
 		"img.wbl-settings click": function(el, ev) {

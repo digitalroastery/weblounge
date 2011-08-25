@@ -23,7 +23,7 @@ steal.plugins(
 		},
 		
 		update: function(showSearchBox) {
-			if(showSearchBox == true) {
+			if(showSearchBox == true && !(this.editorSelectionMode == true)) {
 				this.searchFlag = true;
 				this.searchBox.show();
 				this.scrollView.hide();
@@ -73,6 +73,59 @@ steal.plugins(
 				disabled: false,
 				icons: {primary: "wbl-iconThumbnails"},
 				text: false });
+		},
+		
+		_enableEditorSelectionMode: function(isMultiSelect) {
+			if(this.searchFlag == true) {
+				this.element.find('button.wbl-all').click();
+			}
+			
+			this.editorSelectionMode = true;
+			this.scrollView.editor_resourcescrollview({
+				resources: this.options.resources,
+				language: this.options.language,
+				resourceType: this.options.resourceType,
+				runtime: this.options.runtime,
+				mode: 'editorSelection'
+			});
+			this.listView.editor_resourcelistview({
+				resources: this.options.resources,
+				language: this.options.language,
+				resourceType: this.options.resourceType,
+				runtime: this.options.runtime,
+				mode: 'editorSelection'
+			});
+		},
+		
+		_disableEditorSelectionMode: function() {
+			this.editorSelectionMode = false;
+			this.scrollView.editor_resourcescrollview({
+				resources: this.options.resources,
+				language: this.options.language,
+				resourceType: this.options.resourceType,
+				runtime: this.options.runtime,
+				mode: 'normal'
+			});
+			this.listView.editor_resourcelistview({
+				resources: this.options.resources,
+				language: this.options.language,
+				resourceType: this.options.resourceType,
+				runtime: this.options.runtime,
+				mode: 'normal'
+			});
+		},
+		
+		_getSelection: function(success) {
+			if(this.activeElement.hasClass('wbl-thumbnailView')) {
+				this.options.selectedResources = this.find('div.wbl-scrollViewItem.wbl-marked');
+			} else if(this.activeElement.hasClass('wbl-listView')) {
+				this.options.selectedResources = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
+			}
+			if(this.options.selectedResources.lenght < 1) {
+				success(null);
+			} else {
+				success(this.options.selectedResources.attr('id'));
+			}
 		},
 		
 		_showPendingNotification: function() {

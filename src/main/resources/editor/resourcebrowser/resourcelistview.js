@@ -19,7 +19,7 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		update: function(options) {
-			this.options.resources = options.resources;
+			this._super(options);
 			this.find('tr.wbl-pageEntry').remove();
 			this._initViewItems();
 			this._initDataTable(this.element.find(".wbl-pageSize").val());
@@ -55,13 +55,14 @@ steal.plugins('jquery/view/tmpl')
 				var listViewItem = this.element.find('#wbl-listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {
 					page: res, 
 					runtime: this.options.runtime,
-					language: this.options.language
+					language: this.options.language,
 				});
 				listViewItem.find('tr.wbl-pageEntry').editor_resourcelistviewitem({
 					page: res,
 					runtime: this.options.runtime, 
 					language: this.options.language,
-					resourceType: this.options.resourceType
+					resourceType: this.options.resourceType,
+					mode: this.options.mode
 				});
 			}, this));
 		},

@@ -12,8 +12,20 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		},
 		
 		"click": function(el, ev) {
+			var isMulti = false;
+			if(this.options.mode == 'editorSelection' && !isMulti) {
+				$('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
+			}
 			if($(ev.target).is('.wbl-showPage, .wbl-trashPage, .wbl-editPage, .wbl-pagePath')) return;
 			el.toggleClass('wbl-marked');
+		},
+		
+		"dblclick": function(el, ev) {
+			if(this.options.mode == 'editorSelection') {
+				$('button.wbl-editorSelectionOK').click();
+			} else {
+				this.element.find('img.wbl-showPage').click();
+			}
 		},
 		
 		"img.wbl-showPage click": function(el, ev) {
@@ -41,6 +53,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		},
 		
 		'hoverenter': function(ev, hover) {
+			if(this.options.mode == 'editorSelection') return;
 			this.element.find('img.wbl-showPage').show();
 			this.element.find('img.wbl-trashPage').show();
 			this.element.find('img.wbl-editPage').show();

@@ -30,6 +30,13 @@
 	position: relative;
 }
 
+.editor_menubar button.wbl-editorSelectionCancel, .editor_menubar button.wbl-editorSelectionOK {
+	display: none;
+	float: right;
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
 .editor_menubar a.wbl-tab.wbl-active,
 .editor_menubar a.wbl-tab:hover {
     background-color: #2C2C2D;

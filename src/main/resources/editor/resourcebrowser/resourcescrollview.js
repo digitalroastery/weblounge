@@ -18,7 +18,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		},
 		
 		update: function(options) {
-			this.options.resources = options.resources;
+			this._super(options);
 			this.find('div.wbl-scrollViewItem').remove();
 			this.divScroll.smoothDivScroll("recalculateScrollableArea");
 			this.divScroll.smoothDivScroll("hideHotSpotBackgrounds");
@@ -62,7 +62,8 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 					page: res, 
 					runtime: this.options.runtime, 
 					language: this.options.language,
-					resourceType: this.options.resourceType
+					resourceType: this.options.resourceType,
+					mode: this.options.mode
 				});
 			}, this));
 		},

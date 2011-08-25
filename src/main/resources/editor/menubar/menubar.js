@@ -173,6 +173,60 @@ steal.plugins(
         	$.cookie(cookieName, null, { path: '/' });
         },
         
+        _editorSelectionMode: function(resourceMode, isMultiSelection, success) {
+        	// verbiete unload im unload muss dialog close
+        	
+        	// Hide Dialog
+        	this.editor = $('#wbl-pageleteditor').parent().hide();
+        	// Open PageBrowser
+        	this.editorOverlay = $('body > div.ui-widget-overlay').hide();
+        	this.element.find('a.wbl-pages').click();
+        	// Hide Menubar
+        	this.element.find('a.wbl-designer').hide();
+        	this.element.find('a.wbl-media').hide();
+        	this.element.find('span.wbl-language').hide();
+        	this.element.find('span.wbl-right').hide();
+        	this.element.find('button.wbl-editorSelectionCancel, button.wbl-editorSelectionOK').button().show();
+        	
+        	var browser;
+        	if(resourceMode == 'pages') {
+        		browser = this.element.parent().find('#wbl-pagebrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection);
+        	} else if(resourceMode == 'media') {
+        		browser = this.element.parent().find('#wbl-mediabrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection);
+        	}
+        	
+    		this.element.find('button.wbl-editorSelectionCancel').click($.proxy(function() { 
+    			browser.editor_resourcebrowser('_disableEditorSelectionMode');
+    			this._normalMode();
+    			success(null);
+    		}, this));
+    		this.element.find('button.wbl-editorSelectionOK').click($.proxy(function() { 
+    			var selection = browser.editor_resourcebrowser('_getSelection', function(selection) {
+    				success(selection);
+    			});
+    			browser.editor_resourcebrowser('_disableEditorSelectionMode');
+    			this._normalMode();
+    		}, this));
+        },
+        
+        _normalMode: function() {
+        	this.editor.show();
+        	this.editorOverlay.show();
+        	
+        	this.element.find('button.wbl-editorSelectionOK').unbind();
+        	this.element.find('button.wbl-editorSelectionCancel').unbind();
+        	
+        	// Hide Cancel OK Button
+        	this.element.find('button.wbl-editorSelectionCancel, button.wbl-editorSelectionOK').hide();
+        	// Show Menubar
+        	this.element.find('a.wbl-designer').show();
+        	this.element.find('a.wbl-media').show();
+        	this.element.find('span.wbl-language').show();
+        	this.element.find('span.wbl-right').show();
+        	// Open Designer
+        	this.element.find('a.wbl-designer').click();
+        },
+        
         _enableEditing: function() {
         	this.disabled = false;
         	if(this.options.page.isWorkVersion())

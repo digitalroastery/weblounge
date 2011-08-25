@@ -13,12 +13,21 @@ steal.plugins('jquery/controller',
 		defaults: {
 			resources: {},
 			resourceType: 'pages',
-			selectedResources: {}
+			selectedResources: {},
+			mode: 'normal'
 		}
 	},
 	{	
-		init: function(el) {
-
+		update: function(options) {
+			if(!$.isEmptyObject(options.mode)) {
+				this.options.mode = options.mode
+			}
+			this.options.resources = options.resources;
+			if(this.options.mode == 'normal') {
+				this.element.find('nav.wbl-icons button').show();
+			} else if(this.options.mode == 'editorSelection') {
+				this.element.find('nav.wbl-icons button').hide();
+			}
 		},
 		
 		_initButtons: function() {

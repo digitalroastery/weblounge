@@ -151,6 +151,7 @@ steal.plugins('jqueryui/dialog',
      */
     _convertInputs: function(editor, pagelet) {
     	$(editor).find(':input').each(function(index) {
+    		if(this.tagName == 'BUTTON') return;
     		var name = $(this).attr('name');
     		if(name == undefined) {
     			alert('Bad editor!');
