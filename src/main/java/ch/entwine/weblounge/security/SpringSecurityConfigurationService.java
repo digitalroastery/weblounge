@@ -20,19 +20,27 @@
 
 package ch.entwine.weblounge.security;
 
+import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Security;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.SynchronousBundleListener;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -48,13 +56,25 @@ import javax.servlet.Filter;
  * After the configuration is read, the service registers a {@link Filter} which
  * enforces the security policy at runtime.
  */
-public class SpringSecurityConfigurationService implements SynchronousBundleListener {
+public class SpringSecurityConfigurationService implements BundleListener, ManagedService {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SpringSecurityConfigurationService.class);
 
+  /** Service pid, used to look up the service configuration */
+  public static final String SERVICE_PID = "ch.entwine.weblounge.security";
+
   /** Name of the configuration file */
   public static final String SECURITY_CONFIG_FILE = "/security/security.xml";
+
+  /** Configuration key for the enabled/disabled configuration */
+  public static final String OPT_ENABLED = "security.enabled";
+
+  /** Configuration key for the password encoding configuration */
+  public static final String OPT_ENCODING = "security.passwordencoding";
+
+  /** The default password encoding */
+  public static final DigestType DEFAULT_ENCODING = DigestType.md5;
 
   /** The current bundle */
   protected Bundle bundle = null;
@@ -62,8 +82,14 @@ public class SpringSecurityConfigurationService implements SynchronousBundleList
   /** The spring security filter */
   protected Filter securityFilter = null;
 
+  /** The system password encoding */
+  protected DigestType passwordEncoding = DEFAULT_ENCODING;
+
   /** Reference to the security marker */
   protected ServiceRegistration securityMarker = null;
+
+  /** Is security enabled */
+  protected boolean securityEnabled = true;
 
   /** The security filter registration */
   protected Map<Bundle, ServiceRegistration> securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
@@ -73,11 +99,30 @@ public class SpringSecurityConfigurationService implements SynchronousBundleList
    * 
    * @param ctx
    *          the component context
+   * @throws IOException
+   *           if reading the service configuration fails
+   * @throws ConfigurationException
+   *           if the service configuration is malformed
    */
-  void activate(ComponentContext ctx) {
+  void activate(ComponentContext ctx) throws IOException,
+      ConfigurationException {
     BundleContext bundleCtx = ctx.getBundleContext();
     bundle = ctx.getBundleContext().getBundle();
     securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
+
+    // Try to get hold of the service configuration
+    ServiceReference configAdminRef = bundleCtx.getServiceReference(ConfigurationAdmin.class.getName());
+    if (configAdminRef != null) {
+      ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleCtx.getService(configAdminRef);
+      Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
+      if (config != null) {
+        updated(config);
+      } else {
+        logger.debug("No customized security configuration found");
+      }
+    } else {
+      logger.debug("No configuration admin service found while looking for security configuration");
+    }
 
     // Create the spring security context
     URL securityConfig = bundleCtx.getBundle().getResource(SECURITY_CONFIG_FILE);
@@ -89,20 +134,16 @@ public class SpringSecurityConfigurationService implements SynchronousBundleList
     // Get the security filter chain from the spring context
     securityFilter = (Filter) springContext.getBean("springSecurityFilterChain");
 
-    logger.info("Activating spring security");
-
-    // Process existing bundles
-    for (Bundle b : ctx.getBundleContext().getBundles()) {
-      if (b.getState() == Bundle.ACTIVE || b.getState() == Bundle.STARTING)
-        registerSecurityFilter(b);
+    // Activate the security filters
+    if (securityEnabled) {
+      logger.info("Activating spring security");
+      startSecurity();
+    } else {
+      logger.warn("Security is turned off by configuration");
     }
 
-    // Register for new ones
-    bundleCtx.addBundleListener(this);
-
     // Register the security marker
-    securityMarker = bundleCtx.registerService(Security.class.getName(), new Security() {
-    }, null);
+    publishSecurityMarker();
   }
 
   /**
@@ -118,16 +159,7 @@ public class SpringSecurityConfigurationService implements SynchronousBundleList
 
     // Unregister the security filters
     if (securityFilterRegistrations != null) {
-      for (Map.Entry<Bundle, ServiceRegistration> entry : securityFilterRegistrations.entrySet()) {
-        Bundle bundle = entry.getKey();
-        ServiceRegistration r = entry.getValue();
-        try {
-          r.unregister();
-          logger.debug("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
-        } catch (Throwable t) {
-          logger.error("Unregistering security context for bundle '{}' failed: {}", bundle.getSymbolicName(), t.getMessage());
-        }
-      }
+      stopSecurity();
     }
 
     // Remove the security marker
@@ -139,6 +171,86 @@ public class SpringSecurityConfigurationService implements SynchronousBundleList
       }
     }
 
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   */
+  @SuppressWarnings("rawtypes")
+  public void updated(Dictionary properties) throws ConfigurationException {
+    String enabledProperty = (String) properties.get(OPT_ENABLED);
+    boolean isEnabled = ConfigurationUtils.isTrue(enabledProperty, true);
+
+    // Enable/disable security
+    if (isEnabled != this.securityEnabled) {
+      if (isEnabled) {
+        startSecurity();
+      } else {
+        stopSecurity();
+      }
+    }
+
+    this.securityEnabled = isEnabled;
+
+    // Password encoding
+    String passwordEncodingProperty = StringUtils.trimToNull((String) properties.get(OPT_ENCODING));
+    DigestType digestType = DigestType.md5;
+    if (passwordEncodingProperty != null) {
+      try {
+        digestType = DigestType.valueOf(passwordEncodingProperty);
+      } catch (IllegalArgumentException e) {
+        throw new ConfigurationException(OPT_ENCODING, "'" + passwordEncodingProperty + "' is not a valid encoding");
+      }
+    }
+    if (!digestType.equals(passwordEncoding) && securityMarker != null) {
+      passwordEncoding = digestType;
+      securityMarker.unregister();
+      publishSecurityMarker();
+    }
+
+    this.securityEnabled = isEnabled;
+  }
+
+  /**
+   * Activates security by registering a security filter with active bundles.
+   */
+  private void startSecurity() {
+    for (Bundle b : bundle.getBundleContext().getBundles()) {
+      if (b.getState() == Bundle.ACTIVE || b.getState() == Bundle.STARTING)
+        registerSecurityFilter(b);
+    }
+    bundle.getBundleContext().addBundleListener(this);
+  }
+
+  /**
+   * Registers the security marker in the OSGi registry.
+   */
+  private void publishSecurityMarker() {
+    Dictionary<String, String> securityProperties = new Hashtable<String, String>();
+    securityProperties.put(OPT_ENCODING, passwordEncoding.toString().toLowerCase());
+    bundle.getBundleContext().registerService(Security.class.getName(), new Security() {
+    }, securityProperties);
+  }
+
+  /**
+   * Activates security by registering a security filter with active bundles.
+   */
+  private void stopSecurity() {
+    bundle.getBundleContext().removeBundleListener(this);
+    if (securityFilterRegistrations != null) {
+      for (Map.Entry<Bundle, ServiceRegistration> entry : securityFilterRegistrations.entrySet()) {
+        Bundle bundle = entry.getKey();
+        ServiceRegistration r = entry.getValue();
+        try {
+          r.unregister();
+          logger.debug("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
+        } catch (Throwable t) {
+          logger.error("Unregistering security context for bundle '{}' failed: {}", bundle.getSymbolicName(), t.getMessage());
+        }
+      }
+    }
   }
 
   /**
@@ -189,7 +301,7 @@ public class SpringSecurityConfigurationService implements SynchronousBundleList
    */
   public void bundleChanged(BundleEvent event) {
     switch (event.getType()) {
-      case BundleEvent.STARTING:
+      case BundleEvent.STARTED:
         registerSecurityFilter(event.getBundle());
         break;
       case BundleEvent.STOPPED:

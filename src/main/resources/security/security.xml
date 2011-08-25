@@ -8,47 +8,48 @@
        http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Weblounge"
-    entry-point-ref="userEntryPoint">
+    entry-point-ref="userEntryPoint" path-type="regex">
 
-    <!-- URL SECURITY -->
+    <!-- Login / Logout -->
 
-    <sec:intercept-url pattern="/**" filters="none"/>
-    
-    <!-- 
-    <sec:intercept-url pattern="/**" access="ROLE_USER"/>
-    -->
-    
+    <!-- The login page can't be protected -->
+    <sec:intercept-url pattern="^/weblounge/login/.*" filters="none"/>
+
+    <!-- The login processing urls needs to be covered by the filter chain -->
+    <sec:intercept-url pattern="^/system/weblounge/login/.*" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="^/system/weblounge/logout/.*" access="ROLE_ANONYMOUS"/>
+
+    <!-- Editor -->
+
     <!-- Some resources are open to everybody -->
-    <!--
-    <sec:intercept-url pattern="/weblounge/favicon.ico" filters="none"/>
-    <sec:intercept-url pattern="/weblounge/documentjs/**" filters="none"/>
-    <sec:intercept-url pattern="/weblounge/funcunit/**" filters="none"/>
-    <sec:intercept-url pattern="/weblounge/jquery/**" filters="none"/>
-    <sec:intercept-url pattern="/weblounge/jqueryui/**" filters="none"/>
-    <sec:intercept-url pattern="/weblounge/steal/**" filters="none"/>
-    <sec:intercept-url pattern="/favicon.ico" filters="none"/>
-    -->
+    <sec:intercept-url pattern="^/favicon.ico" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/documentjs/.*" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/funcunit/.*" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/jquery/.*" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/jqueryui/.*" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/steal/.*" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/favicon.ico" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge-shared/.*" filters="none"/>
 
-    <!-- Secure the editor application -->
-    <!--
-    <sec:intercept-url pattern="/weblounge/login/**" access="ROLE_ANONYMOUS"/>
-    <sec:intercept-url pattern="/weblounge/**" access="ROLE_USER"/>
-    -->
+    <!-- The rest of the editor functionality needs to be protected -->
+    <sec:intercept-url pattern="^/weblounge/.*" access="ROLE_USER"/>
 
-    <!-- Enable anonymous access to the runtime information -->
-    <!--
-    <sec:intercept-url pattern="/system/weblounge/runtime" method="GET" access="ROLE_ANONYMOUS, ROLE_USER"/>
-    -->
+    <!-- Enable anonymous access to the REST documentation -->
+    <sec:intercept-url pattern="^/system/weblounge/.*/docs" filters="none"/>
+
+    <!-- Secure the REST endpoints -->
+    <sec:intercept-url pattern="^/system/weblounge/.*" access="ROLE_USER"/>
     
-    <!-- Secure the management URLs for admins only -->
-    <!--
-    <sec:intercept-url pattern="/system/**" access="ROLE_ADMIN"/>
-    -->
+    <!-- Secure the management URLs -->
+    <sec:intercept-url pattern="/system/console/.*" access="ROLE_ADMIN"/>
 
-    <!-- Everything else is for any logged in user -->
-    <!-- 
-    <sec:intercept-url pattern="/**" access="ROLE_ANONYMOUS"/>
-    -->
+    <!-- Trigger authentication on editing entry point -->
+    <sec:intercept-url pattern=".*?(\?|&#36;)edit.*?" access="ROLE_USER"/>
+
+    <!-- Don't bother about the rest -->
+    <sec:intercept-url pattern="^/.*" access="ROLE_ANONYMOUS"/>
+    
+    <!-- FILTER CONFIGURATION -->
 
     <!-- Add the security service to the filter chain -->
     <sec:custom-filter after="SECURITY_CONTEXT_FILTER" ref="webloungeSecurityFilter"/>
@@ -56,7 +57,7 @@
     <!-- LOGIN / LOGOUT MECHANISMS -->
 
     <!-- Enable and configure the failure URL for form-based logins -->
-    <sec:form-login login-page="/weblounge/login/login.html" login-processing-url="/system/weblounge/login/form" authentication-failure-url="/weblounge/login/error.html"/>
+    <sec:form-login login-page="/weblounge/login/login.html" login-processing-url="/system/weblounge/login/form" authentication-failure-url="/weblounge/login/login.html?failed"/>
 
     <!-- Comment out to disable support for openID. OpenID URLs must be specified in the user detail service below -->
     <!--
@@ -113,9 +114,11 @@
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
   <sec:authentication-manager alias="authenticationManager">
     <sec:authentication-provider user-service-ref="userDetailsService">
+      <!-- 
       <sec:password-encoder hash="md5">
         <sec:salt-source user-property="username"/>
       </sec:password-encoder>
+       -->
     </sec:authentication-provider>
   </sec:authentication-manager>
 

@@ -7,8 +7,11 @@
   
   <implementation class="ch.entwine.weblounge.security.SpringSecurityConfigurationService" />
   <property name="service.description" value="Weblounge Security Configuration Service" />
+  <property name="service.pid" value="ch.entwine.weblounge.security" />
+
   <service>
     <provide interface="ch.entwine.weblounge.security.SpringSecurityConfigurationService" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
   <reference name="userDetailsService" interface="org.springframework.security.core.userdetails.UserDetailsService" cardinality="1..1" policy="static" /> 
 
