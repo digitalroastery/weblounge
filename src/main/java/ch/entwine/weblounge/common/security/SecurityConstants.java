@@ -26,21 +26,21 @@ package ch.entwine.weblounge.common.security;
 public interface SecurityConstants {
 
   /** Name of the admin role */
-  String MH_ADMIN = "weblounge_admin";
+  String ADMIN_ROLE = "wl-admin";
 
   /** Name of the anonymous role */
-  String MH_ANONYMOUS = "weblounge_anonymous";
+  String ANONYMOUS_ROLE = "wl-anonymous";
 
   /** The default organization identifier */
-  String DEFAULT_ORGANIZATION_ID = "weblounge_system";
+  String SYSTEM_ID = "weblounge-system";
 
   /** The default organization name */
-  String DEFAULT_ORGANIZATION_NAME = "Weblounge";
+  String SYSTEM_NAME = "Weblounge";
 
   /** Name of the default organization's local admin role */
-  String DEFAULT_ORGANIZATION_ADMIN = "admin";
+  String DEFAULT_SITE_ADMIN = "admin";
 
   /** Name of the default organization's local anonymous role */
-  String DEFAULT_ORGANIZATION_ANONYMOUS = "anonymous";
+  String DEFAULT_SITE_ANONYMOUS = "anonymous";
 
 }
