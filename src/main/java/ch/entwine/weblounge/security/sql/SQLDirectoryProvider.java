@@ -87,7 +87,8 @@ public class SQLDirectoryProvider implements DirectoryProvider {
     User user = null;
     try {
       user = loadUser(login, site, conn);
-      loadUserRoles(user, site, conn);
+      if (user != null)
+        loadUserRoles(user, site, conn);
     } finally {
       try {
         conn.close();
@@ -125,7 +126,7 @@ public class SQLDirectoryProvider implements DirectoryProvider {
       ps.setString(1, user.getLogin());
       ps.setString(2, site.getIdentifier());
       rs = ps.executeQuery();
-      
+
       while (rs.next()) {
         user.addPublicCredentials(new RoleImpl(rs.getString(1), rs.getString(2)));
       }
