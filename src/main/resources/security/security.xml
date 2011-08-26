@@ -27,8 +27,10 @@
     <sec:intercept-url pattern="^/weblounge/funcunit/.*" filters="none"/>
     <sec:intercept-url pattern="^/weblounge/jquery/.*" filters="none"/>
     <sec:intercept-url pattern="^/weblounge/jqueryui/.*" filters="none"/>
-    <sec:intercept-url pattern="^/weblounge/steal/.*" filters="none"/>
-    <sec:intercept-url pattern="^/weblounge/favicon.ico" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/.*\.js(\?.*)?" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/.*\.css(\?.*)?" filters="none"/>
+
+    <!-- Shared resources should not be protected -->
     <sec:intercept-url pattern="^/weblounge-shared/.*" filters="none"/>
 
     <!-- The rest of the editor functionality needs to be protected -->
