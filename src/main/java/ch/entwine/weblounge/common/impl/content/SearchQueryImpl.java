@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.content;
 
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -46,7 +47,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** Name of the stage composer */
   public static final String STAGE_COMPOSER = "#stage#";
-  
+
   /** The site */
   protected Site site = null;
 
@@ -67,7 +68,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The type */
   protected String type = null;
-  
+
   /** The type to block */
   protected String withoutType = null;
 
@@ -100,7 +101,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** True if the resource must not have a modification date */
   protected boolean withoutModification = false;
-  
+
   /** The modification date */
   protected Date modificationDateFrom = null;
 
@@ -130,7 +131,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The path prefix */
   protected String pathPrefix = null;
-  
+
   /** The filename */
   protected String filename = null;
 
@@ -145,16 +146,16 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** Filter terms */
   protected String filter = null;
-  
+
   /** The query offset */
   protected int offset = 0;
 
   /** The query limit */
   protected int limit = -1;
-  
+
   /** True when using faceted search */
   protected boolean subjectFacetEnabled = false;
-  
+
   /** Creation date order relation */
   protected Order creationDateSearchOrder = Order.None;
 
@@ -163,6 +164,9 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** Publication date order relation */
   protected Order publicationDateSearchOrder = Order.None;
+
+  /** The resource versions */
+  protected long version = Resource.LIVE;
 
   /**
    * Creates a new search query that is operating on the given site.
@@ -285,7 +289,7 @@ public class SearchQueryImpl implements SearchQuery {
     this.template = template;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -294,20 +298,20 @@ public class SearchQueryImpl implements SearchQuery {
   public String getTemplate() {
     return template;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withLayout(java.lang.String)
    */
   public SearchQuery withLayout(String layout) {
     this.layout = layout;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getLayout()
    */
   public String getLayout() {
@@ -316,24 +320,24 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withType(java.lang.String)
    */
   public SearchQuery withType(String type) {
     this.type = type;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withoutType(java.lang.String)
    */
   public SearchQuery withoutType(String type) {
     this.withoutType = type;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -342,10 +346,10 @@ public class SearchQueryImpl implements SearchQuery {
   public String getType() {
     return type;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getWithoutType()
    */
   public String getWithoutType() {
@@ -444,13 +448,13 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#inStage()
    */
   public SearchQuery inStage() throws IllegalStateException {
     return inComposer(STAGE_COMPOSER);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -600,28 +604,28 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withoutModification()
    */
   public SearchQuery withoutModification() {
     if (modificationDateFrom != null || modificationDateTo != null)
       throw new IllegalStateException("With modification date and without modification date are mutually exclusive");
-    if (modifier  != null)
+    if (modifier != null)
       throw new IllegalStateException("With modifier and without modification date are mutually exclusive");
     clearExpectations();
     this.withoutModification = true;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getWithoutModification()
    */
   public boolean getWithoutModification() {
     return withoutModification;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -786,22 +790,22 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withoutPublication()
    */
   public SearchQuery withoutPublication() {
     if (publishingDateFrom != null || publishingDateTo != null)
       throw new IllegalStateException("With publishing date and without publishing date are mutually exclusive");
-    if (publisher  != null)
+    if (publisher != null)
       throw new IllegalStateException("With publisher and without modification date are mutually exclusive");
     clearExpectations();
     this.withoutPublication = true;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getWithoutPublication()
    */
   public boolean getWithoutPublication() {
@@ -816,11 +820,12 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withText(String text) {
     return withText(text, false);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.content.SearchQuery#withText(java.lang.String, boolean)
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withText(java.lang.String,
+   *      boolean)
    */
   public SearchQuery withText(String text, boolean wildcardSearch) {
     clearExpectations();
@@ -840,16 +845,16 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#isWildcardSearch()
    */
   public boolean isWildcardSearch() {
     return wildcardSearch;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withFilter(java.lang.String)
    */
   public SearchQuery withFilter(String filter) {
@@ -857,16 +862,16 @@ public class SearchQueryImpl implements SearchQuery {
     this.filter = filter;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getFilter()
    */
   public String getFilter() {
     return filter;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -909,45 +914,45 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withFilename(java.lang.String)
    */
   public SearchQuery withFilename(String filename) {
     this.filename = filename;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getFilename()
    */
   public String getFilename() {
     return filename;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withMimetype(java.lang.String)
    */
   public SearchQuery withMimetype(String mimetype) {
     this.mimetype = mimetype;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getMimetype()
    */
   public String getMimetype() {
     return mimetype;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#sortByCreationDate(ch.entwine.weblounge.common.content.SearchQuery.Order)
    */
   public SearchQuery sortByCreationDate(Order order) {
@@ -957,19 +962,19 @@ public class SearchQueryImpl implements SearchQuery {
       creationDateSearchOrder = order;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getCreationDateSortOrder()
    */
   public Order getCreationDateSortOrder() {
     return creationDateSearchOrder;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#sortByModificationDate(ch.entwine.weblounge.common.content.SearchQuery.Order)
    */
   public SearchQuery sortByModificationDate(Order order) {
@@ -979,19 +984,19 @@ public class SearchQueryImpl implements SearchQuery {
       modificationDateSearchOrder = order;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getModificationDateSortOrder()
    */
   public Order getModificationDateSortOrder() {
     return modificationDateSearchOrder;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#sortByPublishingDate(ch.entwine.weblounge.common.content.SearchQuery.Order)
    */
   public SearchQuery sortByPublishingDate(Order order) {
@@ -1004,32 +1009,51 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getPublishingDateSortOrder()
    */
   public Order getPublishingDateSortOrder() {
     return publicationDateSearchOrder;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withSubjectFacet()
    */
   public SearchQuery withSubjectFacet() {
     subjectFacetEnabled = true;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#isSubjectFacetEnabled()
    */
   public boolean isSubjectFacetEnabled() {
     return subjectFacetEnabled;
   }
-  
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withVersion(long)
+   */
+  public SearchQuery withVersion(long version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getVersion()
+   */
+  public long getVersion() {
+    return version;
+  }
+
   /**
    * Pushes the configuration object onto the stack.
    * 
