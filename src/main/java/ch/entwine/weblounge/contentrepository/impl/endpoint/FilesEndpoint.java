@@ -44,6 +44,7 @@ import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
+import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -116,6 +117,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
   /** Mime type detector */
   private Tika mimeTypeDetector = new Tika();
+
+  /** The security service */
+  protected SecurityService securityService = null;
 
   /** The endpoint documentation */
   private String docs = null;
@@ -1135,6 +1139,16 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       docs = FilesEndpointDocs.createDocumentation(servicePath);
     }
     return docs;
+  }
+
+  /**
+   * Callback from OSGi to set the security service.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**

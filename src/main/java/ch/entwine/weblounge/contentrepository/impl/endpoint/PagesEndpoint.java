@@ -40,6 +40,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
+import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -87,6 +88,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(PagesEndpoint.class);
+
+  /** The security service */
+  protected SecurityService securityService = null;
 
   /** The endpoint documentation */
   private String docs = null;
@@ -1192,6 +1196,16 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       docs = PagesEndpointDocs.createDocumentation(servicePath);
     }
     return docs;
+  }
+
+  /**
+   * Callback from OSGi to set the security service.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**
