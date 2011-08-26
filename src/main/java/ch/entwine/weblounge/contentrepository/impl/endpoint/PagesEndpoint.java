@@ -125,6 +125,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       @QueryParam("searchterms") String searchterms,
       @QueryParam("filter") String filter,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
+      @QueryParam("version") @DefaultValue("0") long version,
       @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset,
       @QueryParam("details") @DefaultValue("false") boolean details) {
@@ -134,6 +135,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     SearchQuery q = new SearchQueryImpl(site);
 
     q.withType(Page.TYPE);
+    q.withVersion(version);
 
     // Path
     if (StringUtils.isNotBlank(path))

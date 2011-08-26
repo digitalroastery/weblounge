@@ -74,6 +74,7 @@ public final class PagesEndpointDocs {
     getAllPagesEndpoint.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
     String[] sortParams = {"published-asc", "published-desc", "created-asc", "created-desc", "modified-asc", "modified-desc"};
     getAllPagesEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("version", Parameter.Type.String, "The version", "0", versions));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
