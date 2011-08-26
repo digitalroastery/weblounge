@@ -217,6 +217,7 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
    * Activates security by registering a security filter with active bundles.
    */
   private void startSecurity() {
+    logger.info("Enabling spring security");
     for (Bundle b : bundle.getBundleContext().getBundles()) {
       if (b.getState() == Bundle.ACTIVE || b.getState() == Bundle.STARTING)
         registerSecurityFilter(b);
@@ -238,6 +239,7 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
    * Activates security by registering a security filter with active bundles.
    */
   private void stopSecurity() {
+    logger.info("Disabling spring security");
     bundle.getBundleContext().removeBundleListener(this);
     if (securityFilterRegistrations != null) {
       for (Map.Entry<Bundle, ServiceRegistration> entry : securityFilterRegistrations.entrySet()) {
