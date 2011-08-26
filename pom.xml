@@ -64,19 +64,22 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.security-sql</Bundle-SymbolicName>
             <Import-Package>
+              ch.entwine.weblounge.common.impl.security,
               ch.entwine.weblounge.common.security,
               ch.entwine.weblounge.common.site,
               javax.persistence,
               org.osgi.framework,
               org.osgi.service.component,
+              org.osgi.service.jdbc,
               org.slf4j
             </Import-Package>
             <Export-Package>
-              ch.entwine.weblounge.security.sql.entities
+              ch.entwine.weblounge.security.sql;version=${project.version},
+              ch.entwine.weblounge.security.sql.entities;version=${project.version}
             </Export-Package>
-            <Meta-Persistence>
-              META-INF/persistence.xml
-            </Meta-Persistence>
+            <Service-Component>
+              OSGI-INF/sql-directory-service.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
