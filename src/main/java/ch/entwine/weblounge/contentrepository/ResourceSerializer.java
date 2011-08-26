@@ -32,7 +32,6 @@ import ch.entwine.weblounge.common.site.Site;
 import org.xml.sax.SAXException;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -124,7 +123,7 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * @return the search result item
    */
   SearchResultItem toSearchResultItem(Site site, double relevance,
-      Map<String, ResourceMetadata<?>> metadata);
+      List<ResourceMetadata<?>> metadata);
 
   /**
    * Returns a <code>ResourceContentReader</code> for the type of resources that
