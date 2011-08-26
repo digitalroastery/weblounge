@@ -22,6 +22,7 @@ package ch.entwine.weblounge.kernel.endpoint;
 
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -66,6 +67,9 @@ public class RuntimeInformationEndpoint {
 
   /** List of rutnime information provider */
   protected Map<String, RuntimeInformationProvider> runtimeInfoProviders = null;
+
+  /** The security service */
+  protected SecurityService securityService = null;
 
   /** The endpoint documentation */
   private String docs = null;
@@ -231,6 +235,16 @@ public class RuntimeInformationEndpoint {
    */
   void removeRuntimeInformationProvider(RuntimeInformationProvider provider) {
     runtimeInfoProviders.remove(provider);
+  }
+
+  /**
+   * Callback from OSGi to set the security service.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**
