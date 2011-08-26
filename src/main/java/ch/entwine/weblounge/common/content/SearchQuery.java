@@ -772,4 +772,20 @@ public interface SearchQuery {
    */
   boolean isSubjectFacetEnabled();
 
+  /**
+   * Asks the search index to return only resources with the indicated version.
+   * 
+   * @param version
+   *          the version
+   * @return the search query
+   */
+  SearchQuery withVersion(long version);
+
+  /**
+   * Returns the resource version.
+   * 
+   * @return the version
+   */
+  long getVersion();
+
 }
