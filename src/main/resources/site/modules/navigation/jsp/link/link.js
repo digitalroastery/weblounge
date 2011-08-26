@@ -25,9 +25,9 @@ $.Controller("Editor.Link",
     
     "button#wbl-linkInternalButton click": function(el, ev) {
     	var input = this.element.find('input#wbl-linkInternal');
-    	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', 'pages', false, function(selectedPage) {
+    	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', $('#wbl-pageleteditor'), 'pages', false, function(selectedPage) {
     		if(selectedPage == null) return;
-			input.val(selectedPage);
+			input.val(selectedPage[0].value.id);
     	});
     },
     
