@@ -68,7 +68,6 @@ import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -352,13 +351,13 @@ public class SearchRequest {
       }
 
       // Wrap the search result metadata
-      Map<String, ResourceMetadata<?>> metadata = new HashMap<String, ResourceMetadata<?>>(doc.size());
+      List<ResourceMetadata<?>> metadata = new ArrayList<ResourceMetadata<?>>(doc.size());
       for (Map.Entry<String, Object> entry : doc.entrySet()) {
         String name = entry.getKey();
         ResourceMetadata<Object> m = new ResourceMetadataImpl<Object>(name);
         // TODO: Add values with more care (localized, correct type etc.)
         m.addValue(entry.getValue());
-        metadata.put(name, m);
+        metadata.add(m);
       }
 
       // Get the score for this item

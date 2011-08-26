@@ -21,17 +21,20 @@
 package ch.entwine.weblounge.contentrepository.impl;
 
 import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
@@ -220,7 +223,31 @@ public abstract class AbstractContentRepository implements ContentRepository {
   public SearchResult find(SearchQuery query) throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
-    return index.find(query);
+
+    // TODO: This special handling needs to be removed, as soon as the search
+    // index contains the work versions as well.
+    if (query.getVersion() == Resource.LIVE) {
+      return index.find(query);
+    } else if (StringUtils.isNotBlank(query.getPath())) {
+      String path = query.getPath();
+      long version = query.getVersion();
+      String type = query.getType();
+
+      ResourceURIImpl uri = new ResourceURIImpl(type, getSite(), path, version);
+      Resource<?> resource = get(uri);
+      int hitCount = (resource != null) ? 1 : 0;
+      SearchResultImpl result = new SearchResultImpl(query, hitCount, hitCount);
+      if (resource != null) {
+        ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(type);
+        List<ResourceMetadata<?>> metadata = serializer.toMetadata(resource);
+        SearchResultItem item = serializer.toSearchResultItem(getSite(), 1.0, metadata);
+        result.addResultItem(item);
+      }
+      return result;
+    } else {
+      throw new IllegalArgumentException("Non-live version can only be searched by path");
+    }
+
   }
 
   /**
@@ -276,7 +303,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     if (uri.getVersion() == Resource.LIVE) {
       SearchQuery q = new SearchQueryImpl(site).withIdentifier(uri.getIdentifier());
       ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) index.find(q).getItems()[0];
-  
+
       InputStream is = null;
       try {
         ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());

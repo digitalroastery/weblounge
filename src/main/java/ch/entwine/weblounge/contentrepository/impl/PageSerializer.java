@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -199,24 +200,30 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
-   *      double, java.util.Map)
+   *      double, List)
    */
   public SearchResultItem toSearchResultItem(Site site, double relevance,
-      Map<String, ResourceMetadata<?>> metadata) {
-    String id = (String) metadata.get(ID).getValues().get(0);
-    String path = (String) metadata.get(PATH).getValues().get(0);
+      List<ResourceMetadata<?>> metadata) {
+    
+    Map<String, ResourceMetadata<?>> metadataMap = new HashMap<String, ResourceMetadata<?>>();
+    for (ResourceMetadata<?> metadataItem : metadata) {
+      metadataMap.put(metadataItem.getName(), metadataItem);
+    }
+    
+    String id = (String) metadataMap.get(ID).getValues().get(0);
+    String path = (String) metadataMap.get(PATH).getValues().get(0);
 
     ResourceURI uri = new PageURIImpl(site, path, id, Resource.LIVE);
     WebUrl url = new WebUrlImpl(site, path);
 
     PageSearchResultItemImpl result = new PageSearchResultItemImpl(uri, url, relevance, site);
 
-    if (metadata.get(XML) != null)
-      result.setResourceXml((String) metadata.get(XML).getValues().get(0));
-    if (metadata.get(HEADER_XML) != null)
-      result.setPageHeaderXml((String) metadata.get(HEADER_XML).getValues().get(0));
-    if (metadata.get(PREVIEW_XML) != null)
-      result.setPagePreviewXml((String) metadata.get(PREVIEW_XML).getValues().get(0));
+    if (metadataMap.get(XML) != null)
+      result.setResourceXml((String) metadataMap.get(XML).getValues().get(0));
+    if (metadataMap.get(HEADER_XML) != null)
+      result.setPageHeaderXml((String) metadataMap.get(HEADER_XML).getValues().get(0));
+    if (metadataMap.get(PREVIEW_XML) != null)
+      result.setPagePreviewXml((String) metadataMap.get(PREVIEW_XML).getValues().get(0));
 
     return result;
   }

@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -192,14 +193,20 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
-   *      double, java.util.Map)
+   *      double, List)
    */
   public SearchResultItem toSearchResultItem(Site site, double relevance,
-      Map<String, ResourceMetadata<?>> metadata) {
-    String id = (String) metadata.get(ID).getValues().get(0);
+      List<ResourceMetadata<?>> metadata) {
+
+    Map<String, ResourceMetadata<?>> metadataMap = new HashMap<String, ResourceMetadata<?>>();
+    for (ResourceMetadata<?> metadataItem : metadata) {
+      metadataMap.put(metadataItem.getName(), metadataItem);
+    }
+
+    String id = (String) metadataMap.get(ID).getValues().get(0);
     String path = null;
-    if (metadata.get(PATH) != null)
-      path = (String) metadata.get(PATH).getValues().get(0);
+    if (metadataMap.get(PATH) != null)
+      path = (String) metadataMap.get(PATH).getValues().get(0);
     else {
       path = URI_PREFIX + "/" + id;
     }
@@ -209,10 +216,10 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
 
     ImageResourceSearchResultItemImpl result = new ImageResourceSearchResultItemImpl(uri, url, relevance, site);
 
-    if (metadata.get(XML) != null)
-      result.setResourceXml((String) metadata.get(XML).getValues().get(0));
-    if (metadata.get(HEADER_XML) != null)
-      result.setImageHeaderXml((String) metadata.get(HEADER_XML).getValues().get(0));
+    if (metadataMap.get(XML) != null)
+      result.setResourceXml((String) metadataMap.get(XML).getValues().get(0));
+    if (metadataMap.get(HEADER_XML) != null)
+      result.setImageHeaderXml((String) metadataMap.get(HEADER_XML).getValues().get(0));
     // TODO: Add remaining metadata
 
     return result;
