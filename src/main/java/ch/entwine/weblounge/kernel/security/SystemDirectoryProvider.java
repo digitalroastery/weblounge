@@ -94,8 +94,13 @@ public class SystemDirectoryProvider implements DirectoryProvider, ManagedServic
    */
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
-    String login = StringUtils.trimToNull((String)properties.get(OPT_ADMIN_LOGIN));
-    String pass = StringUtils.trimToEmpty((String)properties.get(OPT_ADMIN_PASSWORD));
+    String login = null;
+    String pass = "";
+
+    if (properties != null) {
+      login = StringUtils.trimToNull((String) properties.get(OPT_ADMIN_LOGIN));
+      pass = StringUtils.trimToEmpty((String) properties.get(OPT_ADMIN_PASSWORD));
+    }
 
     if (login == null || "".equals(pass)) {
       if (internalAccounts.size() > 0)
