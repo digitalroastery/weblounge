@@ -16,7 +16,7 @@ steal.plugins().then(function($) {
     
 	"a.wbl-pagePath click": function(el, ev) {
 		ev.preventDefault();
-		if(this.options.mode == 'editorSelection') return;
+		if(this.options.mode != 'normal') return;
 		el.trigger('openDesigner');
 	},
 	

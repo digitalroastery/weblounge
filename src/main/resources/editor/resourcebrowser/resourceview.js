@@ -25,7 +25,7 @@ steal.plugins('jquery/controller',
 			this.options.resources = options.resources;
 			if(this.options.mode == 'normal') {
 				this.element.find('nav.wbl-icons button').show();
-			} else if(this.options.mode == 'editorSelection') {
+			} else {
 				this.element.find('nav.wbl-icons button').hide();
 			}
 		},

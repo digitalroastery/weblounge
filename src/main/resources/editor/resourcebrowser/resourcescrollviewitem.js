@@ -12,8 +12,8 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		},
 		
 		"click": function(el, ev) {
-			var isMulti = false;
-			if(this.options.mode == 'editorSelection' && !isMulti) {
+			var isMulti = (this.options.mode == 'editorMultiSelection');
+			if(this.options.mode != 'normal' && !isMulti) {
 				$('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
 			}
 			if($(ev.target).is('.wbl-showPage, .wbl-trashPage, .wbl-editPage, .wbl-pagePath')) return;
@@ -21,7 +21,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		},
 		
 		"dblclick": function(el, ev) {
-			if(this.options.mode == 'editorSelection') {
+			if(this.options.mode != 'normal') {
 				$('button.wbl-editorSelectionOK').click();
 			} else {
 				this.element.find('img.wbl-showPage').click();
@@ -53,7 +53,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		},
 		
 		'hoverenter': function(ev, hover) {
-			if(this.options.mode == 'editorSelection') return;
+			if(this.options.mode != 'normal') return;
 			this.element.find('img.wbl-showPage').show();
 			this.element.find('img.wbl-trashPage').show();
 			this.element.find('img.wbl-editPage').show();

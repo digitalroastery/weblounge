@@ -79,6 +79,8 @@ steal.plugins(
 			if(this.searchFlag == true) {
 				this.element.find('button.wbl-all').click();
 			}
+			var mode = 'editorSelection';
+			if(isMultiSelect) mode = 'editorMultiSelection';
 			
 			this.editorSelectionMode = true;
 			this.scrollView.editor_resourcescrollview({
@@ -86,14 +88,14 @@ steal.plugins(
 				language: this.options.language,
 				resourceType: this.options.resourceType,
 				runtime: this.options.runtime,
-				mode: 'editorSelection'
+				mode: mode
 			});
 			this.listView.editor_resourcelistview({
 				resources: this.options.resources,
 				language: this.options.language,
 				resourceType: this.options.resourceType,
 				runtime: this.options.runtime,
-				mode: 'editorSelection'
+				mode: mode
 			});
 		},
 		
@@ -124,7 +126,11 @@ steal.plugins(
 			if(this.options.selectedResources.lenght < 1) {
 				success(null);
 			} else {
-				success(this.options.selectedResources.attr('id'));
+				var ids = new Array();
+				this.options.selectedResources.each(function(index, elem) {
+					ids.push($(elem).attr('id'));
+				});
+				success(ids);
 			}
 		},
 		
@@ -252,6 +258,19 @@ steal.plugins(
         	ev.stopPropagation();
         	if(!el.is(this.element.find('div.wbl-scrollViewItem'))) {
         		this.element.find('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
+        	}
+        	
+        	var selectedElements; 
+			if(this.activeElement.hasClass('wbl-thumbnailView')) {
+				selectedElements = this.find('div.wbl-scrollViewItem.wbl-marked');
+			} else if(this.activeElement.hasClass('wbl-listView')) {
+				selectedElements = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
+			}
+			
+        	if(this.editorSelectionMode == true && selectedElements.length > 0) {
+        		$('button.wbl-editorSelectionOK').button('option', 'disabled', false);
+        	} else if(this.editorSelectionMode == true) {
+        		$('button.wbl-editorSelectionOK').button('option', 'disabled', true);
         	}
         },
         

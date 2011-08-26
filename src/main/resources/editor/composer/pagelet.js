@@ -83,6 +83,7 @@ steal.plugins('jqueryui/dialog',
 			height: 400,
 			modal: true,
 			autoOpen: true,
+			closeOnEscape: false,
 			resizable: true,
 			buttons: {
 				Abbrechen: function() {

@@ -174,24 +174,27 @@ steal.plugins(
         },
         
         _editorSelectionMode: function(resourceMode, isMultiSelection, success) {
-        	// verbiete unload im unload muss dialog close
-        	
         	// Hide Dialog
         	this.editor = $('#wbl-pageleteditor').parent().hide();
-        	// Open PageBrowser
+        	$(document).unbind('.dialog-overlay');
         	this.editorOverlay = $('body > div.ui-widget-overlay').hide();
-        	this.element.find('a.wbl-pages').click();
+        	// Open PageBrowser
+        	
         	// Hide Menubar
         	this.element.find('a.wbl-designer').hide();
-        	this.element.find('a.wbl-media').hide();
         	this.element.find('span.wbl-language').hide();
         	this.element.find('span.wbl-right').hide();
         	this.element.find('button.wbl-editorSelectionCancel, button.wbl-editorSelectionOK').button().show();
+        	this.element.find('button.wbl-editorSelectionOK').button('option', 'disabled', true);
         	
         	var browser;
         	if(resourceMode == 'pages') {
+        		this.element.find('a.wbl-media').hide();
+        		this.element.find('a.wbl-pages').click();
         		browser = this.element.parent().find('#wbl-pagebrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection);
         	} else if(resourceMode == 'media') {
+        		this.element.find('a.wbl-pages').hide();
+        		this.element.find('a.wbl-media').click();
         		browser = this.element.parent().find('#wbl-mediabrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection);
         	}
         	
