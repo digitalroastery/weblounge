@@ -1,74 +1,7 @@
-<div id="wbl-pagecreatorStep1"><h2>Elternseite auswählen</h2>
-	<div class="wbl-topRight">
-		<button class="wbl-list">List view</button>
-		<button class="wbl-thumbnails">Thumbnails</button>
-		<button class="wbl-tree">Treeview</button>
-	</div>
-	<div class="wbl-listView">
-		<table class="wbl-tablesorter">
-			<thead>
-				<tr>
-					<th>Seite</th>
-				</tr>	
-			</thead>	
-			<tbody id="wbl-listViewContent">
-				{{each pages}}
-				<tr>
-					<td class="filetree"><span class="file">${$value.path}</span></td>
-				</tr>
-	    		{{/each}}
-			</tbody>
-		</table>
-		<div id="wbl-pager">
-			<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/first.png" class="wbl-first"/>
-			<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/prev.png" class="wbl-prev"/>
-			<input type="text" class="wbl-pageDisplay"/>
-			<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/next.png" class="wbl-next"/>
-			<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/last.png" class="wbl-last"/>
-			<select class="wbl-pageSize">
-				<option selected="selected" value="10">10</option>
-				<option value="20">20</option>
-				<option value="30">30</option>
-				<option  value="40">40</option>
-			</select>
-		</div>
-	</div>
-	<div class="wbl-thumbnailView">
-		<div id="wbl-makeMeScrollablePageCreator">
-			<div class="scrollingHotSpotLeft"></div>
-			<div class="scrollingHotSpotRight"></div>
-			<div class="scrollWrapper">
-				<div class="scrollableArea">
-				{{each pages}}
-					<div class="wbl-scrollViewItem wbl-page" id="${$value.path}">
-						<img src="/system/weblounge/previews/${$value.id}/locales/${language}/styles/weblounge-ui:preview" alt="" class="wbl-pageThumbnail" />
-						<h3>${$value.path}</h3>
-					</div>
-			    {{/each}}
-				</div>
-			</div>
-		</div>
-		<div class="wbl-alignCenter">
-			<input type="text" name="filter" placeholder="Filtern..." /> <img src="/weblounge/editor/menubar/images/lupe.png" />
-		</div>
-	</div>
-	<div class="wbl-treeView">
-	    <ul id="wbl-tree" class="filetree">
-		    <li><span class="folder">home</span>
-		    	<ul>
-				{{each pages}}
-			    	<li><span class="file">${$value.path}</span></li>
-			    {{/each}}
-			    </ul>
-		    </li>
-	    </ul>
-	</div>
-</div>
-
-<div id="wbl-pagecreatorStep2">
 <form id="wbl-validate" onsubmit="return false;">
+<button id="wbl-pageSelectorButton" type="button">Elternseite auswählen</button><br /><br />
 Seitentitel: <input type="text" name="title" class="required" /><br /><br />
-URL: <input type="text" name="url" class="required" /><br /><br />
+URL: <span></span><input type="text" name="url" class="required" /><br /><br />
 Layout: <select name="layout" >
 	{{each runtime.getSiteLayouts()}}
 		<option value="${$value}">${$value}</option>
@@ -77,4 +10,3 @@ Layout: <select name="layout" >
 Beschreibung: <input type="text" name="description" /><br /><br />
 Tags: <input type="text" name="tags" />
 </form>
-</div>

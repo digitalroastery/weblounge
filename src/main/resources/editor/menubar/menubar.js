@@ -173,9 +173,9 @@ steal.plugins(
         	$.cookie(cookieName, null, { path: '/' });
         },
         
-        _editorSelectionMode: function(resourceMode, isMultiSelection, success) {
+        _editorSelectionMode: function(editor, resourceMode, isMultiSelection, success) {
         	// Hide Dialog
-        	this.editor = $('#wbl-pageleteditor').parent().hide();
+        	this.editor = editor.parent().hide();
         	$(document).unbind('.dialog-overlay');
         	this.editorOverlay = $('body > div.ui-widget-overlay').hide();
         	// Open PageBrowser
@@ -204,7 +204,7 @@ steal.plugins(
     			success(null);
     		}, this));
     		this.element.find('button.wbl-editorSelectionOK').click($.proxy(function() { 
-    			var selection = browser.editor_resourcebrowser('_getSelection', function(selection) {
+    			browser.editor_resourcebrowser('_getSelection', function(selection) {
     				success(selection);
     			});
     			browser.editor_resourcebrowser('_disableEditorSelectionMode');
@@ -223,6 +223,7 @@ steal.plugins(
         	this.element.find('button.wbl-editorSelectionCancel, button.wbl-editorSelectionOK').hide();
         	// Show Menubar
         	this.element.find('a.wbl-designer').show();
+        	this.element.find('a.wbl-pages').show();
         	this.element.find('a.wbl-media').show();
         	this.element.find('span.wbl-language').show();
         	this.element.find('span.wbl-right').show();

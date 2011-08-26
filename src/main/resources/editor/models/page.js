@@ -9,27 +9,29 @@ steal.then('jsonix')
 		 * @param {Object} params path or id
 		 */
 		findOne: function(params, success, error) {
+			// work version is default
+			var version = 1;
+			if ('version' in params) {
+				version = params.version;
+			}
+			
 			if ('path' in params) {
-				$.ajax('/system/weblounge/pages?details=true&path=' + params.path, {
+				$.ajax('/system/weblounge/pages?details=true&path=' + params.path + '&version=' + version, {
 					success: $.proxy(function(pageXML) {
 						var liveJson = Page.parseXMLPage(pageXML);
-						$.ajax('/system/weblounge/pages/' + liveJson.value.id + '?version=1', {
-							success: this.callback(['parseXMLPage','wrap', success]),
-							error: $.proxy(function() {
-								var livePage = this.wrap(liveJson);
-								success(livePage);
-							}, this)
-						});
-					}, this)
+						if(liveJson == null) {
+							Page.findOne({path: params.path, version: 0}, success);
+						} else {
+							var livePage = this.wrap(liveJson);
+							success(livePage);
+						}
+					}, this),
+					error: function() {
+						Page.findOne({path: params.path, version: 0}, success);
+					}
 				});
 			} 
 			else if ('id' in params) {
-				// work version is default
-				var version = 1;
-				if ('version' in params) {
-					version = params.version;
-				}
-				
 				$.ajax('/system/weblounge/pages/' + params.id + '?version=' + version, {
 					success: this.callback(['parseXMLPage','wrap', success]),
 					error: function() {
@@ -254,6 +256,7 @@ steal.then('jsonix')
 		 */
 		parseXMLPage: function(xml) {
 			var page = $(xml).find('page')[0];
+			if(page == undefined) return null;
 			var unmarshaller = Editor.Jsonix.context().createUnmarshaller();
 			return unmarshaller.unmarshalDocument(page);
 		},

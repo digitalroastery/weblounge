@@ -126,11 +126,18 @@ steal.plugins(
 			if(this.options.selectedResources.lenght < 1) {
 				success(null);
 			} else {
-				var ids = new Array();
-				this.options.selectedResources.each(function(index, elem) {
-					ids.push($(elem).attr('id'));
-				});
-				success(ids);
+				var resources = new Array();
+				this.options.selectedResources.each($.proxy(function(index, elem) {
+					var resource = null;
+					if(this.options.resourceType == 'pages') {
+						resource = this._getPage($(elem).attr('id'));
+					} else {
+						resource = this._getFile($(elem).attr('id'));
+					}
+					if(resource == null) return;
+					resources.push(resource);
+				}, this));
+				success(resources);
 			}
 		},
 		
@@ -212,6 +219,21 @@ steal.plugins(
     		});
 	    	if(page == null) return null;
 	    	return new Page({value: page});
+	    },
+	    
+	    /**
+	     * Get File from the resourceId
+	     */
+	    _getFile: function(id) {
+	    	var file = null;
+	    	$.each(this.options.resources, function(i, resource) {
+	    		if(resource.id == id) {
+	    			file = resource;
+	    			return false;
+	    		}
+	    	});
+	    	if(file == null) return null;
+	    	return new Editor.File({value: file});
 	    },
 		
 		_toggleElement: function(el) {

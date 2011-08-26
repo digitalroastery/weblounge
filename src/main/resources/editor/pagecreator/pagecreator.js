@@ -21,78 +21,10 @@ steal.plugins('jquery',
 	/* @Prototype */
 	{
 		init : function(el){
-			Page.findAll({}, this.callback('_initViews'));
-		},
-		
-		_initViews: function(pages) {
+			$(el).html('//editor/pagecreator/views/init.tmpl', {runtime: this.options.runtime});
+			
 			var pageData = new Object();
-			
-			this.element.html('//editor/pagecreator/views/init.tmpl', {
-				pages: pages, 
-				runtime: this.options.runtime,
-				language: this.options.language
-			});
-			
-			this.scrollView = this.find('div.wbl-thumbnailView').show();
-			this.listView = this.find('div.wbl-listView').hide();
-			this.treeView = this.find('div.wbl-treeView').hide();
-			this.view = this.scrollView;
-			
-			var step1 = this.element.find('div#wbl-pagecreatorStep1').show();
-			var step2 = this.element.find('div#wbl-pagecreatorStep2').hide();
-			
-			
-			// Buttons
-			this.element.find('button.wbl-list').button({
-				icons: {primary: "wbl-iconList"},
-				text: false });
-			this.element.find('button.wbl-tree').button({
-				icons: {primary: "wbl-iconTree"},
-				disabled: false,
-				text: false });
-			this.element.find('button.wbl-thumbnails').button({
-				disabled: false,
-				icons: {primary: "wbl-iconThumbnails"},
-				text: false });
-			
-			// TableView
-			this.table = this.find('table').tablesorter({
-				sortList: [[0,0]],
-		        widgets: ['zebra']
-			}).tablesorterPager({
-				container: this.element.find("#wbl-pager"),
-				positionFixed: false,
-				cssNext: '.wbl-next',
-				cssPrev: '.wbl-prev',
-				cssFirst: '.wbl-first',
-				cssLast: '.wbl-last',
-				cssPageDisplay: '.wbl-pageDisplay',
-				cssPageSize: '.wbl-pageSize'
-			});
-			
-			// ThumbnailView
-			this.divScroll = this.element.find('#wbl-makeMeScrollablePageCreator').smoothDivScroll({
-			  	autoScroll: "onstart",
-				autoScrollDirection: "left",
-				autoScrollStep: 1,
-				autoScrollInterval: 15,
-				visibleHotSpots: "always"
-		  	});
-			
-			// Lazy loading images
-			var rootPath = this.options.runtime.getRootPath();
-			this.element.find('img.wbl-pageThumbnail').lazyload({         
-				placeholder: rootPath + "/editor/resourcebrowser/images/empty_thumbnail.png",
-				event: "scroll",
-				container: this.element.find("div.scrollWrapper")
-			}).one("error", function() {
-				$(this).hide().attr('src', rootPath + '/editor/resourcebrowser/images/empty_thumbnail.png').show();
-			});
-			
-			// TreeView
-			this.element.find("#wbl-tree").treeview({
-				collapsed: true
-			});
+			this.parent = null;
 			
 			// TODO Load AvailableTags
 			Workbench.suggestTags({}, $.proxy(function(tags) {
@@ -132,21 +64,10 @@ steal.plugins('jquery',
 				height: 800,
 				buttons: {
 					Abbrechen: $.proxy(function() {
-						if(this.step.is(step2)) {
-							this.nextButton.text('Weiter');
-							this._showStep(step1);
-							return;
-						}
-						
 						this.element.dialog('close');
 					}, this),
-					Weiter: $.proxy(function() {
-						if(this.step.is(step1)) {
-							this.element.find('input[name=url]').before(this.parent);
-							this.nextButton.text('Fertig');
-							this._showStep(step2);
-							return;
-						}
+					Fertig: $.proxy(function() {
+						if(this.parent == null) return;
 						
 						this.element.find("form#wbl-validate").submit();
 						if(!this.element.find("form#wbl-validate").valid()) return;
@@ -173,15 +94,12 @@ steal.plugins('jquery',
 					this.destroy();
 				},this)
 			});
-			
-			this.divScroll.smoothDivScroll('recalculateScrollableArea');
-			this.step = step1;
-			this.nextButton = this.element.parent().find(".ui-dialog-buttonpane span.ui-button-text:contains('Weiter')");
+//			this.nextButton = this.element.parent().find(".ui-dialog-buttonpane span.ui-button-text:contains('Fertig')");
+//			this.nextButton.button('option', 'disabled', true);
 			this.element.find("form#wbl-validate").validate();
 		},
 		
 		destroy: function() {
-			this.divScroll.smoothDivScroll('destroy');
 			this.element.dialog('destroy');
 			this._super();
 		},
@@ -190,44 +108,18 @@ steal.plugins('jquery',
 	    	this.options = options;
 	    	this.element.dialog('open');
 	    },
-	    
-		_showView: function(view) {
-        	this.view.hide();
-        	this.view = view;
-        	view.show();
-        },
-	    
-	    _showStep : function(step){
-	    	this.step.hide();
-	    	this.step = step;
-	    	step.show();
+		
+	    "button#wbl-pageSelectorButton click": function(el, ev) {
+	    	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', this.element, 'pages', false, $.proxy(function(parentPage) {
+	    		if(parentPage == null) {
+//	    			this.nextButton.button('option', 'disabled', true);
+	    		} else {
+	    			this.parent = parentPage[0].getPath();
+//	    			this.nextButton.button('option', 'disabled', false);
+	    			this.element.find('input[name=url]').prev().html(this.parent);
+	    		}
+	    	}, this));
 	    },
-	    
-		"button.wbl-list click": function(el, ev) {
-			this._showView(this.listView);
-		},
-		
-		"button.wbl-tree click": function(el, ev) {
-			this._showView(this.treeView);
-		},
-		
-		"button.wbl-thumbnails click": function(el, ev) {
-			this._showView(this.scrollView);
-		},
-		
-		".filetree span.file click": function(el, ev) {
-			if(this.active) this.active.removeClass('wbl-active');
-			this.active = el;
-			el.addClass('wbl-active');
-			this.parent = el.text();
-		},
-		
-		"div.wbl-page click": function(el, ev) {
-			if(this.active) this.active.removeClass('wbl-active');
-			this.active = el;
-			el.addClass('wbl-active');
-			this.parent = el.attr('id');
-		},
 		
 		"input[name=title] change": function(el, ev) {
 			this.element.find('input[name=url]').val(encodeURI(el.val().toLowerCase()));
