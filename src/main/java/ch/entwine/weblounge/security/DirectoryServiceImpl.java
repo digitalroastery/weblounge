@@ -41,6 +41,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -148,9 +149,25 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     if (user == null) {
       throw new UsernameNotFoundException(name);
     } else {
+      securityService.setUser(user);
+
+      // Collect the set of roles (granted authorities) for this users
       Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-      for (Object role : user.getPublicCredentials(Role.class)) {
-        authorities.add(new GrantedAuthorityImpl(((Role) role).getIdentifier()));
+      for (Object o : user.getPublicCredentials(Role.class)) {
+        Role masterRole = (Role) o;
+        for (Role r : masterRole.getClosure()) {
+          authorities.add(new GrantedAuthorityImpl(r.getIdentifier()));
+
+          // Every role may or may not be a system role or - in case of non-
+          // system roles, may or may not be including one or more of those
+          // roles. Let's ask for a translation and then add those roles
+          // to the set of granted authorities
+          Role[] systemEquivalents = getSystemRoles(r);
+          for (Role systemRole : systemEquivalents) {
+            authorities.add(new GrantedAuthorityImpl(systemRole.getIdentifier()));
+            user.addPublicCredentials(systemRole);
+          }
+        }
       }
 
       // Try to find the password
@@ -202,6 +219,36 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     }
 
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.security.DirectoryService#getSystemRoles(ch.entwine.weblounge.common.security.Role)
+   */
+  public Role[] getSystemRoles(Role role) {
+    Site site = securityService.getSite();
+
+    if (site == null)
+      throw new IllegalStateException("No site set in security context");
+
+    List<DirectoryProvider> providers = new ArrayList<DirectoryProvider>();
+
+    // Assemble a list of all possible directories
+    List<DirectoryProvider> siteProviders = this.siteDirectories.get(site.getIdentifier());
+    if (siteProviders != null)
+      providers.addAll(siteProviders);
+    providers.addAll(systemDirectories);
+
+    Set<Role> systemRoles = new HashSet<Role>();
+    for (DirectoryProvider directory : providers) {
+      Role[] roleMappings = directory.getSystemRoles(role);
+      if (roleMappings != null && roleMappings.length > 0) {
+        systemRoles.addAll(Arrays.asList(roleMappings));
+      }
+    }
+
+    return systemRoles.toArray(new Role[systemRoles.size()]);
   }
 
   /**

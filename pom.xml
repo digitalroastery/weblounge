@@ -190,6 +190,7 @@
               org.springframework.security;version="3.0.4",
               org.springframework.security.access;version="3.0.4",
               org.springframework.security.access.event;version="3.0.4",
+              org.springframework.security.access.vote;version="3.0.4",
               org.springframework.security.authentication;version="3.0.4",
               org.springframework.security.authentication.event;version="3.0.4",
               org.springframework.security.config;version="3.0.4",

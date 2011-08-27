@@ -7,8 +7,13 @@
        http://www.springframework.org/schema/security
        http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
-  <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Weblounge"
-    entry-point-ref="userEntryPoint" path-type="regex">
+  <sec:http 
+    create-session="ifRequired"
+    servlet-api-provision="true" 
+    realm="Weblounge"
+    entry-point-ref="userEntryPoint" 
+    path-type="regex" 
+    access-decision-manager-ref="accessDecisionManager">
 
     <!-- Login / Logout -->
 
@@ -16,8 +21,8 @@
     <sec:intercept-url pattern="^/weblounge/login/.*" filters="none"/>
 
     <!-- The login processing urls needs to be covered by the filter chain -->
-    <sec:intercept-url pattern="^/system/weblounge/login/.*" access="ROLE_ANONYMOUS"/>
-    <sec:intercept-url pattern="^/system/weblounge/logout/.*" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="^/system/weblounge/login/.*" access="guest"/>
+    <sec:intercept-url pattern="^/system/weblounge/logout/.*" access="guest"/>
 
     <!-- Editor -->
 
@@ -34,22 +39,22 @@
     <sec:intercept-url pattern="^/weblounge-shared/.*" filters="none"/>
 
     <!-- The rest of the editor functionality needs to be protected -->
-    <sec:intercept-url pattern="^/weblounge/.*" access="ROLE_USER"/>
+    <sec:intercept-url pattern="^/weblounge/.*" access="editor"/>
 
     <!-- Enable anonymous access to the REST documentation -->
-    <sec:intercept-url pattern="^/system/weblounge/.*/docs" filters="none"/>
+    <sec:intercept-url pattern="^/system/weblounge/.*/docs" access="guest"/>
 
     <!-- Secure the REST endpoints -->
-    <sec:intercept-url pattern="^/system/weblounge/.*" access="ROLE_USER"/>
+    <sec:intercept-url pattern="^/system/weblounge/.*" access="editor"/>
     
     <!-- Secure the management URLs -->
-    <sec:intercept-url pattern="/system/console/.*" access="ROLE_ADMIN"/>
+    <sec:intercept-url pattern="/system/console/.*" access="systemadministrator"/>
 
     <!-- Trigger authentication on editing entry point -->
-    <sec:intercept-url pattern=".*?(\?|&#36;)edit.*?" access="ROLE_USER"/>
+    <sec:intercept-url pattern=".*?(\?|&#36;)edit.*?" access="editor"/>
 
     <!-- Don't bother about the rest -->
-    <sec:intercept-url pattern="^/.*" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="^/.*" access="guest"/>
     
     <!-- FILTER CONFIGURATION -->
 
@@ -79,7 +84,7 @@
     <sec:logout logout-url="/system/weblounge/logout"/>
 
   </sec:http>
-
+  
   <!-- Instantiates the weblounge security filter that will map requests to their site -->
   <bean id="webloungeSecurityFilter" class="ch.entwine.weblounge.security.WebloungeSecurityFilter">
     <constructor-arg ref="securityService"/>
@@ -123,6 +128,26 @@
        -->
     </sec:authentication-provider>
   </sec:authentication-manager>
+
+  <!-- Get rid of the required ROLE_ prefix for role names -->
+  <bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter">
+    <property name="rolePrefix" value="" />
+  </bean>
+
+  <!-- The authenticated voter is used as is -->
+  <bean id="authenticatedVoter" class="org.springframework.security.access.vote.AuthenticatedVoter" />
+
+  <!-- Register the decision manager with our modified role voter -->
+  <bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+    <property name="decisionVoters">
+      <list>
+        <ref bean="roleVoter" />
+        <ref bean="authenticatedVoter" />
+      </list>
+    </property>
+  </bean>
+  
+  <sec:global-method-security secured-annotations="enabled"  access-decision-manager-ref="accessDecisionManager" />
 
   <!-- Do not use a request cache -->
   <bean id="requestCache" class="org.springframework.security.web.savedrequest.NullRequestCache"/>

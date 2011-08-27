@@ -76,6 +76,9 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
   /** The default password encoding */
   public static final DigestType DEFAULT_ENCODING = DigestType.md5;
 
+  /** The related spring security service */
+  protected SpringSecurityServiceImpl securityService = null;
+
   /** The current bundle */
   protected Bundle bundle = null;
 
@@ -142,6 +145,9 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
       logger.warn("Security is turned off by configuration");
     }
 
+    // Tell the security service abut the current policy
+    securityService.setWideOpen(!securityEnabled);
+
     // Register the security marker
     publishSecurityMarker();
   }
@@ -192,6 +198,10 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
       }
     }
 
+    // Tell the security service abut the current policy
+    securityService.setWideOpen(!isEnabled);
+
+    // Store the security enabled setting
     this.securityEnabled = isEnabled;
 
     // Password encoding
@@ -210,7 +220,8 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
       publishSecurityMarker();
     }
 
-    this.securityEnabled = isEnabled;
+    // Store the password encoding setting
+    this.passwordEncoding = digestType;
   }
 
   /**
@@ -312,6 +323,16 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
       default:
         break;
     }
+  }
+
+  /**
+   * Callback from OSGi to set the spring security service.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SpringSecurityServiceImpl securityService) {
+    this.securityService = securityService;
   }
 
 }
