@@ -84,6 +84,10 @@ public class SQLDirectoryProvider implements DirectoryProvider {
    */
   public User loadUser(String login, Site site) {
     Connection conn = getDBConnection();
+    if (conn == null) {
+      return null;
+    }
+
     User user = null;
     try {
       user = loadUser(login, site, conn);
@@ -96,6 +100,7 @@ public class SQLDirectoryProvider implements DirectoryProvider {
         log.error(e.getMessage());
       }
     }
+
     return user;
   }
 
@@ -158,6 +163,15 @@ public class SQLDirectoryProvider implements DirectoryProvider {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.security.DirectoryService#getSystemRoles(ch.entwine.weblounge.common.security.Role)
+   */
+  public Role[] getSystemRoles(Role role) {
+    return new Role[] {};
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.security.DirectoryProvider#getIdentifier()
    */
   public String getIdentifier() {
@@ -204,6 +218,7 @@ public class SQLDirectoryProvider implements DirectoryProvider {
         dsf = (DataSourceFactory) context.getService(sr[0]);
       } else {
         log.error("No DataSourceFactory found.");
+        return null;
       }
 
     } catch (InvalidSyntaxException e) {
