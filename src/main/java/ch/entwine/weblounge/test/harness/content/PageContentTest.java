@@ -118,7 +118,7 @@ public class PageContentTest extends IntegrationTestBase {
 
     for (Language language : texts.keySet()) {
 
-      String requestUrl = UrlUtils.concat(serverUrl, requestPath, language.getIdentifier());
+      String requestUrl = UrlUtils.concat(serverUrl, requestPath, "index_" + language.getIdentifier() + ".html");
 
       logger.info("Sending request to the {} version of {}", language.getLocale().getDisplayName(), requestUrl);
       HttpGet request = new HttpGet(requestUrl);

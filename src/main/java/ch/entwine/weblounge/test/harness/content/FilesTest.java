@@ -23,7 +23,6 @@ package ch.entwine.weblounge.test.harness.content;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
@@ -112,20 +111,16 @@ public class FilesTest extends IntegrationTestBase {
    */
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of file request handler");
-    try {
-      testGetDocument(serverUrl);
-      testGetDocumentById(serverUrl);
-      testGetDocumentByIdAndName(serverUrl);
-      testGetDocumentByPathLanguage(serverUrl);
-      testGetDocumentByHeaderLanguage(serverUrl);
-      testUploadFile(serverUrl);
-      testUpdateFile(serverUrl);
-      testUpdateFileContents(serverUrl);
-      testDeleteFileContents(serverUrl);
-      testDeleteFile(serverUrl);
-    } catch (Throwable t) {
-      fail("Error occured while testing files request handler: " + t.getMessage());
-    }
+    testGetDocument(serverUrl);
+    testGetDocumentById(serverUrl);
+    testGetDocumentByIdAndName(serverUrl);
+    testGetDocumentByPathLanguage(serverUrl);
+    testGetDocumentByHeaderLanguage(serverUrl);
+    testUploadFile(serverUrl);
+    testUpdateFile(serverUrl);
+    testUpdateFileContents(serverUrl);
+    testDeleteFileContents(serverUrl);
+    testDeleteFile(serverUrl);
   }
 
   /**

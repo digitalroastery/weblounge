@@ -78,7 +78,7 @@ public class JSONActionTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of greeter action");
 
-    String requestUrl = UrlUtils.concat(serverUrl, "greeting/json");
+    String requestUrl = UrlUtils.concat(serverUrl, "greeting/index.json");
 
     // Load the test data
     Map<String, String> greetings = TestSiteUtils.loadGreetings();

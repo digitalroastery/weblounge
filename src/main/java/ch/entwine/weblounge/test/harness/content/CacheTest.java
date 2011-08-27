@@ -97,13 +97,14 @@ public class CacheTest extends IntegrationTestBase {
       try {
         httpClient = new DefaultHttpClient();
         response = TestUtils.request(httpClient, request, null);
-      } catch (Exception e) {
-        throw e;
       } finally {
         if (httpClient != null)
           httpClient.getConnectionManager().shutdown();
       }
     }
+
+    if (response == null)
+      throw new IllegalStateException();
 
     // Test the Cache header
     Header[] cacheHeaders = response.getHeaders("X-Cache-Key");

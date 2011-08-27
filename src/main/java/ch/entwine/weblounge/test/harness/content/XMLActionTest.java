@@ -76,7 +76,7 @@ public class XMLActionTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of greeter action");
 
-    String requestUrl = UrlUtils.concat(serverUrl, "greeting/xml");
+    String requestUrl = UrlUtils.concat(serverUrl, "greeting/index.xml");
 
     // Load the test data
     Map<String, String> greetings = TestSiteUtils.loadGreetings();
