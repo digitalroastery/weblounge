@@ -346,43 +346,6 @@
 	</tag>
 
 	<tag>
-		<description>Creates a mailto link</description>
-		<display-name>Weblounge Mailto Tag</display-name>
-		<name>mailto</name>
-		<tag-class>ch.entwine.weblounge.taglib.content.MailtoTag</tag-class>
-		<body-content>JSP</body-content>
-		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>user</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>class</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>css</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>name</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>lang</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>dir</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>style</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>title</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onclick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>ondblclick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onmousedown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onmouseup</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onmousemove</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onmouseover</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onmouseout</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onkeydown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onkeypress</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onkeyup</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onClick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onDblClick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onMouseDown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onMouseUp</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onMouseMove</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onMouseOver</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onMouseOut</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onKeydown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onKeyPress</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>onKeyUp</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-	</tag>
-
-	<tag>
 		<description>Creates a form tag, linked to the given action</description>
 		<display-name>Weblounge form tag</display-name>
 		<name>form</name>

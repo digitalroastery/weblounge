@@ -21,7 +21,6 @@
 package ch.entwine.weblounge.taglib.security;
 
 import ch.entwine.weblounge.common.security.User;
-import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
 import javax.servlet.jsp.JspException;
@@ -36,7 +35,7 @@ public abstract class UserCheckTag extends WebloungeTag {
   private static final long serialVersionUID = 6402453515629077507L;
 
   /** The user identifier */
-  private String user = null;
+  protected String user = null;
 
   /**
    * Sets the user.
@@ -49,18 +48,17 @@ public abstract class UserCheckTag extends WebloungeTag {
   }
 
   /**
-   * This method is called if the start of a <code>&lt;ifservice&gt;</code> tag
-   * is found. The method evaluates whether the given service is currently
-   * enabled. If so, it returns <code>EVAL_BODY_INCLUDE</code> which will
-   * trigger tag body evaluation, <code>SKIP_BODY</code> otherwise.
+   * This method is called if the start of a <code>&lt;ufuser&gt;</code> tag is
+   * found. The method evaluates whether the given service is currently enabled.
+   * If so, it returns <code>EVAL_BODY_INCLUDE</code> which will trigger tag
+   * body evaluation, <code>SKIP_BODY</code> otherwise.
    * 
    * @return the corresponding <code>int</code> to skip or include the tag body
    * @see javax.servlet.jsp.tagext.Tag#doStartTag()
    */
   public int doStartTag() throws JspException {
     super.doStartTag();
-    Site site = getRequest().getSite();
-    User user = site.getUser(this.user);
+    User user = request.getUser();
     if (skip(user)) {
       return SKIP_BODY;
     } else if (user != null) {
