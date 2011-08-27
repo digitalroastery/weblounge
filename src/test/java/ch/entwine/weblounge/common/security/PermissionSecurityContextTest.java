@@ -41,7 +41,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 
 /**
- * Testcase for {@link SecurityContextImpl}.
+ * Test case for {@link SecurityContextImpl}.
  */
 
 public class PermissionSecurityContextTest extends TestCase {
@@ -83,18 +83,18 @@ public class PermissionSecurityContextTest extends TestCase {
   @Test
   public final void testPermitPermissionAuthority() {
     Permission publish = SystemPermission.PUBLISH;
-    Role translator = SystemRole.TRANSLATOR;
+    Role editor = SystemRole.EDITOR;
 
     // Create the security context
     SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Deny all
-    context.allow(publish, translator);
+    context.allow(publish, editor);
 
     // Test (publish, translator) - expected: success
-    if (!context.check(publish, translator)) {
-      fail("Check for permission " + publish + " and role " + translator + " failed while it shouldn't");
+    if (!context.check(publish, editor)) {
+      fail("Check for permission " + publish + " and role " + editor + " failed while it shouldn't");
     }
   }
 
@@ -104,8 +104,7 @@ public class PermissionSecurityContextTest extends TestCase {
   @Test
   public final void testPermitPermissionAuthorityArray() {
     Permission publish = SystemPermission.PUBLISH;
-    Role translator = SystemRole.TRANSLATOR;
-    Role editor = SystemRole.TRANSLATOR;
+    Role editor = SystemRole.EDITOR;
 
     // Initialize the weblounge admin
     // WebloungeAdminImpl.init("admin", "weblounge".getBytes(),
@@ -116,13 +115,7 @@ public class PermissionSecurityContextTest extends TestCase {
     context.init(path, config);
 
     // Deny all
-    context.allow(publish, translator);
-    context.allow(publish, translator);
-
-    // Test (publish, translator) - expected: success
-    if (!context.check(publish, translator)) {
-      fail("Check for permission " + publish + " and role " + translator + " failed while it shouldn't");
-    }
+    context.allow(publish, editor);
 
     // Test (publish, editor) - expected: success
     if (!context.check(publish, editor)) {
@@ -136,18 +129,18 @@ public class PermissionSecurityContextTest extends TestCase {
   @Test
   public final void testDenyPermissionAuthority() {
     Permission write = SystemPermission.WRITE;
-    Role translator = SystemRole.TRANSLATOR;
+    Role editor = SystemRole.EDITOR;
 
     // Create the security context
     SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Deny all
-    context.deny(write, translator);
+    context.deny(write, editor);
 
     // Test (write, editor) - expected: failure
-    if (context.check(write, translator)) {
-      fail("Check for permission " + write + " and role " + translator + " passed while it shouldn't");
+    if (context.check(write, editor)) {
+      fail("Check for permission " + write + " and role " + editor + " passed while it shouldn't");
     }
   }
 
@@ -157,21 +150,14 @@ public class PermissionSecurityContextTest extends TestCase {
   @Test
   public final void testDenyPermissionAuthorityArray() {
     Permission write = SystemPermission.WRITE;
-    Role translator = SystemRole.TRANSLATOR;
-    Role editor = SystemRole.TRANSLATOR;
+    Role editor = SystemRole.EDITOR;
 
     // Create the security context
     SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Deny all
-    context.deny(write, translator);
     context.deny(write, editor);
-
-    // Test (write, translator) - expected: failure
-    if (context.check(write, translator)) {
-      fail("Check for permission " + write + " and role " + translator + " passed while it shouldn't");
-    }
 
     // Test (write, editor) - expected: failure
     if (context.check(write, editor)) {
@@ -329,7 +315,7 @@ public class PermissionSecurityContextTest extends TestCase {
   public final void testCheckOneOf() {
     Permission publish = SystemPermission.PUBLISH;
     Role editor = SystemRole.EDITOR;
-    Role translator = SystemRole.TRANSLATOR;
+    Role guest = SystemRole.GUEST;
     Role publisher = SystemRole.PUBLISHER;
 
     // Create the security context
@@ -343,9 +329,9 @@ public class PermissionSecurityContextTest extends TestCase {
     }
 
     // Test one of (translator, editor) - expected: failure
-    authorities = new Authority[] { translator, editor };
+    authorities = new Authority[] { guest, editor };
     if (context.checkOne(publish, authorities)) {
-      fail("Neither " + translator + " nor " + editor + " were expected to pass");
+      fail("Neither " + guest + " nor " + editor + " were expected to pass");
     }
   }
 

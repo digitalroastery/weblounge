@@ -27,7 +27,6 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Password;
-import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -40,7 +39,6 @@ import org.w3c.dom.NodeList;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -448,21 +446,6 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       logger.error("Unable to parse last login date '{}'", lastLogin, e);
     }
 
-    // Roles
-    NodeList roles = XPathHelper.selectList(userNode, "security/roles/role", xpath);
-    if (roles != null) {
-      for (int i = 0; i < roles.getLength(); i++) {
-        Node roleNode = roles.item(i);
-        String roleContext = XPathHelper.valueOf(roleNode, "@context", xpath);
-        String roleId = XPathHelper.valueOf(roleNode, "text()", xpath);
-        Role r = site.getRole(roleId, roleContext);
-        if (r != null)
-          user.addPublicCredentials(r);
-        else
-          user.addPublicCredentials(new RoleImpl(roleContext, roleId));
-      }
-    }
-
     // Properties
     NodeList properties = XPathHelper.selectList(userNode, "properties/property", xpath);
     if (properties != null) {
@@ -585,23 +568,6 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       b.append(lastLoginSource);
       b.append("</ip>");
       b.append("</lastlogin>");
-    }
-
-    // Roles
-    Set<Object> roles = getPublicCredentials(Role.class);
-    if (roles != null && roles.size() > 0) {
-      b.append("<roles>");
-      for (Iterator<Object> ri = roles.iterator(); ri.hasNext();) {
-        Role r = (Role)ri.next();
-        if (!r.isAuthorizedBy(SystemRole.GUEST)) {
-          b.append("<role context=\"");
-          b.append(r.getContext());
-          b.append("\">");
-          b.append(r.getIdentifier());
-          b.append("</role>");
-        }
-      }
-      b.append("</roles>");
     }
 
     b.append("</security>");

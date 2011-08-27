@@ -43,7 +43,6 @@ public class PageSecurityContext extends SecurityContextImpl {
    */
   private void addDefaultValues() {
     allowDefault(SystemPermission.READ, SystemRole.GUEST);
-    allowDefault(SystemPermission.TRANSLATE, SystemRole.TRANSLATOR);
     allowDefault(SystemPermission.WRITE, SystemRole.EDITOR);
     allowDefault(SystemPermission.MANAGE, SystemRole.EDITOR);
     allowDefault(SystemPermission.PUBLISH, SystemRole.PUBLISHER);

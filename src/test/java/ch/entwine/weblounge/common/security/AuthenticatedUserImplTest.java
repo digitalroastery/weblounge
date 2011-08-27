@@ -68,7 +68,7 @@ public class AuthenticatedUserImplTest {
   public void setUp() throws Exception {
     user = new AuthenticatedUserImpl(login, realm);
     user.addPrivateCredentials(new PasswordImpl(password, DigestType.plain));
-    user.addPublicCredentials(SystemRole.EDITOR.getClosure());
+    user.addPublicCredentials((Object[])SystemRole.EDITOR.getClosure());
     user.addPublicCredentials(publicKey);
     user.addPublicCredentials(Long.valueOf(1));
     user.addPrivateCredentials(privateKey);
@@ -122,7 +122,7 @@ public class AuthenticatedUserImplTest {
    */
   @Test
   public void testGetPublicCredentials() {
-    assertEquals(5, user.getPublicCredentials().size());
+    assertEquals(4, user.getPublicCredentials().size());
   }
 
   /**
@@ -175,7 +175,7 @@ public class AuthenticatedUserImplTest {
   @Test
   public void testGetRoles() {
     Set<Object> roles = user.getPublicCredentials(Role.class);
-    assertEquals(3, roles.size());
+    assertEquals(2, roles.size());
   }
 
   /**
@@ -197,7 +197,7 @@ public class AuthenticatedUserImplTest {
     Role editor = SystemRole.EDITOR;
     assertTrue(user.getPublicCredentials().contains(editor));
     assertTrue(user.getPublicCredentials().contains(new RoleImpl(editor.getContext(), editor.getIdentifier())));
-    assertTrue(user.getPublicCredentials().contains(SystemRole.TRANSLATOR));
+    assertTrue(user.getPublicCredentials().contains(SystemRole.EDITOR));
     assertFalse(user.getPublicCredentials().contains(SystemRole.PUBLISHER));
   }
 

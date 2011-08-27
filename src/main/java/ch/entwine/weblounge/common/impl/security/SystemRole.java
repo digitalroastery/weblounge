@@ -37,33 +37,25 @@ public final class SystemRole extends RoleImpl {
   /** Guest */
   public static final Role GUEST = new SystemRole("guest");
 
-  /** Translator */
-  public static final Role TRANSLATOR = new SystemRole("translator", GUEST);
-
   /** Editor */
-  public static final Role EDITOR = new SystemRole("editor", TRANSLATOR);
+  public static final Role EDITOR = new SystemRole("editor", GUEST);
 
   /** Publisher */
   public static final Role PUBLISHER = new SystemRole("publisher", EDITOR);
 
-  /** Domain administrator */
-  public static final Role DOMAINADMIN = new SystemRole("domainadmin", PUBLISHER);
-
   /** Site administrator */
-  public static final Role SITEADMIN = new SystemRole("siteadmin", DOMAINADMIN);
+  public static final Role SITEADMIN = new SystemRole("siteadmin", PUBLISHER);
 
   /** Remove role */
   public static final Role SYSTEMADMIN = new SystemRole("systemadmin", SITEADMIN);
 
   /** The system roles collection */
   private static Set<Role> roles = new HashSet<Role>();
-  
+
   static {
     roles.add(SystemRole.GUEST);
-    roles.add(SystemRole.TRANSLATOR);
     roles.add(SystemRole.EDITOR);
     roles.add(SystemRole.PUBLISHER);
-    roles.add(SystemRole.DOMAINADMIN);
     roles.add(SystemRole.SITEADMIN);
     roles.add(SystemRole.SYSTEMADMIN);
   }
@@ -79,15 +71,15 @@ public final class SystemRole extends RoleImpl {
   }
 
   /**
-   * Creates a new system Role which extends the <code>ancestor</code> role.
+   * Creates a new system Role which extends the <code>baseRole</code> role.
    * 
    * @param role
    *          the role name
-   * @param ancestor
+   * @param baseRole
    *          the role to extend
    */
-  private SystemRole(String role, Role ancestor) {
-    super(CONTEXT, role, ancestor);
+  private SystemRole(String role, Role baseRole) {
+    super(CONTEXT, role, baseRole);
   }
 
   /**
@@ -102,38 +94,14 @@ public final class SystemRole extends RoleImpl {
     if (roleId == null)
       return null;
 
-    String context = extractContext(roleId);
-    String id = extractIdentifier(roleId);
-    return getRole(context, id);
-  }
-
-  /**
-   * Returns the corresponding system role or <code>null</code> if no such role
-   * exists.
-   * 
-   * @param context
-   *          the role context, e. g. <code>system</code>
-   * @param id
-   *          the role identifier, e. g. <code>publisher</code>
-   * @return the role or <code>null</code> if no such role exists
-   */
-  public static Role getRole(String context, String id) {
-    // Check if context is "system"
-    if (!"system".equalsIgnoreCase(context))
-      return null;
-
     // Check id
-    if (id.equals(GUEST.getIdentifier()))
+    if (roleId.equals(GUEST.getIdentifier()))
       return GUEST;
-    else if (id.equalsIgnoreCase(TRANSLATOR.getIdentifier()))
-      return TRANSLATOR;
-    else if (id.equalsIgnoreCase(EDITOR.getIdentifier()))
+    else if (roleId.equalsIgnoreCase(EDITOR.getIdentifier()))
       return EDITOR;
-    else if (id.equalsIgnoreCase(PUBLISHER.getIdentifier()))
+    else if (roleId.equalsIgnoreCase(PUBLISHER.getIdentifier()))
       return PUBLISHER;
-    else if (id.equalsIgnoreCase(DOMAINADMIN.getIdentifier()))
-      return DOMAINADMIN;
-    else if (id.equalsIgnoreCase(SITEADMIN.getIdentifier()))
+    else if (roleId.equalsIgnoreCase(SITEADMIN.getIdentifier()))
       return SITEADMIN;
     else
       return null;

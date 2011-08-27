@@ -18,12 +18,12 @@
       <name><![CDATA[Web Office]]></name>
       <email>weboffice@nowhere.com</email>
     </administrator>
-    <authentication>
-    <loginmodule>
-      <class>ch.entwine.weblounge.common.impl.security.jaas.AdminLoginModule</class>
-      <relevance>sufficient</relevance>
-    </loginmodule>
-    </authentication>
+    <roles>
+	    <administrator>my-admin</administrator>
+	    <publisher>my-publisher</publisher>
+	    <editor>my-editor</editor>
+	    <guest>my-guest</guest>
+    </roles>
   </security>
   <templates>
     <template id="default" composeable="true" default="true">

@@ -36,13 +36,11 @@ import ch.entwine.weblounge.common.impl.language.LanguageImpl;
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.WebloungeAdminImpl;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
-import ch.entwine.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.entwine.weblounge.common.impl.site.SiteImpl;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.AuthenticationModule;
-import ch.entwine.weblounge.common.security.AuthenticationModule.Relevance;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Password;
+import ch.entwine.weblounge.common.security.Security;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -148,15 +146,18 @@ public class SiteImplTest {
 
   /** The German language */
   protected static final Language GERMAN = new LanguageImpl(new Locale("de"));
-  
-  /** The admin login module */
-  protected AuthenticationModule adminAuthenticationModule = null;
-  
-  /** The admin login module implementation */ 
-  protected String adminLoginModuleClass = "ch.entwine.weblounge.common.impl.security.jaas.AdminLoginModule";
 
-  /** The admin login module relevance */ 
-  protected Relevance adminLoginModuleRelevance = Relevance.sufficient;
+  /** The admin role */
+  protected String adminRole = "my-admin";
+
+  /** The publisher role */
+  protected String publisherRole = "my-publisher";
+
+  /** The editor role */
+  protected String editorRole = "my-editor";
+
+  /** The guest role */
+  protected String guestRole = "my-guest";
 
   /**
    * @throws java.lang.Exception
@@ -176,7 +177,10 @@ public class SiteImplTest {
     site.setDefaultURL(defaultURL);
     site.addURL(fallbackURL);
     site.addURL(localhost);
-    site.addAuthenticationModule(adminAuthenticationModule);
+    site.addLocalRole(Security.SITE_ADMIN_ROLE, adminRole);
+    site.addLocalRole(Security.PUBLISHER_ROLE, publisherRole);
+    site.addLocalRole(Security.EDITOR_ROLE, editorRole);
+    site.addLocalRole(Security.GUEST_ROLE, guestRole);
   }
 
   /**
@@ -206,8 +210,6 @@ public class SiteImplTest {
     mobileTemplate = new PageTemplateImpl(mobileTemplateId, new URL(mobileTemplateUrl));
     mobileTemplate.setComposeable(true);
     mobileTemplate.setName(mobileTemplateName);
-    // Amin login module
-    adminAuthenticationModule = new AuthenticationModuleImpl(adminLoginModuleClass, adminLoginModuleRelevance);
   }
 
   /**
@@ -510,22 +512,18 @@ public class SiteImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#removeAuthenticationModule(javax.security.auth.spi.AuthenticationModule)}
+   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getLocalRole(String)}
    * .
    */
   @Test
-  public void testRemoveAuthenticationModule() {
-    site.removeAuthenticationModule(adminAuthenticationModule);
-    assertEquals(0, site.getAuthenticationModules().length);
-  }
+  public void testGetLocalRole() {
+    assertEquals(adminRole, site.getLocalRole(Security.SITE_ADMIN_ROLE));
+    assertEquals(publisherRole, site.getLocalRole(Security.PUBLISHER_ROLE));
+    assertEquals(editorRole, site.getLocalRole(Security.EDITOR_ROLE));
+    assertEquals(guestRole, site.getLocalRole(Security.GUEST_ROLE));
 
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getAuthenticationModules()}.
-   */
-  @Test
-  public void testGetAuthenticationModules() {
-    assertEquals(1, site.getAuthenticationModules().length);
+    String nonExistingRole = "test";
+    assertEquals(nonExistingRole, site.getLocalRole(nonExistingRole));
   }
 
 }

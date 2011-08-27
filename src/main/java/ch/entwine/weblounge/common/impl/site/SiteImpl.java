@@ -31,7 +31,6 @@ import ch.entwine.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
-import ch.entwine.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
@@ -46,8 +45,7 @@ import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.scheduler.Job;
 import ch.entwine.weblounge.common.scheduler.JobTrigger;
 import ch.entwine.weblounge.common.scheduler.JobWorker;
-import ch.entwine.weblounge.common.security.AuthenticationModule;
-import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.security.UserListener;
 import ch.entwine.weblounge.common.security.WebloungeUser;
@@ -60,6 +58,7 @@ import ch.entwine.weblounge.common.site.SiteListener;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -113,11 +112,8 @@ public class SiteImpl implements Site {
   /** Regular expression to test the validity of a site identifier */
   private static final String SITE_IDENTIFIER_REGEX = "^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*$";
 
-  /** Name of the administrator role. TODO: Should be configurable */
-  private static final String ADMINISTRATOR_ROLE = "administrator";
-
-  /** Name of the anonymous role. TODO: Should be configurable */
-  private static final String ANONYMOUS_ROLE = "anonymous";
+  /** The local roles */
+  protected Map<String, String> localRoles = null;
 
   /** The site identifier */
   protected String identifier = null;
@@ -173,9 +169,6 @@ public class SiteImpl implements Site {
   /** The site's content repository */
   protected ContentRepository contentRepository = null;
 
-  /** Authentication modules */
-  protected List<AuthenticationModule> authenticationModules = null;
-
   /** Option handling support */
   protected OptionsHelper options = null;
 
@@ -211,7 +204,7 @@ public class SiteImpl implements Site {
     modules = new HashMap<String, Module>();
     urls = new ArrayList<URL>();
     jobs = new HashMap<String, QuartzJob>();
-    authenticationModules = new ArrayList<AuthenticationModule>();
+    localRoles = new HashMap<String, String>();
     i18n = new I18nDictionaryImpl();
     options = new OptionsHelper();
   }
@@ -542,34 +535,6 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#addAuthenticationModule(ch.entwine.weblounge.common.security.AuthenticationModule)
-   */
-  public void addAuthenticationModule(AuthenticationModule module) {
-    if (!authenticationModules.contains(module))
-      authenticationModules.add(module);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.site.Site#removeAuthenticationModule(ch.entwine.weblounge.common.security.AuthenticationModule)
-   */
-  public void removeAuthenticationModule(AuthenticationModule module) {
-    authenticationModules.remove(module);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.site.Site#getLoginModules()
-   */
-  public AuthenticationModule[] getAuthenticationModules() {
-    return authenticationModules.toArray(new AuthenticationModule[authenticationModules.size()]);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.site.Site#getUrl()
    */
   public WebUrl getUrl() {
@@ -745,23 +710,30 @@ public class SiteImpl implements Site {
       }
     }
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.site.Site#getAdministratorRole()
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#addLocalRole(java.lang.String,
+   *      java.lang.String)
    */
-  public String getAdministratorRole() {
-    return ADMINISTRATOR_ROLE;
+  public void addLocalRole(String systemRole, String localRole) {
+    if (StringUtils.isBlank(systemRole))
+      throw new IllegalArgumentException("System role name cannot be blank");
+    if (StringUtils.isBlank(localRole))
+      throw new IllegalArgumentException("Local role name cannot be blank");
+    localRoles.put(systemRole, localRole);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.site.Site#getAnonymousRole()
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#getLocalRole(java.lang.String)
    */
-  public String getAnonymousRole() {
-    return ANONYMOUS_ROLE;
+  public String getLocalRole(String role) {
+    if (localRoles.containsKey(role))
+      return localRoles.get(role);
+    return role;
   }
 
   /**
@@ -1167,7 +1139,7 @@ public class SiteImpl implements Site {
         } catch (Throwable t) {
           logger.error("Error loading module '{}' of site {}", moduleId, identifier);
           if (t instanceof Exception)
-            throw (Exception)t;
+            throw (Exception) t;
           throw new Exception(t);
         }
       }
@@ -1206,27 +1178,6 @@ public class SiteImpl implements Site {
     } finally {
       isShutdownInProgress = false;
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.site.Site#getRole(java.lang.String,
-   *      java.lang.String)
-   */
-  public Role getRole(String role, String context) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.site.Site#getUser(java.lang.String)
-   */
-  public WebloungeUser getUser(String login) {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   /**
@@ -1495,11 +1446,20 @@ public class SiteImpl implements Site {
       site.setAdministrator(SiteAdminImpl.fromXml(adminNode, site, xpathProcessor));
     }
 
-    // login modules
-    NodeList loginModuleNodes = XPathHelper.selectList(config, "ns:security/ns:authentication/ns:loginmodule", xpathProcessor);
-    for (int i = 0; i < loginModuleNodes.getLength(); i++) {
-      AuthenticationModule module = AuthenticationModuleImpl.fromXml(loginModuleNodes.item(i), xpathProcessor);
-      site.addAuthenticationModule(module);
+    // role definitions
+    NodeList roleNodes = XPathHelper.selectList(config, "ns:security/ns:roles/ns:*", xpathProcessor);
+    for (int i = 0; i < roleNodes.getLength(); i++) {
+      Node roleNode = roleNodes.item(i);
+      String roleName = roleNode.getLocalName();
+      String localRoleName = roleNode.getFirstChild().getNodeValue();
+      if (Security.SITE_ADMIN_ROLE.equals(roleName))
+        site.addLocalRole(Security.SITE_ADMIN_ROLE, localRoleName);
+      if (Security.PUBLISHER_ROLE.equals(roleName))
+        site.addLocalRole(Security.PUBLISHER_ROLE, localRoleName);
+      if (Security.EDITOR_ROLE.equals(roleName))
+        site.addLocalRole(Security.EDITOR_ROLE, localRoleName);
+      if (Security.GUEST_ROLE.equals(roleName))
+        site.addLocalRole(Security.GUEST_ROLE, localRoleName);
     }
 
     // options
@@ -1563,17 +1523,35 @@ public class SiteImpl implements Site {
     }
 
     // security
-    if (administrator != null || authenticationModules.size() > 0) {
+    if (administrator != null || localRoles.size() > 0) {
       b.append("<security>");
       if (administrator != null)
         b.append(administrator.toXml());
 
-      if (authenticationModules.size() > 0) {
-        b.append("<authentication>");
-        for (AuthenticationModule module : authenticationModules) {
-          b.append(module.toXml());
-        }
-        b.append("</authentication>");
+      if (localRoles.size() > 0) {
+        b.append("<roles>");
+
+        // Administrator role
+        String administratorRole = localRoles.get(Security.SITE_ADMIN_ROLE);
+        if (administratorRole != null)
+          b.append("<" + Security.SITE_ADMIN_ROLE + ">").append(administratorRole).append("</" + Security.SITE_ADMIN_ROLE + ">");
+
+        // Publisher Role
+        String publisherRole = localRoles.get(Security.PUBLISHER_ROLE);
+        if (publisherRole != null)
+          b.append("<" + Security.PUBLISHER_ROLE + ">").append(publisherRole).append("</" + Security.PUBLISHER_ROLE + ">");
+
+        // Editor Role
+        String editorRole = localRoles.get(Security.EDITOR_ROLE);
+        if (publisherRole != null)
+          b.append("<" + Security.EDITOR_ROLE + ">").append(editorRole).append("</" + Security.EDITOR_ROLE + ">");
+
+        // Guest Role
+        String guestRole = localRoles.get(Security.GUEST_ROLE);
+        if (publisherRole != null)
+          b.append("<" + Security.GUEST_ROLE + ">").append(guestRole).append("</" + Security.GUEST_ROLE + ">");
+
+        b.append("</roles>");
       }
       b.append("</security>");
     }

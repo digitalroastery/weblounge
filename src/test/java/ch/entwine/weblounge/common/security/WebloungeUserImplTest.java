@@ -112,7 +112,6 @@ public class WebloungeUserImplTest {
   protected void setUpPrerequisites() throws Exception {
     mockSite = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(mockSite.getIdentifier()).andReturn("test");
-    EasyMock.expect(mockSite.getRole("apprentice", "myapp")).andReturn(apprenticeRole);
     EasyMock.replay(mockSite);
     lastLoginDate = WebloungeDateFormat.parseStatic("2009-03-17T03:22:05Z");
   }
@@ -415,14 +414,6 @@ public class WebloungeUserImplTest {
     assertTrue(user.removeProperty("test") == null);
     assertEquals(propertyValue, user.removeProperty(propertyName));
     assertTrue(user.removeProperty(propertyName) == null);
-  }
-
-  /**
-   * Test method for role assignments.
-   */
-  @Test
-  public void testRole() {
-    assertTrue(user.getPublicCredentials().contains(apprenticeRole));
   }
 
 }
