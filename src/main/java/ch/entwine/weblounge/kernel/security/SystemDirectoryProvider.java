@@ -20,15 +20,14 @@
 
 package ch.entwine.weblounge.kernel.security;
 
-import static ch.entwine.weblounge.common.security.SecurityConstants.SYSTEM_ID;
-
 import ch.entwine.weblounge.common.impl.security.AuthenticatedUserImpl;
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
-import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.Password;
 import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -40,9 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * An in-memory user directory containing the users and roles used by the
@@ -61,28 +58,6 @@ public class SystemDirectoryProvider implements DirectoryProvider, ManagedServic
 
   /** Configuration key for the system user's password */
   public static final String OPT_ADMIN_PASSWORD = "systemdirectory.password";
-
-  /** The known roles */
-  private static final Set<Role> SYSTEM_ROLES = new HashSet<Role>(4);
-
-  /** Spring oauth role */
-  private static final Role DOMAIN_ADMIN_ROLE = new RoleImpl("system", "ROLE_ADMIN");
-
-  /** Spring admin role */
-  private static final Role SITE_ADMIN_ROLE = new RoleImpl("system", "ROLE_SITE_ADMIN");
-
-  /** Spring user role */
-  private static final Role USER_ROLE = new RoleImpl("system", "ROLE_USER");
-
-  /** Spring user role */
-  private static final Role ANONYMOUS_ROLE = new RoleImpl("system", "ROLE_ANONYMOUS");
-
-  static {
-    SYSTEM_ROLES.add(DOMAIN_ADMIN_ROLE);
-    SYSTEM_ROLES.add(SITE_ADMIN_ROLE);
-    SYSTEM_ROLES.add(USER_ROLE);
-    SYSTEM_ROLES.add(ANONYMOUS_ROLE);
-  }
 
   /** Well-known accounts */
   protected Map<String, User> internalAccounts = new HashMap<String, User>();
@@ -118,7 +93,7 @@ public class SystemDirectoryProvider implements DirectoryProvider, ManagedServic
     internalAccounts.put(login, administrator);
     Password password = new PasswordImpl(StringUtils.trimToEmpty(pass), DigestType.plain);
     administrator.addPrivateCredentials(password);
-    for (Role role : SYSTEM_ROLES) {
+    for (Role role : SystemRole.SYSTEMADMIN.getClosure()) {
       administrator.addPublicCredentials(role);
     }
   }
@@ -129,7 +104,7 @@ public class SystemDirectoryProvider implements DirectoryProvider, ManagedServic
    * @see ch.entwine.weblounge.common.security.DirectoryService#getRoles()
    */
   public Role[] getRoles() {
-    return SYSTEM_ROLES.toArray(new Role[SYSTEM_ROLES.size()]);
+    return SystemRole.SYSTEMADMIN.getClosure();
   }
 
   /**
@@ -145,14 +120,25 @@ public class SystemDirectoryProvider implements DirectoryProvider, ManagedServic
   /**
    * {@inheritDoc}
    * 
+   * Since this directory does not represent a local directory but a system
+   * directory already, there is no need to transform roles into local roles.
+   * 
    * @see ch.entwine.weblounge.common.security.DirectoryService#getLocalRole(ch.entwine.weblounge.common.security.Role)
    */
   public Role getLocalRole(Role role) {
-    if (role.equals(DOMAIN_ADMIN_ROLE)) {
-      return SITE_ADMIN_ROLE;
-    } else {
-      return null;
-    }
+    return role;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * Every role issued by this provider already represents system roles,
+   * therefore no translation is needed.
+   * 
+   * @see ch.entwine.weblounge.common.security.DirectoryService#getSystemRoles(ch.entwine.weblounge.common.security.Role)
+   */
+  public Role[] getSystemRoles(Role role) {
+    return new Role[] {};
   }
 
   /**
@@ -161,7 +147,7 @@ public class SystemDirectoryProvider implements DirectoryProvider, ManagedServic
    * @see ch.entwine.weblounge.common.security.DirectoryProvider#getIdentifier()
    */
   public String getIdentifier() {
-    return SYSTEM_ID;
+    return Security.SYSTEM_CONTEXT;
   }
 
   /**
