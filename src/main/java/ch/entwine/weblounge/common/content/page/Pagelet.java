@@ -45,7 +45,6 @@ public interface Pagelet extends Creatable, Publishable, LocalizedModifiable, Se
   Permission[] permissions = new Permission[] {
       SystemPermission.READ,
       SystemPermission.WRITE,
-      SystemPermission.TRANSLATE,
       SystemPermission.MANAGE };
 
   /**

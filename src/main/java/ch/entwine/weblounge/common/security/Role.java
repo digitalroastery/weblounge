@@ -29,6 +29,21 @@ import java.security.Principal;
  */
 public interface Role extends Principal, Authority, Localizable {
 
+  /** Guest */
+  String GUEST = "guest";
+
+  /** Editor */
+  String EDITOR = "editor";
+
+  /** Publisher */
+  String PUBLISHER = "publisher";
+
+  /** Site administrator */
+  String SITEADMIN = "siteadmin";
+
+  /** Remove role */
+  String SYSTEMADMIN = "systemadmin";
+
   /**
    * Returns the role identifier.
    * 

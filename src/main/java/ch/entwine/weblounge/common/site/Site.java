@@ -27,8 +27,6 @@ import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.RequestListener;
-import ch.entwine.weblounge.common.security.AuthenticationModule;
-import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.UserListener;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 
@@ -265,30 +263,6 @@ public interface Site extends Customizable, RequestListener, Serializable {
   PageLayout getLayout(String layoutId);
 
   /**
-   * Adds <code>module</code> to the ordered set of authentication modules.
-   * 
-   * @param login
-   *          module the new authentication module
-   */
-  void addAuthenticationModule(AuthenticationModule module);
-
-  /**
-   * Removes the login module from the set of authentication modules.
-   * 
-   * @param module
-   *          the authentication module
-   */
-  void removeAuthenticationModule(AuthenticationModule module);
-
-  /**
-   * Returns this site's authentication modules which define who can log into
-   * this site.
-   * 
-   * @return the authentication modules
-   */
-  AuthenticationModule[] getAuthenticationModules();
-
-  /**
    * Adds the listener to the list of user listeners.
    * 
    * @param listener
@@ -473,41 +447,7 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * 
    * @return the site administrator user
    */
-  @Deprecated
   WebloungeUser getAdministrator();
-
-  /**
-   * Returns the user with the given login name or <code>null</code> if no such
-   * user exists.
-   * <p>
-   * Preferably, the
-   * {@link ch.entwine.weblounge.common.security.SecurityService} is used
-   * instead of this method.
-   * 
-   * @param login
-   *          the user's login name
-   * @return the user
-   */
-  @Deprecated
-  WebloungeUser getUser(String login);
-
-  /**
-   * Returns the role with the given identifier, defined in the specified
-   * context or <code>null</code> if no such role was found.
-   * 
-   * <p>
-   * Preferably, the
-   * {@link ch.entwine.weblounge.common.security.SecurityService} is used
-   * instead of this method.
-   * 
-   * @param role
-   *          the role identifier
-   * @param context
-   *          the role domain
-   * @return the role
-   */
-  @Deprecated
-  Role getRole(String role, String context);
 
   /**
    * Returns an <code>XML</code> representation of the site, which will look
@@ -536,25 +476,29 @@ public interface Site extends Customizable, RequestListener, Serializable {
   void setContentRepository(ContentRepository repository);
 
   /**
-   * Returns the name of the site's administrator role.
-   * <p>
-   * Weblounge needs to know what that role name is in order to be able to
-   * assign it to system administrative users.
-   * <p>
-   * In addition, many access restricted actions need to be performed by an
-   * administrator by default.
+   * Adds a local role definition which will be used to map weblounge roles to
+   * local roles. The mapping will be used if a system components needs to add a
+   * default set of permissions.
    * 
-   * 
-   * @return the name of the administrative role
+   * @param sytemRole
+   *          the system role name, e. g. <code>editor</code>
+   * @param localRole
+   *          the local equivalent
    */
-  String getAdministratorRole();
+  void addLocalRole(String sytemRole, String localRole);
 
   /**
-   * Returns the name of the site's anonymous role. Weblounge needs to know what
-   * that role name is in order to be able to assign it to unknown users.
+   * Returns the local role name for each system role as defined by
+   * {@link ch.entwine.weblounge.common.security.Security}.
+   * <p>
+   * This method is used to translate roles that are referred to by weblounge
+   * (e. g. <code>editor</code>) to each individual site, since these roles will
+   * have different names depending on the site's directory.
    * 
-   * @return the name of the anonymous role
+   * @param role
+   *          the system role name
+   * @return the local role
    */
-  String getAnonymousRole();
+  String getLocalRole(String role);
 
 }

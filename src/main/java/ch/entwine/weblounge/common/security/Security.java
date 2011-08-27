@@ -30,6 +30,22 @@ package ch.entwine.weblounge.common.security;
  */
 public interface Security {
 
-  // Marker interface
+  /** Name of the system admin role */
+  String SYSTEM_ADMIN_ROLE = "systemadministrator";
+
+  /** Name of the site admin role */
+  String SITE_ADMIN_ROLE = "administrator";
+
+  /** Name of the publisher role */
+  String PUBLISHER_ROLE = "publisher";
+
+  /** Name of the editor role */
+  String EDITOR_ROLE = "editor";
+
+  /** Name of the anonymous role */
+  String GUEST_ROLE = "guest";
+
+  /** The context for system role definitions */
+  String SYSTEM_CONTEXT = "weblounge";
 
 }

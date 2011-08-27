@@ -40,7 +40,6 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
   Permission[] permissions = new Permission[] {
       SystemPermission.READ,
       SystemPermission.WRITE,
-      SystemPermission.TRANSLATE,
       SystemPermission.PUBLISH,
       SystemPermission.MANAGE };
 

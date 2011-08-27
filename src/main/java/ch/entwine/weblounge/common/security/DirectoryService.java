@@ -61,4 +61,20 @@ public interface DirectoryService {
    */
   Role getLocalRole(Role role);
 
+  /**
+   * Returns the system roles that are represented by the local role
+   * <code>role</code>. This supports translation of roles defined in given
+   * directory structures to Weblounge roles.
+   * <p>
+   * For example, a directory provider may return a user with a local role
+   * <code>SPECIAL_LOCAL_ROLE</code>. This locally defined role may include the
+   * right to edit content in Weblounge, so this method should return the system
+   * role <code>ROLE_EDITOR</code>.
+   * 
+   * @param role
+   *          the local role
+   * @return zero, one or more system roles
+   */
+  Role[] getSystemRoles(Role role);
+
 }

@@ -57,9 +57,6 @@ public final class SystemPermission implements Permission {
   /** Manage permission */
   public static final Permission MANAGE = new SystemPermission("manage");
 
-  /** Translate permission */
-  public static final Permission TRANSLATE = new SystemPermission("translate");
-
   /** Publish permission */
   public static final Permission PUBLISH = new SystemPermission("publish");
 
