@@ -183,7 +183,7 @@ public class SiteServlet extends HttpServlet {
 
     // Check the requested format. In case of a JSP, this can either be
     // processed (default) or raw, in which case the file contents are
-    // returned rather than Jaspers output of it.
+    // returned rather than Jasper's output of it.
     Format format = Format.Processed;
     String f = request.getParameter(PARAM_FORMAT);
     if (StringUtils.isNotBlank(f)) {

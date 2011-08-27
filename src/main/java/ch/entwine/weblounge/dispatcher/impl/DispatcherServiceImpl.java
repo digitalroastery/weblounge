@@ -84,7 +84,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    */
   void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
-    logger.warn("Activating weblounge dispatcher");
+    logger.info("Activating weblounge dispatcher");
 
     Dictionary<String, String> initParams = new Hashtable<String, String>();
     // initParams.put("alias", "/");
