@@ -399,7 +399,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       contextRegistrationProperties.put("httpContext.id", contextName);
       ServiceRegistration contextRegistration = siteBundle.getBundleContext().registerService(HttpContext.class.getName(), bundleHttpContext, contextRegistrationProperties);
       contextRegistrations.put(site, contextRegistration);
-      
+
       // Create and register the site servlet
       SiteServlet siteServlet = new SiteServlet(site, bundleHttpContext);
       Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
@@ -407,6 +407,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       servletRegistrationProperties.put("alias", siteRoot);
       servletRegistrationProperties.put("servlet-name", site.getIdentifier());
       servletRegistrationProperties.put("httpContext.id", contextName);
+      servletRegistrationProperties.put(OPT_JASPER_SCRATCHDIR, PathUtils.concat(jasperConfig.get(OPT_JASPER_SCRATCHDIR), site.getIdentifier()));
       ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
       servletRegistrations.put(site, servletRegistration);
 
