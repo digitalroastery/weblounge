@@ -40,11 +40,12 @@ import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
-import ch.entwine.weblounge.common.impl.security.UserImpl;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.security.SecurityService;
+import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -471,9 +472,15 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
-    // TODO: Replace with current user
-    User admin = site.getAdministrator();
-    User user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
+    // Get the current user
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has editing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
     content.setCreator(user);
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
@@ -547,12 +554,22 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
+    // Get the current user
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has editing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    // TODO: Replace with real user
 
     // Delete the resource
     try {
       resource = contentRepository.deleteContent(uri, content);
+      resource.setModified(user, new Date());
+      contentRepository.put(resource);
     } catch (IllegalStateException e) {
       logger.warn("Tried to remove content from missing resource " + uri);
       throw new WebApplicationException(Status.NOT_FOUND);
@@ -608,7 +625,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
-    User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     ResourceURI resourceURI = null;
 
@@ -637,6 +653,15 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       }
     }
 
+    // Get the current user
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has editing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
     // Parse the resource and update it in the repository
     Resource<?> resource = null;
     // TOOD: Extract resource type
@@ -645,9 +670,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
       ResourceReader<?, ?> resourceReader = serializer.getReader();
       resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
-      // TODO: Replace this with current user
-      User admin = site.getAdministrator();
-      user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       resource.setModified(user, new Date());
       contentRepository.put(resource);
     } catch (IOException e) {
@@ -698,6 +720,15 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Attempt to write to read-only content repository {}", site);
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
+
+    // Get the current user
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has editing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
@@ -758,9 +789,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     } else {
       logger.debug("Creating new resource at {}", resourceURI);
       resource = new FileResourceImpl(resourceURI);
-      User admin = site.getAdministrator();
-      User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-      resource.setCreated(creator, new Date());
+      resource.setCreated(user, new Date());
     }
 
     // Store the new resource
@@ -813,6 +842,15 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Attempt to write to read-only content repository {}", site);
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
+
+    // Get the current user
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has editing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     ResourceURI resourceURI = null;
@@ -923,12 +961,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
               }
             }
           }
+
         } catch (FileUploadException e) {
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         } catch (IOException e) {
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
-
       }
 
       // Octet binary stream
@@ -962,8 +1000,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
       }
 
+      // Has there been a file in the request?
+      if (uploadedFile == null)
+        throw new WebApplicationException(Status.BAD_REQUEST);
+
       // Check the filename
-      if (fileName == null && uploadedFile != null) {
+      if (fileName == null) {
         logger.warn("No filename found for upload, request header 'X-File-Name' not specified");
         fileName = uploadedFile.getName();
         mimeType = mimeTypeDetector.detect(fileName);
@@ -1003,9 +1045,15 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       resourceURI = resource.getURI();
 
       // Set owner and date created
-      User admin = site.getAdministrator();
-      User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-      resource.setCreated(creator, new Date());
+      User user = securityService.getUser();
+      if (user == null)
+        throw new WebApplicationException(Status.UNAUTHORIZED);
+
+      // Make sure the user has editing rights
+      if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+        throw new WebApplicationException(Status.UNAUTHORIZED);
+
+      resource.setCreated(user, new Date());
 
       // If a path has been specified, set it
       if (path != null && StringUtils.isNotBlank(path)) {
@@ -1090,8 +1138,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         IOUtils.closeQuietly(is);
       }
 
-      // TODO: Replace with current user
-      User user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       content.setCreator(user);
       content.setFilename(fileName);
 

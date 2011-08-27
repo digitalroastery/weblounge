@@ -38,9 +38,11 @@ import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.security.SecurityService;
+import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -55,6 +57,9 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.UUID;
@@ -401,12 +406,18 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Get the user
-    // TODO: Change to current user
-    User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
-    boolean isAdmin = true;
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has editing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
 
     // If the page is locked by a different user, refuse
-    if (currentPage.isLocked() && (!currentPage.getLockOwner().equals(currentUser) && !isAdmin)) {
+    if (currentPage.isLocked() && (!currentPage.getLockOwner().equals(user) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
@@ -416,9 +427,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       PageReader pageReader = new PageReader();
       page = pageReader.read(IOUtils.toInputStream(pageXml, "utf-8"), site);
       // TODO: Replace this with current user
-      User admin = site.getAdministrator();
-      User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-      page.setModified(modifier, new Date());
+      page.setModified(user, new Date());
       page.setVersion(Resource.WORK);
       contentRepository.put(page);
       if (!page.getURI().getPath().equals(currentPage.getURI().getPath())) {
@@ -509,6 +518,15 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
+    // Get the user
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has editing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
     // Parse the page and store it
     PageImpl page = null;
     URI uri = null;
@@ -531,9 +549,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.debug("Creating new page at {}", pageURI);
       page = new PageImpl(pageURI);
       page.setTemplate(site.getDefaultTemplate().getIdentifier());
-      User admin = site.getAdministrator();
-      User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-      page.setCreated(creator, new Date());
+      page.setCreated(user, new Date());
     }
 
     // Store the new page
@@ -603,7 +619,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Page lookup {} failed for site '{}'", livePageURI, site);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
-    
+
     Page page = null;
     try {
       if (contentRepository.exists(livePageURI)) {
@@ -615,14 +631,24 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Error lookup up page {} from repository: {}", livePageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
-    
+
     // Get the user
-    // TODO: Change to current user
-    User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
-    boolean isAdmin = false;
-    
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has editing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // If the page is published, the user needs publishing rights
+    if (page.isPublished() && !SecurityUtils.userHasRole(user, SystemRole.PUBLISHER))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
+
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
+    if (page.isLocked() && (!page.getLockOwner().equals(user) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
@@ -827,24 +853,28 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Get the user
-    // TODO: Change to current user
-    User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
-    User futureLockOwner = currentUser;
-    if (StringUtils.isNotBlank(userId)) {
-      futureLockOwner = new UserImpl(userId);
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has editing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
+    if (StringUtils.isNotBlank(userId) && isAdmin) {
+      user = new UserImpl(userId);
     }
 
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && !page.getLockOwner().getLogin().equals(futureLockOwner)) {
+    if (page.isLocked() && !page.getLockOwner().getLogin().equals(user)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
     // Finally, perform the lock operation (on all resource versions)
     try {
-      User admin = site.getAdministrator();
-      User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-      contentRepository.lock(workURI, modifier);
-      logger.info("Page {} has been locked by {}", workURI, currentUser);
+      contentRepository.lock(workURI, user);
+      logger.info("Page {} has been locked by {}", workURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to lock page {} of site '{}' without permission", workURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
@@ -919,22 +949,25 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Get the user
-    // TODO: Change to current user
-    User currentUser = getSite(request).getAdministrator();
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has editing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
 
     // If the page is locked by a different user, refuse
-    // TODO: Determine site admin role
-    boolean isSiteAdmin = true;
-    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isSiteAdmin)) {
+    if (page.isLocked() && (!page.getLockOwner().equals(user) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
     // Finally, perform the lock operation (on all resource versions)
     try {
-      User admin = site.getAdministrator();
-      User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-      contentRepository.unlock(pageURI, modifier);
-      logger.info("Page {} has been unlocked by {}", pageURI, currentUser);
+      contentRepository.unlock(pageURI, user);
+      logger.info("Page {} has been unlocked by {}", pageURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
@@ -1022,40 +1055,45 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Get the user
-    // TODO: Change to current user
-    User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
-    boolean isAdmin = true;
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has publishing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.PUBLISHER))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
 
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
+    if (page.isLocked() && (!page.getLockOwner().equals(user) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
     // Fix the dates
     Date startDate = null;
     Date endDate = null;
+    DateFormat df = new SimpleDateFormat();
     try {
       if (StringUtils.isNotBlank(startDateText))
-        startDate = new Date(startDateText);
+        startDate = df.parse(startDateText);
       else
         startDate = new Date();
       if (StringUtils.isNotBlank(endDateText)) {
-        endDate = new Date(endDateText);
+        endDate = df.parse(endDateText);
       }
-    } catch (IllegalArgumentException e) {
+    } catch (ParseException e) {
       throw new WebApplicationException(Status.BAD_REQUEST);
     }
 
     // Finally, perform the publish operation
     try {
-      page.setPublished(currentUser, startDate, endDate);
-      User admin = site.getAdministrator();
-      User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-      page.setModified(modifier, new Date());
+      page.setPublished(user, startDate, endDate);
+      page.setModified(user, new Date());
       page.setVersion(Resource.LIVE);
       contentRepository.put(page);
       contentRepository.delete(workURI);
-      logger.info("Page {} has been published by {}", workURI, currentUser);
+      logger.info("Page {} has been published by {}", workURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to publish page {} of site '{}' without permission", workURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
@@ -1137,12 +1175,18 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Get the user
-    // TODO: Change to current user
-    User currentUser = new UserImpl(getSite(request).getAdministrator().getLogin());
-    boolean isAdmin = true;
+    User user = securityService.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    // Make sure the user has publishing rights
+    if (!SecurityUtils.userHasRole(user, SystemRole.PUBLISHER))
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+
+    boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
 
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && (!page.getLockOwner().equals(currentUser) && !isAdmin)) {
+    if (page.isLocked() && (!page.getLockOwner().equals(user) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
@@ -1155,12 +1199,10 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         logger.debug("Creating work version of {}", workURI);
         page.setVersion(Resource.WORK);
         page.setPublished(null, null, null);
-        User admin = site.getAdministrator();
-        User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-        page.setModified(modifier, new Date());
+        page.setModified(user, new Date());
         contentRepository.put(page);
       }
-      logger.info("Page {} has been unpublished by {}", liveURI, currentUser);
+      logger.info("Page {} has been unpublished by {}", liveURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to unpublish page {} of site '{}' without permission", liveURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
