@@ -35,16 +35,19 @@ public class WorkbenchTag extends WebloungeTag {
 
   /** Serial version uid */
   private static final long serialVersionUID = -498800954917968929L;
-  
+
   /** Path to the workbench script */
   public static final String WORKBENCH_SCRIPT = "<script src=\"/weblounge/steal/steal.js?editor,development\"></script>";
-  
+
   /**
    * Writes the workbench script tag to the output.
    * 
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
+    // if (!SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR))
+    // return super.doEndTag();
+
     if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
       Cookie cookie = new Cookie(EditingState.STATE_COOKIE, "true");
       cookie.setPath("/");
@@ -52,15 +55,16 @@ public class WorkbenchTag extends WebloungeTag {
       writeWorkbenchScript();
       return super.doEndTag();
     }
-    
-    if(request.getCookies() == null) return super.doEndTag();
-    for(Cookie cookie : request.getCookies()) {
-      if(cookie.getName().equals(EditingState.STATE_COOKIE) && cookie.getValue().equals("true")) {
-         writeWorkbenchScript();
-         break;
+
+    if (request.getCookies() == null)
+      return super.doEndTag();
+    for (Cookie cookie : request.getCookies()) {
+      if (cookie.getName().equals(EditingState.STATE_COOKIE) && "true".equals(cookie.getValue())) {
+        writeWorkbenchScript();
+        break;
       }
     }
-    
+
     return super.doEndTag();
   }
 
