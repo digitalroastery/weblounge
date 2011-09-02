@@ -20,6 +20,9 @@
 
 package ch.entwine.weblounge.common.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Utility methods around security.
  */
@@ -83,6 +86,23 @@ public final class SecurityUtils {
       }
     }
     return false;
+  }
+
+  /**
+   * Returns a user's roles.
+   * 
+   * @param user
+   *          the user
+   * @return the roles
+   */
+  public static Role[] getRoles(User user) {
+    if (user == null)
+      throw new IllegalArgumentException("User cannot be null");
+    List<Role> roles = new ArrayList<Role>();
+    for (Object o : user.getPublicCredentials(Role.class)) {
+      roles.add((Role) o);
+    }
+    return roles.toArray(new Role[roles.size()]);
   }
 
 }
