@@ -139,7 +139,6 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
 
     // Activate the security filters
     if (securityEnabled) {
-      logger.info("Activating spring security");
       startSecurity();
     } else {
       logger.warn("Security is turned off by configuration");
