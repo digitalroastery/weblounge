@@ -148,8 +148,8 @@
   <xsd:element name="includes">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element ref="link" minOccurs="0" />
-        <xsd:element ref="script" minOccurs="0" />
+        <xsd:element ref="link" minOccurs="0" maxOccurs="unbounded" />
+        <xsd:element ref="script" minOccurs="0" maxOccurs="unbounded" />
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
