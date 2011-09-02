@@ -106,10 +106,10 @@
     <xsd:complexType>
       <xsd:sequence>
         <xsd:element name="name" type="xsd:string" minOccurs="0" />
-        <xsd:element name="renderer" type="xsd:anyURI" />
+        <xsd:element name="renderer" type="xsd:anyURI" minOccurs="0" />
         <xsd:element name="stage" type="xsd:string" minOccurs="0" />
-        <xsd:element name="recheck" type="durationType" />
-        <xsd:element name="valid" type="durationType" />
+        <xsd:element name="recheck" type="durationType" minOccurs="0" />
+        <xsd:element name="valid" type="durationType" minOccurs="0" />
       </xsd:sequence>
       <xsd:attribute name="id" type="xsd:ID" />
       <xsd:attribute name="composeable" type="xsd:boolean" />
