@@ -23,6 +23,7 @@ package ch.entwine.weblounge.taglib.content;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.editor.EditingState;
@@ -30,6 +31,8 @@ import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Module;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.ComposerTagSupport;
 
 import java.io.IOException;
@@ -72,7 +75,7 @@ public class ComposerTag extends ComposerTagSupport {
     long version = request.getVersion();
     Page targetPage = getTargetPage();
     Page contentPage = getContentProvider();
-
+    
     boolean isLocked = targetPage != null && targetPage.isLocked();
     boolean isLockedByCurrentUser = targetPage != null && isLocked && user.equals(targetPage.getLockOwner());
     boolean isWorkVersion = version == Resource.WORK;
@@ -104,12 +107,27 @@ public class ComposerTag extends ComposerTagSupport {
   protected int beforePagelet(Pagelet pagelet, int position, JspWriter writer)
       throws IOException, ContentRepositoryException,
       ContentRepositoryUnavailableException {
-
+    
     // Start editing support
     // FIXME temporary solution
     // if (version == Page.WORK && isLockedByCurrentUser) {
     if (isEditingState(request)) {
-      writer.println("<div class=\"pagelet\">");
+      
+      boolean hasEditor = false;
+      
+      Site site = getTargetPage().getURI().getSite();
+      Module module = site.getModule(pagelet.getModule());
+      if (module != null) {
+         PageletRenderer renderer = module.getRenderer(pagelet.getIdentifier());
+         if(renderer.getEditor() != null) hasEditor = true;
+      }
+      
+      // if pagelet has no editor add a cssClass noEditor
+      if(hasEditor) {
+        writer.println("<div class=\"pagelet\">");
+      } else {
+        writer.println("<div class=\"pagelet wbl-noEditor\">");
+      }
       writer.flush();
     }
     return super.beforePagelet(pagelet, position, writer);
