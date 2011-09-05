@@ -158,6 +158,7 @@ steal.plugins(
         		$('input#wbl-editmode', this.element).removeAttr('disabled');
         		$('input#wbl-editmode', this.element).val(['editmode']);
         		this._enableEditing();
+        		$('#wbl-pageletcreator').editor_pageletcreator();
         	} 
         	else {
         		$('input#wbl-editmode', this.element).removeAttr('disabled');
@@ -372,6 +373,7 @@ steal.plugins(
 						$('#weblounge-editor').editor_app('_initComposer', this.options.page);
 					}
 					this._enableEditing();
+					$('#wbl-pageletcreator').editor_pageletcreator();
 				}, this), $.proxy(function() {
 					$('input#wbl-editmode', this.element).val([]);
 					alert('Locking failed!');

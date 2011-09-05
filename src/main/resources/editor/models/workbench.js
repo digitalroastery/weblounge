@@ -14,7 +14,7 @@ steal.then(function($) {
 			
 			if ('id' in params) {
 				$.ajax(url, {
-					success: success,
+					success: success
 //					beforeSend : function (xhr) {
 //						if('language' in params) {
 //							xhr.setRequestHeader('Accept-Language', params.language);

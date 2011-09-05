@@ -41,7 +41,7 @@ steal.plugins('jquery/controller',
 		"img.wbl-itemDelete click": function(el, ev) {
 			ev.stopPropagation();
 			el.trigger('deleteResource', el.parent().parent());
-		},
+		}
 		
 	});
 
