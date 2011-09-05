@@ -71,415 +71,440 @@ import javax.servlet.http.HttpServletResponse;
  */
 public final class PageRequestHandlerImpl implements PageRequestHandler {
 
-  /** Logging facility */
-  protected static final Logger logger = LoggerFactory.getLogger(PageRequestHandlerImpl.class);
+	/** Logging facility */
+	protected static final Logger logger = LoggerFactory
+			.getLogger(PageRequestHandlerImpl.class);
 
-  /** Alternate uri prefix */
-  protected static final String URI_PREFIX = "/weblounge-pages/";
+	/** Alternate uri prefix */
+	protected static final String URI_PREFIX = "/weblounge-pages/";
 
-  /** The singleton handler instance */
-  private static final PageRequestHandlerImpl handler = new PageRequestHandlerImpl();
+	/** The singleton handler instance */
+	private static final PageRequestHandlerImpl handler = new PageRequestHandlerImpl();
 
-  /**
-   * Handles the request for a simple url available somewhere in the system. The
-   * handler sets the response type, does the url history and then forwards
-   * request to the corresponding JSP page or XSLT stylesheet.
-   * <p>
-   * This method returns <code>true</code> if the handler is decided to handle
-   * the request, <code>false</code> otherwise.
-   * 
-   * @param request
-   *          the weblounge request
-   * @param response
-   *          the weblounge response
-   */
-  public boolean service(WebloungeRequest request, WebloungeResponse response) {
+	/**
+	 * Handles the request for a simple url available somewhere in the system.
+	 * The handler sets the response type, does the url history and then
+	 * forwards request to the corresponding JSP page or XSLT stylesheet.
+	 * <p>
+	 * This method returns <code>true</code> if the handler is decided to handle
+	 * the request, <code>false</code> otherwise.
+	 * 
+	 * @param request
+	 *            the weblounge request
+	 * @param response
+	 *            the weblounge response
+	 */
+	public boolean service(WebloungeRequest request, WebloungeResponse response) {
 
-    logger.debug("Page handler agrees to handle {}", request.getUrl());
+		logger.debug("Page handler agrees to handle {}", request.getUrl());
 
-    Mode processingMode = Mode.Default;
-    WebUrl url = request.getUrl();
-    String path = url.getPath();
-    RequestFlavor contentFlavor = request.getFlavor();
+		Mode processingMode = Mode.Default;
+		WebUrl url = request.getUrl();
+		String path = url.getPath();
+		RequestFlavor contentFlavor = request.getFlavor();
 
-    if (contentFlavor == null || contentFlavor.equals(ANY))
-      contentFlavor = RequestFlavor.HTML;
+		if (contentFlavor == null || contentFlavor.equals(ANY))
+			contentFlavor = RequestFlavor.HTML;
 
-    // Check the request flavor
-    // TODO: Criteria would be loading the page from the repository
-    // TODO: Think about performance, page lookup is expensive
-    if (!HTML.equals(contentFlavor)) {
-      logger.debug("Skipping request for {}, flavor {} is not supported", path, request.getFlavor());
-      return false;
-    }
+		// Check the request flavor
+		// TODO: Criteria would be loading the page from the repository
+		// TODO: Think about performance, page lookup is expensive
+		if (!HTML.equals(contentFlavor)) {
+			logger.debug("Skipping request for {}, flavor {} is not supported",
+					path, request.getFlavor());
+			return false;
+		}
 
-    // Check the request method
-    String requestMethod = request.getMethod();
-    if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
-      logger.debug("Page handler answered head request for {}", request.getUrl());
-      return true;
-    }
-    
-    // Determine the editing state
-    boolean isEditing = getEditingInformation(request);
+		// Check the request method
+		String requestMethod = request.getMethod();
+		if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
+			logger.debug("Page handler answered head request for {}",
+					request.getUrl());
+			return true;
+		}
 
-    // Create the set of tags that identify the page
-    CacheTagSet cacheTags = createCacheTags(request);
+		// Determine the editing state
+		boolean isEditing = getEditingInformation(request);
 
-    // Check if the request is controlled by an action.
-    Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
+		// Create the set of tags that identify the page
+		CacheTagSet cacheTags = createCacheTags(request);
 
-    // Check if the page is already part of the cache. If so, our task is
-    // already done!
-    if (request.getVersion() == Resource.LIVE && !isEditing && action == null) {
-      long validTime = Renderer.DEFAULT_VALID_TIME;
-      long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+		// Check if the request is controlled by an action.
+		Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
 
-      // Check if the page is already part of the cache
-      if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
-        logger.debug("Page handler answered request for {} from cache", request.getUrl());
-        return true;
-      }
+		// Check if the page is already part of the cache. If so, our task is
+		// already done!
+		if (request.getVersion() == Resource.LIVE && !isEditing
+				&& action == null) {
+			long validTime = Renderer.DEFAULT_VALID_TIME;
+			long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
 
-      processingMode = Mode.Cached;
-    } else if (Http11Constants.METHOD_HEAD.equals(requestMethod)) {
-      // handle HEAD requests
-      Http11Utils.startHeadResponse(response);
-      processingMode = Mode.Head;
-    } else if (request.getVersion() == Resource.WORK) {
-      response.setMaximumValidTime(0);
-    }
+			// Check if the page is already part of the cache
+			if (response.startResponse(cacheTags.getTags(), validTime,
+					recheckTime)) {
+				logger.debug("Page handler answered request for {} from cache",
+						request.getUrl());
+				return true;
+			}
 
-    // Add the cache tags (in addition to what the action handler might have
-    // set already)
-    response.addTags(cacheTags);
+			processingMode = Mode.Cached;
+		} else if (Http11Constants.METHOD_HEAD.equals(requestMethod)) {
+			// handle HEAD requests
+			Http11Utils.startHeadResponse(response);
+			processingMode = Mode.Head;
+		} else if (request.getVersion() == Resource.WORK) {
+			response.setMaximumValidTime(0);
+		}
 
-    // Set the default maximum render and valid times for pages
-    response.setMaximumRecheckTime(Renderer.DEFAULT_RECHECK_TIME);
-    response.setMaximumValidTime(Renderer.DEFAULT_VALID_TIME);
+		// Add the cache tags (in addition to what the action handler might have
+		// set already)
+		response.addTags(cacheTags);
 
-    // Get the renderer id that has been registered with the url. For this, we
-    // first have to load the page data, then get the associated renderer
-    // bundle.
-    try {
-      Page page = null;
-      ResourceURI pageURI = null;
-      Site site = request.getSite();
+		// Set the default maximum render and valid times for pages
+		response.setMaximumRecheckTime(Renderer.DEFAULT_RECHECK_TIME);
+		response.setMaximumValidTime(Renderer.DEFAULT_VALID_TIME);
 
-      // Check if a page was passed as an attribute
-      if (request.getAttribute(WebloungeRequest.PAGE) != null) {
-        page = (Page) request.getAttribute(WebloungeRequest.PAGE);
-        pageURI = page.getURI();
-      }
+		// Get the renderer id that has been registered with the url. For this,
+		// we
+		// first have to load the page data, then get the associated renderer
+		// bundle.
+		try {
+			Page page = null;
+			ResourceURI pageURI = null;
+			Site site = request.getSite();
 
-      // Load the page from the content repository
-      else {
-        ContentRepository contentRepository = site.getContentRepository();
-        if (contentRepository == null) {
-          logger.debug("No content repository found for site '{}'", site);
-          return false;
-        }
+			// Check if a page was passed as an attribute
+			if (request.getAttribute(WebloungeRequest.PAGE) != null) {
+				page = (Page) request.getAttribute(WebloungeRequest.PAGE);
+				pageURI = page.getURI();
+			}
 
-        // Load the page
-        try {
-          if (action != null) {
-            pageURI = getPageURIForAction(action, request);
-          } else if (path.startsWith(URI_PREFIX)) {
-            String uriSuffix = StringUtils.chomp(path.substring(URI_PREFIX.length()), "/");
-            uriSuffix = URLDecoder.decode(uriSuffix, "utf-8");
-            pageURI = new PageURIImpl(site, null, uriSuffix);
-          } else {
-            pageURI = new PageURIImpl(request);
-            if (isEditing)
-              pageURI.setVersion(Resource.WORK);
-          }
+			// Load the page from the content repository
+			else {
+				ContentRepository contentRepository = site
+						.getContentRepository();
+				if (contentRepository == null) {
+					logger.debug("No content repository found for site '{}'",
+							site);
+					return false;
+				}
 
-          // Does the page exist?
-          if (!contentRepository.existsInAnyVersion(pageURI))
-            return false;
-          else if (!isEditing && !contentRepository.exists(pageURI))
-            DispatchUtils.sendNotFound(request, response);
-          else if (isEditing && !contentRepository.exists(pageURI))
-            pageURI.setVersion(Resource.LIVE);
-          
-          page = (Page) contentRepository.get(pageURI);
-          if (page == null) {
-            DispatchUtils.sendNotFound(request, response);
-            return true;
-          }
-        } catch (ContentRepositoryException e) {
-          logger.error("Unable to load page {} from {}: {}", new Object[] {
-              pageURI,
-              contentRepository,
-              e.getMessage(),
-              e });
-          DispatchUtils.sendInternalError(request, response);
-          return true;
-        }
-      }
-      
-      // Add the resource id to the cache
-      response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
+				// Load the page
+				try {
+					if (action != null) {
+						pageURI = getPageURIForAction(action, request);
+					} else if (path.startsWith(URI_PREFIX)) {
+						String uriSuffix = StringUtils.chomp(
+								path.substring(URI_PREFIX.length()), "/");
+						uriSuffix = URLDecoder.decode(uriSuffix, "utf-8");
+						pageURI = new PageURIImpl(site, null, uriSuffix);
+					} else {
+						pageURI = new PageURIImpl(request);
+						if (isEditing)
+							pageURI.setVersion(Resource.WORK);
+					}
 
-      // Is it published?
-      if (!page.isPublished() && !(page.getVersion() == Resource.WORK)) {
-        logger.debug("Access to unpublished page {}", pageURI);
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        return true;
-      }
+					// Does the page exist?
+					if (!contentRepository.existsInAnyVersion(pageURI))
+						return false;
+					else if (!isEditing && !contentRepository.exists(pageURI))
+						DispatchUtils.sendNotFound(request, response);
+					else if (isEditing && !contentRepository.exists(pageURI))
+						pageURI.setVersion(Resource.LIVE);
 
-      // Does the client already have up-to-date content?
-      if (action == null && !ResourceUtils.hasChanged(request, page)) {
-        logger.debug("Page {} was not modified", pageURI);
-        DispatchUtils.sendNotModified(request, response);
-        return true;
-      }
+					page = (Page) contentRepository.get(pageURI);
+					if (page == null) {
+						DispatchUtils.sendNotFound(request, response);
+						return true;
+					}
+				} catch (ContentRepositoryException e) {
+					logger.error(
+							"Unable to load page {} from {}: {}",
+							new Object[] { pageURI, contentRepository,
+									e.getMessage(), e });
+					DispatchUtils.sendInternalError(request, response);
+					return true;
+				}
+			}
 
-      // Can the page be accessed by the current user?
-      User user = request.getUser();
-      try {
-        // TODO: Check permission
-        // PagePermission p = new PagePermission(page, user);
-        // AccessController.checkPermission(p);
-      } catch (SecurityException e) {
-        logger.warn("Accessed to page {} denied for user {}", pageURI, user);
-        DispatchUtils.sendAccessDenied(request, response);
-        return true;
-      }
+			// Add the resource id to the cache
+			response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
 
-      // Store the page in the request
-      request.setAttribute(WebloungeRequest.PAGE, page);
+			// Is it published?
+			if (!page.isPublished() && !(page.getVersion() == Resource.WORK)) {
+				logger.debug("Access to unpublished page {}", pageURI);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+				return true;
+			}
 
-      // Get hold of the page template
-      PageTemplate template = null;
-      try {
-        template = getPageTemplate(page, request);
-      } catch (IllegalStateException e) {
-        DispatchUtils.sendInternalError(request, response);
-        return true;
-      }
+			// Does the client already have up-to-date content?
+			if (action == null && !ResourceUtils.hasChanged(request, page)) {
+				logger.debug("Page {} was not modified", pageURI);
+				DispatchUtils.sendNotModified(request, response);
+				return true;
+			}
 
-      // Does the template support the requested flavor?
-      if (!template.supportsFlavor(contentFlavor)) {
-        logger.warn("Template '{}' does not support requested flavor {}", template, contentFlavor);
-        DispatchUtils.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, request, response);
-        return true;
-      }
+			// Can the page be accessed by the current user?
+			User user = request.getUser();
+			try {
+				// TODO: Check permission
+				// PagePermission p = new PagePermission(page, user);
+				// AccessController.checkPermission(p);
+			} catch (SecurityException e) {
+				logger.warn("Accessed to page {} denied for user {}", pageURI,
+						user);
+				DispatchUtils.sendAccessDenied(request, response);
+				return true;
+			}
 
-      // Add last modified header
-      response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(page).getTime());
-      // Add ETag header
-      String eTag = ResourceUtils.getETagValue(page);
-      response.setHeader("ETag", eTag);
-      // Set the content type
-      response.setContentType("text/html");
+			// Store the page in the request
+			request.setAttribute(WebloungeRequest.PAGE, page);
 
-      // Add additional cache tags
-      response.addTag(CacheTag.Renderer, template.getIdentifier());
+			// Get hold of the page template
+			PageTemplate template = null;
+			try {
+				template = getPageTemplate(page, request);
+			} catch (IllegalStateException e) {
+				logger.debug(e.getMessage());
+				DispatchUtils.sendInternalError(request, response);
+				return true;
+			}
 
-      // Configure valid and recheck time according to the template
-      response.setMaximumRecheckTime(template.getRecheckTime());
-      response.setMaximumValidTime(template.getValidTime());
+			// Does the template support the requested flavor?
+			if (!template.supportsFlavor(contentFlavor)) {
+				logger.warn(
+						"Template '{}' does not support requested flavor {}",
+						template, contentFlavor);
+				DispatchUtils.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED,
+						request, response);
+				return true;
+			}
 
-      // Set the Expires header
-      long expires = response.getMaxiumValidTime();
-      if (expires > 0) {
-        expires = System.currentTimeMillis() + expires;
-      } else {
-        expires = System.currentTimeMillis() + Times.MS_PER_MIN;
-      }
-      response.setDateHeader("Expires", expires);
+			// Add last modified header
+			response.setDateHeader("Last-Modified", ResourceUtils
+					.getModificationDate(page).getTime());
+			// Add ETag header
+			String eTag = ResourceUtils.getETagValue(page);
+			response.setHeader("ETag", eTag);
+			// Set the content type
+			response.setContentType("text/html");
 
-      // Select the actual renderer by method and have it render the
-      // request. Since renderers are being pooled by the bundle, we
-      // have to return it after the request has finished.
-      try {
-        logger.debug("Rendering {} using page template '{}'", path, template);
-        template.render(request, response);
-      } catch (Throwable t) {
-        String params = RequestUtils.dumpParameters(request);
-        String msg = "Error rendering template '" + template + "' on '" + path + "' " + params;
-        Throwable o = t.getCause();
-        if (o != null) {
-          msg += ": " + o.getMessage();
-          logger.error(msg, o);
-        } else {
-          logger.error(msg, t);
-        }
-        DispatchUtils.sendInternalError(request, response);
-      }
+			// Add additional cache tags
+			response.addTag(CacheTag.Renderer, template.getIdentifier());
 
-      return true;
-    } catch (EOFException e) {
-      logger.debug("Error writing page '{}' back to client: connection closed by client", url);
-      return true;
-    } catch (IOException e) {
-      logger.error("I/O exception while sending error status: {}", e.getMessage(), e);
-      return true;
-    } finally {
-      if (action == null) {
-        switch (processingMode) {
-          case Cached:
-            response.endResponse();
-            break;
-          case Head:
-            Http11Utils.endHeadResponse(response);
-            break;
-          default:
-            break;
-        }
-      }
-    }
-  }
+			// Configure valid and recheck time according to the template
+			response.setMaximumRecheckTime(template.getRecheckTime());
+			response.setMaximumValidTime(template.getValidTime());
 
-  /**
-   * Returns the cookie containing the current editing state or
-   * <code>null</code> if no such cookie exists.
-   * 
-   * @param request
-   *          the request
-   * @return the editing state
-   */
-  private boolean getEditingInformation(WebloungeRequest request) {
-    if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
-      return true;
-    } else if (request.getCookies() != null) {
-      for (Cookie cookie : request.getCookies()) {
-        if (EditingState.STATE_COOKIE.equals(cookie.getName())) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+			// Set the Expires header
+			long expires = response.getMaxiumValidTime();
+			if (expires > 0) {
+				expires = System.currentTimeMillis() + expires;
+			} else {
+				expires = System.currentTimeMillis() + Times.MS_PER_MIN;
+			}
+			response.setDateHeader("Expires", expires);
 
-  /**
-   * Tries to determine the target page for the action result. The
-   * <code>{@link HTMLAction.TARGET}</code> request attribute and parameter will
-   * be considered. In any case, the site's homepage will be the fallback.
-   * 
-   * @param action
-   *          the action handler
-   * @param request
-   *          the weblounge request
-   * @return the target page
-   */
-  protected ResourceURI getPageURIForAction(Action action,
-      WebloungeRequest request) {
-    ResourceURI target = null;
-    Site site = request.getSite();
+			// Select the actual renderer by method and have it render the
+			// request. Since renderers are being pooled by the bundle, we
+			// have to return it after the request has finished.
+			try {
+				logger.debug("Rendering {} using page template '{}'", path,
+						template);
+				template.render(request, response);
+			} catch (Throwable t) {
+				String params = RequestUtils.dumpParameters(request);
+				String msg = "Error rendering template '" + template + "' on '"
+						+ path + "' " + params;
+				Throwable o = t.getCause();
+				if (o != null) {
+					msg += ": " + o.getMessage();
+					logger.error(msg, o);
+				} else {
+					logger.error(msg, t);
+				}
+				DispatchUtils.sendInternalError(request, response);
+			}
 
-    // Check if a target-page parameter was passed
-    if (request.getParameter(HTMLAction.TARGET) != null) {
-      String targetUrl = request.getParameter(HTMLAction.TARGET);
-      try {
-        String decocedTargetUrl = null;
-        String encoding = request.getCharacterEncoding();
-        if (encoding == null)
-          encoding = "utf-8";
-        decocedTargetUrl = URLDecoder.decode(targetUrl, encoding);
-        target = new PageURIImpl(site, decocedTargetUrl);
-      } catch (UnsupportedEncodingException e) {
-        logger.warn("Error while decoding target url {}: {}", targetUrl, e.getMessage());
-        target = new PageURIImpl(site, "/");
-      }
-    }
+			return true;
+		} catch (EOFException e) {
+			logger.debug(
+					"Error writing page '{}' back to client: connection closed by client",
+					url);
+			return true;
+		} catch (IOException e) {
+			logger.error("I/O exception while sending error status: {}",
+					e.getMessage(), e);
+			return true;
+		} finally {
+			if (action == null) {
+				switch (processingMode) {
+				case Cached:
+					response.endResponse();
+					break;
+				case Head:
+					Http11Utils.endHeadResponse(response);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
 
-    // Nothing found, let's choose the site's homepage
-    if (target == null) {
-      target = new PageURIImpl(site, "/");
-    }
+	/**
+	 * Returns the cookie containing the current editing state or
+	 * <code>null</code> if no such cookie exists.
+	 * 
+	 * @param request
+	 *            the request
+	 * @return the editing state
+	 */
+	private boolean getEditingInformation(WebloungeRequest request) {
+		if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
+			return true;
+		} else if (request.getCookies() != null) {
+			for (Cookie cookie : request.getCookies()) {
+				if (EditingState.STATE_COOKIE.equals(cookie.getName())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-    return target;
-  }
+	/**
+	 * Tries to determine the target page for the action result. The
+	 * <code>{@link HTMLAction.TARGET}</code> request attribute and parameter
+	 * will be considered. In any case, the site's homepage will be the
+	 * fallback.
+	 * 
+	 * @param action
+	 *            the action handler
+	 * @param request
+	 *            the weblounge request
+	 * @return the target page
+	 */
+	protected ResourceURI getPageURIForAction(Action action,
+			WebloungeRequest request) {
+		ResourceURI target = null;
+		Site site = request.getSite();
 
-  /**
-   * Returns the template that will be used to handle this request. If the
-   * template cannot be found or used for some reason, an
-   * {@link IllegalStateException} is thrown.
-   * 
-   * @param page
-   *          the page
-   * @param request
-   *          the request
-   * @return the template
-   * @throws IllegalStateException
-   *           if the template cannot be found
-   */
-  protected PageTemplate getPageTemplate(Page page, WebloungeRequest request)
-      throws IllegalStateException {
-    Site site = request.getSite();
-    String templateId = (String) request.getAttribute(WebloungeRequest.TEMPLATE);
-    PageTemplate template = null;
-    if (templateId != null) {
-      template = site.getTemplate(templateId);
-      if (template == null) {
-        throw new IllegalStateException("Page template " + templateId + " specified by request was not found");
-      }
-    } else {
-      template = site.getTemplate(page.getTemplate());
-      if (template == null) {
-        throw new IllegalStateException("Page template " + templateId + " specified by page " + page + " was not found");
-      }
-    }
-    return template;
-  }
+		// Check if a target-page parameter was passed
+		if (request.getParameter(HTMLAction.TARGET) != null) {
+			String targetUrl = request.getParameter(HTMLAction.TARGET);
+			try {
+				String decocedTargetUrl = null;
+				String encoding = request.getCharacterEncoding();
+				if (encoding == null)
+					encoding = "utf-8";
+				decocedTargetUrl = URLDecoder.decode(targetUrl, encoding);
+				target = new PageURIImpl(site, decocedTargetUrl);
+			} catch (UnsupportedEncodingException e) {
+				logger.warn("Error while decoding target url {}: {}",
+						targetUrl, e.getMessage());
+				target = new PageURIImpl(site, "/");
+			}
+		}
 
-  /**
-   * Returns the primary set of cache tags for the given request.
-   * 
-   * @param request
-   *          the request
-   * @return the cache tags
-   */
-  protected CacheTagSet createCacheTags(WebloungeRequest request) {
-    CacheTagSet cacheTags = new CacheTagSet();
-    cacheTags.add(CacheTag.Url, request.getUrl().getPath());
-    cacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
-    cacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
-    cacheTags.add(CacheTag.User, request.getUser().getLogin());
-    cacheTags.add(CacheTag.Site, request.getSite().getIdentifier());
-    Enumeration<?> pe = request.getParameterNames();
-    int parameterCount = 0;
-    while (pe.hasMoreElements()) {
-      parameterCount++;
-      String key = pe.nextElement().toString();
-      String[] values = request.getParameterValues(key);
-      for (String value : values) {
-        cacheTags.add(key, value);
-      }
-    }
-    cacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
-    return cacheTags;
-  }
+		// Nothing found, let's choose the site's homepage
+		if (target == null) {
+			target = new PageURIImpl(site, "/");
+		}
 
-  /**
-   * Returns the singleton instance of this class.
-   * 
-   * @return the request handler instance
-   */
-  public static RequestHandler getInstance() {
-    return handler;
-  }
+		return target;
+	}
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.dispatcher.RequestHandler#getName()
-   */
-  public String getName() {
-    return "page request handler";
-  }
+	/**
+	 * Returns the template that will be used to handle this request. If the
+	 * template cannot be found or used for some reason, an
+	 * {@link IllegalStateException} is thrown.
+	 * 
+	 * @param page
+	 *            the page
+	 * @param request
+	 *            the request
+	 * @return the template
+	 * @throws IllegalStateException
+	 *             if the template cannot be found
+	 */
+	protected PageTemplate getPageTemplate(Page page, WebloungeRequest request)
+			throws IllegalStateException {
+		Site site = request.getSite();
+		String templateId = (String) request
+				.getAttribute(WebloungeRequest.TEMPLATE);
+		PageTemplate template = null;
+		if (templateId != null) {
+			template = site.getTemplate(templateId);
+			if (template == null) {
+				throw new IllegalStateException("Page template " + templateId
+						+ " specified by request was not found");
+			}
+		} else {
+			template = site.getTemplate(page.getTemplate());
+			if (template == null) {
+				throw new IllegalStateException("Page template " + templateId
+						+ " specified by page " + page + " was not found");
+			}
+		}
+		return template;
+	}
 
-  /**
-   * Returns a string representation of this request handler.
-   * 
-   * @return the handler name
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString() {
-    return getName();
-  }
+	/**
+	 * Returns the primary set of cache tags for the given request.
+	 * 
+	 * @param request
+	 *            the request
+	 * @return the cache tags
+	 */
+	protected CacheTagSet createCacheTags(WebloungeRequest request) {
+		CacheTagSet cacheTags = new CacheTagSet();
+		cacheTags.add(CacheTag.Url, request.getUrl().getPath());
+		cacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
+		cacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
+		cacheTags.add(CacheTag.User, request.getUser().getLogin());
+		cacheTags.add(CacheTag.Site, request.getSite().getIdentifier());
+		Enumeration<?> pe = request.getParameterNames();
+		int parameterCount = 0;
+		while (pe.hasMoreElements()) {
+			parameterCount++;
+			String key = pe.nextElement().toString();
+			String[] values = request.getParameterValues(key);
+			for (String value : values) {
+				cacheTags.add(key, value);
+			}
+		}
+		cacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
+		return cacheTags;
+	}
+
+	/**
+	 * Returns the singleton instance of this class.
+	 * 
+	 * @return the request handler instance
+	 */
+	public static RequestHandler getInstance() {
+		return handler;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see ch.entwine.weblounge.dispatcher.RequestHandler#getName()
+	 */
+	public String getName() {
+		return "page request handler";
+	}
+
+	/**
+	 * Returns a string representation of this request handler.
+	 * 
+	 * @return the handler name
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return getName();
+	}
 
 }
