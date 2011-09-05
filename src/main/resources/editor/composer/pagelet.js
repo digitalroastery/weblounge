@@ -268,15 +268,17 @@ steal.plugins('jqueryui/dialog',
 		};
     },
     
-	'hoverenter': function(ev, hover) {
+	'hoverenter': function(el, ev) {
 		if(!this.showHover) return;
-		this.element.append('<img class="wbl-iconEditing" src="' + this.options.composer.runtime.getRootPath() + 
+		if(!el.hasClass('wbl-noEditor')) {
+			this.element.append('<img class="wbl-iconEditing" src="' + this.options.composer.runtime.getRootPath() + 
 			'/editor/composer/resources/icon_editing.png" />');
+		}
 		this.element.append('<img class="wbl-iconRemove" src="' + this.options.composer.runtime.getRootPath() + 
 			'/editor/composer/resources/icon_trash.png" />');
     },
     
-	'hoverleave': function(ev, hover) {
+	'hoverleave': function(el, ev) {
 		if(!this.showHover) return;
 		this.element.find('img.wbl-iconEditing').remove();
 		this.element.find('img.wbl-iconRemove').remove();
