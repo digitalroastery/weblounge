@@ -2,8 +2,6 @@
 	<td><input type="checkbox">
 	{{if page.path}}
 		<a href="${page.path}" class="wbl-pagePath">${page.path}</a>
-	{{else}}
-		-
 	{{/if}}
 	</input></td>
 	{{if !$.isEmptyObject(page.head.metadata.title) && !$.isEmptyObject(page.head.metadata.title[language])}}
@@ -23,3 +21,4 @@
 		<!-- <img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_favorite.png" class="wbl-itemFavorize" alt="favorize"> -->
 	</td>
 </tr>
+

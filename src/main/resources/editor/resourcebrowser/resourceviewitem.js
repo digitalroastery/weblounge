@@ -16,8 +16,19 @@ steal.plugins().then(function($) {
     
 	"a.wbl-pagePath click": function(el, ev) {
 		ev.preventDefault();
-		if(this.options.mode != 'normal') return;
-		el.trigger('openDesigner');
+		if(this.options.mode == 'normal') {
+			el.trigger('openDesigner');
+		} else {
+			// Unmark all Elements, mark current and click ok
+			if(el.parents('.wbl-thumbnailView').length > 0) {
+				el.parents('.wbl-thumbnailView').find('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
+				el.parents('.wbl-scrollViewItem').addClass('wbl-marked');
+			} else {
+				el.parents('.wbl-listView').find('tr.wbl-pageEntry input:checked').removeAttr('checked');
+				el.parent().find('input').attr('checked', 'checked');
+			}
+			$('button.wbl-editorSelectionOK').click();
+		}
 	},
 	
 	_openSettings: function(resourceItem) {

@@ -8,7 +8,7 @@ steal.plugins('jquery/view/tmpl')
 	Editor.Resourceview.extend('Editor.Resourcelistview', 
 	{	
 		init: function(el) {
-			$(el).html('//editor/resourcebrowser/views/resourcelistview.tmpl', {runtime: this.options.runtime});
+			$(el).html('//editor/resourcebrowser/views/resourcelistview.tmpl', {runtime: this.options.runtime, resourceType: this.options.resourceType});
 			this._initViewItems();
 			this._initButtons();
 			this._initFilter();
@@ -56,6 +56,7 @@ steal.plugins('jquery/view/tmpl')
 					page: res, 
 					runtime: this.options.runtime,
 					language: this.options.language,
+					resourceType: this.options.resourceType
 				});
 				listViewItem.find('tr.wbl-pageEntry').editor_resourcelistviewitem({
 					page: res,

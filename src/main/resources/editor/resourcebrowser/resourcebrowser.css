@@ -146,10 +146,15 @@
 
 .editor_resourcebrowser .wbl-itemDelete {
 	display: none;
+	cursor: pointer;
 }
 
 .editor_resourcebrowser .wbl-itemFavorize {
 	display: none;
+	cursor: pointer;
+}
+.editor_resourcebrowser .wbl-settings {
+	cursor: pointer;
 }
 
 .editor_resourcebrowser button.wbl-lock {

@@ -1,11 +1,19 @@
 <table class="wbl-tablesorter">
 	<thead>
 		<tr>
+			{{if resourceType == 'pages'}}
 			<th>Seite</th>
 			<th>Seitentitel</th>
 			<th>Erstellt</th>
 			<th>Zuletzt editiert</th>
 			<th></th>
+			{{else}}
+			<th>Seite</th>
+			<th>Titel</th>
+			<th>Erstellt</th>
+			<th>Zuletzt editiert</th>
+			<th></th>
+			{{/if}}
 		</tr>	
 	</thead>	
 	<tbody id="wbl-listViewContent">
@@ -27,7 +35,13 @@
 
 <nav class="wbl-alignCenter wbl-icons">
 	<input type="text" name="filter" placeholder="Filtern..." id="wbl-filter" /> 
-	<!-- <button class="wbl-duplicate">Markierte Seite duplizieren</button> -->
-	<button class="wbl-delete">Markierte Seite(n) löschen</button>
-	<!-- <button class="wbl-favorize">Zu Favoriten hinzufügen</button> -->
+	{{if resourceType == 'pages'}}
+		<!-- <button class="wbl-duplicate">Markierte Seite duplizieren</button> -->
+		<button class="wbl-delete">Markierte Seiten löschen</button>
+		<!-- <button class="wbl-favorize">Zu Favoriten hinzufügen</button> -->
+	{{else}}
+		<!-- <button class="wbl-duplicate">Markiertes Medium duplizieren</button> -->
+		<button class="wbl-delete">Markierte Medien löschen</button>
+		<!-- <button class="wbl-favorize">Zu Favoriten hinzufügen</button> -->
+	{{/if}}
 </nav>

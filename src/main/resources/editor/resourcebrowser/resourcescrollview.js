@@ -8,7 +8,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 	Editor.Resourceview.extend('Editor.Resourcescrollview', 
 	{
 		init: function(el) {
-			$(el).html('//editor/resourcebrowser/views/resourcescrollview.tmpl', {});
+			$(el).html('//editor/resourcebrowser/views/resourcescrollview.tmpl', {resourceType: this.options.resourceType});
 			this._initViewItems();
 			this._initButtons();
 			this._initFilter();
@@ -56,7 +56,8 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 				var scrollViewItem = this.element.find('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {
 					page: res, 
 					language: this.options.language,
-					runtime: this.options.runtime
+					runtime: this.options.runtime,
+					resourceType: this.options.resourceType
 				});
 				scrollViewItem.find('div.wbl-scrollViewItem').editor_resourcescrollviewitem({
 					page: res, 

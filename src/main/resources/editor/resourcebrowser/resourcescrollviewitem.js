@@ -21,10 +21,18 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		},
 		
 		"dblclick": function(el, ev) {
-			if(this.options.mode != 'normal') {
-				$('button.wbl-editorSelectionOK').click();
-			} else {
+			switch(this.options.mode) {
+			case 'normal':
 				this.element.find('img.wbl-showPage').click();
+				break;
+			case 'editorMultiSelection':
+				$('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
+				el.addClass('wbl-marked');
+				$('button.wbl-editorSelectionOK').click();
+				break;
+			case 'editorSelection':
+				$('button.wbl-editorSelectionOK').click();
+				break;
 			}
 		},
 		
