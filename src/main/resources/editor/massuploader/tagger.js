@@ -50,8 +50,8 @@ steal.plugins('jquery',
 				autoOpen: true,
 				resizable: true,
 				buttons: this.options.buttons,
-				width: 900,
-				height: 800,
+				width: 700,
+				height: 650,
 				buttons: {
 					Abbrechen: function() {
 						$(this).dialog('close');

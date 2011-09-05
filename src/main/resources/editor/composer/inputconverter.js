@@ -62,10 +62,10 @@ $.Class.extend('InputConverter',
 	convertTextarea: function(textarea, element, pagelet) {
 		InputConverter.convert(element, pagelet,
 		function() {
-			textarea.html('Current: ' + pagelet.locale.original.text[element[1]].toString());
+			textarea.html(pagelet.locale.original.text[element[1]].toString());
 		}, 
 		function() {
-			textarea.html('Original: ' + pagelet.locale.original.text[element[1]].toString());
+			textarea.html(pagelet.locale.original.text[element[1]].toString());
 		},
 		function() {
 			textarea.html(pagelet.properties.property[element[1]].toString());
