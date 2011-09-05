@@ -35,9 +35,6 @@
         <user id="hans" realm="testland">Hans Muster</user>
       </owner>
     </security>
-    <locked>
-      <user id="amelie" realm="testland">Amélie Poulard</user>
-    </locked>
   </head>
   <body/>
 </page>
