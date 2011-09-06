@@ -11,15 +11,24 @@ steal.then(function($) {
 			if ('language' in params) {
 				url += "?language=" + params.language;
 			}
-			
 			if ('id' in params) {
 				$.ajax(url, {
 					success: success
-//					beforeSend : function (xhr) {
-//						if('language' in params) {
-//							xhr.setRequestHeader('Accept-Language', params.language);
-//						}
-//					}
+				});
+			}
+		},
+		
+		/**
+		 * Returns the renderer for the given pagelet
+		 */
+		getRenderer: function(params, success, error) {
+			var url = '/system/weblounge/workbench/renderer/' + params.id + '/' + params.composer + '/' + params.pagelet;
+			if('language' in params) {
+				url += "?language=" + params.language;
+			}
+			if('id' in params) {
+				$.ajax(url, {
+					success: success
 				});
 			}
 		},

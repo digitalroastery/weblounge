@@ -487,11 +487,11 @@ steal.then('jsonix')
 	     * @param {String} composerId The parent composer id 
 	     * @param {int} index The pagelet index to insert
 	     */
-	    insertPagelet: function(pagelet, composerId, index) {
+	    insertPagelet: function(pagelet, composerId, index, success) {
 	    	delete pagelet.locale.current;
 	    	delete pagelet.locale.original;
 	    	this.value.body.composers[this.getComposerIndex(composerId)].pagelets[index] = pagelet;
-	    	Page.update({id:this.value.id}, this);
+	    	Page.update({id:this.value.id}, this, success);
 	    },
 	    
 	    /**

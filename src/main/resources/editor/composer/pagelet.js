@@ -44,14 +44,11 @@ steal.plugins('jqueryui/dialog',
     _openPageEditor: function(pageletEditor, isNew) {
     	// Parse Pagelet-Editor Data
     	var pagelet = this.options.composer.page.getEditorPagelet(this.options.composer.id, this.element.index(), this.options.composer.language);
-    	var renderer = $(pageletEditor).find('renderer:first').text().trim();
     	var editor = $(pageletEditor).find('editor:first');
     	
     	if(!editor.length) {
-    		var html = this._processTemplate(renderer, pagelet);
-    		if(html == null && isNew) 
-    			this._deletePagelet();
-    		else this.element.html(html);
+    		if(isNew) this._deletePagelet();
+    		else this._showRenderer();
     		return;
     	}
     	
@@ -94,13 +91,9 @@ steal.plugins('jqueryui/dialog',
 					if(!this.editorDialog.find("form#wbl-validate").valid()) return;
 					var newPagelet = this._updatePageletValues(pagelet);
 					
-					// Render site
-					var html = this._processTemplate(renderer, newPagelet);
-					this.element.html(this._processTemplate(renderer, newPagelet));
+					// Save New Pagelet and show Renderer
+					this.options.composer.page.insertPagelet(newPagelet, this.options.composer.id, this.element.index(), this.callback('_showRenderer'));
 					
-					// Save New Pagelet
-			    	this.options.composer.page.insertPagelet(newPagelet, this.options.composer.id, this.element.index());
-			    	
 					this.editorDialog.dialog('destroy');
 				}, this)
 			},
@@ -231,6 +224,17 @@ steal.plugins('jqueryui/dialog',
     		}
 		});
 		return pagelet;
+    },
+    
+    _showRenderer: function() {
+		Workbench.getRenderer({
+			id: this.options.composer.page.value.id,
+			composer: this.options.composer.id,
+			language: this.options.composer.language,
+			pagelet: this.element.index()
+		}, $.proxy(function(renderer) {
+			this.element.html(renderer);
+		}, this));
     },
     
     /**
