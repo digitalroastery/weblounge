@@ -13,6 +13,7 @@
   
   <properties>
     <weblounge.basedir>${project.basedir}/../..</weblounge.basedir>
+    <weblounge.deploymentdir>lib</weblounge.deploymentdir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   
