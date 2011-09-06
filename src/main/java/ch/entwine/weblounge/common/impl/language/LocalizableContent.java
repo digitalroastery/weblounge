@@ -285,12 +285,8 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
     T c = content.get(language);
 
     // Not found? Try the fall back language
-    try {
     if (c == null && !force)
       c = content.get(resolveLanguage());
-    } catch (IllegalStateException e) {
-      return super.toString();
-    }
 
     return (c != null) ? c.toString() : null;
   }
