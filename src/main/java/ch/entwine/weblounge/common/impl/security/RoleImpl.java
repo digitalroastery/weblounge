@@ -217,6 +217,8 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    *          the language
    */
   public void setName(String name, Language language) {
+    if (originalLanguage == null)
+      setOriginalLanguage(language);
     content.put(language, name);
   }
 
