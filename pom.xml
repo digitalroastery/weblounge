@@ -106,12 +106,12 @@
         <module>modules/weblounge-i18n-mygengo</module>
         <module>modules/weblounge-kernel</module>
         <module>modules/weblounge-security</module>
+        <module>modules/weblounge-security-sql</module>
         <module>modules/weblounge-system</module>
         <module>modules/weblounge-taglib</module>
         <module>modules/weblounge-test</module>
         <module>modules/weblounge-ui</module>
         <module>modules/weblounge-workbench</module>
-        <module>modules/weblounge-security-sql</module>
       </modules>
     </profile>
 
