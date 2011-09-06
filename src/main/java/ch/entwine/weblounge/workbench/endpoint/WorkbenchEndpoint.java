@@ -50,7 +50,7 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("/")
 public class WorkbenchEndpoint {
-
+  
   /** The workbench */
   protected transient WorkbenchService workbench = null;
 
@@ -94,6 +94,33 @@ public class WorkbenchEndpoint {
     if (editor == null)
       throw new WebApplicationException(Status.NOT_FOUND);
     return Response.ok(editor.toXml()).build();
+  }
+  
+  @GET
+  @Produces(MediaType.TEXT_HTML)
+  @Path("/renderer/{page}/{composer}/{pageletindex}")
+  public Response getRenderer(@Context HttpServletRequest request,
+      @PathParam("page") String pageURI,
+      @PathParam("composer") String composerId,
+      @PathParam("pageletindex") int pageletIndex,
+      @QueryParam("language") String language) {
+    
+    // Load the site
+    Site site = getSite(request);
+    if(site == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+    
+    ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.WORK);
+    String renderer;
+    try {
+      renderer = workbench.getRenderer(site, uri, composerId, pageletIndex, language);
+    } catch (IOException e) {
+      throw new WebApplicationException(e);
+    }
+    
+    if (renderer == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+    return Response.ok(renderer).build();
   }
 
   /**

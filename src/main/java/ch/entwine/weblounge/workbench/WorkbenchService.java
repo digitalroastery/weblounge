@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.workbench;
 
+import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.page.Composer;
@@ -31,6 +32,7 @@ import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.workbench.suggest.PageSuggestion;
@@ -58,6 +60,8 @@ import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 
 /**
  * Implementation of a weblounge workbench. The workbench provides support for
@@ -208,7 +212,7 @@ public class WorkbenchService {
    *          the composer id
    * @param pageletIndex
    *          the pagelet index
-   * @param language 
+   * @param language
    * @return the pagelet editor
    * @throws IOException
    *           if reading the pagelet fails
@@ -222,24 +226,9 @@ public class WorkbenchService {
     if (pageletIndex < 0)
       throw new IllegalArgumentException("Pagelet index must be a positive integer");
 
-    // Get hold of the site's content repository
-    ContentRepository contentRepository = site.getContentRepository();
-    if (contentRepository == null) {
-      logger.warn("No content repository found for site '{}'", site);
-      return null;
-    }
-
-    // Load the page
-    Page page = null;
-
-    try {
-      page = (Page) contentRepository.get(pageURI);
-      if (page == null) {
-        logger.warn("Client requested pagelet editor for non existing page {}", pageURI);
-        return null;
-      }
-    } catch (ContentRepositoryException e) {
-      logger.error("Error trying to access content repository {}: {}", contentRepository, e);
+    Page page = getPage(site, pageURI);
+    if (page == null) {
+      logger.warn("Client requested pagelet editor for non existing page {}", pageURI);
       return null;
     }
 
@@ -260,18 +249,6 @@ public class WorkbenchService {
     pagelet = new TrimpathPageletWrapper(pagelet);
     PageletEditor pageletEditor = new PageletEditor(pagelet, pageURI, composerId, pageletIndex);
 
-    // Load the contents of the renderer url
-    URL rendererURL = pageletEditor.getRenderer();
-    if (rendererURL != null) {
-      String rendererContent = null;
-      try {
-        rendererContent = loadContents(rendererURL, site, page, composer, pagelet, language);
-        pageletEditor.setRenderer(rendererContent);
-      } catch (ServletException e) {
-        logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
-      }
-    }
-
     // Load the contents of the editor url
     URL editorURL = pageletEditor.getEditorURL();
     if (editorURL != null) {
@@ -285,6 +262,102 @@ public class WorkbenchService {
     }
 
     return pageletEditor;
+  }
+
+  /**
+   * Returns the page or <code>null</code> if the page is not found.
+   * 
+   * @param site
+   *          the site
+   * @param pageURI
+   *          the pareURI
+   * @return the page
+   */
+  private Page getPage(Site site, ResourceURI pageURI) {
+    // Get hold of the site's content repository
+    ContentRepository contentRepository = site.getContentRepository();
+    if (contentRepository == null) {
+      logger.warn("No content repository found for site '{}'", site);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Load the page
+    Page page = null;
+    try {
+      page = (Page) contentRepository.get(pageURI);
+    } catch (ContentRepositoryException e) {
+      logger.error("Error trying to access content repository {}: {}", contentRepository, e);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+    return page;
+  }
+
+  /**
+   * Returns the pagelet renderer or <code>null</code> if either one of the
+   * page, the composer or the is not available.
+   * 
+   * @param site
+   *          the site
+   * @param pageURI
+   *          the page uri
+   * @param composerId
+   *          the composer id
+   * @param pageletIndex
+   *          the pagelet index
+   * @param language
+   *          the language
+   * @return the pagelet renderer
+   * @throws IOException
+   *           if reading the pagelet fails
+   */
+  public String getRenderer(Site site, ResourceURI pageURI, String composerId,
+      int pageletIndex, String language) throws IOException {
+
+    Page page = getPage(site, pageURI);
+    if (page == null) {
+      logger.warn("Client requested pagelet renderer for non existing page {}", pageURI);
+      return null;
+    }
+
+    // Load the composer
+    Composer composer = page.getComposer(composerId);
+    if (composer == null) {
+      logger.warn("Client requested pagelet renderer for non existing composer {} on page {}", composerId, pageURI);
+      return null;
+    }
+
+    // Get the pagelet
+    if (composer.getPagelets().length <= pageletIndex || composer.size() <= pageletIndex) {
+      logger.warn("Client requested pagelet renderer for non existing pagelet on page {}", pageURI);
+      return null;
+    }
+
+    Pagelet pagelet = composer.getPagelet(pageletIndex);
+    Module module = site.getModule(pagelet.getModule());
+    if (module == null) {
+      logger.warn("Client requested pagelet renderer for non existing module {}", pagelet.getModule());
+      return null;
+    }
+
+    Renderer renderer = module.getRenderer(pagelet.getIdentifier());
+    if (renderer == null) {
+      logger.warn("Client requested pagelet renderer for non existing renderer on pagelet {}", pagelet.getIdentifier());
+      return null;
+    }
+
+    // Load the contents of the renderer url
+    URL rendererURL = renderer.getRenderer();
+    String rendererContent = null;
+    if (rendererURL != null) {
+      try {
+        rendererContent = loadContents(rendererURL, site, page, composer, pagelet, language);
+      } catch (ServletException e) {
+        logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
+    }
+
+    return rendererContent;
   }
 
   /**
@@ -302,7 +375,7 @@ public class WorkbenchService {
    *          the composer
    * @param pagelet
    *          the pagelet
-   * @param language 
+   * @param language
    * @return the servlet response, serialized to a string
    * @throws IOException
    *           if the servlet fails to create the response
@@ -310,7 +383,8 @@ public class WorkbenchService {
    *           if an exception occurs while processing
    */
   private String loadContents(URL rendererURL, Site site, Page page,
-      Composer composer, Pagelet pagelet, String language) throws IOException, ServletException {
+      Composer composer, Pagelet pagelet, String language) throws IOException,
+      ServletException {
 
     Servlet servlet = siteServlets.get(site.getIdentifier());
 
@@ -325,7 +399,7 @@ public class WorkbenchService {
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
       request.setLocalAddr(site.getURL().toExternalForm());
-      if(language != null)
+      if (language != null)
         request.addPreferredLocale(new Locale(language));
       request.setAttribute(WebloungeRequest.PAGE, page);
       request.setAttribute(WebloungeRequest.COMPOSER, composer);

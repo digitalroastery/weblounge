@@ -61,6 +61,19 @@ public final class WorkbenchEndpointDocs {
     getPageletEditor.addOptionalParameter(new Parameter("language", Parameter.Type.String, "The language id"));
     getPageletEditor.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getPageletEditor);
+    
+    Endpoint getRenderer = new Endpoint("/renderer/{page}/{composer}/{pageletindex}", Method.GET, "getrenderer");
+    getRenderer.setDescription("Returns the renderer for the given pagelet");
+    getRenderer.addFormat(new Format("html", null, null));
+    getRenderer.addStatus(ok("the pagelet was found and it's renderer is returned"));
+    getRenderer.addStatus(notFound("the page, the composer, the pagelet or the renderer were not found"));
+    getRenderer.addStatus(serviceUnavailable("the site is temporarily offline"));
+    getRenderer.addPathParameter(new Parameter("page", Parameter.Type.String, "The page uri"));
+    getRenderer.addPathParameter(new Parameter("composer", Parameter.Type.String, "The composer identifier"));
+    getRenderer.addPathParameter(new Parameter("pageletindex", Parameter.Type.String, "The pagelet's index within the composer (0 based)"));
+    getRenderer.addOptionalParameter(new Parameter("language", Parameter.Type.String, "The language id"));
+    getRenderer.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getRenderer);
 
     // GET /suggest/subjects/{hint}
     Endpoint suggestSubjects = new Endpoint("/suggest/subjects/{hint}", Method.GET, "suggestsubjects");
