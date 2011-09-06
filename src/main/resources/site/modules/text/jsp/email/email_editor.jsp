@@ -12,6 +12,6 @@
 </p>
 <h2><webl:i18n key="module.text.email.link" /><span class="required">*</span></h2>
 <p>
-	<input name="property:email" class="required" type="text" /><br />
+	<input name="property:email" class="required email" type="text" /><br />
 	<span class="editor-sample"><webl:i18n key="module.text.email.link.sample" /></span>
 </p>

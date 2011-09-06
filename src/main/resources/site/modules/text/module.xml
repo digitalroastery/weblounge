@@ -51,6 +51,9 @@
       <name>Author</name>
       <renderer>file://${module.root}/jsp/author/author.jsp</renderer>
       <editor>file://${module.root}/jsp/author/author_editor.jsp</editor>
+      <includes>
+        <script use="editor" src="file://${module.root}/jsp/author/author.js" type="javascript"></script>
+      </includes>
     </pagelet>
 
     <pagelet id="address" composeable="true">
