@@ -14,6 +14,7 @@
 
   <properties>
     <weblounge.basedir>${project.basedir}/../..</weblounge.basedir>
+    <weblounge.deploymentdir>lib</weblounge.deploymentdir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
 
@@ -161,12 +162,6 @@
       <version>3.1.8</version>
     </dependency>
     
-    <dependency>
-      <groupId>c3p0</groupId>
-      <artifactId>c3p0</artifactId>
-      <version>0.9.1.2</version>
-    </dependency>
-
     <!-- testing -->
 
     <dependency>
@@ -383,11 +378,8 @@
               ch.entwine.weblounge.kernel.shared;version=${project.version},
               ch.entwine.weblounge.kernel.webconsole;version=${project.version}
             </Export-Package>
-            <Embed-Dependency>
-              c3p0;inline=true
-            </Embed-Dependency>
             <Private-Package>
-              org.json,
+              org.json
             </Private-Package>
             <Service-Component>
               OSGI-INF/endpoint-publishing-service.xml,
@@ -395,6 +387,7 @@
               OSGI-INF/kernel-service.xml,
               OSGI-INF/language-runtime-information.xml,
               OSGI-INF/resource-publishing-service.xml,
+              OSGI-INF/role-runtime-information.xml,
               OSGI-INF/runtime-information-rest-service.xml,
               OSGI-INF/shared-resources.xml,
               OSGI-INF/site-command.xml,
