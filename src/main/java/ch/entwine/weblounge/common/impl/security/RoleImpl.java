@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.impl.language.LocalizableContent;
+import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Role;
 
@@ -105,7 +106,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.security.Role#extend(ch.entwine.weblounge.common.security.Role)
    */
   public void extend(Role ancestor) {
@@ -114,7 +115,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.security.Role#isExtensionOf(ch.entwine.weblounge.common.security.Role)
    */
   public boolean isExtensionOf(Role ancestor) {
@@ -136,7 +137,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.security.Role#getExtendedRoles()
    */
   public Role[] getExtendedRoles() {
@@ -165,7 +166,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.security.Role#getContext()
    */
   public String getContext() {
@@ -174,7 +175,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.security.Authority#getAuthorityType()
    */
   public String getAuthorityType() {
@@ -183,7 +184,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.security.Authority#getAuthorityId()
    */
   public String getAuthorityId() {
@@ -192,7 +193,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.security.Authority#isAuthorizedBy(ch.entwine.weblounge.common.security.Authority)
    */
   public boolean isAuthorizedBy(Authority authority) {
@@ -205,6 +206,18 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
       return equals(r) || isExtensionOf(r);
     }
     return false;
+  }
+
+  /**
+   * Sets the role name in the given language.
+   * 
+   * @param name
+   *          the role name
+   * @param language
+   *          the language
+   */
+  public void setName(String name, Language language) {
+    content.put(language, name);
   }
 
   /**
@@ -247,7 +260,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
@@ -256,7 +269,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object obj) {
