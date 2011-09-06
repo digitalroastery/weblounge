@@ -11,7 +11,7 @@ steal.plugins('jquery',
 .views('//editor/massuploader/views/init.tmpl')
 .css('massuploader', 'fileuploader')
 .models('../../models/file')
-.resources('fileuploader', 'jsupload/jsupload.nocache')
+.resources('fileuploader')
 .then('tagger')
 .then(function($) {
 	

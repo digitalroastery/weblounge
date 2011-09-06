@@ -3,7 +3,6 @@ steal.plugins(
 	'jquery/controller/view',
 	'jquery/view',
 	'jquery/view/tmpl',
-	'editor/massuploader',
 	'editor/pagecreator',
 	'editor/pageletcreator',
 	'editor/pageheadeditor',
