@@ -1,4 +1,5 @@
-steal.then(function($) {
+steal.plugins('jquery/model')
+.then(function($) {
 	
 	$.Model('Workbench',
 	/* @Static */
@@ -23,10 +24,10 @@ steal.then(function($) {
 		 */
 		getRenderer: function(params, success, error) {
 			var url = '/system/weblounge/workbench/renderer/' + params.id + '/' + params.composer + '/' + params.pagelet;
-			if('language' in params) {
+			if ('language' in params) {
 				url += "?language=" + params.language;
 			}
-			if('id' in params) {
+			if ('id' in params) {
 				$.ajax(url, {
 					success: success
 				});
@@ -47,6 +48,6 @@ steal.then(function($) {
 		}
 	},
 	/* @Prototype */
-	{});
-
+	{}
+	);
 });
