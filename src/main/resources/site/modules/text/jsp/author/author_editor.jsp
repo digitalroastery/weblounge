@@ -22,3 +22,8 @@
 	<input name="element:position" type="text"/><br />
 	<span class="editor-sample"><webl:i18n key="module.text.author.position.sample"/></span>
 </p>
+<h2><webl:i18n key="module.text.author.copyrightholder"/></h2>
+<p>
+	<input name="property:copyrightholder" type="text"/><br />
+	<span class="editor-sample"><webl:i18n key="module.text.author.copyrightholder.sample"/></span>
+</p>

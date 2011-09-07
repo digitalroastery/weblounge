@@ -225,6 +225,12 @@
 	<string name="module.text.author.position.sample">
 		Developer
 	</string>
+	<string name="module.text.author.copyrightholder">
+		Copyright holder
+	</string>
+	<string name="module.text.author.copyrightholder.sample">
+		swiss unihockey
+	</string>
 	
 	<!-- paragraph -->
 	<string name="module.text.paragraph.tab.default">

@@ -22,5 +22,5 @@
 		</webl:ifelement>
 	</webl:ifproperty>
 	
-    &copy;&nbsp;<webl:property name="year" />&nbsp;swiss unihockey
+    &copy;&nbsp;<webl:property name="year" />&nbsp;<webl:property name="copyrightholder" />
 </p>

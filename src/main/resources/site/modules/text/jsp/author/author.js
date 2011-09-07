@@ -13,6 +13,14 @@ $.Controller("Editor.Author",
     	var login = this.element.find('input[name="property:login"]');
     	var name = this.element.find('input[name="property:name"]');
     	
+    	this.element.find('input[name="property:email"]').change(function() {
+    		if($(this).val() == '') {
+    			name.removeClass('required');
+    		} else {
+    			name.addClass('required');
+    		}
+    	});
+    	
     	if(year.val() == "") {
     		year.val(new Date().getFullYear());
     	}
@@ -25,7 +33,6 @@ $.Controller("Editor.Author",
     			name.val(runtime.getUserName());
     		}
     	});
-    	
     }
     
 });

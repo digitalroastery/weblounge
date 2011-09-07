@@ -24,8 +24,8 @@
 
     <pagelet id="subtitle" composeable="true">
       <name>Subtitle</name>
-      <renderer>file://${module.root}/jsp/title2nd/title2nd.jsp</renderer>
-      <editor>file://${module.root}/jsp/title2nd/title2nd_editor.jsp</editor>
+      <renderer>file://${module.root}/jsp/subtitle/subtitle.jsp</renderer>
+      <editor>file://${module.root}/jsp/subtitle/subtitle_editor.jsp</editor>
     </pagelet>
 
     <pagelet id="categorie" composeable="true">
