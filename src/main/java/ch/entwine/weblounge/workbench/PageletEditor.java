@@ -62,9 +62,6 @@ public class PageletEditor {
   /** The pagelet renderer */
   protected PageletRenderer renderer = null;
 
-  /** The pagelet's renderer content */
-  protected String rendererContents = null;
-
   /** The pagelet's editor content */
   protected String editorContents = null;
 
@@ -196,16 +193,6 @@ public class PageletEditor {
    * @param contents
    *          the renderer contents
    */
-  public void setRenderer(String contents) {
-    rendererContents = contents;
-  }
-
-  /**
-   * Sets the renderer contents.
-   * 
-   * @param contents
-   *          the renderer contents
-   */
   public void setEditor(String contents) {
     editorContents = contents;
   }
@@ -217,9 +204,11 @@ public class PageletEditor {
    */
   public String toXml() {
     StringBuffer buf = new StringBuffer();
-
+    
     // head
     buf.append("<pageleteditor ");
+    buf.append("name=\"").append(renderer.getName()).append("\" ");
+    buf.append("module=\"").append(renderer.getModule().getName()).append("\" ");
     buf.append("uri=\"").append(uri.getIdentifier()).append("\" ");
     buf.append("composer=\"").append(composerId).append("\" ");
     buf.append("index=\"").append(pageletIndex).append("\">");
@@ -243,13 +232,6 @@ public class PageletEditor {
     }
     buf.append(data);
     buf.append("</data>");
-
-    // the renderer
-    if (rendererContents != null) {
-      buf.append("<renderer type=\"xhtml\"><![CDATA[");
-      buf.append(rendererContents);
-      buf.append("]]></renderer>");
-    }
 
     // the editor
     if (editorContents != null) {
