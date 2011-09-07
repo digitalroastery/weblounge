@@ -122,7 +122,8 @@ steal.plugins('jquery',
 	    },
 		
 		"input[name=title] change": function(el, ev) {
-			this.element.find('input[name=url]').val(encodeURI(el.val().toLowerCase()));
+			var url = this.element.find('input[name=url]');
+			if(url.val() == '') url.val(encodeURI(el.val().toLowerCase()));
 		}
 	    
 	})
