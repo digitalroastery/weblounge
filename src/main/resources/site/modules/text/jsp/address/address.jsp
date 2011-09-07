@@ -1,9 +1,8 @@
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <webl:element define="adress, pob, company, position">
 <webl:property define="name">
-<webl:context>
+<webl:context define="site, language">
 	<div class="adress vcard">
 		<p class="person">
 			<webl:property define="anrede">
@@ -52,18 +51,17 @@
 			<% } %>
 		</p>
 
-			<webl:ifproperty name="phone">
-				<div class="tel">
-					<p class="phone"><span class="value"><webl:property name="phone" /></span></p>
-				</div>
-			</webl:ifproperty>
-			<webl:ifproperty name="mobile">
-				<div class="tel">
-					<abbr class="type" title="Mobil"></abbr>
-					<p class="phone"><span class="value"><webl:property name="mobile" /></span></p>
-				</div>
-			</webl:ifproperty>
-			
+		<webl:ifproperty name="phone">
+			<div class="tel">
+				<p class="phone"><span class="value"><webl:property name="phone" /></span></p>
+			</div>
+		</webl:ifproperty>
+		<webl:ifproperty name="mobile">
+			<div class="tel">
+				<abbr class="type" title="Mobil"></abbr>
+				<p class="phone"><span class="value"><webl:property name="mobile" /></span></p>
+			</div>
+		</webl:ifproperty>
 	</div>
 </webl:context>
 </webl:property>

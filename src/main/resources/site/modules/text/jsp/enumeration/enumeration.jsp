@@ -1,19 +1,3 @@
-<%--
- * weblounge
- *
- * Enumeration
- * Ordered or unorderd list
- *
- * @dependency  -
- * @attributes  
- * @parameters  
- *
- * @version     weblounge 2.2
- * @author      Tobias Wunden
- * @link        http://www.o2it.ch
- * @copyright   Copyright 2008, o2it
- *
---%>
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
 
 <webl:element define="zwischentitel">

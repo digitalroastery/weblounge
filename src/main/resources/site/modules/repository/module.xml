@@ -20,7 +20,7 @@
       <name>Image</name>
       <renderer>file://${module.root}/jsp/image/image.jsp</renderer>
       <renderer type="feed">file://${module.root}/jsp/image/image.jsp</renderer>
-      <editor>file://${module.root}/jsp/gallery/gallery_editor.jsp</editor>
+      <editor>file://${module.root}/jsp/image/image_editor.jsp</editor>
       <includes>
         <link use="editor" href="file://${module.root}/jsp/gallery/gallery.css" rel="stylesheet" type="text/css"></link>
         <script use="editor" src="file://${module.root}/jsp/gallery/gallery.js" type="javascript"></script>

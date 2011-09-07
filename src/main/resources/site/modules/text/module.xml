@@ -45,6 +45,9 @@
       <name>Enumeration</name>
       <renderer>file://${module.root}/jsp/enumeration/enumeration.jsp</renderer>
       <editor>file://${module.root}/jsp/enumeration/enumeration_editor.jsp</editor>
+      <includes>
+        <script use="editor" src="file://${module.root}/jsp/enumeration/enumeration.js" type="javascript"></script>
+      </includes>
     </pagelet>
 
     <pagelet id="author" composeable="true">
