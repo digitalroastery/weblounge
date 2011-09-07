@@ -7,7 +7,7 @@
 </p>
 <h2><webl:i18n key="module.text.paragraph.paragraph"/><span class="required">*</span></h2>
 <p>
-   <textarea name="element:paragraph" class="required"></textarea><br />
+   <textarea name="element:paragraph" class="required" rows="6"></textarea><br />
    <span class="editor-sample"><webl:i18n key="module.text.paragraph.paragraph.sample"/></span>
 </p>
 
