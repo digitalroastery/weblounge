@@ -82,8 +82,9 @@ steal.plugins('jquery',
 						Page.create({path: pageData.url}, $.proxy(function(page) {
 							var path = page.getPath(); // Let this line at this position!!
 							page.saveMetadata(pageData, this.options.language, $.proxy(function() {
-								page.lock(this.options.runtime.getUserLogin());
-								location.href = path + "?edit&_=" + new Date().getTime();
+								page.lock(this.options.runtime.getUserLogin(), function() {
+									location.href = path + "?edit&_=" + new Date().getTime();
+								});
 							}, this));
 						}, this));
 						
@@ -94,8 +95,8 @@ steal.plugins('jquery',
 					this.destroy();
 				},this)
 			});
-//			this.nextButton = this.element.parent().find(".ui-dialog-buttonpane span.ui-button-text:contains('Fertig')");
-//			this.nextButton.button('option', 'disabled', true);
+			this.nextButton = this.element.parent().find(".ui-dialog-buttonpane span.ui-button-text:contains('Fertig')").parent();
+			this.nextButton.button('option', 'disabled', true);
 			this.element.find("form#wbl-validate").validate();
 		},
 		
@@ -111,12 +112,14 @@ steal.plugins('jquery',
 		
 	    "button#wbl-pageSelectorButton click": function(el, ev) {
 	    	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', this.element, 'pages', false, $.proxy(function(parentPage) {
+	    		var parentSpan = this.element.find('input[name=url]').prev();
 	    		if(parentPage == null) {
-//	    			this.nextButton.button('option', 'disabled', true);
+	    			if(parentSpan.html() == '') 
+	    				this.nextButton.button('option', 'disabled', true);
 	    		} else {
 	    			this.parent = parentPage[0].getPath();
-//	    			this.nextButton.button('option', 'disabled', false);
-	    			this.element.find('input[name=url]').prev().html(this.parent);
+	    			this.nextButton.button('option', 'disabled', false);
+	    			parentSpan.html(this.parent);
 	    		}
 	    	}, this));
 	    },
