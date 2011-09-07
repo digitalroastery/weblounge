@@ -45,6 +45,7 @@ steal.plugins('jqueryui/dialog',
     	// Parse Pagelet-Editor Data
     	var pagelet = this.options.composer.page.getEditorPagelet(this.options.composer.id, this.element.index(), this.options.composer.language);
     	var editor = $(pageletEditor).find('editor:first');
+    	var pageletName = $(pageletEditor).find('pageleteditor:first').attr('name');
     	
     	if(!editor.length) {
     		this._showRenderer();
@@ -74,7 +75,7 @@ steal.plugins('jqueryui/dialog',
     	
 		this.editorDialog = $('#wbl-pageleteditor').html('<form id="wbl-validate" onsubmit="return false;">' + resultDom.html() + '</form>')
 		.dialog({
-			title: 'Pagelet bearbeiten',
+			title: 'Pagelet bearbeiten: ' + pageletName,
 			width: 500,
 			height: 400,
 			modal: true,
