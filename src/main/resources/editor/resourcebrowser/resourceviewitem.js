@@ -58,7 +58,7 @@ steal.plugins().then(function($) {
 			break;
 		case 'media':
 			var map = new Array({resourceId: resourceItem.attr('id')});
-			$('div#wbl-tagger').editor_tagger({
+			$('div#wbl-mediaeditor').editor_mediaeditor({
 				map: map, 
 				language: this.options.language, 
 				runtime: this.options.runtime,

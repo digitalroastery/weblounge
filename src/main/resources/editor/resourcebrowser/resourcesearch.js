@@ -1,5 +1,8 @@
-steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller', 'jqueryui/effects')
+steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller', 'jqueryui/effects', 'editor/mediaeditor')
 .views('//editor/resourcebrowser/views/resourcepagessearch.tmpl', '//editor/resourcebrowser/views/resourcemediasearch.tmpl')
+.resources('fileuploader')
+.models('../../models/file')
+.css('resources/fileuploader')
 .then(function($) {
 
 	$.Controller('Editor.Resourcesearch', 

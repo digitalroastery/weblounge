@@ -8,21 +8,21 @@ steal.plugins('jquery',
 		'jqueryui/resizable',
 		'jqueryui/mouse')
 .models('../../models/workbench')
-.views('//editor/massuploader/views/tagger.tmpl')
-.css('tagger')
+.views('//editor/mediaeditor/views/init.tmpl')
+.css('mediaeditor')
 .then(function($) {
 	
-	$.Controller("Editor.Tagger",	
+	$.Controller("Editor.Mediaeditor",	
 	/* @static */
 	{
   	},
   	/* @prototype */
   	{
 		/**
-		 * Initialize a new MassUploader controller.
+		 * Initialize a new MediaEditor controller.
 		 */
 		init: function(el) {
-			$(el).html('//editor/massuploader/views/tagger.tmpl', {map : this.options.map, language: this.options.language, runtime: this.options.runtime});
+			$(el).html('//editor/mediaeditor/views/init.tmpl', {map : this.options.map, language: this.options.language, runtime: this.options.runtime});
 			this.img = this.element.find('.wbl-taggerImage img:first').show();
 			
 			// Initialize Buttons
@@ -58,11 +58,13 @@ steal.plugins('jquery',
 					},
 					Fertig: $.proxy(function () {
 						$.each(this.metadata, $.proxy(function(key, value) {
-							this.file[key].saveMetadata(value, this.options.language);
+							this.file[key].saveMetadata(value, this.options.language, null, $.proxy(function() {
+								if(this.metadata.length == key + 1 && $.isFunction(this.options.success)) 
+									this.options.success();
+							}, this));
 				    	},this));
 						
 						this.element.dialog('close');
-						if($.isFunction(this.options.success)) this.options.success();
 					},this)
 				},
 				close: $.proxy(function () {

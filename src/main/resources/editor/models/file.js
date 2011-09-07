@@ -235,7 +235,7 @@ steal.then('jsonix')
 			return metadata;
 		},
 		
-		saveMetadata: function(metadata, language, eTag) {
+		saveMetadata: function(metadata, language, eTag, success) {
 			if($.isEmptyObject(this.value.head.metadata)) {
 				this.value.head.metadata = {};
 			}
@@ -259,10 +259,10 @@ steal.then('jsonix')
 			
 			this.value.head.created.user.name = metadata.author;
 			if(eTag == null) 
-				Editor.File.update({id:this.value.id}, this);
+				Editor.File.update({id:this.value.id}, this, success);
 			else {
 				eTag = eTag.replace(/"/g, '');
-				Editor.File.update({id:this.value.id, eTag: eTag}, this);
+				Editor.File.update({id:this.value.id, eTag: eTag}, this, success);
 			}
 		}
 		

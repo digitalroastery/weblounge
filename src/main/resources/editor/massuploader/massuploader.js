@@ -3,6 +3,7 @@ steal.plugins('jquery',
 		'jquery/view',
 		'jquery/view/tmpl',
 		'jquery/event/hover',
+		'editor/mediaeditor',
 		'jqueryui/widget',
 		'jqueryui/dialog',
 		'jqueryui/draggable',
@@ -12,7 +13,6 @@ steal.plugins('jquery',
 .css('massuploader', 'fileuploader')
 .models('../../models/file')
 .resources('fileuploader')
-.then('tagger')
 .then(function($) {
 	
 	$.Controller("Editor.Massuploader",	
@@ -116,7 +116,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    _openTagDialog: function() {
-	    	$('div#wbl-tagger').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
+	    	$('div#wbl-mediaeditor').editor_mediaeditor({map: this.map, language: this.options.language, runtime: this.options.runtime});
 	    },
 	    
         _loadImage: function(url) {
