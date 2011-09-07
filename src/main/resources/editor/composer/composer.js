@@ -95,6 +95,9 @@ steal.plugins('jquery/controller','jqueryui/sortable')
             // If pagelet is new open page editor dialog
             if(ui.item.hasClass('wbl-draggable')) {
             	Workbench.getPageletEditor({ id: page.value.id, language: this.options.language, composer: composerId, pagelet: pagelet.attr('index') }, $.proxy(function(pageletEditor) {
+            		if(!$(pageletEditor).find('editor:first').length) {
+            			pagelet.addClass('wbl-noEditor');
+            		}
             		pagelet.editor_pagelet('_openPageEditor', pageletEditor, true);
             	}, this));
         	}

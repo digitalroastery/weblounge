@@ -47,8 +47,7 @@ steal.plugins('jqueryui/dialog',
     	var editor = $(pageletEditor).find('editor:first');
     	
     	if(!editor.length) {
-    		if(isNew) this._deletePagelet();
-    		else this._showRenderer();
+    		this._showRenderer();
     		return;
     	}
     	
