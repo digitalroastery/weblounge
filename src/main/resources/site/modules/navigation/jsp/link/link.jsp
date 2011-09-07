@@ -3,10 +3,10 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <webl:context define="language, user">
-<webl:property define="typ">
+<webl:property define="type">
 
 <%-- internal --%>
-<% if (typ.equals("internal")) { %>
+<% if (type.equals("internal")) { %>
 	<webl:property define="pageid, anchor">
 		<webl:element define="title, description">
 			<weblr:page uuid="<%= pageid %>">
@@ -26,9 +26,14 @@
 
 <%-- external --%>
 <% } else { %>
-	<webl:property define="link, anchor">
+	<webl:property define="link, anchor, window">
 		<webl:element define="title, description">
-			<p class="link"><a href="<%= link %><% if (anchor.length() >0) out.print("#" + anchor); %>">
+			<p class="link"><a href="<%= link %><% if (anchor.length() >0) out.print("#" + anchor); %>" 
+				<% if (window.equals("Ja")) { %>
+					<% out.print("target=\"_blank\""); %>
+				<% } else { %>
+					<% out.print("target=\"_self\""); %>
+				<% } %>>
 				<% if (!title.equals("")) { %>
 						<%= title %>
 				<% } else { %>

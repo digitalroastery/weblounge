@@ -32,7 +32,6 @@ $.Controller("Editor.Link",
     },
     
     "input#wbl-linkExternal change": function(el, ev) {
-    	alert('validate link');
     	// URL mit Linkchecker Rot Grün
     }
     
