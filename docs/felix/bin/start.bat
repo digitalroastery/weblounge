@@ -10,11 +10,13 @@ REM # - file paths that contain spaces need to be enclosed in double quotes (")
 REM # Therefore, a valid file path would be "C:/Program Files/Weblounge".
 
 REM # Weblounge home
-SET WEBLOUNGE_HOME="C:/Program Files/Weblounge"
-SET WEBLOUNGE_WORKDIR=%WEBLOUNGE_HOME%
+REM # SET WEBLOUNGE_HOME="C:/Program Files/Weblounge"
+REM # SET WEBLOUNGE_WORKDIR=%WEBLOUNGE_HOME%
+
+IF "%WEBLOUNGE_HOME%"=="" GOTO QUICKEND
 
 REM # Memory settings
-SET MEMORY_OPTS=-Xmx1024m
+SET MEMORY_OPTS=-Xmx1024m -XX:MaxPermSize=256m
 
 REM # Felix debug options
 SET DEBUG_PORT=8000
@@ -33,11 +35,13 @@ REM #
 REM # Only change the lines below if you know what you are doing
 REM #
 
-SET WEBLOUNGE_OPTS=-Dweblounge.sitesdir=%WEBLOUNGE_SITESDIR% -Dweblounge.sitesdatadir=%WEBLOUNGE_SITESDATADIR%
+SET WEBLOUNGE_SITES_OPTS=-Dweblounge.sitesdir=%WEBLOUNGE_SITESDIR% 
+SET WEBLOUNGE_SITES_DATA_OPTS=-Dweblounge.sitesdatadir=%WEBLOUNGE_SITESDATADIR%
 SET WEBLOUNGE_FILEINSTALL_OPTS=-Dfelix.fileinstall.dir=%WEBLOUNGE_HOME%/load
-SET PAX_CONFMAN_OPTS=-Dbundles.configuration.location=%WEBLOUNGE_HOME%/conf -Dweblounge.logdir=%WEBLOUNGE_LOGDIR%
+SET PAX_CONFMAN_OPTS=-Dbundles.configuration.location=%WEBLOUNGE_HOME%/conf 
 SET PAX_LOGGING_OPTS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN
 SET PAX_WEB_OPTS=-Dorg.ops4j.pax.web.config.file=%WEBLOUNGE_HOME%/conf/jetty.xml
+SET WEBLOUNGE_LOGGING_OPTS=-Dweblounge.logdir=%WEBLOUNGE_LOGDIR%
 SET GRAPHICS_OPTS=-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit
 SET TEMPDIR_OPTS=-Djava.io.tmpdir=%WEBLOUNGE_TEMPDIR%
 
@@ -47,7 +51,7 @@ SET DEBUG_OPTS=-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=%DEBUG_PO
 
 REM # Create the java runtime options
 
-SET RUNTIME_OPTS=%WEBLOUNGE_OPTS% %TEMPDIR_OPTS% %GRAPHICS_OPTS% %WEBLOUNGE_FILEINSTALL_OPTS% %PAX_CONFMAN_OPTS% %PAX_LOGGING_OPTS%
+SET RUNTIME_OPTS=%WEBLOUNGE_SITES_OPTS% %WEBLOUNGE_SITES_DATA_OPTS% %TEMPDIR_OPTS% %GRAPHICS_OPTS% %WEBLOUNGE_FILEINSTALL_OPTS% %PAX_CONFMAN_OPTS% %WEBLOUNGE_LOGGING_OPTS% %PAX_LOGGING_OPTS%
 
 REM # Create the directories
 IF NOT EXIST %WEBLOUNGE_LOGDIR% MKDIR %WEBLOUNGE_LOGDIR%
@@ -60,3 +64,6 @@ REM # Finally start Weblounge
 java %MEMORY_OPTS% %RUNTIME_OPTS% %DEBUG_OPTS% -jar %WEBLOUNGE_HOME%/bin/felix.jar %WEBLOUNGE_CACHEDIR%
 
 ENDLOCAL
+
+:QUICKEND
+echo Please define WEBLOUNGE_HOME
