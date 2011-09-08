@@ -20,17 +20,6 @@
 
 package ch.entwine.weblounge.kernel.publisher;
 
-import ch.entwine.weblounge.common.impl.request.Http11ProtocolHandler;
-import ch.entwine.weblounge.common.impl.request.Http11ResponseType;
-import ch.entwine.weblounge.common.url.PathUtils;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.osgi.framework.Bundle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +33,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.entwine.weblounge.common.impl.request.Http11ProtocolHandler;
+import ch.entwine.weblounge.common.impl.request.Http11ResponseType;
+import ch.entwine.weblounge.common.url.PathUtils;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 /**
  * Servlet that serves both resources from an arbitrary directory or a bundle's
@@ -219,7 +220,7 @@ public class ResourcesServlet extends HttpServlet {
     if (bundle != null && url == null) {
       if (welcomeFile != null && "/".equals(requestPath))
         requestPath = welcomeFile;
-      String resourcePath = PathUtils.concat(bundlePath, requestPath);
+      String resourcePath = UrlUtils.concat(bundlePath, requestPath);
       url = bundle.getResource(resourcePath);
     }
 
