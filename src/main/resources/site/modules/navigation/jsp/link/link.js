@@ -36,5 +36,3 @@ $.Controller("Editor.Link",
     }
     
 });
-
-$('#wbl-pageleteditor div#wbl-linkEditor').editor_link();

@@ -1,5 +1,11 @@
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
 
+<script>
+	$(document).bind('pageletEditorOpen', function() {
+		$('#wbl-pageleteditor form').editor_author();
+	});
+</script>
+
 <input name="property:year" type="hidden" />
 <input name="property:login" type="hidden" />
 <h2><webl:i18n key="module.text.author.source"/></h2>

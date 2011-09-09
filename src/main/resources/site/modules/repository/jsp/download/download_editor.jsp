@@ -1,4 +1,11 @@
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+
+<script>
+	$(document).bind('pageletEditorOpen', function() {
+		$('#wbl-pageleteditor div#wbl-downloadEditor').editor_download();
+	});
+</script>
+
 <div id="wbl-downloadEditor">
 	<p>
 	    <label for="wbl-downloadTitle">Titel:</label> <input id="wbl-downloadTitle" type="text" name="element:title" />

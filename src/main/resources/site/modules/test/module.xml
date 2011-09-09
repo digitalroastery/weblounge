@@ -13,7 +13,7 @@
         <link href="file://${module.root}/css/greeting.css" rel="stylesheet"
           type="text/css" />
         <script src="file://${module.root}/scripts/greeting.js"
-          type="javascript" />
+          type="text/javascript" />
       </includes>
     </pagelet>
     <pagelet id="include" composeable="true">
@@ -38,7 +38,7 @@
       <mountpoint>/greeting/</mountpoint>
       <includes>
         <script src="file://${module.root}/scripts/greeting.js"
-          type="javascript" />
+          type="text/javascript" />
       </includes>
     </action>
     <action id="greeter.html-targeted">
@@ -48,7 +48,7 @@
       <page>/test/htmlaction</page>
       <includes>
         <script src="file://${module.root}/scripts/greeting.js"
-          type="javascript" />
+          type="text/javascript" />
       </includes>
     </action>
     <action id="greeter.xml">

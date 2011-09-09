@@ -21,5 +21,3 @@ $.Controller("Editor.Download",
     },
     
 });
-
-$('#wbl-pageleteditor div#wbl-downloadEditor').editor_download();

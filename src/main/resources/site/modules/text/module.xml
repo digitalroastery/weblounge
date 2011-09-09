@@ -46,7 +46,9 @@
       <renderer>file://${module.root}/jsp/enumeration/enumeration.jsp</renderer>
       <editor>file://${module.root}/jsp/enumeration/enumeration_editor.jsp</editor>
       <includes>
-        <script use="editor" src="file://${module.root}/jsp/enumeration/enumeration.js" type="javascript"></script>
+        <link use="editor" href="file://${module.root}/jsp/enumeration/enumeration.css" rel="stylesheet" type="text/css"></link>
+        <script use="editor" src="file://${module.root}/jsp/enumeration/jquery.tablednd_0_5.js" type="text/javascript"></script>
+        <script use="editor" src="file://${module.root}/jsp/enumeration/enumeration.js" type="text/javascript"></script>
       </includes>
     </pagelet>
 
@@ -55,7 +57,7 @@
       <renderer>file://${module.root}/jsp/author/author.jsp</renderer>
       <editor>file://${module.root}/jsp/author/author_editor.jsp</editor>
       <includes>
-        <script use="editor" src="file://${module.root}/jsp/author/author.js" type="javascript"></script>
+        <script use="editor" src="file://${module.root}/jsp/author/author.js" type="text/javascript"></script>
       </includes>
     </pagelet>
 

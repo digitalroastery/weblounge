@@ -10,7 +10,7 @@
 	<%= "<" + type + ">" %>
 
 	<%-- show all enumaration-items --%>
-	<webl:element-iterator element="text">
+	<webl:element-iterator regex="text*">
 		<li><webl:element name="text" templates="true" />&nbsp;</li>
 	</webl:element-iterator>
 

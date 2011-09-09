@@ -1,0 +1,10 @@
+div#wbl-galleryEditor label {
+    display: inline-block;
+    width: 160px
+}
+
+p.editor-title {
+	float: left; 
+	width: 50%; 
+	clear: left; 
+}

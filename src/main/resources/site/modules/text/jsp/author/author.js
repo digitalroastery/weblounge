@@ -36,5 +36,3 @@ $.Controller("Editor.Author",
     }
     
 });
-
-$('#wbl-pageleteditor form').editor_author();

@@ -109,8 +109,7 @@
 		<tei-class>ch.entwine.weblounge.taglib.content.ElementIteratorTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>element</name><required>false</required><rtexprvalue>false</rtexprvalue></attribute>
-		<attribute><name>elements</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>properties</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>regex</name><required>false</required><rtexprvalue>false</rtexprvalue></attribute>
 		<attribute><name>minOccurs</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
 

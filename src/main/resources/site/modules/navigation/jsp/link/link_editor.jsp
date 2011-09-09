@@ -1,4 +1,11 @@
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+
+<script>
+	$(document).bind('pageletEditorOpen', function() {
+		$('#wbl-pageleteditor div#wbl-linkEditor').editor_link();
+	});
+</script>
+
 <div id="wbl-linkEditor">
 <p>
     <label for="wbl-linkTitle"><webl:i18n key="module.navigation.linkanchor.title"/></label> <input id="wbl-linkTitle" type="text" name="element:title" />
