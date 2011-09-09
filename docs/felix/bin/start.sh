@@ -41,9 +41,13 @@ PAX_WEB_OPTS="-Dorg.ops4j.pax.web.config.file=$WEBLOUNGE_HOME/conf/jetty.xml"
 WEBLOUNGE_LOGGING_OPTS="-Dweblounge.logdir=$WEBLOUNGE_LOG_DIR"
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
 TEMP_DIR_OPTS="-Djava.io.tmpdir=$WEBLOUNGE_TEMP_DIR"
+LIB_DIR="-Dweblounge.libdir=$WEBLOUNGE_HOME/lib"
 
 # Create the debug config
 DEBUG_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,server=y,suspend=$DEBUG_SUSPEND"
+
+#Create the java runtime options
+RUNTIME_OPTS="$WEBLOUNGE_SITES_OPTS $WEBLOUNGE_SITES_DATA_OPTS $WEBLOUNGE_LOGGING_OPTS $TEMP_DIR_OPTS $GRAPHICS_OPTS $WEBLOUNGE_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $LIB_DIR"
 
 # Create the directories
 mkdir -p "$WEBLOUNGE_LOG_DIR"
@@ -62,4 +66,4 @@ fi
 
 # Finally start Weblounge
 cd "$WEBLOUNGE_HOME"
-java $MEMORY_OPTS $DEBUG_OPTS "$WEBLOUNGE_SITES_OPTS" "$WEBLOUNGE_SITES_DATA_OPTS" "$WEBLOUNGE_LOGGING_OPTS" "$TEMP_DIR_OPTS" "$GRAPHICS_OPTS" "$WEBLOUNGE_FILEINSTALL_OPTS" "$PAX_CONFMAN_OPTS" "$PAX_LOGGING_OPTS" -jar "$WEBLOUNGE_HOME/bin/felix.jar" "$WEBLOUNGE_CACHE_DIR"
+java $MEMORY_OPTS $DEBUG_OPTS $RUNTIME_OPTS -jar "$WEBLOUNGE_HOME/bin/felix.jar" "$WEBLOUNGE_CACHE_DIR"
