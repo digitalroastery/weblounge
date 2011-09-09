@@ -60,8 +60,10 @@ $.Class.extend('InputConverter',
 	},
 	
 	convertTextarea: function(textarea, element, pagelet) {
+		// load value with [2] index element:title:0
 		InputConverter.convert(element, pagelet,
 		function() {
+//			if(element[2] != null) lade
 			textarea.html(pagelet.locale.original.text[element[1]].toString());
 		}, 
 		function() {

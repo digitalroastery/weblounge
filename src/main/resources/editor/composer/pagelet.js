@@ -69,6 +69,13 @@ steal.plugins('jqueryui/dialog',
     	    });
     	});
     	
+    	// Load Pagelet Javascript
+    	this.scriptIndex = 0;
+    	var scripts = $(pageletEditor).find('script');
+    	scripts.each($.proxy(function(index, script) {
+    		$.getScript($(script).attr('src'), this.callback('_openEditor', scripts.length));
+    	}, this));
+    	
     	// Hack to create new Dom element
     	var resultDom = $('<div></div>').html(result);
     	this._convertInputs(resultDom, pagelet);
@@ -79,7 +86,7 @@ steal.plugins('jqueryui/dialog',
 			width: 500,
 			height: 400,
 			modal: true,
-			autoOpen: true,
+			autoOpen: false,
 			closeOnEscape: false,
 			resizable: true,
 			buttons: {
@@ -104,13 +111,17 @@ steal.plugins('jqueryui/dialog',
 				this.editorDialog.dialog('destroy');
 			}, this),
 			open: function(event, ui) {
-		    	// Load Pagelet Javascript
-		    	$(pageletEditor).find('script').each(function(index) {
-		    		$.getScript($(this).attr('src'));
-		    	});
+				$(this).trigger('pageletEditorOpen');
 			}
 		});
 		this.editorDialog.find("form#wbl-validate").validate();
+    },
+    
+    _openEditor: function(size) {
+    	this.scriptIndex++;
+		if(size == this.scriptIndex) {
+			this.editorDialog.dialog('open');
+		}
     },
     
     /**
@@ -119,7 +130,7 @@ steal.plugins('jqueryui/dialog',
     _processTemplate: function(template, data) {
     	var result = {};
     	try {
-    		var templateObject = TrimPath.parseTemplate(template);
+    		var templateObject = TrimPath.parseTemplate(template.trim());
     		result = templateObject.process(data);
     	} catch(err) {
     		result.exception = err;
@@ -215,6 +226,7 @@ steal.plugins('jqueryui/dialog',
     			}
     		}
     		else {
+    			// save array with push();
     			if(element[0] == 'property') {
     				pagelet.properties.property[element[1]] = [input.value];
     			} 

@@ -13,6 +13,7 @@
 
 .editor_pageletcreator div#wbl-moduleTabs {
 	height: 100%;
+	overflow: auto;
 }
 
 .editor_pageletcreator .wbl-tabHover {
