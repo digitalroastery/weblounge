@@ -55,7 +55,7 @@
     <sec:intercept-url pattern=".*?(\?|&#36;)edit.*?" access="editor"/>
 
     <!-- Don't bother about the rest -->
-    <sec:intercept-url pattern="^/.*" filters="none"/>
+    <sec:intercept-url pattern="^/.*" access="guest"/>
     
     <!-- FILTER CONFIGURATION -->
 
@@ -65,7 +65,7 @@
     <!-- LOGIN / LOGOUT MECHANISMS -->
 
     <!-- Enable and configure the failure URL for form-based logins -->
-    <sec:form-login login-page="/weblounge/login/login.html" login-processing-url="/system/weblounge/login/form" authentication-failure-url="/weblounge/login/login.html?failed"/>
+    <sec:form-login login-page="/weblounge/login/login.html" login-processing-url="/system/weblounge/login/form" authentication-failure-url="/weblounge/login/login.html?failed" authentication-success-handler-ref="loginSuccessHandler"/>
 
     <!-- Comment out to disable support for openID. OpenID URLs must be specified in the user detail service below -->
     <!--
@@ -98,7 +98,7 @@
     <property name="loginFormUrl" value="/weblounge/login/login.html"/>
   </bean>
 
-  <bean id="authSuccessHandler" class="ch.entwine.weblounge.security.RoleBasedLoginSuccessHandler">
+  <bean id="loginSuccessHandler" class="ch.entwine.weblounge.security.RoleBasedLoginSuccessHandler">
     <property name="securityService" ref="securityService" />
     <property name="welcomePages">
       <map>
