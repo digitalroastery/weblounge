@@ -20,8 +20,8 @@
 
 package ch.entwine.weblounge.taglib.content;
 
-import ch.entwine.weblounge.common.content.page.Pagelet;
-import ch.entwine.weblounge.common.request.WebloungeRequest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.jsp.JspException;
 
@@ -33,11 +33,10 @@ public class ElementIteratorTag extends AbstractContentIteratorTag {
   /** The serial version id */
   private static final long serialVersionUID = -5705402493357299735L;
 
-  /** The pagelet in question */
-  private Pagelet pagelet = null;
-
   /** The element's cardinality */
   private int cardinality = -1;
+  
+  private String regex = null;
 
   /**
    * Sets the element to iterate over.
@@ -46,7 +45,15 @@ public class ElementIteratorTag extends AbstractContentIteratorTag {
    *          the element name
    */
   public void setElement(String value) {
+    if (regex != null)
+      throw new IllegalStateException("Cannot specify both 'regex' and 'element' attribute");
     elements.add(value);
+  }
+  
+  public void setRegex(String regex) {
+    if (elements.size() > 0)
+      throw new IllegalStateException("Cannot specify both 'regex' and 'element' attribute");
+    this.regex = regex;
   }
 
   /**
@@ -54,24 +61,38 @@ public class ElementIteratorTag extends AbstractContentIteratorTag {
    */
   public int doStartTag() throws JspException {
     super.doStartTag();
-    if (pagelet == null) {
+
+    if(cardinality == -1 && pagelet != null) {
+      // Have elements been specified explicitly?
       if (elements.size() > 0) {
-        pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
-        if (pagelet == null) {
-          return SKIP_BODY;
-        }
-        pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_COUNT, new Integer(cardinality));
-        pageContext.setAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
         Object[] e = pagelet.getMultiValueContent(elements.get(0), request.getLanguage());
         if (e != null) {
           cardinality = e.length;
-        }
-        if (cardinality > 0 || minOccurs > 0) {
-          return EVAL_BODY_INCLUDE;
-        }
+        }      
       }
+      
+      // Try to select elements by regular expression
+      else if (regex != null) {
+        Pattern p = Pattern.compile(regex);
+        for (String elementName : pagelet.getContentNames(request.getLanguage())) {
+          Matcher m = p.matcher(elementName);
+          if (m.matches()) {
+            elements.add(elementName);
+          }
+        }
+        cardinality = elements.size();
+        index = 0;
+      }
+    }
+    
+    // Did we find elements to iterate over?
+    if (cardinality <= 0 && !(index < minOccurs)) {
       return SKIP_BODY;
     }
+
+    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_COUNT, new Integer(cardinality));
+    pageContext.setAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
+
     return EVAL_BODY_INCLUDE;
   }
 
@@ -80,7 +101,7 @@ public class ElementIteratorTag extends AbstractContentIteratorTag {
    */
   public int doAfterBody() {
     if (super.doAfterBody() == EVAL_BODY_AGAIN) {
-      if (index <= cardinality - 1 || index < minOccurs) {
+      if (index < cardinality || index < minOccurs) {
         pageContext.setAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
         return EVAL_BODY_AGAIN;
       }
@@ -92,11 +113,16 @@ public class ElementIteratorTag extends AbstractContentIteratorTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    cardinality = 0;
-    pagelet = null;
     pageContext.removeAttribute(ElementIteratorTagVariables.ELEMENT_COUNT);
     pageContext.removeAttribute(ElementIteratorTagVariables.INDEX);
     return super.doEndTag();
+  }
+  
+  @Override
+  protected void reset() {
+    super.reset();
+    cardinality = -1;
+    regex = null;
   }
 
 }

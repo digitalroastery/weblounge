@@ -37,7 +37,7 @@ public class WorkbenchTag extends WebloungeTag {
   private static final long serialVersionUID = -498800954917968929L;
 
   /** Path to the workbench script */
-  public static final String WORKBENCH_SCRIPT = "<script src=\"/weblounge/steal/steal.js?editor,development\"></script>";
+  public static final String WORKBENCH_SCRIPT = "<script src=\"/weblounge-shared/steal/steal.js?editor,development\"></script>";
 
   /**
    * Writes the workbench script tag to the output.

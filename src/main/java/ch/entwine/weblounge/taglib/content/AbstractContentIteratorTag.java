@@ -33,7 +33,7 @@ import javax.servlet.jsp.JspException;
 /**
  * This tags iterates over multivalue pagelet content elements. If there are
  * elements or properties defined, the iteration will only walk over those
- * elements and properties. Otherwhise, the iteration will respect every
+ * elements and properties. Otherwise, the iteration will respect every
  * embedded multivalue element or property.
  */
 public abstract class AbstractContentIteratorTag extends WebloungeTag {
@@ -47,7 +47,7 @@ public abstract class AbstractContentIteratorTag extends WebloungeTag {
   protected List<String> properties = null;
 
   /** The iteration index */
-  protected int index = -1;
+  protected int index = 0;
 
   /** The minimum number of iterations */
   protected int minOccurs = -1;

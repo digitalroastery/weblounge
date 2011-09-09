@@ -23,6 +23,7 @@ package ch.entwine.weblounge.taglib.content;
 import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -88,9 +89,11 @@ public class HTMLHeaderTag extends WebloungeTag {
         }
         Renderer renderer = module.getRenderer(p.getIdentifier());
         if (renderer != null) {
+          // TODO if use == renderer include to html as script
           for (HTMLHeadElement header : renderer.getHTMLHeaders()) {
             if (header instanceof DeclarativeHTMLHeadElement)
               ((DeclarativeHTMLHeadElement)header).configure(request, site, module);
+            if(header.getUse().equals(HTMLInclude.Use.Editor)) continue;
             headElements.add(header);
           }
         } else {
@@ -123,5 +126,5 @@ public class HTMLHeaderTag extends WebloungeTag {
 
     return super.doEndTag();
   }
-
+  
 }
