@@ -208,6 +208,15 @@ public class SQLDirectoryProvider implements DirectoryProvider {
     return emf.createEntityManager();
   }
 
+  /**
+   * Gets a connection from the database and returns it. If no connection is
+   * available, <code>null</code> is returned instead.
+   * 
+   * TODO: Add pooling
+   * TODO: Remove fixed connection pool
+   * 
+   * @return the connection or <code>null</code> if no connection is available
+   */
   private Connection getDBConnection() {
     String filter = "(osgi.jdbc.driver.class=com.mysql.jdbc.Driver)";
     ServiceReference[] sr;
@@ -217,7 +226,7 @@ public class SQLDirectoryProvider implements DirectoryProvider {
       if (sr != null && sr.length > 0) {
         dsf = (DataSourceFactory) context.getService(sr[0]);
       } else {
-        log.error("No DataSourceFactory found.");
+        log.debug("No DataSourceFactory found.");
         return null;
       }
 
