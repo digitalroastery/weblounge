@@ -46,6 +46,9 @@ public interface Site extends Customizable, RequestListener, Serializable {
   /** The modules folder */
   String MODULE_DIR = "module";
 
+  /** Default value for a site's path inside a bundle */
+  String BUNDLE_PATH = "/site";
+
   /**
    * Sets the site identifier.
    * <p>
