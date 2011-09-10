@@ -21,6 +21,8 @@
 package ch.entwine.weblounge.taglib.content;
 
 import ch.entwine.weblounge.common.editor.EditingState;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
+import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
 import java.io.IOException;
@@ -45,9 +47,18 @@ public class WorkbenchTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    // if (!SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR))
-    // return super.doEndTag();
+    // If the user does not have editing rights, make sure the
+    // cookie is deleted. This is likely to be the case after the user
+    // has hit the logout button or after the session has expired.
+    if (!SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR)) {
+      Cookie cookie = new Cookie(EditingState.STATE_COOKIE, null);
+      cookie.setMaxAge(0);
+      cookie.setPath("/");
+      response.addCookie(cookie);
+      return super.doEndTag();
+    }
 
+    // Is the ?edit parameter in place?
     if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
       Cookie cookie = new Cookie(EditingState.STATE_COOKIE, "true");
       cookie.setPath("/");
@@ -56,6 +67,7 @@ public class WorkbenchTag extends WebloungeTag {
       return super.doEndTag();
     }
 
+    // If not, do we have the cookie instead?
     if (request.getCookies() == null)
       return super.doEndTag();
     for (Cookie cookie : request.getCookies()) {
