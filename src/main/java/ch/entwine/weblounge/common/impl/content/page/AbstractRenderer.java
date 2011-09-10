@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -241,6 +242,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
       String servletPath = "/weblounge-sites/" + site.getIdentifier();
       String requestPath = renderer.getPath();
       requestPath = requestPath.substring(servletPath.length());
+      requestPath = UrlUtils.concat(Site.BUNDLE_PATH, requestPath);
       SiteRequestWrapper siteRequest = new SiteRequestWrapper(request, requestPath, false);
 
       RequestDispatcher dispatcher = request.getRequestDispatcher(servletPath);
