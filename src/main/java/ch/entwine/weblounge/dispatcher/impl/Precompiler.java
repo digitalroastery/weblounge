@@ -44,7 +44,8 @@ import java.util.Enumeration;
 /**
  * This precompiler searches an OSGi bundle for Java Server Pages (JSP) and
  * sends a request to <code>JspC</code>, the java server page compiler provided
- * by Jasper.
+ * by Jasper in order to get the compilation work done before a user request
+ * hits the jsp.
  */
 public class Precompiler {
 
@@ -77,8 +78,8 @@ public class Precompiler {
   }
 
   /**
-   * Precompiles all of the bundle's server pages to the output directory as
-   * specified in the <code>scratchdir</code> setting of the compiler
+   * Precompiles all of the bundle's server pages intoto the output directory as
+   * specified in the <code>scratchDir</code> setting of the compiler
    * configuration.
    * 
    * @param outputDir
@@ -125,7 +126,6 @@ public class Precompiler {
 
       Site site = servlet.getSite();
       Bundle bundle = servlet.getBundle();
-      String bundlePath = servlet.getBundleContext().getBundlePath();
 
       // Prepare the mock request and response objects
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
@@ -146,7 +146,7 @@ public class Precompiler {
       }
 
       // Collect all jsp files and ask for precompilation
-      Enumeration<URL> jspEntries = bundle.findEntries(bundlePath, "*.jsp", true);
+      Enumeration<URL> jspEntries = bundle.findEntries(Site.BUNDLE_PATH, "*.jsp", true);
       if (jspEntries == null) {
         logger.debug("No java server pages found to precompile for {}", site);
         return;
@@ -157,7 +157,7 @@ public class Precompiler {
       while (keepGoing && jspEntries.hasMoreElements()) {
         URL entry = jspEntries.nextElement();
         String path = entry.getPath();
-        String pathInfo = path.substring(path.indexOf(bundlePath) + bundlePath.length());
+        String pathInfo = path.substring(path.indexOf(Site.BUNDLE_PATH) + Site.BUNDLE_PATH.length());
         request.setPathInfo(pathInfo);
         request.setRequestURI(pathInfo);
 

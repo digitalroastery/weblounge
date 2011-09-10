@@ -28,11 +28,12 @@ import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.kernel.http.BundleResourceHttpContext;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.tika.Tika;
 import org.eclipse.jetty.util.resource.Resource;
 import org.ops4j.pax.web.jsp.JspServletWrapper;
 import org.osgi.framework.Bundle;
@@ -76,14 +77,17 @@ public class SiteServlet extends HttpServlet {
   /** The site */
   private final Site site;
 
-  /** The http context */
-  private final BundleResourceHttpContext siteHttpContext;
+  /** The site bundle */
+  private final Bundle bundle;
 
   /** The Jasper servlet */
   protected final Servlet jasperServlet;
 
   /** Path rules */
   private List<ResourceSet> resourceSets = null;
+
+  /** Tika mimetype library */
+  private Tika tika = null;
 
   /** Flag to reflect servlet initialization */
   private boolean initialized = false;
@@ -95,17 +99,18 @@ public class SiteServlet extends HttpServlet {
    *          the site
    * @param bundle
    *          the site bundle
-   * @param httpContext
-   *          the http context
+   * @param bundle
+   *          the site bundle
    */
   public SiteServlet(final Site site,
-      final BundleResourceHttpContext httpContext) {
+ final Bundle bundle) {
     this.site = site;
-    this.siteHttpContext = httpContext;
-    this.jasperServlet = new JspServletWrapper(httpContext.getBundle());
+    this.bundle = bundle;
+    this.jasperServlet = new JspServletWrapper(bundle);
     this.resourceSets = new ArrayList<ResourceSet>();
     this.resourceSets.add(new SiteResourceSet());
     this.resourceSets.add(new ModuleResourceSet());
+    this.tika = new Tika();
   }
 
   /**
@@ -142,17 +147,7 @@ public class SiteServlet extends HttpServlet {
    * @return the bundle
    */
   public Bundle getBundle() {
-    return siteHttpContext.getBundle();
-  }
-
-  /**
-   * Returns the bundle context that is used by this servlet to load the actual
-   * content for delivery.
-   * 
-   * @return the bundle context
-   */
-  public BundleResourceHttpContext getBundleContext() {
-    return siteHttpContext;
+    return bundle;
   }
 
   /**
@@ -224,7 +219,8 @@ public class SiteServlet extends HttpServlet {
     } else {
       WebloungeRequestImpl webloungeRequest = new WebloungeRequestImpl(httpRequest);
       webloungeRequest.init(site);
-      request = new SiteRequestWrapper(webloungeRequest, httpRequest.getPathInfo(), false);
+      String requestPath = UrlUtils.concat("/site", httpRequest.getPathInfo());
+      request = new SiteRequestWrapper(webloungeRequest, requestPath, false);
       response = new WebloungeResponseImpl(httpResponse);
       ((WebloungeResponseImpl) response).setRequest(webloungeRequest);
     }
@@ -271,7 +267,7 @@ public class SiteServlet extends HttpServlet {
     }
 
     // Does the resource exist?
-    final URL url = siteHttpContext.getResource(requestPath);
+    final URL url = bundle.getResource(requestPath);
     if (url == null) {
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
       return;
@@ -291,7 +287,7 @@ public class SiteServlet extends HttpServlet {
     }
 
     URLConnection conn = url.openConnection();
-    String mimeType = siteHttpContext.getMimeType(requestPath);
+    String mimeType = tika.detect(requestPath);
     String encoding = null;
 
     // Try to get mime type and content encoding from resource

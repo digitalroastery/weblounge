@@ -34,7 +34,6 @@ import ch.entwine.weblounge.dispatcher.SiteDispatcherService;
 import ch.entwine.weblounge.dispatcher.impl.http.WebXml;
 import ch.entwine.weblounge.kernel.SiteManager;
 import ch.entwine.weblounge.kernel.SiteServiceListener;
-import ch.entwine.weblounge.kernel.http.BundleResourceHttpContext;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -46,7 +45,6 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.http.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,9 +79,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /** Default value for the <code>BUNDLE_ROOT_URI</code> property */
   public static final String DEFAULT_BUNDLE_CONTEXT_ROOT_URI = "/weblounge-sites";
 
-  /** Default value for the <code>BUNDLE_ENTRY</code> property */
-  public static final String DEFAULT_BUNDLE_ENTRY = "/site";
-
   /** Service pid, used to look up the service configuration */
   public static final String SERVICE_PID = "ch.entwine.weblounge.sitedispatcher";
 
@@ -116,9 +111,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
   /** The site servlet registrations */
   private Map<Site, ServiceRegistration> servletRegistrations = null;
-
-  /** The http bundle context registrations */
-  private Map<Site, ServiceRegistration> contextRegistrations = null;
 
   /** The precompiler for java server pages */
   private boolean precompile = true;
@@ -177,7 +169,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     }
 
     servletRegistrations = new HashMap<Site, ServiceRegistration>();
-    contextRegistrations = new HashMap<Site, ServiceRegistration>();
 
     logger.debug("Site dispatcher activated");
 
@@ -386,27 +377,17 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     // Create the site URI
     String contextRoot = webXml.getContextParam(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT, DEFAULT_WEBAPP_CONTEXT_ROOT);
-    String bundleEntry = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ENTRY, DEFAULT_BUNDLE_ENTRY);
     String bundleURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_URI, site.getIdentifier());
     String siteContextURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI, DEFAULT_BUNDLE_CONTEXT_ROOT_URI);
     String siteRoot = UrlUtils.concat(contextRoot, siteContextURI, bundleURI);
 
     try {
-      // Create and register the bundle http context
-      BundleResourceHttpContext bundleHttpContext = new BundleResourceHttpContext(siteBundle, bundleEntry);
-      String contextName = "weblounge." + siteBundle.getSymbolicName().toLowerCase() + "-site";
-      Dictionary<String, String> contextRegistrationProperties = new Hashtable<String, String>();
-      contextRegistrationProperties.put("httpContext.id", contextName);
-      ServiceRegistration contextRegistration = siteBundle.getBundleContext().registerService(HttpContext.class.getName(), bundleHttpContext, contextRegistrationProperties);
-      contextRegistrations.put(site, contextRegistration);
-
       // Create and register the site servlet
-      SiteServlet siteServlet = new SiteServlet(site, bundleHttpContext);
+      SiteServlet siteServlet = new SiteServlet(site, siteBundle);
       Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
       servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
       servletRegistrationProperties.put("alias", siteRoot);
       servletRegistrationProperties.put("servlet-name", site.getIdentifier());
-      servletRegistrationProperties.put("httpContext.id", contextName);
       servletRegistrationProperties.put(OPT_JASPER_SCRATCHDIR, PathUtils.concat(jasperConfig.get(OPT_JASPER_SCRATCHDIR), site.getIdentifier()));
       ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
       servletRegistrations.put(site, servletRegistration);
@@ -457,10 +438,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     // Remove site dispatcher servlet
     ServiceRegistration servletRegistration = servletRegistrations.remove(site);
     servletRegistration.unregister();
-
-    // Remove site http context
-    ServiceRegistration contextRegistration = contextRegistrations.remove(site);
-    contextRegistration.unregister();
 
     // We are no longer interested in site events
     site.removeSiteListener(this);
@@ -570,7 +547,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     WebXml webXml = new WebXml();
     webXml.addContextParam(DispatcherConfiguration.BUNDLE_NAME, siteBundle.getSymbolicName());
-    webXml.addContextParam(DispatcherConfiguration.BUNDLE_ENTRY, DEFAULT_BUNDLE_ENTRY);
+    webXml.addContextParam(DispatcherConfiguration.BUNDLE_ENTRY, Site.BUNDLE_PATH);
 
     // Webapp context root
     String webappRoot = null;
@@ -617,7 +594,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     else if (System.getProperty(DispatcherConfiguration.BUNDLE_ENTRY) != null)
       bundleEntry = System.getProperty(DispatcherConfiguration.BUNDLE_ENTRY);
     if (bundleEntry == null)
-      bundleEntry = DEFAULT_BUNDLE_ENTRY;
+      bundleEntry = Site.BUNDLE_PATH;
     if (!bundleEntry.startsWith("/"))
       bundleEntry = "/" + bundleEntry;
     webXml.addContextParam(DispatcherConfiguration.BUNDLE_ENTRY, bundleEntry);
