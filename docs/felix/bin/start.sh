@@ -10,6 +10,9 @@ fi
 # Main Weblounge path configuration. Make sure that the user executing Weblounge
 # has write access to WEBLOUNGE_WORK_DIR.
 
+# This setting is fine if you want everything to be in the same directory.
+# Change work directory to something else if you care about writable versus
+# non-writable directory
 WEBLOUNGE_WORK_DIR="$WEBLOUNGE_HOME"
 
 # Memory settings
@@ -27,6 +30,7 @@ WEBLOUNGE_CACHE_DIR="$WEBLOUNGE_WORK_DIR/cache"
 WEBLOUNGE_TEMP_DIR="$WEBLOUNGE_WORK_DIR/work"
 WEBLOUNGE_SITES_DIR="$WEBLOUNGE_WORK_DIR/sites"
 WEBLOUNGE_SITESDATA_DIR="$WEBLOUNGE_WORK_DIR/sites-data"
+WEBLOUNGE_LIB_DIR="$WEBLOUNGE_HOME/lib"
 
 ##
 # Only change the line below if you want to customize the server
@@ -35,19 +39,13 @@ WEBLOUNGE_SITESDATA_DIR="$WEBLOUNGE_WORK_DIR/sites-data"
 WEBLOUNGE_SITES_OPTS="-Dweblounge.sitesdir=$WEBLOUNGE_SITES_DIR"
 WEBLOUNGE_SITES_DATA_OPTS="-Dweblounge.sitesdatadir=$WEBLOUNGE_SITESDATA_DIR"
 WEBLOUNGE_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$WEBLOUNGE_HOME/load"
+WEBLOUNGE_LIB_OPTS="-Dweblounge.libdir=$WEBLOUNGE_LIB_DIR"
 PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$WEBLOUNGE_HOME/conf"
 PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN"
 PAX_WEB_OPTS="-Dorg.ops4j.pax.web.config.file=$WEBLOUNGE_HOME/conf/jetty.xml"
 WEBLOUNGE_LOGGING_OPTS="-Dweblounge.logdir=$WEBLOUNGE_LOG_DIR"
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
 TEMP_DIR_OPTS="-Djava.io.tmpdir=$WEBLOUNGE_TEMP_DIR"
-LIB_DIR="-Dweblounge.libdir=$WEBLOUNGE_HOME/lib"
-
-# Create the debug config
-DEBUG_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,server=y,suspend=$DEBUG_SUSPEND"
-
-#Create the java runtime options
-RUNTIME_OPTS="$WEBLOUNGE_SITES_OPTS $WEBLOUNGE_SITES_DATA_OPTS $WEBLOUNGE_LOGGING_OPTS $TEMP_DIR_OPTS $GRAPHICS_OPTS $WEBLOUNGE_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $LIB_DIR"
 
 # Create the directories
 mkdir -p "$WEBLOUNGE_LOG_DIR"
@@ -63,6 +61,12 @@ if [ -d "$WEBLOUNGE_CACHE_DIR" ]; then
     rm -r "$WEBLOUNGE_CACHE_DIR/$bundle"
   done
 fi
+
+# Create the debug config
+DEBUG_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,server=y,suspend=$DEBUG_SUSPEND"
+
+#Create the java runtime options
+RUNTIME_OPTS="$WEBLOUNGE_SITES_OPTS $WEBLOUNGE_SITES_DATA_OPTS $WEBLOUNGE_LOGGING_OPTS $WEBLOUNGE_LIB_OPTS $TEMP_DIR_OPTS $GRAPHICS_OPTS $WEBLOUNGE_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS"
 
 # Finally start Weblounge
 cd "$WEBLOUNGE_HOME"
