@@ -17,12 +17,12 @@
 
     <!-- Login / Logout -->
 
-    <!-- The login page can't be protected -->
+    <!-- The login form can't be protected -->
     <sec:intercept-url pattern="^/weblounge/login/.*" filters="none"/>
 
     <!-- The login processing urls needs to be covered by the filter chain -->
     <sec:intercept-url pattern="^/system/weblounge/login/.*" access="guest"/>
-    <sec:intercept-url pattern="^/system/weblounge/logout" access="guest"/>
+    <sec:intercept-url pattern="^/system/weblounge/logout"/>
 
     <!-- Editor -->
 
@@ -55,7 +55,7 @@
     <sec:intercept-url pattern=".*?(\?|&#36;)edit.*?" access="editor"/>
 
     <!-- Don't bother about the rest -->
-    <sec:intercept-url pattern="^/.*" access="guest"/>
+    <sec:intercept-url pattern="^/.*" filters="none"/>
     
     <!-- FILTER CONFIGURATION -->
 
