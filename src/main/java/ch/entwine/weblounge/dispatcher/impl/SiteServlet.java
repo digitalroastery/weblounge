@@ -258,7 +258,7 @@ public class SiteServlet extends HttpServlet {
       final HttpServletResponse response) throws ServletException, IOException {
 
     Http11ResponseType responseType = null;
-    String requestPath = request.getPathInfo();
+    String requestPath = UrlUtils.concat("/site", request.getPathInfo());
 
     // There is also a special set of resources that we don't want to expose
     if (isProtected(requestPath)) {
