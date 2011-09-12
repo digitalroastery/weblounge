@@ -371,7 +371,6 @@
               ch.entwine.weblounge.kernel;version=${project.version},
               ch.entwine.weblounge.kernel.command;version=${project.version},
               ch.entwine.weblounge.kernel.endpoint;version=${project.version},
-              ch.entwine.weblounge.kernel.http;version=${project.version},
               ch.entwine.weblounge.kernel.publisher;version=${project.version},
               ch.entwine.weblounge.kernel.runtime;version=${project.version},
               ch.entwine.weblounge.kernel.security;version=${project.version},
