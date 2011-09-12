@@ -191,6 +191,8 @@ steal.plugins('jqueryui/dialog',
 		if(pagelet.locale.current == undefined) {
 			pagelet = this._createNewLocale(pagelet, this.options.composer.language);
 		} else {
+			pagelet.locale.current.text = {};
+			pagelet.properties.property = {};
 			this._updateModified(pagelet);
 		}
 		
