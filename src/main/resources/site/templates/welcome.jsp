@@ -4,7 +4,6 @@
 	<head>
 		<title>Welcome to Weblounge</title>
 		<webl:generator/>
-		<script src="http://127.0.0.1:8080/weblounge-sites/weblounge-test/web/jquery-1.6.3.min.js" type="text/javascript"></script>
 		<webl:headers/>
 		<webl:workbench/>
 	</head>
