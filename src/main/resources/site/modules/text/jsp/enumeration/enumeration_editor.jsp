@@ -22,7 +22,7 @@
 			</select>
 		</p>
 		<table id="enumeration">
-			<webl:element-iterator regex="text*" minOccurs="2">
+			<webl:element-iterator regex="text[\d*]" minOccurs="1">
 				<% int i = index.intValue(); %>
 				<tr id="<%= i %>">
 					<td class="dragHandle">&nbsp;</td>

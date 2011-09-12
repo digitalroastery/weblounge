@@ -9,9 +9,10 @@
 <webl:property define="type">
 	<%= "<" + type + ">" %>
 
-	<%-- show all enumaration-items --%>
-	<webl:element-iterator regex="text*">
-		<li><webl:element name="text" templates="true" />&nbsp;</li>
+	<%-- show all enumeration-items --%>
+	<webl:element-iterator regex="text[\d*]">
+		<% int i = index.intValue(); %>
+		<li><webl:element name="text<%= i %>" templates="true" />&nbsp;</li>
 	</webl:element-iterator>
 
 	<%= "</" + type + ">" %>
