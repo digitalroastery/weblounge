@@ -36,6 +36,7 @@ import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
+import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.CacheTag;
@@ -97,6 +98,22 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   @Override
   public void connect(Site site) throws ContentRepositoryException {
     super.connect(site);
+    
+    // Make sure there is a home page
+    ResourceURI homeURI = new ResourceURIImpl(Page.TYPE, site, "/");
+    if (!existsInAnyVersion(homeURI)) {
+      try {
+        Page page = new PageImpl(homeURI);
+        page.setTemplate(site.getDefaultTemplate().getIdentifier());
+        page.setCreated(site.getAdministrator(), new Date());
+        page.setPublished(site.getAdministrator(), new Date(), null);
+        put(page);
+        logger.info("Created homepage for {}", site.getIdentifier());
+      } catch (IOException e) {
+        logger.warn("Error creating home page in empty site '{}': {}", site.getIdentifier(), e.getMessage());
+      }
+    }
+      
     Bundle bundle = loadBundle(site);
     if (bundle != null) {
       imageStyleTracker = new ImageStyleTracker(bundle.getBundleContext());
@@ -159,8 +176,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#unlock(ch.entwine.weblounge.common.content.ResourceURI)
    */
-  public Resource<?> unlock(ResourceURI uri, User user) throws ContentRepositoryException,
-      IllegalStateException, IOException {
+  public Resource<?> unlock(ResourceURI uri, User user)
+      throws ContentRepositoryException, IllegalStateException, IOException {
     Resource<?> resource = null;
     Date date = new Date();
     for (ResourceURI u : getVersions(uri)) {
@@ -308,7 +325,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           createPreviews(r);
       }
     }
-    
+
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
     if (cache != null) {
@@ -357,7 +374,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         index.add(resource);
       }
     }
-    
+
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
     if (cache != null) {

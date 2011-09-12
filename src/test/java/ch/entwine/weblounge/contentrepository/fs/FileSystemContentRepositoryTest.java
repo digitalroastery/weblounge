@@ -85,6 +85,7 @@ import java.util.UUID;
 /**
  * Test case for {@link FileSystemContentRepositoryTest}.
  */
+@Ignore
 public class FileSystemContentRepositoryTest {
 
   /** The content repository */
