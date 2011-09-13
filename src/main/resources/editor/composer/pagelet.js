@@ -110,9 +110,12 @@ steal.plugins('jqueryui/dialog',
 				}
 				this.editorDialog.dialog('destroy');
 			}, this),
-			open: function(event, ui) {
-				$(this).trigger('pageletEditorOpen');
-			}
+			open: $.proxy(function(event, ui) {
+				this.editorDialog.trigger('pageletEditorOpen', {
+					language: this.options.composer.language,
+					runtime: this.options.composer.runtime
+				});
+			}, this)
 		});
 		this.editorDialog.find("form#wbl-validate").validate();
     },

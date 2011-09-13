@@ -192,10 +192,10 @@ steal.plugins(
         		this.element.find('a.wbl-media').hide();
         		this.element.find('a.wbl-pages').click();
         		browser = this.element.parent().find('#wbl-pagebrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection);
-        	} else if(resourceMode == 'media') {
+        	} else if(resourceMode == 'media' || resourceMode == 'files' || resourceMode == 'images' || resourceMode == 'videos') {
         		this.element.find('a.wbl-pages').hide();
         		this.element.find('a.wbl-media').click();
-        		browser = this.element.parent().find('#wbl-mediabrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection);
+        		browser = this.element.parent().find('#wbl-mediabrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection, resourceMode);
         	}
         	
     		this.element.find('button.wbl-editorSelectionCancel').click($.proxy(function() { 
