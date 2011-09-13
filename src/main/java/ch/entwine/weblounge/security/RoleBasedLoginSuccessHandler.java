@@ -50,7 +50,7 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
   protected Map<String, String> welcomePages = new HashMap<String, String>();
 
   /** The default welcome page */
-  protected String defaultWelcomePage = "/#wbl-pages?edit";
+  protected String defaultWelcomePage = "/?edit";
 
   /**
    * {@inheritDoc}
