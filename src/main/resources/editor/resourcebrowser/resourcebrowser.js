@@ -75,10 +75,17 @@ steal.plugins(
 				text: false });
 		},
 		
-		_enableEditorSelectionMode: function(isMultiSelect) {
+		_enableEditorSelectionMode: function(isMultiSelect, resourceMode) {
+			if(!$.isEmptyObject(resourceMode)) {
+				this.resourceMode = resourceMode;
+			}
+			
 			if(this.searchFlag == true) {
 				this.element.find('button.wbl-all').click();
+			} else {
+				this._updateLast();
 			}
+			
 			var mode = 'editorSelection';
 			if(isMultiSelect) mode = 'editorMultiSelection';
 			
@@ -101,6 +108,7 @@ steal.plugins(
 		
 		_disableEditorSelectionMode: function() {
 			this.editorSelectionMode = false;
+			this.resourceMode = {};
 			this.scrollView.editor_resourcescrollview({
 				resources: this.options.resources,
 				language: this.options.language,
@@ -263,6 +271,11 @@ steal.plugins(
 		},
         
         _loadResources: function(params, functions) {
+        	if(!$.isEmptyObject(this.resourceMode)) {
+        		params.type = this.resourceMode;
+        	} else {
+        		delete params.type;
+        	}
 			switch(this.options.resourceType) {
 			case 'pages':
 				functions.page(params);

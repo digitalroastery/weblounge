@@ -41,6 +41,9 @@ steal.then('jsonix')
 			if ('filter' in params) {
 				url += "&filter=" + params.filter;
 			}
+			if ('type' in params) {
+				url += "&type=" + params.type;
+			}
 			$.ajax(url, {
 				success: function(xml) {
 					var json = Editor.File.parseXML(xml);
@@ -56,6 +59,9 @@ steal.then('jsonix')
 			var url = "/system/weblounge/files/?sort=modified-desc&limit=8&offset=0";
 			if ('filter' in params) {
 				url += "&filter=" + params.filter;
+			}
+			if ('type' in params) {
+				url += "&type=" + params.type;
 			}
 			$.ajax(url, {
 				success: function(xml) {
@@ -73,6 +79,9 @@ steal.then('jsonix')
 			if ('filter' in params) {
 				url += "?filter=" + params.filter;
 			}
+			if ('type' in params) {
+				url += "&type=" + params.type;
+			}
 			$.ajax(url, {
 				success: function(xml) {
 					var json = Editor.File.parseXML(xml);
@@ -88,6 +97,9 @@ steal.then('jsonix')
 			var url = '/system/weblounge/files/?searchterms=' + params.search + '&sort=modified-desc&limit=8&offset=0';
 			if ('filter' in params) {
 				url += "&filter=" + params.filter;
+			}
+			if ('type' in params) {
+				url += "&type=" + params.type;
 			}
 			$.ajax(url, {
 				success: function(xml) {
