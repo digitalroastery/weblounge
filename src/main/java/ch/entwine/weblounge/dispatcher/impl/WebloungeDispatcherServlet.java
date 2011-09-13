@@ -252,7 +252,11 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     logger.debug("Serving {}", httpRequest.getRequestURI());
 
     // Get the site dispatcher
-    Site site = getSiteByRequest(httpRequest);
+    Site site = securityService.getSite();
+    if (site == null) {
+      site = getSiteByRequest(httpRequest);
+      securityService.setSite(site);
+    }
     boolean isSpecial = StringUtils.isNotBlank(httpRequest.getHeader("X-Weblounge-Special"));
     if (site == null) {
       if (!wellknownFiles.contains(httpRequest.getRequestURI()))
@@ -293,6 +297,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     // Wrap request and response
     WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest, siteServlet);
     WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
+    securityService.setSite(site);
     request.setUser(securityService.getUser());
 
     // See if a site dispatcher was found, and if so, if it's enabled
