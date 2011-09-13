@@ -20,7 +20,7 @@ $.Controller("Editor.Image",
     	var input = this.element.find('input#wbl-imageId');
     	var language = this.options.language;
     	var previewImage = this.element.find('img');
-    	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', $('#wbl-pageleteditor'), 'images', false, function(selectedMedia) {
+    	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', $('#wbl-pageleteditor'), 'image', false, function(selectedMedia) {
     		if(selectedMedia == null) {
     			previewImage.hide();
     			return;
