@@ -172,7 +172,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
         }
       }
     }
-    
+
     // Extract the language from the session (a.k.a an earlier request). Then
     // make sure the language was put there for the current site.
     if (language == null) {
@@ -247,6 +247,16 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // to what getUrl() returns
     requestedUrl = getUrl();
     return requestedUrl;
+  }
+
+  /**
+   * Sets this request's user.
+   * 
+   * @param user
+   *          the user
+   */
+  public void setUser(User user) {
+    this.user = user;
   }
 
   /**
