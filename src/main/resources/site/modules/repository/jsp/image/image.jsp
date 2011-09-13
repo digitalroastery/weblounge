@@ -8,7 +8,7 @@
 <webl:context define="site, language">
 
 	<webl:element define="description">
-	<webl:property define="resourceid, style, alignment, border, enlarge, description_preview, group, photographer">
+	<webl:property define="resourceid, style, alignment, border, enlarge, description_preview, group, photographer, link">
 
 	<weblr:image uuid="<%= resourceid %>" imagestyle="<%= style %>">
 	  <%

@@ -24,15 +24,12 @@ $.Controller("Editor.Author",
     	if(year.val() == "") {
     		year.val(new Date().getFullYear());
     	}
-    	
-    	Runtime.findOne({}, function(runtime) {
-    		if(login.val() == "") {
-    			login.val(runtime.getUserLogin());
-    		}
-    		if(name.val() == "") {
-    			name.val(runtime.getUserName());
-    		}
-    	});
+		if(login.val() == "") {
+			login.val(this.options.runtime.getUserLogin());
+		}
+		if(name.val() == "") {
+			name.val(this.options.runtime.getUserName());
+		}
     }
     
 });

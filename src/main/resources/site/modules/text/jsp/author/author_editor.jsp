@@ -1,8 +1,8 @@
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
 
 <script>
-	$(document).bind('pageletEditorOpen', function() {
-		$('#wbl-pageleteditor form').editor_author();
+	$(document).bind('pageletEditorOpen', function(event, options) {
+		$('#wbl-pageleteditor form').editor_author(options);
 	});
 </script>
 

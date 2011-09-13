@@ -6,17 +6,24 @@
 <%@ page import="ch.entwine.weblounge.common.content.image.ImageStyle" %>
 <%@ page import="ch.entwine.weblounge.common.site.Module" %>
 
+<script>
+	$(document).bind('pageletEditorOpen', function(event, options) {
+		$('#wbl-pageleteditor div#wbl-imageEditor').editor_image(options);
+	});
+</script>
+
 <webl:context define="site, language">
-<div id="wbl-galleryEditor">
+<div id="wbl-imageEditor">
 	<p>
-	    <label for="wbl-galleryTitle">Titel:</label> <input id="wbl-galleryTitle" type="text" name="element:gallerytitle" />
+	    <label for="wbl-imageTitle">Titel:</label> <input id="wbl-imageTitle" type="text" name="element:title" />
    		<webl:i18n key="module.repository.image.description"/><br />
        	<input name="element:description" type="text" /><br />
        	<span class="editor-sample"><webl:i18n key="module.repository.image.description.sample"/></span><br /><br />
-		<button id="wbl-galleryFilesButton" type="button">Select Files</button>
-	    <input id="wbl-galleryFiles" type="text" name="property:resourceid" readonly="readonly" /><br /><br />
+		<button id="wbl-imageFileButton" type="button">Select Image</button><br />
+   	    <img src=""></img>
+	    <input id="wbl-imageId" type="hidden" name="property:resourceid" />
 	</p>
-	<p class="editor-title">
+	<p class="editor-left">
 		<webl:i18n key="module.repository.image.style"/><br />
 		<select name="property:style">
 			<%
@@ -50,7 +57,7 @@
 	    <input name="property:link" type="text" /><br />
 	    <span class="editor-sample"><webl:i18n key="module.repository.image.link.sample"/></span>
 	</p>
-	<p>
+	<p class="editor-right">
 		<input name="property:enlarge" type="checkbox" checked="checked" />&nbsp;<webl:i18n key="module.repository.image.enlarge"/><br />
 		<input name="property:border" type="checkbox" checked="checked" />&nbsp;<webl:i18n key="module.repository.image.border"/><br />
 		<input name="property:description_preview" type="checkbox" />&nbsp;<webl:i18n key="module.repository.image.description_preview"/><br />
