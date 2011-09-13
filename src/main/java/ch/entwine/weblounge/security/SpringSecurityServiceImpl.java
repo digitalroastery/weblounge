@@ -37,8 +37,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * A Spring Security implementation of {@link SecurityService}.
@@ -48,6 +48,9 @@ public class SpringSecurityServiceImpl implements SecurityService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SpringSecurityServiceImpl.class);
 
+  /** Spring configuration guest identifier */
+  private static final String SPRING_GUEST = "spring:guest";
+  
   /** Name of the generic anonymous user */
   public static final String ANONYMOUS_USER = "anonymous";
 
@@ -105,17 +108,19 @@ public class SpringSecurityServiceImpl implements SecurityService {
     logger.trace("Looking up user from spring security context");
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     User user = null;
-    Set<Role> roles = new TreeSet<Role>();
+    Set<Role> roles = new HashSet<Role>();
 
     if (wideOpen) {
-      user = new UserImpl(ADMIN_USER, "worldwide");
+      user = new UserImpl(ADMIN_USER, "world");
       roles.add(SystemRole.SYSTEMADMIN);
       // user = new UserImpl(ADMIN_USER, site.getIdentifier());
       // roles.add(getLocalRole(site, SystemRole.SYSTEMADMIN));
     } else if (auth == null) {
-      logger.warn("No spring security context available, setting current user to anonymous");
-      user = new UserImpl(ANONYMOUS_USER, site.getIdentifier());
-      roles.add(getLocalRole(site, SystemRole.GUEST));
+      logger.debug("No spring security context available, setting current user to anonymous");
+      String realm = site != null ? site.getIdentifier() : "world";
+      user = new UserImpl(ANONYMOUS_USER, realm);
+      roles.add(SystemRole.GUEST);
+      // roles.add(getLocalRole(site, SystemRole.GUEST));
     } else {
       Object principal = auth.getPrincipal();
       if (principal == null) {
@@ -129,14 +134,20 @@ public class SpringSecurityServiceImpl implements SecurityService {
         Collection<GrantedAuthority> authorities = auth.getAuthorities();
         if (authorities != null && authorities.size() > 0) {
           for (GrantedAuthority ga : authorities) {
-            roles.add(new RoleImpl(ga.getAuthority()));
+            roles.add(new RoleImpl(SystemRole.CONTEXT, ga.getAuthority()));
           }
         }
         logger.debug("Principal was identified as '{}'", user.getLogin());
+        
+      } else if (SPRING_GUEST.equals(principal)) {
+        user = new UserImpl(ANONYMOUS_USER, site.getIdentifier());
+        roles.add(SystemRole.GUEST);
+        //roles.add(getLocalRole(site, SystemRole.GUEST));
       } else {
         logger.warn("Principal was not compatible with spring security, setting current user to anonymous");
         user = new UserImpl(ANONYMOUS_USER, site.getIdentifier());
-        roles.add(getLocalRole(site, SystemRole.GUEST));
+        roles.add(SystemRole.GUEST);
+        //roles.add(getLocalRole(site, SystemRole.GUEST));
       }
     }
 

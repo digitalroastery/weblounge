@@ -52,10 +52,10 @@
     <sec:intercept-url pattern="/system/console/.*" access="systemadministrator"/>
 
     <!-- Trigger authentication on editing entry point -->
-    <sec:intercept-url pattern=".*?(\?|&#36;)edit.*?" access="editor"/>
+    <sec:intercept-url pattern="^/.*?(\?|&#36;)edit(=true)?(&#36;.*)*" access="editor"/>
 
     <!-- Don't bother about the rest -->
-    <sec:intercept-url pattern="^/.*" filters="none"/>
+    <sec:intercept-url pattern="^/.*" access="guest"/>
     
     <!-- FILTER CONFIGURATION -->
 
@@ -79,7 +79,7 @@
     <sec:request-cache ref="requestCache"/>
 
     <!-- If any URLs are to be exposed to anonymous users, the "sec:anonymous" filter must be present -->
-    <sec:anonymous/>
+    <sec:anonymous username="spring:guest" granted-authority="guest" />
 
     <!-- Enables log out -->
     <sec:logout logout-url="/system/weblounge/logout"/>
