@@ -48,6 +48,12 @@ public class ImageResourceTagExtraInfo extends TagExtraInfo {
 
   /** Variable that will hold the url to the image */
   public static final String IMAGE_SRC = "imageUrl";
+  
+  /** Variable that will hold the title to the image */
+  public static final String IMAGE_TITLE = "imageTitle";
+  
+  /** Variable that will hold the description to the image */
+  public static final String IMAGE_DESC = "imageDescription";
 
   /** Variable that will hold the image style */
   public static final String STYLE = "imagestyle";
@@ -65,6 +71,8 @@ public class ImageResourceTagExtraInfo extends TagExtraInfo {
         new VariableInfo(IMAGE_WIDTH, Integer.class.getName(), true, VariableInfo.NESTED),
         new VariableInfo(IMAGE_HEIGHT, Integer.class.getName(), true, VariableInfo.NESTED),
         new VariableInfo(IMAGE_SRC, String.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(IMAGE_TITLE, String.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(IMAGE_DESC, String.class.getName(), true, VariableInfo.NESTED)
     };
   }
 

@@ -31,7 +31,6 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
-import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -200,7 +199,6 @@ public class ImageResourceTag extends WebloungeTag {
     // Load the content
     try {
       image = (ImageResource) repository.get(uri);
-      language = LanguageUtils.getPreferredLanguage(image, request, site);
       image.switchTo(language);
       imageContent = image.getContent(language);
       imageWidth = imageContent.getWidth();
@@ -233,6 +231,8 @@ public class ImageResourceTag extends WebloungeTag {
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_WIDTH, imageWidth);
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_HEIGHT, imageHeight);
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_SRC, linkToImage);
+    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_TITLE, image.getTitle(language));
+    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_DESC, image.getDescription(language));
 
     return EVAL_BODY_INCLUDE;
   }
@@ -249,6 +249,8 @@ public class ImageResourceTag extends WebloungeTag {
     pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_HEIGHT);
     pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_SRC);
     pageContext.removeAttribute(ImageResourceTagExtraInfo.STYLE);
+    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_TITLE);
+    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_DESC);
     return super.doEndTag();
   }
 
