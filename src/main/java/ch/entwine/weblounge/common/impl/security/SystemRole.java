@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Security;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,9 +33,6 @@ import java.util.Set;
  * This class declares the roles used by the weblounge system.
  */
 public final class SystemRole extends RoleImpl {
-
-  /** The System role context */
-  public static final String CONTEXT = "system";
 
   /** Guest */
   public static final Role GUEST = new SystemRole("guest", "Guest");
@@ -69,7 +67,7 @@ public final class SystemRole extends RoleImpl {
    *          the role name
    */
   private SystemRole(String role) {
-    super(CONTEXT, role);
+    super(Security.SYSTEM_CONTEXT, role);
   }
 
   /**
@@ -81,7 +79,7 @@ public final class SystemRole extends RoleImpl {
    *          the English role name
    */
   private SystemRole(String role, String name) {
-    super(CONTEXT, role);
+    super(Security.SYSTEM_CONTEXT, role);
     setName(name, LanguageUtils.getLanguage(Locale.ENGLISH));
     setDefaultLanguage(LanguageUtils.getLanguage(Locale.ENGLISH));
   }
@@ -95,7 +93,7 @@ public final class SystemRole extends RoleImpl {
    *          the role to extend
    */
   private SystemRole(String role, Role baseRole) {
-    super(CONTEXT, role, baseRole);
+    super(Security.SYSTEM_CONTEXT, role, baseRole);
   }
 
   /**
@@ -109,7 +107,7 @@ public final class SystemRole extends RoleImpl {
    *          the role name
    */
   private SystemRole(String role, Role baseRole, String name) {
-    super(CONTEXT, role, baseRole);
+    super(Security.SYSTEM_CONTEXT, role, baseRole);
     setName(name, LanguageUtils.getLanguage(Locale.ENGLISH));
     setDefaultLanguage(LanguageUtils.getLanguage(Locale.ENGLISH));
   }
