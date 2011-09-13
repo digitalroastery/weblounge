@@ -312,7 +312,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
           throw new ContentRepositoryException("No resource serializer for type '" + uri.getType() + "' found");
         }
         ResourceReader<?, ?> reader = serializer.getReader();
-        return reader.read(IOUtils.toInputStream(searchResultItem.getResourceXml(), "utf-8"), site);
+        is = IOUtils.toInputStream(searchResultItem.getResourceXml(), "utf-8");
+        return reader.read(is, site);
       } catch (Throwable t) {
         logger.error("Error loading {}: {}", uri, t.getMessage());
         throw new ContentRepositoryException(t);
