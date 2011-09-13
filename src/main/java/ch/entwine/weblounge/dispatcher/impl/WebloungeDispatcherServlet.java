@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.request.RequestListener;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.dispatcher.DispatchListener;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
@@ -72,6 +73,9 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
   /** The sites that are online */
   private transient SiteDispatcherService sites = null;
+
+  /** The security service */
+  private SecurityService securityService = null;
 
   /** List of request listeners */
   private List<RequestListener> requestListeners = null;
@@ -124,6 +128,16 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    */
   void removeSiteDispatcher(SiteDispatcherService siteDispatcher) {
     this.sites = null;
+  }
+
+  /**
+   * Sets the security service.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**
@@ -264,7 +278,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
     // Make sure the response is buffered
     httpResponse = new BufferedHttpServletResponse(httpResponse);
-    
+
     // Get the servlet that is responsible for the site's content
     Servlet siteServlet = sites.getSiteServlet(site);
 
@@ -279,6 +293,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     // Wrap request and response
     WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest, siteServlet);
     WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
+    request.setUser(securityService.getUser());
 
     // See if a site dispatcher was found, and if so, if it's enabled
     if (!site.isOnline() && !isSpecial) {

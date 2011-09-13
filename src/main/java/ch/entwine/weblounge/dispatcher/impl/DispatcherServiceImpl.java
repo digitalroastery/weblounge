@@ -20,6 +20,7 @@
 package ch.entwine.weblounge.dispatcher.impl;
 
 import ch.entwine.weblounge.cache.CacheService;
+import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.dispatcher.DispatcherService;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.SiteDispatcherService;
@@ -53,7 +54,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
 
   /** The main dispatcher servlet */
   private WebloungeDispatcherServlet dispatcher = null;
-  
+
   /** Service registration for the main dispatcher servlet */
   private ServiceRegistration dispatcherServiceRegistration = null;
 
@@ -112,6 +113,16 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     }
 
     logger.debug("Weblounge dispatcher deactivated");
+  }
+
+  /**
+   * Callback from the OSGi environment when the security service is activated.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    dispatcher.setSecurityService(securityService);
   }
 
   /**
