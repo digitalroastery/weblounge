@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.security;
 
+import ch.entwine.weblounge.common.impl.security.Guest;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
@@ -96,7 +97,6 @@ public class SpringSecurityServiceImpl implements SecurityService {
    * @see ch.entwine.weblounge.common.security.SecurityService#getUser()
    */
   public User getUser() {
-    Site site = getSite();
     User delegatedUser = userHolder.get();
     if (delegatedUser != null) {
       return delegatedUser;
@@ -106,6 +106,7 @@ public class SpringSecurityServiceImpl implements SecurityService {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     User user = null;
     Set<Role> roles = new HashSet<Role>();
+    Site site = getSite();
 
     if (wideOpen) {
       user = new UserImpl(ADMIN_USER, "world");
@@ -137,12 +138,12 @@ public class SpringSecurityServiceImpl implements SecurityService {
         logger.debug("Principal was identified as '{}'", user.getLogin());
         
       } else if (ANONYMOUS_USER.equals(principal)) {
-        user = new UserImpl(ANONYMOUS_USER, site.getIdentifier());
+        user = new Guest(site.getIdentifier());
         roles.add(SystemRole.GUEST);
         //roles.add(getLocalRole(site, SystemRole.GUEST));
       } else {
         logger.warn("Principal was not compatible with spring security, setting current user to anonymous");
-        user = new UserImpl(ANONYMOUS_USER, site.getIdentifier());
+        user = new Guest(site.getIdentifier());
         roles.add(SystemRole.GUEST);
         //roles.add(getLocalRole(site, SystemRole.GUEST));
       }
@@ -152,6 +153,7 @@ public class SpringSecurityServiceImpl implements SecurityService {
       user.addPublicCredentials(role);
     }
 
+    userHolder.set(user);
     return user;
   }
 
