@@ -20,9 +20,9 @@
 
 package ch.entwine.weblounge.kernel.security;
 
-import ch.entwine.weblounge.common.impl.security.AuthenticatedUserImpl;
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.Password;
@@ -89,7 +89,7 @@ public class SystemDirectoryProvider implements DirectoryProvider, ManagedServic
 
     // Register the new one
     logger.info("Activating system admin user '{}'", login);
-    User administrator = new AuthenticatedUserImpl(login);
+    User administrator = new UserImpl(login, Security.SYSTEM_CONTEXT);
     internalAccounts.put(login, administrator);
     Password password = new PasswordImpl(StringUtils.trimToEmpty(pass), DigestType.plain);
     administrator.addPrivateCredentials(password);
