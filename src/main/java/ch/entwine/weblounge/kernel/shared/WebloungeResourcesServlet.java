@@ -23,6 +23,7 @@ package ch.entwine.weblounge.kernel.shared;
 import ch.entwine.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.entwine.weblounge.common.impl.request.Http11ResponseType;
 import ch.entwine.weblounge.common.url.PathUtils;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -39,7 +40,6 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import javax.activation.FileTypeMap;
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -129,10 +129,6 @@ public class WebloungeResourcesServlet extends HttpServlet {
     this.bundlePath = bundlePath;
     if (resourcesDir == null && (bundle == null || StringUtils.isBlank(bundlePath)))
       throw new IllegalArgumentException("Either one of resources directory or bundle and bundle path must be provided");
-    MimetypesFileTypeMap fileTypes = (MimetypesFileTypeMap) FileTypeMap.getDefaultFileTypeMap();
-    fileTypes.addMimeTypes("text/javascript js");
-    fileTypes.addMimeTypes("text/css css");
-    FileTypeMap.setDefaultFileTypeMap(fileTypes);
   }
 
   /**
@@ -187,7 +183,7 @@ public class WebloungeResourcesServlet extends HttpServlet {
     // already
 
     if (bundle != null && url == null) {
-      String resourcePath = PathUtils.concat(bundlePath, requestPath);
+      String resourcePath = UrlUtils.concat(bundlePath, requestPath);
       url = bundle.getEntry(resourcePath);
     }
 
