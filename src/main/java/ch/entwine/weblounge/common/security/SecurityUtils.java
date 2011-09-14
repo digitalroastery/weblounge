@@ -29,7 +29,7 @@ import java.util.List;
 public final class SecurityUtils {
 
   /**
-   * Private construtor to prevent instantiation.
+   * Private constructor to prevent instantiation.
    */
   private SecurityUtils() {
     // Nothing to do
