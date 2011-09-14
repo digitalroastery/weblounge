@@ -25,7 +25,7 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.AuthenticatedUser;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
@@ -76,7 +76,7 @@ public class ContextTagExtraInfo extends TagExtraInfo {
           varinfo.add(new VariableInfo(name, Language.class.getName(), true, VariableInfo.NESTED));
         // User
         if ((name = variables.getUser()) != null)
-          varinfo.add(new VariableInfo(name, AuthenticatedUser.class.getName(), true, VariableInfo.NESTED));
+          varinfo.add(new VariableInfo(name, User.class.getName(), true, VariableInfo.NESTED));
         // Page
         if ((name = variables.getPage()) != null)
           varinfo.add(new VariableInfo(name, Page.class.getName(), true, VariableInfo.NESTED));
@@ -131,7 +131,7 @@ public class ContextTagExtraInfo extends TagExtraInfo {
       return new VariableInfo[] {
           new VariableInfo(ContextTagVariables.URL, WebUrl.class.getName(), true, VariableInfo.NESTED),
           new VariableInfo(ContextTagVariables.SITE, Site.class.getName(), true, VariableInfo.NESTED),
-          new VariableInfo(ContextTagVariables.USER, AuthenticatedUser.class.getName(), true, VariableInfo.NESTED),
+          new VariableInfo(ContextTagVariables.USER, User.class.getName(), true, VariableInfo.NESTED),
           new VariableInfo(ContextTagVariables.LANGUAGE, Language.class.getName(), true, VariableInfo.NESTED),
           new VariableInfo(ContextTagVariables.REPOSITORY, ContentRepository.class.getName(), true, VariableInfo.NESTED) };
     }
