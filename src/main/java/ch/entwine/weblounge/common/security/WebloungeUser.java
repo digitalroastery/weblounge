@@ -28,7 +28,7 @@ import java.util.Date;
  * This class represents a user that has been authenticated and identified by
  * weblounge.
  */
-public interface WebloungeUser extends AuthenticatedUser {
+public interface WebloungeUser extends User {
 
   /**
    * Sets the person's email.

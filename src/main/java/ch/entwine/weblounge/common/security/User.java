@@ -30,9 +30,6 @@ public interface User extends Cloneable {
   /** Default realm for weblounge users */
   String DefaultRealm = "weblounge";
 
-  /** Default realm for system users */
-  String SystemRealm = "system";
-
   /**
    * Returns the name of this user.
    * 
