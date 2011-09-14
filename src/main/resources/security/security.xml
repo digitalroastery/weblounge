@@ -20,14 +20,11 @@
     <!-- The login form can't be protected -->
     <sec:intercept-url pattern="^/weblounge/login/.*" filters="none"/>
 
-    <!-- The login processing urls needs to be covered by the filter chain -->
-    <sec:intercept-url pattern="^/system/weblounge/login/.*" access="guest"/>
-    <sec:intercept-url pattern="^/system/weblounge/logout"/>
-
     <!-- Editor -->
 
     <!-- Some resources are open to everybody -->
     <sec:intercept-url pattern="^/favicon.ico" filters="none"/>
+    <!--
     <sec:intercept-url pattern="^/weblounge/documentjs/.*" filters="none"/>
     <sec:intercept-url pattern="^/weblounge/funcunit/.*" filters="none"/>
     <sec:intercept-url pattern="^/weblounge/jquery/.*" filters="none"/>
@@ -35,27 +32,32 @@
     <sec:intercept-url pattern="^/weblounge/.*\.js(\?.*)?" filters="none"/>
     <sec:intercept-url pattern="^/weblounge/.*\.css(\?.*)?" filters="none"/>
     <sec:intercept-url pattern="^/weblounge/.*\.png" filters="none"/>
+    -->
 
     <!-- Shared resources should not be protected -->
     <sec:intercept-url pattern="^/weblounge-shared/.*" filters="none"/>
 
     <!-- The rest of the editor functionality needs to be protected -->
-    <sec:intercept-url pattern="^/weblounge/.*" access="editor"/>
+    <sec:intercept-url pattern="^/weblounge/.*" access="weblounge:guest"/>
 
     <!-- Enable anonymous access to the REST documentation -->
-    <sec:intercept-url pattern="^/system/weblounge/.*/docs" access="guest"/>
+    <sec:intercept-url pattern="^/system/weblounge/.*/docs" access="weblounge:guest"/>
 
     <!-- Secure the REST endpoints -->
-    <sec:intercept-url pattern="^/system/weblounge/.*" access="editor"/>
+    <sec:intercept-url pattern="^/system/weblounge/.*" access="weblounge:guest"/>
+
+    <!-- The login processing urls needs to be covered by the filter chain -->
+    <sec:intercept-url pattern="^/system/weblounge/login/.*" access="weblounge:guest"/>
+    <sec:intercept-url pattern="^/system/weblounge/logout"/>
     
     <!-- Secure the management URLs -->
-    <sec:intercept-url pattern="/system/console/.*" access="systemadministrator"/>
+    <sec:intercept-url pattern="/system/console/.*" access="weblounge:systemadministrator"/>
 
     <!-- Trigger authentication on editing entry point -->
-    <sec:intercept-url pattern="^/.*?(\?|&#36;)edit(=true)?(&#36;.*)*" access="editor"/>
+    <sec:intercept-url pattern="^/.*?(\?|&#36;)edit(=true)?(&#36;.*)*" access="weblounge:editor"/>
 
     <!-- Don't bother about the rest -->
-    <sec:intercept-url pattern="^/.*" access="guest"/>
+    <sec:intercept-url pattern="^/.*" access="weblounge:guest"/>
     
     <!-- FILTER CONFIGURATION -->
 
@@ -77,9 +79,11 @@
 
     <!-- Set the request cache -->
     <sec:request-cache ref="requestCache"/>
+    
+    <sec:session-management invalid-session-url="/weblounge/login/login.html"/>
 
     <!-- If any URLs are to be exposed to anonymous users, the "sec:anonymous" filter must be present -->
-    <sec:anonymous username="spring:guest" granted-authority="guest" />
+    <sec:anonymous username="anonymous" granted-authority="weblounge:guest"/>
 
     <!-- Enables log out -->
     <sec:logout logout-url="/system/weblounge/logout"/>
@@ -102,7 +106,7 @@
     <property name="securityService" ref="securityService" />
     <property name="welcomePages">
       <map>
-        <entry key="editor" value="/?edit" />
+        <entry key="weblounge:editor" value="/?edit" />
         <entry key="*" value="/index.html" />
       </map>
     </property>

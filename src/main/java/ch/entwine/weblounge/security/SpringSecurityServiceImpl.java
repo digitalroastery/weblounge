@@ -24,7 +24,6 @@ import ch.entwine.weblounge.common.impl.security.RoleImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.security.Role;
-import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -135,7 +134,7 @@ public class SpringSecurityServiceImpl implements SecurityService {
         Collection<GrantedAuthority> authorities = auth.getAuthorities();
         if (authorities != null && authorities.size() > 0) {
           for (GrantedAuthority ga : authorities) {
-            roles.add(new RoleImpl(Security.SYSTEM_CONTEXT, ga.getAuthority()));
+            roles.add(new RoleImpl(ga.getAuthority()));
           }
         }
         logger.debug("Principal was identified as '{}'", user.getLogin());

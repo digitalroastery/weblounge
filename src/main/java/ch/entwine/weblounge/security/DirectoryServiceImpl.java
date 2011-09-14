@@ -156,7 +156,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
       for (Object o : user.getPublicCredentials(Role.class)) {
         Role masterRole = (Role) o;
         for (Role r : masterRole.getClosure()) {
-          authorities.add(new GrantedAuthorityImpl(r.getIdentifier()));
+          authorities.add(new GrantedAuthorityImpl(r.getContext() + ":" + r.getIdentifier()));
 
           // Every role may or may not be a system role or - in case of non-
           // system roles, may or may not be including one or more of those
@@ -164,7 +164,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
           // to the set of granted authorities
           Role[] systemEquivalents = getSystemRoles(r);
           for (Role systemRole : systemEquivalents) {
-            authorities.add(new GrantedAuthorityImpl(systemRole.getIdentifier()));
+            authorities.add(new GrantedAuthorityImpl(systemRole.getContext() + ":" +systemRole.getIdentifier()));
             user.addPublicCredentials(systemRole);
           }
         }
