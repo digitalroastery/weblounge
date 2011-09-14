@@ -33,9 +33,6 @@ import java.util.Set;
  */
 public final class SystemPermission implements Permission {
 
-  /** System context identifier */
-  public static final String CONTEXT = "system";
-
   /** Read permission */
   public static final Permission READ = new SystemPermission("read");
 
@@ -96,7 +93,7 @@ public final class SystemPermission implements Permission {
    * @return the permission context
    */
   public String getContext() {
-    return CONTEXT;
+    return Security.SYSTEM_CONTEXT;
   }
 
   /**
@@ -122,7 +119,7 @@ public final class SystemPermission implements Permission {
    */
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof Permission) {
-      return ((Permission) obj).getIdentifier().equals(identifier) && ((Permission) obj).getContext().equals(CONTEXT);
+      return ((Permission) obj).getIdentifier().equals(identifier) && ((Permission) obj).getContext().equals(Security.SYSTEM_CONTEXT);
     }
     return false;
   }
@@ -135,7 +132,7 @@ public final class SystemPermission implements Permission {
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    return CONTEXT + ":" + identifier;
+    return Security.SYSTEM_CONTEXT + ":" + identifier;
   }
 
   /**
