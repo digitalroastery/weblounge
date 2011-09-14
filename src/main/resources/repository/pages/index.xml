@@ -29,11 +29,6 @@
       <from>2006-05-05T16:58:21Z</from>
       <to>292278994-08-17T07:12:55Z</to>
     </published>
-    <security>
-      <owner>
-        <user id="hans" realm="testland">Hans Muster</user>
-      </owner>
-    </security>
   </head>
   <body>
     <composer id="main">
