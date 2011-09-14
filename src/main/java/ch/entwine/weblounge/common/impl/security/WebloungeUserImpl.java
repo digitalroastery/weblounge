@@ -48,7 +48,7 @@ import javax.xml.xpath.XPathFactory;
 /**
  * Default implementation of a weblounge user.
  */
-public class WebloungeUserImpl extends AuthenticatedUserImpl implements WebloungeUser {
+public class WebloungeUserImpl extends UserImpl implements WebloungeUser {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WebloungeUserImpl.class);

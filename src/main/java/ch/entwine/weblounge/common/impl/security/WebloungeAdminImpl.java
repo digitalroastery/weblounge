@@ -26,7 +26,7 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Password;
-import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.w3c.dom.Node;
@@ -50,7 +50,7 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl {
    * according to your needs.
    */
   public WebloungeAdminImpl(String login) {
-    super(login, User.SystemRealm);
+    super(login, Security.SYSTEM_CONTEXT);
     addPublicCredentials(SystemRole.SYSTEMADMIN);
     setName("Weblounge Administrator");
   }

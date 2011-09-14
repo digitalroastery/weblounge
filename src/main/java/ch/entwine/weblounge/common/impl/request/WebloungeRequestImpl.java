@@ -280,7 +280,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // being logged in as guest.
     if (user == null) {
       logger.debug("New guest at {}", getLocalName());
-      user = new Guest();
+      user = new Guest(getSite().getIdentifier());
     }
 
     return user;

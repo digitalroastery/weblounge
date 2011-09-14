@@ -282,6 +282,9 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
     if (language == null)
       throw new IllegalArgumentException("Language must not be null");
 
+    if (content.size() == 0)
+      return null;
+
     T c = content.get(language);
 
     // Not found? Try the fall back language

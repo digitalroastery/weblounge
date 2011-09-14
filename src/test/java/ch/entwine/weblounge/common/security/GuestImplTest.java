@@ -20,14 +20,16 @@
 
 package ch.entwine.weblounge.common.security;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import ch.entwine.weblounge.common.impl.security.Guest;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.Set;
 
 /**
  * Test case for the implementation of {@link Guest}.
@@ -42,7 +44,7 @@ public class GuestImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    guest = new Guest();
+    guest = new Guest(Security.SYSTEM_CONTEXT);
   }
 
   /**
@@ -51,10 +53,10 @@ public class GuestImplTest {
    * .
    */
   @Test
-  @Ignore
   public void testGetRoleClosure() {
-    // assertEquals(1, guest.getRoleClosure().length);
-    // assertTrue(guest.getRoleClosure()[0].equals(SystemRole.GUEST));
+    Set<Object> roles = guest.getPublicCredentials(Role.class);
+    assertEquals(1, roles.size());
+    assertTrue(SystemRole.GUEST.equals(roles.iterator().next()));
   }
 
   /**

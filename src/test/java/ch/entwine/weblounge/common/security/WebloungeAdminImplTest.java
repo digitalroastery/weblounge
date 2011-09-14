@@ -43,7 +43,7 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   public void setUp() throws Exception {
     setUpPrerequisites();
     user = new WebloungeAdminImpl(login);
-    realm = User.SystemRealm;
+    realm = Security.SYSTEM_CONTEXT;
     adminName = "Weblounge Administrator";
     setUpUser();
   }
@@ -65,7 +65,7 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
    */
   @Test
   public void testGetRealm() {
-    assertEquals(User.SystemRealm, user.getRealm());
+    assertEquals(Security.SYSTEM_CONTEXT, user.getRealm());
   }
 
   /**

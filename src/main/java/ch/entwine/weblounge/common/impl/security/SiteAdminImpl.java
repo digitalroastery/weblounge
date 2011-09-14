@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Password;
+import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.w3c.dom.Node;
@@ -53,7 +54,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
    *          the login name
    */
   public SiteAdminImpl(String login) {
-    super(login, SystemRealm);
+    super(login, Security.SYSTEM_CONTEXT);
     addPublicCredentials(SystemRole.SITEADMIN);
     setName("Site Administrator (" + login + ")");
   }

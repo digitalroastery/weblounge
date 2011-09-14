@@ -20,7 +20,6 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
-
 /**
  * Guest user, which is automatically taken as the user object if no valid user
  * is found in the current session. The guest user normally has the smallest set
@@ -30,9 +29,12 @@ public class Guest extends WebloungeUserImpl {
 
   /**
    * Creates a new guest user for the given site.
+   * 
+   * @param realm
+   *          the user context
    */
-  public Guest() {
-    super("guest");
+  public Guest(String realm) {
+    super("anonymous", realm);
     setName("Guest");
     addPublicCredentials(SystemRole.GUEST);
   }
