@@ -37,6 +37,15 @@
 	<string name="module.navigation.linkanchor.anchor.sample">
 		bottom
 	</string>
+	
+	<string name="module.navigation.link.type">Type</string>
+	<string name="module.navigation.link.type.internal.name">internal Page</string>
+	<string name="module.navigation.link.type.external.name">external URL</string>
+	<string name="module.navigation.link.external.url">URL</string>
+	<string name="module.navigation.link.external.window">Open in new window</string>
+	<string name="module.navigation.link.external.window.yes">Yes</string>
+	<string name="module.navigation.link.external.window.no">No</string>
+	<string name="module.navigation.link.internal.button">Select Page</string>
 
 	<!-- linkexternal -->
 	<string name="module.navigation.linkexternal.title">

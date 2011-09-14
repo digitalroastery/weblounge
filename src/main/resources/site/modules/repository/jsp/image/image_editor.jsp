@@ -15,11 +15,11 @@
 <webl:context define="site, language">
 <div id="wbl-imageEditor">
 	<p>
-	    <label for="wbl-imageTitle">Titel:</label> <input id="wbl-imageTitle" type="text" name="element:title" />
+	    <label for="wbl-imageTitle"><webl:i18n key="module.repository.image.title"/></label> <input id="wbl-imageTitle" type="text" name="element:title" />
    		<webl:i18n key="module.repository.image.description"/><br />
        	<input name="element:description" type="text" /><br />
        	<span class="editor-sample"><webl:i18n key="module.repository.image.description.sample"/></span><br /><br />
-		<button id="wbl-imageFileButton" type="button">Select Image</button><br />
+		<button id="wbl-imageFileButton" type="button"><webl:i18n key="module.repository.image.button"/></button><br />
    	    <img src=""></img>
 	    <input id="wbl-imageId" type="hidden" name="property:resourceid" />
 	</p>

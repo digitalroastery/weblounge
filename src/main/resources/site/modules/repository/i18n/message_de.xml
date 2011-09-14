@@ -39,8 +39,11 @@
 	<string name="module.repository.download.description.sample">
 		Protokoll der Vorstandsitzung vom 1. Juli
 	</string>
+	<string name="module.repository.download.button">Datei auswählen</string>
 	
 	<!-- image -->
+	<string name="module.repository.image.title">Titel</string>
+	<string name="module.repository.image.button">Bild auswählen</string>
 	<string name="module.repository.image.image">
 		Bild
 	</string>
@@ -207,4 +210,5 @@
 	<string name="module.repository.gallery.next">
 		Weiter
 	</string>
+	<string name="module.repository.gallery.button">Bilder auswählen</string>
 </resources>
