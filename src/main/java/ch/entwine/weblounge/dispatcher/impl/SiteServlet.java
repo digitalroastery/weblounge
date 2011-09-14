@@ -258,7 +258,7 @@ public class SiteServlet extends HttpServlet {
       final HttpServletResponse response) throws ServletException, IOException {
 
     Http11ResponseType responseType = null;
-    String requestPath = UrlUtils.concat("/site", request.getPathInfo());
+    String requestPath = request.getPathInfo();
 
     // There is also a special set of resources that we don't want to expose
     if (isProtected(requestPath)) {
@@ -266,8 +266,10 @@ public class SiteServlet extends HttpServlet {
       return;
     }
 
+    String bundlePath = UrlUtils.concat("/site", requestPath);
+
     // Does the resource exist?
-    final URL url = bundle.getResource(requestPath);
+    final URL url = bundle.getResource(bundlePath);
     if (url == null) {
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
       return;
@@ -287,7 +289,7 @@ public class SiteServlet extends HttpServlet {
     }
 
     URLConnection conn = url.openConnection();
-    String mimeType = tika.detect(requestPath);
+    String mimeType = tika.detect(bundlePath);
     String encoding = null;
 
     // Try to get mime type and content encoding from resource
