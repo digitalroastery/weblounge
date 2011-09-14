@@ -69,15 +69,6 @@ public class PermissionSecurityContextTest extends TestCase {
   }
 
   /**
-   * Constructor for PermissionSecurityContextTest.
-   * 
-   * @param arg0
-   */
-  public PermissionSecurityContextTest(String arg0) {
-    super(arg0);
-  }
-
-  /**
    * Test for void allow(Permission, Authority)
    */
   @Test
@@ -407,10 +398,10 @@ public class PermissionSecurityContextTest extends TestCase {
     StringBuffer xml = new StringBuffer();
     xml.append("<security>");
     xml.append("<owner>tobias.wunden</owner>");
-    xml.append("<permission id=\"system:publish\" type=\"role\">system:publisher</permission>");
-    xml.append("<permission id=\"system:write\" type=\"" + Role.class.getName() + "\">system:editor</permission>");
-    xml.append("<permission id=\"system:write\" type=\"role\">system:editor,system:translator</permission>");
-    xml.append("<permission id=\"system:write\" type=\"user\">tobias.wunden</permission>");
+    xml.append("<permission id=\"weblounge:publish\" type=\"role\">weblounge:publisher</permission>");
+    xml.append("<permission id=\"weblounge:write\" type=\"" + Role.class.getName() + "\">weblounge:editor</permission>");
+    xml.append("<permission id=\"weblounge:write\" type=\"role\">weblounge:editor,weblounge:translator</permission>");
+    xml.append("<permission id=\"weblounge:write\" type=\"user\">tobias.wunden</permission>");
     xml.append("</security>");
 
     // Create xml builder
