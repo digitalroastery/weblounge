@@ -24,15 +24,6 @@
 
     <!-- Some resources are open to everybody -->
     <sec:intercept-url pattern="^/favicon.ico" filters="none"/>
-    <!--
-    <sec:intercept-url pattern="^/weblounge/documentjs/.*" filters="none"/>
-    <sec:intercept-url pattern="^/weblounge/funcunit/.*" filters="none"/>
-    <sec:intercept-url pattern="^/weblounge/jquery/.*" filters="none"/>
-    <sec:intercept-url pattern="^/weblounge/jqueryui/.*" filters="none"/>
-    <sec:intercept-url pattern="^/weblounge/.*\.js(\?.*)?" filters="none"/>
-    <sec:intercept-url pattern="^/weblounge/.*\.css(\?.*)?" filters="none"/>
-    <sec:intercept-url pattern="^/weblounge/.*\.png" filters="none"/>
-    -->
 
     <!-- Shared resources should not be protected -->
     <sec:intercept-url pattern="^/weblounge-shared/.*" filters="none"/>
@@ -68,11 +59,6 @@
 
     <!-- Enable and configure the failure URL for form-based logins -->
     <sec:form-login login-page="/weblounge/login/login.html" login-processing-url="/system/weblounge/login/form" authentication-failure-url="/weblounge/login/login.html?failed" authentication-success-handler-ref="loginSuccessHandler"/>
-
-    <!-- Comment out to disable support for openID. OpenID URLs must be specified in the user detail service below -->
-    <!--
-    <sec:openid-login authentication-failure-url="/login.html?error" user-service-ref="userDetailsService"/>
-    -->
 
     <!-- Enables "remember me" functionality -->
     <sec:remember-me key="weblounge" user-service-ref="userDetailsService"/>

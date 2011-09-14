@@ -48,9 +48,6 @@ public class SpringSecurityServiceImpl implements SecurityService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SpringSecurityServiceImpl.class);
 
-  /** Spring configuration guest identifier */
-  private static final String SPRING_GUEST = "spring:guest";
-  
   /** Name of the generic anonymous user */
   public static final String ANONYMOUS_USER = "anonymous";
 
@@ -139,7 +136,7 @@ public class SpringSecurityServiceImpl implements SecurityService {
         }
         logger.debug("Principal was identified as '{}'", user.getLogin());
         
-      } else if (SPRING_GUEST.equals(principal)) {
+      } else if (ANONYMOUS_USER.equals(principal)) {
         user = new UserImpl(ANONYMOUS_USER, site.getIdentifier());
         roles.add(SystemRole.GUEST);
         //roles.add(getLocalRole(site, SystemRole.GUEST));
