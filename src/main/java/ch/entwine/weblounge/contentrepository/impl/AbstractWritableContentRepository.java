@@ -38,6 +38,7 @@ import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
@@ -104,9 +105,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     if (!existsInAnyVersion(homeURI)) {
       try {
         Page page = new PageImpl(homeURI);
+        User siteAdmininstrator = new UserImpl(site.getAdministrator());
         page.setTemplate(site.getDefaultTemplate().getIdentifier());
-        page.setCreated(site.getAdministrator(), new Date());
-        page.setPublished(site.getAdministrator(), new Date(), null);
+        page.setCreated(siteAdmininstrator, new Date());
+        page.setPublished(siteAdmininstrator, new Date(), null);
         put(page);
         logger.info("Created homepage for {}", site.getIdentifier());
       } catch (IOException e) {
