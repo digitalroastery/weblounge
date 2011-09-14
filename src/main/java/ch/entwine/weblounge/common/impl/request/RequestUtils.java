@@ -20,8 +20,11 @@
 
 package ch.entwine.weblounge.common.impl.request;
 
+import ch.entwine.weblounge.common.editor.EditingState;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.site.ActionSupport;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.site.Action;
 
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+
+import javax.servlet.http.Cookie;
 
 /**
  * Utility implementation to deal with <code>HttpRequest</code> objects.
@@ -1231,6 +1236,29 @@ public final class RequestUtils {
   public static boolean getBooleanParameter(WebloungeRequest request,
       String parameterName) throws IllegalArgumentException {
     return getBooleanParameter(request, parameterName, false);
+  }
+  
+  /**
+   * Returns <code>true</code> if the editing state is enable, else return
+   * <code>false</code>
+   * 
+   * @param request
+   *          the request
+   * @return the editing state
+   */
+  public static boolean isEditingState(WebloungeRequest request) {
+    if (!SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR)) {
+      return false;
+    } else if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
+      return true;
+    } else if (request.getCookies() != null) {
+      for (Cookie cookie : request.getCookies()) {
+        if (EditingState.STATE_COOKIE.equals(cookie.getName())) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
