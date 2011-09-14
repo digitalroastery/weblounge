@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.kernel.endpoint;
 
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
@@ -95,7 +96,7 @@ public class RuntimeInformationEndpoint {
 
     if (sites != null) {
       Site site = getSite(request);
-      User user = site.getAdministrator();
+      User user = new UserImpl(site.getAdministrator());
       Language language = LanguageUtils.getPreferredLanguage(request, site);
 
       for (Map.Entry<String, RuntimeInformationProvider> entry : runtimeInfoProviders.entrySet()) {
@@ -132,7 +133,7 @@ public class RuntimeInformationEndpoint {
 
     if (sites != null) {
       Site site = getSite(request);
-      User user = site.getAdministrator();
+      User user = new UserImpl(site.getAdministrator());
       Language language = LanguageUtils.getPreferredLanguage(request, site);
 
       RuntimeInformationProvider provider = runtimeInfoProviders.get(component);
