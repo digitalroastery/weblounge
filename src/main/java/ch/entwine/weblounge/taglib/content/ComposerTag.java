@@ -26,8 +26,8 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryUnavailableException;
-import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.User;
@@ -37,7 +37,6 @@ import ch.entwine.weblounge.taglib.ComposerTagSupport;
 
 import java.io.IOException;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.jsp.JspWriter;
 
 /**
@@ -111,7 +110,7 @@ public class ComposerTag extends ComposerTagSupport {
     // Start editing support
     // FIXME temporary solution
     // if (version == Page.WORK && isLockedByCurrentUser) {
-    if (isEditingState(request)) {
+    if (RequestUtils.isEditingState(request)) {
       
       boolean hasEditor = false;
       
@@ -150,7 +149,7 @@ public class ComposerTag extends ComposerTagSupport {
     // FIXME temporary solution
     // if (version == Page.WORK && isLockedByCurrentUser &&
     // request.getAttribute(PageletEditorTag.ID) == null) {
-    if (isEditingState(request)) {
+    if (RequestUtils.isEditingState(request)) {
       request.setAttribute(WebloungeRequest.PAGE, targetPage);
       request.setAttribute(WebloungeRequest.PAGELET, pagelet);
       request.setAttribute(WebloungeRequest.COMPOSER, new ComposerImpl(name));
@@ -158,27 +157,6 @@ public class ComposerTag extends ComposerTagSupport {
       writer.flush();
     }
     super.afterPagelet(pagelet, position, writer);
-  }
-
-  /**
-   * Returns <code>true</code> if the editing state is enable, else return
-   * <code>false</code>
-   * 
-   * @param request
-   *          the request
-   * @return the editing state
-   */
-  private boolean isEditingState(WebloungeRequest request) {
-    if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
-      return true;
-    } else if (request.getCookies() != null) {
-      for (Cookie cookie : request.getCookies()) {
-        if (EditingState.STATE_COOKIE.equals(cookie.getName())) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   /**
