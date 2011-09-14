@@ -20,16 +20,20 @@
 
 package ch.entwine.weblounge.kernel.runtime;
 
+import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- * Returns runtime information on the current user's roles.
+ * Returns runtime information on the current user.
  */
-public class RoleRuntimeInformation implements RuntimeInformationProvider {
+public class SecurityRuntimeInformation implements RuntimeInformationProvider {
 
   /**
    * {@inheritDoc}
@@ -37,7 +41,7 @@ public class RoleRuntimeInformation implements RuntimeInformationProvider {
    * @see ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider#getComponentId()
    */
   public String getComponentId() {
-    return "roles";
+    return "security";
   }
 
   /**
@@ -50,7 +54,18 @@ public class RoleRuntimeInformation implements RuntimeInformationProvider {
   public String getRuntimeInformation(Site site, User user, Language language) {
     if (user == null)
       return null;
+    String securityXml = user.toXml();
 
+    // Filter out the root tag
+    Pattern p = Pattern.compile("^<([^>]*)>(.*)</\\1>$");
+    Matcher m = p.matcher(securityXml);
+    if (m.matches())
+      securityXml = m.group(2);
+
+    // Remove the password
+    securityXml = securityXml.replaceAll("<password.*</password>", "");
+    securityXml = ConfigurationUtils.processTemplate(securityXml, site);
+    
     // Add role information
     StringBuffer roles = new StringBuffer();
     for (Role role : SecurityUtils.getRoles(user)) {
@@ -61,8 +76,11 @@ public class RoleRuntimeInformation implements RuntimeInformationProvider {
       roles.append("]]></name>");
       roles.append("</role>");
     }
+    if (roles.length() > 0) {
+      securityXml += "<roles>" + roles.toString() + "</roles>";
+    }
 
-    return roles.toString();
+    return securityXml;
   }
 
 }

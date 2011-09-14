@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
   immediate="true"
-  name="Weblounge Role Runtime Information">
+  name="Weblounge Security Runtime Information">
   
-  <implementation class="ch.entwine.weblounge.kernel.runtime.RoleRuntimeInformation" />
-  <property name="service.description" value="Weblounge Role Runtime Information" />
+  <implementation class="ch.entwine.weblounge.kernel.runtime.SecurityRuntimeInformation" />
+  <property name="service.description" value="Weblounge Security Runtime Information" />
   <service>
     <provide interface="ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider" />
   </service>

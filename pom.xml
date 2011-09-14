@@ -386,8 +386,8 @@
               OSGI-INF/kernel-service.xml,
               OSGI-INF/language-runtime-information.xml,
               OSGI-INF/resource-publishing-service.xml,
-              OSGI-INF/role-runtime-information.xml,
               OSGI-INF/runtime-information-rest-service.xml,
+              OSGI-INF/security-runtime-information.xml,
               OSGI-INF/shared-resources.xml,
               OSGI-INF/site-command.xml,
               OSGI-INF/site-manager-service.xml,
@@ -395,7 +395,6 @@
               OSGI-INF/site-runtime-information.xml,
               OSGI-INF/systemdirectory-provider.xml,
               OSGI-INF/test-command.xml,
-              OSGI-INF/user-runtime-information.xml,
               OSGI-INF/webconsole-plugin.xml,
             </Service-Component>
           </instructions>
