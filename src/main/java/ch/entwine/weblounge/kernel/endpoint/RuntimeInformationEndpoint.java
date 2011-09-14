@@ -103,12 +103,13 @@ public class RuntimeInformationEndpoint {
         String component = entry.getKey();
         RuntimeInformationProvider provider = entry.getValue();
         String runtimeInformation = provider.getRuntimeInformation(site, user, language);
-        if (StringUtils.isNotBlank(runtimeInformation))
+        if (StringUtils.isNotBlank(runtimeInformation)) {
+            if (StringUtils.isNotBlank(component))
+              xml.append("<").append(component).append(">");
+          xml.append(runtimeInformation);
           if (StringUtils.isNotBlank(component))
-            xml.append("<").append(component).append(">");
-        xml.append(runtimeInformation);
-        if (StringUtils.isNotBlank(component))
-          xml.append("</").append(component).append(">");
+            xml.append("</").append(component).append(">");
+        }
       }
     }
 
