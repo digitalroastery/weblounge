@@ -32,18 +32,15 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.request.Http11Constants;
 import ch.entwine.weblounge.common.impl.request.Http11Utils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
-import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
-import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.HTMLAction;
@@ -63,7 +60,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Enumeration;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -123,7 +119,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     }
 
     // Determine the editing state
-    boolean isEditing = getEditingInformation(request);
+    boolean isEditing = RequestUtils.isEditingState(request);
 
     // Create the set of tags that identify the page
     CacheTagSet cacheTags = createCacheTags(request);
@@ -334,29 +330,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         }
       }
     }
-  }
-
-  /**
-   * Returns the cookie containing the current editing state or
-   * <code>null</code> if no such cookie exists.
-   * 
-   * @param request
-   *          the request
-   * @return the editing state
-   */
-  private boolean getEditingInformation(WebloungeRequest request) {
-    if (!SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR)) {
-      return false;
-    } else if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
-      return true;
-    } else if (request.getCookies() != null) {
-      for (Cookie cookie : request.getCookies()) {
-        if (EditingState.STATE_COOKIE.equals(cookie.getName())) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   /**
