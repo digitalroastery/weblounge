@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.scheduler.JobException;
 import ch.entwine.weblounge.common.scheduler.JobWorker;
@@ -210,7 +211,7 @@ public class MailAggregator implements JobWorker {
     // Standard fields
     page.setTitle(title, language);
     page.setTemplate(template.getIdentifier());
-    page.setPublished(site.getAdministrator(), message.getReceivedDate(), null);
+    page.setPublished(new UserImpl(site.getAdministrator()), message.getReceivedDate(), null);
 
     // TODO: Translate e-mail "from" into site user and throw if no such
     // user can be found
