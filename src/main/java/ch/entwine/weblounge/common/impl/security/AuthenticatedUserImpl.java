@@ -66,6 +66,18 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
   }
 
   /**
+   * Creates a user from an existing user. This constructor is intended to
+   * transform special users such as the site administrator to regular ones.
+   * 
+   * @param user
+   *          the user
+   */
+  public AuthenticatedUserImpl(User user) {
+    this(user.getLogin(), user.getRealm());
+    setName(user.getName());
+  }
+
+  /**
    * Sets the login context which is later used to perform a clean logout
    * operation.
    * 
