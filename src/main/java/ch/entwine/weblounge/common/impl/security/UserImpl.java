@@ -94,6 +94,21 @@ public class UserImpl implements User {
   }
 
   /**
+   * Creates a user from an existing user. This constructor is intended to
+   * transform special users such as the site administrator to regular ones.
+   * 
+   * @param user
+   *          the user
+   */
+  public UserImpl(User user) {
+    this.login = user.getLogin();
+    this.realm = user.getRealm();
+    this.name = user.getName();
+    addPublicCredentials(user.getPublicCredentials());
+    addPrivateCredentials(user.getPrivateCredentials());
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.security.User#getLogin()

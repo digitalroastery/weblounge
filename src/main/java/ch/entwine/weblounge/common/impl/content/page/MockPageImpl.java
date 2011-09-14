@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageContentListener;
 import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.security.Authority;
@@ -606,7 +607,7 @@ public class MockPageImpl implements Page {
    * @see ch.entwine.weblounge.common.content.Creatable#getCreator()
    */
   public User getCreator() {
-    return uri.getSite().getAdministrator();
+    return new UserImpl(uri.getSite().getAdministrator());
   }
 
   /**
@@ -624,7 +625,7 @@ public class MockPageImpl implements Page {
    * @see ch.entwine.weblounge.common.content.Modifiable#getModifier()
    */
   public User getModifier() {
-    return uri.getSite().getAdministrator();
+    return new UserImpl(uri.getSite().getAdministrator());
   }
 
   /**
@@ -633,7 +634,7 @@ public class MockPageImpl implements Page {
    * @see ch.entwine.weblounge.common.content.Publishable#getPublisher()
    */
   public User getPublisher() {
-    return uri.getSite().getAdministrator();
+    return new UserImpl(uri.getSite().getAdministrator());
   }
 
   /**
@@ -687,7 +688,7 @@ public class MockPageImpl implements Page {
    * @see ch.entwine.weblounge.common.security.Securable#getOwner()
    */
   public User getOwner() {
-    return uri.getSite().getAdministrator();
+    return new UserImpl(uri.getSite().getAdministrator());
   }
 
   /**
