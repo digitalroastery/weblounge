@@ -30,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,14 +79,30 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
       String roleId = entry.getKey();
       String welcomePage = entry.getValue();
       if (SecurityUtils.userHasRole(user, roleId)) {
-        response.sendRedirect(welcomePage);
+        response.sendRedirect(addTimeStamp(welcomePage));
         return;
       }
     }
 
     // No idea what the user wants or who he/she is. Send them back
-    response.sendRedirect(defaultWelcomePage);
+    response.sendRedirect(addTimeStamp(defaultWelcomePage));
 
+  }
+
+  /**
+   * Add a timestamp parameter to the url location
+   * 
+   * @param location
+   *          the url
+   * @return the page with a timestamp
+   */
+  private String addTimeStamp(String location) {
+    long timeStamp = new Date().getTime();
+    if (location.contains("?")) {
+      return location.concat("&_=" + timeStamp);
+    } else {
+      return location.concat("?_=" + timeStamp);
+    }
   }
 
   /**
