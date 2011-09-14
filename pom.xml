@@ -70,14 +70,14 @@
 
     <dependency>
       <groupId>org.springframework.security</groupId>
-      <artifactId>org.springframework.security.core</artifactId>
-      <version>3.0.4.RELEASE</version>
+      <artifactId>spring-security-core</artifactId>
+      <version>3.0.6.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.security</groupId>
-      <artifactId>org.springframework.security.web</artifactId>
-      <version>3.0.4.RELEASE</version>
+      <artifactId>spring-security-web</artifactId>
+      <version>3.0.6.RELEASE</version>
     </dependency>
 
     <dependency>
@@ -178,31 +178,31 @@
               javax.servlet.http;version="2.5.0",
               javax.ws.rs;version="1.0",
               javax.ws.rs.core;version="1.0",
-              org.springframework.beans;version="3.0.4",
-              org.springframework.beans.factory;version="3.0.4",
-              org.springframework.beans.factory.config;version="3.0.4",
-              org.springframework.beans.factory.support;version="3.0.4",
-              org.springframework.beans.factory.xml;version="3.0.4",
-              org.springframework.context;version="3.0.4",
-              org.springframework.context.annotation;version="3.0.4",
-              org.springframework.dao;version="3.0.4",
+              org.springframework.beans;version="3.0.6",
+              org.springframework.beans.factory;version="3.0.6",
+              org.springframework.beans.factory.config;version="3.0.6",
+              org.springframework.beans.factory.support;version="3.0.6",
+              org.springframework.beans.factory.xml;version="3.0.6",
+              org.springframework.context;version="3.0.6",
+              org.springframework.context.annotation;version="3.0.6",
+              org.springframework.dao;version="3.0.6",
               org.springframework.osgi.context;version="1.2.1",
               org.springframework.osgi.context.support;version="1.2.1",
-              org.springframework.security;version="3.0.4",
-              org.springframework.security.access;version="3.0.4",
-              org.springframework.security.access.event;version="3.0.4",
-              org.springframework.security.access.vote;version="3.0.4",
-              org.springframework.security.authentication;version="3.0.4",
-              org.springframework.security.authentication.event;version="3.0.4",
-              org.springframework.security.config;version="3.0.4",
-              org.springframework.security.core;version="3.0.4",
-              org.springframework.security.core.userdetails;version="3.0.4",
-              org.springframework.security.core.userdetails.cache;version="3.0.4",
-              org.springframework.security.core.userdetails.memory;version="3.0.4",
-              org.springframework.security.web;version="3.0.4",
-              org.springframework.security.web.authentication;version="3.0.4",
-              org.springframework.security.web.authentication.www;version="3.0.4",
-              org.springframework.util;version="3.0.4",
+              org.springframework.security;version="3.0.6",
+              org.springframework.security.access;version="3.0.6",
+              org.springframework.security.access.event;version="3.0.6",
+              org.springframework.security.access.vote;version="3.0.6",
+              org.springframework.security.authentication;version="3.0.6",
+              org.springframework.security.authentication.event;version="3.0.6",
+              org.springframework.security.config;version="3.0.6",
+              org.springframework.security.core;version="3.0.6",
+              org.springframework.security.core.userdetails;version="3.0.6",
+              org.springframework.security.core.userdetails.cache;version="3.0.6",
+              org.springframework.security.core.userdetails.memory;version="3.0.6",
+              org.springframework.security.web;version="3.0.6",
+              org.springframework.security.web.authentication;version="3.0.6",
+              org.springframework.security.web.authentication.www;version="3.0.6",
+              org.springframework.util;version="3.0.6",
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
