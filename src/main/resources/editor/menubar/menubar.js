@@ -123,7 +123,7 @@ steal.plugins(
 					},
 					Ja: $.proxy(function () {
 						this.options.page.publish($.proxy(function() {
-							this._disableEditing();
+							
 						}, this), function() {
 							alert('Publish error!');
 						});
@@ -339,8 +339,8 @@ steal.plugins(
 		},
 		
 		"span.wbl-profileMenu click": function(el, ev) {
-			$('.wbl-menu').hide();
-			$('div#wbl-profileMenu').show().hover(function() { }, function() {$(this).hide();});
+//			$('.wbl-menu').hide();
+//			$('div#wbl-profileMenu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
 		"div#wbl-pageOptions click": function(el, ev) {
@@ -352,7 +352,7 @@ steal.plugins(
 		},
 		
 		"input focus": function(el, ev) {
-			$('div#wbl-searchResult').show();
+//			$('div#wbl-searchResult').show();
 		},
 		
 		"input blur": function() {
