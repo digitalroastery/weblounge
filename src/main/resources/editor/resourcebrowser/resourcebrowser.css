@@ -79,13 +79,6 @@
 	height: 100%;
 }
 
-/* Page Browser */
-.editor_resourcebrowser #wbl-container div.scrollingHotSpotLeft,
-.editor_resourcebrowser #wbl-container div.scrollingHotSpotRight {
-	height: 261px;
-	background-color: #000;
-}
-
 .editor_resourcebrowser div.wbl-listView {
 	width: 80%;
 	margin: 50px auto;

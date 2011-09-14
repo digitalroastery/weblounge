@@ -2,8 +2,7 @@ steal.plugins(
 	'jquery/controller/view',
 	'jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/init.tmpl')
-.resources('jquery.treeview')
-.css('resourcebrowser', 'resources/jquery.treeview')
+.css('resourcebrowser')
 .then('resourcescrollview', 'resourcelistview', 'resourcesearch')
 .then(function($) {
 
@@ -394,7 +393,7 @@ steal.plugins(
         "div#wbl-mainContainer favorizeResources": function(el, ev, resources) {
         	// TODO
 			if(resources.length) {
-				this._showMessage('Zu Favoriten hinzugefügt');
+				this._showMessage('Zu Favoriten hinzugef&uuml;gt');
 			} else {
 				this._showErrorMessage('Es wurde keine Seite markiert.');
 			}
