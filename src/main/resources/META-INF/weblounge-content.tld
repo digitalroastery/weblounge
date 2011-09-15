@@ -4,21 +4,22 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
     version="2.1">
 
-  <description>Tag library providing access to the Weblounge CMS content</description>
-  <display-name>Weblounge Content Tags</display-name>
+    <description>Tag library providing access to the Weblounge CMS content</description>
+    <display-name>Weblounge Content Tags</display-name>
 	<tlib-version>3.0</tlib-version>
 	<short-name>webl</short-name>
-  <uri>http://entwinemedia.com/weblounge/3.0/content</uri>
+    <uri>http://entwinemedia.com/weblounge/3.0/content</uri>
   
-  <tag>
+    <tag>
 		<description>Shows the workbench</description>
 		<display-name>Weblounge Cache Tagging Tag</display-name>
 		<name>workbench</name>
 		<tag-class>ch.entwine.weblounge.taglib.content.WorkbenchTag</tag-class>
 		<body-content>empty</body-content>
-  </tag>
+        <attribute><name>uri</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    </tag>
 
-  <tag>
+    <tag>
 		<description>Adds a tag to the cache</description>
 		<display-name>Weblounge Cache Tagging Tag</display-name>
 		<name>cachetag</name>

@@ -22,10 +22,9 @@ package ch.entwine.weblounge.taglib.content;
 
 import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
+import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
-
-import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 
@@ -42,8 +41,28 @@ public class WorkbenchTag extends WebloungeTag {
 
   /** Path to the workbench script */
   public static final String WORKBENCH_SCRIPT = "<script src=\"/%1$2s/steal/steal.js?editor,%2$2s\"></script>";
-  private static final String DEFAULT_ENVIRONMENT_PARAM = "production";
-  private static final String DEFAULT_EDITOR_PARAM = "weblounge";
+
+  /** Development identifier for steal */
+  private static final String STEAL_DEVELOPMENT = "development";
+
+  /** Production identifier for steal */
+  private static final String STEAL_PRODUCTION = "production";
+
+  /** Default path to the workbench ui */
+  private static final String DEFAULT_WORKBENCH_PATH = "weblounge";
+
+  /** The workbench path */
+  private String workbenchPath = DEFAULT_WORKBENCH_PATH;
+
+  /**
+   * Sets the workbench path.
+   * 
+   * @param workbenchPath
+   *          the path to the workbench ui
+   */
+  public void setUri(String workbenchPath) {
+    this.workbenchPath = workbenchPath;
+  }
 
   /**
    * Writes the workbench script tag to the output.
@@ -67,7 +86,7 @@ public class WorkbenchTag extends WebloungeTag {
       Cookie cookie = new Cookie(EditingState.STATE_COOKIE, "true");
       cookie.setPath("/");
       response.addCookie(cookie);
-      writeWorkbenchScript();
+      writeWorkbenchScript(getRequest());
       return super.doEndTag();
     }
 
@@ -76,7 +95,7 @@ public class WorkbenchTag extends WebloungeTag {
       return super.doEndTag();
     for (Cookie cookie : request.getCookies()) {
       if (cookie.getName().equals(EditingState.STATE_COOKIE) && "true".equals(cookie.getValue())) {
-        writeWorkbenchScript();
+        writeWorkbenchScript(getRequest());
         break;
       }
     }
@@ -84,17 +103,21 @@ public class WorkbenchTag extends WebloungeTag {
     return super.doEndTag();
   }
 
-  private void writeWorkbenchScript() throws JspException {
-    String environment = DEFAULT_ENVIRONMENT_PARAM;
-    String editorUri = DEFAULT_EDITOR_PARAM;
-    String requestEnvironmentParam = request.getParameter(EditingState.WORKBENCH_ENVIRONMENT_PARAM);
-    String requestEditorParam = request.getParameter(EditingState.WORKBENCH_EDITOR_PARAM);
-    if(!StringUtils.isBlank(requestEnvironmentParam)) 
-      environment = requestEnvironmentParam;
-    if(!StringUtils.isBlank(requestEditorParam)) 
-      editorUri = requestEditorParam;
+  private void writeWorkbenchScript(WebloungeRequest request)
+      throws JspException {
+
+    // Determine the environment for the steal.js script
+    String environment = null;
+    switch (request.getEnvironment()) {
+      case Development:
+        environment = STEAL_DEVELOPMENT;
+        break;
+      default:
+        environment = STEAL_PRODUCTION;
+    }
+
     try {
-      pageContext.getOut().write(String.format(WORKBENCH_SCRIPT, editorUri, environment));
+      pageContext.getOut().write(String.format(WORKBENCH_SCRIPT, workbenchPath, environment));
     } catch (IOException e) {
       throw new JspException(e);
     }
