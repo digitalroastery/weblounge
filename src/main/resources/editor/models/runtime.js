@@ -13,11 +13,12 @@ steal.then('jsonix')
 		
 		parseXML: function(xml) {
 			var runtime = new Object();
-			runtime.path = $(xml).find('ui path')[0].textContent;
+			runtime.path = $(xml).find('ui path:first').text();
 			runtime.user = new Object();
-			runtime.user.login = $(xml).find('site security user login:first').text();
-			runtime.user.name = $(xml).find('site security user name:first').text();
-			runtime.user.email = $(xml).find('site security user email:first').text();
+			var userElement = $(xml).find('security user:first');
+			runtime.user.name = $(xml).find('security user name:first').text();
+			runtime.user.login = userElement.attr('id');
+			runtime.user.realm = userElement.attr('realm');
 			runtime.site = new Object();
 			$(xml).find('site').each(function(index) {
 				runtime.site.id = $(this).find('id:first').text();
