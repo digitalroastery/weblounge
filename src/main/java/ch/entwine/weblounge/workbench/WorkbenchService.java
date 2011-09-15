@@ -398,7 +398,7 @@ public class WorkbenchService {
 
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setLocalAddr(site.getURL().toExternalForm());
+      request.setLocalAddr(site.getConnector().toExternalForm());
       if (language != null)
         request.addPreferredLocale(new Locale(language));
       request.setAttribute(WebloungeRequest.PAGE, page);
