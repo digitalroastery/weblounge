@@ -70,6 +70,19 @@ public interface Script extends HTMLInclude {
   String getCharset();
 
   /**
+   * Sets the jquery version to user for the script
+   * 
+   * @param jquery
+   *          the jquery version
+   */
+  void setJQuery(String jquery);
+
+  /**
+   * Return the <code>jquery</code> version to use in the script
+   */
+  String getJQuery();
+
+  /**
    * Set to <code>true</code> if the script should only be executed after the
    * whole page has been loaded, <code>false</code> otherwise.
    * <p>
