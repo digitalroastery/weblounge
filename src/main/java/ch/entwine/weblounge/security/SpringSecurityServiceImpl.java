@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.impl.security.RoleImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -49,11 +50,17 @@ public class SpringSecurityServiceImpl implements SecurityService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SpringSecurityServiceImpl.class);
 
-  /** Name of the generic anonymous user */
+  /** Login of the generic anonymous user */
   public static final String ANONYMOUS_USER = "anonymous";
 
-  /** Name of the generic admin user */
+  /** Name of the generic anonymous user */
+  public static final String ANONYMOUS_NAME = "Anonymous";
+
+  /** Login of the generic admin user */
   public static final String ADMIN_USER = "admin";
+
+  /** Name of the generic admin user */
+  public static final String ADMIN_NAME = "Weblounge System Administrator";
 
   /** Holds the site associated with the current thread */
   private static final ThreadLocal<Site> siteHolder = new ThreadLocal<Site>();
@@ -109,14 +116,14 @@ public class SpringSecurityServiceImpl implements SecurityService {
     Site site = getSite();
 
     if (wideOpen) {
-      user = new UserImpl(ADMIN_USER, "world");
+      user = new UserImpl(ADMIN_USER, Security.SYSTEM_CONTEXT, ADMIN_NAME);
       roles.add(SystemRole.SYSTEMADMIN);
       // user = new UserImpl(ADMIN_USER, site.getIdentifier());
       // roles.add(getLocalRole(site, SystemRole.SYSTEMADMIN));
     } else if (auth == null) {
       logger.debug("No spring security context available, setting current user to anonymous");
-      String realm = site != null ? site.getIdentifier() : "world";
-      user = new UserImpl(ANONYMOUS_USER, realm);
+      String realm = site != null ? site.getIdentifier() : Security.SYSTEM_CONTEXT;
+      user = new UserImpl(ANONYMOUS_USER, realm, ANONYMOUS_NAME);
       roles.add(SystemRole.GUEST);
       // roles.add(getLocalRole(site, SystemRole.GUEST));
     } else {
