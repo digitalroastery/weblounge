@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 import ch.entwine.weblounge.common.content.page.Link;
 import ch.entwine.weblounge.common.impl.content.page.LinkImpl;
 import ch.entwine.weblounge.common.impl.site.ModuleImpl;
+import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -116,7 +117,7 @@ public class ActionSupportTest {
   protected void setUpPreliminaries() throws Exception {
     // site
     site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getURL()).andReturn(new URL(siteUrl));
+    EasyMock.expect(site.getConnector((Environment)EasyMock.anyObject())).andReturn(new SiteURLImpl(new URL(siteUrl)));
     EasyMock.replay(site);
 
     // module

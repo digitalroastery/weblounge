@@ -158,7 +158,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
     Site site = uri.getSite();
     String html = null;
     try {
-      URL pageURL = new URL(UrlUtils.concat(site.getURL().toExternalForm(), PAGE_HANDLER_PREFIX, uri.getIdentifier()));
+      URL pageURL = new URL(UrlUtils.concat(site.getConnector().toExternalForm(), PAGE_HANDLER_PREFIX, uri.getIdentifier()));
       html = render(pageURL, site, language);
       if (StringUtils.isBlank(html)) {
         logger.warn("Error rendering preview of page " + uri.getPath());
@@ -202,14 +202,14 @@ public class PagePreviewGenerator implements PreviewGenerator {
       }
 
       // Configure the renderer
-      renderer.getSharedContext().setBaseURL(site.getURL().toExternalForm());
+      renderer.getSharedContext().setBaseURL(site.getConnector().toExternalForm());
       renderer.getSharedContext().setInteractive(false);
 
       // Make sure the renderer is using a user agent that will correctly
       // resolve urls
       WebloungeUserAgent agent = userAgents.get(site.getIdentifier());
       if (agent == null) {
-        agent = new WebloungeUserAgent(site.getURL());
+        agent = new WebloungeUserAgent(site.getConnector().getURL());
         userAgents.put(site.getIdentifier(), agent);
       }
       renderer.getSharedContext().setUserAgentCallback(agent);
@@ -266,7 +266,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
 
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setLocalAddr(site.getURL().toExternalForm());
+      request.setLocalAddr(site.getConnector().toExternalForm());
       request.setAttribute(WebloungeRequest.LANGUAGE, language);
       request.setPathInfo(pathInfo);
       request.setRequestURI(UrlUtils.concat(httpContextURI, pathInfo));

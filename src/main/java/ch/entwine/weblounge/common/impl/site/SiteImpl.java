@@ -31,7 +31,6 @@ import ch.entwine.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
-import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
 import ch.entwine.weblounge.common.impl.util.xml.ValidationErrorHandler;
@@ -49,14 +48,15 @@ import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.security.UserListener;
 import ch.entwine.weblounge.common.security.WebloungeUser;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.I18nDictionary;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.ModuleException;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteException;
 import ch.entwine.weblounge.common.site.SiteListener;
+import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.common.url.WebUrl;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
@@ -124,9 +124,6 @@ public class SiteImpl implements Site {
   /** Site running state */
   private boolean isOnline = false;
 
-  /** Url of this site */
-  private WebUrl url = null;
-
   /** Site description */
   protected String name = null;
 
@@ -155,10 +152,13 @@ public class SiteImpl implements Site {
   protected Map<String, Module> modules = null;
 
   /** The default hostname */
-  protected URL defaultURL = null;
+  protected SiteURL defaultURL = null;
 
   /** Ordered list of site urls */
-  protected List<URL> urls = null;
+  protected List<SiteURL> urls = null;
+  
+  /** Default urls by environment */
+  protected Map<Environment, SiteURL> defaultURLByEnvironment = null;
 
   /** Jobs */
   protected Map<String, QuartzJob> jobs = null;
@@ -202,7 +202,8 @@ public class SiteImpl implements Site {
     templates = new HashMap<String, PageTemplate>();
     layouts = new HashMap<String, PageLayout>();
     modules = new HashMap<String, Module>();
-    urls = new ArrayList<URL>();
+    urls = new ArrayList<SiteURL>();
+    defaultURLByEnvironment = new HashMap<Environment, SiteURL>();
     jobs = new HashMap<String, QuartzJob>();
     localRoles = new HashMap<String, String>();
     i18n = new I18nDictionaryImpl();
@@ -480,33 +481,55 @@ public class SiteImpl implements Site {
    * 
    * @see ch.entwine.weblounge.common.site.Site#setDefaultURL(URL)
    */
-  public void setDefaultURL(URL url) {
+  public void setDefaultURL(SiteURL url) {
     defaultURL = url;
     if (url != null)
-      addURL(url);
+      addConnector(url);
   }
-
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.site.Site#setDefaultURL(ch.entwine.weblounge.common.site.SiteURL, ch.entwine.weblounge.common.site.Environment)
+   */
+  public void setDefaultURL(SiteURL url, Environment environment) {
+    if (url == null)
+      throw new IllegalArgumentException("Url must not be null");
+    if (environment == null)
+      throw new IllegalArgumentException("Environment must not be null");
+  }
+  
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#addURL(URL)
+   * @see ch.entwine.weblounge.common.site.Site#addConnector(URL)
    */
-  public void addURL(URL url) {
+  public void addConnector(SiteURL url) {
     if (url == null)
       throw new IllegalArgumentException("Url must not be null");
     urls.add(url);
+    
+    if (url.isDefault()) {
+      defaultURLByEnvironment.put(url.getEnvironment(), url);
+      if (Environment.Production.equals(url.getEnvironment()))
+        defaultURL = url;
+    }
 
     // Make sure we have a default URL
     if (defaultURL == null)
       defaultURL = url;
+    
+    // ... and a default
+    if (defaultURLByEnvironment.get(url.getEnvironment()) == null)
+      defaultURLByEnvironment.put(url.getEnvironment(), url);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#removeURL(URL)
+   * @see ch.entwine.weblounge.common.site.Site#removeConnector(URL)
    */
-  public boolean removeURL(URL url) {
+  public boolean removeConnector(SiteURL url) {
     if (url == null)
       throw new IllegalArgumentException("Hostname must not be null");
     if (url.equals(defaultURL))
@@ -517,33 +540,31 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#getURLs()
+   * @see ch.entwine.weblounge.common.site.Site#getConnectors()
    */
-  public URL[] getURLs() {
-    return urls.toArray(new URL[urls.size()]);
+  public SiteURL[] getConnectors() {
+    return urls.toArray(new SiteURL[urls.size()]);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#getURL()
+   * @see ch.entwine.weblounge.common.site.Site#getConnector()
    */
-  public URL getURL() {
+  public SiteURL getConnector() {
     return defaultURL;
   }
-
+  
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.site.Site#getUrl()
+   *
+   * @see ch.entwine.weblounge.common.site.Site#getConnector(ch.entwine.weblounge.common.site.Environment)
    */
-  public WebUrl getUrl() {
+  public SiteURL getConnector(Environment environment) {
+    SiteURL url = defaultURLByEnvironment.get(environment);
     if (url != null)
       return url;
-    if (defaultURL == null)
-      return null;
-    url = new WebUrlImpl(this, defaultURL.getPath());
-    return url;
+    return defaultURL;
   }
 
   /**
@@ -1400,11 +1421,19 @@ public class SiteImpl implements Site {
     String url = null;
     try {
       for (int i = 0; i < urlNodes.getLength(); i++) {
-        url = urlNodes.item(i).getFirstChild().getNodeValue();
-        if (ConfigurationUtils.isDefault(urlNodes.item(i)))
-          site.setDefaultURL(new URL(url));
-        else
-          site.addURL(new URL(url));
+        Node urlNode = urlNodes.item(i);
+        url = urlNode.getFirstChild().getNodeValue();
+        boolean defaultUrl = ConfigurationUtils.isDefault(urlNode);
+        Environment environment = Environment.Production;
+        Node environmentAttribute = urlNode.getAttributes().getNamedItem("environment");
+        if (environmentAttribute != null && environmentAttribute.getNodeValue() != null)
+          environment = Environment.valueOf(StringUtils.capitalize(environmentAttribute.getNodeValue()));
+
+        SiteURLImpl siteURL = new SiteURLImpl(new URL(url));
+        siteURL.setDefault(defaultUrl);
+        siteURL.setEnvironment(environment);
+        
+        site.addConnector(siteURL);
       }
     } catch (MalformedURLException e) {
       throw new IllegalStateException("Site '" + identifier + "' defines malformed url: " + url);
@@ -1511,10 +1540,11 @@ public class SiteImpl implements Site {
     // hostnames
     if (urls.size() > 0) {
       b.append("<domains>");
-      for (URL url : urls) {
+      for (SiteURL url : urls) {
         b.append("<url");
         if (url.equals(defaultURL))
           b.append(" default=\"true\"");
+        b.append(" environment=\"").append(url.getEnvironment().toString().toLowerCase()).append("\"");
         b.append(">");
         b.append(url.toExternalForm());
         b.append("</url>");

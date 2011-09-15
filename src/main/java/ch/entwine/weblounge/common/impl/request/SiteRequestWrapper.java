@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -101,6 +102,9 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
   /** The url */
   private final WebUrl url;
 
+  /** The request environment */
+  private final Environment environment;
+
   /**
    * Creates a new <code>DispatcherRequest</code>.
    * 
@@ -119,6 +123,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
 
     this.site = request.getSite();
     this.include = include;
+    this.environment = request.getEnvironment();
 
     int index = url.indexOf('?');
     params = request.getParameterMap();
@@ -301,6 +306,15 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
     if (include)
       return super.getContextPath();
     return contextPath;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.WebloungeRequest#getEnvironment()
+   */
+  public Environment getEnvironment() {
+    return environment;
   }
 
   /**

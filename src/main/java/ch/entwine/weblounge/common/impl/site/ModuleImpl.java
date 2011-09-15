@@ -32,10 +32,12 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.impl.util.xml.XPathNamespaceContext;
 import ch.entwine.weblounge.common.scheduler.Job;
 import ch.entwine.weblounge.common.site.Action;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.ModuleException;
 import ch.entwine.weblounge.common.site.ModuleListener;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -147,11 +149,21 @@ public class ModuleImpl implements Module {
    * @see ch.entwine.weblounge.common.site.Module#getUrl()
    */
   public WebUrl getUrl() {
+    return getUrl(Environment.Production);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.site.Module#getUrl(ch.entwine.weblounge.common.site.Environment)
+   */
+  public WebUrl getUrl(Environment environment) {
     if (url != null)
       return url;
     if (site == null)
       throw new IllegalStateException("Site has not yet been set");
-    url = new WebUrlImpl(site, UrlUtils.concat(site.getURL().toExternalForm(), "module", identifier));
+    SiteURL siteURL = site.getConnector(environment);
+    url = new WebUrlImpl(site, UrlUtils.concat(siteURL.toExternalForm(), "module", identifier));
     return url;
   }
 

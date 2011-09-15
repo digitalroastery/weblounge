@@ -37,6 +37,7 @@ import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.WebloungeAdminImpl;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.impl.site.SiteImpl;
+import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Password;
@@ -48,6 +49,7 @@ import org.junit.Test;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -127,13 +129,13 @@ public class SiteImplTest {
   protected List<String> hostnames = new ArrayList<String>();
 
   /** Default hostname */
-  protected URL defaultURL = null;
+  protected SiteURL defaultURL = null;
 
   /** Default hostname */
-  protected URL fallbackURL = null;
+  protected SiteURL fallbackURL = null;
 
   /** Default hostname */
-  protected URL localhost = null;
+  protected SiteURL localhost = null;
 
   /** Portrait image style */
   protected ImageStyle portraitImageStyle = null;
@@ -174,9 +176,9 @@ public class SiteImplTest {
     site.addTemplate(mobileTemplate);
     site.setDefaultLanguage(GERMAN);
     site.addLanguage(ENGLISH);
-    site.setDefaultURL(defaultURL);
-    site.addURL(fallbackURL);
-    site.addURL(localhost);
+    site.addConnector(defaultURL);
+    site.addConnector(fallbackURL);
+    site.addConnector(localhost);
     site.addLocalRole(Security.SITE_ADMIN_ROLE, adminRole);
     site.addLocalRole(Security.PUBLISHER_ROLE, publisherRole);
     site.addLocalRole(Security.EDITOR_ROLE, editorRole);
@@ -190,9 +192,9 @@ public class SiteImplTest {
    */
   protected void setupPrerequisites() throws Exception {
     // Urls
-    defaultURL = new URL("http://www.weblounge.org");
-    fallbackURL = new URL("http://*.nowhere.com");
-    localhost = new URL("http://localhost:8080");
+    defaultURL = new SiteURLImpl(new URL("http://www.weblounge.org"), true);
+    fallbackURL = new SiteURLImpl(new URL("http://*.nowhere.com"), Environment.Staging);
+    localhost = new SiteURLImpl(new URL("http://localhost:8080"), Environment.Development);
     
     // Administrator
     administrator = new WebloungeAdminImpl(administratorLogin);
@@ -430,39 +432,40 @@ public class SiteImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#removeURL(URL)}
+   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#removeConnector(URL)}
    * .
    */
   @Test
   public void testRemoveURL() throws Exception {
-    site.removeURL(new URL("http://test"));
-    assertEquals(3, site.getURLs().length);
-    site.removeURL(defaultURL);
-    assertEquals(2, site.getURLs().length);
+    site.removeConnector(new SiteURLImpl(new URL("http://test")));
+    assertEquals(3, site.getConnectors().length);
+    site.removeConnector(defaultURL);
+    assertEquals(2, site.getConnectors().length);
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getURLs()}.
+   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getConnectors()}.
    */
   @Test
   public void testGetURLs() {
-    assertEquals(3, site.getURLs().length);
-    assertEquals(defaultURL, site.getURLs()[0]);
-    assertEquals(fallbackURL, site.getURLs()[1]);
-    assertEquals(localhost, site.getURLs()[2]);
+    assertEquals(3, site.getConnectors().length);
+    List<SiteURL> connectors = Arrays.asList(site.getConnectors());
+    assertTrue(connectors.contains(defaultURL));
+    assertTrue(connectors.contains(fallbackURL));
+    assertTrue(connectors.contains(localhost));
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getURL()}.
+   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getConnector()}.
    */
   @Test
   public void testGetURL() {
-    assertEquals(defaultURL, site.getURL());
-    site.removeURL(defaultURL);
-    assertEquals(2, site.getURLs().length);
-    assertTrue(site.getURL() == null);
+    assertEquals(defaultURL, site.getConnector());
+    site.removeConnector(defaultURL);
+    assertEquals(2, site.getConnectors().length);
+    assertTrue(site.getConnector() == null);
   }
 
   /**
@@ -471,11 +474,11 @@ public class SiteImplTest {
    */
   @Test
   public void testGetUrl() {
-    assertEquals(defaultURL, site.getURL());
-    site.removeURL(defaultURL);
-    site.removeURL(fallbackURL);
-    site.removeURL(localhost);
-    assertNull(site.getURL());
+    assertEquals(defaultURL, site.getConnector());
+    site.removeConnector(defaultURL);
+    site.removeConnector(fallbackURL);
+    site.removeConnector(localhost);
+    assertNull(site.getConnector());
   }
 
   /**

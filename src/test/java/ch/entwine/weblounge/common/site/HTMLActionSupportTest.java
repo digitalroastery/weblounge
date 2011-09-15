@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.entwine.weblounge.common.impl.site.HTMLActionSupport;
+import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
@@ -95,7 +96,7 @@ public class HTMLActionSupportTest extends ActionSupportTest {
     // site
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getTemplate(template)).andReturn(pageTemplate);
-    EasyMock.expect(site.getURL()).andReturn(new URL(siteUrl));
+    EasyMock.expect(site.getConnector((Environment)EasyMock.anyObject())).andReturn(new SiteURLImpl(new URL(siteUrl)));
     EasyMock.replay(site);
 
     // Renderer 

@@ -24,11 +24,11 @@ import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -605,10 +605,10 @@ public final class ConfigurationUtils {
 
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = request.getSite();
-    URL url = site.getURL();
+    SiteURL siteURL = site.getConnector(request.getEnvironment());
 
     StringBuffer siteRootReplacement = new StringBuffer();
-    siteRootReplacement.append(url.toExternalForm());
+    siteRootReplacement.append(siteURL.getURL().toExternalForm());
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
 
     replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
@@ -640,10 +640,9 @@ public final class ConfigurationUtils {
 
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = module.getSite();
-    URL url = site.getURL();
 
     StringBuffer siteRootReplacement = new StringBuffer();
-    siteRootReplacement.append(url);
+    siteRootReplacement.append(site.getConnector().toExternalForm());
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
     replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
 
@@ -676,10 +675,9 @@ public final class ConfigurationUtils {
     text = processTemplate(text);
 
     Map<String, String> replacements = new HashMap<String, String>();
-    URL url = site.getURL();
 
     StringBuffer siteRootReplacement = new StringBuffer();
-    siteRootReplacement.append(url);
+    siteRootReplacement.append(site.getConnector().toExternalForm());
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
     replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
 

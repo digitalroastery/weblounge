@@ -89,6 +89,15 @@
       <xsd:simpleContent>
         <xsd:extension base="xsd:anyURI">
           <xsd:attribute name="default" type="xsd:boolean" />
+          <xsd:attribute name="environment">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="production" />
+                <xsd:enumeration value="staging" />
+                <xsd:enumeration value="development" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
         </xsd:extension>
       </xsd:simpleContent>
     </xsd:complexType>

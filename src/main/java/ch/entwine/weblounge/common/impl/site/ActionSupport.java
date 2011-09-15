@@ -38,8 +38,10 @@ import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.ActionException;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -167,9 +169,19 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @return the action's link
    */
   public WebUrl getUrl() {
-    return new WebUrlImpl(site, UrlUtils.concat(site.getURL().toExternalForm(), mountpoint));
+    return getUrl(Environment.Production);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.site.Action#getUrl(ch.entwine.weblounge.common.site.Environment)
+   */
+  public WebUrl getUrl(Environment environment) {
+    SiteURL siteURL = site.getConnector(environment);
+    return new WebUrlImpl(site, UrlUtils.concat(siteURL.toExternalForm(), mountpoint));
+  }
+  
   /**
    * {@inheritDoc}
    * 

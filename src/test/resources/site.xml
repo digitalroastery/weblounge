@@ -7,9 +7,9 @@
     <language>en</language>
   </languages>
   <domains>
-  	<url default="true">http://www.weblounge.org</url>
-  	<url>http://*.nowhere.com</url>
-    <url>http://localhost:8080</url>
+  	<url default="true" environment="production">http://www.weblounge.org</url>
+  	<url environment="staging">http://*.nowhere.com</url>
+    <url environment="development">http://localhost:8080</url>
   </domains>
   <security>
     <administrator>
@@ -19,10 +19,10 @@
       <email>weboffice@nowhere.com</email>
     </administrator>
     <roles>
-	    <administrator>my-admin</administrator>
-	    <publisher>my-publisher</publisher>
-	    <editor>my-editor</editor>
-	    <guest>my-guest</guest>
+	  <administrator>my-admin</administrator>
+	  <publisher>my-publisher</publisher>
+	  <editor>my-editor</editor>
+	  <guest>my-guest</guest>
     </roles>
   </security>
   <templates>

@@ -29,7 +29,9 @@ import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -87,6 +89,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /** Url that was originally requested */
   protected WebUrl requestedUrl = null;
+  
+  /** The request environment */
+  protected Environment environment = null;
 
   /**
    * Creates a new wrapper for <code>request</code>.
@@ -118,6 +123,34 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     user = null;
     url = null;
     language = null;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.request.WebloungeRequest#getEnvironment()
+   */
+  public Environment getEnvironment() {
+    if (environment != null)
+      return environment;
+
+    // The language might very well be encoded as part of the path, so asking
+    // for the url might give us the language for free.
+    if (url == null)
+      url = getUrl();
+
+    // Set the environment to production by default
+    environment = Environment.Production;
+    
+    // Find the environment by looking at the url
+    for (SiteURL connector : site.getConnectors()) {
+      if (url.toString().startsWith(connector.toExternalForm())) {
+        environment = connector.getEnvironment();
+        break;
+      }
+    }
+    
+    return environment;
   }
 
   /**

@@ -25,10 +25,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -75,7 +77,7 @@ public class WebUrlImplTest {
   protected WebUrlImpl flavoredLocalizedVersionedUrl = null;
 
   /** Site hostname */
-  protected URL siteUrl = null;
+  protected SiteURL siteUrl = null;
 
   /** Default url path */
   protected String livePath = "/test/";
@@ -133,12 +135,12 @@ public class WebUrlImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    siteUrl = new URL("http://www.test.com");
+    siteUrl = new SiteURLImpl(new URL("http://www.test.com"));
     
     siteMock = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(siteMock.getLanguage("de")).andReturn(german).anyTimes();
     EasyMock.expect(siteMock.getDefaultLanguage()).andReturn(english);
-    EasyMock.expect(siteMock.getURL()).andReturn(siteUrl).anyTimes();
+    EasyMock.expect(siteMock.getConnector()).andReturn(siteUrl).anyTimes();
     EasyMock.replay(siteMock);
     otherSiteMock = EasyMock.createNiceMock(Site.class);
 
@@ -326,10 +328,11 @@ public class WebUrlImplTest {
    */
   @Test
   public void testNormalize() {
-    assertEquals(UrlUtils.concat(siteUrl.toExternalForm(), segmentedPath), liveUrl.normalize());
-    assertEquals(UrlUtils.concat(siteUrl.toExternalForm(), flavoredSegmentedPath), flavoredSegmentedLiveUrl.normalize());
-    assertEquals(UrlUtils.concat(siteUrl.toExternalForm(), localizedSegmentedPath), localizedSegmentedLiveUrl.normalize());
-    assertEquals(UrlUtils.concat(siteUrl.toExternalForm(), flavoredLocalizedSegmentedPath), flavoredLocalizedSegmentedLiveUrl.normalize());
+    String url = siteUrl.toExternalForm(); 
+    assertEquals(UrlUtils.concat(url, segmentedPath), liveUrl.normalize());
+    assertEquals(UrlUtils.concat(url, flavoredSegmentedPath), flavoredSegmentedLiveUrl.normalize());
+    assertEquals(UrlUtils.concat(url, localizedSegmentedPath), localizedSegmentedLiveUrl.normalize());
+    assertEquals(UrlUtils.concat(url, flavoredLocalizedSegmentedPath), flavoredLocalizedSegmentedLiveUrl.normalize());
   }
 
   /**
