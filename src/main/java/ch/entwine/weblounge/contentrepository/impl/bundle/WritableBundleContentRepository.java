@@ -91,6 +91,12 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
    */
   @Override
   public void connect(Site site) throws ContentRepositoryException {
+
+    // Don't have the super implementation automatically create a home page
+    // for us. Otherwise, the creation of the index from the bundle won't work.
+    createHomepage = false;
+
+    // Initialize the repository and the repository index
     super.connect(site);
 
     try {
@@ -104,6 +110,9 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
       // Add the bundle contents to the index
       if (getResourceCount() == 0)
         indexBundleContents();
+
+      // If there was no homepage as part of the bundle, create it
+      createHomepage();
 
     } finally {
       initializing = false;

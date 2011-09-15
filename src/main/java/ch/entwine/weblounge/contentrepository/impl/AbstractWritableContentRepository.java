@@ -81,6 +81,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** The response cache tracker */
   private ResponseCacheTracker responseCacheTracker = null;
 
+  /** True to create a homepage when an empty repository is started */
+  protected boolean createHomepage = true;
+
   /**
    * Creates a new instance of the content repository.
    * 
@@ -99,23 +102,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   @Override
   public void connect(Site site) throws ContentRepositoryException {
     super.connect(site);
-    
-    // Make sure there is a home page
-    ResourceURI homeURI = new ResourceURIImpl(Page.TYPE, site, "/");
-    if (!existsInAnyVersion(homeURI)) {
-      try {
-        Page page = new PageImpl(homeURI);
-        User siteAdmininstrator = new UserImpl(site.getAdministrator());
-        page.setTemplate(site.getDefaultTemplate().getIdentifier());
-        page.setCreated(siteAdmininstrator, new Date());
-        page.setPublished(siteAdmininstrator, new Date(), null);
-        put(page);
-        logger.info("Created homepage for {}", site.getIdentifier());
-      } catch (IOException e) {
-        logger.warn("Error creating home page in empty site '{}': {}", site.getIdentifier(), e.getMessage());
-      }
+
+    if (createHomepage) {
+      createHomepage();
     }
-      
+
     Bundle bundle = loadBundle(site);
     if (bundle != null) {
       imageStyleTracker = new ImageStyleTracker(bundle.getBundleContext());
@@ -150,6 +141,32 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     if (responseCacheTracker == null)
       return null;
     return responseCacheTracker.getCache();
+  }
+
+  /**
+   * Creates an empty homepage in the content repository if it doesn't exist
+   * yet.
+   * 
+   * @throws IllegalStateException
+   * @throws ContentRepositoryException
+   */
+  protected void createHomepage() throws IllegalStateException,
+      ContentRepositoryException {
+    // Make sure there is a home page
+    ResourceURI homeURI = new ResourceURIImpl(Page.TYPE, site, "/");
+    if (!existsInAnyVersion(homeURI)) {
+      try {
+        Page page = new PageImpl(homeURI);
+        User siteAdmininstrator = new UserImpl(site.getAdministrator());
+        page.setTemplate(site.getDefaultTemplate().getIdentifier());
+        page.setCreated(siteAdmininstrator, new Date());
+        page.setPublished(siteAdmininstrator, new Date(), null);
+        put(page);
+        logger.info("Created homepage for {}", site.getIdentifier());
+      } catch (IOException e) {
+        logger.warn("Error creating home page in empty site '{}': {}", site.getIdentifier(), e.getMessage());
+      }
+    }
   }
 
   /**
