@@ -22,7 +22,7 @@ package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.impl.security.UserImpl;
+import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.Password;
@@ -59,6 +59,12 @@ public class SystemDirectoryProvider implements DirectoryProvider, ManagedServic
   /** Configuration key for the system user's password */
   public static final String OPT_ADMIN_PASSWORD = "systemdirectory.password";
 
+  /** Configuration key for the system user's name */
+  public static final String OPT_ADMIN_NAME = "systemdirectory.name";
+
+  /** Configuration key for the system user's email */
+  public static final String OPT_ADMIN_EMAIL = "systemdirectory.email";
+
   /** Well-known accounts */
   protected Map<String, User> internalAccounts = new HashMap<String, User>();
 
@@ -71,16 +77,24 @@ public class SystemDirectoryProvider implements DirectoryProvider, ManagedServic
   public void updated(Dictionary properties) throws ConfigurationException {
     String login = null;
     String pass = "";
+    String name = null;
+    String email = null;
 
     if (properties != null) {
       login = StringUtils.trimToNull((String) properties.get(OPT_ADMIN_LOGIN));
       pass = StringUtils.trimToEmpty((String) properties.get(OPT_ADMIN_PASSWORD));
+      name = StringUtils.trimToEmpty((String) properties.get(OPT_ADMIN_NAME));
+      email = StringUtils.trimToEmpty((String) properties.get(OPT_ADMIN_EMAIL));
     }
 
+    // Whatever has been defined before is no longer valid
+    internalAccounts.clear();
+
+    // If no user can be found
     if (login == null || "".equals(pass)) {
+      logger.info("No system accounts have been defined");
       if (internalAccounts.size() > 0)
         logger.info("Deactivating system admin account");
-      internalAccounts.clear();
       return;
     }
 
@@ -89,7 +103,11 @@ public class SystemDirectoryProvider implements DirectoryProvider, ManagedServic
 
     // Register the new one
     logger.info("Activating system admin user '{}'", login);
-    User administrator = new UserImpl(login, Security.SYSTEM_CONTEXT);
+    WebloungeUserImpl administrator = new WebloungeUserImpl(login, Security.SYSTEM_CONTEXT);
+    if (StringUtils.isNotBlank(name))
+      administrator.setName(name);
+    if (StringUtils.isNotBlank(email))
+      administrator.setEmail(email);
     internalAccounts.put(login, administrator);
     Password password = new PasswordImpl(StringUtils.trimToEmpty(pass), DigestType.plain);
     administrator.addPrivateCredentials(password);
