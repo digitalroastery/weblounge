@@ -26,6 +26,8 @@ import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.content.page.Script;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.HTMLAction;
 import ch.entwine.weblounge.common.site.Module;
@@ -76,6 +78,7 @@ public class HTMLHeaderTag extends WebloungeTag {
     Set<HTMLHeadElement> headElements = new HashSet<HTMLHeadElement>();
     Site site = request.getSite();
 
+    boolean needJQuery = false;
     // Pagelets links & scripts
     Page page = (Page) request.getAttribute(WebloungeRequest.PAGE);
     if (page != null) {
@@ -94,6 +97,8 @@ public class HTMLHeaderTag extends WebloungeTag {
             if (header instanceof DeclarativeHTMLHeadElement)
               ((DeclarativeHTMLHeadElement)header).configure(request, site, module);
             if(header.getUse().equals(HTMLInclude.Use.Editor)) continue;
+            if (header instanceof Script)
+              if(((Script)header).getJQuery() != null) needJQuery = true;
             headElements.add(header);
           }
         } else {
@@ -102,7 +107,7 @@ public class HTMLHeaderTag extends WebloungeTag {
         }
       }
     }
-
+    
     // Action links & scripts
     if (action != null) {
       Module module = action.getModule();
@@ -112,10 +117,13 @@ public class HTMLHeaderTag extends WebloungeTag {
         headElements.add(l);
       }
     }
-
+    
     // Write links & scripts to output
     try {
       pageContext.getOut().flush();
+      // Write first jquery script to output
+      if(!RequestUtils.isEditingState(request) && needJQuery)
+        pageContext.getOut().print("<script src=\"/weblounge-shared/scripts/jquery/1.6.4/jquery.min.js\" type=\"text/javascript\"></script>");
       for (HTMLHeadElement s : headElements) {
         pageContext.getOut().println(s.toXml());
       }
