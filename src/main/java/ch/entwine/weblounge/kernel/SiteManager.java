@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteException;
+import ch.entwine.weblounge.common.site.SiteURL;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
@@ -241,11 +242,11 @@ public class SiteManager {
   synchronized void addSite(Site site, ServiceReference reference) {
     sites.add(site);
     siteBundles.put(site, reference.getBundle());
-    for (URL url : site.getURLs()) {
-      String hostName = url.getHost();
+    for (SiteURL connector : site.getConnectors()) {
+      String hostName = connector.getURL().getHost();
       Site registeredFirst = sitesByServerName.get(hostName);
       if (registeredFirst != null && !site.equals(registeredFirst)) {
-        logger.warn("Another site is already registered to " + url);
+        logger.warn("Another site is already registered to " + connector);
         continue;
       }
       sitesByServerName.put(hostName, site);

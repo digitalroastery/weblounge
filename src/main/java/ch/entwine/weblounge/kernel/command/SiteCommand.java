@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -39,7 +40,6 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -194,8 +194,8 @@ public class SiteCommand {
     pad("running", (site.isOnline() ? "yes" : "no"));
 
     // Hostnames
-    if (site.getURLs().length > 0)
-      pad("hosts", site.getURLs());
+    if (site.getConnectors().length > 0)
+      pad("hosts", site.getConnectors());
 
     // Languages
     if (site.getLanguages().length > 0) {
@@ -428,7 +428,7 @@ public class SiteCommand {
    * @param info
    *          the information
    */
-  private void pad(String caption, URL[] info) {
+  private void pad(String caption, SiteURL[] info) {
     for (int i = 0; i < info.length; i++) {
       if (i == 0)
         pad(caption, info[i].toExternalForm());
