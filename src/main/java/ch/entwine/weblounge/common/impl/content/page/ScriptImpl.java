@@ -60,6 +60,9 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /** Element usage scenario */
   protected Use use = null;
 
+  /** The jquery version to use in for the script */
+  protected String jquery = null;
+
   /**
    * Creates a new <code>Script</code> object with the script's path and
    * character set given and a default character set of <code>iso-8859-1</code>.
@@ -68,7 +71,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    *          the path to the script
    */
   public ScriptImpl(String href) {
-    this(href, null, DEFAULT_CHARSET, false);
+    this(href, null, DEFAULT_CHARSET, null, false);
   }
 
   /**
@@ -81,7 +84,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    *          the type, e. g. <code>text/javascript</code>
    */
   public ScriptImpl(String href, String type) {
-    this(href, type, DEFAULT_CHARSET, false);
+    this(href, type, DEFAULT_CHARSET, null, false);
   }
 
   /**
@@ -94,8 +97,8 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    * @param charset
    *          the character set, e. g. <code>utf-8</code>
    */
-  public ScriptImpl(String href, String type, String charset) {
-    this(href, type, charset, false);
+  public ScriptImpl(String href, String type, String jquery, String charset) {
+    this(href, type, charset, jquery, false);
   }
 
   /**
@@ -110,11 +113,12 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    * @param defer
    *          defer, e. g. <code>true</code>
    */
-  public ScriptImpl(String href, String type, String charset, boolean defer) {
+  public ScriptImpl(String href, String type, String charset, String jquery, boolean defer) {
     this.href = href;
     this.defer = defer;
     this.type = type;
     this.charset = charset;
+    this.jquery = jquery;
   }
 
   /**
@@ -193,6 +197,24 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   public String getCharset() {
     return charset;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.page.Script#setJQuery(java.lang.String)
+   */
+  public void setJQuery(String jquery) {
+    this.jquery = jquery;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.page.Script#getJQuery()
+   */
+  public String getJQuery() {
+    return jquery;
+  }
 
   /**
    * {@inheritDoc}
@@ -253,6 +275,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
     ScriptImpl script = new ScriptImpl(href);
     script.setType(XPathHelper.valueOf(config, "@type", xpathProcessor));
     script.setCharset(XPathHelper.valueOf(config, "@charset", xpathProcessor));
+    script.setJQuery(XPathHelper.valueOf(config, "@jquery", xpathProcessor));
     script.setDeferred("true".equalsIgnoreCase(XPathHelper.valueOf(config, "@defer", xpathProcessor)));
 
     String use = XPathHelper.valueOf(config, "@use", xpathProcessor);
@@ -271,6 +294,13 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   public String toXml() {
     StringBuilder sb = new StringBuilder("<script");
 
+    // jquery
+    if(jquery != null) {
+      sb.append(" jquery=\"");
+      sb.append(jquery);
+      sb.append("\"");
+    }
+    
     // use
     if (use != null) {
       sb.append(" use=\"");
@@ -332,17 +362,22 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    */
   public String toString() {
     StringBuilder sb = new StringBuilder("script [");
-
-    // use
-    if (use != null) {
-      sb.append(" use=\"");
-      sb.append(use.toString().toLowerCase());
-      sb.append("\"");
-    }
-
+    
     // The source
     sb.append("src=");
     sb.append(href);
+    
+    // jquery
+    if(jquery != null) {
+      sb.append(";jquery=");
+      sb.append(jquery);
+    }
+
+    // use
+    if (use != null) {
+      sb.append(";use=");
+      sb.append(use.toString().toLowerCase());
+    }
 
     // type
     if (type != null) {

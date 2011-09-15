@@ -47,6 +47,9 @@ public class ScriptImplTest {
 
   /** Script type or language */
   protected String type = "text/javascript";
+  
+  /** Script type or language */
+  protected String jquery = "1.6";
 
   /** The character set */
   protected String charset = "utf-8";
@@ -65,7 +68,7 @@ public class ScriptImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    script = new ScriptImpl(href, type, charset, defer);
+    script = new ScriptImpl(href, type, charset, jquery, defer);
     setUpPreliminaries();
   }
   
@@ -95,6 +98,14 @@ public class ScriptImplTest {
   @Test
   public void testGetType() {
     assertEquals(type, script.getType());
+  }
+  
+  /**
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.ScriptImplg#getJQuery()
+   */
+  @Test
+  public void testGetJQuery() {
+    assertEquals(jquery, script.getJQuery());
   }
 
   /**

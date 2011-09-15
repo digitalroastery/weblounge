@@ -168,6 +168,7 @@
   
   <xsd:element name="script">
     <xsd:complexType>
+      <xsd:attribute name="jquery" type="xsd:string" use="optional" />
       <xsd:attribute name="use" type="useType" use="optional" />
       <xsd:attribute name="src" type="xsd:anyURI" use="required" />
       <xsd:attribute name="type" type="xsd:string" use="required" />
