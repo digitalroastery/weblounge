@@ -161,7 +161,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
       Document stylesXml = TestUtils.parseXMLResponse(response);
-      assertEquals(7, Integer.parseInt(XPathHelper.valueOf(stylesXml, "count(//imagestyle)")));
+      assertEquals(8, Integer.parseInt(XPathHelper.valueOf(stylesXml, "count(//imagestyle)")));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
