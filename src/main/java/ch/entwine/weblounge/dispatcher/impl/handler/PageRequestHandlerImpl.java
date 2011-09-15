@@ -121,44 +121,11 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     // Determine the editing state
     boolean isEditing = RequestUtils.isEditingState(request);
 
-    // Create the set of tags that identify the page
-    CacheTagSet cacheTags = createCacheTags(request);
-
     // Check if the request is controlled by an action.
     Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
 
-    // Check if the page is already part of the cache. If so, our task is
-    // already done!
-    if (request.getVersion() == Resource.LIVE && !isEditing && action == null) {
-      long validTime = Renderer.DEFAULT_VALID_TIME;
-      long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
-
-      // Check if the page is already part of the cache
-      if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
-        logger.debug("Page handler answered request for {} from cache", request.getUrl());
-        return true;
-      }
-
-      processingMode = Mode.Cached;
-    } else if (Http11Constants.METHOD_HEAD.equals(requestMethod)) {
-      // handle HEAD requests
-      Http11Utils.startHeadResponse(response);
-      processingMode = Mode.Head;
-    } else if (request.getVersion() == Resource.WORK) {
-      response.setMaximumValidTime(0);
-    }
-
-    // Add the cache tags (in addition to what the action handler might have
-    // set already)
-    response.addTags(cacheTags);
-
-    // Set the default maximum render and valid times for pages
-    response.setMaximumRecheckTime(Renderer.DEFAULT_RECHECK_TIME);
-    response.setMaximumValidTime(Renderer.DEFAULT_VALID_TIME);
-
     // Get the renderer id that has been registered with the url. For this,
-    // we
-    // first have to load the page data, then get the associated renderer
+    // we first have to load the page data, then get the associated renderer
     // bundle.
     try {
       Page page = null;
@@ -217,9 +184,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         }
       }
 
-      // Add the resource id to the cache
-      response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
-
       // Is it published?
       if (!page.isPublished() && !(page.getVersion() == Resource.WORK)) {
         logger.debug("Access to unpublished page {}", pageURI);
@@ -245,6 +209,38 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         DispatchUtils.sendAccessDenied(request, response);
         return true;
       }
+
+      // Create the set of tags that identify the page
+      CacheTagSet cacheTags = createCacheTags(request);
+
+      // Check if the page is already part of the cache. If so, our task is
+      // already done!
+      if (request.getVersion() == Resource.LIVE && !isEditing && action == null) {
+        long validTime = Renderer.DEFAULT_VALID_TIME;
+        long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+
+        // Check if the page is already part of the cache
+        if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
+          logger.debug("Page handler answered request for {} from cache", request.getUrl());
+          return true;
+        }
+
+        processingMode = Mode.Cached;
+      } else if (Http11Constants.METHOD_HEAD.equals(requestMethod)) {
+        // handle HEAD requests
+        Http11Utils.startHeadResponse(response);
+        processingMode = Mode.Head;
+      } else if (request.getVersion() == Resource.WORK) {
+        response.setMaximumValidTime(0);
+      }
+
+      // Add the cache tags (in addition to what the action handler might have
+      // set already)
+      response.addTags(cacheTags);
+
+      // Set the default maximum render and valid times for pages
+      response.setMaximumRecheckTime(Renderer.DEFAULT_RECHECK_TIME);
+      response.setMaximumValidTime(Renderer.DEFAULT_VALID_TIME);
 
       // Store the page in the request
       request.setAttribute(WebloungeRequest.PAGE, page);
