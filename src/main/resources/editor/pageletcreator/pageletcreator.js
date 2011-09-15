@@ -24,6 +24,12 @@ steal.plugins('jquery',
 			this.enabled = true;
 			this._hide();
 			this.options.runtime.getSiteModules(this.callback('_initViews', el));
+			
+			$(window).resize($.proxy(function() {
+				if(!this.element.is(":visible")) return;
+				this._calculateHeight();
+			}, this));
+
 	    },
 	    
 	    _initViews: function(el, modules) {
@@ -74,6 +80,7 @@ steal.plugins('jquery',
 	    	if(!this.enabled) return;
 	    	$("body").css("margin-top","185px");
 	    	this.element.show();
+	    	this._calculateHeight();
 	    },
 	    
 	    enable: function() {
@@ -120,7 +127,23 @@ steal.plugins('jquery',
 	    			tabContent.append('<div id="' + pagelet.id + '" class="wbl-draggable ui-widget-content" module="' + module + '">' + pagelet.id + '</div>');
 	    		});
 	    		this._updateDraggable();
+	    		this._calculateHeight();
 	    	}, this));
+	    },
+	    
+	    _calculateHeight: function() {
+	    	if(!this.enabled) return;
+	    	var elements = this.element.find('#wbl-tabContent').children();
+	    	if(elements.length < 2) return;
+	    	var firstTop = elements.first().position().top;
+	    	var lastTop = elements.last().position().top;
+	    	if(firstTop == lastTop) {
+	    		this.element.css('height', '130px');
+	    		$("body").css("margin-top","185px");
+	    	} else {
+	    		this.element.css('height', '170px');
+	    		$("body").css("margin-top","225px");
+	    	}
 	    },
 	    
 	    "li a click": function(el, ev) {
