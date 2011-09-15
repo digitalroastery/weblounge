@@ -30,5 +30,11 @@ public interface EditingState {
 
   /** Name of the request parameter that will trigger editing support */
   String WORKBENCH_PARAM = "edit";
+  
+  /** Name of the request parameter for the environment mode */
+  String WORKBENCH_ENVIRONMENT_PARAM = "environment";
+  
+  /** Name of the request parameter for the editor uri */
+  String WORKBENCH_EDITOR_PARAM = "editor";
 
 }
