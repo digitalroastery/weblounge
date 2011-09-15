@@ -4,8 +4,8 @@
 	<head>
 		<title>Weblounge Test Site</title>
 		<webl:generator/>
-		<webl:headers/>
 		<webl:workbench/>
+		<webl:headers/>
 	</head>
 	<body>
 		<webl:composer name="main"/>
