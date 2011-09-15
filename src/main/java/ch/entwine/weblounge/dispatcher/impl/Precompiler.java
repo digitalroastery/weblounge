@@ -129,7 +129,7 @@ public class Precompiler {
 
       // Prepare the mock request and response objects
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setLocalAddr(site.getURL().toExternalForm());
+      request.setLocalAddr(site.getConnector().toExternalForm());
       request.setServletPath("");
       MockHttpServletResponse response = new MockHttpServletResponse();
 

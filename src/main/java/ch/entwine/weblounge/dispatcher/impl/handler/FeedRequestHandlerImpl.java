@@ -419,7 +419,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
 
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setLocalAddr(site.getURL().toExternalForm());
+      request.setLocalAddr(site.getConnector().toExternalForm());
       request.setAttribute(WebloungeRequest.PAGE, page);
       request.setAttribute(WebloungeRequest.COMPOSER, composer);
       request.setAttribute(WebloungeRequest.PAGELET, pagelet);
