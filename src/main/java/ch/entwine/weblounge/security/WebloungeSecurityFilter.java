@@ -22,6 +22,7 @@ package ch.entwine.weblounge.security;
 
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.osgi.framework.Bundle;
@@ -146,11 +147,11 @@ public class WebloungeSecurityFilter implements Filter {
    *          the new site
    */
   void addSite(Site site) {
-    for (URL url : site.getURLs()) {
-      String hostName = url.getHost();
+    for (SiteURL connector : site.getConnectors()) {
+      String hostName = connector.getURL().getHost();
       Site registeredFirst = sitesByServerName.get(hostName);
       if (registeredFirst != null && !site.equals(registeredFirst)) {
-        logger.warn("Another site is already registered to " + url);
+        logger.warn("Another site is already registered to " + connector);
         continue;
       }
       sitesByServerName.put(hostName, site);
