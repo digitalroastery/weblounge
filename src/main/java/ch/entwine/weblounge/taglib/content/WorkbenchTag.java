@@ -25,6 +25,8 @@ import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 
 import javax.servlet.http.Cookie;
@@ -39,7 +41,9 @@ public class WorkbenchTag extends WebloungeTag {
   private static final long serialVersionUID = -498800954917968929L;
 
   /** Path to the workbench script */
-  public static final String WORKBENCH_SCRIPT = "<script src=\"/weblounge/steal/steal.js?editor,development\"></script>";
+  public static final String WORKBENCH_SCRIPT = "<script src=\"/%1$2s/steal/steal.js?editor,%2$2s\"></script>";
+  private static final String DEFAULT_ENVIRONMENT_PARAM = "production";
+  private static final String DEFAULT_EDITOR_PARAM = "weblounge";
 
   /**
    * Writes the workbench script tag to the output.
@@ -81,8 +85,16 @@ public class WorkbenchTag extends WebloungeTag {
   }
 
   private void writeWorkbenchScript() throws JspException {
+    String environment = DEFAULT_ENVIRONMENT_PARAM;
+    String editorUri = DEFAULT_EDITOR_PARAM;
+    String requestEnvironmentParam = request.getParameter(EditingState.WORKBENCH_ENVIRONMENT_PARAM);
+    String requestEditorParam = request.getParameter(EditingState.WORKBENCH_EDITOR_PARAM);
+    if(!StringUtils.isBlank(requestEnvironmentParam)) 
+      environment = requestEnvironmentParam;
+    if(!StringUtils.isBlank(requestEditorParam)) 
+      editorUri = requestEditorParam;
     try {
-      pageContext.getOut().write(WORKBENCH_SCRIPT);
+      pageContext.getOut().write(String.format(WORKBENCH_SCRIPT, editorUri, environment));
     } catch (IOException e) {
       throw new JspException(e);
     }
