@@ -31,7 +31,6 @@ import ch.entwine.weblounge.common.security.UserListener;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 
 import java.io.Serializable;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -282,22 +281,39 @@ public interface Site extends Customizable, RequestListener, Serializable {
   void removeUserListener(UserListener listener);
 
   /**
-   * Sets a default hostname for the site. This hostname is used when links are
-   * being generated for the site.
+   * Adds <code>url</code> to the list of site urls. Note that the url that is
+   * added first will be considered the default hostname for this site unless
+   * one of them is explicitly marked as such.
    * 
    * @param url
-   *          the default hostname
+   *          the url to add
    */
-  void setDefaultURL(URL url);
+  void addConnector(SiteURL url);
 
   /**
-   * Adds <code>hostname</code> to the list of hostnames. Note that the hostname
-   * that is added first will be considered the default hostname for this site.
+   * Returns the primary url used to reach this site. This method will return
+   * the default url as found in the <code>&lt;url&gt;</code> section of
+   * <code>site.xml</code>.
    * 
-   * @param url
-   *          the hostname to add
+   * @return the site's primary url
    */
-  void addURL(URL url);
+  SiteURL getConnector();
+
+  /**
+   * Returns the primary url used to reach this site in the given environment.
+   * This method will return the default url as found in the
+   * <code>&lt;url&gt;</code> section of <code>site.xml</code>.
+   * 
+   * @return the site's primary url for the given environment
+   */
+  SiteURL getConnector(Environment environment);
+
+  /**
+   * Returns the urls that will lead to this site.
+   * 
+   * @return the registered site urls
+   */
+  SiteURL[] getConnectors();
 
   /**
    * Removes <code>hostname</code> from the list of hostnames. The method
@@ -308,23 +324,7 @@ public interface Site extends Customizable, RequestListener, Serializable {
    *          the hostname to remove
    * @return <code>true</code> if the hostname was removed
    */
-  boolean removeURL(URL url);
-
-  /**
-   * Returns the primary url used to reach this site. This method will return
-   * the default url as found in the <code>&lt;url&gt;</code> section of
-   * <code>site.xml</code>.
-   * 
-   * @return the site's primary url
-   */
-  URL getURL();
-
-  /**
-   * Returns the urls that will lead to this site.
-   * 
-   * @return the registered site urls
-   */
-  URL[] getURLs();
+  boolean removeConnector(SiteURL url);
 
   /**
    * Adds <code>language</code> to the site languages.

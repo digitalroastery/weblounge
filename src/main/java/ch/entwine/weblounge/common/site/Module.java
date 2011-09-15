@@ -111,6 +111,16 @@ public interface Module extends Customizable {
   WebUrl getUrl();
 
   /**
+   * Returns the url that is used to link to elements inside the module, e. g.
+   * scripts, style definitions or images in the given environment.
+   * 
+   * @param environment
+   *          the environment
+   * @return the module url
+   */
+  WebUrl getUrl(Environment environment);
+
+  /**
    * Starts the module. This includes starting the module services and sending a
    * <code>moduleStarted</code> event to registered module listeners.
    * 
@@ -332,8 +342,8 @@ public interface Module extends Customizable {
    * </pre>
    * 
    * Use {@link #fromXml(org.wc3.dom.Node))} or
-   * {@link #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)} to create a <code>Module</code>
-   * from the serialized output of this method.
+   * {@link #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)} to create a
+   * <code>Module</code> from the serialized output of this method.
    * 
    * @return the <code>XML</code> representation of the module
    * @see #fromXml(org.w3c.dom.Node)

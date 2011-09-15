@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.request;
 
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -34,31 +35,55 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface WebloungeRequest extends HttpServletRequest {
 
-  /** The attribute name used to store the {@link ch.entwine.weblounge.common.security.User} in the session */
+  /**
+   * The attribute name used to store the
+   * {@link ch.entwine.weblounge.common.security.User} in the session
+   */
   String USER = "weblounge-user";
 
-  /** The attribute name used to store the {@link ch.entwine.weblounge.common.language.Language} in the session */
+  /**
+   * The attribute name used to store the
+   * {@link ch.entwine.weblounge.common.language.Language} in the session
+   */
   String LANGUAGE = "weblounge-language";
 
-  /** The attribute name used to store the {@link ch.entwine.weblounge.common.site.Site} in the session */
+  /**
+   * The attribute name used to store the
+   * {@link ch.entwine.weblounge.common.site.Site} in the session
+   */
   String SITE = "weblounge-site";
 
   /** The attribute name used to store the {@link java.net.UR} in the session */
   String URL = "weblounge-url";
 
-  /** The attribute name used to store the {@link ch.entwine.weblounge.common.content.page.Page} in the request */
+  /**
+   * The attribute name used to store the
+   * {@link ch.entwine.weblounge.common.content.page.Page} in the request
+   */
   String PAGE = "weblounge-page";
 
-  /** The attribute name used to store the {@link ch.entwine.weblounge.common.site.Action} in the request */
+  /**
+   * The attribute name used to store the
+   * {@link ch.entwine.weblounge.common.site.Action} in the request
+   */
   String ACTION = "weblounge-action";
 
-  /** The attribute name used to store the {@link ch.entwine.weblounge.common.content.Renderer} in the request */
+  /**
+   * The attribute name used to store the
+   * {@link ch.entwine.weblounge.common.content.Renderer} in the request
+   */
   String TEMPLATE = "weblounge-template";
 
-  /** The attribute name used to store the {@link ch.entwine.weblounge.common.content.page.Composer} in the request */
+  /**
+   * The attribute name used to store the
+   * {@link ch.entwine.weblounge.common.content.page.Composer} in the request
+   */
   String COMPOSER = "weblounge-composer";
 
-  /** The attribute name used to store the {@link ch.entwine.weblounge.common.content.page.Pagelet} in the request */
+  /**
+   * The attribute name used to store the
+   * {@link ch.entwine.weblounge.common.content.page.Pagelet} in the request
+   */
   String PAGELET = "weblounge-pagelet";
 
   /**
@@ -93,6 +118,14 @@ public interface WebloungeRequest extends HttpServletRequest {
    * @see #getUrl()
    */
   WebUrl getRequestedUrl();
+
+  /**
+   * Returns the request environment as determined by the hostname and the site
+   * settings.
+   * 
+   * @return the request environment
+   */
+  Environment getEnvironment();
 
   /**
    * Returns the current user.

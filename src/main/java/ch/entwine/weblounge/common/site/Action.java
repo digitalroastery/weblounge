@@ -126,11 +126,20 @@ public interface Action extends Composeable, Customizable {
       throws IOException, ActionException;
 
   /**
-   * Returns the url to this action.
+   * Returns the url to this action. The url will use the site's default url.
    * 
    * @return the action url
    */
   WebUrl getUrl();
+
+  /**
+   * Returns the url to this action in the given environment.
+   * 
+   * @param environment
+   *          the environment
+   * @return the action url
+   */
+  WebUrl getUrl(Environment environment);
 
   /**
    * Adds the given flavor to the list of supported flavors.
@@ -242,7 +251,7 @@ public interface Action extends Composeable, Customizable {
    * in order to not interfere with their ancestor's implementation.
    */
   void passivate();
-  
+
   /**
    * Returns an <code>XML</code> representation of the action configuration,
    * that will look similar to the following example:
@@ -253,7 +262,8 @@ public interface Action extends Composeable, Customizable {
    * &lt;/action&gt;
    * </pre>
    * 
-   * Use {@link #fromXml(org.w3c.dom.Node))} or {@link #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)} to create a
+   * Use {@link #fromXml(org.w3c.dom.Node))} or
+   * {@link #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)} to create a
    * <code>ActionConfiguration</code> from the serialized output of this method.
    * 
    * @return the <code>XML</code> representation of the action configuration
