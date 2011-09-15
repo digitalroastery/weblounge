@@ -87,21 +87,21 @@
   <xsd:element name="url">
     <xsd:complexType>
       <xsd:simpleContent>
-        <xsd:extension base="xsd:anyURI">
+        <xsd:extension base="xsd:string">
           <xsd:attribute name="default" type="xsd:boolean" />
-          <xsd:attribute name="environment">
-            <xsd:simpleType>
-              <xsd:restriction base="xsd:string">
-                <xsd:enumeration value="production" />
-                <xsd:enumeration value="staging" />
-                <xsd:enumeration value="development" />
-              </xsd:restriction>
-            </xsd:simpleType>
-          </xsd:attribute>
+          <xsd:attribute name="environment" type="environment" />
         </xsd:extension>
       </xsd:simpleContent>
     </xsd:complexType>
   </xsd:element>
+
+  <xsd:simpleType name="environment">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="production" />
+      <xsd:enumeration value="staging" />
+      <xsd:enumeration value="development" />
+    </xsd:restriction>
+  </xsd:simpleType>
 
   <xsd:element name="templates">
     <xsd:complexType>
