@@ -38,6 +38,12 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- thirdparty -->
 
     <dependency>
