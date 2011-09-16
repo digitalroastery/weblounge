@@ -1018,14 +1018,22 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
       // A mime type would be nice as well
       if (StringUtils.isBlank(mimeType)) {
-        InputStream is = null;
-        try {
-          is = new FileInputStream(uploadedFile);
-          mimeType = mimeTypeDetector.detect(is);
-        } catch (IOException e) {
-          logger.warn("Error detecting mime type: {}", e.getMessage());
-        } finally {
-          IOUtils.closeQuietly(is);
+        if(fileName.endsWith(".ogg")) {
+          mimeType = "video/ogg";
+        } else if(fileName.endsWith(".mp4")) {
+          mimeType = "video/mp4";
+        } else if(fileName.endsWith(".webm")) {
+          mimeType = "video/webm";
+        } else {
+          InputStream is = null;
+          try {
+            is = new FileInputStream(uploadedFile);
+            mimeType = mimeTypeDetector.detect(is);
+          } catch (IOException e) {
+            logger.warn("Error detecting mime type: {}", e.getMessage());
+          } finally {
+            IOUtils.closeQuietly(is);
+          }
         }
       }
 
