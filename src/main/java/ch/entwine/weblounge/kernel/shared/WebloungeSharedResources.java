@@ -62,6 +62,9 @@ public class WebloungeSharedResources implements ManagedService {
 
   /** Option name for the external location of shared resources */
   public static final String OPT_EXT_RESOURCES = "resources.external.dir";
+  
+  /** Name of the current jQuery version */
+  public static final String JQUERY_VERSION = "1.6.4";
 
   /** Directory with external resources */
   private File externalResourcesDir = null;
