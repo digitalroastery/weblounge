@@ -255,8 +255,8 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     Site site = securityService.getSite();
     if (site == null) {
       site = getSiteByRequest(httpRequest);
-      securityService.setSite(site);
     }
+    
     boolean isSpecial = StringUtils.isNotBlank(httpRequest.getHeader("X-Weblounge-Special"));
     if (site == null) {
       if (!wellknownFiles.contains(httpRequest.getRequestURI()))
@@ -321,6 +321,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     // Ask the registered request handler if they are willing to handle
     // the request.
     try {
+      securityService.setSite(site);
       for (RequestHandler handler : requestHandler) {
         try {
           logger.trace("Asking {} to serve {}", handler, request);
@@ -352,6 +353,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         }
       }
     } finally {
+      securityService.setSite(null);
       response.endResponse();
       logger.debug("Finished processing of {}", httpRequest.getRequestURI());
     }
@@ -401,7 +403,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   void removeRequestListener(RequestListener listener) {
     requestListeners.remove(listener);
   }
-
+  
   /**
    * Adds <code>listener</code> to the list of dispatch listeners if it has not
    * already been registered. The listener is called every time the current
