@@ -714,7 +714,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @return the bundle
    */
   protected Bundle loadBundle(Site site) {
-    Bundle bundle = FrameworkUtil.getBundle(site.getClass());
+    Bundle bundle = FrameworkUtil.getBundle(this.getClass());
     if (bundle == null)
       return null;
     BundleContext bundleCtx = bundle.getBundleContext();
