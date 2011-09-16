@@ -99,7 +99,7 @@ public class HTMLHeaderTag extends WebloungeTag {
               ((DeclarativeHTMLHeadElement)header).configure(request, site, module);
             if(header.getUse().equals(HTMLInclude.Use.Editor)) continue;
             if (header instanceof Script)
-              needsJQuery = ((Script)header).getJQuery() != null;
+              if(((Script)header).getJQuery() != null) needsJQuery = true;
             headElements.add(header);
           }
         } else {
