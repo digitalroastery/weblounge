@@ -114,17 +114,23 @@ public class WebloungeSecurityFilter implements Filter {
   public void doFilter(ServletRequest request, ServletResponse response,
       FilterChain chain) throws IOException, ServletException {
 
+    Site site = null;
     if (request instanceof HttpServletRequest) {
       HttpServletRequest httpRequest = (HttpServletRequest) request;
-      Site site = findSiteByRequest(httpRequest);
-      securityService.setSite(site);
+      site = findSiteByRequest(httpRequest);
       if (site != null)
         logger.debug("Mapped {} to site '{}'", httpRequest.getPathInfo(), site.getIdentifier());
       else
         logger.debug("No site available for request to {}", httpRequest.getPathInfo());
     }
 
+    // Set the site on the request for the time being
+    securityService.setSite(site);
+
     chain.doFilter(request, response);
+    
+    // Done. Make sure the thread is not associated with a site anymore
+    securityService.setSite(site);
   }
 
   /**
