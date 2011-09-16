@@ -134,7 +134,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   public void configure(WebloungeRequest request, Site site, Module module)
       throws IllegalStateException {
     if (href != null && href.matches(".*\\$\\{.*\\}.*")) {
-      href = ConfigurationUtils.processTemplate(href, module);
+      href = ConfigurationUtils.processTemplate(href, module, request.getEnvironment());
     }
   }
   

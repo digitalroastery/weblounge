@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.impl.content.page.LinkImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Environment;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -97,6 +98,7 @@ public class PageletRendererImplTest {
   public void setUp() throws Exception {
     setUpPreliminaries();
     renderer = new PageletRendererImpl();
+    renderer.setEnvironment(Environment.Production);
     renderer.setIdentifier(identifier);
     renderer.setRenderer(rendererUrl);
     renderer.addRenderer(feedRendererUrl, feedRendererType);

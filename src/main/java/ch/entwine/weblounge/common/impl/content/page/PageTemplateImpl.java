@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
@@ -153,7 +154,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   public void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException {
     if (!urlTemplatesProcessed)
-      processURLTemplates(request.getSite());
+      processURLTemplates(request.getSite(), request.getEnvironment());
     URL renderer = renderers.get(RendererType.Page.toString().toLowerCase());
     includeJSP(request, response, renderer);
   }
@@ -411,19 +412,21 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    * 
    * @param site
    *          the site
+   * @param environment
+   *          the environment
    * @return <code>false</code> if the paths don't end up being real urls,
    *         <code>true</code> otherwise
    */
-  private boolean processURLTemplates(Site site) {
+  private boolean processURLTemplates(Site site, Environment environment) {
     if (site == null)
       return false;
-    
+
     urlTemplatesProcessed = true;
 
     // Process the renderer URL
     for (Map.Entry<String, URL> entry : renderers.entrySet()) {
       URL renderer = entry.getValue();
-      String rendererURL = ConfigurationUtils.processTemplate(renderer.toExternalForm(), site);
+      String rendererURL = ConfigurationUtils.processTemplate(renderer.toExternalForm(), site, environment);
       try {
         renderer = new URL(rendererURL);
         renderers.put(entry.getKey(), renderer);

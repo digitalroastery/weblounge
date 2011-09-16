@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 
 import org.apache.commons.lang.StringUtils;
@@ -63,6 +64,9 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
 
   /** The preview mode */
   protected PagePreviewMode previewMode = PagePreviewMode.None;
+
+  /** The execution environment */
+  protected Environment environment = Environment.Production;
 
   /** Flag to indicate whether template processing in the urls has happened */
   private boolean urlTemplatesProcessed = false;
@@ -105,7 +109,17 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void setModule(Module module) {
     this.module = module;
-    processURLTemplates(module);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.PageletRenderer#setEnvironment(ch.entwine.weblounge.common.site.Environment)
+   */
+  public void setEnvironment(Environment environment) {
+    if (urlTemplatesProcessed && !environment.equals(this.environment))
+      urlTemplatesProcessed = false;
+    this.environment = environment;
   }
 
   /**
@@ -114,19 +128,25 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * 
    * @param module
    *          the module
+   * @param environment
+   *          the environment
    * @return <code>false</code> if the paths don't end up being real urls,
    *         <code>true</code> otherwise
    */
-  private boolean processURLTemplates(Module module) {
+  private boolean processURLTemplates(Module module, Environment environment) {
     if (module == null || module.getSite() == null)
       return false;
 
-    urlTemplatesProcessed = true;
+    if (environment == null)
+      throw new IllegalStateException("Environment has not been set");
+
+    this.urlTemplatesProcessed = true;
+    this.environment = environment;
 
     // Process the renderer URL
     for (Map.Entry<String, URL> entry : renderers.entrySet()) {
       URL renderer = entry.getValue();
-      String rendererURL = ConfigurationUtils.processTemplate(renderer.toExternalForm(), module);
+      String rendererURL = ConfigurationUtils.processTemplate(renderer.toExternalForm(), module, environment);
       try {
         renderer = new URL(rendererURL);
         renderers.put(entry.getKey(), renderer);
@@ -138,7 +158,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
 
     // Process the editor URL
     if (editor != null) {
-      String editorURL = ConfigurationUtils.processTemplate(editor.toExternalForm(), module);
+      String editorURL = ConfigurationUtils.processTemplate(editor.toExternalForm(), module, environment);
       try {
         editor = new URL(editorURL);
       } catch (MalformedURLException e) {
@@ -206,7 +226,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   @Override
   public URL getRenderer(String type) {
     if (!urlTemplatesProcessed)
-      processURLTemplates(module);
+      processURLTemplates(module, environment);
     return super.getRenderer(type);
   }
 
@@ -227,7 +247,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public URL getEditor() {
     if (!urlTemplatesProcessed)
-      processURLTemplates(module);
+      processURLTemplates(module, environment);
     return editor;
   }
 
@@ -240,7 +260,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   public void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException {
     if (!urlTemplatesProcessed)
-      processURLTemplates(module);
+      processURLTemplates(module, request.getEnvironment());
     URL renderer = renderers.get(RendererType.Page.toString().toLowerCase());
     includeJSP(request, response, renderer);
   }
@@ -254,7 +274,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   public void renderAsEditor(WebloungeRequest request,
       WebloungeResponse response) throws RenderException {
     if (!urlTemplatesProcessed)
-      processURLTemplates(module);
+      processURLTemplates(module, request.getEnvironment());
     includeJSP(request, response, editor);
   }
 

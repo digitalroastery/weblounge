@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.impl.util.config;
 
 import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteURL;
@@ -633,16 +634,19 @@ public final class ConfigurationUtils {
    *          the text to process
    * @param module
    *          the module
+   * @param environment
+   *          the environment
    * @return the processed text
    */
-  public static String processTemplate(String text, Module module) {
+  public static String processTemplate(String text, Module module,
+      Environment environment) {
     text = processTemplate(text);
 
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = module.getSite();
 
     StringBuffer siteRootReplacement = new StringBuffer();
-    siteRootReplacement.append(site.getConnector().toExternalForm());
+    siteRootReplacement.append(site.getConnector(environment).toExternalForm());
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
     replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
 
@@ -669,15 +673,18 @@ public final class ConfigurationUtils {
    *          the text to process
    * @param site
    *          the site
+   * @param environment
+   *          the environment
    * @return the processed text
    */
-  public static String processTemplate(String text, Site site) {
+  public static String processTemplate(String text, Site site,
+      Environment environment) {
     text = processTemplate(text);
 
     Map<String, String> replacements = new HashMap<String, String>();
 
     StringBuffer siteRootReplacement = new StringBuffer();
-    siteRootReplacement.append(site.getConnector().toExternalForm());
+    siteRootReplacement.append(site.getConnector(environment).toExternalForm());
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
     replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
 
