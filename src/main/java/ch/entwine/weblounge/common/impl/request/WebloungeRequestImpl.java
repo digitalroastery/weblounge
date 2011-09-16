@@ -134,17 +134,12 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     if (environment != null)
       return environment;
 
-    // The language might very well be encoded as part of the path, so asking
-    // for the url might give us the language for free.
-    if (url == null)
-      url = getUrl();
-
     // Set the environment to production by default
     environment = Environment.Production;
     
     // Find the environment by looking at the url
     for (SiteURL connector : site.getConnectors()) {
-      if (url.toString().startsWith(connector.toExternalForm())) {
+      if (super.getRequestURL().toString().startsWith(connector.toExternalForm())) {
         environment = connector.getEnvironment();
         break;
       }
