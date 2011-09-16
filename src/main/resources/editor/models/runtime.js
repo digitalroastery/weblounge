@@ -16,7 +16,7 @@ steal.then('jsonix')
 			runtime.path = $(xml).find('ui path:first').text();
 			runtime.user = new Object();
 			var userElement = $(xml).find('security user:first');
-			runtime.user.name = $(xml).find('security user name:first').text();
+			runtime.user.name = userElement.text();
 			runtime.user.login = userElement.attr('id');
 			runtime.user.realm = userElement.attr('realm');
 			runtime.site = new Object();

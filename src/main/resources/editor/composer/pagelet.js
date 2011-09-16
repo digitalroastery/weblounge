@@ -58,8 +58,8 @@ steal.plugins('jqueryui/dialog',
     	
     	// Load Pagelet CSS
     	$(pageletEditor).find('link').each(function(index) {
-    		var test = $('head link[href="' + $(this).attr('href') + '"][rel="stylesheet"]');
-    		if(test.length > 0) return;
+    		var headLink = $('head link[href="' + $(this).attr('href') + '"][rel="stylesheet"]');
+    		if(headLink.length > 0) return;
     		$("head").append("<link>");
     	    var css = $("head").children(":last");
     	    css.attr({
