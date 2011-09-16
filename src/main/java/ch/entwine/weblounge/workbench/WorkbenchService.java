@@ -20,18 +20,19 @@
 
 package ch.entwine.weblounge.workbench;
 
-import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -213,12 +214,16 @@ public class WorkbenchService {
    * @param pageletIndex
    *          the pagelet index
    * @param language
+   *          the environment
+   * @param environment
+   *          the execution environment
    * @return the pagelet editor
    * @throws IOException
    *           if reading the pagelet fails
    */
   public PageletEditor getEditor(Site site, ResourceURI pageURI,
-      String composerId, int pageletIndex, String language) throws IOException {
+      String composerId, int pageletIndex, String language,
+      Environment environment) throws IOException {
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
     if (composerId == null)
@@ -247,7 +252,7 @@ public class WorkbenchService {
 
     Pagelet pagelet = composer.getPagelet(pageletIndex);
     pagelet = new TrimpathPageletWrapper(pagelet);
-    PageletEditor pageletEditor = new PageletEditor(pagelet, pageURI, composerId, pageletIndex);
+    PageletEditor pageletEditor = new PageletEditor(pagelet, pageURI, composerId, pageletIndex, environment);
 
     // Load the contents of the editor url
     URL editorURL = pageletEditor.getEditorURL();
@@ -306,12 +311,15 @@ public class WorkbenchService {
    *          the pagelet index
    * @param language
    *          the language
+   * @param environment
+   *          the environment
    * @return the pagelet renderer
    * @throws IOException
    *           if reading the pagelet fails
    */
   public String getRenderer(Site site, ResourceURI pageURI, String composerId,
-      int pageletIndex, String language) throws IOException {
+      int pageletIndex, String language, Environment environment)
+      throws IOException {
 
     Page page = getPage(site, pageURI);
     if (page == null) {
@@ -339,13 +347,14 @@ public class WorkbenchService {
       return null;
     }
 
-    Renderer renderer = module.getRenderer(pagelet.getIdentifier());
+    PageletRenderer renderer = module.getRenderer(pagelet.getIdentifier());
     if (renderer == null) {
       logger.warn("Client requested pagelet renderer for non existing renderer on pagelet {}", pagelet.getIdentifier());
       return null;
     }
 
     // Load the contents of the renderer url
+    renderer.setEnvironment(environment);
     URL rendererURL = renderer.getRenderer();
     String rendererContent = null;
     if (rendererURL != null) {

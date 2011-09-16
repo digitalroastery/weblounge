@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -65,14 +66,25 @@ public class PageletEditor {
   /** The pagelet's editor content */
   protected String editorContents = null;
 
+  /** The environment */
+  protected Environment environment = null;
+
   /**
    * Creates a new pagelet editor for the given pagelet.
    * 
    * @param pagelet
    *          the pagelet
+   * @param uri
+   *          the uri
+   * @param composer
+   *          the composer id
+   * @param pageletIndex
+   *          the pagelet index
+   * @param environment
+   *          the execution environment
    */
   public PageletEditor(Pagelet pagelet, ResourceURI uri, String composer,
-      int pageletIndex) {
+      int pageletIndex, Environment environment) {
     if (pagelet == null)
       throw new IllegalArgumentException("Pagelet cannot be null");
     if (uri == null)
@@ -86,11 +98,13 @@ public class PageletEditor {
     this.uri = uri;
     this.composerId = composer;
     this.pageletIndex = pageletIndex;
+    this.environment = environment;
 
     Site site = uri.getSite();
     Module module = site.getModule(pagelet.getModule());
     if (module != null) {
       renderer = module.getRenderer(pagelet.getIdentifier());
+      renderer.setEnvironment(environment);
     }
   }
 
@@ -204,7 +218,7 @@ public class PageletEditor {
    */
   public String toXml() {
     StringBuffer buf = new StringBuffer();
-    
+
     // head
     buf.append("<pageleteditor ");
     buf.append("name=\"").append(renderer.getName()).append("\" ");
@@ -243,7 +257,7 @@ public class PageletEditor {
     // HTML head elements
     Module m = renderer.getModule();
     for (HTMLHeadElement headElement : renderer.getHTMLHeaders()) {
-      buf.append(ConfigurationUtils.processTemplate(headElement.toXml(), m));
+      buf.append(ConfigurationUtils.processTemplate(headElement.toXml(), m, environment));
     }
 
     buf.append("</pageleteditor>");

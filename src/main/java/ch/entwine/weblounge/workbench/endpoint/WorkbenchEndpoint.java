@@ -23,7 +23,9 @@ package ch.entwine.weblounge.workbench.endpoint;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.SiteManager;
 import ch.entwine.weblounge.workbench.PageletEditor;
@@ -83,11 +85,20 @@ public class WorkbenchEndpoint {
     if (site == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
+    // What is the current environment?
+    Environment environment = Environment.Production;
+    for (SiteURL url : site.getConnectors()) {
+      if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
+        environment = url.getEnvironment();
+        break;
+      }
+    }
+
     // Return the editor
     ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.WORK);
     PageletEditor editor;
     try {
-      editor = workbench.getEditor(site, uri, composerId, pagelet, language);
+      editor = workbench.getEditor(site, uri, composerId, pagelet, language, environment);
     } catch (IOException e) {
       throw new WebApplicationException(e);
     }
@@ -110,10 +121,19 @@ public class WorkbenchEndpoint {
     if(site == null)
       throw new WebApplicationException(Status.NOT_FOUND);
     
+    // What is the current environment?
+    Environment environment = Environment.Production;
+    for (SiteURL url : site.getConnectors()) {
+      if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
+        environment = url.getEnvironment();
+        break;
+      }
+    }
+
     ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.WORK);
     String renderer;
     try {
-      renderer = workbench.getRenderer(site, uri, composerId, pageletIndex, language);
+      renderer = workbench.getRenderer(site, uri, composerId, pageletIndex, language, environment);
     } catch (IOException e) {
       throw new WebApplicationException(e);
     }
