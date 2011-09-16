@@ -22,6 +22,7 @@ package ch.entwine.weblounge.ui.runtime;
 
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider;
 
@@ -65,9 +66,9 @@ public class UIRuntimeInformation implements RuntimeInformationProvider {
    * 
    * @see ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider#getRuntimeInformation(ch.entwine.weblounge.common.site.Site,
    *      ch.entwine.weblounge.common.security.User,
-   *      ch.entwine.weblounge.common.language.Language)
+   *      ch.entwine.weblounge.common.language.Language, Environment)
    */
-  public String getRuntimeInformation(Site site, User user, Language language) {
+  public String getRuntimeInformation(Site site, User user, Language language, Environment environment) {
     if (contextPath == null)
       return null;
     StringBuilder buf = new StringBuilder();
