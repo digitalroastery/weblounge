@@ -21,9 +21,11 @@
 package ch.entwine.weblounge.kernel.endpoint;
 
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteException;
+import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.kernel.SiteManager;
 
 import org.apache.commons.lang.StringUtils;
@@ -87,13 +89,16 @@ public class SitesEndpoint {
    * Returns the site with the given identifier or a <code>404</code> if the
    * site could not be found.
    * 
+   * @param request
+   *          the request
    * @param siteId
    *          the site identifier
    * @return the site
    */
   @GET
   @Path("/{site}")
-  public Response getSite(@PathParam("site") String siteId) {
+  public Response getSite(@Context HttpServletRequest request,
+      @PathParam("site") String siteId) {
 
     // Check the parameters
     if (siteId == null)
@@ -105,11 +110,20 @@ public class SitesEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
+    // What is the current environment?
+    Environment environment = Environment.Production;
+    for (SiteURL url : site.getConnectors()) {
+      if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
+        environment = url.getEnvironment();
+        break;
+      }
+    }
+
     // Create the response
     String siteXml = site.toXml();
     siteXml = siteXml.replaceAll("<password.*</password>", "");
     siteXml = siteXml.replaceAll("( xmlns.*?>)", ">");
-    siteXml = ConfigurationUtils.processTemplate(siteXml, site);
+    siteXml = ConfigurationUtils.processTemplate(siteXml, site, environment);
     ResponseBuilder response = Response.ok(siteXml);
     return response.build();
   }
@@ -205,13 +219,16 @@ public class SitesEndpoint {
    * Returns the modules of the site with the given identifier or a
    * <code>404</code> if the site could not be found.
    * 
+   * @param request
+   *          the request
    * @param siteId
    *          the site identifier
    * @return the site
    */
   @GET
   @Path("/{site}/modules/{module}")
-  public Response getModules(@PathParam("site") String siteId, @PathParam("module") String moduleId) {
+  public Response getModules(@Context HttpServletRequest request,
+      @PathParam("site") String siteId, @PathParam("module") String moduleId) {
 
     // Check the parameters
     if (siteId == null)
@@ -227,6 +244,15 @@ public class SitesEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
+    // What is the current environment?
+    Environment environment = Environment.Production;
+    for (SiteURL url : site.getConnectors()) {
+      if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
+        environment = url.getEnvironment();
+        break;
+      }
+    }
+
     Module m = site.getModule(moduleId);
     if (m == null)
       throw new WebApplicationException(Status.NOT_FOUND);
@@ -234,7 +260,7 @@ public class SitesEndpoint {
     // Create the response
     String moduleXml = m.toXml();
     moduleXml = moduleXml.replaceAll("( xmlns.*?>)", ">");
-    moduleXml = ConfigurationUtils.processTemplate(moduleXml, m);
+    moduleXml = ConfigurationUtils.processTemplate(moduleXml, m, environment);
     ResponseBuilder response = Response.ok(moduleXml);
     return response.build();
   }

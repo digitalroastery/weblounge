@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.SiteManager;
@@ -101,7 +102,7 @@ public class RuntimeInformationEndpoint {
       for (Map.Entry<String, RuntimeInformationProvider> entry : runtimeInfoProviders.entrySet()) {
         String component = entry.getKey();
         RuntimeInformationProvider provider = entry.getValue();
-        String runtimeInformation = provider.getRuntimeInformation(site, user, language);
+        String runtimeInformation = provider.getRuntimeInformation(site, user, language, Environment.Production);
         if (StringUtils.isNotBlank(runtimeInformation)) {
             if (StringUtils.isNotBlank(component))
               xml.append("<").append(component).append(">");
@@ -140,7 +141,7 @@ public class RuntimeInformationEndpoint {
       if (provider == null)
         throw new WebApplicationException(Status.NOT_FOUND);
 
-      String runtimeInformation = provider.getRuntimeInformation(site, user, language);
+      String runtimeInformation = provider.getRuntimeInformation(site, user, language, Environment.Production);
       if (StringUtils.isNotBlank(runtimeInformation))
         if (StringUtils.isNotBlank(component))
           xml.append("<").append(component).append(">");

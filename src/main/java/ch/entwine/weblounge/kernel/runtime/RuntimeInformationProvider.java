@@ -22,6 +22,7 @@ package ch.entwine.weblounge.kernel.runtime;
 
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 
 /**
@@ -56,8 +57,9 @@ public interface RuntimeInformationProvider {
    *          the current user
    * @param language
    *          the current language
+   * @param environment TODO
    * @return the runtime information
    */
-  String getRuntimeInformation(Site site, User user, Language language);
+  String getRuntimeInformation(Site site, User user, Language language, Environment environment);
 
 }

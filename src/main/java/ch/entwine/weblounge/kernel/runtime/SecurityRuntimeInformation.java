@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 
 import java.util.regex.Matcher;
@@ -49,9 +50,9 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
    * 
    * @see ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider#getRuntimeInformation(ch.entwine.weblounge.common.site.Site,
    *      ch.entwine.weblounge.common.security.User,
-   *      ch.entwine.weblounge.common.language.Language)
+   *      ch.entwine.weblounge.common.language.Language, Environment)
    */
-  public String getRuntimeInformation(Site site, User user, Language language) {
+  public String getRuntimeInformation(Site site, User user, Language language, Environment environment) {
     if (user == null)
       return null;
     String securityXml = user.toXml();
@@ -64,7 +65,7 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
 
     // Remove the password
     securityXml = securityXml.replaceAll("<password.*</password>", "");
-    securityXml = ConfigurationUtils.processTemplate(securityXml, site);
+    securityXml = ConfigurationUtils.processTemplate(securityXml, site, environment);
     
     // Add role information
     StringBuffer roles = new StringBuffer();
