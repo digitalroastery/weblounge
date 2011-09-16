@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.RenderException;
 import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 
 import java.net.URL;
@@ -56,6 +57,14 @@ public interface PageletRenderer extends Renderer {
    *          the preview mode
    */
   void setPreviewMode(PagePreviewMode mode);
+
+  /**
+   * Sets the execution environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment);
 
   /**
    * Returns the preview mode, which defines whether a pagelet will be part of a
