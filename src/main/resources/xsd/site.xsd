@@ -119,6 +119,7 @@
         <xsd:element name="stage" type="xsd:string" minOccurs="0" />
         <xsd:element name="recheck" type="durationType" minOccurs="0" />
         <xsd:element name="valid" type="durationType" minOccurs="0" />
+        <xsd:element ref="includes" minOccurs="0"/>
       </xsd:sequence>
       <xsd:attribute name="id" type="xsd:ID" />
       <xsd:attribute name="composeable" type="xsd:boolean" />
@@ -161,6 +162,15 @@
       <xsd:sequence>
         <xsd:element name="name" type="xsd:string" />
         <xsd:element name="value" type="xsd:string" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="includes">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="link" minOccurs="0" maxOccurs="unbounded" />
+        <xsd:element ref="script" minOccurs="0" maxOccurs="unbounded" />
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>

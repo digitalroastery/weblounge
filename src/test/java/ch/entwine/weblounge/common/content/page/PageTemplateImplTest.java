@@ -24,11 +24,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import ch.entwine.weblounge.common.impl.content.page.LinkImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
+import ch.entwine.weblounge.common.impl.content.page.ScriptImpl;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Test cases for {@link PageTemplateImpl}.
@@ -44,6 +49,12 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
   /** Default page layout */
   protected String layout = "unrestricted";
   
+  /** Cascading style sheet include */
+  protected Link css = new LinkImpl("http://localhost/css.css");
+
+  /** Java script include */
+  protected Script script = new ScriptImpl("http://localhost/javascript.js");
+
   /**
    * @throws java.lang.Exception
    */
@@ -54,6 +65,8 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
     setUpComposeable();
     template.setStage(stage);
     template.setDefaultLayout(layout);
+    template.addHTMLHeader(css);
+    template.addHTMLHeader(script);
   }
 
   /**
@@ -109,4 +122,17 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
     assertEquals(layout, template.getDefaultLayout());
   }
   
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.page.GeneralComposeabl#getHTMLHeaders()
+   * .
+   */
+  @Test
+  public void testGetIncludes() {
+    assertEquals(2, template.getHTMLHeaders().length);
+    List<HTMLHeadElement> includes = Arrays.asList(template.getHTMLHeaders());
+    assertTrue(includes.contains(css));
+    assertTrue(includes.contains(script));
+  }
+
 }
