@@ -130,7 +130,8 @@ public class WebloungeSecurityFilter implements Filter {
     chain.doFilter(request, response);
     
     // Done. Make sure the thread is not associated with a site anymore
-    securityService.setSite(site);
+    securityService.setSite(null);
+    securityService.setUser(null);
   }
 
   /**
