@@ -69,8 +69,10 @@
               ch.entwine.weblounge.common.security,
               ch.entwine.weblounge.common.site,
               javax.persistence,
+              org.apache.commons.lang,
               org.osgi.framework,
               org.osgi.service.component,
+              org.osgi.service.cm,
               org.osgi.service.jdbc,
               org.slf4j
             </Import-Package>
