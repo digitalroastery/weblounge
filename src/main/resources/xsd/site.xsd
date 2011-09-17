@@ -175,6 +175,29 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="link">
+    <xsd:complexType>
+      <xsd:attribute name="use" type="useType" use="optional" />
+      <xsd:attribute name="href" type="xsd:anyURI" use="required" />
+      <xsd:attribute name="type" type="xsd:string" use="required" />
+      <xsd:attribute name="charset" type="xsd:string" use="optional" />
+      <xsd:attribute name="media" type="xsd:string" use="optional" />
+      <xsd:attribute name="rel" type="xsd:string" use="optional" />
+      <xsd:attribute name="rev" type="xsd:string" use="optional" />
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="script">
+    <xsd:complexType>
+      <xsd:attribute name="jquery" type="xsd:string" use="optional" />
+      <xsd:attribute name="use" type="useType" use="optional" />
+      <xsd:attribute name="src" type="xsd:anyURI" use="required" />
+      <xsd:attribute name="type" type="xsd:string" use="required" />
+      <xsd:attribute name="charset" type="xsd:string" use="optional" />
+      <xsd:attribute name="defer" type="xsd:boolean" use="optional" />
+    </xsd:complexType>
+  </xsd:element>
+
   <!-- 
   Type definition for identifiers. Since identifiers are used in path names
   and potentially database table and column names as well, they are restricted
@@ -203,6 +226,18 @@
   <xsd:simpleType name="durationType">
     <xsd:restriction base="xsd:string">
       <xsd:pattern value="([\d]+y)?([\d]+m)?([\d]+w)?([\d]+d)?([\d]+H)?([\d]+M)?([\d]+S)?" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- 
+  Type definition for use attributes in include elements. These includes can
+  either be included for the renderer or the editor only or both.
+   -->
+  <xsd:simpleType name="useType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="renderer"/>
+      <xsd:enumeration value="editor"/>
+      <xsd:enumeration value="all"/>
     </xsd:restriction>
   </xsd:simpleType>
 
