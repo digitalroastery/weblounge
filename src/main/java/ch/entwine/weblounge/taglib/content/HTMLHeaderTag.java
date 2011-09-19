@@ -128,6 +128,11 @@ public class HTMLHeaderTag extends WebloungeTag {
         linkToJQuery.append(WebloungeSharedResources.JQUERY_VERSION);
         linkToJQuery.append("/jquery.min.js");
         pageContext.getOut().print("<script src=\"" + linkToJQuery + "\" type=\"text/javascript\"></script>");
+        
+        StringBuffer linkToJQueryTools = new StringBuffer("/weblounge-shared/scripts/jquery-tools/");
+        linkToJQueryTools.append(WebloungeSharedResources.JQUERY_TOOLS_VERSION);
+        linkToJQueryTools.append("/jquery.tools.min.js");
+        pageContext.getOut().print("<script src=\"" + linkToJQueryTools + "\" type=\"text/javascript\"></script>");
       }
       for (HTMLHeadElement s : headElements) {
         pageContext.getOut().println(s.toXml());
