@@ -30,12 +30,14 @@ import ch.entwine.weblounge.common.impl.content.page.PageSecurityContext;
 import ch.entwine.weblounge.common.impl.language.LocalizableContent;
 import ch.entwine.weblounge.common.impl.language.LocalizableObject;
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Permission;
 import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
+import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -746,7 +748,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    *          the locking user
    */
   public void lock(User user) throws IllegalStateException {
-    if (lockOwner != null && !lockOwner.equals(user))
+    if (lockOwner != null && !lockOwner.equals(user) && !SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
       throw new IllegalStateException("The page is already locked by " + lockOwner);
     lockOwner = user;
   }
