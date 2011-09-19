@@ -93,7 +93,6 @@ public class HTMLHeaderTag extends WebloungeTag {
         }
         Renderer renderer = module.getRenderer(p.getIdentifier());
         if (renderer != null) {
-          // TODO if use == renderer include to html as script
           for (HTMLHeadElement header : renderer.getHTMLHeaders()) {
             if (header instanceof DeclarativeHTMLHeadElement)
               ((DeclarativeHTMLHeadElement)header).configure(request, site, module);

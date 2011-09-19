@@ -107,9 +107,6 @@ public class ComposerTag extends ComposerTagSupport {
       throws IOException, ContentRepositoryException,
       ContentRepositoryUnavailableException {
     
-    // Start editing support
-    // FIXME temporary solution
-    // if (version == Page.WORK && isLockedByCurrentUser) {
     if (RequestUtils.isEditingState(request)) {
       
       boolean hasEditor = false;
@@ -143,12 +140,6 @@ public class ComposerTag extends ComposerTagSupport {
       throws IOException, ContentRepositoryException,
       ContentRepositoryUnavailableException {
 
-    // If user is not editing this page, then we are finished with
-    // the current pagelet.
-    // finally {
-    // FIXME temporary solution
-    // if (version == Page.WORK && isLockedByCurrentUser &&
-    // request.getAttribute(PageletEditorTag.ID) == null) {
     if (RequestUtils.isEditingState(request)) {
       request.setAttribute(WebloungeRequest.PAGE, targetPage);
       request.setAttribute(WebloungeRequest.PAGELET, pagelet);
