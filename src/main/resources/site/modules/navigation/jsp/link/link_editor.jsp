@@ -1,8 +1,8 @@
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
 
 <script>
-	$(document).bind('pageletEditorOpen', function() {
-		$('#wbl-pageleteditor div#wbl-linkEditor').editor_link();
+	$(document).bind('pageletEditorOpen', function(event, options) {
+		$('#wbl-pageleteditor div#wbl-linkEditor').editor_link(options);
 	});
 </script>
 
@@ -23,13 +23,14 @@
 <!-- external -->
 <p class="wbl-linkExternal">
     <label for="wbl-linkExternal"><webl:i18n key="module.navigation.link.external.url"/></label> <input id="wbl-linkExternal" type="text" name="property:link" /><br />
-    <label for="wbl-linkWindow"><webl:i18n key="module.navigation.link.external.window"/></label> <input id="wbl-linkWindow" type="radio" name="property:window" value="Ja" checked="checked" /><webl:i18n key="module.navigation.link.external.window.yes"/> <input type="radio" name="property:window" value="Nein" /><webl:i18n key="module.navigation.link.external.window.no"/><br />
+    <label for="wbl-linkWindow"><webl:i18n key="module.navigation.link.external.window"/></label> <input id="wbl-linkWindow" type="radio" name="property:window" value="Ja" checked="checked" /><webl:i18n key="module.navigation.link.external.window.yes"/> <input type="radio" name="property:window" value="Nein" /><webl:i18n key="module.navigation.link.external.window.no"/>
 </p>
 
 <!-- internal -->
 <div class="wbl-linkInternal">
-    <input id="wbl-linkInternal" type="text" name="property:pageid" readonly="readonly" /><br /><br />
-	<button id="wbl-linkInternalButton" type="button"><webl:i18n key="module.navigation.link.internal.button"/></button>
+	<button id="wbl-linkInternalButton" type="button"><webl:i18n key="module.navigation.link.internal.button"/></button><br />
+ 	<img src=""></img>
+    <input id="wbl-linkInternal" type="hidden" name="property:pageid" />
 </div>
 
 </div>

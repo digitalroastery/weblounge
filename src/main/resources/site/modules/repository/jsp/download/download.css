@@ -2,3 +2,7 @@ div#wbl-downloadEditor label {
     display: inline-block;
     width: 160px
 }
+
+div#wbl-downloadEditor img {
+	display: none;
+}

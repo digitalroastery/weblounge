@@ -1,16 +1,17 @@
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
 
 <script>
-	$(document).bind('pageletEditorOpen', function() {
-		$('#wbl-pageleteditor div#wbl-downloadEditor').editor_download();
+	$(document).bind('pageletEditorOpen', function(event, options) {
+		$('#wbl-pageleteditor div#wbl-downloadEditor').editor_download(options);
 	});
 </script>
 
 <div id="wbl-downloadEditor">
 	<p>
 	    <label for="wbl-downloadTitle"><webl:i18n key="module.repository.download.title"/></label> <input id="wbl-downloadTitle" type="text" name="element:title" />
-	    <label for="wbl-downloadDesc"><webl:i18n key="module.repository.download.description"/></label> <input id="wbl-downloadDesc" type="text" name="element:description" /><br />
-	    <input id="wbl-downloadFile" type="text" name="property:resourceid" readonly="readonly" /><br /><br />
-		<button id="wbl-downloadFileButton" type="button"><webl:i18n key="module.repository.download.button"/></button>
+	    <label for="wbl-downloadDesc"><webl:i18n key="module.repository.download.description"/></label> <input id="wbl-downloadDesc" type="text" name="element:description" /><br /><br />
+		<button id="wbl-downloadFileButton" type="button"><webl:i18n key="module.repository.download.button"/></button><br />
+	    <img src=""></img>
+	    <input id="wbl-downloadFile" type="hidden" name="property:resourceid" /><br /><br />
 	</p>
 </div>
