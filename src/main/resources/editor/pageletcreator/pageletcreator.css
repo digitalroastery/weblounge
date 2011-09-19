@@ -1,8 +1,5 @@
 .editor_pageletcreator {
-    background-color: #242F37;
-    background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
-    border: 1px solid #333333;
-    height: 130px;
+    height: 70px;
     position: fixed;
 	top: 45px;
 	bottom: 0;
@@ -37,6 +34,7 @@
 	padding: 0.5em; 
 	float: left;
 	margin: 10px 10px 10px 0;
+	cursor: move;
 }
 
 .wbl-draggableHelper {
@@ -45,4 +43,100 @@
 	padding: 0.5em; 
 	float: none;
 	margin: 10px 10px 10px 0; 
+}
+
+/* CSS FOR TOOLS TABS */
+
+/* root element for tabs  */
+.editor_pageletcreator .wbl-tabs { 
+	list-style:none; 
+	margin:0 !important; 
+	padding:0;
+	height:30px;
+	border-bottom:1px solid #666;	
+}
+
+/* single tab */
+.editor_pageletcreator .wbl-tabs li { 
+	float:left;	 
+	text-indent:0;
+	padding:0;
+	margin:0 !important;
+	list-style-image:none !important; 
+}
+
+/* link inside the tab. uses a background image */
+.editor_pageletcreator .wbl-tabs a { 
+	background: url(images/blue.png) no-repeat -420px 0;
+	font-size:11px;
+	display:block;
+	height: 30px;  
+	line-height:30px;
+	width: 134px;
+	text-align:center;	
+	text-decoration:none;
+	color:#000;
+	padding:0px;
+	margin:0px;	
+	position:relative;
+	top:1px;
+}
+
+.editor_pageletcreator .wbl-tabs a:active {
+	outline:none;		
+}
+
+/* when mouse enters the tab move the background image */
+.editor_pageletcreator .wbl-tabs a:hover {
+	background-position: -420px -31px;	
+	color:#fff;	
+}
+
+/* active tab uses a class name "current". it's highlight is also done by moving the background image. */
+.editor_pageletcreator .wbl-tabs .current, .editor_pageletcreator .wbl-tabs .current:hover, .editor_pageletcreator .wbl-tabs li.current a {
+	background-position: -420px -62px;		
+	cursor:default !important; 
+	color:#000 !important;
+}
+
+/* Different widths for tabs: use a class name: w1, w2, w3 or w2 */
+
+/* width 1 */
+.editor_pageletcreator .wbl-tabs .w1 			{ background-position: -519px 0; width:134px; }
+.editor_pageletcreator .wbl-tabs .w1:hover 	{ background-position: -519px -31px; }
+.editor_pageletcreator .wbl-tabs .w1.current { background-position: -519px -62px; }
+
+/* width 2 */
+.editor_pageletcreator .wbl-tabs .w2 			{ background-position: -366px -0px; width:154px; }
+.editor_pageletcreator .wbl-tabs .w2:hover 	{ background-position: -366px -31px; }
+.editor_pageletcreator .wbl-tabs .w2.current { background-position: -366px -62px; }
+
+
+/* width 3 */
+.editor_pageletcreator .wbl-tabs .w3 			{ background-position: -193px -0px; width:174px; }
+.editor_pageletcreator .wbl-tabs .w3:hover 	{ background-position: -193px -31px; }
+.editor_pageletcreator .wbl-tabs .w3.current { background-position: -193px -62px; }
+
+/* width 4 */
+.editor_pageletcreator .wbl-tabs .w4 			{ background-position: -0px -0px; width:194px; }
+.editor_pageletcreator .wbl-tabs .w4:hover 	{ background-position: -0px -31px; }
+.editor_pageletcreator .wbl-tabs .w4.current { background-position: -0px -62px; }
+
+
+/* initially all panes are hidden */ 
+.editor_pageletcreator .wbl-panes > div {
+	display:none;
+	-moz-border-bottom-colors: none;
+    -moz-border-image: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #FFFFFF;
+    border-color: -moz-use-text-color #999999 #999999;
+    border-right: 1px solid #999999;
+    border-style: none solid solid;
+    border-width: 0 1px 1px;
+    font-size: 14px;
+    padding: 15px 10px;
+    height: 100%;
 }
