@@ -149,20 +149,27 @@ steal.plugins(
         _initPageLocking: function() {
         	var locked = this.options.page.isLocked();
         	var userLocked = this.options.page.isLockedUser(this.options.runtime.getUserLogin())
+        	var isAdmin = this.options.runtime.isSystemAdmin();
+        	var lockCheckBox = $('input#wbl-editmode', this.element);
+        	
         	if(locked && !userLocked) {
-        		$('input#wbl-editmode', this.element).attr('disabled', 'disabled');
+        		lockCheckBox.attr('disabled', 'disabled');
         		this._disableEditing();
         	} 
         	else if(locked && userLocked) {
-        		$('input#wbl-editmode', this.element).removeAttr('disabled');
-        		$('input#wbl-editmode', this.element).val(['editmode']);
+        		lockCheckBox.removeAttr('disabled');
+        		lockCheckBox.val(['editmode']);
         		this._enableEditing();
         		$('#wbl-pageletcreator').editor_pageletcreator();
-        	} 
-        	else {
-        		$('input#wbl-editmode', this.element).removeAttr('disabled');
-        		$('input#wbl-editmode', this.element).val([]);
+        	} else {
+        		lockCheckBox.removeAttr('disabled');
+        		lockCheckBox.val([]);
         		this._disableEditing();
+        	}
+        	
+        	if(lockCheckBox.is(':disabled') && isAdmin) {
+        		lockCheckBox.removeAttr('disabled');
+        		lockCheckBox.val([]);
         	}
         },
         

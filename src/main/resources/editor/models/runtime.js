@@ -20,6 +20,15 @@ steal.then('jsonix')
 			runtime.user.login = userElement.attr('id');
 			runtime.user.realm = userElement.attr('realm');
 			runtime.site = new Object();
+			runtime.roles = new Array();
+			$(xml).find('security roles').each(function(index) {
+				var role = $(this).find('role');
+				runtime.roles.push({
+					id: role.attr('id'),
+					context: role.attr('context'),
+					name: role.find('name').text()
+				});
+			});
 			$(xml).find('site').each(function(index) {
 				runtime.site.id = $(this).find('id:first').text();
 				
@@ -52,6 +61,17 @@ steal.then('jsonix')
 	{
 	    getLanguages: function() {
 	    	return this.site.languages;
+	    },
+	    
+	    isSystemAdmin: function() {
+	    	var isAdmin = false;
+	    	$.each(this.roles, function(index, role) {
+	    		if(role.id == 'systemadmin' && role.context == 'weblounge') {
+	    			isAdmin = true;
+	    			return false;
+	    		}
+	    	});
+	    	return isAdmin;
 	    },
 	    
 	    getUserName: function() {
