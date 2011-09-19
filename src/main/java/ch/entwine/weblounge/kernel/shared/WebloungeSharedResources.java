@@ -65,6 +65,9 @@ public class WebloungeSharedResources implements ManagedService {
   
   /** Name of the current jQuery version */
   public static final String JQUERY_VERSION = "1.6.4";
+  
+  /** Name of the current jQuery Tools version */
+  public static final String JQUERY_TOOLS_VERSION = "1.2.5";
 
   /** Directory with external resources */
   private File externalResourcesDir = null;
