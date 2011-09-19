@@ -39,7 +39,6 @@ import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.SecurityUtils;
@@ -862,12 +861,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.UNAUTHORIZED);
 
     boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
-    if (StringUtils.isNotBlank(userId) && isAdmin) {
-      user = new UserImpl(userId);
-    }
 
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && !page.getLockOwner().getLogin().equals(user)) {
+    if (page.isLocked() && (!page.getLockOwner().equals(user) && ! isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
