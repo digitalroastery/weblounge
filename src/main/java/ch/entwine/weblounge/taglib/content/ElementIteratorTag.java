@@ -35,7 +35,8 @@ public class ElementIteratorTag extends AbstractContentIteratorTag {
 
   /** The element's cardinality */
   private int cardinality = -1;
-  
+
+  /** The regular expression */
   private String regex = null;
 
   /**
@@ -49,7 +50,14 @@ public class ElementIteratorTag extends AbstractContentIteratorTag {
       throw new IllegalStateException("Cannot specify both 'regex' and 'element' attribute");
     elements.add(value);
   }
-  
+
+  /**
+   * Sets the regular expression used to select the elements that will be
+   * iterated.
+   * 
+   * @param regex
+   *          the regular expression
+   */
   public void setRegex(String regex) {
     if (elements.size() > 0)
       throw new IllegalStateException("Cannot specify both 'regex' and 'element' attribute");
@@ -62,29 +70,11 @@ public class ElementIteratorTag extends AbstractContentIteratorTag {
   public int doStartTag() throws JspException {
     super.doStartTag();
 
-    if(cardinality == -1 && pagelet != null) {
-      // Have elements been specified explicitly?
-      if (elements.size() > 0) {
-        Object[] e = pagelet.getMultiValueContent(elements.get(0), request.getLanguage());
-        if (e != null) {
-          cardinality = e.length;
-        }      
-      }
-      
-      // Try to select elements by regular expression
-      else if (regex != null) {
-        Pattern p = Pattern.compile(regex);
-        for (String elementName : pagelet.getContentNames(request.getLanguage())) {
-          Matcher m = p.matcher(elementName);
-          if (m.matches()) {
-            elements.add(elementName);
-          }
-        }
-        cardinality = elements.size();
-        index = 0;
-      }
+    // Has the tag been initialized?
+    if (cardinality == -1 && pagelet != null) {
+      selectElements();
     }
-    
+
     // Did we find elements to iterate over?
     if (cardinality <= 0 && !(index < minOccurs)) {
       return SKIP_BODY;
@@ -97,7 +87,9 @@ public class ElementIteratorTag extends AbstractContentIteratorTag {
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.IterationTag#doAfterBody()
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.taglib.content.AbstractContentIteratorTag#doAfterBody()
    */
   public int doAfterBody() {
     if (super.doAfterBody() == EVAL_BODY_AGAIN) {
@@ -110,14 +102,44 @@ public class ElementIteratorTag extends AbstractContentIteratorTag {
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.Tag#doEndTag()
+   * Selects the set of elements over which to iterate. If one element has been
+   * specified, the multiple values of that element will be chosen.
+   */
+  protected void selectElements() {
+    if (elements.size() > 0) {
+      Object[] e = pagelet.getMultiValueContent(elements.get(0), request.getLanguage());
+      if (e != null) {
+        cardinality = e.length;
+      }
+    } else if (regex != null) {
+      Pattern p = Pattern.compile(regex);
+      for (String elementName : pagelet.getContentNames(request.getLanguage())) {
+        Matcher m = p.matcher(elementName);
+        if (m.matches()) {
+          elements.add(elementName);
+        }
+      }
+      cardinality = elements.size();
+      index = 0;
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.taglib.WebloungeTag#doEndTag()
    */
   public int doEndTag() throws JspException {
     pageContext.removeAttribute(ElementIteratorTagVariables.ELEMENT_COUNT);
     pageContext.removeAttribute(ElementIteratorTagVariables.INDEX);
     return super.doEndTag();
   }
-  
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.taglib.content.AbstractContentIteratorTag#reset()
+   */
   @Override
   protected void reset() {
     super.reset();

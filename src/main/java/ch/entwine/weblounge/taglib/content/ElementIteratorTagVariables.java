@@ -25,8 +25,10 @@ package ch.entwine.weblounge.taglib.content;
  */
 public class ElementIteratorTagVariables {
 
+  /** The index of the current element */
   public static final String INDEX = "index";
 
+  /** The total number of elements */
   public static final String ELEMENT_COUNT = "elementCount";
 
 }
