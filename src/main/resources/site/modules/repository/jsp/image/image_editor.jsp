@@ -17,11 +17,11 @@
 	<p>
 	    <label for="wbl-imageTitle"><webl:i18n key="module.repository.image.title"/></label> <input id="wbl-imageTitle" type="text" name="element:title" />
    		<webl:i18n key="module.repository.image.description"/><br />
-       	<input name="element:description" type="text" /><br />
+       	<input id="wbl-imageDesc" name="element:description" type="text" /><br />
        	<span class="editor-sample"><webl:i18n key="module.repository.image.description.sample"/></span><br /><br />
-		<button id="wbl-imageFileButton" type="button"><webl:i18n key="module.repository.image.button"/></button><br />
-   	    <img src=""></img>
+		<button id="wbl-imageFileButton" type="button"><webl:i18n key="module.repository.image.button"/></button><br /><br />
 	    <input id="wbl-imageId" type="hidden" name="property:resourceid" />
+   	    <img src=""></img>
 	</p>
 	<p class="editor-left">
 		<webl:i18n key="module.repository.image.style"/><br />
@@ -51,7 +51,7 @@
 			 <option value="left_floated"><webl:i18n key="module.repository.image.left_floated"/></option>
 		</select>
 		<webl:i18n key="module.repository.image.photographer"/><br />
-		<input name="property:photographer" type="text" /><br />
+		<input id="wbl-imagePhotographer" name="property:photographer" type="text" /><br />
 		<span class="editor-sample"><webl:i18n key="module.repository.image.photographer.sample"/></span>
 	   	<webl:i18n key="module.repository.image.link"/><br />
 	    <input name="property:link" type="text" /><br />

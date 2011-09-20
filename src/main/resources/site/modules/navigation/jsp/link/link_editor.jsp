@@ -28,9 +28,9 @@
 
 <!-- internal -->
 <div class="wbl-linkInternal">
-	<button id="wbl-linkInternalButton" type="button"><webl:i18n key="module.navigation.link.internal.button"/></button><br />
- 	<img src=""></img>
+	<button id="wbl-linkInternalButton" type="button"><webl:i18n key="module.navigation.link.internal.button"/></button><br /><br />
     <input id="wbl-linkInternal" type="hidden" name="property:pageid" />
+ 	<img src=""></img>
 </div>
 
 </div>

@@ -9,26 +9,36 @@ $.Controller("Editor.Download",
      * Initialize a new DownloadEditor controller.
      */
     init: function(el) {
-    	var resourceId = this.element.find('input#wbl-downloadFile');
-    	var previewImage = this.element.find('img');
-    	if(resourceId.val() != '') {
-    		previewImage.attr('src', '/system/weblounge/previews/' + resourceId.val() + '/locales/' + this.options.language + '/styles/editorpreview').show();
+    	var resourceId = this.element.find('input#wbl-downloadFile').val();
+    	if(resourceId != '') {
+    		this._setImage(resourceId);
     	}
     },
     
+    _setImage: function(resourceId) {
+    	this.element.find('img').error(function() {
+    		$(this).attr('src', '/weblounge/editor/resourcebrowser/images/empty_thumbnail.png');
+    	}).attr('src', '/system/weblounge/previews/' + resourceId + '/locales/' + this.options.language + '/styles/editorpreview').show();
+    },
+    
     "button#wbl-downloadFileButton click": function(el, ev) {
-    	var input = this.element.find('input#wbl-downloadFile');
-    	var language = this.options.language;
-    	var previewImage = this.element.find('img');
-    	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', $('#wbl-pageleteditor'), 'media', false, function(selectedMedia) {
+    	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', $('#wbl-pageleteditor'), 'media', false, $.proxy(function(selectedMedia) {
     		if(selectedMedia == null) {
-    			previewImage.hide();
+    			this.element.find('img').hide();
     			return;
     		}
     		var id = selectedMedia[0].value.id;
-			input.val(id);
-			previewImage.attr('src', '/system/weblounge/previews/' + id + '/locales/' + language + '/styles/editorpreview').show();
-    	});
+			var title = selectedMedia[0].getTitle(this.options.language);
+			var desc = selectedMedia[0].getDescription(this.options.language);
+    		
+    		this.element.find('input#wbl-downloadFile').val(id);
+    		this._setImage(id);
+    		
+	    	var inputTitle = this.element.find('input#wbl-downloadTitle');
+	    	var inputDesc = this.element.find('input#wbl-downloadDesc');
+			if(title != '' && inputTitle.val() == '') inputTitle.val(title);
+			if(desc != '' && inputDesc.val() == '') inputDesc.val(desc);
+    	}, this));
     },
     
 });
