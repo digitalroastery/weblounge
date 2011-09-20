@@ -247,8 +247,9 @@ steal.plugins(
         	if(this.options.page.isWorkVersion())
         		$('.composer').editor_composer('enable');
         	$('#wbl-pageletcreator').editor_pageletcreator('enable');
-        	this.element.find('img.wbl-add').show();
-        	this.element.find('img.wbl-more').show();
+//        	this.element.find('img.wbl-add').show();
+//        	this.element.find('img.wbl-more').show();
+        	this.element.find('button.wbl-pageSettings').show();
         },
         
         _disableEditing: function() {
@@ -256,8 +257,9 @@ steal.plugins(
         	if(this.options.page.isWorkVersion())
         		$('.composer').editor_composer('disable');
         	$('#wbl-pageletcreator').editor_pageletcreator('disable');
-        	this.element.find('img.wbl-add').hide();
-        	this.element.find('img.wbl-more').hide();
+//        	this.element.find('img.wbl-add').hide();
+//        	this.element.find('img.wbl-more').hide();
+        	this.element.find('button.wbl-pageSettings').hide();
         },
         
         _toggleTab: function(el) {
@@ -291,7 +293,7 @@ steal.plugins(
 			this.publishDialog.dialog('open');
 		},
 		
-		"li.wbl-pageSettings click": function(el, ev) {
+		"button.wbl-pageSettings click": function(el, ev) {
 			$('.wbl-menu').hide();
 			$('#wbl-pageheadeditor').editor_pageheadeditor({page: this.options.page, language: this.options.language, runtime: this.options.runtime});
 		},

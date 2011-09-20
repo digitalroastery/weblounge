@@ -104,11 +104,6 @@ steal.plugins('jquery/controller','jqueryui/sortable')
 		}, this)
       });
       
-      if(this.element.hasClass('empty')) {
-    	  this.element.append('<a class="wbl-addPagelet" />');
-    	  return;
-      }
-      
       $(el).find('div.pagelet').editor_pagelet({
         composer: {
           id: this.id,
@@ -124,11 +119,9 @@ steal.plugins('jquery/controller','jqueryui/sortable')
     	var pagelets = this.element.find('div.pagelet');
     	if(!pagelets.length) {
     		this.element.addClass('empty');
-			this.element.append('<a class="wbl-addPagelet" />');
 			return;
     	}
 		this.element.removeClass('empty');
-		this.element.find('a.wbl-addPagelet').remove();
 		
     	pagelets.editor_pagelet({
         composer: {
@@ -144,14 +137,12 @@ steal.plugins('jquery/controller','jqueryui/sortable')
 		$(this.element).removeClass('wbl-nojQuery');
 		$(this.element).sortable('disable');
 		$(this.element).find('div.pagelet').editor_pagelet('disable').css('min-height', '');
-		$(this.element).find('a.wbl-addPagelet').hide();
 	},
 	
 	enable: function() {
 		$(this.element).addClass('wbl-nojQuery');
 		$(this.element).sortable('enable');
 		$(this.element).find('div.pagelet').editor_pagelet('enable').css('min-height', '35px');
-		$(this.element).find('a.wbl-addPagelet').show();
 	},
     
     _enablePagelets: function() {
@@ -160,10 +151,6 @@ steal.plugins('jquery/controller','jqueryui/sortable')
     
     _disablePagelets: function() {
     	$('.composer').editor_composer('disable');
-    },
-    
-    "a.wbl-addPagelet click": function(el, ev) {
-    	$('#wbl-pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
     }
     
   });
