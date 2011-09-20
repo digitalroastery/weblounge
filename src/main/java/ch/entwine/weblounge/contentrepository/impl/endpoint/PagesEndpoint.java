@@ -425,7 +425,6 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     try {
       PageReader pageReader = new PageReader();
       page = pageReader.read(IOUtils.toInputStream(pageXml, "utf-8"), site);
-      // TODO: Replace this with current user
       page.setModified(user, new Date());
       page.setVersion(Resource.WORK);
       contentRepository.put(page);
