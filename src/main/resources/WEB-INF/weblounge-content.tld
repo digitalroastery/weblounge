@@ -4,22 +4,22 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
     version="2.1">
 
-    <description>Tag library providing access to the Weblounge CMS content</description>
-    <display-name>Weblounge Content Tags</display-name>
+  <description>Tag library providing access to the Weblounge CMS content</description>
+  <display-name>Weblounge Content Tags</display-name>
 	<tlib-version>3.0</tlib-version>
 	<short-name>webl</short-name>
-    <uri>http://entwinemedia.com/weblounge/3.0/content</uri>
+  <uri>http://entwinemedia.com/weblounge/3.0/content</uri>
   
-    <tag>
+  <tag>
 		<description>Shows the workbench</description>
 		<display-name>Weblounge Cache Tagging Tag</display-name>
 		<name>workbench</name>
 		<tag-class>ch.entwine.weblounge.taglib.content.WorkbenchTag</tag-class>
 		<body-content>empty</body-content>
-        <attribute><name>uri</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-    </tag>
+    <attribute><name>uri</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+  </tag>
 
-    <tag>
+  <tag>
 		<description>Adds a tag to the cache</description>
 		<display-name>Weblounge Cache Tagging Tag</display-name>
 		<name>cachetag</name>
@@ -102,17 +102,28 @@
 	</tag>
 
 	<tag>
-		<description>Displays pagelet element data</description>
+		<description>Iterates over multiple occurrences of element data</description>
 		<display-name>Pagelet Element Iterator Tag</display-name>
 		<name>element-iterator</name>
 		<tag-class>ch.entwine.weblounge.taglib.content.ElementIteratorTag</tag-class>
 		<tei-class>ch.entwine.weblounge.taglib.content.ElementIteratorTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
-		<attribute><name>element</name><required>false</required><rtexprvalue>false</rtexprvalue></attribute>
-		<attribute><name>elements</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>properties</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>minOccurs</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>elements</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>minOccurs</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>maxOccurs</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
+
+  <tag>
+    <description>Iterates over multiple values of a single element's data</description>
+    <display-name>Pagelet Element Value Iterator Tag</display-name>
+    <name>elementvalue-iterator</name>
+    <tag-class>ch.entwine.weblounge.taglib.content.ElementValueIteratorTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.content.ElementIteratorTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute><name>element</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>minOccurs</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>maxOccurs</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+  </tag>
 
 	<tag>
 		<description>Tests for the existance of a pagelet element</description>
@@ -159,11 +170,22 @@
 		<tag-class>ch.entwine.weblounge.taglib.content.PropertyIteratorTag</tag-class>
 		<tei-class>ch.entwine.weblounge.taglib.content.PropertyIteratorTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
-		<attribute><name>property</name><required>false</required><rtexprvalue>false</rtexprvalue></attribute>
-		<attribute><name>elements</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>properties</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>properties</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>minOccurs</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>maxOccurs</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
+
+  <tag>
+    <description>Displays pagelet property value data</description>
+    <display-name>Pagelet Property Value Iterator Tag</display-name>
+    <name>propertyvalue-iterator</name>
+    <tag-class>ch.entwine.weblounge.taglib.content.PropertyValueIteratorTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.content.PropertyIteratorTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute><name>property</name><required>true</required><rtexprvalue>false</rtexprvalue></attribute>
+    <attribute><name>minOccurs</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>maxOccurs</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+  </tag>
 	
 	<tag>
 		<description>Tests for the existance of a pagelet property</description>
