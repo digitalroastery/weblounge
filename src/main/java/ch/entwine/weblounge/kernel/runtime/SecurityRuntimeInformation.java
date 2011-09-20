@@ -20,16 +20,13 @@
 
 package ch.entwine.weblounge.kernel.runtime;
 
-import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.security.WebloungeUser;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Returns runtime information on the current user.
@@ -55,17 +52,46 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
   public String getRuntimeInformation(Site site, User user, Language language, Environment environment) {
     if (user == null)
       return null;
-    String securityXml = user.toXml();
+    
+    StringBuffer b = new StringBuffer();
 
-    // Filter out the root tag
-    Pattern p = Pattern.compile("^<([^>]*)>(.*)</\\1>$");
-    Matcher m = p.matcher(securityXml);
-    if (m.matches())
-      securityXml = m.group(2);
+    b.append("<user id=\"" + user.getLogin() + "\"");
+    if (user.getRealm() != null) {
+      b.append(" realm=\"");
+      b.append(user.getRealm());
+      b.append("\"");
+    }
+    b.append(">");
 
-    // Remove the password
-    securityXml = securityXml.replaceAll("<password.*</password>", "");
-    securityXml = ConfigurationUtils.processTemplate(securityXml, site, environment);
+    // First name
+    if (user instanceof WebloungeUser && ((WebloungeUser)user).getFirstName() != null) {
+      b.append("<firstname>");
+      b.append(((WebloungeUser)user).getFirstName());
+      b.append("</firstname>");
+    }
+
+    // First name
+    if (user instanceof WebloungeUser && ((WebloungeUser)user).getLastName() != null) {
+      b.append("<lastname>");
+      b.append(((WebloungeUser)user).getLastName());
+      b.append("</lastname>");
+    }
+
+    // Name, if first name and last name were not given
+    if (user.getName() != null) {
+      b.append("<name><![CDATA[");
+      b.append(user.getName());
+      b.append("]]></name>");
+    }
+
+    // Email
+    if (user instanceof WebloungeUser && ((WebloungeUser)user).getEmail() != null) {
+      b.append("<email>");
+      b.append(((WebloungeUser)user).getEmail());
+      b.append("</email>");
+    }
+    
+    b.append("</user>");
     
     // Add role information
     StringBuffer roles = new StringBuffer();
@@ -78,10 +104,12 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
       roles.append("</role>");
     }
     if (roles.length() > 0) {
-      securityXml += "<roles>" + roles.toString() + "</roles>";
+      b.append("<roles>");
+      b.append(roles.toString());
+      b.append("</roles>");
     }
 
-    return securityXml;
+    return b.toString();
   }
 
 }
