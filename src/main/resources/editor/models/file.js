@@ -221,6 +221,34 @@ steal.then('jsonix')
 	},
 	/* @Prototype */
 	{
+	    /**
+	     * Return the file title
+	     */
+	    getTitle: function(language) {
+	    	if($.isEmptyObject(this.value.head.metadata)) return '';
+	    	if($.isEmptyObject(this.value.head.metadata.title)) return '';
+	    	if($.isEmptyObject(this.value.head.metadata.title[language])) return '';
+	    	return this.value.head.metadata.title[language];
+	    },
+	    
+	    /**
+	     * Return the file description
+	     */
+	    getDescription: function(language) {
+	    	if($.isEmptyObject(this.value.head.metadata)) return '';
+	    	if($.isEmptyObject(this.value.head.metadata.description)) return '';
+	    	if($.isEmptyObject(this.value.head.metadata.description[language])) return '';
+	    	return this.value.head.metadata.description[language];
+	    },
+	    
+	    /**
+	     * Return the file tags
+	     */
+	    getTags: function() {
+	    	if($.isEmptyObject(this.value.head.metadata)) return '';
+	    	if($.isEmptyObject(this.value.head.metadata.subject)) return '';
+	    	return this.value.head.metadata.subject;
+	    },
 		
 		getMetadata: function(language) {
 			var metadata = new Object();

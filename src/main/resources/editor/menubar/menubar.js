@@ -65,6 +65,7 @@ steal.plugins(
 	      		  this.find('span.wbl-editmode').show();
 	      		  this.find('span.wbl-language').show();
 	      		  this.find('div#wbl-pageOptions').show();
+	      		  this.find('button.wbl-pageSettings').show();
 	      		  $(document.body).css('overflow', 'visible');
 	      		  break;
 	      	  case 1:
@@ -74,6 +75,7 @@ steal.plugins(
 	      		  this.find('span.wbl-language').hide();
 	      		  this.find('span.wbl-editmode').hide();
 	      		  this.find('div#wbl-pageOptions').hide();
+	      		  this.find('button.wbl-pageSettings').hide();
 	      		  window.scrollTo(0, 0);
 	      		  $(document.body).css('overflow', 'hidden');
 	      		  break;
@@ -84,6 +86,7 @@ steal.plugins(
 	      		  this.find('span.wbl-language').hide();
 	      		  this.find('span.wbl-editmode').hide();
 	      		  this.find('div#wbl-pageOptions').hide();
+	      		  this.find('button.wbl-pageSettings').hide();
 	      		  window.scrollTo(0, 0);
 	      		  $(document.body).css('overflow', 'hidden');
 	      		  break;
@@ -191,6 +194,7 @@ steal.plugins(
         	this.element.find('a.wbl-designer').hide();
         	this.element.find('span.wbl-language').hide();
         	this.element.find('span.wbl-right').hide();
+        	this.element.find('button.wbl-pageSettings').hide();
         	this.element.find('button.wbl-editorSelectionCancel, button.wbl-editorSelectionOK').button().show();
         	this.element.find('button.wbl-editorSelectionOK').button('option', 'disabled', true);
         	
@@ -238,6 +242,7 @@ steal.plugins(
         	this.element.find('a.wbl-media').show();
         	this.element.find('span.wbl-language').show();
         	this.element.find('span.wbl-right').show();
+        	this.element.find('button.wbl-pageSettings').show();
         	// Open Designer
         	this.element.find('a.wbl-designer').click();
         },

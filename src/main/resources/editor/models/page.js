@@ -390,7 +390,7 @@ steal.then('jsonix')
 	    },
 	    
 	    /**
-	     * Return the page description
+	     * Return the page tags
 	     */
 	    getTags: function() {
 	    	if($.isEmptyObject(this.value.head.metadata)) return '';
