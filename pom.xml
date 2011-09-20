@@ -21,7 +21,6 @@
     <weblounge.basedir>${basedir}</weblounge.basedir>
     <checkstyle.skip>true</checkstyle.skip>
     <jmeter.version>2.5</jmeter.version>
-    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
   </properties>
 
   <organization>
@@ -152,33 +151,11 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>unpack-jmeter</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.apache.jmeter</groupId>
-                      <artifactId>jmeter</artifactId>
-                      <version>${jmeter.version}</version>
-                      <type>zip</type>
-                    </artifactItem>
-                  </artifactItems>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>chronos-maven-plugin</artifactId>
             <configuration>
+              <jMeterRemoteLocation>http://www.eu.apache.org/dist/jakarta/jmeter/binaries/jakarta-jmeter-${jmeter.version}.zip</jMeterRemoteLocation>
+              <jmeterhome>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeterhome>
               <input>${weblounge.basedir}/docs/jmeter/general.jmx</input>
             </configuration>
           </plugin>
