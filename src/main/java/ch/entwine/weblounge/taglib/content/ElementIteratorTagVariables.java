@@ -21,14 +21,21 @@
 package ch.entwine.weblounge.taglib.content;
 
 /**
- * Holds the variable definitions for the <code>ElementIteratorTag</code>.
+ * Holds the variable definitions for the <code>ElementIteratorTag</code> and
+ * the <code>ElementValueIteratorTag</code>.
  */
 public class ElementIteratorTagVariables {
 
-  /** The index of the current element */
+  /** The current index */
   public static final String INDEX = "index";
 
-  /** The total number of elements */
-  public static final String ELEMENT_COUNT = "elementCount";
+  /** The total number of values */
+  public static final String ITERATIONS = "iterations";
+
+  /** Name of the current element */
+  public static final String ELEMENT_NAME = "elementName";
+
+  /** Value of the current element */
+  public static final String ELEMENT_VALUE = "elementValue";
 
 }

@@ -23,86 +23,188 @@ package ch.entwine.weblounge.taglib.content;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.servlet.jsp.JspException;
 
 /**
- * This tag iteratos over a property.
+ * This tag iterates over a property.
  */
 public class PropertyIteratorTag extends AbstractContentIteratorTag {
 
-  /** Serial version uid */
-  private static final long serialVersionUID = -3408702889049578384L;
+  /** The serial version id */
+  private static final long serialVersionUID = -5705402493357299735L;
 
-  /** The element to iterate over */
-  private String property = null;
+  /** The iteration index */
+  protected int index = 0;
 
-  /** The propery's cardinality */
-  private int cardinality = -1;
+  /** The number of iterations */
+  protected int iterations = -1;
 
-  /** The pagelet in question */
-  private Pagelet pagelet = null;
+  /** The minimum number of iterations */
+  protected int minOccurs = -1;
+
+  /** The maximum number of iterations */
+  protected int maxOccurs = -1;
+
+  /** The property name */
+  protected String propertyName = null;
+
+  /** The property values */
+  protected List<String> propertyValues = null;
 
   /**
-   * Sets the property to iterate over.
+   * Sets the regular expression that selects the properties to iterate over.
    * 
-   *@param value
-   *          the property name
+   * @param value
+   *          the regular expression for the property name
    */
-  public void setProperty(String value) {
-    property = value;
-    properties.add(value);
+  public void setPropertys(String value) {
+    propertyName = StringUtils.trim(value);
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+   * Sets the minimum number of iterations.
+   * 
+   * @param value
+   *          the minimum number of iterations
+   */
+  public void setMinOccurs(String value) {
+    minOccurs = Integer.parseInt(value);
+  }
+
+  /**
+   * Sets the maximum number of iterations.
+   * 
+   * @param value
+   *          the maximum number of iterations
+   */
+  public void setMaxOccurs(String value) {
+    maxOccurs = Integer.parseInt(value);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
   public int doStartTag() throws JspException {
-    super.doStartTag();
-    if (pagelet == null) {
-      if (property != null && !property.trim().equals("")) {
-        pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
-        if (pagelet == null) {
-          return SKIP_BODY;
-        }
-        pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_COUNT, new Integer(cardinality));
-        pageContext.setAttribute(PropertyIteratorTagVariables.INDEX, new Integer(index));
-        Object[] e = pagelet.getMultiValueContent(property);
-        if (e != null) {
-          cardinality = e.length;
-        }
-        if (cardinality > 0 || minOccurs > 0) {
-          return EVAL_BODY_INCLUDE;
-        }
 
+    // If pagelet is null, then this is the first iteration and the tag needs
+    // to be initialized
+    if (propertyValues == null) {
+      Pagelet pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
+
+      // Do we have a pagelet?
+      if (pagelet == null)
+        return SKIP_BODY;
+
+      // Initialize the tag
+      propertyValues = new ArrayList<String>();
+      Pattern p = Pattern.compile(propertyName);
+      for (String propertyName : pagelet.getPropertyNames()) {
+        Matcher m = p.matcher(propertyName);
+        if (m.matches()) {
+          String[] values = pagelet.getMultiValueProperty(propertyName);
+          if (values != null)
+            propertyValues.addAll(Arrays.asList(values));
+        }
       }
-      return SKIP_BODY;
+
+      setupPropertyData();
+
+      // Are there values to iterate over?
+      if (iterations == 0)
+        return SKIP_BODY;
     }
+
+    // Get the first property value
+    String propertyValue = propertyValues.get(index);
+
+    pageContext.setAttribute(PropertyIteratorTagVariables.ITERATIONS, new Integer(iterations));
+    pageContext.setAttribute(PropertyIteratorTagVariables.INDEX, new Integer(index));
+    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_NAME, propertyName);
+    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_VALUE, propertyValue);
+
     return EVAL_BODY_INCLUDE;
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.IterationTag#doAfterBody()
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.taglib.content.AbstractContentIteratorTag#doAfterBody()
    */
   public int doAfterBody() {
-    if (super.doAfterBody() == EVAL_BODY_AGAIN) {
-      if (index <= cardinality - 1 || index < minOccurs) {
-        pageContext.setAttribute(PropertyIteratorTagVariables.INDEX, new Integer(index));
-        return EVAL_BODY_AGAIN;
-      }
-    }
-    return SKIP_BODY;
+    index++;
+    if (index >= iterations)
+      return SKIP_BODY;
+
+    // Get the current property value
+    String propertyValue = propertyValues.get(index);
+
+    pageContext.setAttribute(PropertyIteratorTagVariables.INDEX, new Integer(index));
+    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_VALUE, propertyValue);
+
+    return EVAL_BODY_AGAIN;
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.Tag#doEndTag()
+   * Selects the set of property values over which to iterate.
+   */
+  protected void setupPropertyData() {
+    int cardinality = -1;
+    index = 0;
+
+    // Did we find the property?
+    if (propertyValues != null) {
+      cardinality = propertyValues.size();
+      if (maxOccurs >= 0)
+        iterations = Math.min(maxOccurs, cardinality);
+      else
+        iterations = cardinality;
+    } else {
+      iterations = 0;
+      cardinality = 0;
+    }
+
+    // Are there enough values to iterate over?
+    if (minOccurs >= 0 && minOccurs > cardinality)
+      iterations = 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.taglib.WebloungeTag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    property = null;
-    cardinality = 0;
-    pagelet = null;
-    pageContext.removeAttribute(PropertyIteratorTagVariables.PROPERTY_COUNT);
+    pageContext.removeAttribute(PropertyIteratorTagVariables.ITERATIONS);
     pageContext.removeAttribute(PropertyIteratorTagVariables.INDEX);
+    pageContext.removeAttribute(PropertyIteratorTagVariables.PROPERTY_NAME);
+    pageContext.removeAttribute(PropertyIteratorTagVariables.PROPERTY_VALUE);
     return super.doEndTag();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.taglib.content.AbstractContentIteratorTag#reset()
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+    propertyValues = null;
+    propertyName = null;
+    index = 0;
+    iterations = 0;
+    minOccurs = -1;
+    maxOccurs = -1;
   }
 
 }

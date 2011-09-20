@@ -37,14 +37,14 @@ public class PropertyIteratorTagExtraInfo extends TagExtraInfo {
    */
   public VariableInfo[] getVariableInfo(TagData tagData) {
     return new VariableInfo[] {
-      new VariableInfo(PropertyIteratorTagVariables.INDEX, Integer.class.getName(), true, VariableInfo.NESTED),
-      new VariableInfo(PropertyIteratorTagVariables.PROPERTY_COUNT, Integer.class.getName(), true, VariableInfo.NESTED)
-    };
+        new VariableInfo(ElementIteratorTagVariables.INDEX, Integer.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(ElementIteratorTagVariables.ITERATIONS, Integer.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(ElementIteratorTagVariables.ELEMENT_NAME, String.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(ElementIteratorTagVariables.ELEMENT_VALUE, String.class.getName(), true, VariableInfo.NESTED) };
   }
 
   /**
-   * Returns <code>true</code> if the tag data is valid. This is the case if the
-   * <code>define</code> attribute can be parsed without exception.
+   * {@inheritDoc}
    * 
    * @see javax.servlet.jsp.tagext.TagExtraInfo#isValid(javax.servlet.jsp.tagext.TagData)
    */

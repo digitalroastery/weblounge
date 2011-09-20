@@ -29,15 +29,15 @@ import org.apache.commons.lang.StringUtils;
 import javax.servlet.jsp.JspException;
 
 /**
- * This tag iterates over multiple values of an element.
+ * This tag iterates over multiple values of a property.
  */
-public class ElementValueIteratorTag extends WebloungeTag {
+public class PropertyValueIteratorTag extends WebloungeTag {
 
   /** The serial version id */
   private static final long serialVersionUID = -5705402493357299735L;
 
-  /** The element name */
-  private String elementName = null;
+  /** The property name */
+  private String propertyName = null;
 
   /** The iteration index */
   protected int index = 0;
@@ -51,17 +51,17 @@ public class ElementValueIteratorTag extends WebloungeTag {
   /** The maximum number of iterations */
   protected int maxOccurs = -1;
 
-  /** The element values */
-  protected String[] elementValues = null;
+  /** The property values */
+  protected String[] propertyValues = null;
 
   /**
-   * Sets the element to iterate over.
+   * Sets the property to iterate over.
    * 
    * @param value
-   *          the element name
+   *          the property name
    */
-  public void setElement(String value) {
-    elementName = StringUtils.trim(value);
+  public void setProperty(String value) {
+    propertyName = StringUtils.trim(value);
   }
 
   /**
@@ -93,7 +93,7 @@ public class ElementValueIteratorTag extends WebloungeTag {
 
     // If pagelet is null, then this is the first iteration and the tag needs
     // to be initialized
-    if (elementValues == null) {
+    if (propertyValues == null) {
       Pagelet pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
 
       // Do we have a pagelet?
@@ -101,21 +101,21 @@ public class ElementValueIteratorTag extends WebloungeTag {
         return SKIP_BODY;
 
       // Initialize the tag
-      elementValues = pagelet.getMultiValueContent(elementName, request.getLanguage());
-      setupElementData();
+      propertyValues = pagelet.getMultiValueProperty(propertyName);
+      setupPropertyData();
 
       // Are there values to iterate over?
       if (iterations == 0)
         return SKIP_BODY;
     }
 
-    // Get the first element value
-    String propertyValue = elementValues[index];
+    // Get the first property value
+    String propertyValue = propertyValues[index];
 
-    pageContext.setAttribute(ElementIteratorTagVariables.ITERATIONS, new Integer(iterations));
-    pageContext.setAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
-    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_NAME, elementName);
-    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_VALUE, propertyValue);
+    pageContext.setAttribute(PropertyIteratorTagVariables.ITERATIONS, new Integer(iterations));
+    pageContext.setAttribute(PropertyIteratorTagVariables.INDEX, new Integer(index));
+    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_NAME, propertyName);
+    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_VALUE, propertyValue);
 
     return EVAL_BODY_INCLUDE;
   }
@@ -130,25 +130,25 @@ public class ElementValueIteratorTag extends WebloungeTag {
     if (index >= iterations)
       return SKIP_BODY;
 
-    // Get the current element value
-    String elementValue = elementValues[index];
+    // Get the current property value
+    String propertyValue = propertyValues[index];
 
-    pageContext.setAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
-    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_VALUE, elementValue);
+    pageContext.setAttribute(PropertyIteratorTagVariables.INDEX, new Integer(index));
+    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_VALUE, propertyValue);
 
     return EVAL_BODY_AGAIN;
   }
 
   /**
-   * Selects the set of element values over which to iterate.
+   * Selects the set of property values over which to iterate.
    */
-  protected void setupElementData() {
+  protected void setupPropertyData() {
     int cardinality = -1;
     index = 0;
 
-    // Did we find the element?
-    if (elementValues != null) {
-      cardinality = elementValues.length;
+    // Did we find the property?
+    if (propertyValues != null) {
+      cardinality = propertyValues.length;
       if (maxOccurs >= 0)
         iterations = Math.min(maxOccurs, cardinality);
       else
@@ -169,10 +169,10 @@ public class ElementValueIteratorTag extends WebloungeTag {
    * @see ch.entwine.weblounge.taglib.WebloungeTag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(ElementIteratorTagVariables.ITERATIONS);
-    pageContext.removeAttribute(ElementIteratorTagVariables.INDEX);
-    pageContext.removeAttribute(ElementIteratorTagVariables.ELEMENT_NAME);
-    pageContext.removeAttribute(ElementIteratorTagVariables.ELEMENT_VALUE);
+    pageContext.removeAttribute(PropertyIteratorTagVariables.ITERATIONS);
+    pageContext.removeAttribute(PropertyIteratorTagVariables.INDEX);
+    pageContext.removeAttribute(PropertyIteratorTagVariables.PROPERTY_NAME);
+    pageContext.removeAttribute(PropertyIteratorTagVariables.PROPERTY_VALUE);
     return super.doEndTag();
   }
 
@@ -184,8 +184,8 @@ public class ElementValueIteratorTag extends WebloungeTag {
   @Override
   protected void reset() {
     super.reset();
-    elementValues = null;
-    elementName = null;
+    propertyName = null;
+    propertyValues = null;
     index = 0;
     iterations = 0;
     minOccurs = -1;
