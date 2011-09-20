@@ -201,10 +201,12 @@ public class ImageResourceTag extends WebloungeTag {
       image = (ImageResource) repository.get(uri);
       image.switchTo(language);
       imageContent = image.getContent(language);
+      if(imageContent == null)
+        imageContent = image.getOriginalContent();
       imageWidth = imageContent.getWidth();
       imageHeight = imageContent.getHeight();
       // TODO: Make this a reference rather than a hard coded string
-      linkToImage = UrlUtils.concat("/weblounge-images", image.getIdentifier(), imageContent.getFilename());
+      linkToImage = UrlUtils.concat("/weblounge-images", image.getIdentifier(), language.getIdentifier());
     } catch (ContentRepositoryException e) {
       logger.warn("Error trying to load image " + uri + ": " + e.getMessage(), e);
       return SKIP_BODY;
