@@ -115,7 +115,8 @@
 	<string name="module.repository.movie.movie">
 		Movie
 	</string>
-	<string name="module.repository.movie.border"> <!-- andere Sprachen noch aendern -->
+  <!-- andere Sprachen noch aendern -->
+ 	<string name="module.repository.movie.border">
 		Border
 	</string>
 	<string name="module.repository.movie.link">

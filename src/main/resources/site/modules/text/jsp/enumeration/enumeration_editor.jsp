@@ -22,12 +22,11 @@
 			</select>
 		</p>
 		<table id="enumeration">
-			<webl:element-iterator regex="text[\d*]" minOccurs="1">
-				<% int i = index.intValue(); %>
-				<tr id="<%= i %>">
+			<webl:element-iterator elements="text[\d*]" minOccurs="1">
+				<tr id="<%= index %>">
 					<td class="dragHandle">&nbsp;</td>
 					<%--TODO: delete-button doesn't work before the wizard was saved --%>
-					<td><textarea name="element:text<%= i %>"></textarea> <img id="<%= i %>" src="/weblounge-sites/<%= site.getIdentifier() %>/modules/text/jsp/enumeration/delete.png" alt="del" title="<%= site.getI18n().getAsHTML("module.text.enumeration.delete", language) %>" /></td>
+					<td><textarea name="element:text<%= index %>"></textarea> <img id="<%= index %>" src="/weblounge-sites/<%= site.getIdentifier() %>/modules/text/jsp/enumeration/delete.png" alt="del" title="<%= site.getI18n().getAsHTML("module.text.enumeration.delete", language) %>" /></td>
 				</tr>
 			</webl:element-iterator>
 		</table>

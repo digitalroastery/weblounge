@@ -6,13 +6,13 @@
 	</webl:ifelement>
 </webl:element>
 
-<webl:property define="type">
-	<%= "<" + type + ">" %>
+<%-- open the correct enumeration tag --%>
+<<webl:property name="type"/>>
 
-	<%-- show all enumeration-items --%>
-	<webl:element-iterator elements="text[\d*]">
-		<li><webl:element name="text<%= index %>"/>&nbsp;</li>
-	</webl:element-iterator>
+<%-- show all enumeration-items --%>
+<webl:element-iterator elements="text[\d*]">
+	<li><%= elementValue %></li>
+</webl:element-iterator>
 
-	<%= "</" + type + ">" %>
-</webl:property>
+<%-- close the correct enumeration tag --%>
+<<webl:property name="type"/>>
