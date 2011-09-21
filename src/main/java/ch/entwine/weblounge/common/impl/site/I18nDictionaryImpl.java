@@ -254,7 +254,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
           warnInvalidKeys = true;
           continue;
         } else if (value == null) {
-          logger.debug("I18n dictionary {} contains invalid value (null) for key '{}'", url, key);
+          logger.warn("I18n dictionary {} contains invalid value (null) for key '{}'", url, key);
           warnInvalidValues = true;
           continue;
         }

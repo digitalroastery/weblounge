@@ -113,7 +113,8 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    * @param defer
    *          defer, e. g. <code>true</code>
    */
-  public ScriptImpl(String href, String type, String charset, String jquery, boolean defer) {
+  public ScriptImpl(String href, String type, String charset, String jquery,
+      boolean defer) {
     this.href = href;
     this.defer = defer;
     this.type = type;
@@ -197,19 +198,19 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   public String getCharset() {
     return charset;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Script#setJQuery(java.lang.String)
    */
   public void setJQuery(String jquery) {
     this.jquery = jquery;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Script#getJQuery()
    */
   public String getJQuery() {
@@ -295,12 +296,12 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
     StringBuilder sb = new StringBuilder("<script");
 
     // jquery
-    if(jquery != null) {
+    if (jquery != null) {
       sb.append(" jquery=\"");
       sb.append(jquery);
       sb.append("\"");
     }
-    
+
     // use
     if (use != null) {
       sb.append(" use=\"");
@@ -362,13 +363,13 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    */
   public String toString() {
     StringBuilder sb = new StringBuilder("script [");
-    
+
     // The source
     sb.append("src=");
     sb.append(href);
-    
+
     // jquery
-    if(jquery != null) {
+    if (jquery != null) {
       sb.append(";jquery=");
       sb.append(jquery);
     }
