@@ -26,7 +26,7 @@ import ch.entwine.weblounge.common.request.WebloungeRequest;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,7 +57,7 @@ public class PropertyIteratorTag extends AbstractContentIteratorTag {
   protected String propertyName = null;
 
   /** The property values */
-  protected List<String> propertyValues = null;
+  protected List<PropertyValue> propertyValues = null;
 
   /**
    * Sets the regular expression that selects the properties to iterate over.
@@ -106,18 +106,22 @@ public class PropertyIteratorTag extends AbstractContentIteratorTag {
         return SKIP_BODY;
 
       // Initialize the tag
-      propertyValues = new ArrayList<String>();
+      propertyValues = new ArrayList<PropertyValue>();
       Pattern p = Pattern.compile(propertyName);
       for (String propertyName : pagelet.getPropertyNames()) {
         Matcher m = p.matcher(propertyName);
         if (m.matches()) {
           String[] values = pagelet.getMultiValueProperty(propertyName);
-          if (values != null)
-            propertyValues.addAll(Arrays.asList(values));
+          if (values != null) {
+            for (String value : values) {
+              propertyValues.add(new PropertyValue(propertyName, value));
+            }
+          }
         }
       }
 
       setupPropertyData();
+      Collections.sort(propertyValues);
 
       // Are there values to iterate over?
       if (iterations == 0)
@@ -125,12 +129,12 @@ public class PropertyIteratorTag extends AbstractContentIteratorTag {
     }
 
     // Get the first property value
-    String propertyValue = propertyValues.get(index);
+    PropertyValue propertyValue = propertyValues.get(index);
 
     pageContext.setAttribute(PropertyIteratorTagVariables.ITERATIONS, new Integer(iterations));
     pageContext.setAttribute(PropertyIteratorTagVariables.INDEX, new Integer(index));
-    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_NAME, propertyName);
-    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_VALUE, propertyValue);
+    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_NAME, propertyValue.getName());
+    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_VALUE, propertyValue.getValue());
 
     return EVAL_BODY_INCLUDE;
   }
@@ -146,10 +150,11 @@ public class PropertyIteratorTag extends AbstractContentIteratorTag {
       return SKIP_BODY;
 
     // Get the current property value
-    String propertyValue = propertyValues.get(index);
+    PropertyValue propertyValue = propertyValues.get(index);
 
     pageContext.setAttribute(PropertyIteratorTagVariables.INDEX, new Integer(index));
-    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_VALUE, propertyValue);
+    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_NAME, propertyValue.getName());
+    pageContext.setAttribute(PropertyIteratorTagVariables.PROPERTY_VALUE, propertyValue.getValue());
 
     return EVAL_BODY_AGAIN;
   }
@@ -205,6 +210,62 @@ public class PropertyIteratorTag extends AbstractContentIteratorTag {
     iterations = 0;
     minOccurs = -1;
     maxOccurs = -1;
+  }
+
+  /**
+   * This class holds for every property value the corresponding property name.
+   */
+  private final static class PropertyValue implements Comparable<PropertyValue> {
+
+    /** The property name */
+    private String propertyName = null;
+
+    /** The property value */
+    private String propertyValue = null;
+
+    /**
+     * Creates a new property value - name mapping.
+     * 
+     * @param propertyName
+     *          the property name
+     * @param propertyValue
+     *          the property value
+     */
+    public PropertyValue(String propertyName, String propertyValue) {
+      this.propertyName = propertyName;
+      this.propertyValue = propertyValue;
+    }
+
+    /**
+     * Returns the property name.
+     * 
+     * @return the property name
+     */
+    String getName() {
+      return propertyName;
+    }
+
+    /**
+     * Returns the property value.
+     * 
+     * @return the property value
+     */
+    String getValue() {
+      return propertyValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(PropertyValue v) {
+      int comparison = propertyName.compareTo(v.propertyName);
+      if (comparison != 0)
+        return comparison;
+      return propertyValue.compareTo(v.propertyValue);
+    }
+
   }
 
 }

@@ -27,7 +27,7 @@ import ch.entwine.weblounge.taglib.WebloungeTag;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,7 +58,7 @@ public class ElementIteratorTag extends WebloungeTag {
   protected String elementName = null;
 
   /** The element values */
-  protected List<String> elementValues = null;
+  protected List<ElementValue> elementValues = null;
 
   /**
    * Sets the regular expression that selects the elements to iterate over.
@@ -107,18 +107,22 @@ public class ElementIteratorTag extends WebloungeTag {
         return SKIP_BODY;
 
       // Initialize the tag
-      elementValues = new ArrayList<String>();
+      elementValues = new ArrayList<ElementValue>();
       Pattern p = Pattern.compile(elementName);
       for (String elementName : pagelet.getContentNames(request.getLanguage())) {
         Matcher m = p.matcher(elementName);
         if (m.matches()) {
           String[] values = pagelet.getMultiValueContent(elementName, request.getLanguage());
-          if (values != null)
-            elementValues.addAll(Arrays.asList(values));
+          if (values != null) {
+            for (String value : values) {
+              elementValues.add(new ElementValue(elementName, value));
+            }
+          }
         }
       }
 
       setupElementData();
+      Collections.sort(elementValues);
 
       // Are there values to iterate over?
       if (iterations == 0)
@@ -126,12 +130,12 @@ public class ElementIteratorTag extends WebloungeTag {
     }
 
     // Get the first element value
-    String propertyValue = elementValues.get(index);
+    ElementValue elementValue = elementValues.get(index);
 
     pageContext.setAttribute(ElementIteratorTagVariables.ITERATIONS, new Integer(iterations));
     pageContext.setAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
-    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_NAME, elementName);
-    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_VALUE, propertyValue);
+    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_NAME, elementValue.getName());
+    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_VALUE, elementValue.getValue());
 
     return EVAL_BODY_INCLUDE;
   }
@@ -147,10 +151,11 @@ public class ElementIteratorTag extends WebloungeTag {
       return SKIP_BODY;
 
     // Get the current element value
-    String elementValue = elementValues.get(index);
+    ElementValue elementValue = elementValues.get(index);
 
     pageContext.setAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
-    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_VALUE, elementValue);
+    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_NAME, elementValue.getName());
+    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_VALUE, elementValue.getValue());
 
     return EVAL_BODY_AGAIN;
   }
@@ -206,6 +211,62 @@ public class ElementIteratorTag extends WebloungeTag {
     iterations = 0;
     minOccurs = -1;
     maxOccurs = -1;
+  }
+
+  /**
+   * This class holds for every element value the corresponding element name.
+   */
+  private final static class ElementValue implements Comparable<ElementValue> {
+
+    /** The element name */
+    private String elementName = null;
+
+    /** The element value */
+    private String elementValue = null;
+
+    /**
+     * Creates a new element value - name mapping.
+     * 
+     * @param elementName
+     *          the element name
+     * @param elementValue
+     *          the element value
+     */
+    public ElementValue(String elementName, String elementValue) {
+      this.elementName = elementName;
+      this.elementValue = elementValue;
+    }
+
+    /**
+     * Returns the element name.
+     * 
+     * @return the element name
+     */
+    String getName() {
+      return elementName;
+    }
+
+    /**
+     * Returns the element value.
+     * 
+     * @return the element value
+     */
+    String getValue() {
+      return elementValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(ElementValue v) {
+      int comparison = elementName.compareTo(v.elementName);
+      if (comparison != 0)
+        return comparison;
+      return elementValue.compareTo(v.elementValue);
+    }
+
   }
 
 }
