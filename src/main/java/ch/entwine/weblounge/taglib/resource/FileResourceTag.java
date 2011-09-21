@@ -26,7 +26,6 @@ import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
-import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -124,9 +123,10 @@ public class FileResourceTag extends WebloungeTag {
     // Store the result in the jsp page context
     try {
       file = (FileResource) repository.get(uri);
-      language = LanguageUtils.getPreferredLanguage(file, request, site);
       file.switchTo(language);
       fileContent = file.getContent(language);
+      if(fileContent == null)
+        fileContent = file.getOriginalContent();
     } catch (ContentRepositoryException e) {
       logger.warn("Error trying to load file " + uri + ": " + e.getMessage(), e);
       return SKIP_BODY;
