@@ -2,23 +2,33 @@
 div.apple_overlay {
 	
 	/* initially overlay is hidden */
-	display:none;
+	display: none;
 	
-	/* growing background image */
-	background-image:url(white.png);
+	border: 10px solid #666;
 	
-	/* some padding to layout nested elements nicely  */
-	padding:35px;
+	background: rgb(82, 82, 82);
 
+	/* for modern browsers use semi-transparent color on the border. nice! */
+	border: 20px solid rgb(82, 82, 82);
+
+	/* hot CSS3 features for mozilla and webkit-based browsers (rounded borders) */
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+
+	/* growing background image */
+	color: #fff;
+	
 	/* a little styling */	
-	font-size:11px;
+	font-size: 13px;
 }
 
 /* default close button positioned on upper right corner */
 div.apple_overlay .close {
-	background-image:url(close.png);
-	position:absolute; right:5px; top:5px;
-	cursor:pointer;
-	height:35px;
-	width:35px;
+	background-image: url(close.png);
+	position: absolute; 
+	right: -15px; 
+	top: -15px;
+	cursor: pointer;
+	height: 35px;
+	width: 35px;
 }

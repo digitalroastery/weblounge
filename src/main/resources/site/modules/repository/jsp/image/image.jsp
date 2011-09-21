@@ -45,9 +45,9 @@
 	  		<% if (StringUtils.isNotBlank(description)) { %>
 				<dd>						
 					<% if ("false".equals(description_preview)) { %>
-						<webl:ifelement name="description">
-							<p class="image_description"><webl:element name="description" /></p>
-						</webl:ifelement>
+					<webl:ifproperty name="description">
+						<p class="image_description"><%= description %></p>
+					</webl:ifproperty>
 					<% } %>
 		
 					<webl:ifproperty name="photographer">
@@ -57,8 +57,8 @@
 				<% } %>
 			</dl>
 		</div>
-		<% if ("true".equals(enlarge)) { %>
-			<div class="apple_overlay black" id="photo<%= image.getIdentifier() %>">
+		<% if (enlarge.equals("true")) { %>
+			<div class="apple_overlay" id="photo<%= image.getIdentifier() %>">
 				<img src="<%= linkToEnlarged %>" />
 				<div class="details">
 					<h2><%= title %></h2>
