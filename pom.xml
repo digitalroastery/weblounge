@@ -383,6 +383,7 @@
             <Service-Component>
               OSGI-INF/endpoint-publishing-service.xml,
               OSGI-INF/endpoint-runtime-information.xml,
+              OSGI-INF/environment-service.xml,
               OSGI-INF/kernel-service.xml,
               OSGI-INF/language-runtime-information.xml,
               OSGI-INF/resource-publishing-service.xml,
