@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -64,16 +65,23 @@ public class Precompiler {
   /** Switch for precompiler error logging */
   protected boolean logErrors = true;
 
+  /** The default environment */
+  protected Environment environment = null;
+
   /**
    * Creates a new precompiler for the site identified by the servlet.
    * 
    * @param servlet
    *          the site servlet
+   * @param environment
+   *          the environment to use
    * @param logErrors
    *          <code>true</code> to log precompilation errors
    */
-  public Precompiler(SiteServlet servlet, boolean logErrors) {
+  public Precompiler(SiteServlet servlet, Environment environment,
+      boolean logErrors) {
     this.servlet = servlet;
+    this.environment = environment;
     this.logErrors = logErrors;
   }
 
@@ -129,7 +137,7 @@ public class Precompiler {
 
       // Prepare the mock request and response objects
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setLocalAddr(site.getConnector().toExternalForm());
+      request.setLocalAddr(site.getConnector(environment).toExternalForm());
       request.setServletPath("");
       MockHttpServletResponse response = new MockHttpServletResponse();
 

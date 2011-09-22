@@ -23,6 +23,7 @@ package ch.entwine.weblounge.dispatcher.impl;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.site.Action;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteListener;
@@ -102,6 +103,9 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
   /** The site manager */
   private SiteManager siteManager = null;
+
+  /** The default environment */
+  private Environment environment = null;
 
   /** Init parameters for jetty */
   private TreeMap<String, String> jasperConfig = new TreeMap<String, String>();
@@ -412,7 +416,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
       // Start the precompiler if requested
       if (precompile) {
-        Precompiler precompiler = new Precompiler(siteServlet, logCompileErrors);
+        Precompiler precompiler = new Precompiler(siteServlet, environment, logCompileErrors);
         precompilers.put(site, precompiler);
         precompiler.precompile();
       }
@@ -620,6 +624,16 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   void removeSiteManager(SiteManager siteManager) {
     this.siteManager = null;
+  }
+
+  /**
+   * Sets the default environment;
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
   }
 
 }
