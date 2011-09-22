@@ -26,6 +26,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -203,7 +204,7 @@ public final class TestUtils {
     } else {
       if (request instanceof HttpPost || request instanceof HttpPut) {
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(new ArrayList<NameValuePair>(), "utf-8");
-        ((HttpPut) request).setEntity(entity);
+        ((HttpEntityEnclosingRequestBase) request).setEntity(entity);
       }
     }
     return httpClient.execute(request);
