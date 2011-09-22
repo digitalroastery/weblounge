@@ -476,6 +476,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       if (uploadedFile == null)
         throw new WebApplicationException(Status.BAD_REQUEST);
 
+      // A mime type would be nice as well
+      if (StringUtils.isBlank(mimeType)) {
+        mimeType = detectMimeTypeFromFile(fileName, uploadedFile);
+        if(mimeType == null)
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
+
       // Get the current user
       User user = securityService.getUser();
       if (user == null)
@@ -1019,7 +1026,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       if (fileName == null) {
         logger.warn("No filename found for upload, request header 'X-File-Name' not specified");
         fileName = uploadedFile.getName();
-        mimeType = mimeTypeDetector.detect(fileName);
       }
 
       // Make sure there is a language
@@ -1029,23 +1035,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
       // A mime type would be nice as well
       if (StringUtils.isBlank(mimeType)) {
-        if (fileName.endsWith(".ogg")) {
-          mimeType = "video/ogg";
-        } else if (fileName.endsWith(".mp4")) {
-          mimeType = "video/mp4";
-        } else if (fileName.endsWith(".webm")) {
-          mimeType = "video/webm";
-        } else {
-          InputStream is = null;
-          try {
-            is = new FileInputStream(uploadedFile);
-            mimeType = mimeTypeDetector.detect(is);
-          } catch (IOException e) {
-            logger.warn("Error detecting mime type: {}", e.getMessage());
-          } finally {
-            IOUtils.closeQuietly(is);
-          }
-        }
+        mimeType = detectMimeTypeFromFile(fileName, uploadedFile);
+        if(mimeType == null)
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
 
       WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
@@ -1214,6 +1206,39 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    */
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Try to detect the mimetype from filename or file.
+   * 
+   * @param fileName
+   *          the file name
+   * @param uploadedFile
+   *          the uploaded file
+   * @return the mimetype or <code>null</code> if no mimetype could be detected
+   */
+  private String detectMimeTypeFromFile(String fileName, File uploadedFile) {
+    String mimeType = mimeTypeDetector.detect(fileName);
+    if(!StringUtils.isBlank(mimeType)) return mimeType;
+    
+    if (fileName.endsWith(".ogg")) {
+      mimeType = "video/ogg";
+    } else if (fileName.endsWith(".mp4")) {
+      mimeType = "video/mp4";
+    } else if (fileName.endsWith(".webm")) {
+      mimeType = "video/webm";
+    } else {
+      InputStream is = null;
+      try {
+        is = new FileInputStream(uploadedFile);
+        mimeType = mimeTypeDetector.detect(is);
+      } catch (IOException e) {
+        logger.warn("Error detecting mime type: {}", e.getMessage());
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+    }
+    return mimeType;
   }
 
   /**
