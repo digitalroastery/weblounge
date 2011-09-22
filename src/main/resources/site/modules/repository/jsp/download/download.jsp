@@ -1,3 +1,5 @@
+<%@page import="ch.entwine.weblounge.common.content.file.FileResource"%>
+<%@page import="ch.entwine.weblounge.common.impl.content.ResourceURIImpl"%>
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
 <%@ taglib uri="/WEB-INF/weblounge-resource.tld" prefix="weblr" %>
 <%@ page import="ch.entwine.weblounge.common.content.ResourceUtils" %>
@@ -9,22 +11,26 @@
 	<webl:element define="title, description">
 	<webl:property define="resourceid">
 	
-	<weblr:file uuid="<%= resourceid %>">
-		<%	
+	<%	
+		new ResourceURIImpl(FileResource.TYPE, site, null, resourceid);
+	%>
+	
+	<weblr:resource uuid="<%= resourceid %>">
+	<%	
 	    /** Resource description */	
 	    if (StringUtils.isNotBlank(description)) {
-	    	description = file.getDescription(language);
+	    	description = resource.getDescription(language);
 	    }
+	
+		/** Create the download link */
+		String link = UrlUtils.concat("/weblounge-files", resource.getIdentifier(), resourcecontent.getFilename());
 		
-			/** Create the download link */
-			String link = UrlUtils.concat("/weblounge-files", file.getIdentifier(), filecontent.getFilename());
-			
-			/** Get the file size */
-			String size = ResourceUtils.formatFileSize(filecontent.getSize());
-			
-			/** The mimetype */
-			String mimetype = filecontent.getMimetype();
-		%>
+		/** Get the resource size */
+		String size = ResourceUtils.formatFileSize(resourcecontent.getSize());
+		
+		/** The mimetype */
+		String mimetype = resourcecontent.getMimetype();
+	%>
 					
 		<table class="download">
 			<tr>
@@ -38,7 +44,7 @@
 			</tr>
 			</webl:ifelement>
 		</table>
-	</weblr:file>	
+	</weblr:resource>
 
 	</webl:property>
 	</webl:element>

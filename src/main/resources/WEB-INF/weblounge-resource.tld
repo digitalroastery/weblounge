@@ -22,6 +22,17 @@
   </tag>
   
   <tag>
+  	<description>Loads a resource</description>
+  	<description>Resource Tag</description>
+  	<name>resource</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.ResourceTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.ResourceTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+  </tag>
+  
+  <tag>
     <description>Loads a file resource</description>
     <display-name>File Resource Tag</display-name>
     <name>file</name>
