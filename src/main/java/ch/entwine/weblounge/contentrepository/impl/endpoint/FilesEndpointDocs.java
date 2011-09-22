@@ -130,13 +130,11 @@ public final class FilesEndpointDocs {
     createFileEndpoint.setDescription("Creates a new file, either at the given path or at a random location and returns the REST url of the created resource.");
     createFileEndpoint.addFormat(Format.xml());
     createFileEndpoint.addStatus(ok("the file was created and the response body contains it's resource url"));
-    createFileEndpoint.addStatus(badRequest("the path was not specified"));
-    createFileEndpoint.addStatus(badRequest("the file content is malformed"));
+    createFileEndpoint.addStatus(badRequest("the path was invalid"));
     createFileEndpoint.addStatus(conflict("a file already exists at the specified path"));
     createFileEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     createFileEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     createFileEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The target path"));
-    createFileEndpoint.addOptionalParameter(new Parameter("content", Parameter.Type.Text, "The resource data"));
     createFileEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, createFileEndpoint);
 
@@ -169,21 +167,21 @@ public final class FilesEndpointDocs {
     docs.addEndpoint(Endpoint.Type.WRITE, deleteFileEndpoint);
 
     // PUT /{resource}/content/{language}
-    Endpoint updateFileContentEndpoint = new Endpoint("/{resource}/content/{language}", Method.PUT, "updatefilecontent");
-    updateFileContentEndpoint.setDescription("Updates the specified file contents. If the client supplies an If-Match header, the update is processed only if the header value matches the file's ETag");
-    updateFileContentEndpoint.addFormat(Format.xml());
-    updateFileContentEndpoint.addStatus(ok("the file content was updated"));
-    updateFileContentEndpoint.addStatus(badRequest("the file content was not specified"));
-    updateFileContentEndpoint.addStatus(badRequest("the language does not exist"));
-    updateFileContentEndpoint.addStatus(badRequest("the file content is malformed"));
-    updateFileContentEndpoint.addStatus(preconditionFailed("the file's etag does not match the value specified in the If-Match header"));
-    updateFileContentEndpoint.addStatus(methodNotAllowed("the site or it's content repository is read-only"));
-    updateFileContentEndpoint.addStatus(serviceUnavailable("the site or it's content repository is temporarily offline"));
-    updateFileContentEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The file identifier"));
-    updateFileContentEndpoint.addPathParameter(new Parameter("language", Parameter.Type.String, "The language"));
-    updateFileContentEndpoint.addOptionalParameter(new Parameter("content", Parameter.Type.File, "The resource content"));
-    updateFileContentEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.WRITE, updateFileContentEndpoint);
+    Endpoint addFileContentEndpoint = new Endpoint("/{resource}/content/{language}", Method.POST, "addfilecontent");
+    addFileContentEndpoint.setDescription("Updates the specified file contents. If the client supplies an If-Match header, the update is processed only if the header value matches the file's ETag");
+    addFileContentEndpoint.addFormat(Format.xml());
+    addFileContentEndpoint.addStatus(ok("the file content was updated"));
+    addFileContentEndpoint.addStatus(badRequest("the file content was not specified"));
+    addFileContentEndpoint.addStatus(badRequest("the language does not exist"));
+    addFileContentEndpoint.addStatus(badRequest("the file content is malformed"));
+    addFileContentEndpoint.addStatus(preconditionFailed("the file's etag does not match the value specified in the If-Match header"));
+    addFileContentEndpoint.addStatus(methodNotAllowed("the site or it's content repository is read-only"));
+    addFileContentEndpoint.addStatus(serviceUnavailable("the site or it's content repository is temporarily offline"));
+    addFileContentEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The file identifier"));
+    addFileContentEndpoint.addPathParameter(new Parameter("language", Parameter.Type.String, "The language"));
+    addFileContentEndpoint.addBodyParameter(true, null, "the filecontent");
+    addFileContentEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, addFileContentEndpoint);
 
     // DELETE /{resource}/content/{language}
     Endpoint deleteFileContentEndpoint = new Endpoint("/{resource}/content/{language}", Method.DELETE, "deletefilecontent");

@@ -64,7 +64,7 @@ public class ContentRepositoryEndpoint {
   static final Logger logger = LoggerFactory.getLogger(ContentRepositoryEndpoint.class);
 
   /** Regular expression to match the resource type */
-  protected static final Pattern resourceTypeRegex = Pattern.compile(".*<\\s*([\\w]*) .*");
+  protected static final Pattern resourceTypeRegex = Pattern.compile("<([a-z]*)\\s");
 
   /** The sites that are online */
   protected transient SiteManager sites = null;
@@ -337,7 +337,7 @@ public class ContentRepositoryEndpoint {
    */
   protected String getResourceType(String input) {
     Matcher m = resourceTypeRegex.matcher(input);
-    if (m.matches()) {
+    if (m.find()) {
       return m.group(1);
     }
     return null;

@@ -332,51 +332,15 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    *          the request
    * @param resourceId
    *          the resource identifier
-   * @return the resource
-   */
-  @GET
-  @Path("/{resource}/content")
-  public Response getFileContent(@Context HttpServletRequest request,
-      @PathParam("resource") String resourceId) {
-
-    // Check the parameters
-    if (resourceId == null)
-      throw new WebApplicationException(Status.BAD_REQUEST);
-
-    // Get the resource
-    final Resource<?> resource = loadResource(request, resourceId, null);
-    if (resource == null || resource.contents().isEmpty()) {
-      throw new WebApplicationException(Status.NOT_FOUND);
-    }
-
-    // Determine the language
-    Site site = getSite(request);
-    Language preferred = LanguageUtils.getPreferredLanguage(resource, request, site);
-    if (preferred == null) {
-      preferred = resource.getOriginalContent().getLanguage();
-    }
-
-    return getResourceContent(request, resource, preferred);
-  }
-
-  /**
-   * Returns the resource content with the given identifier or a
-   * <code>404</code> if the resource or the resource content could not be
-   * found.
-   * 
-   * @param request
-   *          the request
-   * @param resourceId
-   *          the resource identifier
-   * @param languageId
+   * @param language
    *          the language identifier
    * @return the resource
    */
   @GET
-  @Path("/{resource}/content/{languageid}")
+  @Path("/{resource}/content/{language}")
   public Response getFileContent(@Context HttpServletRequest request,
       @PathParam("resource") String resourceId,
-      @PathParam("languageid") String languageId) {
+      @PathParam("language") String languageId) {
 
     // Check the parameters
     if (resourceId == null)
@@ -415,16 +379,17 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    *          the input stream
    * @return the resource
    */
-  @PUT
-  @Path("/{resource}/content/{languageid}")
+  @POST
+  @Path("/{resource}/content/{language}")
+  @Produces(MediaType.MEDIA_TYPE_WILDCARD)
   public Response addFileContent(@Context HttpServletRequest request,
       @PathParam("resource") String resourceId,
-      @PathParam("languageid") String languageId, InputStream is) {
+      @PathParam("language") String languageId) {
+
+    Site site = getSite(request);
 
     // Check the parameters
     if (resourceId == null)
-      throw new WebApplicationException(Status.BAD_REQUEST);
-    if (is == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Extract the language
@@ -439,69 +404,148 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
-    // Check the ETag
-    if (ResourceUtils.isMismatch(request, resource, null)) {
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    }
+    String fileName = null;
+    String mimeType = null;
+    File uploadedFile = null;
 
-    // Try to create the resource
-    ResourceURI uri = resource.getURI();
-    ResourceContent content = null;
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resource.getURI().getType());
-    ResourceReader<?, ?> reader;
     try {
-      reader = (ResourceReader<?, ?>) serializer.getContentReader();
-      // TODO: Get input stream for resource
-      content = (ResourceContent) reader.read(null, resource.getURI().getSite());
-    } catch (IOException e) {
-      logger.warn("Error reading resource content {} from request", uri);
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    } catch (ParserConfigurationException e) {
-      logger.warn("Error configuring parser to read resource content {}: {}", uri, e.getMessage());
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    } catch (SAXException e) {
-      logger.warn("Error parsing udpated resource {}: {}", uri, e.getMessage());
-      throw new WebApplicationException(Status.BAD_REQUEST);
+      // Multipart form encoding?
+      if (ServletFileUpload.isMultipartContent(request)) {
+        try {
+          ServletFileUpload payload = new ServletFileUpload();
+          for (FileItemIterator iter = payload.getItemIterator(request); iter.hasNext();) {
+            FileItemStream item = iter.next();
+            if (item.isFormField()) {
+              String fieldName = item.getFieldName();
+              String fieldValue = Streams.asString(item.openStream());
+              if (StringUtils.isBlank(fieldValue))
+                continue;
+              if (OPT_MIMETYPE.equals(fieldName)) {
+                mimeType = fieldValue;
+              }
+            } else {
+              // once the body gets read iter.hasNext must not be invoked
+              // or the stream can not be read
+              fileName = StringUtils.trim(item.getName());
+              mimeType = StringUtils.trim(item.getContentType());
+              uploadedFile = File.createTempFile("upload-", null);
+              FileOutputStream fos = new FileOutputStream(uploadedFile);
+              try {
+                IOUtils.copy(item.openStream(), fos);
+              } catch (IOException e) {
+                IOUtils.closeQuietly(fos);
+                throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+              } finally {
+                IOUtils.closeQuietly(fos);
+              }
+            }
+          }
+        } catch (FileUploadException e) {
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        }
+      }
+
+      // Octet binary stream
+      else {
+        try {
+          fileName = StringUtils.trimToNull(request.getHeader("X-File-Name"));
+          mimeType = StringUtils.trimToNull(request.getParameter(OPT_MIMETYPE));
+        } catch (UnknownLanguageException e) {
+          throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        InputStream is = null;
+        FileOutputStream fos = null;
+        try {
+          is = request.getInputStream();
+          if (is == null)
+            throw new WebApplicationException(Status.BAD_REQUEST);
+          uploadedFile = File.createTempFile("upload-", null);
+          fos = new FileOutputStream(uploadedFile);
+          IOUtils.copy(is, fos);
+        } catch (IOException e) {
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        } finally {
+          IOUtils.closeQuietly(is);
+          IOUtils.closeQuietly(fos);
+        }
+
+      }
+      // Has there been a file in the request?
+      if (uploadedFile == null)
+        throw new WebApplicationException(Status.BAD_REQUEST);
+
+      // Get the current user
+      User user = securityService.getUser();
+      if (user == null)
+        throw new WebApplicationException(Status.UNAUTHORIZED);
+
+      // Make sure the user has editing rights
+      if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
+        throw new WebApplicationException(Status.UNAUTHORIZED);
+
+      // Try to create the resource content
+      InputStream is = null;
+      ResourceContent content = null;
+      ResourceContentReader<?> reader = null;
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resource.getURI().getType());
+      try {
+        reader = serializer.getContentReader();
+        is = new FileInputStream(uploadedFile);
+        content = reader.createFromContent(is, language, uploadedFile.length(), fileName, mimeType);
+        content.setCreator(user);
+      } catch (IOException e) {
+        logger.warn("Error reading resource content {} from request", resource.getURI());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      } catch (ParserConfigurationException e) {
+        logger.warn("Error configuring parser to read resource content {}: {}", resource.getURI(), e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      } catch (SAXException e) {
+        logger.warn("Error parsing udpated resource {}: {}", resource.getURI(), e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+
+      // Make sure the content repository is writable
+      if (site.getContentRepository().isReadOnly()) {
+        logger.warn("Attempt to write to read-only content repository {}", site);
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      }
+
+      URI uri = null;
+      WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+      try {
+        is = new FileInputStream(uploadedFile);
+        resource = contentRepository.putContent(resource.getURI(), content, is);
+        uri = new URI(resource.getURI().getIdentifier());
+      } catch (IOException e) {
+        logger.warn("Error writing content to resource {}: {}", resource.getURI(), e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      } catch (IllegalStateException e) {
+        logger.warn("Illegal state while adding content to resource {}: {}", resource.getURI(), e.getMessage());
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      } catch (ContentRepositoryException e) {
+        logger.warn("Error adding content to resource {}: {}", resource.getURI(), e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      } catch (URISyntaxException e) {
+        logger.warn("Error creating a uri for resource {}: {}", resource.getURI(), e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+
+      // Create the response
+      ResponseBuilder response = Response.created(uri);
+      response.type(MediaType.MEDIA_TYPE_WILDCARD);
+      response.tag(ResourceUtils.getETagValue(resource));
+      response.lastModified(ResourceUtils.getModificationDate(resource));
+      return response.build();
+
+    } finally {
+      FileUtils.deleteQuietly(uploadedFile);
     }
-
-    Site site = getSite(request);
-
-    // Make sure the content repository is writable
-    if (site.getContentRepository().isReadOnly()) {
-      logger.warn("Attempt to write to read-only content repository {}", site);
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    }
-
-    // Get the current user
-    User user = securityService.getUser();
-    if (user == null)
-      throw new WebApplicationException(Status.UNAUTHORIZED);
-
-    // Make sure the user has editing rights
-    if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
-      throw new WebApplicationException(Status.UNAUTHORIZED);
-
-    content.setCreator(user);
-
-    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    try {
-      resource = contentRepository.putContent(resource.getURI(), content, is);
-    } catch (IOException e) {
-      logger.warn("Error writing content to resource {}: {}", uri, e.getMessage());
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    } catch (IllegalStateException e) {
-      logger.warn("Illegal state while adding content to resource {}: {}", uri, e.getMessage());
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    } catch (ContentRepositoryException e) {
-      logger.warn("Error adding content to resource {}: {}", uri, e.getMessage());
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    }
-
-    // Create the response
-    ResponseBuilder response = Response.ok();
-    response.tag(ResourceUtils.getETagValue(resource));
-    response.lastModified(ResourceUtils.getModificationDate(resource));
-    return response.build();
   }
 
   /**
@@ -518,10 +562,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    * @return the resource
    */
   @DELETE
-  @Path("/{resource}/content/{languageid}")
+  @Path("/{resource}/content/{language}")
   public Response deleteFileContent(@Context HttpServletRequest request,
       @PathParam("resource") String resourceId,
-      @PathParam("languageid") String languageId) {
+      @PathParam("language") String languageId) {
 
     // Check the parameters
     if (resourceId == null)
@@ -711,7 +755,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   @POST
   @Path("/")
   public Response createFile(@Context HttpServletRequest request,
-      @FormParam("resource") String resourceXml, @FormParam("path") String path) {
+      @FormParam("path") String path) {
 
     Site site = getSite(request);
 
@@ -758,42 +802,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       resourceURI = new ResourceURIImpl(null, site, "/" + uuid.replaceAll("-", ""), uuid);
     }
 
-    // Parse the resource and store it
-    Resource<?> resource = null;
-
     URI uri = null;
-    if (!StringUtils.isBlank(resourceXml)) {
-      logger.debug("Adding resource to {}", resourceURI);
-
-      // Determine the resource type
-      String resourceType = getResourceType(resourceXml);
-      if (resourceType == null) {
-        logger.warn("Tried to create a resource without a type");
-        throw new WebApplicationException(Status.BAD_REQUEST);
-      }
-
-      try {
-        ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
-        ResourceReader<?, ?> resourceReader = serializer.getReader();
-        resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
-      } catch (IOException e) {
-        logger.warn("Error reading resource {} from request", resourceURI);
-        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-      } catch (ParserConfigurationException e) {
-        logger.warn("Error configuring parser to read udpated resource {}: {}", resourceURI, e.getMessage());
-        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-      } catch (SAXException e) {
-        logger.warn("Error parsing udpated resource {}: {}", resourceURI, e.getMessage());
-        throw new WebApplicationException(Status.BAD_REQUEST);
-      }
-    } else {
+    Resource<?> resource = null;
+    try {
+      // Parse the resource and store it
       logger.debug("Creating new resource at {}", resourceURI);
       resource = new FileResourceImpl(resourceURI);
       resource.setCreated(user, new Date());
-    }
-
-    // Store the new resource
-    try {
       contentRepository.put(resource);
       uri = new URI(UrlUtils.concat(request.getRequestURL().toString(), resourceURI.getIdentifier()));
     } catch (URISyntaxException e) {
@@ -920,9 +935,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     File uploadedFile = null;
 
     try {
-
       // Multipart form encoding?
-
       if (ServletFileUpload.isMultipartContent(request)) {
         try {
           ServletFileUpload payload = new ServletFileUpload();
@@ -970,9 +983,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       }
 
       // Octet binary stream
-
       else {
-
         try {
           fileName = StringUtils.trimToNull(request.getHeader("X-File-Name"));
           path = StringUtils.trimToNull(request.getParameter(OPT_PATH));
@@ -1018,11 +1029,11 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
       // A mime type would be nice as well
       if (StringUtils.isBlank(mimeType)) {
-        if(fileName.endsWith(".ogg")) {
+        if (fileName.endsWith(".ogg")) {
           mimeType = "video/ogg";
-        } else if(fileName.endsWith(".mp4")) {
+        } else if (fileName.endsWith(".mp4")) {
           mimeType = "video/mp4";
-        } else if(fileName.endsWith(".webm")) {
+        } else if (fileName.endsWith(".webm")) {
           mimeType = "video/webm";
         } else {
           InputStream is = null;
