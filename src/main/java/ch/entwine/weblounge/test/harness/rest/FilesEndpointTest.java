@@ -11,7 +11,6 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.test.util.TestSiteUtils;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -19,11 +18,11 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +41,6 @@ public class FilesEndpointTest extends IntegrationTestBase {
 
   /** The path to the files endpoint */
   private static final String FILES_ENDPOINT_PATH = "system/weblounge/files";
-
-  /** XML Image File to test */
-  private static final String imageXMLFile = "/repository/images/test/image/index.xml";
 
   /** Image File to test */
   private static final String imageFile = "/repository/files/test/document/de.jpg";
@@ -100,8 +96,15 @@ public class FilesEndpointTest extends IntegrationTestBase {
     testGetFileContent(serverUrl, resourceId);
     testGetWrongFileContent(serverUrl, resourceId);
 
-    // testCreateFile(serverUrl);
+    testCreateFile(serverUrl);
+    testDeleteFile(serverUrl);
+    
+    testCreateFileWithoutPath(serverUrl);
+    testDeleteFile(serverUrl);
+    
     testUploadFile(serverUrl);
+    testDeleteFile(serverUrl);
+    
     testUploadFileByPath(serverUrl);
 
     testUpdateFile(serverUrl);
@@ -265,11 +268,9 @@ public class FilesEndpointTest extends IntegrationTestBase {
    *           if file creation fails
    */
   private void testCreateFile(String serverUrl) throws Exception {
-    String fileXML = IOUtils.toString(getClass().getResourceAsStream(imageXMLFile));
-
     String requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
     HttpPost createFileRequest = new HttpPost(requestUrl);
-    String[][] params = new String[][] { { "resource", fileXML } };
+    String[][] params = new String[][] { { "path", filePath } };
     logger.debug("Creating new file at {}", createFileRequest.getURI());
     HttpClient httpClient = new DefaultHttpClient();
     try {
@@ -287,8 +288,79 @@ public class FilesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+    
+    // Test Conflict
+    logger.debug("Creating new file at existing path {}", createFileRequest.getURI());
+    httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, createFileRequest, params);
+      assertEquals(HttpServletResponse.SC_CONFLICT, response.getStatusLine().getStatusCode());
+      assertEquals(0, response.getEntity().getContentLength());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+    
+    requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
+    HttpGet getFileRequest = new HttpGet(UrlUtils.concat(requestUrl, fileId));
+    logger.debug("Requesting file at {}", getFileRequest.getURI());
+    httpClient = new DefaultHttpClient();
+    Document pageXml = null;
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getFileRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
 
-    // TODO Test Conflict by path
+      pageXml = TestUtils.parseXMLResponse(response);
+      assertEquals(fileId, XPathHelper.valueOf(pageXml, "/file/@id"));
+      assertEquals(filePath, XPathHelper.valueOf(pageXml, "/file/@path"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+  }
+  
+  /**
+   * Creates a new file resource with path on the server.
+   * 
+   * @param serverUrl
+   *          the base url
+   * @throws Exception
+   *           if file creation fails
+   */
+  private void testCreateFileWithoutPath(String serverUrl) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
+    HttpPost createFileRequest = new HttpPost(requestUrl);
+    logger.debug("Creating new file at {}", createFileRequest.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, createFileRequest, null);
+      assertEquals(HttpServletResponse.SC_CREATED, response.getStatusLine().getStatusCode());
+      assertEquals(0, response.getEntity().getContentLength());
+      
+      // Extract the id of the new page
+      assertNotNull(response.getHeaders("Location"));
+      String locationHeader = response.getHeaders("Location")[0].getValue();
+      assertTrue(locationHeader.startsWith(serverUrl));
+      fileId = locationHeader.substring(locationHeader.lastIndexOf("/") + 1);
+      assertEquals("Identifier doesn't have correct length", 36, fileId.length());
+      logger.debug("Id of the new file is {}", fileId);
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+    
+    requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
+    HttpGet getFileRequest = new HttpGet(UrlUtils.concat(requestUrl, fileId));
+    logger.debug("Requesting file at {}", getFileRequest.getURI());
+    httpClient = new DefaultHttpClient();
+    Document pageXml = null;
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getFileRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      
+      pageXml = TestUtils.parseXMLResponse(response);
+      assertEquals(fileId, XPathHelper.valueOf(pageXml, "/file/@id"));
+      assertNull(XPathHelper.valueOf(pageXml, "/image/@path"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
   }
 
   /**
@@ -436,12 +508,27 @@ public class FilesEndpointTest extends IntegrationTestBase {
    *           if the file update fails
    */
   private void testUpdateFile(String serverUrl) throws Exception {
-    String fileXML = IOUtils.toString(getClass().getResourceAsStream(imageXMLFile));
-
     String requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
-    HttpPut updateFileRequest = new HttpPut(UrlUtils.concat(requestUrl, fileId));
+    HttpGet getFileRequest = new HttpGet(UrlUtils.concat(requestUrl, fileId));
+    logger.debug("Requesting file at {}", getFileRequest.getURI());
     HttpClient httpClient = new DefaultHttpClient();
-    String[][] params = new String[][] { { "content", fileXML } };
+    String responseXml;
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getFileRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertTrue(response.getEntity().getContentLength() > 0);
+
+      responseXml = EntityUtils.toString(response.getEntity(), "utf-8");
+      responseXml = responseXml.replace("path=\"" + filePath + "\"", "");
+      responseXml = responseXml.replace("<metadata></metadata>", "<metadata><rights language=\"de\"><![CDATA[Copyright 2009 by T. Wunden]]></rights></metadata>");
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
+    HttpPut updateFileRequest = new HttpPut(UrlUtils.concat(requestUrl, fileId));
+    httpClient = new DefaultHttpClient();
+    String[][] params = new String[][] { { "content", responseXml } };
     logger.info("Updating file at {}", updateFileRequest.getURI());
     try {
       HttpResponse response = TestUtils.request(httpClient, updateFileRequest, params);
@@ -452,7 +539,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
     }
 
     requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
-    HttpGet getFileRequest = new HttpGet(UrlUtils.concat(requestUrl, fileId));
+    getFileRequest = new HttpGet(UrlUtils.concat(requestUrl, fileId));
     logger.debug("Requesting file at {}", getFileRequest.getURI());
     httpClient = new DefaultHttpClient();
     Document pageXml = null;
@@ -464,8 +551,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(fileId, XPathHelper.valueOf(pageXml, "/image/@id"));
       assertNull(XPathHelper.valueOf(pageXml, "/image/@path"));
-      assertNotNull(XPathHelper.valueOf(pageXml, "/image/body/content"));
-      assertNull(XPathHelper.valueOf(pageXml, "/image/body/content/@fr"));
+      assertNotNull(XPathHelper.valueOf(pageXml, "/image/head/metadata/rights"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -481,34 +567,27 @@ public class FilesEndpointTest extends IntegrationTestBase {
    */
   private void testUpdateFileContents(String serverUrl) throws Exception {
     String requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
-    HttpPut updateFileRequest = new HttpPut(UrlUtils.concat(requestUrl, fileId, "content", "fr"));
+    HttpPost updateFileRequest = new HttpPost(UrlUtils.concat(requestUrl, fileId, "content", "fr"));
     HttpClient httpClient = new DefaultHttpClient();
-    // TODO
-    BasicHttpEntity myEntity = new BasicHttpEntity();
-    myEntity.setContent(getClass().getResourceAsStream(imageFile));
-    updateFileRequest.setEntity(myEntity);
+    
+    MultipartEntity multipartEntity = new MultipartEntity();
+    String filename = "newFileContent.jpg";
+    multipartEntity.addPart(requestUrl, new InputStreamBody(getClass().getResourceAsStream(imageFile), mimetypeGerman, filename));
+    updateFileRequest.setEntity(multipartEntity);
+    
     logger.info("Updating filecontent at {}", updateFileRequest.getURI());
     try {
-      HttpResponse response = TestUtils.request(httpClient, updateFileRequest, null);
-      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      HttpResponse response = httpClient.execute(updateFileRequest);
+      assertEquals(HttpServletResponse.SC_CREATED, response.getStatusLine().getStatusCode());
       assertEquals(0, response.getEntity().getContentLength());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
-
-    requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
-    HttpGet getFileRequest = new HttpGet(UrlUtils.concat(requestUrl, fileId));
-    logger.debug("Requesting file at {}", getFileRequest.getURI());
-    httpClient = new DefaultHttpClient();
-    Document pageXml = null;
-    try {
-      HttpResponse response = TestUtils.request(httpClient, getFileRequest, null);
-      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      assertTrue(response.getEntity().getContentLength() > 0);
-
-      pageXml = TestUtils.parseXMLResponse(response);
-      assertEquals(fileId, XPathHelper.valueOf(pageXml, "/image/@id"));
-      assertNotNull(XPathHelper.valueOf(pageXml, "/image/body/content@fr"));
+      
+      // Extract the id of the new page
+      assertNotNull(response.getHeaders("Location"));
+      String locationHeader = response.getHeaders("Location")[0].getValue();
+      assertTrue(locationHeader.startsWith(serverUrl));
+      fileId = locationHeader.substring(locationHeader.lastIndexOf("/") + 1);
+      assertEquals("Identifier doesn't have correct length", 36, fileId.length());
+      logger.debug("Id of the new file is {}", fileId);
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -520,9 +599,9 @@ public class FilesEndpointTest extends IntegrationTestBase {
       HttpResponse response = TestUtils.request(httpClient, getFileContentRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertEquals(sizeGerman, response.getEntity().getContentLength());
-      assertEquals(mimetypeGerman, response.getEntity().getContentType());
+      assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
-      assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+      assertEquals("inline; filename=" + filename, response.getHeaders("Content-Disposition")[0].getValue());
       response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
@@ -559,11 +638,10 @@ public class FilesEndpointTest extends IntegrationTestBase {
       HttpResponse response = TestUtils.request(httpClient, getFileRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue(response.getEntity().getContentLength() > 0);
-      assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
 
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(fileId, XPathHelper.valueOf(pageXml, "/image/@id"));
-      assertNull(XPathHelper.valueOf(pageXml, "/image/body/content"));
+      assertEquals("fr", XPathHelper.valueOf(pageXml, "/image/body/content/@language"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -579,7 +657,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
    */
   private void testDeleteFile(String serverUrl) throws Exception {
     String requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
-    HttpDelete deleteContentRequest = new HttpDelete(UrlUtils.concat(requestUrl, fileId, "content", "de"));
+    HttpDelete deleteContentRequest = new HttpDelete(UrlUtils.concat(requestUrl, fileId));
     logger.debug("Deleting file at {}", deleteContentRequest.getURI());
     DefaultHttpClient httpClient = new DefaultHttpClient();
     try {
