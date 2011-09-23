@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.content;
 
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Environment;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +51,8 @@ public interface PreviewGenerator {
    * 
    * @param resource
    *          the resource
+   * @param environment
+   *          the environment
    * @param language
    *          the preview language
    * @param style
@@ -61,8 +64,9 @@ public interface PreviewGenerator {
    * @throws IOException
    *           if the resource content cannot be read
    */
-  void createPreview(Resource<?> resource, Language language, ImageStyle style,
-      InputStream is, OutputStream os) throws IOException;
+  void createPreview(Resource<?> resource, Environment environment,
+      Language language, ImageStyle style, InputStream is, OutputStream os)
+      throws IOException;
 
   /**
    * Creates a filename for the resource preview based on the resource itself,
