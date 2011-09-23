@@ -414,7 +414,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     storeResource(resource);
 
     // Create the preview images. Don't if the site is currently being created.
-    if (connected && !initializing)
+    if (connected && !initializing && resource.getURI().getVersion() == Resource.LIVE)
       createPreviews(resource);
 
     return resource;
@@ -462,7 +462,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     index.update(resource);
 
     // Create the preview images
-    if (connected && !initializing)
+    if (connected && !initializing && resource.getURI().getVersion() == Resource.LIVE)
       createPreviews(resource);
 
     // Make sure related stuff gets thrown out of the cache
