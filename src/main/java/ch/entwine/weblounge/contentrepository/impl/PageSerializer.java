@@ -42,6 +42,8 @@ import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.PageInputDocument;
@@ -53,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,6 +123,18 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
    */
   public Resource<ResourceContent> newResource(Site site) {
     return new PageImpl(new PageURIImpl(site));
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
+   *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
+   *      ch.entwine.weblounge.common.language.Language)
+   */
+  public Resource<ResourceContent> newResource(Site site, InputStream is,
+      User user, Language language) {
+    return newResource(site);
   }
 
   /**
@@ -204,12 +219,12 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
    */
   public SearchResultItem toSearchResultItem(Site site, double relevance,
       List<ResourceMetadata<?>> metadata) {
-    
+
     Map<String, ResourceMetadata<?>> metadataMap = new HashMap<String, ResourceMetadata<?>>();
     for (ResourceMetadata<?> metadataItem : metadata) {
       metadataMap.put(metadataItem.getName(), metadataItem);
     }
-    
+
     String id = (String) metadataMap.get(ID).getValues().get(0);
     String path = (String) metadataMap.get(PATH).getValues().get(0);
 

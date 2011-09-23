@@ -36,22 +36,31 @@ import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.image.ImageContentReader;
+import ch.entwine.weblounge.common.impl.content.image.ImageMetadata;
+import ch.entwine.weblounge.common.impl.content.image.ImageMetadataUtils;
 import ch.entwine.weblounge.common.impl.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.ImageInputDocument;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,6 +121,40 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
    */
   public Resource<ImageContent> newResource(Site site) {
     return new ImageResourceImpl(new ImageResourceURIImpl(site));
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
+   *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
+   *      ch.entwine.weblounge.common.language.Language)
+   */
+  public Resource<ImageContent> newResource(Site site, InputStream is,
+      User user, Language language) {
+    ImageMetadata imageMetadata = ImageMetadataUtils.extractMetadata(new BufferedInputStream(is));
+    ImageResource imageResource = new ImageResourceImpl(new ImageResourceURIImpl(site));
+    imageResource.setCreated(user, new Date());
+
+    if (!StringUtils.isBlank(imageMetadata.getCaption())) {
+      imageResource.setTitle(imageMetadata.getCaption(), language);
+    }
+    if (!StringUtils.isBlank(imageMetadata.getLegend())) {
+      imageResource.setDescription(imageMetadata.getLegend(), language);
+    }
+    if (!StringUtils.isBlank(imageMetadata.getPhotographer())) {
+      imageResource.setCreator(new UserImpl(user.getLogin(), user.getRealm(), imageMetadata.getPhotographer()));
+    }
+    for (String keyword : imageMetadata.getKeywords()) {
+      imageResource.addSubject(keyword);
+    }
+    if (!StringUtils.isBlank(imageMetadata.getCopyright())) {
+      imageResource.setRights(imageMetadata.getCopyright(), language);
+    }
+    if (imageMetadata.getDateTaken() != null) {
+      imageResource.setCreationDate(imageMetadata.getDateTaken());
+    }
+    return imageResource;
   }
 
   /**

@@ -52,6 +52,7 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -68,6 +69,7 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -500,8 +502,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       try {
         reader = serializer.getContentReader();
         is = new FileInputStream(uploadedFile);
-        content = reader.createFromContent(is, language, uploadedFile.length(), fileName, mimeType);
-        content.setCreator(user);
+        content = reader.createFromContent(is,user, language, uploadedFile.length(), fileName, mimeType);
       } catch (IOException e) {
         logger.warn("Error reading resource content {} from request", resource.getURI());
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1039,22 +1040,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         if (mimeType == null)
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
-
-      WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-
-      // Create the resource uri
-      ResourceURI resourceURI = null;
-      Resource<?> resource = null;
-      URI uri = null;
-      logger.debug("Adding resource to {}", resourceURI);
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
-      if (serializer == null) {
-        logger.debug("No specialized resource serializer found, using regular file serializer");
-        serializer = ResourceSerializerFactory.getSerializerByType(FileResource.TYPE);
-      }
-      resource = serializer.newResource(site);
-      resourceURI = resource.getURI();
-
+      
       // Set owner and date created
       User user = securityService.getUser();
       if (user == null)
@@ -1064,7 +1050,33 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
         throw new WebApplicationException(Status.UNAUTHORIZED);
 
-      resource.setCreated(user, new Date());
+      WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+
+      // Create the resource uri
+      URI uri = null;
+      InputStream is = null;
+      Resource<?> resource = null;
+      ResourceURI resourceURI = null;
+      logger.debug("Adding resource to {}", resourceURI);
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
+      if (serializer == null) {
+        logger.debug("No specialized resource serializer found, using regular file serializer");
+        serializer = ResourceSerializerFactory.getSerializerByType(FileResource.TYPE);
+      }
+      if(serializer instanceof ImageResourceSerializer) {
+        try {
+          is = new FileInputStream(uploadedFile);
+          resource = ((ImageResourceSerializer) serializer).newResource(site, is, user, language);
+        } catch (FileNotFoundException e) {
+          logger.warn("Error creating resource at {} from image: {}", uri, e.getMessage());
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        } finally {
+          IOUtils.closeQuietly(is);
+        }
+      } else {
+        resource = serializer.newResource(site);
+      }
+      resourceURI = resource.getURI();
 
       // If a path has been specified, set it
       if (path != null && StringUtils.isNotBlank(path)) {
@@ -1108,11 +1120,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
       ResourceContent content = null;
       ResourceContentReader<?> reader = null;
-      InputStream is = null;
       try {
         reader = serializer.getContentReader();
         is = new FileInputStream(uploadedFile);
-        content = reader.createFromContent(is, language, uploadedFile.length(), fileName, mimeType);
+        content = reader.createFromContent(is, user, language, uploadedFile.length(), fileName, mimeType);
       } catch (IOException e) {
         logger.warn("Error reading resource content {} from request", uri);
         try {
@@ -1148,9 +1159,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       } finally {
         IOUtils.closeQuietly(is);
       }
-
-      content.setCreator(user);
-      content.setFilename(fileName);
 
       try {
         is = new FileInputStream(uploadedFile);

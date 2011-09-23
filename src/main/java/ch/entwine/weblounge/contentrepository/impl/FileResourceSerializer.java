@@ -41,6 +41,8 @@ import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.FileInputDocument;
@@ -51,6 +53,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +110,16 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
    */
   public Resource<FileContent> newResource(Site site) {
     return new FileResourceImpl(new FileResourceURIImpl(site));
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site, java.io.InputStream, ch.entwine.weblounge.common.security.User, ch.entwine.weblounge.common.language.Language)
+   */
+  public Resource<FileContent> newResource(Site site, InputStream is,
+      User user, Language language) {
+    return newResource(site);
   }
 
   /**
