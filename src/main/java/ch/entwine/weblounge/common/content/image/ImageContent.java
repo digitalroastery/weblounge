@@ -58,5 +58,100 @@ public interface ImageContent extends FileContent {
    * @return the height
    */
   int getHeight();
-  
+
+  /**
+   * Returns the shooting location
+   * 
+   * @return the shooting location
+   */
+  String getLocation();
+
+  /**
+   * Sets the shooting location
+   * 
+   * @param location
+   *          the shooting location to set
+   */
+  void setLocation(String location);
+
+  /**
+   * @return the gpsLat
+   */
+  double getGpsLat();
+
+  /**
+   * @return the gpsLong
+   */
+  double getGpsLong();
+
+  /**
+   * Set the gps position
+   * 
+   * @param gpsLat
+   *          the gpsLat to set
+   * @param gpsLong
+   *          the gpsLong to set
+   */
+  void setGpsPosition(double gpsLat, double gpsLong);
+
+  /**
+   * Returns the film speed used for this picture
+   * 
+   * @return the filmspeed
+   */
+  int getFilmspeed();
+
+  /**
+   * Sets the film speed used for this picture
+   * 
+   * @param filmspeed
+   *          the filmspeed to set
+   */
+  void setFilmspeed(int filmspeed);
+
+  /**
+   * Returns the f-number used for this picture
+   * 
+   * @return the fnumber
+   */
+  float getFNumber();
+
+  /**
+   * Sets the f-number used for this picture
+   * 
+   * @param fnumber
+   *          the f-number to set
+   */
+  void setFNumber(float fnumber);
+
+  /**
+   * Returns the focal width used for this picture
+   * 
+   * @return the focal width
+   */
+  int getFocalWidth();
+
+  /**
+   * Sets the focal width used for this picture
+   * 
+   * @param focalWidth
+   *          the focal width to set
+   */
+  void setFocalWidth(int focalWidth);
+
+  /**
+   * Returns the exposure time used for this picture
+   * 
+   * @return the exposure time
+   */
+  float getExposureTime();
+
+  /**
+   * Sets the exposure time used for this picture
+   * 
+   * @param exposureTime
+   *          the exposure time to set
+   */
+  void setExposureTime(float exposureTime);
+
 }

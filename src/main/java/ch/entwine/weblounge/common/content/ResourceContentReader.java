@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.content;
 
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 
 import org.xml.sax.SAXException;
 
@@ -66,7 +67,7 @@ public interface ResourceContentReader<T extends ResourceContent> {
    *          the content type
    * @return the resource content object
    */
-  T createFromContent(InputStream is, Language language, long size,
+  T createFromContent(InputStream is, User user, Language language, long size,
       String fileName, String mimeType) throws IOException;
 
   /**
