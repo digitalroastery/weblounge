@@ -118,6 +118,10 @@ steal.plugins('jqueryui/dialog',
 			}, this)
 		});
 		this.editorDialog.find("form#wbl-validate").validate();
+		
+		if(scripts.length < 1) {
+			this.editorDialog.dialog('open');
+		}
     },
     
     _openEditor: function(size) {
