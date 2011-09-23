@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Environment;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -46,17 +47,19 @@ public class ImagePreviewGenerator implements PreviewGenerator {
   public boolean supports(Resource<?> resource, Language language) {
     return resource.getContent(language) != null;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(ch.entwine.weblounge.common.content.Resource,
+   *      ch.entwine.weblounge.common.site.Environment,
    *      ch.entwine.weblounge.common.language.Language,
    *      ch.entwine.weblounge.common.content.image.ImageStyle,
    *      java.io.InputStream, java.io.OutputStream)
    */
-  public void createPreview(Resource<?> resource, Language language,
-      ImageStyle style, InputStream is, OutputStream os) throws IOException {
+  public void createPreview(Resource<?> resource, Environment environment,
+      Language language, ImageStyle style, InputStream is, OutputStream os)
+      throws IOException {
     String mimetype = resource.getContent(language).getMimetype();
     String format = mimetype.substring(mimetype.indexOf("/") + 1);
     ImageStyleUtils.style(is, os, format, style);

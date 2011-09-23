@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Environment;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -52,11 +53,13 @@ public class FilePreviewGenerator implements PreviewGenerator {
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(ch.entwine.weblounge.common.content.Resource,
+   *      ch.entwine.weblounge.common.site.Environment,
    *      ch.entwine.weblounge.common.language.Language,
    *      ch.entwine.weblounge.common.content.image.ImageStyle,
    *      java.io.InputStream, java.io.OutputStream)
    */
-  public void createPreview(Resource<?> resource, Language language,
+  public void createPreview(Resource<?> resource, Environment environment,
+      Language language,
       ImageStyle style, InputStream is, OutputStream os) throws IOException {
     // TODO: create generic file preview image and return scaled
     throw new IllegalStateException("Previews for regular documents not yet supported");

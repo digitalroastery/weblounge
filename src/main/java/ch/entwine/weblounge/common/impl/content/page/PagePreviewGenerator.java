@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.impl.util.html.HTMLUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
@@ -147,19 +148,21 @@ public class PagePreviewGenerator implements PreviewGenerator {
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(ch.entwine.weblounge.common.content.Resource,
+   *      ch.entwine.weblounge.common.site.Environment,
    *      ch.entwine.weblounge.common.language.Language,
    *      ch.entwine.weblounge.common.content.image.ImageStyle,
    *      java.io.InputStream, java.io.OutputStream)
    */
-  public void createPreview(Resource<?> resource, Language language,
-      ImageStyle style, InputStream is, OutputStream os) throws IOException {
+  public void createPreview(Resource<?> resource, Environment environment,
+      Language language, ImageStyle style, InputStream is, OutputStream os)
+      throws IOException {
 
     ResourceURI uri = resource.getURI();
     Site site = uri.getSite();
     String html = null;
     try {
-      URL pageURL = new URL(UrlUtils.concat(site.getConnector().toExternalForm(), PAGE_HANDLER_PREFIX, uri.getIdentifier()));
-      html = render(pageURL, site, language);
+      URL pageURL = new URL(UrlUtils.concat(site.getConnector(environment).toExternalForm(), PAGE_HANDLER_PREFIX, uri.getIdentifier()));
+      html = render(pageURL, site, environment, language);
       if (StringUtils.isBlank(html)) {
         logger.warn("Error rendering preview of page " + uri.getPath());
         return;
@@ -244,6 +247,8 @@ public class PagePreviewGenerator implements PreviewGenerator {
    *          the page url
    * @param site
    *          the site
+   * @param environment
+   *          the environment
    * @param language
    *          the language
    * @return the rendered <code>HTML</code>
@@ -252,8 +257,8 @@ public class PagePreviewGenerator implements PreviewGenerator {
    * @throws IOException
    *           if reading from the servlet fails
    */
-  private String render(URL rendererURL, Site site, Language language)
-      throws ServletException, IOException {
+  private String render(URL rendererURL, Site site, Environment environment,
+      Language language) throws ServletException, IOException {
     Servlet servlet = siteServlets.get(site.getIdentifier());
 
     String httpContextURI = UrlUtils.concat("/weblounge-sites", site.getIdentifier());
@@ -266,7 +271,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
 
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setLocalAddr(site.getConnector().toExternalForm());
+      request.setLocalAddr(site.getConnector(environment).toExternalForm());
       request.setAttribute(WebloungeRequest.LANGUAGE, language);
       request.setPathInfo(pathInfo);
       request.setRequestURI(UrlUtils.concat(httpContextURI, pathInfo));
