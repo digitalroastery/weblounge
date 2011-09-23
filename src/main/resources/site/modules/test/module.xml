@@ -1,10 +1,12 @@
 <module id="test" xmlns="http://www.entwinemedia.com/weblounge/3.0/module"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
+  
   <enable>true</enable>
   <name>Testmodul</name>
+  
   <pagelets>
-    <pagelet id="content" composeable="true">
+    <pagelet id="content" composeable="false">
       <name>Page content</name>
       <renderer>file://${module.root}/pagelets/content.jsp</renderer>
       <recheck>1d10M</recheck>
@@ -16,7 +18,7 @@
           type="text/javascript" />
       </includes>
     </pagelet>
-    <pagelet id="include" composeable="true">
+    <pagelet id="include" composeable="false">
       <name>Greeting</name>
       <renderer>file://${module.root}/pagelets/include.jsp</renderer>
       <recheck>1d10M</recheck>
@@ -31,6 +33,7 @@
       <renderer>file://${module.root}/pagelets/i18n.jsp</renderer>
     </pagelet>
   </pagelets>
+  
   <actions>
     <action id="greeter.html">
       <name>Greetings</name>
@@ -62,6 +65,7 @@
       <mountpoint>/greeting/json</mountpoint>
     </action>
   </actions>
+  
   <jobs>
     <job id="startup">
       <name>Job title</name>
@@ -99,6 +103,7 @@
     </job>
     -->
   </jobs>
+  
   <imagestyles>
     <imagestyle id="none">
       <name>Original size</name>
@@ -133,4 +138,5 @@
       <height>250</height>
     </imagestyle>
   </imagestyles>
+  
 </module>
