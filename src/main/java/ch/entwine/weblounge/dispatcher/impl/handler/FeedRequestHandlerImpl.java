@@ -20,12 +20,12 @@
 
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
+import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.Renderer.RendererType;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -39,6 +39,7 @@ import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -271,7 +272,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
         entry.setLink(item.getUrl().getLink());
         entry.setAuthor(page.getCreator().getName());
         entry.setTitle(page.getTitle());
-        
+
         // Categories
         if (page.getSubjects().length > 0) {
           List<SyndCategory> categories = new ArrayList<SyndCategory>();
@@ -298,12 +299,13 @@ public class FeedRequestHandlerImpl implements RequestHandler {
 
           renderer = module.getRenderer(pagelet.getIdentifier());
           URL rendererURL = renderer.getRenderer(RendererType.Feed.toString());
+          Environment environment = request.getEnvironment();
           if (rendererURL == null)
             rendererURL = renderer.getRenderer();
           if (rendererURL != null) {
             String rendererContent = null;
             try {
-              rendererContent = loadContents(rendererURL, site, page, composer, pagelet);
+              rendererContent = loadContents(rendererURL, site, page, composer, pagelet, environment);
             } catch (ServletException e) {
               logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
             } catch (IOException e) {
@@ -398,6 +400,8 @@ public class FeedRequestHandlerImpl implements RequestHandler {
    *          the composer
    * @param pagelet
    *          the pagelet
+   * @param environment
+   *          the environment
    * @return the servlet response, serialized to a string
    * @throws IOException
    *           if the servlet fails to create the response
@@ -405,7 +409,8 @@ public class FeedRequestHandlerImpl implements RequestHandler {
    *           if an exception occurs while processing
    */
   private String loadContents(URL rendererURL, Site site, Page page,
-      Composer composer, Pagelet pagelet) throws IOException, ServletException {
+      Composer composer, Pagelet pagelet, Environment environment)
+      throws IOException, ServletException {
 
     Servlet servlet = siteServlets.get(site.getIdentifier());
 
@@ -419,7 +424,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
 
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setLocalAddr(site.getConnector().toExternalForm());
+      request.setLocalAddr(site.getConnector(environment).toExternalForm());
       request.setAttribute(WebloungeRequest.PAGE, page);
       request.setAttribute(WebloungeRequest.COMPOSER, composer);
       request.setAttribute(WebloungeRequest.PAGELET, pagelet);
