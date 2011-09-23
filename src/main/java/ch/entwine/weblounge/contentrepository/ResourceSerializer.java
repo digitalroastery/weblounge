@@ -27,10 +27,13 @@ import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.SearchResultItem;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.xml.sax.SAXException;
 
+import java.io.InputStream;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -146,6 +149,23 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * @return the new resource
    */
   Resource<S> newResource(Site site);
+
+  /**
+   * Creates a new image resource and add the existing Exif data to the image
+   * resource.
+   * 
+   * @param site
+   *          the site
+   * @param is
+   *          the resource
+   * @param user
+   *          the creating user
+   * @param language
+   *          the language for the metadata
+   * @return the new resource
+   */
+  Resource<S> newResource(Site site, InputStream is, User user,
+      Language language);
 
   /**
    * Returns an object for preview generation or <code>null</code> if the
