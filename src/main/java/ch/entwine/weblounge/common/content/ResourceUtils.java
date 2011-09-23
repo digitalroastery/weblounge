@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.content;
 
 import ch.entwine.weblounge.common.content.image.ImageStyle;
+import ch.entwine.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -64,7 +65,29 @@ public final class ResourceUtils {
    */
   public static boolean hasChanged(HttpServletRequest request,
       Resource<?> resource) throws IllegalArgumentException {
-    return hasChanged(request, resource, null);
+    return hasChanged(request, resource, null, null);
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * 
+   * @param request
+   *          the client request
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean hasChanged(HttpServletRequest request,
+      Resource<?> resource, Language language) throws IllegalArgumentException {
+    return hasChanged(request, resource, null, language);
   }
 
   /**
@@ -78,6 +101,8 @@ public final class ResourceUtils {
    *          the resource
    * @param style
    *          the imageStle
+   * @param langauge
+   *          the language
    * @return <code>true</code> if the resource is more recent than the version
    *         that is cached at the client.
    * @throws IllegalArgumentException
@@ -85,9 +110,10 @@ public final class ResourceUtils {
    *           to a date.
    */
   public static boolean hasChanged(HttpServletRequest request,
-      Resource<?> resource, ImageStyle style) throws IllegalArgumentException {
+      Resource<?> resource, ImageStyle style, Language language)
+      throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
-      return isModified(request, resource);
+      return isModified(request, resource, language);
     } else if (request.getHeader("If-None-Match") != null) {
       return isMismatch(request, resource, style);
     }
@@ -103,8 +129,8 @@ public final class ResourceUtils {
    *          the client request
    * @param resource
    *          the resource
-   * @return <code>true</code> if the resource is more recent than the version that
-   *         is cached at the client.
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
    * @throws IllegalArgumentException
    *           if the <code>If-Modified-Since</code> header cannot be converted
    *           to a date.
@@ -113,7 +139,34 @@ public final class ResourceUtils {
       Resource<?> resource) throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
       long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-      long resourceModificationDate = getModificationDate(resource).getTime();
+      long resourceModificationDate = getModificationDate(resource, null).getTime();
+      return cachedModificationDate < resourceModificationDate;
+    }
+    return true;
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * 
+   * @param request
+   *          the client request
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean isModified(HttpServletRequest request,
+      Resource<?> resource, Language language) throws IllegalArgumentException {
+    if (request.getHeader("If-Modified-Since") != null) {
+      long cachedModificationDate = request.getDateHeader("If-Modified-Since");
+      long resourceModificationDate = getModificationDate(resource, language).getTime();
       return cachedModificationDate < resourceModificationDate;
     }
     return true;
@@ -127,6 +180,7 @@ public final class ResourceUtils {
    * The decision is based on the availability and value of the
    * <code>If-None-Match</code> header (called <code>ETag</code>).
    * <p>
+   * 
    * @param request
    *          the client request
    * @param resource
@@ -179,7 +233,7 @@ public final class ResourceUtils {
 
   /**
    * Returns the value for the <code>ETag</code> header field, which is
-   * calculated from the resource identifier and the resource's modification 
+   * calculated from the resource identifier and the resource's modification
    * date.
    * 
    * @param resource
@@ -205,7 +259,7 @@ public final class ResourceUtils {
     long etag = resource.getIdentifier().hashCode();
     if (style != null)
       etag += style.getIdentifier().hashCode();
-    etag += getModificationDate(resource).getTime();
+    etag += getModificationDate(resource, null).getTime();
     return new StringBuffer().append("\"").append(etag).append("\"").toString();
   }
 
@@ -221,9 +275,40 @@ public final class ResourceUtils {
    */
   public static Date getModificationDate(Resource<?> resource)
       throws IllegalArgumentException {
+    return getModificationDate(resource, null);
+  }
+
+  /**
+   * Returns the modification date. If the resource has never been modified, its
+   * creation date is returned instead.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @return the modification date
+   * @throws IllegalArgumentException
+   *           if the resource is <code>null</code>
+   */
+  public static Date getModificationDate(Resource<?> resource, Language language)
+      throws IllegalArgumentException {
     if (resource == null)
       throw new IllegalArgumentException("Resource cannot be null");
-    return resource.getModificationDate() != null ? resource.getModificationDate() : resource.getCreationDate();
+
+    // Has a language been specified? If so, use the localized content
+    if (language != null) {
+      ResourceContent content = resource.getContent(language);
+      if (content != null)
+        return content.getCreationDate();
+    }
+
+    // The resource's modified date is the last resort
+    Date modificationDate = resource.getModificationDate();
+    if (modificationDate != null)
+      return modificationDate;
+
+    // If nothing else helps, return the creation date
+    return resource.getCreationDate();
   }
 
   /**
