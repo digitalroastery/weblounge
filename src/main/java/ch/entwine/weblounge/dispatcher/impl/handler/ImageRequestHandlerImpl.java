@@ -219,7 +219,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     }
     
     // Check the modified headers
-    if (!ResourceUtils.hasChanged(request, imageResource, style)) {
+    if (!ResourceUtils.hasChanged(request, imageResource, style, language)) {
       logger.debug("Image {} was not modified", imageURI);
       DispatchUtils.sendNotModified(request, response);
       return true;
@@ -236,7 +236,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     response.setContentType(contentType);
 
     // Add last modified header
-    response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource).getTime());
+    response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource, language).getTime());
     
     // Set Expires header
     response.setDateHeader("Expires", System.currentTimeMillis() + Times.MS_PER_HOUR);
@@ -288,11 +288,9 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Write the scaled file back to the response
     File scaledImageFile = null;
     try {
-
-      // If the scaled version is not there yet, create it
       String filename = imageContents.getFilename();
       scaledImageFile = ImageStyleUtils.createScaledFile(imageURI, filename, language, style);
-      long lastModified = ResourceUtils.getModificationDate(imageResource).getTime();
+      long lastModified = ResourceUtils.getModificationDate(imageResource, language).getTime();
       if (!scaledImageFile.isFile() || scaledImageFile.lastModified() < lastModified) {
         InputStream is = contentRepository.getContent(imageURI, language);
         FileOutputStream fos = new FileOutputStream(scaledImageFile);
@@ -302,19 +300,64 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
         IOUtils.closeQuietly(fos);
         scaledImageFile.setLastModified(lastModified);
       }
-
-      response.setHeader("Content-Disposition", "inline; filename=" + scaledImageFile.getName());
-      response.setHeader("Content-Length", Long.toString(scaledImageFile.length()));
-      imageInputStream = new FileInputStream(scaledImageFile);
-      IOUtils.copy(imageInputStream, response.getOutputStream());
-      response.getOutputStream().flush();
-      return true;
     } catch (ContentRepositoryException e) {
       logger.error("Unable to load image {}: {}", new Object[] {
           imageURI,
           e.getMessage(),
           e });
+
+      File f = scaledImageFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+
       DispatchUtils.sendInternalError(request, response);
+      return true;
+    } catch (IOException e) {
+      logger.error("Error sending image '{}' to the client: {}", imageURI, e.getMessage());
+      
+      File f = scaledImageFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+      
+      DispatchUtils.sendInternalError(request, response);
+      return true;
+    } catch (Throwable t) {
+      logger.error("Error creating scaled image '{}': {}", imageURI, t.getMessage());
+
+      File f = scaledImageFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+
+      DispatchUtils.sendInternalError(request, response);
+      return true;
+    } finally {
+      IOUtils.closeQuietly(imageInputStream);
+    }
+
+    // Did scaling work? If not, cleanup and tell the user
+    if (scaledImageFile.length() == 0) {
+      File f = scaledImageFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+      DispatchUtils.sendInternalError(request, response);
+      return true;
+    }
+
+    // Write the image back to the client
+    try {
+      response.setHeader("Content-Disposition", "inline; filename=" + scaledImageFile.getName());
+      response.setHeader("Content-Length", Long.toString(scaledImageFile.length()));
+      imageInputStream = new FileInputStream(scaledImageFile);
+      IOUtils.copy(imageInputStream, response.getOutputStream());
+      response.getOutputStream().flush();
       return true;
     } catch (EOFException e) {
       logger.debug("Error writing image '{}' back to client: connection closed by client", imageResource);
@@ -324,7 +367,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       DispatchUtils.sendInternalError(request, response);
       return true;
     } catch (Throwable t) {
-      FileUtils.deleteQuietly(scaledImageFile);
       logger.error("Error creating scaled image '{}': {}", imageURI, t.getMessage());
       DispatchUtils.sendInternalError(request, response);
       return true;

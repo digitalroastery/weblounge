@@ -200,7 +200,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     }
 
     // Check the modified headers
-    if (!ResourceUtils.hasChanged(request, fileResource)) {
+    if (!ResourceUtils.hasChanged(request, fileResource, language)) {
       logger.debug("File {} was not modified", fileURI);
       DispatchUtils.sendNotModified(request, response);
       return true;
@@ -214,7 +214,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     response.setContentType(contentType);
 
     // Add last modified header
-    response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(fileResource).getTime());
+    response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(fileResource, language).getTime());
 
     // Add content size
     response.setHeader("Content-Length", Long.toString(content.getSize()));
