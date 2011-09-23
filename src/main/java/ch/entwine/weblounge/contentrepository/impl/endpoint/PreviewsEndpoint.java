@@ -167,7 +167,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.hasChanged(request, resource, style)) {
+    if (!ResourceUtils.hasChanged(request, resource, style, language)) {
       return Response.notModified().build();
     }
 
@@ -216,7 +216,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     File scaledResourceFile = null;
     try {
       scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
-      long lastModified = ResourceUtils.getModificationDate(resource).getTime();
+      long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
       if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
         contentRepositoryIs = contentRepository.getContent(resourceURI, language);
         fos = new FileOutputStream(scaledResourceFile);
@@ -241,6 +241,16 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
         }
       }
 
+      // Did scaling work? If not, cleanup and tell the user
+      if (scaledResourceFile.length() == 0) {
+        File f = scaledResourceFile;
+        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+          FileUtils.deleteQuietly(f);
+          f = f.getParentFile();
+        }
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
+
       // The scaled resource should now exist
       resourceInputStream = new FileInputStream(scaledResourceFile);
       contentLength = scaledResourceFile.length();
@@ -253,21 +263,46 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       logger.error(e.getMessage(), e);
       IOUtils.closeQuietly(resourceInputStream);
       FileUtils.deleteQuietly(scaledResourceFile);
+
+      File f = scaledResourceFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+
       throw new WebApplicationException();
     } catch (IOException e) {
       logger.error("Error scaling image '{}': {}", resourceURI, e.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
-      FileUtils.deleteQuietly(scaledResourceFile);
+
+      File f = scaledResourceFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+
       throw new WebApplicationException();
     } catch (IllegalArgumentException e) {
       logger.error("Image '{}' is of unsupported format: {}", resourceURI, e.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
-      FileUtils.deleteQuietly(scaledResourceFile);
+
+      File f = scaledResourceFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+
       throw new WebApplicationException();
     } catch (Throwable t) {
       logger.error("Error scaling image '{}': {}", resourceURI, t.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
-      FileUtils.deleteQuietly(scaledResourceFile);
+
+      File f = scaledResourceFile;
+      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+      }
+
       throw new WebApplicationException();
     } finally {
       IOUtils.closeQuietly(contentRepositoryIs);
@@ -295,7 +330,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     response.type(mimetype);
 
     // Add last modified header
-    response.lastModified(ResourceUtils.getModificationDate(resource));
+    response.lastModified(ResourceUtils.getModificationDate(resource, language));
 
     // Add ETag header
     String eTag = ResourceUtils.getETagValue(resource, style);

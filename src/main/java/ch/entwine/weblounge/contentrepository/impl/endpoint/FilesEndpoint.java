@@ -547,7 +547,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       ResponseBuilder response = Response.created(uri);
       response.type(MediaType.MEDIA_TYPE_WILDCARD);
       response.tag(ResourceUtils.getETagValue(resource));
-      response.lastModified(ResourceUtils.getModificationDate(resource));
+      response.lastModified(ResourceUtils.getModificationDate(resource, language));
       return response.build();
 
     } finally {

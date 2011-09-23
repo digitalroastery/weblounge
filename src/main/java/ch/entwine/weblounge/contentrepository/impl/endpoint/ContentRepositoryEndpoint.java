@@ -88,7 +88,7 @@ public class ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.hasChanged(request, resource)) {
+    if (!ResourceUtils.hasChanged(request, resource, language)) {
       return Response.notModified().build();
     }
 
@@ -143,7 +143,7 @@ public class ContentRepositoryEndpoint {
     // Add an e-tag and send the response
     response.header("Content-Disposition", "inline; filename=" + resource.getContent(language).getFilename());
     response.tag(ResourceUtils.getETagValue(resource));
-    response.lastModified(ResourceUtils.getModificationDate(resource));
+    response.lastModified(ResourceUtils.getModificationDate(resource, language));
     return response.build();
   }
 

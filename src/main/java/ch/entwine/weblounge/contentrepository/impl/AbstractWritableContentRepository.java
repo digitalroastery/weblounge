@@ -691,7 +691,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
 
       // Find the modification date
-      long lastModified = ResourceUtils.getModificationDate(resource).getTime();
+      long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
 
       // Create the file if it doesn't exist or if it is outdated
       if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {

@@ -783,14 +783,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the request
    * @param pageId
    *          the page identifier
-   * @param userId
-   *          the user
    * @return the page
    */
   @PUT
   @Path("/{page}/lock")
   public Response lockPage(@Context HttpServletRequest request,
-      @PathParam("page") String pageId, @FormParam("user") String userId,
+      @PathParam("page") String pageId,
       @HeaderParam("If-Match") String ifMatchHeader) {
 
     // Check the parameters
@@ -862,7 +860,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
 
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && (!page.getLockOwner().equals(user) && ! isAdmin)) {
+    if (page.isLocked() && (!page.getLockOwner().equals(user) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
