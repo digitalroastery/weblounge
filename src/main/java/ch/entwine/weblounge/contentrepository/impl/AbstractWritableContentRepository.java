@@ -193,7 +193,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       Resource<?> r = get(u);
       r.lock(user);
       r.setModified(user, date);
-      put(r);
+      put(r, false);
       if (r.getVersion() == uri.getVersion())
         resource = r;
     }
@@ -213,7 +213,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       Resource<?> r = get(u);
       r.unlock();
       r.setModified(user, date);
-      put(r);
+      put(r, false);
       if (r.getVersion() == uri.getVersion())
         resource = r;
     }
@@ -369,6 +369,31 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   public <T extends ResourceContent> Resource<T> put(Resource<T> resource)
       throws ContentRepositoryException, IOException, IllegalStateException {
+    return put(resource, true);
+  }
+
+  /**
+   * Updates the resource and optionally updates the resource's previews.
+   * 
+   * @param resource
+   *          the resource
+   * @param updatePreviews
+   *          <code>true</code> to update the previews
+   * @return the updated resource
+   * @throws ContentRepositoryException
+   *           if updating the content repository fails
+   * @throws IOException
+   *           if adding fails due to a database error
+   * @throws IllegalStateException
+   *           if the resource does not exist and contains a non-empty content
+   *           section.
+   * @throws IllegalStateException
+   *           if the resource exists but contains different resource content
+   *           than what is specified in the updated document
+   */
+  private <T extends ResourceContent> Resource<T> put(Resource<T> resource,
+      boolean updatePreviews) throws ContentRepositoryException, IOException,
+      IllegalStateException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
@@ -414,7 +439,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     storeResource(resource);
 
     // Create the preview images. Don't if the site is currently being created.
-    if (connected && !initializing && resource.getURI().getVersion() == Resource.LIVE)
+    if (updatePreviews && connected && !initializing && resource.getURI().getVersion() == Resource.LIVE)
       createPreviews(resource);
 
     return resource;
