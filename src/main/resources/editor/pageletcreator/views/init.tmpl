@@ -2,13 +2,17 @@
 	<!-- the tabs -->
 	<ul class="wbl-tabs">
 		{{each modules}}
+			{{if $value.pagelets.length > 0}}
 			<li><a href="#${$value.id}">${$value.name}</a></li>
+			{{/if}}
     	{{/each}}
 	</ul>
 	<!-- tab "panes" -->
 	<div class="wbl-panes">
 		{{each modules}}
+			{{if $value.pagelets.length > 0}}
 			<div class="wbl-pane${$value.id}"></div>
+			{{/if}}
     	{{/each}}
 	</div>
 </div>

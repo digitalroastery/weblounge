@@ -42,13 +42,17 @@ steal.plugins('jquery',
 //	        	favorites[i] = pagelet;
 //	        }
 	    	
+			$.each(modules, $.proxy(function(index, module) {
+		    	this.options.runtime.getModulePagelets(module.id, function(pagelets) {
+		    		modules[index].pagelets = pagelets;
+		    	});
+			}, this));
+	    	
 			$(el).html('//editor/pageletcreator/views/init.tmpl', {modules: modules, favorites: {}});
 			
 			var tabs = $("#wbl-moduleTabs ul").tabs('div.wbl-panes > div');
 			
-			$.each(modules, $.proxy(function(index, module) {
-				this._loadContent(module);
-			}, this));
+			this._loadContent(modules);
 			
 //			var tab_items = $("ul:first li:first", tabs).droppable({
 //				accept: ".wbl-draggable",
@@ -87,9 +91,11 @@ steal.plugins('jquery',
 				start: function(e, ui) {
 					$(ui.helper).removeClass('wbl-draggable');
 					$(ui.helper).addClass('wbl-draggableHelper');
+					steal.dev.log('show border');
 				},
 				stop: function(e, ui) {
 					$('.composer').editor_composer('enable');
+					steal.dev.log('hide border');
 				}
 			}).disableSelection();
 	    },
@@ -115,15 +121,16 @@ steal.plugins('jquery',
 	    	$("body").css("margin-top","45px");
 	    },
 	    
-	    _loadContent: function(module) {
-	    	this.options.runtime.getModulePagelets(module.id, $.proxy(function(pagelets) {
+	    _loadContent: function(modules) {
+			$.each(modules, $.proxy(function(index, module) {
 	    		var contentPane = this.element.find('div.wbl-pane' + module.id);
-	    		$.each(pagelets, function(key, pagelet) {
+	    		if(contentPane.length < 1) return;
+	    		$.each(module.pagelets, function(key, pagelet) {
 	    			contentPane.append('<div id="' + pagelet.id + '" class="wbl-draggable ui-widget-content" module="' + module.id + '">' + pagelet.id + '</div>');
 	    		});
 	    		this._calculateHeight();
 	    		this._initDraggable(contentPane);
-	    	}, this));
+			}, this));
 	    },
 	    
 	    _calculateHeight: function() {

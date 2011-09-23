@@ -20,6 +20,7 @@ steal.then('jsonix')
 		
 		getModule: function(params, success, error) {
 			$.ajax('/system/weblounge/sites/' + params.id + '/modules/' + params.module, {
+				async: false,
 				success: function(xml) {
 					var pagelets = Site.parseModule(xml);
 					if(params.composeable == true) {
