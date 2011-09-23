@@ -23,6 +23,7 @@ package ch.entwine.weblounge.common.impl.content.image;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.impl.content.ResourceContentReaderImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
@@ -36,6 +37,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.Date;
 
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
@@ -53,8 +55,8 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
   /**
    * Creates a new file content reader that will parse serialized XML version of
    * the file content and store it in the
-   * {@link ch.entwine.weblounge.common.content.ResourceContent} that is returned
-   * by the {@link #read} method.
+   * {@link ch.entwine.weblounge.common.content.ResourceContent} that is
+   * returned by the {@link #read} method.
    * 
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
@@ -80,8 +82,8 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public ImageContent createFromXml(InputStream is) throws SAXException, IOException,
-      ParserConfigurationException {
+  public ImageContent createFromXml(InputStream is) throws SAXException,
+      IOException, ParserConfigurationException {
 
     SAXParser parser = parserRef.get();
     if (parser == null) {
@@ -98,10 +100,44 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
    * @see ch.entwine.weblounge.common.content.ResourceContentReader#createFromContent(java.io.InputStream,
    *      ch.entwine.weblounge.common.language.Language, long, java.lang.String)
    */
-  public ImageContent createFromContent(InputStream is, Language language,
-      long size, String fileName, String mimeType) throws IOException {
-    ImageContentImpl content = new ImageContentImpl(fileName, language, mimeType);
-    
+  public ImageContent createFromContent(InputStream is, User user,
+      Language language, long size, String fileName, String mimeType)
+      throws IOException {
+    ImageContent content = new ImageContentImpl(fileName, language, mimeType);
+    content.setCreator(user);
+    content.setCreationDate(new Date());
+
+    // TODO use input stream twice
+//    PipedOutputStream outputStream = new PipedOutputStream();
+//    PipedInputStream pipedInputStream = new PipedInputStream(outputStream);
+//    InputStream tis = new TeeInputStream(is, outputStream);
+//    ImageMetadata imageMetadata = ImageMetadataUtils.extractMetadata(new BufferedInputStream(tis));
+//
+//    if (!StringUtils.isBlank(imageMetadata.getPhotographer())) {
+//      content.setCreator(new UserImpl(user.getLogin(), user.getRealm(), imageMetadata.getPhotographer()));
+//    }
+//    if (imageMetadata.getDateTaken() != null) {
+//      content.setCreationDate(imageMetadata.getDateTaken());
+//    }
+//    if (!StringUtils.isBlank(imageMetadata.getLocation())) {
+//      content.setLocation(imageMetadata.getLocation());
+//    }
+//    if (imageMetadata.getGpsLat() != 0 && imageMetadata.getGpsLong() != 0) {
+//      content.setGpsPosition(imageMetadata.getGpsLat(), imageMetadata.getGpsLong());
+//    }
+//    if (imageMetadata.getFilmspeed() != 0) {
+//      content.setFilmspeed(imageMetadata.getFilmspeed());
+//    }
+//    if (imageMetadata.getFNumber() != 0) {
+//      content.setFNumber(imageMetadata.getFNumber());
+//    }
+//    if (imageMetadata.getFocalWidth() != 0) {
+//      content.setFocalWidth(imageMetadata.getFocalWidth());
+//    }
+//    if (imageMetadata.getExposureTime() != 0) {
+//      content.setExposureTime(imageMetadata.getExposureTime());
+//    }
+
     SeekableStream imageInputStream = null;
     try {
       imageInputStream = new MemoryCacheSeekableStream(is);
@@ -147,6 +183,15 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
       logger.debug("Started reading image content {}", content);
     }
 
+    // gps position
+    else if ("gps".equals(raw)) {
+      double gpsLat = Double.parseDouble(attrs.getValue("lat"));
+      double gpsLong = Double.parseDouble(attrs.getValue("lng"));
+      content.setGpsPosition(gpsLat, gpsLong);
+      logger.trace("Image's gps lat is '{}'", content.getGpsLat());
+      logger.trace("Image's gps long is '{}'", content.getGpsLong());
+    }
+
     super.startElement(uri, local, raw, attrs);
   }
 
@@ -162,17 +207,17 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     // mimetype
     if ("mimetype".equals(raw)) {
       content.setMimetype(getCharacters());
-      logger.trace("File content's mimetype is '{}'", content.getMimetype());
+      logger.trace("Images's content mimetype is '{}'", content.getMimetype());
     }
 
     // size
     else if ("size".equals(raw)) {
       content.setSize(Long.parseLong(getCharacters()));
-      logger.trace("File content's filesize is '{}'", content.getSize());
+      logger.trace("Image's content filesize is '{}'", content.getSize());
     }
 
     // width
-    if ("width".equals(raw)) {
+    else if ("width".equals(raw)) {
       content.setWidth(Integer.parseInt(getCharacters()));
       logger.trace("Image's width is '{}'", content.getWidth());
     }
@@ -181,6 +226,36 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     else if ("height".equals(raw)) {
       content.setHeight(Integer.parseInt(getCharacters()));
       logger.trace("Image's height is '{}'", content.getHeight());
+    }
+
+    // location
+    else if ("location".equals(raw)) {
+      content.setLocation(getCharacters());
+      logger.trace("Image's location is '{}'", content.getLocation());
+    }
+
+    // filmspeed
+    else if ("filmspeed".endsWith(raw)) {
+      content.setFilmspeed(Integer.parseInt(getCharacters()));
+      logger.trace("Image's filmspeed is '{}'", content.getFilmspeed());
+    }
+
+    // fnumber
+    else if ("fnumber".equals(raw)) {
+      content.setFNumber(Float.parseFloat(getCharacters()));
+      logger.trace("Image's fnumber is '{}'", content.getFNumber());
+    }
+
+    // focalwidth
+    else if ("focalwidth".equals(raw)) {
+      content.setFocalWidth(Integer.parseInt(getCharacters()));
+      logger.trace("Image's focalwidth is '{}'", content.getFocalWidth());
+    }
+
+    // exposuretime
+    else if ("exposuretime".equals(raw)) {
+      content.setExposureTime(Float.parseFloat(getCharacters()));
+      logger.trace("Image's exposuretime is '{}'", content.getExposureTime());
     }
 
     else {

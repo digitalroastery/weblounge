@@ -24,6 +24,10 @@ import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.impl.content.file.FileContentImpl;
 import ch.entwine.weblounge.common.language.Language;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+
 
 /**
  * Default implementation of an image resource content.
@@ -35,6 +39,27 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
 
   /** The image height in pixels */
   protected int height = -1;
+  
+  /** location where the picture was taken */
+  protected String location = null;
+
+  /** GPS latitude of the place where the picture was taken */
+  protected double gpsLat = -1;
+
+  /** GPS longitude of the place where the picture was taken */
+  protected double gpsLong = -1;
+
+  /** film speed with which the picture was taken */
+  protected int filmspeed = -1;
+
+  /** f-number with which the picture was taken */
+  protected float fnumber = -1;
+
+  /** focal width with which the picture was taken */
+  protected int focalWidth = -1;
+
+  /** exposure time used while taking the picture */
+  protected float exposureTime = -1;
 
   /**
    * Creates a new image content representation.
@@ -138,6 +163,124 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
   public int getHeight() {
     return height;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#getLocation()
+   */
+  public String getLocation() {
+    return location;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#setLocation(java.lang.String)
+   */
+  public void setLocation(String location) {
+    this.location = location;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#getGpsLat()
+   */
+  public double getGpsLat() {
+    return gpsLat;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#getGpsLong()
+   */
+  public double getGpsLong() {
+    return gpsLong;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#setGpsPosition(double, double)
+   */
+  public void setGpsPosition(double gpsLat, double gpsLong) {
+    this.gpsLat = gpsLat;
+    this.gpsLong = gpsLong;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#getFilmspeed()
+   */
+  public int getFilmspeed() {
+    return filmspeed;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#setFilmspeed(int)
+   */
+  public void setFilmspeed(int filmspeed) {
+    this.filmspeed = filmspeed;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#getFNumber()
+   */
+  public float getFNumber() {
+    return fnumber;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#setFNumber(float)
+   */
+  public void setFNumber(float fnumber) {
+    this.fnumber = fnumber;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#getFocalWidth()
+   */
+  public int getFocalWidth() {
+    return focalWidth;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#setFocalWidth(int)
+   */
+  public void setFocalWidth(int focalWidth) {
+    this.focalWidth = focalWidth;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#getExposureTime()
+   */
+  public float getExposureTime() {
+    return exposureTime;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#setExposureTime(float)
+   */
+  public void setExposureTime(float exposureTime) {
+    this.exposureTime = exposureTime;
+  }
 
   /**
    * {@inheritDoc}
@@ -151,8 +294,19 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
       throw new IllegalArgumentException("Image must be wider than 0 pixels");
     if (height <= 0)
       throw new IllegalArgumentException("Image must be taller than 0 pixels");
+    
+    DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
+    formatSymbols.setDecimalSeparator('.');
+    NumberFormat nf = new DecimalFormat("0.000000", formatSymbols);
+    
     xml.append("<width>").append(width).append("</width>");
     xml.append("<height>").append(height).append("</height>");
+    xml.append("<location><![CDATA[").append(location).append("]]></location>");
+    xml.append("<gps lat=\"").append(nf.format(gpsLat)).append("\" lng=\"").append(nf.format(gpsLong)).append("\" />");
+    xml.append("<filmspeed>").append(filmspeed).append("</filmspeed>");
+    xml.append("<fnumber>").append(fnumber).append("</fnumber>");
+    xml.append("<focalwidth>").append(focalWidth).append("</focalwidth>");
+    xml.append("<exposuretime>").append(exposureTime).append("</exposuretime>");
     return xml;
   }
 

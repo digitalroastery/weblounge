@@ -23,6 +23,7 @@ package ch.entwine.weblounge.common.impl.content.file;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.impl.content.ResourceContentReaderImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,8 +109,9 @@ public class FileContentReader extends ResourceContentReaderImpl<FileContent> {
    *      ch.entwine.weblounge.common.language.Language, long, java.lang.String,
    *      java.lang.String)
    */
-  public FileContent createFromContent(InputStream is, Language language,
-      long size, String fileName, String mimeType) throws IOException {
+  public FileContent createFromContent(InputStream is, User user,
+      Language language, long size, String fileName, String mimeType)
+      throws IOException {
     return new FileContentImpl(fileName, language, mimeType, size);
   }
 

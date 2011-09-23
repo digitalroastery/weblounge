@@ -68,17 +68,44 @@ public class ImageContentImplTest {
   /** The image width */
   protected int height = 1446;
   
+  /** location where the picture was taken */
+  protected String location = "Zürich";
+
+  /** GPS latitude of the place where the picture was taken */
+  protected double gpsLat = 47.376409;
+
+  /** GPS longitude of the place where the picture was taken */
+  protected double gpsLong = 8.547750;
+
+  /** film speed with which the picture was taken */
+  protected int filmspeed = 23;
+
+  /** f-number with which the picture was taken */
+  protected float fnumber = 4.0F;
+
+  /** focal width with which the picture was taken */
+  protected int focalWidth = 18;
+
+  /** exposure time used while taking the picture */
+  protected float exposureTime = 1.3F;
+  
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
     image = new ImageContentImpl(filename, german, mimetype, width, height, size);
+    image.setLocation(location);
+    image.setGpsPosition(gpsLat, gpsLong);
+    image.setFilmspeed(filmspeed);
+    image.setFNumber(fnumber);
+    image.setFocalWidth(focalWidth);
+    image.setExposureTime(exposureTime);
     ((ImageContentImpl)image).setCreated(creationDate, amelie);
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.file.ImageContentImpl#getLanguage()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getLanguage()}.
    */
   @Test
   public void testGetLanguage() {
@@ -86,7 +113,7 @@ public class ImageContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.file.ImageContentImpl#getMimetype()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getMimetype()}.
    */
   @Test
   public void testGetMimetype() {
@@ -94,7 +121,7 @@ public class ImageContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.file.ImageContentImpl#getFilename()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getFilename()}.
    */
   @Test
   public void testGetFilename() {
@@ -102,7 +129,7 @@ public class ImageContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.file.ImageContentImpl#getSize()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getSize()}.
    */
   @Test
   public void testGetSize() {
@@ -110,7 +137,7 @@ public class ImageContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.file.ImageContentImpl#getWidth()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getWidth()}.
    */
   @Test
   public void testGetWidth() {
@@ -118,11 +145,67 @@ public class ImageContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.file.ImageContentImpl#getHeight()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getHeight()}.
    */
   @Test
   public void testGetHeight() {
     assertEquals(height, image.getHeight());
+  }
+  
+  /**
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getLocation()}.
+   */
+  @Test
+  public void testGetLocation() {
+    assertEquals(location, image.getLocation());
+  }
+  
+  /**
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getGpsLat()}.
+   */
+  @Test
+  public void testGetGpsLat() {
+    assertEquals(gpsLat, image.getGpsLat());
+  }
+  
+  /**
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getGpsLong()}.
+   */
+  @Test
+  public void testGetGpsLong() {
+    assertEquals(gpsLong, image.getGpsLong());
+  }
+  
+  /**
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getFilmspeed()}.
+   */
+  @Test
+  public void testGetFilmspeed() {
+    assertEquals(filmspeed, image.getFilmspeed());
+  }
+  
+  /**
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getFNumber()}.
+   */
+  @Test
+  public void testGetFNumber() {
+    assertEquals(fnumber, image.getFNumber());
+  }
+  
+  /**
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getFocalWidth()}.
+   */
+  @Test
+  public void testGetFocalWidth() {
+    assertEquals(focalWidth, image.getFocalWidth());
+  }
+  
+  /**
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getExposureTime()}.
+   */
+  @Test
+  public void testGetExposureTime() {
+    assertEquals(exposureTime, image.getExposureTime());
   }
 
 }

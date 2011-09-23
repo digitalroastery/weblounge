@@ -277,9 +277,11 @@
               com.springsource.javax.media.jai.core;inline=true,
               com.springsource.javax.media.jai.codec;inline=true,
               core-renderer;inline=true,
-              freemarker;inline=true
+              freemarker;inline=true,
+              metadata-extractor
             </Embed-Dependency>
             <Private-Package>
+              com.drew.metadata,
               freemarker.core,
               freemarker.template,
               javax.media.jai
