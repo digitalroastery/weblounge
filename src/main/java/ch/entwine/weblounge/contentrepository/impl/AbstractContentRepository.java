@@ -36,6 +36,7 @@ import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
@@ -99,6 +100,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /** Regular expression to match the resource id, path and version */
   protected static final Pattern resourceHeaderRegex = Pattern.compile(".*<\\s*([\\w]*) .*id=\"([a-z0-9-]*)\".*path=\"([^\"]*)\".*version=\"([^\"]*)\".*");
+
+  /** The environment */
+  protected Environment environment = Environment.Production;
 
   /**
    * Creates a new instance of the content repository.
@@ -734,6 +738,16 @@ public abstract class AbstractContentRepository implements ContentRepository {
       logger.error("Error trying to locate the site's bundle", e);
       return null;
     }
+  }
+
+  /**
+   * Callback from OSGi to set the environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
   }
 
 }

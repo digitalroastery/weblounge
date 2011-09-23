@@ -43,6 +43,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
@@ -81,6 +82,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** The response cache tracker */
   private ResponseCacheTracker responseCacheTracker = null;
 
+  /** The environment tracker */
+  private EnvironmentTracker environmentTracker = null;
+
+  /** The default environment */
+  private Environment environment = null;
+
   /** True to create a homepage when an empty repository is started */
   protected boolean createHomepage = true;
 
@@ -113,6 +120,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       imageStyleTracker.open();
       responseCacheTracker = new ResponseCacheTracker(bundle.getBundleContext(), site.getIdentifier());
       responseCacheTracker.open();
+      environmentTracker = new EnvironmentTracker(bundle.getBundleContext(), this);
     }
   }
 
@@ -129,6 +137,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       imageStyleTracker = null;
       responseCacheTracker.close();
       responseCacheTracker = null;
+      environmentTracker.close();
+      environmentTracker = null;
     }
   }
 
@@ -628,7 +638,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         }
 
         // Create the preview
-        File previewFile = createPreview(resource, style, language, filename.toString(), previewGenerator);
+        File previewFile = createPreview(resource, style, environment, language, filename.toString(), previewGenerator);
 
         if (previewFile != null)
           logger.debug("Created {} preview '{}' for {}", new Object[] {
@@ -656,6 +666,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *          the resource
    * @param style
    *          the image style
+   * @param environment
+   *          environment
    * @param language
    *          the language
    * @param filename
@@ -665,7 +677,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @return the preview file
    */
   private File createPreview(Resource<?> resource, ImageStyle style,
-      Language language, String filename, PreviewGenerator previewGenerator) {
+      Environment environment, Language language, String filename,
+      PreviewGenerator previewGenerator) {
     ResourceURI resourceURI = resource.getURI();
     String resourceType = resourceURI.getType();
 
@@ -685,7 +698,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         contentRepositoryIs = getContent(resourceURI, language);
         fos = new FileOutputStream(scaledResourceFile);
         logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
-        previewGenerator.createPreview(resource, language, style, contentRepositoryIs, fos);
+        previewGenerator.createPreview(resource, environment, language, style, contentRepositoryIs, fos);
         if (scaledResourceFile.length() > 0) {
           scaledResourceFile.setLastModified(lastModified);
         } else {

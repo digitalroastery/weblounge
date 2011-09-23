@@ -479,7 +479,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       // A mime type would be nice as well
       if (StringUtils.isBlank(mimeType)) {
         mimeType = detectMimeTypeFromFile(fileName, uploadedFile);
-        if(mimeType == null)
+        if (mimeType == null)
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
 
@@ -1036,7 +1036,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       // A mime type would be nice as well
       if (StringUtils.isBlank(mimeType)) {
         mimeType = detectMimeTypeFromFile(fileName, uploadedFile);
-        if(mimeType == null)
+        if (mimeType == null)
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
 
@@ -1219,8 +1219,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    */
   private String detectMimeTypeFromFile(String fileName, File uploadedFile) {
     String mimeType = mimeTypeDetector.detect(fileName);
-    if(!StringUtils.isBlank(mimeType)) return mimeType;
-    
+    if (!StringUtils.isBlank(mimeType))
+      return mimeType;
+
     if (fileName.endsWith(".ogg")) {
       mimeType = "video/ogg";
     } else if (fileName.endsWith(".mp4")) {

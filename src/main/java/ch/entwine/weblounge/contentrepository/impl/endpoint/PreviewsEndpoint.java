@@ -32,9 +32,11 @@ import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
@@ -219,7 +221,17 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
         contentRepositoryIs = contentRepository.getContent(resourceURI, language);
         fos = new FileOutputStream(scaledResourceFile);
         logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
-        previewGenerator.createPreview(resource, language, style, contentRepositoryIs, fos);
+
+        // What is the current environment?
+        Environment environment = Environment.Production;
+        for (SiteURL url : site.getConnectors()) {
+          if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
+            environment = url.getEnvironment();
+            break;
+          }
+        }
+
+        previewGenerator.createPreview(resource, environment, language, style, contentRepositoryIs, fos);
         if (scaledResourceFile.length() > 1) {
           scaledResourceFile.setLastModified(lastModified);
         } else {
