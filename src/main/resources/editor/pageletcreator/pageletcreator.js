@@ -91,11 +91,9 @@ steal.plugins('jquery',
 				start: function(e, ui) {
 					$(ui.helper).removeClass('wbl-draggable');
 					$(ui.helper).addClass('wbl-draggableHelper');
-					steal.dev.log('show border');
 				},
 				stop: function(e, ui) {
 					$('.composer').editor_composer('enable');
-					steal.dev.log('hide border');
 				}
 			}).disableSelection();
 	    },

@@ -50,7 +50,7 @@
     opacity: 0.5;
 }
 
-div.composer.wbl-nojQuery.empty {
+div.composer.wbl-nojQuery.empty, div.composer.wbl-composerBorder {
 	position: relative;
 	border: 1px solid black;
 }
