@@ -259,7 +259,7 @@ public class WorkbenchService {
     if (editorURL != null) {
       String rendererContent = null;
       try {
-        rendererContent = loadContents(editorURL, site, page, composer, pagelet, language);
+        rendererContent = loadContents(editorURL, site, page, composer, pagelet, environment, language);
         pageletEditor.setEditor(rendererContent);
       } catch (ServletException e) {
         logger.warn("Error processing the pagelet renderer at {}: {}", editorURL, e.getMessage());
@@ -359,7 +359,7 @@ public class WorkbenchService {
     String rendererContent = null;
     if (rendererURL != null) {
       try {
-        rendererContent = loadContents(rendererURL, site, page, composer, pagelet, language);
+        rendererContent = loadContents(rendererURL, site, page, composer, pagelet, environment, language);
       } catch (ServletException e) {
         logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -384,7 +384,10 @@ public class WorkbenchService {
    *          the composer
    * @param pagelet
    *          the pagelet
+   * @param environment
+   *          the environment
    * @param language
+   *          the language
    * @return the servlet response, serialized to a string
    * @throws IOException
    *           if the servlet fails to create the response
@@ -392,8 +395,8 @@ public class WorkbenchService {
    *           if an exception occurs while processing
    */
   private String loadContents(URL rendererURL, Site site, Page page,
-      Composer composer, Pagelet pagelet, String language) throws IOException,
-      ServletException {
+      Composer composer, Pagelet pagelet, Environment environment,
+      String language) throws IOException, ServletException {
 
     Servlet servlet = siteServlets.get(site.getIdentifier());
 
@@ -407,7 +410,7 @@ public class WorkbenchService {
 
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setLocalAddr(site.getConnector().toExternalForm());
+      request.setLocalAddr(site.getConnector(environment).toExternalForm());
       if (language != null)
         request.addPreferredLocale(new Locale(language));
       request.setAttribute(WebloungeRequest.PAGE, page);
