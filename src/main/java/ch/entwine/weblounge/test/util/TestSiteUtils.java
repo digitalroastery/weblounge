@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -36,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -108,8 +111,8 @@ public final class TestSiteUtils {
    * 
    * @param request
    *          the http request
-   * @param eTagValue
-   *          the expected etag value
+   * @param date
+   *          the expected modification date
    * @param logger
    *          used to log test output
    * @param params
@@ -117,12 +120,15 @@ public final class TestSiteUtils {
    * @throws Exception
    *           if processing the request fails
    */
-  public static void testModifiedHeader(HttpUriRequest request, Logger logger,
+  public static void testModifiedHeader(HttpUriRequest request, Date modificationDate, Logger logger,
       String[][] params) throws Exception {
     DefaultHttpClient httpClient = new DefaultHttpClient();
+    Date before = new Date(modificationDate.getTime() - Times.MS_PER_DAY);
+    Date after = new Date(modificationDate.getTime() + Times.MS_PER_DAY);
+    SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
     try {
       request.removeHeaders("If-None-Match");
-      request.setHeader("If-Modified-Since", "Wed, 16 Feb 2011 21:06:40 GMT");
+      request.setHeader("If-Modified-Since", format.format(after));
       logger.info("Sending 'If-Modified-Since' request to {}", request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, params);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
@@ -134,7 +140,7 @@ public final class TestSiteUtils {
     httpClient = new DefaultHttpClient();
     try {
       request.removeHeaders("If-None-Match");
-      request.setHeader("If-Modified-Since", "Wed, 10 Feb 1999 21:06:40 GMT");
+      request.setHeader("If-Modified-Since", format.format(before));
       logger.info("Sending 'If-Modified-Since' request to {}", request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());

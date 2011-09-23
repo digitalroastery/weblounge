@@ -30,7 +30,9 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.media.jai.JAI;
@@ -84,6 +86,9 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
 
   /** Image resource identifier */
   private static final String pageId = "4bb19980-8f98-4873-a813-000000000001";
+  
+  /** Modification date parser */
+  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 
   static {
     styles.add(new ImageStyleImpl("box", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Box, false));
@@ -207,6 +212,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
     HttpGet getPreviewRequest = new HttpGet(requestUrl);
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
+    Date modificationDate = null;
     logger.info("Requesting image preview at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPreviewRequest, null);
@@ -257,12 +263,17 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
 
     TestSiteUtils.testETagHeader(getPreviewRequest, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(getPreviewRequest, logger, null);
+    TestSiteUtils.testModifiedHeader(getPreviewRequest, modificationDate, logger, null);
   }
   
   private void testPagePreview(String serverUrl, String resourceId,
@@ -271,6 +282,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
     HttpGet getPreviewRequest = new HttpGet(requestUrl);
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
+    Date modificationDate = null;
     logger.info("Requesting image preview at {}", requestUrl);
     HttpResponse response = TestUtils.request(httpClient, getPreviewRequest, null);
       if (ImageScalingMode.None.equals(imageStyle.getScalingMode())) {
@@ -297,11 +309,16 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
           assertNotNull(eTagHeader);
           assertNotNull(eTagHeader.getValue());
           eTagValue = eTagHeader.getValue();
+          
+          // Test Last-Modified header
+          Header modifiedHeader = response.getFirstHeader("Last-Modified");
+          assertNotNull(modifiedHeader);
+          modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
       TestSiteUtils.testETagHeader(getPreviewRequest, eTagValue, logger, null);
-      TestSiteUtils.testModifiedHeader(getPreviewRequest, logger, null);
+      TestSiteUtils.testModifiedHeader(getPreviewRequest, modificationDate, logger, null);
     }
   }
 

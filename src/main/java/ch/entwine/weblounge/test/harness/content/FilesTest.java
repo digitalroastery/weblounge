@@ -38,6 +38,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -77,6 +80,9 @@ public class FilesTest extends IntegrationTestBase {
 
   /** File path */
   protected String filePath = null;
+
+  /** Modification date parser */
+  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 
   /**
    * Creates a new instance of the images test.
@@ -126,6 +132,7 @@ public class FilesTest extends IntegrationTestBase {
     request.setHeader("Accept-Language", "de");
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
+    Date modificationDate = null;
     try {
       logger.info("Requesting original document from {}", request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);
@@ -145,6 +152,11 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -152,7 +164,7 @@ public class FilesTest extends IntegrationTestBase {
     }
     
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
   /**
@@ -171,6 +183,7 @@ public class FilesTest extends IntegrationTestBase {
     request.setHeader("Accept-Language", "de");
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
+    Date modificationDate = null;
     try {
       logger.info("Requesting German document version from {}", request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);
@@ -190,6 +203,11 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -197,7 +215,7 @@ public class FilesTest extends IntegrationTestBase {
     }
     
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
   /**
@@ -257,6 +275,7 @@ public class FilesTest extends IntegrationTestBase {
     HttpGet request = new HttpGet(englishUrl);
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
+    Date modificationDate = null;
     try {
       logger.info("Requesting English document from {}", request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);
@@ -276,6 +295,11 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -283,7 +307,7 @@ public class FilesTest extends IntegrationTestBase {
     }
     
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
     
     // German
     String germanUrl = UrlUtils.concat(serverUrl, path, "de");
@@ -308,6 +332,11 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -315,7 +344,7 @@ public class FilesTest extends IntegrationTestBase {
     }
     
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
   /**
@@ -337,6 +366,8 @@ public class FilesTest extends IntegrationTestBase {
     request.setHeader("Accept-Language", "en");
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
+    Date modificationDate = null;
+    
     try {
       logger.info("Requesting English document from {}", request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);
@@ -356,6 +387,11 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -363,7 +399,7 @@ public class FilesTest extends IntegrationTestBase {
     }
     
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
     
     // German
     String germanUrl = UrlUtils.concat(serverUrl, path);
@@ -389,6 +425,11 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -396,7 +437,7 @@ public class FilesTest extends IntegrationTestBase {
     }
     
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
 }

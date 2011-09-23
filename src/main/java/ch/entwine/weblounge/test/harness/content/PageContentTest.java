@@ -43,6 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -62,6 +64,9 @@ public class PageContentTest extends IntegrationTestBase {
 
   /** The expected text */
   private static final Map<Language, String> texts = new HashMap<Language, String>();
+
+  /** Modification date parser */
+  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 
   /**
    * Prepare the test data.
@@ -127,6 +132,8 @@ public class PageContentTest extends IntegrationTestBase {
           language.getIdentifier() } };
 
       String eTagValue;
+      Date modificationDate = null;
+
       // Send and the request and examine the response
       logger.debug("Sending request to {}", request.getURI());
       HttpClient httpClient = new DefaultHttpClient();
@@ -168,12 +175,17 @@ public class PageContentTest extends IntegrationTestBase {
         assertNotNull(eTagHeader.getValue());
         eTagValue = eTagHeader.getValue();
 
+        // Test Last-Modified header
+        Header modifiedHeader = response.getFirstHeader("Last-Modified");
+        assertNotNull(modifiedHeader);
+        modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
 
       TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-      TestSiteUtils.testModifiedHeader(request, logger, null);
+      TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
     }
   }
 

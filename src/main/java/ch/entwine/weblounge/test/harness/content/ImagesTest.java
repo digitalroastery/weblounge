@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
@@ -52,7 +51,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.media.jai.JAI;
@@ -106,6 +107,9 @@ public class ImagesTest extends IntegrationTestBase {
   /** Image resource identifier */
   private static final String imageId = "5bc19990-8f99-4873-a813-71b6dfac22ad";
 
+  /** Modification date parser */
+  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+
   static {
     styles.add(new ImageStyleImpl("box", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Box, false));
     styles.add(new ImageStyleImpl("cover", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Cover, false));
@@ -144,19 +148,14 @@ public class ImagesTest extends IntegrationTestBase {
 
     String requestUrl = serverUrl;
 
-    try {
-      testGetOriginalImage(requestUrl);
-      testGetOriginalImageById(requestUrl);
-      testGetOriginalImageByIdAndName(requestUrl);
-      testGetOriginalImageByPathLanguage(requestUrl);
-      testGetOriginalImageByHeaderLanguage(requestUrl);
-      testGetStyledImageById(requestUrl);
-      testGetStyledImageByPathLanguage(requestUrl);
-      testGetStyledImageByHeaderLanguage(requestUrl);
-    } catch (Throwable t) {
-      fail("Error occured while testing endpoint: " + t.getMessage());
-    }
-
+    testGetOriginalImage(requestUrl);
+    testGetOriginalImageById(requestUrl);
+    testGetOriginalImageByIdAndName(requestUrl);
+    testGetOriginalImageByPathLanguage(requestUrl);
+    testGetOriginalImageByHeaderLanguage(requestUrl);
+    testGetStyledImageById(requestUrl);
+    testGetStyledImageByPathLanguage(requestUrl);
+    testGetStyledImageByHeaderLanguage(requestUrl);
   }
 
   /**
@@ -298,15 +297,17 @@ public class ImagesTest extends IntegrationTestBase {
     logger.info("");
 
     List<String> eTags = new ArrayList<String>();
+    HttpGet request = null;
     for (ImageStyle style : styles) {
       String url = UrlUtils.concat(serverUrl, "weblounge-images", imageId);
-      HttpGet request = new HttpGet(url + "?style=" + style.getIdentifier());
 
       // English
+      request = new HttpGet(url + "?style=" + style.getIdentifier());
       request.setHeader("Accept-Language", "en");
       testEnglishScaled(request, style, eTags);
 
       // German
+      request = new HttpGet(url + "?style=" + style.getIdentifier());
       request.setHeader("Accept-Language", "de");
       testGermanScaled(request, style, eTags);
     }
@@ -360,15 +361,17 @@ public class ImagesTest extends IntegrationTestBase {
     logger.info("");
 
     List<String> eTags = new ArrayList<String>();
+    HttpGet request = null;
     for (ImageStyle style : styles) {
       String url = UrlUtils.concat(serverUrl, imagePath);
-      HttpGet request = new HttpGet(url + "?style=" + style.getIdentifier());
 
       // English
+      request = new HttpGet(url + "?style=" + style.getIdentifier());
       request.setHeader("Accept-Language", "en");
       testEnglishScaled(request, style, eTags);
 
       // German
+      request = new HttpGet(url + "?style=" + style.getIdentifier());
       request.setHeader("Accept-Language", "de");
       testGermanScaled(request, style, eTags);
     }
@@ -385,6 +388,8 @@ public class ImagesTest extends IntegrationTestBase {
     logger.info("Requesting original English image at {}", request.getURI());
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
+    Date modificationDate = null;
+    
     try {
       HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
@@ -405,6 +410,11 @@ public class ImagesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -412,7 +422,7 @@ public class ImagesTest extends IntegrationTestBase {
     }
 
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
   /**
@@ -424,6 +434,8 @@ public class ImagesTest extends IntegrationTestBase {
   private void testGermanOriginal(HttpUriRequest request) throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
+    Date modificationDate = null;
+    
     try {
       logger.info("Requesting original German image at {}", request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);
@@ -445,6 +457,11 @@ public class ImagesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
       // Consume the content
       response.getEntity().consumeContent();
     } finally {
@@ -452,7 +469,7 @@ public class ImagesTest extends IntegrationTestBase {
     }
 
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
   /**
@@ -467,6 +484,8 @@ public class ImagesTest extends IntegrationTestBase {
       List<String> eTags) throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
+    Date modificationDate = null;
+    
     try {
       logger.info("Requesting scaled English image '{}' at {}", style.getIdentifier(), request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);
@@ -522,13 +541,18 @@ public class ImagesTest extends IntegrationTestBase {
         eTags.add(eTagValue);
       }
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
     } finally {
       eTags.clear();
       httpClient.getConnectionManager().shutdown();
     }
 
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
   /**
@@ -543,6 +567,8 @@ public class ImagesTest extends IntegrationTestBase {
       List<String> eTags) throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
+    Date modificationDate = null;
+    
     try {
       logger.info("Requesting scaled German image '{}' at {}", style.getIdentifier(), request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);
@@ -598,13 +624,18 @@ public class ImagesTest extends IntegrationTestBase {
         eTags.add(eTagValue);
       }
 
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
     } finally {
       eTags.clear();
       httpClient.getConnectionManager().shutdown();
     }
 
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
 }

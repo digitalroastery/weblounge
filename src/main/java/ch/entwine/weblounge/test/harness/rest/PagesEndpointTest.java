@@ -297,19 +297,6 @@ public class PagesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    // Try to relock with a different user and make sure it fails
-    HttpPut relockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, "lock"));
-    String[][] params = new String[][] { { "user", "amelie" } };
-    httpClient = new DefaultHttpClient();
-    logger.info("Trying to relock the page at {}", requestUrl);
-    try {
-      HttpResponse response = TestUtils.request(httpClient, relockPageRequest, params);
-      assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatusLine().getStatusCode());
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
-
   }
 
   /**
