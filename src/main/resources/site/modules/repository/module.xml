@@ -3,7 +3,7 @@
   xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
   
   <enable>true</enable>
-  <name>File repository / Images</name>
+  <name>Media</name>
   
   <pagelets>
     <pagelet id="download" composeable="true">
