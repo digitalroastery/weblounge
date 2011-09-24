@@ -29,7 +29,7 @@
 <!-- internal -->
 <div class="wbl-linkInternal">
 	<button id="wbl-linkInternalButton" type="button"><webl:i18n key="module.navigation.link.internal.button"/></button><br /><br />
-    <input id="wbl-linkInternal" type="hidden" name="property:pageid" />
+    <input id="wbl-linkInternal" type="hidden" name="property:resourceid" />
  	<img src=""></img>
 </div>
 

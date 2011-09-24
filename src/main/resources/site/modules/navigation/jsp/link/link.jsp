@@ -7,9 +7,9 @@
 
 <%-- internal --%>
 <% if (type.equals("internal")) { %>
-	<webl:property define="pageid, anchor">
+	<webl:property define="resourceid, anchor">
 		<webl:element define="title, description">
-			<weblr:page uuid="<%= pageid %>">
+			<weblr:page uuid="<%= resourceid %>">
 				<% String link = pagecontent.getURI().getPath(); %>
       			<% anchor = StringUtils.isNotBlank(anchor) ? "#" + anchor : ""; %>
       			<% title = StringUtils.isNotBlank(title) ? title : pagecontent.getTitle(language); %>
