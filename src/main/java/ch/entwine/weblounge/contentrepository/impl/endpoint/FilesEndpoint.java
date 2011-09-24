@@ -39,6 +39,7 @@ import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
@@ -326,6 +327,52 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   }
 
   /**
+   * Returns pages containing pagelets with properties of name
+   * <code>resourceid</code> and a value equal to that of the resource
+   * identifier.
+   * 
+   * @param request
+   *          the request
+   * @param resourceId
+   *          the resource identifier
+   * @return the referring pages
+   */
+  @GET
+  @Path("/{resource}/referrer")
+  public Response getReferencesByURI(@Context HttpServletRequest request,
+      @PathParam("resource") String resourceId) {
+
+    // Check the parameters
+    if (resourceId == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    Site site = getSite(request);
+    SearchQuery q = new SearchQueryImpl(site);
+    q.withType(Page.TYPE);
+    q.withProperty("resourceid", resourceId);
+
+    ContentRepository repository = getContentRepository(site, false);
+    SearchResult result = null;
+    try {
+      result = repository.find(q);
+    } catch (ContentRepositoryException e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+
+    StringBuffer buf = new StringBuffer("<pages>");
+    for (SearchResultItem item : result.getItems()) {
+      if (resourceId.equals(item.getId()))
+        continue;
+      String headerXml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
+      buf.append(headerXml);
+    }
+    buf.append("</pages>");
+
+    // Create the response
+    return Response.ok(buf.toString()).build();
+  }
+
+  /**
    * Returns the resource content with the given identifier or a
    * <code>404</code> if the resource or the resource content could not be
    * found.
@@ -502,7 +549,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       try {
         reader = serializer.getContentReader();
         is = new FileInputStream(uploadedFile);
-        content = reader.createFromContent(is,user, language, uploadedFile.length(), fileName, mimeType);
+        content = reader.createFromContent(is, user, language, uploadedFile.length(), fileName, mimeType);
       } catch (IOException e) {
         logger.warn("Error reading resource content {} from request", resource.getURI());
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1040,7 +1087,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         if (mimeType == null)
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
-      
+
       // Set owner and date created
       User user = securityService.getUser();
       if (user == null)
@@ -1063,7 +1110,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         logger.debug("No specialized resource serializer found, using regular file serializer");
         serializer = ResourceSerializerFactory.getSerializerByType(FileResource.TYPE);
       }
-      if(serializer instanceof ImageResourceSerializer) {
+      if (serializer instanceof ImageResourceSerializer) {
         try {
           is = new FileInputStream(uploadedFile);
           resource = ((ImageResourceSerializer) serializer).newResource(site, is, user, language);

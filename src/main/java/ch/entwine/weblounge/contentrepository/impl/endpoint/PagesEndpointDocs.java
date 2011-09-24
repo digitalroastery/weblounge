@@ -192,6 +192,17 @@ public final class PagesEndpointDocs {
     getChildPagesByURIEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getChildPagesByURIEndpoint);
 
+    // GET /{page}/referrer
+    Endpoint getReferrerByURIEndpoint = new Endpoint("/{page}/referrer", Method.GET, "getreferrer");
+    getReferrerByURIEndpoint.setDescription("Returns pages containing references to the page with the given id");
+    getReferrerByURIEndpoint.addFormat(Format.xml());
+    getReferrerByURIEndpoint.addStatus(ok("the referring pages were found and are returned as part of the response"));
+    getReferrerByURIEndpoint.addStatus(badRequest("an invalid page identifier was received"));
+    getReferrerByURIEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    getReferrerByURIEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    getReferrerByURIEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getReferrerByURIEndpoint);
+
     // PUT /{page}/lock
     Endpoint lockPageEndpoint = new Endpoint("/{page}/lock", Method.PUT, "lockpage");
     lockPageEndpoint.setDescription("Locks the specified page. If the client supplies an If-Match header, the lock is processed only if the header value matches the page's ETag");

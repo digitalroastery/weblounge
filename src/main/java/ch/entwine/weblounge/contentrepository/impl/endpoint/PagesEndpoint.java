@@ -336,6 +336,51 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     StringBuffer buf = new StringBuffer("<pages>");
     for (SearchResultItem item : result.getItems()) {
+      if (pageId.equals(item.getId()))
+        continue;
+      String headerXml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
+      buf.append(headerXml);
+    }
+    buf.append("</pages>");
+
+    // Create the response
+    return Response.ok(buf.toString()).build();
+  }
+
+  /**
+   * Returns pages containing pagelets with properties of name
+   * <code>resourceid</code> and a value equal to that of the page identifier.
+   * 
+   * @param request
+   *          the request
+   * @param pageId
+   *          the page identifier
+   * @return the referring pages
+   */
+  @GET
+  @Path("/{page}/referrer")
+  public Response getReferencesByURI(@Context HttpServletRequest request,
+      @PathParam("page") String pageId) {
+
+    // Check the parameters
+    if (pageId == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    Site site = getSite(request);
+    SearchQuery q = new SearchQueryImpl(site);
+    q.withType(Page.TYPE);
+    q.withProperty("resourceid", pageId);
+
+    ContentRepository repository = getContentRepository(site, false);
+    SearchResult result = null;
+    try {
+      result = repository.find(q);
+    } catch (ContentRepositoryException e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+
+    StringBuffer buf = new StringBuffer("<pages>");
+    for (SearchResultItem item : result.getItems()) {
       String headerXml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
       buf.append(headerXml);
     }

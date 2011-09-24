@@ -97,6 +97,17 @@ public final class FilesEndpointDocs {
     getFileByURIEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getFileByURIEndpoint);
 
+    // GET /{page}/referrer
+    Endpoint getReferrerByURIEndpoint = new Endpoint("/{resource}/referrer", Method.GET, "getreferrer");
+    getReferrerByURIEndpoint.setDescription("Returns pages containing references to the page with the given id");
+    getReferrerByURIEndpoint.addFormat(Format.xml());
+    getReferrerByURIEndpoint.addStatus(ok("the referring pages were found and are returned as part of the response"));
+    getReferrerByURIEndpoint.addStatus(badRequest("an invalid page identifier was received"));
+    getReferrerByURIEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    getReferrerByURIEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The resource identifier"));
+    getReferrerByURIEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getReferrerByURIEndpoint);
+
     // GET /{resource}/content/{language}
     Endpoint getFileContentEndpoint = new Endpoint("/{resource}/content/{language}", Method.GET, "getfilecontent");
     getFileContentEndpoint.setDescription("Returns the localized file contents with the given id");
