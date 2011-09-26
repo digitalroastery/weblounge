@@ -509,6 +509,7 @@ public class ComposerTagSupport extends WebloungeTag {
             String templateId = targetPage.getTemplate();
             PageTemplate template = site.getTemplate(templateId);
             if (template != null && name.equalsIgnoreCase(template.getStage())) {
+              template.setEnvironment(request.getEnvironment());
               if (htmlAction.startStage(request, response, composer) == HTMLAction.SKIP_COMPOSER) {
                 return EVAL_PAGE;
               }

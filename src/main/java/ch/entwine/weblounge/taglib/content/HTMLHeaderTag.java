@@ -20,12 +20,13 @@
 
 package ch.entwine.weblounge.taglib.content;
 
-import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.page.Script;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -39,8 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 import javax.servlet.jsp.JspException;
 
@@ -56,6 +56,12 @@ public class HTMLHeaderTag extends WebloungeTag {
   /** Logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(HTMLHeaderTag.class);
 
+  /** A list for link and script head elements */
+  private ArrayList<HTMLHeadElement> headElements = new ArrayList<HTMLHeadElement>();
+
+  /** A flag if an script head element need jquery */
+  private boolean needsJQuery = false;
+
   /**
    * Does the tag processing.
    * 
@@ -63,7 +69,7 @@ public class HTMLHeaderTag extends WebloungeTag {
    */
   public int doEndTag() throws JspException {
     HTMLAction action = (HTMLAction) getRequest().getAttribute(WebloungeRequest.ACTION);
-    
+
     // See what the action has to contribute
     try {
       pageContext.getOut().flush();
@@ -76,58 +82,64 @@ public class HTMLHeaderTag extends WebloungeTag {
     }
 
     // Start with the default processing
-    Set<HTMLHeadElement> headElements = new HashSet<HTMLHeadElement>();
     Site site = request.getSite();
-
-    boolean needsJQuery = false;
-    // Pagelets links & scripts
     Page page = (Page) request.getAttribute(WebloungeRequest.PAGE);
+
+    // Page template links & scripts
+    PageTemplate template = site.getTemplate(page.getTemplate());
+    template.setEnvironment(request.getEnvironment());
+    for (HTMLHeadElement header : template.getHTMLHeaders()) {
+      addHeadElement(header, site, null);
+    }
+
+    // Pagelets links & scripts
     if (page != null) {
-      Pagelet[] pagelets = page.getPagelets();
-      for (Pagelet p : pagelets) {
+      for (Pagelet p : page.getPagelets()) {
         String moduleId = p.getModule();
         Module module = site.getModule(moduleId);
         if (module == null) {
-          logger.debug("Unable to load includes for renderer '{}': module '{}' not installed", new Object[] { p.getIdentifier(), site, request.getRequestedUrl(), moduleId });
+          logger.debug("Unable to load includes for renderer '{}': module '{}' not installed", new Object[] {
+              p.getIdentifier(),
+              site,
+              request.getRequestedUrl(),
+              moduleId });
           continue;
         }
-        Renderer renderer = module.getRenderer(p.getIdentifier());
-        if (renderer != null) {
-          for (HTMLHeadElement header : renderer.getHTMLHeaders()) {
-            if (header instanceof DeclarativeHTMLHeadElement)
-              ((DeclarativeHTMLHeadElement)header).configure(request, site, module);
-            if(header.getUse().equals(HTMLInclude.Use.Editor)) continue;
-            if (header instanceof Script)
-              if(((Script)header).getJQuery() != null) needsJQuery = true;
-            headElements.add(header);
-          }
-        } else {
+        PageletRenderer renderer = module.getRenderer(p.getIdentifier());
+        if (renderer == null) {
           logger.warn("Renderer '" + p + "' not found for " + request.getUrl() + "!");
           continue;
         }
+
+        renderer.setEnvironment(request.getEnvironment());
+
+        for (HTMLHeadElement header : renderer.getHTMLHeaders()) {
+          addHeadElement(header, site, module);
+        }
       }
     }
-    
+
     // Action links & scripts
     if (action != null) {
       Module module = action.getModule();
-      for (HTMLHeadElement l : action.getHTMLHeaders()) {
-        if (l instanceof DeclarativeHTMLHeadElement)
-          ((DeclarativeHTMLHeadElement)l).configure(request, site, module);
-        headElements.add(l);
+      for (HTMLHeadElement header : action.getHTMLHeaders()) {
+        if (header instanceof DeclarativeHTMLHeadElement)
+          ((DeclarativeHTMLHeadElement) header).configure(request, site, module);
+        if (!headElements.contains(header))
+          headElements.add(header);
       }
     }
-    
+
     // Write links & scripts to output
     try {
       pageContext.getOut().flush();
       // Write first jQuery script to output
-      if(!RequestUtils.isEditingState(request) && needsJQuery) {
+      if (!RequestUtils.isEditingState(request) && needsJQuery) {
         StringBuffer linkToJQuery = new StringBuffer("/weblounge-shared/scripts/jquery/");
         linkToJQuery.append(WebloungeSharedResources.JQUERY_VERSION);
         linkToJQuery.append("/jquery.min.js");
         pageContext.getOut().print("<script src=\"" + linkToJQuery + "\" type=\"text/javascript\"></script>");
-        
+
         StringBuffer linkToJQueryTools = new StringBuffer("/weblounge-shared/scripts/jquery-tools/");
         linkToJQueryTools.append(WebloungeSharedResources.JQUERY_TOOLS_VERSION);
         linkToJQueryTools.append("/jquery.tools.min.js");
@@ -143,5 +155,28 @@ public class HTMLHeaderTag extends WebloungeTag {
 
     return super.doEndTag();
   }
-  
+
+  /**
+   * Adds a head element to the list if it isn't only used by the editor.
+   * 
+   * @param headElement
+   *          the head element to include
+   * @param site
+   *          the site
+   * @param module
+   *          the module
+   */
+  private void addHeadElement(HTMLHeadElement headElement, Site site,
+      Module module) {
+    if (headElement instanceof DeclarativeHTMLHeadElement)
+      ((DeclarativeHTMLHeadElement) headElement).configure(request, site, module);
+    if (headElement.getUse().equals(HTMLInclude.Use.Editor))
+      return;
+    if (headElement instanceof Script)
+      if (((Script) headElement).getJQuery() != null)
+        needsJQuery = true;
+    if (!headElements.contains(headElement))
+      headElements.add(headElement);
+  }
+
 }

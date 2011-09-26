@@ -158,8 +158,8 @@ public class PagePreviewTag extends WebloungeTag {
    * <li><code>None</code> - All elements of the page's stage composer are
    * included</li>
    * <li><code>Elements</code> - Only elements of the given types are included</li>
-   * <li><code>Endmarker</code> - All elements up until the appearance of the stop
-   * marker are included</li>
+   * <li><code>Endmarker</code> - All elements up until the appearance of the
+   * stop marker are included</li>
    * <li><code>PagePreview - The page preview elements are included</code></li>
    * </ul>
    */
@@ -227,7 +227,7 @@ public class PagePreviewTag extends WebloungeTag {
         response.invalidate();
         return SKIP_BODY;
       }
-      
+
       ResourceURI pageURI = new PageURIImpl(site, null, pageId);
 
       try {
@@ -251,6 +251,7 @@ public class PagePreviewTag extends WebloungeTag {
       logger.error("No page template found for {}", page);
       return EVAL_PAGE;
     }
+    template.setEnvironment(request.getEnvironment());
 
     String stage = template.getStage();
     if (stage == null) {
@@ -446,7 +447,7 @@ public class PagePreviewTag extends WebloungeTag {
           }
 
         } // render?
-        
+
         // Add cache tags
         response.addTag(CacheTag.Module, pagelet.getModule());
         response.addTag(CacheTag.Renderer, pagelet.getIdentifier());
