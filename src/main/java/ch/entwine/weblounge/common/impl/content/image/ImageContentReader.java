@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.impl.content.image;
 
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.impl.content.ResourceContentReaderImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 
@@ -29,11 +30,13 @@ import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -107,45 +110,68 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     content.setCreator(user);
     content.setCreationDate(new Date());
 
-    // TODO use input stream twice
+    // Fork the input stream so that it can be consumed twice
 //    PipedOutputStream outputStream = new PipedOutputStream();
 //    PipedInputStream pipedInputStream = new PipedInputStream(outputStream);
-//    InputStream tis = new TeeInputStream(is, outputStream);
-//    ImageMetadata imageMetadata = ImageMetadataUtils.extractMetadata(new BufferedInputStream(tis));
-//
-//    if (!StringUtils.isBlank(imageMetadata.getPhotographer())) {
-//      content.setCreator(new UserImpl(user.getLogin(), user.getRealm(), imageMetadata.getPhotographer()));
-//    }
-//    if (imageMetadata.getDateTaken() != null) {
-//      content.setCreationDate(imageMetadata.getDateTaken());
-//    }
-//    if (!StringUtils.isBlank(imageMetadata.getLocation())) {
-//      content.setLocation(imageMetadata.getLocation());
-//    }
-//    if (imageMetadata.getGpsLat() != 0 && imageMetadata.getGpsLong() != 0) {
-//      content.setGpsPosition(imageMetadata.getGpsLat(), imageMetadata.getGpsLong());
-//    }
-//    if (imageMetadata.getFilmspeed() != 0) {
-//      content.setFilmspeed(imageMetadata.getFilmspeed());
-//    }
-//    if (imageMetadata.getFNumber() != 0) {
-//      content.setFNumber(imageMetadata.getFNumber());
-//    }
-//    if (imageMetadata.getFocalWidth() != 0) {
-//      content.setFocalWidth(imageMetadata.getFocalWidth());
-//    }
-//    if (imageMetadata.getExposureTime() != 0) {
-//      content.setExposureTime(imageMetadata.getExposureTime());
-//    }
+//    final InputStream tis = new TeeInputStream(is, outputStream);
 
+//    ImageMetadataExtractor extractor = new ImageMetadataExtractor(tis);
+//    Thread extractorThread = new Thread(extractor);
+//    extractorThread.start();
+
+    InputStream pipedInputStream = is;
+
+    // Read the image metadata
     SeekableStream imageInputStream = null;
     try {
-      imageInputStream = new MemoryCacheSeekableStream(is);
+      imageInputStream = new MemoryCacheSeekableStream(pipedInputStream);
       RenderedOp image = JAI.create("stream", imageInputStream);
       content.setWidth(image.getWidth());
       content.setHeight(image.getHeight());
     } finally {
       IOUtils.closeQuietly(imageInputStream);
+    }
+
+    // Read the image's EXIF data
+    ImageMetadata imageMetadata = null;
+//    synchronized (extractor) {
+//      while ((imageMetadata = extractor.getMetadata()) == null) {
+//        try {
+//          extractor.wait();
+//        } catch (InterruptedException e) {
+//          logger.warn("Interrupted while waiting for image metadata extraction");
+//          break;
+//        }
+//      }
+//    }
+
+    if (imageMetadata == null)
+      return content;
+
+    // Add metadata
+    if (!StringUtils.isBlank(imageMetadata.getPhotographer())) {
+      content.setCreator(new UserImpl(user.getLogin(), user.getRealm(), imageMetadata.getPhotographer()));
+    }
+    if (imageMetadata.getDateTaken() != null) {
+      content.setCreationDate(imageMetadata.getDateTaken());
+    }
+    if (!StringUtils.isBlank(imageMetadata.getLocation())) {
+      content.setLocation(imageMetadata.getLocation());
+    }
+    if (imageMetadata.getGpsLat() != 0 && imageMetadata.getGpsLong() != 0) {
+      content.setGpsPosition(imageMetadata.getGpsLat(), imageMetadata.getGpsLong());
+    }
+    if (imageMetadata.getFilmspeed() != 0) {
+      content.setFilmspeed(imageMetadata.getFilmspeed());
+    }
+    if (imageMetadata.getFNumber() != 0) {
+      content.setFNumber(imageMetadata.getFNumber());
+    }
+    if (imageMetadata.getFocalWidth() != 0) {
+      content.setFocalWidth(imageMetadata.getFocalWidth());
+    }
+    if (imageMetadata.getExposureTime() != 0) {
+      content.setExposureTime(imageMetadata.getExposureTime());
     }
 
     return content;
@@ -261,6 +287,51 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     else {
       super.endElement(uri, local, raw);
     }
+  }
+
+  /**
+   * Implements a separate thread that extracts the image metadata.
+   */
+  private static class ImageMetadataExtractor implements Runnable {
+
+    /** The input stream */
+    private InputStream imageInputStream = null;
+
+    /** The image metadata */
+    private ImageMetadata metadata = null;
+
+    ImageMetadataExtractor(InputStream is) {
+      imageInputStream = is;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Runnable#run()
+     */
+    public void run() {
+      BufferedInputStream bis = new BufferedInputStream(imageInputStream);
+      try {
+        metadata = ImageMetadataUtils.extractMetadata(bis);
+        while (bis.available() > 0) {
+          bis.read();
+        }
+      } catch (Throwable t) {
+        synchronized (this) {
+          this.notify();
+        }
+      }
+    }
+
+    /**
+     * Returns the extracted metadata.
+     * 
+     * @return the metadata
+     */
+    ImageMetadata getMetadata() {
+      return metadata;
+    }
+
   }
 
 }
