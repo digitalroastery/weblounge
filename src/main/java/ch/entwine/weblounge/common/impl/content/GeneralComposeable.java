@@ -282,7 +282,6 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#setEnvironment(ch.entwine.weblounge.common.site.Environment)
    */
-  @Override
   public void setEnvironment(Environment environment) {
     this.environment = environment;
   }
