@@ -54,7 +54,6 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
-import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -1117,20 +1116,18 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         logger.debug("No specialized resource serializer found, using regular file serializer");
         serializer = ResourceSerializerFactory.getSerializerByType(FileResource.TYPE);
       }
-      if (serializer instanceof ImageResourceSerializer) {
-        try {
-          is = new FileInputStream(uploadedFile);
-          resource = ((ImageResourceSerializer) serializer).newResource(site, is, user, language);
-        } catch (FileNotFoundException e) {
-          logger.warn("Error creating resource at {} from image: {}", uri, e.getMessage());
-          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-        } finally {
-          IOUtils.closeQuietly(is);
-        }
-      } else {
-        resource = serializer.newResource(site);
+
+      // Create the resource
+      try {
+        is = new FileInputStream(uploadedFile);
+        resource = serializer.newResource(site, is, user, language);
+        resourceURI = resource.getURI();
+      } catch (FileNotFoundException e) {
+        logger.warn("Error creating resource at {} from image: {}", uri, e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      } finally {
+        IOUtils.closeQuietly(is);
       }
-      resourceURI = resource.getURI();
 
       // If a path has been specified, set it
       if (path != null && StringUtils.isNotBlank(path)) {
