@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.content;
 
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.site.Environment;
 
 /**
  * This interface defines common methods and fields for composeable objects like
@@ -30,8 +31,8 @@ import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
  * or a part of a response to a request. When the Composeable represents a
  * response part only, it might want to place include instructions into the
  * <code>&lt;head&gt;</code> section of the enclosing <code>HTML</code> page. To
- * do this, it just needs to return these includes in {@link #getHTMLHeaders()} and
- * {@link #getScripts()}.
+ * do this, it just needs to return these includes in {@link #getHTMLHeaders()}
+ * and {@link #getScripts()}.
  * <p>
  * Composeables are usually used to display content to the user. Often, this
  * content might become invalid and needs to be recalculated in some way. The
@@ -143,12 +144,20 @@ public interface Composeable {
   /**
    * Returns the &lt;link&gt; or &lt;script&gt; elements that have been defined
    * for this action. They will be set as attributes in the
-   * {@link javax.servlet.http.HttpServletRequest}, where they are available to the page renderer
-   * so that they can be included in the page's <code>&lt;head&gt;</code>
-   * section.
+   * {@link javax.servlet.http.HttpServletRequest}, where they are available to
+   * the page renderer so that they can be included in the page's
+   * <code>&lt;head&gt;</code> section.
    * 
    * @return the includes
    */
   HTMLHeadElement[] getHTMLHeaders();
+
+  /**
+   * Sets the execution environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment);
 
 }
