@@ -42,6 +42,17 @@
     <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
   </tag>
+  
+  <tag>
+    <description>Loads a video resource</description>
+    <display-name>Video Resource Tag</display-name>
+    <name>video</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.VideoResourceTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.VideoResourceTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+  </tag>
 
   <tag>
     <description>Load an image resource</description>

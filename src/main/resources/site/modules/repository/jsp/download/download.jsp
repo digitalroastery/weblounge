@@ -11,10 +11,6 @@
 	<webl:element define="title, description">
 	<webl:property define="resourceid">
 	
-	<%	
-		new ResourceURIImpl(FileResource.TYPE, site, null, resourceid);
-	%>
-	
 	<weblr:resource uuid="<%= resourceid %>">
 	<%	
 	    /** Resource description */	
