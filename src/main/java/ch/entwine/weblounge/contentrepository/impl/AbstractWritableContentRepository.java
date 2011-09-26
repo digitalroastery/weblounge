@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
@@ -247,7 +248,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *      boolean)
    */
   public boolean delete(ResourceURI uri, boolean allRevisions)
-      throws ContentRepositoryException, IOException {
+      throws ContentRepositoryException,
+      IOException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
@@ -258,12 +260,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Make sure the resource is not being referenced elsewhere
-    // TODO: Make this it's own index
     SearchQuery searchByResource = new SearchQueryImpl(uri.getSite());
     searchByResource.withProperty("resourceid", uri.getIdentifier());
     if (index.find(searchByResource).getItems().length > 0) {
       logger.warn("Resource '{}' is still being referenced", uri);
-      return false;
+      throw new ReferentialIntegrityException(uri.getIdentifier());
     }
 
     // Get the revisions to delete

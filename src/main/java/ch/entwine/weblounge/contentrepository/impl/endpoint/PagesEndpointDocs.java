@@ -145,6 +145,7 @@ public final class PagesEndpointDocs {
     deletePageEndpoint.addStatus(ok("the page was deleted"));
     deletePageEndpoint.addStatus(badRequest("the page was not specified"));
     deletePageEndpoint.addStatus(notFound("the page was not found"));
+    deletePageEndpoint.addStatus(preconditionFailed("the page is still being referenced"));
     deletePageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     deletePageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     deletePageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));

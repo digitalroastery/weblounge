@@ -35,6 +35,7 @@ import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
@@ -942,6 +943,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       // TODO: Versions?
       resourceURI = contentRepository.get(resourceURI).getURI();
       contentRepository.delete(resourceURI);
+    } catch (SecurityException e) {
+      logger.warn("Tried to delete file {} of site '{}' without permission", resourceURI, site);
+      throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (ReferentialIntegrityException e) {
+      logger.warn("Tried to delete referenced file {} of site '{}'", resourceURI, site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
     } catch (IOException e) {
       logger.warn("Error deleting resource {} from site '{}': {}", new Object[] {
           resourceURI,

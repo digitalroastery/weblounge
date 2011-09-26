@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
@@ -701,6 +702,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     } catch (SecurityException e) {
       logger.warn("Tried to delete page {} of site '{}' without permission", livePageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (ReferentialIntegrityException e) {
+      logger.warn("Tried to delete referenced page {} of site '{}'", livePageURI, site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
     } catch (IOException e) {
       logger.warn("Error deleting page {} from site '{}': {}", new Object[] {
           livePageURI,

@@ -36,7 +36,9 @@ import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
+import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
@@ -46,6 +48,7 @@ import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
@@ -318,18 +321,6 @@ public class FileSystemContentRepositoryTest {
       t.printStackTrace();
       fail("Error deleting resource");
     }
-
-    // Delete image resource which is referenced by page
-    try {
-      if (repository.delete(imageURI)) {
-        fail("Managed to remove referenced resource");
-      }
-      assertNotNull(repository.get(imageURI));
-      assertEquals(resources - 1, repository.getResourceCount() - 1);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error trying to delete a resource");
-    }
   }
 
   /**
@@ -364,6 +355,35 @@ public class FileSystemContentRepositoryTest {
       t.printStackTrace();
       fail("Error deleting document from the repository");
     }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI)}
+   * .
+   */
+  @Test
+  public void testDeleteLinkedResource() throws Exception {
+    int resources = populateRepository();
+
+    // Add a reference
+    Page page = pages[0];
+    Pagelet pagelet = new PageletImpl("test", "link");
+    pagelet.setProperty("resourceid", imageURI.getIdentifier());
+    page.addPagelet(pagelet, "main");
+    repository.put(page);
+
+    // Delete image resource which is referenced by page
+    try {
+      repository.delete(imageURI);
+      fail("Managed to remove referenced resource");
+    } catch (ReferentialIntegrityException e) {
+      // Expected
+    }
+
+    // Make sure the resource is still part of the repository
+    assertNotNull(repository.get(imageURI));
+    assertEquals(resources, repository.getResourceCount() - 1);
   }
 
   /**

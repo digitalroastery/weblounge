@@ -171,6 +171,7 @@ public final class FilesEndpointDocs {
     deleteFileEndpoint.addStatus(ok("the file was deleted"));
     deleteFileEndpoint.addStatus(badRequest("the file was not specified"));
     deleteFileEndpoint.addStatus(notFound("the file was not found"));
+    deleteFileEndpoint.addStatus(preconditionFailed("the file is still being referenced"));
     deleteFileEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     deleteFileEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     deleteFileEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The file identifier"));
