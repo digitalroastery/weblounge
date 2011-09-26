@@ -1,4 +1,6 @@
-steal.plugins('jquery/controller','jqueryui/sortable')
+steal.plugins('jquery/controller',
+		'jqueryui/sortable',
+		'jqueryui/mouse')
 .models('../../models/page')
 .css('composer')
 .then('pagelet')
@@ -32,8 +34,14 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         cursor: 'move',
         cursorAt: { top: -8, left: -10 },
         revert: true,
+        over: $.proxy(function(event, ui) {
+        	$(this.element).addClass('wbl-composerBorder');
+        }, this),
+        out: $.proxy(function(event, ui) {
+        	if($(this.element).hasClass('empty')) return;
+        	$(this.element).removeClass('wbl-composerBorder');
+        }, this),
         start: $.proxy(function(event, ui) {
-        	steal.dev.log('show composer border');
         	this.element.find('img.wbl-iconEditing').remove();
         	this.element.find('img.wbl-iconRemove').remove();
         	this._disablePagelets();
@@ -48,7 +56,6 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         }, this),
         stop: $.proxy(function(event, ui) {
         	this._enablePagelets();
-        	steal.dev.log('hide composer border');
         }, this),
         update: $.proxy(function(event, ui) {
         	var page = this.options.page;
@@ -136,14 +143,12 @@ steal.plugins('jquery/controller','jqueryui/sortable')
     },
     
 	disable: function() {
-		$(this.element).addClass('wbl-composerBorder');
 		$(this.element).removeClass('wbl-nojQuery');
 		$(this.element).sortable('disable');
 		$(this.element).find('div.pagelet').editor_pagelet('disable').css('min-height', '');
 	},
 	
 	enable: function() {
-		$(this.element).removeClass('wbl-composerBorder');
 		$(this.element).addClass('wbl-nojQuery');
 		$(this.element).sortable('enable');
 		$(this.element).find('div.pagelet').editor_pagelet('enable').css('min-height', '35px');
