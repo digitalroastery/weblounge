@@ -249,6 +249,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       PageTemplate template = null;
       try {
         template = getPageTemplate(page, request);
+        template.setEnvironment(request.getEnvironment());
       } catch (IllegalStateException e) {
         logger.debug(e.getMessage());
         DispatchUtils.sendInternalError(request, response);
@@ -397,6 +398,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         throw new IllegalStateException("Page template " + templateId + " specified by page " + page + " was not found");
       }
     }
+    template.setEnvironment(request.getEnvironment());
     return template;
   }
 

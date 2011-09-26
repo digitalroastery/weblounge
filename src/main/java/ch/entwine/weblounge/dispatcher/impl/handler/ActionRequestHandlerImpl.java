@@ -511,6 +511,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         throw new IllegalStateException("Page template for page " + page + " was not found");
       }
     }
+    template.setEnvironment(request.getEnvironment());
     return template;
   }
 
