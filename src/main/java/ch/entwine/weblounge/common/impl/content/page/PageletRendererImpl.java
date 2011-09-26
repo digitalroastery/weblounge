@@ -65,9 +65,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /** The preview mode */
   protected PagePreviewMode previewMode = PagePreviewMode.None;
 
-  /** The execution environment */
-  protected Environment environment = Environment.Production;
-
   /** Flag to indicate whether template processing in the urls has happened */
   private boolean urlTemplatesProcessed = false;
 
@@ -114,12 +111,13 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.PageletRenderer#setEnvironment(ch.entwine.weblounge.common.site.Environment)
+   * @see ch.entwine.weblounge.common.impl.content.GeneralComposeable#setEnvironment(ch.entwine.weblounge.common.site.Environment)
    */
+  @Override
   public void setEnvironment(Environment environment) {
     if (urlTemplatesProcessed && !environment.equals(this.environment))
       urlTemplatesProcessed = false;
-    this.environment = environment;
+    super.setEnvironment(environment);
   }
 
   /**

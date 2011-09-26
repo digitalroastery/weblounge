@@ -89,7 +89,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /** Url that was originally requested */
   protected WebUrl requestedUrl = null;
-  
+
   /** The request environment */
   protected Environment environment = null;
 
@@ -124,10 +124,10 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     url = null;
     language = null;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getEnvironment()
    */
   public Environment getEnvironment() {
@@ -136,7 +136,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
     // Set the environment to production by default
     environment = Environment.Production;
-    
+
     // Find the environment by looking at the url
     for (SiteURL connector : site.getConnectors()) {
       if (super.getRequestURL().toString().startsWith(connector.toExternalForm())) {
@@ -144,7 +144,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
         break;
       }
     }
-    
+
     return environment;
   }
 

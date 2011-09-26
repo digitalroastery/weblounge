@@ -131,8 +131,13 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    */
   public void configure(WebloungeRequest request, Site site, Module module)
       throws IllegalStateException {
-    if (href != null && href.matches(".*\\$\\{.*\\}.*")) {
+    if (href == null || !href.matches(".*\\$\\{.*\\}.*"))
+      return;
+
+    if (module != null) {
       href = ConfigurationUtils.processTemplate(href, module, request.getEnvironment());
+    } else {
+      href = ConfigurationUtils.processTemplate(href, site, request.getEnvironment());
     }
   }
 

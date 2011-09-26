@@ -422,6 +422,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       return false;
 
     urlTemplatesProcessed = true;
+    this.environment = environment;
 
     // Process the renderer URL
     for (Map.Entry<String, URL> entry : renderers.entrySet()) {
@@ -437,6 +438,18 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     }
 
     return true;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.impl.content.GeneralComposeable#setEnvironment(ch.entwine.weblounge.common.site.Environment)
+   */
+  @Override
+  public void setEnvironment(Environment environment) {
+    if (urlTemplatesProcessed && !environment.equals(this.environment))
+      urlTemplatesProcessed = false;
+    super.setEnvironment(environment);
   }
 
 }

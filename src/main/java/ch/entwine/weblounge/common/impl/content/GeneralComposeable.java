@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.Composeable;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLInclude;
+import ch.entwine.weblounge.common.site.Environment;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +48,10 @@ public class GeneralComposeable implements Composeable {
 
   /** Name of this composeable */
   protected String name = null;
-  
+
+  /** The execution environment */
+  protected Environment environment = Environment.Production;
+
   /** HTML head elements */
   protected Set<HTMLHeadElement> headers = null;
 
@@ -109,7 +113,7 @@ public class GeneralComposeable implements Composeable {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Composeable#setIdentifier(java.lang.String)
    */
   public void setIdentifier(String identifier) {
@@ -117,7 +121,7 @@ public class GeneralComposeable implements Composeable {
       throw new IllegalArgumentException("Identifier cannot be null");
     this.identifier = identifier;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -129,7 +133,7 @@ public class GeneralComposeable implements Composeable {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Composeable#setName(java.lang.String)
    */
   public void setName(String name) {
@@ -205,7 +209,7 @@ public class GeneralComposeable implements Composeable {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Composeable#addHTMLHeader(HTMLHeadElement)
    */
   public void addHTMLHeader(HTMLHeadElement header) {
@@ -216,7 +220,7 @@ public class GeneralComposeable implements Composeable {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Composeable#removeHTMLHeader(HTMLHeadElement)
    */
   public void removeHTMLHeader(HTMLHeadElement header) {
@@ -227,7 +231,7 @@ public class GeneralComposeable implements Composeable {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Composeable#getHTMLHeaders()
    */
   public HTMLHeadElement[] getHTMLHeaders() {
@@ -262,15 +266,25 @@ public class GeneralComposeable implements Composeable {
     }
     return false;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.impl.language.LocalizableObject#toString()
    */
   @Override
   public String toString() {
     return identifier;
   }
-  
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Composeable#setEnvironment(ch.entwine.weblounge.common.site.Environment)
+   */
+  @Override
+  public void setEnvironment(Environment environment) {
+    this.environment = environment;
+  }
+
 }
