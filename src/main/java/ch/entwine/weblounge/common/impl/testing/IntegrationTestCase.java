@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This integration test is automatically created from a test definition using
@@ -216,17 +218,20 @@ public class IntegrationTestCase {
    *          <code>true</code> to ignore whitespace when matching
    * @param ignoreCase
    *          <code>true</code> to ignore character case when matching
+   * @param regularExpression
+   *          <code>true</code> to treat <code>value</code> as a regular
+   *          expression
    * @throws IllegalArgumentException
    *           if <code>xpath</code> is blank
    */
   public void assertEquals(String xpath, String value,
-      boolean ignoreWhitespace, boolean ignoreCase)
+      boolean ignoreWhitespace, boolean ignoreCase, boolean regularExpression)
       throws IllegalArgumentException {
     if (StringUtils.isBlank(xpath))
       throw new IllegalArgumentException("Path must not be blank");
     if (StringUtils.isBlank(value))
       throw new IllegalArgumentException("Value must not be blank");
-    assertions.add(new EqualityAssertion(xpath, value, ignoreWhitespace, ignoreCase, true));
+    assertions.add(new EqualityAssertion(xpath, value, ignoreWhitespace, ignoreCase, regularExpression, true));
   }
 
   /**
@@ -241,17 +246,30 @@ public class IntegrationTestCase {
    *          <code>true</code> to ignore whitespace when matching
    * @param ignoreCase
    *          <code>true</code> to ignore character case when matching
+   * @param regularExpression
+   *          <code>true</code> to treat <code>value</code> as a regular
+   *          expression
    * @throws IllegalArgumentException
    *           if <code>xpath</code> is blank
    */
   public void assertNotEquals(String xpath, String value,
-      boolean ignoreWhitespace, boolean ignoreCase)
+      boolean ignoreWhitespace, boolean ignoreCase, boolean regularExpression)
       throws IllegalArgumentException {
     if (StringUtils.isBlank(xpath))
       throw new IllegalArgumentException("Path must not be blank");
     if (StringUtils.isBlank(value))
       throw new IllegalArgumentException("Value must not be blank");
-    assertions.add(new EqualityAssertion(xpath, value, ignoreWhitespace, ignoreCase, false));
+    assertions.add(new EqualityAssertion(xpath, value, ignoreWhitespace, ignoreCase, regularExpression, false));
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return name != null ? name : super.toString();
   }
 
   /**
@@ -381,6 +399,9 @@ public class IntegrationTestCase {
     /** True to ignore the case when matching */
     private boolean ignoreCase = true;
 
+    /** True to match using regular expressions */
+    private boolean regularExpression = false;
+
     /** <code>true</code> to test for existence */
     private boolean testPositive = true;
 
@@ -398,15 +419,18 @@ public class IntegrationTestCase {
      *          <code>true</code> to ignore whitespace when matching
      * @param ignoreCase
      *          <code>true</code> to ignore case when matching
+     * @param regularExpression
+     *          <code>true</code> to compare using regular expressions
      * @param testPositive
      *          <code>true</code> to test for equality, <code>false</code> for
      *          mismatch
      */
     EqualityAssertion(String xpath, String value, boolean ignoreWhitespace,
-        boolean ignoreCase, boolean testPositive) {
+        boolean ignoreCase, boolean regularExpression, boolean testPositive) {
       this.xpath = xpath;
       this.ignoreWhitespace = ignoreWhitespace;
       this.ignoreCase = ignoreCase;
+      this.regularExpression = regularExpression;
       this.testPositive = testPositive;
       this.expectedValue = value;
     }
@@ -428,7 +452,15 @@ public class IntegrationTestCase {
         found = StringUtils.deleteWhitespace(found);
         expected = StringUtils.deleteWhitespace(expected);
       }
-      boolean matches = ignoreCase ? found.equalsIgnoreCase(expected) : found.equals(expected);
+      boolean matches = false;
+      if (regularExpression) {
+        int flags = ignoreCase ? Pattern.CASE_INSENSITIVE : 0;
+        Pattern p = Pattern.compile(expected, flags);
+        Matcher m = p.matcher(found);
+        matches = m.matches();
+      } else {
+        matches = ignoreCase ? found.equalsIgnoreCase(expected) : found.equals(expected);
+      }
       if (testPositive && !matches)
         throw new IllegalStateException("Expected '" + this.expectedValue + "' at " + xpath + " but found '" + actualValue + "'");
       if (!testPositive && matches)
@@ -460,6 +492,17 @@ public class IntegrationTestCase {
      */
     public boolean ignoreCase() {
       return ignoreCase;
+    }
+
+    /**
+     * Returns <code>true</code> if the test should be made using regular
+     * expression logic.
+     * 
+     * @return <code>true</code> if the test is conducted using regular
+     *         expression logic
+     */
+    public boolean regularExpression() {
+      return regularExpression;
     }
 
     /**

@@ -19,6 +19,10 @@
       <path>//div[@id='main']/h2</path>
       <value><![CDATA[hello world i am happy now]]></value>
     </assert-not-equals>
+    <assert-equals regularexpression="true">
+      <path>//div[@id='main']/h2</path>
+      <value><![CDATA[^hello world i am [\w]* now$]]></value>
+    </assert-equals>
   </test-case>
   <test-case>
     <name><![CDATA[German greeting test]]></name>

@@ -93,7 +93,7 @@ public class IntegrationTestParserTest {
   @Test
   public void testAssertions() {
     List<IntegrationTestCaseAssertion> assertions = testCases.get(0).getAssertions();
-    assertEquals(5, assertions.size());
+    assertEquals(6, assertions.size());
   }
 
   /**
@@ -103,7 +103,7 @@ public class IntegrationTestParserTest {
   public void testStatusAssertion() {
     List<IntegrationTestCaseAssertion> assertions = testCases.get(0).getAssertions();
     assertTrue(assertions.get(0) instanceof StatusCodeAssertion);
-    StatusCodeAssertion assertion = (StatusCodeAssertion)assertions.get(0);
+    StatusCodeAssertion assertion = (StatusCodeAssertion) assertions.get(0);
     List<Integer> expectedCodes = assertion.getExpectedCodes();
     assertEquals(2, expectedCodes.size());
     assertEquals(200, expectedCodes.get(0));
@@ -117,11 +117,11 @@ public class IntegrationTestParserTest {
   public void testAssertExists() {
     List<IntegrationTestCaseAssertion> assertions = testCases.get(0).getAssertions();
     assertTrue(assertions.get(1) instanceof ExistenceAssertion);
-    ExistenceAssertion assertion = (ExistenceAssertion)assertions.get(1);
+    ExistenceAssertion assertion = (ExistenceAssertion) assertions.get(1);
     assertTrue(assertion.isPositive());
     assertEquals("//div[@id='main']/h1", assertion.getXPath());
   }
-  
+
   /**
    * Tests parsing of <code>assert-not-exists</code> clauses.
    */
@@ -129,7 +129,7 @@ public class IntegrationTestParserTest {
   public void testAssertNotExists() {
     List<IntegrationTestCaseAssertion> assertions = testCases.get(0).getAssertions();
     assertTrue(assertions.get(2) instanceof ExistenceAssertion);
-    ExistenceAssertion assertion = (ExistenceAssertion)assertions.get(2);
+    ExistenceAssertion assertion = (ExistenceAssertion) assertions.get(2);
     assertFalse(assertion.isPositive());
     assertEquals("//div[@id='main']/h2", assertion.getXPath());
   }
@@ -141,27 +141,45 @@ public class IntegrationTestParserTest {
   public void testAssertEquals() {
     List<IntegrationTestCaseAssertion> assertions = testCases.get(0).getAssertions();
     assertTrue(assertions.get(3) instanceof EqualityAssertion);
-    EqualityAssertion assertion = (EqualityAssertion)assertions.get(3);
+    EqualityAssertion assertion = (EqualityAssertion) assertions.get(3);
     assertTrue(assertion.isPositive());
     assertTrue(assertion.ignoreWhitespace());
     assertTrue(assertion.ignoreCase());
+    assertFalse(assertion.regularExpression());
     assertEquals("//div[@id='main']/h1", assertion.getXPath());
     assertEquals("hello world i am happy today", assertion.getExpectedValue());
   }
-  
+
   /**
    * Tests parsing of <code>assert-not-equals</code> clauses.
    */
   @Test
   public void testAssertNotEquals() {
     List<IntegrationTestCaseAssertion> assertions = testCases.get(0).getAssertions();
-    assertTrue(assertions.get(4) instanceof EqualityAssertion);
-    EqualityAssertion assertion = (EqualityAssertion)assertions.get(4);
+    assertTrue(assertions.get(5) instanceof EqualityAssertion);
+    EqualityAssertion assertion = (EqualityAssertion) assertions.get(5);
     assertFalse(assertion.isPositive());
     assertTrue(assertion.ignoreWhitespace());
     assertFalse(assertion.ignoreCase());
+    assertFalse(assertion.regularExpression());
     assertEquals("//div[@id='main']/h2", assertion.getXPath());
     assertEquals("hello world i am happy now", assertion.getExpectedValue());
+  }
+
+  /**
+   * Tests parsing of <code>assert-equals</code> clauses.
+   */
+  @Test
+  public void testAssertEqualsUsingRegularExpression() {
+    List<IntegrationTestCaseAssertion> assertions = testCases.get(0).getAssertions();
+    assertTrue(assertions.get(4) instanceof EqualityAssertion);
+    EqualityAssertion assertion = (EqualityAssertion) assertions.get(4);
+    assertTrue(assertion.isPositive());
+    assertFalse(assertion.ignoreWhitespace());
+    assertFalse(assertion.ignoreCase());
+    assertTrue(assertion.regularExpression());
+    assertEquals("//div[@id='main']/h2", assertion.getXPath());
+    assertEquals("^hello world i am [\\w]* now$", assertion.getExpectedValue());
   }
 
   /**

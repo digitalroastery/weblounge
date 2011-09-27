@@ -176,9 +176,11 @@ public final class IntegrationTestParser {
           String value = XPathHelper.valueOf(node, "value");
           String whitespace = XPathHelper.valueOf(node, "@ignorewhitespace");
           String casesensitivity = XPathHelper.valueOf(node, "@ignorecase");
+          String regex = XPathHelper.valueOf(node, "@regularexpression");
           boolean ignoreWhitespace = ConfigurationUtils.isTrue(whitespace);
           boolean ignoreCase = ConfigurationUtils.isTrue(casesensitivity);
-          testCase.assertEquals(path, value, ignoreWhitespace, ignoreCase);
+          boolean regularExpression = ConfigurationUtils.isTrue(regex);
+          testCase.assertEquals(path, value, ignoreWhitespace, ignoreCase, regularExpression);
         }
       }
 
@@ -191,9 +193,11 @@ public final class IntegrationTestParser {
           String value = XPathHelper.valueOf(node, "value");
           String whitespace = XPathHelper.valueOf(node, "@ignorewhitespace");
           String casesensitivity = XPathHelper.valueOf(node, "@ignorecase");
+          String regex = XPathHelper.valueOf(node, "@regularexpression");
           boolean ignoreWhitespace = ConfigurationUtils.isTrue(whitespace);
           boolean ignoreCase = ConfigurationUtils.isTrue(casesensitivity);
-          testCase.assertNotEquals(path, value, ignoreWhitespace, ignoreCase);
+          boolean regularExpression = ConfigurationUtils.isTrue(regex);
+          testCase.assertNotEquals(path, value, ignoreWhitespace, ignoreCase, regularExpression);
         }
       }
 
