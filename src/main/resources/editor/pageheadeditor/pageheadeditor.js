@@ -30,6 +30,18 @@ steal.plugins('jquery',
 			});
 			this.element.find("select[name=layout]").val(this.options.page.getTemplate());
 			
+			Page.findReferrer({id: this.options.page.value.id}, $.proxy(function(referrer) {
+				if(referrer == undefined) {
+					this.element.find('div.wbl-referrerPageSettings').html('Keine Verweise');
+					return;
+				}
+				$.each(referrer, $.proxy(function(index, ref) {
+			    	var page = new Page({value: ref});
+					this.element.find('div.wbl-referrerPageSettings').append(page.getTitle(this.options.language))
+					.append(': <a href="' + page.getPath() + '?_=' + new Date().getTime() + '">' + page.getPath() + '</a><br />');
+				}, this));
+			}, this));
+			
 			// TODO Load AvailableTags
 			Workbench.suggestTags({}, $.proxy(function(tags) {
 				if(tags == null || tags == undefined) return;
@@ -64,8 +76,8 @@ steal.plugins('jquery',
 				autoOpen: true,
 				resizable: true,
 				draggable: true,
-				width: 1024,
-				height: 800,
+				width: 700,
+				height: 650,
 				buttons: {
 					Abbrechen: $.proxy(function() {
 						this.element.dialog('close');

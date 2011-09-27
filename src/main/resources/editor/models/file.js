@@ -117,8 +117,8 @@ steal.then('jsonix')
 				var url = '/system/weblounge/files/' + params.id + '/referrer';
 				$.ajax(url, {
 					success: function(xml) {
-						var json = Editor.File.parseXML(xml);
-						success(Editor.File.concatFiles(json));
+						var json = Page.parseXML(xml);
+						success(json.value.page);
 					}
 				});
 			}

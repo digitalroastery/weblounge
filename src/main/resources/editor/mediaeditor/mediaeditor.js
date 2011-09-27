@@ -119,6 +119,19 @@ steal.plugins('jquery',
 	    			this.metadata[key] = file.getMetadata(this.options.language);
 	    			success();
 	    		}, this));
+	    		
+				Editor.File.findReferrer({id: value.resourceId}, $.proxy(function(referrer) {
+					if(referrer == undefined) {
+						this.element.find('div.wbl-referrerMediaEditor').html('Keine Verweise');
+						return;
+					}
+					$.each(referrer, $.proxy(function(index, ref) {
+				    	var page = new Page({value: ref});
+						this.element.find('div.wbl-referrerMediaEditor').append(page.getTitle(this.options.language))
+						.append(': <a href="' + page.getPath() + '?_=' + new Date().getTime() + '">' + page.getPath() + '</a><br />');
+					}, this));
+				}, this));
+	    		
 	    	}, this));
 	    },
 	    
