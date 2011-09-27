@@ -48,7 +48,7 @@ public class I18nTest extends IntegrationTestBase {
   private static final Logger logger = LoggerFactory.getLogger(I18nTest.class);
 
   /** Path to the i18n test page */
-  private static final String TEST_URL = "/test/i18n";
+  private static final String TEST_URL = "/test/i18n/en";
 
   /**
    * Creates a new instance of the <code>I18nTest</code> test.
