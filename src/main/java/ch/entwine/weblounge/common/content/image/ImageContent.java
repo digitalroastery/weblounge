@@ -22,6 +22,8 @@ package ch.entwine.weblounge.common.content.image;
 
 import ch.entwine.weblounge.common.content.file.FileContent;
 
+import java.util.Date;
+
 /**
  * Describes the contents of an image resource, including the general attributes
  * such as file size and mime type. In addition, it contains technical
@@ -58,6 +60,36 @@ public interface ImageContent extends FileContent {
    * @return the height
    */
   int getHeight();
+
+  /**
+   * Returns the name of the photographer of this picture
+   * 
+   * @return the photographer's name
+   */
+  String getPhotographer();
+
+  /**
+   * Set the name of the photographer
+   * 
+   * @param photographer
+   *          the photographer to set
+   */
+  void setPhotographer(String photographer);
+
+  /**
+   * Returns the date the picture was taken
+   * 
+   * @return the dateTaken
+   */
+  Date getDateTaken();
+
+  /**
+   * Sets the date the picture was taken
+   * 
+   * @param dateTaken
+   *          the dateTaken to set
+   */
+  void setDateTaken(Date dateTaken);
 
   /**
    * Returns the shooting location
