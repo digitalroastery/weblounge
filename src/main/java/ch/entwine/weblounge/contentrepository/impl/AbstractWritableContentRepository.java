@@ -86,9 +86,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** The environment tracker */
   private EnvironmentTracker environmentTracker = null;
 
-  /** The default environment */
-  private Environment environment = null;
-
   /** True to create a homepage when an empty repository is started */
   protected boolean createHomepage = true;
 
@@ -122,6 +119,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       responseCacheTracker = new ResponseCacheTracker(bundle.getBundleContext(), site.getIdentifier());
       responseCacheTracker.open();
       environmentTracker = new EnvironmentTracker(bundle.getBundleContext(), this);
+      environmentTracker.open();
     }
   }
 
@@ -638,7 +636,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       if (!previewGenerator.supports(resource, language))
         continue;
 
-      logger.info("Creating {} previews for {} {}", new Object[] {
+      logger.debug("Creating {} previews for {} {}", new Object[] {
           language.getDescription(),
           resourceType,
           resource });
