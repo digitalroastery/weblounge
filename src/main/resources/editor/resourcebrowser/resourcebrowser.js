@@ -354,12 +354,21 @@ steal.plugins(
                 	if(page.getPath() == '/') {
                 		this._showErrorMessage("Can't delete root page");
                 	} else if(!locked || (locked && userLocked)) {
-                		this._showMessage('Seite gel&ouml;scht!');
-                		Page.destroy({id: element.id}, this.callback('_removeResource', element.id));
-                		// Relocate to Root if current page was deleted
-                		if(page.getPath() == location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1)) {
-                			location.href = '/?edit&_=' + new Date().getTime();
-                		}
+                		Page.destroy({id: element.id}, $.proxy(function() {
+                			this._showMessage('Seite gel&ouml;scht!');
+                			this._removeResource(element.id);
+                			
+                			// Relocate to Root if current page was deleted
+                			if(page.getPath() == location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1)) {
+                				location.href = '/?edit&_=' + new Date().getTime();
+                			}
+                		}, this), $.proxy(function(statusCode, errorMessage) {
+                			if(statusCode == 412) {
+                				this._showErrorMessage("Can't delete" + page.getPath() + ": Page has active referrers!");
+                			} else {
+                				this._showErrorMessage("Can't delete" + page.getPath() + ": " + errorMessage);
+                			}
+                		}, this));
                 	} else {
                 		this._showErrorMessage("Can't delete " + page.getPath() + ": Page is locked!");
                 	}
@@ -367,8 +376,16 @@ steal.plugins(
         		break;
         	case 'media':
         		$(resources).each($.proxy(function(index, element) {
-        			this._showMessage('Media gel&ouml;scht!');
-        			Editor.File.destroy({id: element.id}, this.callback('_removeResource', element.id));
+        			Editor.File.destroy({id: element.id}, $.proxy(function() {
+        				this._showMessage('Media gel&ouml;scht!');
+        				this._removeResource(element.id);
+        			}, this), $.proxy(function(statusCode, errorMessage) {
+              			if(statusCode == 412) {
+            				this._showErrorMessage("Can't delete file: Media has active referrers!");
+            			} else {
+            				this._showErrorMessage("Can't delete file: " + errorMessage);
+            			}
+        			}, this));
         		}, this))
         		break;
         	}

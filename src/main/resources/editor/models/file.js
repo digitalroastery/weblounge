@@ -110,6 +110,21 @@ steal.then('jsonix')
 		},
 		
 		/**
+		 * Returns pages containing references to the page with the given id
+		 */
+		findReferrer: function(params, success, error) {
+			if ('id' in params) {
+				var url = '/system/weblounge/files/' + params.id + '/referrer';
+				$.ajax(url, {
+					success: function(xml) {
+						var json = Editor.File.parseXML(xml);
+						success(Editor.File.concatFiles(json));
+					}
+				});
+			}
+		},
+		
+		/**
 		 * Updates the specified file or the specified file content.
 		 * @param {Object} params The file identifier, language and eTag
 		 * @param {File} file The file object
@@ -177,14 +192,20 @@ steal.then('jsonix')
 				$.ajax({
 					url: '/system/weblounge/files/' + params.id + '/content/' + params.language,
 					type: 'delete',
-					success: success
+					success: success,
+					error: function(jqXHR, textStatus, errorThrown) {
+						error(jqXHR.status, errorThrown);
+					}
 				});
 			}
 			else if ('id' in params) {
 				$.ajax({
 					url: '/system/weblounge/files/' + params.id,
 					type: 'delete',
-					success: success
+					success: success,
+					error: function(jqXHR, textStatus, errorThrown) {
+						error(jqXHR.status, errorThrown);
+					}
 				});
 			}
 		},

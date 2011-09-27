@@ -106,6 +106,21 @@ steal.then('jsonix')
 		},
 		
 		/**
+		 * Returns pages containing references to the page with the given id
+		 */
+		findReferrer: function(params, success, error) {
+			if ('id' in params) {
+				var url = '/system/weblounge/pages/' + params.id + '/referrer';
+				$.ajax(url, {
+					success: function(xml) {
+						var json = Page.parseXML(xml);
+						success(json.value.page);
+					}
+				});
+			}
+		},
+		
+		/**
 		 * Updates the specified page.
 		 * @param {Object} params The page identifier and eTag
 		 * @param {Page} page The page object
@@ -160,7 +175,10 @@ steal.then('jsonix')
 				$.ajax({
 					url: '/system/weblounge/pages/' + params.id,
 					type: 'delete',
-					success: success
+					success: success,
+					error: function(jqXHR, textStatus, errorThrown) {
+						error(jqXHR.status, errorThrown);
+					}
 				});
 			}
 		},
