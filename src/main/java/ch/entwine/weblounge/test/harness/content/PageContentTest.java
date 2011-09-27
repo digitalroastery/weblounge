@@ -66,7 +66,7 @@ public class PageContentTest extends IntegrationTestBase {
   private static final Map<Language, String> texts = new HashMap<Language, String>();
 
   /** Modification date parser */
-  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
   /**
    * Prepare the test data.
@@ -255,7 +255,7 @@ public class PageContentTest extends IntegrationTestBase {
     try {
 
       request.setHeader("Cookie", EditingState.STATE_COOKIE + "=true");
-      
+
       HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
 

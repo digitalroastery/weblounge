@@ -40,6 +40,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -120,12 +121,12 @@ public final class TestSiteUtils {
    * @throws Exception
    *           if processing the request fails
    */
-  public static void testModifiedHeader(HttpUriRequest request, Date modificationDate, Logger logger,
-      String[][] params) throws Exception {
+  public static void testModifiedHeader(HttpUriRequest request,
+      Date modificationDate, Logger logger, String[][] params) throws Exception {
     DefaultHttpClient httpClient = new DefaultHttpClient();
     Date before = new Date(modificationDate.getTime() - Times.MS_PER_DAY);
     Date after = new Date(modificationDate.getTime() + Times.MS_PER_DAY);
-    SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+    SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
     try {
       request.removeHeaders("If-None-Match");
       request.setHeader("If-Modified-Since", format.format(after));

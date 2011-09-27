@@ -55,6 +55,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
@@ -108,7 +109,7 @@ public class ImagesTest extends IntegrationTestBase {
   private static final String imageId = "5bc19990-8f99-4873-a813-71b6dfac22ad";
 
   /** Modification date parser */
-  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
   static {
     styles.add(new ImageStyleImpl("box", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Box, false));
@@ -389,7 +390,7 @@ public class ImagesTest extends IntegrationTestBase {
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
     Date modificationDate = null;
-    
+
     try {
       HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
@@ -435,7 +436,7 @@ public class ImagesTest extends IntegrationTestBase {
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
     Date modificationDate = null;
-    
+
     try {
       logger.info("Requesting original German image at {}", request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);
@@ -485,7 +486,7 @@ public class ImagesTest extends IntegrationTestBase {
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
     Date modificationDate = null;
-    
+
     try {
       logger.info("Requesting scaled English image '{}' at {}", style.getIdentifier(), request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);
@@ -568,7 +569,7 @@ public class ImagesTest extends IntegrationTestBase {
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
     Date modificationDate = null;
-    
+
     try {
       logger.info("Requesting scaled German image '{}' at {}", style.getIdentifier(), request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);

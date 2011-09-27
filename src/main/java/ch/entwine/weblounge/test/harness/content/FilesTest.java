@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -82,7 +83,7 @@ public class FilesTest extends IntegrationTestBase {
   protected String filePath = null;
 
   /** Modification date parser */
-  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
   /**
    * Creates a new instance of the images test.
@@ -162,7 +163,7 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
     TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
@@ -213,7 +214,7 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
     TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
@@ -305,10 +306,10 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
     TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
-    
+
     // German
     String germanUrl = UrlUtils.concat(serverUrl, path, "de");
     request = new HttpGet(germanUrl);
@@ -342,7 +343,7 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
     TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
@@ -367,7 +368,7 @@ public class FilesTest extends IntegrationTestBase {
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
     Date modificationDate = null;
-    
+
     try {
       logger.info("Requesting English document from {}", request.getURI());
       HttpResponse response = TestUtils.request(httpClient, request, null);
@@ -397,10 +398,10 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
     TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
-    
+
     // German
     String germanUrl = UrlUtils.concat(serverUrl, path);
     request = new HttpGet(germanUrl);
@@ -435,7 +436,7 @@ public class FilesTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
     TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }

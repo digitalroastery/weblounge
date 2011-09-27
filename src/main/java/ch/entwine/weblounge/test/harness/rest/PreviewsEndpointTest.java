@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
@@ -68,16 +69,16 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
 
   /** The style's height */
   private static final int BOX_HEIGHT = 250;
-  
+
   /** The style's width */
   private static final int PREVIEW_WIDTH = 300;
-  
+
   /** The style's height */
   private static final int PREVIEW_HEIGHT = 200;
 
   /** Mime type of the English version */
   private static final String mimetypeJpeg = "image/jpeg";
-  
+
   /** Mime type of the English version */
   private static final String mimetypePng = "image/png";
 
@@ -86,9 +87,9 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
 
   /** Image resource identifier */
   private static final String pageId = "4bb19980-8f98-4873-a813-000000000001";
-  
+
   /** Modification date parser */
-  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+  private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
   static {
     styles.add(new ImageStyleImpl("box", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Box, false));
@@ -242,8 +243,8 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
           // Get the original image size
           int imageWidth = image.getWidth();
           int imageHeight = image.getHeight();
-          assertTrue((int)(scaledHeight) == imageHeight || (int)(scaledHeight) + 1 == imageHeight || (int)(scaledHeight) - 1 == imageHeight);
-          assertTrue((int)(scaledWidth) == imageWidth || (int)(scaledWidth) + 1 == imageWidth || (int)(scaledWidth) - 1 == imageWidth);
+          assertTrue((int) (scaledHeight) == imageHeight || (int) (scaledHeight) + 1 == imageHeight || (int) (scaledHeight) - 1 == imageHeight);
+          assertTrue((int) (scaledWidth) == imageWidth || (int) (scaledWidth) + 1 == imageWidth || (int) (scaledWidth) - 1 == imageWidth);
           fileName.append("-en");
         } else {
           response.getEntity().consumeContent();
@@ -275,7 +276,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
     TestSiteUtils.testETagHeader(getPreviewRequest, eTagValue, logger, null);
     TestSiteUtils.testModifiedHeader(getPreviewRequest, modificationDate, logger, null);
   }
-  
+
   private void testPagePreview(String serverUrl, String resourceId,
       ImageStyle imageStyle) throws Exception {
     String requestUrl = UrlUtils.concat(serverUrl, resourceId, "locales", "fr", "styles", imageStyle.getIdentifier());
@@ -285,35 +286,35 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
     Date modificationDate = null;
     logger.info("Requesting image preview at {}", requestUrl);
     HttpResponse response = TestUtils.request(httpClient, getPreviewRequest, null);
-      if (ImageScalingMode.None.equals(imageStyle.getScalingMode())) {
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
-        assertTrue("No content received", response.getEntity().getContentLength() < 1);
-        response.getEntity().consumeContent();
-      } else {
-        try {
-          assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-          assertTrue("No content received", response.getEntity().getContentLength() > 0);
-          
-          // Test general headers
-          assertEquals(mimetypePng, response.getHeaders("Content-Type")[0].getValue());
-          assertEquals(1, response.getHeaders("Content-Type").length);
-          assertEquals(1, response.getHeaders("Content-Disposition").length);
-          
-          // Test filename
-          StringBuilder fileName = new StringBuilder(pageId).append("-fr.png");
-          String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
-          assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
-          
-          // Test ETag header
-          Header eTagHeader = response.getFirstHeader("Etag");
-          assertNotNull(eTagHeader);
-          assertNotNull(eTagHeader.getValue());
-          eTagValue = eTagHeader.getValue();
-          
-          // Test Last-Modified header
-          Header modifiedHeader = response.getFirstHeader("Last-Modified");
-          assertNotNull(modifiedHeader);
-          modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+    if (ImageScalingMode.None.equals(imageStyle.getScalingMode())) {
+      assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
+      assertTrue("No content received", response.getEntity().getContentLength() < 1);
+      response.getEntity().consumeContent();
+    } else {
+      try {
+        assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        assertTrue("No content received", response.getEntity().getContentLength() > 0);
+
+        // Test general headers
+        assertEquals(mimetypePng, response.getHeaders("Content-Type")[0].getValue());
+        assertEquals(1, response.getHeaders("Content-Type").length);
+        assertEquals(1, response.getHeaders("Content-Disposition").length);
+
+        // Test filename
+        StringBuilder fileName = new StringBuilder(pageId).append("-fr.png");
+        String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
+        assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
+
+        // Test ETag header
+        Header eTagHeader = response.getFirstHeader("Etag");
+        assertNotNull(eTagHeader);
+        assertNotNull(eTagHeader.getValue());
+        eTagValue = eTagHeader.getValue();
+
+        // Test Last-Modified header
+        Header modifiedHeader = response.getFirstHeader("Last-Modified");
+        assertNotNull(modifiedHeader);
+        modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
