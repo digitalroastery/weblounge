@@ -369,7 +369,7 @@ public final class ImageStyleUtils {
       cropX = Math.max(cropX, (float) Math.ceil(getCropX(scaledWidth, scaledHeight, style)));
       cropY = Math.max(cropY, (float) Math.ceil(getCropY(scaledWidth, scaledHeight, style)));
 
-      if (cropX > 0 || cropY > 0) {
+      if ((cropX > 0 && Math.floor(cropX / 2.0f) > 0) || (cropY > 0 && Math.floor(cropY / 2.0f) > 0)) {
 
         ParameterBlock cropTopLeftParams = new ParameterBlock();
         cropTopLeftParams.addSource(image);
