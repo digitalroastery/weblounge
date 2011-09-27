@@ -248,7 +248,7 @@ public class ResourceContentImpl implements ResourceContent {
   public boolean equals(Object obj) {
     if (obj instanceof ResourceContent) {
       ResourceContent c = (ResourceContent) obj;
-      if (!StringUtils.trimToEmpty(filename).equals(c.getFilename()))
+      if (!StringUtils.trimToEmpty(filename).equals(StringUtils.trimToEmpty(c.getFilename())))
         return false;
       return language.equals(c.getLanguage());
     }

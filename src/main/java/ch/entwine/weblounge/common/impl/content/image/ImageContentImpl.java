@@ -398,11 +398,16 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
         return false;
       if (height != content.getHeight())
         return false;
-      if (photographer == null || !photographer.equals(content.getPhotographer()))
+      if (!StringUtils.trimToEmpty(photographer).equals(StringUtils.trimToEmpty(content.getPhotographer())))
         return false;
-      if (dateTaken == null || dateTaken.equals(content.getDateTaken()))
-        return false;
-      if (location == null || !location.equals(content.getLocation()))
+      if (dateTaken != null) {
+        if (!dateTaken.equals(content.getDateTaken()))
+          return false;
+      } else {
+        if (content.getDateTaken() != null)
+          return false;
+      }
+      if (!StringUtils.trimToEmpty(location).equals(StringUtils.trimToEmpty(content.getLocation())))
         return false;
       if (gpsLat != content.getGpsLat())
         return false;
