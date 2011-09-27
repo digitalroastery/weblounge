@@ -38,6 +38,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.xpath.XPath;
@@ -51,6 +53,9 @@ public final class LanguageUtils {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(LanguageUtils.class);
+
+  /** Regular expression to extract CH_de style Accept-Language headers */
+  private static final Pattern ACCEPT_LANGUAGE_HEADER = Pattern.compile("([\\w][\\w])_([\\w][\\w])");
 
   /** Globally available languages */
   private static final Map<String, Language> systemLanguages = new HashMap<String, Language>();
@@ -73,6 +78,12 @@ public final class LanguageUtils {
    */
   public static Language getLanguage(Locale locale)
       throws UnknownLanguageException {
+    
+    Matcher matcher = ACCEPT_LANGUAGE_HEADER.matcher(locale.getLanguage());
+    if (matcher.matches()) {
+      locale = new Locale(matcher.group(2), matcher.group(1));
+    }
+    
     Language language = systemLanguages.get(locale.getLanguage());
     if (language == null) {
       language = new LanguageImpl(locale);
