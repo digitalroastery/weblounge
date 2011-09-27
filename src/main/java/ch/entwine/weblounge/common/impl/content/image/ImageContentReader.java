@@ -22,13 +22,12 @@ package ch.entwine.weblounge.common.impl.content.image;
 
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.impl.content.ResourceContentReaderImpl;
-import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
-import org.apache.commons.io.input.TeeInputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +37,6 @@ import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.lang.ref.WeakReference;
 import java.util.Date;
 
@@ -107,84 +104,40 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
   public ImageContent createFromContent(InputStream is, User user,
       Language language, long size, String fileName, String mimeType)
       throws IOException {
+
     ImageContent content = new ImageContentImpl(fileName, language, mimeType);
+
+    // Use the logged in user as the author
     content.setCreator(user);
+
+    // Set the creation date
     content.setCreationDate(new Date());
 
-    // Fork the input stream so that it can be consumed twice
-    PipedOutputStream outputStream = new PipedOutputStream();
-    PipedInputStream pipedInputStream = new PipedInputStream(outputStream);
-    final InputStream tis = new TeeInputStream(is, outputStream);
+    MemoryCacheSeekableStream mcss = new MemoryCacheSeekableStream(is);
+    UnclosableInputStream bis = new UnclosableInputStream(mcss);
 
     // Read the Exif metadata (if available)
-    ExifMetadataExtractor exifMetadataExtractor = new ExifMetadataExtractor(pipedInputStream);
-    Thread exifMetadataExtractorThread = new Thread(exifMetadataExtractor);
-    ImageMetadata imageMetadata = null;
-    exifMetadataExtractorThread.start();
+    try {
+      readExifMetadata(content, bis);
+    } catch (Throwable t) {
+      logger.warn("Error extracting Exif metadata from {}: {}", fileName, t.getMessage());
+    }
 
-    // Read the Jai metadata (if available)
-    JAIImageMetadataExtractor jaiMetadataExtractor = new JAIImageMetadataExtractor(tis);
-    Thread jaiMetadataExtractorThread = new Thread(jaiMetadataExtractor);
-    RenderedOp jaiImageMetadata = null;
-    jaiMetadataExtractorThread.start();
-
-    // Wait for the Exif reader to finish
-    synchronized (exifMetadataExtractor) {
-      while ((imageMetadata = exifMetadataExtractor.getMetadata()) == null) {
-        try {
-          exifMetadataExtractor.wait();
-        } catch (InterruptedException e) {
-          logger.warn("Interrupted while waiting for exif image metadata extraction");
-          break;
-        }
+    // Read the JAI metadata
+    if (content.getWidth() <= 0 || content.getHeight() <= 0) {
+      try {
+        mcss.seek(0);
+        readJAIMetadata(content, mcss);
+      } catch (Throwable t) {
+        logger.warn("Error extracting metadata using java advanced imaging (jai) from {}: {}", fileName, t.getMessage());
+      } finally {
+        IOUtils.closeQuietly(is);
       }
     }
 
-    // Wait for the JAI reader to finish
-    synchronized (jaiMetadataExtractor) {
-      while ((jaiImageMetadata = jaiMetadataExtractor.getMetadata()) == null) {
-        try {
-          jaiMetadataExtractor.wait();
-        } catch (InterruptedException e) {
-          logger.warn("Interrupted while waiting for jai image metadata extraction");
-          break;
-        }
-      }
-    }
-
-    if (jaiImageMetadata != null) {
-      content.setWidth(jaiImageMetadata.getWidth());
-      content.setHeight(jaiImageMetadata.getHeight());
-    }
-
-    if (imageMetadata == null)
-      return content;
-
-    // Add metadata
-    if (!StringUtils.isBlank(imageMetadata.getPhotographer())) {
-      content.setCreator(new UserImpl(user.getLogin(), user.getRealm(), imageMetadata.getPhotographer()));
-    }
-    if (imageMetadata.getDateTaken() != null) {
-      content.setCreationDate(imageMetadata.getDateTaken());
-    }
-    if (!StringUtils.isBlank(imageMetadata.getLocation())) {
-      content.setLocation(imageMetadata.getLocation());
-    }
-    if (imageMetadata.getGpsLat() != 0 && imageMetadata.getGpsLong() != 0) {
-      content.setGpsPosition(imageMetadata.getGpsLat(), imageMetadata.getGpsLong());
-    }
-    if (imageMetadata.getFilmspeed() != 0) {
-      content.setFilmspeed(imageMetadata.getFilmspeed());
-    }
-    if (imageMetadata.getFNumber() != 0) {
-      content.setFNumber(imageMetadata.getFNumber());
-    }
-    if (imageMetadata.getFocalWidth() != 0) {
-      content.setFocalWidth(imageMetadata.getFocalWidth());
-    }
-    if (imageMetadata.getExposureTime() != 0) {
-      content.setExposureTime(imageMetadata.getExposureTime());
-    }
+    // Close the input stream
+    IOUtils.closeQuietly(mcss);
+    bis = null;
 
     return content;
   }
@@ -302,93 +255,105 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
   }
 
   /**
-   * Implements a separate thread that extracts the image metadata.
+   * Extracts the Exif metadata from the image.
+   * 
+   * @param content
+   *          the resource content
+   * @param is
+   *          the input stream
+   * @return the Exif metadata
    */
-  private static class ExifMetadataExtractor implements Runnable {
+  protected ImageMetadata readExifMetadata(ImageContent content, InputStream is) {
+    BufferedInputStream bis = new BufferedInputStream(is);
+    ImageMetadata exifMetadata = ImageMetadataUtils.extractMetadata(bis);
 
-    /** The input stream */
-    private BufferedInputStream imageInputStream = null;
+    if (exifMetadata == null)
+      return null;
 
-    /** The image metadata */
-    private ImageMetadata metadata = null;
+    // Add metadata
+    // if (!StringUtils.isBlank(imageMetadata.getPhotographer())) {
+    // content.setCreator(new UserImpl(user.getLogin(), user.getRealm(),
+    // imageMetadata.getPhotographer()));
+    // }
 
-    ExifMetadataExtractor(InputStream is) {
-      imageInputStream = new BufferedInputStream(is);
+    if (exifMetadata.getDateTaken() != null) {
+      content.setCreationDate(exifMetadata.getDateTaken());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Runnable#run()
-     */
-    public void run() {
-      try {
-        while (imageInputStream.available() == 0)
-          Thread.sleep(100);
-        metadata = ImageMetadataUtils.extractMetadata(imageInputStream);
-//        while (imageInputStream.available() > 0)
-//          imageInputStream.read();
-      } catch (Throwable t) {
-        logger.warn("Error extracting Exif image metadata", t);
-      } finally {
-        synchronized (this) {
-          this.notify();
-        }
-      }
+    if (!StringUtils.isBlank(exifMetadata.getLocation())) {
+      content.setLocation(exifMetadata.getLocation());
     }
 
-    /**
-     * Returns the extracted metadata.
-     * 
-     * @return the metadata
-     */
-    ImageMetadata getMetadata() {
-      return metadata;
+    if (exifMetadata.getGpsLat() != 0 && exifMetadata.getGpsLong() != 0) {
+      content.setGpsPosition(exifMetadata.getGpsLat(), exifMetadata.getGpsLong());
     }
 
+    if (exifMetadata.getFilmspeed() != 0) {
+      content.setFilmspeed(exifMetadata.getFilmspeed());
+    }
+
+    if (exifMetadata.getFNumber() != 0) {
+      content.setFNumber(exifMetadata.getFNumber());
+    }
+
+    if (exifMetadata.getFocalWidth() != 0) {
+      content.setFocalWidth(exifMetadata.getFocalWidth());
+    }
+
+    if (exifMetadata.getExposureTime() != 0) {
+      content.setExposureTime(exifMetadata.getExposureTime());
+    }
+
+    return exifMetadata;
   }
 
   /**
-   * Implements a separate thread that extracts the image metadata.
+   * Extracts image metadata from the image using Java Advanced Imaging (JAI).
+   * 
+   * @param content
+   *          the resource content
+   * @param is
+   *          the input stream
+   * @return the image metadata
    */
-  private static class JAIImageMetadataExtractor implements Runnable {
+  protected RenderedOp readJAIMetadata(ImageContent content, InputStream is) {
+    MemoryCacheSeekableStream imageInputStream = new MemoryCacheSeekableStream(is);
+    RenderedOp jaiMetadata = JAI.create("stream", imageInputStream);
 
-    /** The input stream */
-    private MemoryCacheSeekableStream imageInputStream = null;
+    if (jaiMetadata == null)
+      return null;
 
-    /** The image metadata */
-    private RenderedOp image = null;
+    content.setWidth(jaiMetadata.getWidth());
+    content.setHeight(jaiMetadata.getHeight());
 
-    JAIImageMetadataExtractor(InputStream is) {
-      imageInputStream = new MemoryCacheSeekableStream(is);
+    return jaiMetadata;
+  }
+
+  /**
+   * Implementation of an input stream that ignores calls to
+   * {@link java.io.InputStream#close()}.
+   */
+  private static class UnclosableInputStream extends BufferedInputStream {
+
+    /**
+     * Creates a new input stream which will be fully consumed before being
+     * closed.
+     * 
+     * @param is
+     *          the input stream to be consumed from
+     */
+    public UnclosableInputStream(InputStream is) {
+      super(is);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see java.lang.Runnable#run()
+     * @see java.io.BufferedInputStream#close()
      */
-    public void run() {
-      try {
-        image = JAI.create("stream", imageInputStream);
-        while (imageInputStream.available() > 0)
-          imageInputStream.read();
-      } catch (Throwable t) {
-        logger.warn("Error extracting jai image metadata", t);
-      } finally {
-        synchronized (this) {
-          this.notify();
-        }
-      }
-    }
-
-    /**
-     * Returns the JAI image object
-     * 
-     * @return the metadata
-     */
-    RenderedOp getMetadata() {
-      return image;
+    @Override
+    public void close() throws IOException {
+      // Don't do anything, we still need this input stream
     }
 
   }

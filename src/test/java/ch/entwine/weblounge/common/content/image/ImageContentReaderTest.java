@@ -29,7 +29,6 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -57,10 +56,10 @@ public class ImageContentReaderTest {
   protected String mimeType = "image/jpeg";
 
   /** The image width */
-  protected long imageWidth = 666;
+  protected long imageWidth = 1000;
 
   /** The image height */
-  protected long imageHeight = 1000;
+  protected long imageHeight = 666;
 
   /**
    * Sets up all the members.
@@ -78,7 +77,6 @@ public class ImageContentReaderTest {
    * .
    */
   @Test
-  @Ignore
   public void testCreateFromContent() throws Exception {
     InputStream is = ImageContentReaderTest.class.getResourceAsStream("/" + fileName);
     ImageContent content = reader.createFromContent(is, user, language, size, fileName, mimeType);
