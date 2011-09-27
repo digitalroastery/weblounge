@@ -84,7 +84,7 @@ public final class ImageMetadataUtils {
     try {
       meta = ImageMetadataReader.readMetadata(img);
     } catch (ImageProcessingException e) {
-      logger.warn("Failed to extract image metadata from image");
+      logger.warn("Failed to extract image metadata from image", e);
       return null;
     }
 

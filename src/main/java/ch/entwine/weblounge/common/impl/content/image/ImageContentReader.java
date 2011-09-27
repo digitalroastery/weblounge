@@ -27,9 +27,8 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
-import com.sun.media.jai.codec.SeekableStream;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +38,8 @@ import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.lang.ref.WeakReference;
 import java.util.Date;
 
@@ -53,7 +54,7 @@ import javax.xml.parsers.SAXParser;
 public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(ImageContentReader.class);
+  protected static final Logger logger = LoggerFactory.getLogger(ImageContentReader.class);
 
   /**
    * Creates a new file content reader that will parse serialized XML version of
@@ -111,39 +112,50 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     content.setCreationDate(new Date());
 
     // Fork the input stream so that it can be consumed twice
-//    PipedOutputStream outputStream = new PipedOutputStream();
-//    PipedInputStream pipedInputStream = new PipedInputStream(outputStream);
-//    final InputStream tis = new TeeInputStream(is, outputStream);
+    PipedOutputStream outputStream = new PipedOutputStream();
+    PipedInputStream pipedInputStream = new PipedInputStream(outputStream);
+    final InputStream tis = new TeeInputStream(is, outputStream);
 
-//    ImageMetadataExtractor extractor = new ImageMetadataExtractor(tis);
-//    Thread extractorThread = new Thread(extractor);
-//    extractorThread.start();
+    // Read the Exif metadata (if available)
+    ExifMetadataExtractor exifMetadataExtractor = new ExifMetadataExtractor(pipedInputStream);
+    Thread exifMetadataExtractorThread = new Thread(exifMetadataExtractor);
+    ImageMetadata imageMetadata = null;
+    exifMetadataExtractorThread.start();
 
-    InputStream pipedInputStream = is;
+    // Read the Jai metadata (if available)
+    JAIImageMetadataExtractor jaiMetadataExtractor = new JAIImageMetadataExtractor(tis);
+    Thread jaiMetadataExtractorThread = new Thread(jaiMetadataExtractor);
+    RenderedOp jaiImageMetadata = null;
+    jaiMetadataExtractorThread.start();
 
-    // Read the image metadata
-    SeekableStream imageInputStream = null;
-    try {
-      imageInputStream = new MemoryCacheSeekableStream(pipedInputStream);
-      RenderedOp image = JAI.create("stream", imageInputStream);
-      content.setWidth(image.getWidth());
-      content.setHeight(image.getHeight());
-    } finally {
-      IOUtils.closeQuietly(imageInputStream);
+    // Wait for the Exif reader to finish
+    synchronized (exifMetadataExtractor) {
+      while ((imageMetadata = exifMetadataExtractor.getMetadata()) == null) {
+        try {
+          exifMetadataExtractor.wait();
+        } catch (InterruptedException e) {
+          logger.warn("Interrupted while waiting for exif image metadata extraction");
+          break;
+        }
+      }
     }
 
-    // Read the image's EXIF data
-    ImageMetadata imageMetadata = null;
-//    synchronized (extractor) {
-//      while ((imageMetadata = extractor.getMetadata()) == null) {
-//        try {
-//          extractor.wait();
-//        } catch (InterruptedException e) {
-//          logger.warn("Interrupted while waiting for image metadata extraction");
-//          break;
-//        }
-//      }
-//    }
+    // Wait for the JAI reader to finish
+    synchronized (jaiMetadataExtractor) {
+      while ((jaiImageMetadata = jaiMetadataExtractor.getMetadata()) == null) {
+        try {
+          jaiMetadataExtractor.wait();
+        } catch (InterruptedException e) {
+          logger.warn("Interrupted while waiting for jai image metadata extraction");
+          break;
+        }
+      }
+    }
+
+    if (jaiImageMetadata != null) {
+      content.setWidth(jaiImageMetadata.getWidth());
+      content.setHeight(jaiImageMetadata.getHeight());
+    }
 
     if (imageMetadata == null)
       return content;
@@ -230,7 +242,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
   public void endElement(String uri, String local, String raw)
       throws SAXException {
 
-    // mimetype
+    // mime type
     if ("mimetype".equals(raw)) {
       content.setMimetype(getCharacters());
       logger.trace("Images's content mimetype is '{}'", content.getMimetype());
@@ -272,13 +284,13 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
       logger.trace("Image's fnumber is '{}'", content.getFNumber());
     }
 
-    // focalwidth
+    // focal width
     else if ("focalwidth".equals(raw)) {
       content.setFocalWidth(Integer.parseInt(getCharacters()));
       logger.trace("Image's focalwidth is '{}'", content.getFocalWidth());
     }
 
-    // exposuretime
+    // exposure time
     else if ("exposuretime".equals(raw)) {
       content.setExposureTime(Float.parseFloat(getCharacters()));
       logger.trace("Image's exposuretime is '{}'", content.getExposureTime());
@@ -292,16 +304,16 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
   /**
    * Implements a separate thread that extracts the image metadata.
    */
-  private static class ImageMetadataExtractor implements Runnable {
+  private static class ExifMetadataExtractor implements Runnable {
 
     /** The input stream */
-    private InputStream imageInputStream = null;
+    private BufferedInputStream imageInputStream = null;
 
     /** The image metadata */
     private ImageMetadata metadata = null;
 
-    ImageMetadataExtractor(InputStream is) {
-      imageInputStream = is;
+    ExifMetadataExtractor(InputStream is) {
+      imageInputStream = new BufferedInputStream(is);
     }
 
     /**
@@ -310,13 +322,15 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
      * @see java.lang.Runnable#run()
      */
     public void run() {
-      BufferedInputStream bis = new BufferedInputStream(imageInputStream);
       try {
-        metadata = ImageMetadataUtils.extractMetadata(bis);
-        while (bis.available() > 0) {
-          bis.read();
-        }
+        while (imageInputStream.available() == 0)
+          Thread.sleep(100);
+        metadata = ImageMetadataUtils.extractMetadata(imageInputStream);
+//        while (imageInputStream.available() > 0)
+//          imageInputStream.read();
       } catch (Throwable t) {
+        logger.warn("Error extracting Exif image metadata", t);
+      } finally {
         synchronized (this) {
           this.notify();
         }
@@ -330,6 +344,51 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
      */
     ImageMetadata getMetadata() {
       return metadata;
+    }
+
+  }
+
+  /**
+   * Implements a separate thread that extracts the image metadata.
+   */
+  private static class JAIImageMetadataExtractor implements Runnable {
+
+    /** The input stream */
+    private MemoryCacheSeekableStream imageInputStream = null;
+
+    /** The image metadata */
+    private RenderedOp image = null;
+
+    JAIImageMetadataExtractor(InputStream is) {
+      imageInputStream = new MemoryCacheSeekableStream(is);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Runnable#run()
+     */
+    public void run() {
+      try {
+        image = JAI.create("stream", imageInputStream);
+        while (imageInputStream.available() > 0)
+          imageInputStream.read();
+      } catch (Throwable t) {
+        logger.warn("Error extracting jai image metadata", t);
+      } finally {
+        synchronized (this) {
+          this.notify();
+        }
+      }
+    }
+
+    /**
+     * Returns the JAI image object
+     * 
+     * @return the metadata
+     */
+    RenderedOp getMetadata() {
+      return image;
     }
 
   }
