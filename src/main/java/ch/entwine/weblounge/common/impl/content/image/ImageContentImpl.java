@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.impl.content.image;
 
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.impl.content.file.FileContentImpl;
+import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;
@@ -29,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Date;
 
 /**
  * Default implementation of an image resource content.
@@ -40,6 +42,12 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
 
   /** The image height in pixels */
   protected int height = -1;
+
+  /** photographer of the picture */
+  protected String photographer = null;
+
+  /** date the picture was taken */
+  protected Date dateTaken = null;
 
   /** location where the picture was taken */
   protected String location = null;
@@ -163,6 +171,42 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
    */
   public int getHeight() {
     return height;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#getPhotographer()
+   */
+  public String getPhotographer() {
+    return photographer;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#setPhotographer(java.lang.String)
+   */
+  public void setPhotographer(String photographer) {
+    this.photographer = photographer;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#getDateTaken()
+   */
+  public Date getDateTaken() {
+    return dateTaken;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.image.ImageContent#setDateTaken(java.util.Date)
+   */
+  public void setDateTaken(Date dateTaken) {
+    this.dateTaken = dateTaken;
   }
 
   /**
@@ -304,6 +348,12 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
     xml.append("<width>").append(width).append("</width>");
     xml.append("<height>").append(height).append("</height>");
 
+    if (!StringUtils.isBlank(photographer)) {
+      xml.append("<photographer><![CDATA[").append(photographer).append("]]></photographer>");
+    }
+    if (dateTaken != null) {
+      xml.append("<datetaken>").append(WebloungeDateFormat.formatStatic(dateTaken)).append("</datetaken>");
+    }
     if (!StringUtils.isBlank(location)) {
       xml.append("<location><![CDATA[").append(location).append("]]></location>");
     }
@@ -347,6 +397,24 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
       if (width != content.getWidth())
         return false;
       if (height != content.getHeight())
+        return false;
+      if (photographer == null || !photographer.equals(content.getPhotographer()))
+        return false;
+      if (dateTaken == null || dateTaken.equals(content.getDateTaken()))
+        return false;
+      if (location == null || !location.equals(content.getLocation()))
+        return false;
+      if (gpsLat != content.getGpsLat())
+        return false;
+      if (gpsLong != content.getGpsLong())
+        return false;
+      if (filmspeed != content.getFilmspeed())
+        return false;
+      if (fnumber != content.getFNumber())
+        return false;
+      if (focalWidth != content.getFocalWidth())
+        return false;
+      if (exposureTime != content.getExposureTime())
         return false;
       return super.equals(content);
     }

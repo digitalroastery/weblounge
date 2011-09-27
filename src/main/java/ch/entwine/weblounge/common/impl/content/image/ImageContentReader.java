@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.impl.content.image;
 
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.impl.content.ResourceContentReaderImpl;
+import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 
@@ -38,6 +39,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.text.ParseException;
 import java.util.Date;
 
 import javax.media.jai.JAI;
@@ -207,16 +209,32 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
       logger.trace("Image's content filesize is '{}'", content.getSize());
     }
 
+    // height
+    else if ("height".equals(raw)) {
+      content.setHeight(Integer.parseInt(getCharacters()));
+      logger.trace("Image's height is '{}'", content.getHeight());
+    }
+
     // width
     else if ("width".equals(raw)) {
       content.setWidth(Integer.parseInt(getCharacters()));
       logger.trace("Image's width is '{}'", content.getWidth());
     }
 
-    // height
-    else if ("height".equals(raw)) {
-      content.setHeight(Integer.parseInt(getCharacters()));
-      logger.trace("Image's height is '{}'", content.getHeight());
+    // photographer
+    else if ("photographer".equals(raw)) {
+      content.setPhotographer(getCharacters());
+      logger.trace("Image's photographer is '{}'", content.getPhotographer());
+    }
+
+    // date taken
+    else if ("datetaken".equals(raw)) {
+      try {
+        content.setDateTaken(WebloungeDateFormat.parseStatic(getCharacters()));
+      } catch (ParseException e) {
+        throw new IllegalStateException("The date taken '" + getCharacters() + "' cannot be parsed", e);
+      }
+      logger.trace("Image's date taken is '{}'", content.getDateTaken());
     }
 
     // location
@@ -270,14 +288,12 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     if (exifMetadata == null)
       return null;
 
-    // Add metadata
-    // if (!StringUtils.isBlank(imageMetadata.getPhotographer())) {
-    // content.setCreator(new UserImpl(user.getLogin(), user.getRealm(),
-    // imageMetadata.getPhotographer()));
-    // }
-
     if (exifMetadata.getDateTaken() != null) {
-      content.setCreationDate(exifMetadata.getDateTaken());
+      content.setDateTaken(exifMetadata.getDateTaken());
+    }
+
+    if (!StringUtils.isBlank(exifMetadata.getPhotographer())) {
+      content.setPhotographer(exifMetadata.getPhotographer());
     }
 
     if (!StringUtils.isBlank(exifMetadata.getLocation())) {
