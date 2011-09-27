@@ -85,15 +85,15 @@ public class HTMLHeaderTag extends WebloungeTag {
     Site site = request.getSite();
     Page page = (Page) request.getAttribute(WebloungeRequest.PAGE);
 
-    // Page template links & scripts
-    PageTemplate template = site.getTemplate(page.getTemplate());
-    template.setEnvironment(request.getEnvironment());
-    for (HTMLHeadElement header : template.getHTMLHeaders()) {
-      addHeadElement(header, site, null);
-    }
-
-    // Pagelets links & scripts
     if (page != null) {
+      // Page template links & scripts
+      PageTemplate template = site.getTemplate(page.getTemplate());
+      template.setEnvironment(request.getEnvironment());
+      for (HTMLHeadElement header : template.getHTMLHeaders()) {
+        addHeadElement(header, site, null);
+      }
+
+      // Pagelets links & scripts
       for (Pagelet p : page.getPagelets()) {
         String moduleId = p.getModule();
         Module module = site.getModule(moduleId);
