@@ -43,7 +43,6 @@ import ch.entwine.weblounge.common.impl.content.image.ImageResourceImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
-import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
@@ -142,17 +141,11 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     if (!StringUtils.isBlank(imageMetadata.getLegend())) {
       imageResource.setDescription(imageMetadata.getLegend(), language);
     }
-    if (!StringUtils.isBlank(imageMetadata.getPhotographer())) {
-      imageResource.setCreator(new UserImpl(user.getLogin(), user.getRealm(), imageMetadata.getPhotographer()));
-    }
     for (String keyword : imageMetadata.getKeywords()) {
       imageResource.addSubject(keyword);
     }
     if (!StringUtils.isBlank(imageMetadata.getCopyright())) {
       imageResource.setRights(imageMetadata.getCopyright(), language);
-    }
-    if (imageMetadata.getDateTaken() != null) {
-      imageResource.setCreationDate(imageMetadata.getDateTaken());
     }
     return imageResource;
   }
