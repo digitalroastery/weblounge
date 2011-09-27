@@ -12,6 +12,10 @@ FileMappings.User = new Jsonix.Model.ClassInfo({
   name: 'FileMappings.User'
 });
 
+FileMappings.GPS = new Jsonix.Model.ClassInfo({
+	name: 'FileMappings.GPS'
+});
+
 FileMappings.CreatedModified = new Jsonix.Model.ClassInfo({
   name: 'FileMappings.CreatedModified'
 });
@@ -58,6 +62,15 @@ FileMappings.User.properties = [new Jsonix.Model.AttributePropertyInfo({
 }), new Jsonix.Model.ValuePropertyInfo({
   name: 'name',
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+})];
+
+// <gps lat="47.323323" lng="8.321939" />
+FileMappings.GPS.properties = [new Jsonix.Model.AttributePropertyInfo({
+	name: 'lat',
+	typeInfo: Jsonix.Schema.XSD.Double.INSTANCE
+}), new Jsonix.Model.AttributePropertyInfo({
+	name: 'lng',
+	typeInfo: Jsonix.Schema.XSD.Double.INSTANCE
 })];
 
 // <created|modified><user .../><date.../></created|modified>
@@ -233,6 +246,24 @@ FileMappings.Body.Content.properties = [new Jsonix.Model.AttributePropertyInfo({
 }), new Jsonix.Model.ElementPropertyInfo({
   name: 'height',
   typeInfo: Jsonix.Schema.XSD.Integer.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'location',
+  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'gps',
+  typeInfo: FileMappings.GPS
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'filmspeed',
+  typeInfo: Jsonix.Schema.XSD.Integer.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'fnumber',
+  typeInfo: Jsonix.Schema.XSD.Float.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'focalwidth',
+  typeInfo: Jsonix.Schema.XSD.Integer.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'exposuretime',
+  typeInfo: Jsonix.Schema.XSD.Float.INSTANCE
 })];
 
 FileMappings.typeInfos = [FileMappings.Head];
