@@ -62,21 +62,6 @@ public interface ImageContent extends FileContent {
   int getHeight();
 
   /**
-   * Returns the name of the photographer of this picture
-   * 
-   * @return the photographer's name
-   */
-  String getPhotographer();
-
-  /**
-   * Set the name of the photographer
-   * 
-   * @param photographer
-   *          the photographer to set
-   */
-  void setPhotographer(String photographer);
-
-  /**
    * Returns the date the picture was taken
    * 
    * @return the dateTaken

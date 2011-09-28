@@ -44,6 +44,21 @@ public interface ResourceContent extends Creatable {
   String getFilename();
 
   /**
+   * Returns the name of the author of this resource
+   * 
+   * @return the author's name
+   */
+  String getAuthor();
+
+  /**
+   * Set the name of the author
+   * 
+   * @param author
+   *          the author to set
+   */
+  void setAuthor(String author);
+
+  /**
    * Sets the content mime type.
    * 
    * @param mimetype
@@ -87,7 +102,7 @@ public interface ResourceContent extends Creatable {
    * @return the language
    */
   Language getLanguage();
-  
+
   /**
    * Returns an xml representation of this content.
    * 
