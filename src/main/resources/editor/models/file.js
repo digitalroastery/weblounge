@@ -244,6 +244,7 @@ steal.then('jsonix')
 	{
 	    /**
 	     * Return the file title
+	     * @param {String} language
 	     */
 	    getTitle: function(language) {
 	    	if($.isEmptyObject(this.value.head.metadata)) return '';
@@ -254,6 +255,7 @@ steal.then('jsonix')
 	    
 	    /**
 	     * Return the file description
+	     * @param {String} language
 	     */
 	    getDescription: function(language) {
 	    	if($.isEmptyObject(this.value.head.metadata)) return '';
@@ -270,13 +272,45 @@ steal.then('jsonix')
 	    	if($.isEmptyObject(this.value.head.metadata.subject)) return '';
 	    	return this.value.head.metadata.subject;
 	    },
+	    
+	    /**
+	     * Return the content author
+	     * @param {String} language
+	     */
+	    getAuthor: function(language) {
+	    	var content = this.getContent(language);
+	    	if($.isEmptyObject(content)) return '';
+	    	if($.isEmptyObject(content.author)) return '';
+	    	return content.author;
+	    },
+	    
+		/**
+		 * Return the specified Content
+		 * @param {String} language
+		 */
+	    getContent: function(language) {
+	    	if($.isEmptyObject(this.value.body)) return null;
+	    	if($.isEmptyObject(this.value.body.contents)) return null;
+	    	var content;
+	    	$.each(this.value.body.contents, function(i, cont) {
+	    		if(cont.language == language) {
+	    			content = cont;
+	    			return false;
+	    		}
+    		});
+	    	return content;
+	    },
 		
+	    /**
+	     * Return the editable file metadata
+	     * @param {String} language
+	     */
 		getMetadata: function(language) {
 			var metadata = new Object();
 			metadata.title = '';
 			metadata.description = '';
 			metadata.tags = '';
-			metadata.author = '';
+			metadata.author = this.getAuthor(language);
 			
 			if($.isEmptyObject(this.value.head.metadata)) {
 				this.value.head.metadata = {};
@@ -290,12 +324,12 @@ steal.then('jsonix')
 			if(!$.isEmptyObject(this.value.head.metadata.subject)) {
 				metadata.tags = this.value.head.metadata.subject.toString();
 			}
-			if(!$.isEmptyObject(this.value.head.created)) {
-				metadata.author = this.value.head.created.user.name;
-			}
 			return metadata;
 		},
 		
+		/**
+		 * Update the editable file metadata
+		 */
 		saveMetadata: function(metadata, language, eTag, success) {
 			if($.isEmptyObject(this.value.head.metadata)) {
 				this.value.head.metadata = {};
@@ -312,13 +346,14 @@ steal.then('jsonix')
 			
 			this.value.head.metadata.title[language] = metadata.title;
 			this.value.head.metadata.description[language] = metadata.description;
+			var content = this.getContent(language);
+			content.author = metadata.author;
 			
 			// Filter out empty values
 			this.value.head.metadata.subject = metadata.tags.split(/\s*,\s*/).filter(function(value) { 
 				return value != ''; 
 			});
 			
-			this.value.head.created.user.name = metadata.author;
 			if(eTag == null) 
 				Editor.File.update({id:this.value.id}, this, success);
 			else {

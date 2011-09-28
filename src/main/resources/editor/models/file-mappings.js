@@ -247,7 +247,7 @@ FileMappings.Body.Content.properties = [new Jsonix.Model.AttributePropertyInfo({
   name: 'height',
   typeInfo: Jsonix.Schema.XSD.Integer.INSTANCE
 }), new Jsonix.Model.ElementPropertyInfo({
-  name: 'photographer',
+  name: 'author',
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
 }), new Jsonix.Model.ElementPropertyInfo({
   name: 'datetaken',
