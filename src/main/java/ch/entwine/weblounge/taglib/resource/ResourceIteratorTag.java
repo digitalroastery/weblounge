@@ -70,6 +70,12 @@ public class ResourceIteratorTag extends WebloungeTag {
   /** The content repository */
   private ContentRepository repository = null;
 
+  /**
+   * Sets the subjects for the search.
+   * 
+   * @param subjects
+   *          the subjects to search
+   */
   public void setSubjects(String subjects) {
     if (resourceSubjects == null)
       resourceSubjects = new ArrayList<String>();
@@ -79,6 +85,12 @@ public class ResourceIteratorTag extends WebloungeTag {
     }
   }
 
+  /**
+   * Set the minimum creation date to search from
+   * 
+   * @param startDate
+   *          the creator date
+   */
   public void setStartdate(String startDate) {
     try {
       creatorStartDate = WebloungeDateFormat.parseStatic(startDate);
@@ -131,6 +143,16 @@ public class ResourceIteratorTag extends WebloungeTag {
     return setResource(searchResultItem, EVAL_BODY_INCLUDE);
   }
 
+  /**
+   * Get the search result item from the repository and set it to the page
+   * context.
+   * 
+   * @param searchResultItem
+   *          the search result item
+   * @param resultCode
+   *          the success code
+   * @return the <code>resultCode</code> if success else <code>SKIP_BODY</code>
+   */
   private int setResource(ResourceSearchResultItem searchResultItem,
       int resultCode) {
     ResourceURI uri = searchResultItem.getResourceURI();
