@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
@@ -1094,6 +1095,30 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       if (!etag.equals(ifMatchHeader)) {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
+    }
+
+    // Make sure the page does not contain references to resources that don't
+    // exist anymore.
+    logger.debug("Checking referenced resources on {}", page);
+    try {
+      for (Pagelet pagelet : page.getPagelets()) {
+        String resourceId = pagelet.getProperty("resourceid");
+        if (resourceId == null)
+          continue;
+        ResourceURI resourceURI = contentRepository.getResourceURI(resourceId);
+        if (resourceURI == null) {
+          logger.warn("Page {} references non existing resource '{}'", page, resourceId);
+          throw new WebApplicationException(Status.PRECONDITION_FAILED);
+        }
+        resourceURI.setVersion(Resource.LIVE);
+        if (!contentRepository.exists(resourceURI)) {
+          logger.warn("Page {} references unpublished resource '{}'", page, resourceURI);
+          throw new WebApplicationException(Status.PRECONDITION_FAILED);
+        }
+      }
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error looking up referenced resources", e);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Get the user

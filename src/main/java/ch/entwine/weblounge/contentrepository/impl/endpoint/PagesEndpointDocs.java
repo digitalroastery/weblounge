@@ -241,6 +241,7 @@ public final class PagesEndpointDocs {
     publishPageEndpoint.addStatus(ok("the page was published"));
     publishPageEndpoint.addStatus(badRequest("the page was not specified"));
     publishPageEndpoint.addStatus(preconditionFailed("the page's etag does not match the value specified in the If-Match header"));
+    publishPageEndpoint.addStatus(preconditionFailed("the page references resources that are no longer present or published"));
     publishPageEndpoint.addStatus(notFound("the page was not found"));
     publishPageEndpoint.addStatus(forbidden("the page is locked by a different user"));
     publishPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
