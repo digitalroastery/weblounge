@@ -45,6 +45,9 @@ public class GreeterHTMLAction extends HTMLActionSupport {
 
   /** Name of the language parameter */
   public static final String LANGUAGE_PARAM = "language";
+  
+  /** Identifier of the included pagelet */
+  public static final String PAGELET_ID = "include";
 
   /** The greetings */
   protected String greeting = null;
@@ -69,6 +72,8 @@ public class GreeterHTMLAction extends HTMLActionSupport {
     } catch (IllegalStateException e) {
       throw new ActionException("Language parameter '" + LANGUAGE_PARAM + "' was not specified");
     }
+
+    use(module.getRenderer(PAGELET_ID));
   }
 
   /**
@@ -85,7 +90,7 @@ public class GreeterHTMLAction extends HTMLActionSupport {
       IOUtils.write("<h1>" + htmlGreeting + "</h1>", response.getWriter());
 
       // Include another pagelet
-      include(request, response, "include", null);
+      include(request, response, PAGELET_ID, null);
       return HTMLAction.SKIP_COMPOSER;
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);
