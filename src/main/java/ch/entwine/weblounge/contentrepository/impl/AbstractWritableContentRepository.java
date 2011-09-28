@@ -246,8 +246,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *      boolean)
    */
   public boolean delete(ResourceURI uri, boolean allRevisions)
-      throws ContentRepositoryException,
-      IOException {
+      throws ContentRepositoryException, IOException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
@@ -413,10 +412,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       if (r != null) {
         if (resource.contents().size() != r.contents().size())
           throw new IllegalStateException("Cannot modify content metadata without content");
-        for (ResourceContent c : resource.contents()) {
-          if (!c.equals(r.getContent(c.getLanguage())))
-            throw new IllegalStateException("Cannot modify content metadata without content");
-        }
         index.update(resource);
       }
 
