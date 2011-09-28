@@ -101,7 +101,7 @@ public class ImageContentImplTest {
   @Before
   public void setUp() throws Exception {
     image = new ImageContentImpl(filename, german, mimetype, width, height, size);
-    image.setPhotographer(photographer);
+    image.setAuthor(photographer);
     image.setDateTaken(dateTaken);
     image.setLocation(location);
     image.setGpsPosition(gpsLat, gpsLong);
@@ -144,6 +144,16 @@ public class ImageContentImplTest {
 
   /**
    * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getAuthor()}
+   * .
+   */
+  @Test
+  public void testGetAuthor() {
+    assertEquals(photographer, image.getAuthor());
+  }
+
+  /**
+   * Test method for
    * {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getSize()}
    * .
    */
@@ -170,16 +180,6 @@ public class ImageContentImplTest {
   @Test
   public void testGetHeight() {
     assertEquals(height, image.getHeight());
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getPhotographer()}
-   * .
-   */
-  @Test
-  public void testGetPhotographer() {
-    assertEquals(photographer, image.getPhotographer());
   }
 
   /**

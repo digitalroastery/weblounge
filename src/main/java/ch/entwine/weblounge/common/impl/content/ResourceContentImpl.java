@@ -36,6 +36,9 @@ public class ResourceContentImpl implements ResourceContent {
   /** The content's name */
   protected String filename = null;
 
+  /** author of the picture */
+  protected String author = null;
+
   /** The file's mime type */
   protected String mimetype = null;
 
@@ -110,6 +113,24 @@ public class ResourceContentImpl implements ResourceContent {
    */
   public String getFilename() {
     return filename;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceContent#setAuthor(java.lang.String)
+   */
+  public void setAuthor(String author) {
+    this.author = author;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceContent#getAuthor()
+   */
+  public String getAuthor() {
+    return author;
   }
 
   /**
@@ -250,6 +271,8 @@ public class ResourceContentImpl implements ResourceContent {
       ResourceContent c = (ResourceContent) obj;
       if (!StringUtils.trimToEmpty(filename).equals(StringUtils.trimToEmpty(c.getFilename())))
         return false;
+      if (!StringUtils.trimToEmpty(author).equals(StringUtils.trimToEmpty(c.getAuthor())))
+        return false;
       return language.equals(c.getLanguage());
     }
     return false;
@@ -279,6 +302,8 @@ public class ResourceContentImpl implements ResourceContent {
     buf.append(creationCtx.toXml());
     if (filename != null)
       buf.append("<filename><![CDATA[").append(filename).append("]]></filename>");
+    if (!StringUtils.isBlank(author))
+      buf.append("<author><![CDATA[").append(author).append("]]></author>");
     if (mimetype != null)
       buf.append("<mimetype>").append(mimetype).append("</mimetype>");
     if (size >= 0)

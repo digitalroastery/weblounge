@@ -35,25 +35,29 @@ import org.junit.Test;
 import java.util.Date;
 
 /**
- * Test case for class {@link ch.entwine.weblounge.common.impl.content.ResourceContentImpl}.
+ * Test case for class
+ * {@link ch.entwine.weblounge.common.impl.content.ResourceContentImpl}.
  */
 public class FileContentImplTest {
-  
+
   /** The file content object to test */
   protected FileContent content = null;
 
   /** The filename */
   protected String filename = "document.pdf";
-  
+
+  /** The author */
+  protected String author = "Hans Muster";
+
   /** The German language */
   protected Language german = LanguageUtils.getLanguage("de");
-  
+
   /** The file size */
   protected long size = 1408338L;
-  
+
   /** The mime type */
   protected String mimetype = "application/pdf";
-  
+
   /** The creation date */
   protected Date creationDate = new Date(1231358741000L);
 
@@ -70,11 +74,14 @@ public class FileContentImplTest {
   public void setUp() throws Exception {
     content = new FileContentImpl(filename, german, mimetype, size);
     content.setMimetype(mimetype);
-    ((FileContentImpl)content).setCreated(creationDate, amelie);
+    content.setAuthor(author);
+    ((FileContentImpl) content).setCreated(creationDate, amelie);
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.ResourceContentImpl#getLanguage()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileContentImpl#getLanguage()}
+   * .
    */
   @Test
   public void testGetLanguage() {
@@ -82,7 +89,9 @@ public class FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.ResourceContentImpl#getMimetype()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileContentImpl#getMimetype()}
+   * .
    */
   @Test
   public void testGetMimetype() {
@@ -90,7 +99,9 @@ public class FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.ResourceContentImpl#getFilename()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileContentImpl#getFilename()}
+   * .
    */
   @Test
   public void testGetFilename() {
@@ -98,7 +109,19 @@ public class FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.ResourceContentImpl#getSize()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileContentImpl#getAuthor()}
+   * .
+   */
+  @Test
+  public void testGetAuthor() {
+    assertEquals(author, content.getAuthor());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileContentImpl#getSize()}
+   * .
    */
   @Test
   public void testGetSize() {
@@ -106,7 +129,9 @@ public class FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.ResourceContentImpl#getCreationDate()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileContentImpl#getCreationDate()}
+   * .
    */
   @Test
   public void testGetCreationDate() {
@@ -114,7 +139,9 @@ public class FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.ResourceContentImpl#getCreator()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileContentImpl#getCreator()}
+   * .
    */
   @Test
   public void testGetCreator() {
@@ -122,7 +149,9 @@ public class FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.ResourceContentImpl#isCreatedAfter(java.util.Date)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileContentImpl#isCreatedAfter(Date)}
+   * .
    */
   @Test
   public void testIsCreatedAfter() {

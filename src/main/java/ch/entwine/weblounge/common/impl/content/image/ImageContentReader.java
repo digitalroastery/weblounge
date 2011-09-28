@@ -221,12 +221,6 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
       logger.trace("Image's width is '{}'", content.getWidth());
     }
 
-    // photographer
-    else if ("photographer".equals(raw)) {
-      content.setPhotographer(getCharacters());
-      logger.trace("Image's photographer is '{}'", content.getPhotographer());
-    }
-
     // date taken
     else if ("datetaken".equals(raw)) {
       try {
@@ -293,7 +287,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     }
 
     if (!StringUtils.isBlank(exifMetadata.getPhotographer())) {
-      content.setPhotographer(exifMetadata.getPhotographer());
+      content.setAuthor(exifMetadata.getPhotographer());
     }
 
     if (!StringUtils.isBlank(exifMetadata.getLocation())) {

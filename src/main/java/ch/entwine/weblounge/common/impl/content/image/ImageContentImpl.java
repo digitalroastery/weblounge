@@ -43,9 +43,6 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
   /** The image height in pixels */
   protected int height = -1;
 
-  /** photographer of the picture */
-  protected String photographer = null;
-
   /** date the picture was taken */
   protected Date dateTaken = null;
 
@@ -171,24 +168,6 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
    */
   public int getHeight() {
     return height;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.image.ImageContent#getPhotographer()
-   */
-  public String getPhotographer() {
-    return photographer;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.image.ImageContent#setPhotographer(java.lang.String)
-   */
-  public void setPhotographer(String photographer) {
-    this.photographer = photographer;
   }
 
   /**
@@ -348,9 +327,6 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
     xml.append("<width>").append(width).append("</width>");
     xml.append("<height>").append(height).append("</height>");
 
-    if (!StringUtils.isBlank(photographer)) {
-      xml.append("<photographer><![CDATA[").append(photographer).append("]]></photographer>");
-    }
     if (dateTaken != null) {
       xml.append("<datetaken>").append(WebloungeDateFormat.formatStatic(dateTaken)).append("</datetaken>");
     }
@@ -397,8 +373,6 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
       if (width != content.getWidth())
         return false;
       if (height != content.getHeight())
-        return false;
-      if (!StringUtils.trimToEmpty(photographer).equals(StringUtils.trimToEmpty(content.getPhotographer())))
         return false;
       if (dateTaken != null) {
         if (!dateTaken.equals(content.getDateTaken()))
