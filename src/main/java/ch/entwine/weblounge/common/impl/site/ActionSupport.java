@@ -581,7 +581,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   public void passivate() {
     logger.trace("Passivating action {}", this);
-    headers = null;
     flavor = null;
     files = null;
     includeCount = 0;
