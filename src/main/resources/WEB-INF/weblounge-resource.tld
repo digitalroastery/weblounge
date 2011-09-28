@@ -33,6 +33,17 @@
   </tag>
   
   <tag>
+  	<description>Loads resources by query</description>
+  	<description>Resource Iterator Tag</description>
+  	<name>resource-iterator</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.ResourceIteratorTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.ResourceIteratorTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute><name>subjects</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>startdate</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+  </tag>
+  
+  <tag>
     <description>Loads a file resource</description>
     <display-name>File Resource Tag</display-name>
     <name>file</name>
