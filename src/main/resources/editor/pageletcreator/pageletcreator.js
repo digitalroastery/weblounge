@@ -50,7 +50,7 @@ steal.plugins('jquery',
 	    	
 			$(el).html('//editor/pageletcreator/views/init.tmpl', {modules: modules, favorites: {}});
 			
-			var tabs = $("#wbl-moduleTabs ul").tabs('div.wbl-panes > div');
+			var tabs = this.element.tabs('div.wbl-panes > div');
 			
 			this._loadContent(modules);
 			
@@ -139,10 +139,10 @@ steal.plugins('jquery',
 	    	var firstTop = elements.first().position().top;
 	    	var lastTop = elements.last().position().top;
 	    	if(firstTop == lastTop) {
-	    		this.element.css('height', '70px');
+	    		this.element.find('div.wbl-panes').css('height', '80px');
 	    		$("body").css("margin-top","185px");
 	    	} else {
-	    		this.element.css('height', '110px');
+	    		this.element.find('div.wbl-panes').css('height', '120px');
 	    		$("body").css("margin-top","225px");
 	    	}
 	    }

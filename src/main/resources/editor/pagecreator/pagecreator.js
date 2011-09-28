@@ -60,8 +60,8 @@ steal.plugins('jquery',
 				autoOpen: true,
 				resizable: true,
 				draggable: true,
-				width: 1024,
-				height: 800,
+				width: 700,
+				height: 650,
 				buttons: {
 					Abbrechen: $.proxy(function() {
 						this.element.dialog('close');
