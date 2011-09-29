@@ -176,9 +176,7 @@ steal.then('jsonix')
 					url: '/system/weblounge/pages/' + params.id,
 					type: 'delete',
 					success: success,
-					error: function(jqXHR, textStatus, errorThrown) {
-						error(jqXHR.status, errorThrown);
-					}
+					error: error
 				});
 			}
 		},

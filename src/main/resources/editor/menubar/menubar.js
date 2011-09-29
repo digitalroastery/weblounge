@@ -126,9 +126,13 @@ steal.plugins(
 					},
 					Ja: $.proxy(function () {
 						this.options.page.publish($.proxy(function() {
-							
-						}, this), function() {
-							alert('Publish error!');
+							// Success nothing to do
+						}, this), function(jqXHR, textStatus, errorThrown) {
+							if(jqXHR.status == 412) {
+								alert('Publish aborted: Page has invalid references!')
+							} else {
+								alert('Publish error: ' + errorThrown);
+							}
 						});
 						this.publishDialog.dialog('close');
 					},this)

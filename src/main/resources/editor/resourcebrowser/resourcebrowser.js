@@ -362,11 +362,11 @@ steal.plugins(
                 			if(page.getPath() == location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1)) {
                 				location.href = '/?edit&_=' + new Date().getTime();
                 			}
-                		}, this), $.proxy(function(statusCode, errorMessage) {
-                			if(statusCode == 412) {
+                		}, this), $.proxy(function(jqXHR, textStatus, errorThrown) {
+                			if(jqXHR.status == 412) {
                 				this._showErrorMessage("Can't delete" + page.getPath() + ": Page has active referrers!");
                 			} else {
-                				this._showErrorMessage("Can't delete" + page.getPath() + ": " + errorMessage);
+                				this._showErrorMessage("Can't delete" + page.getPath() + ": " + errorThrown);
                 			}
                 		}, this));
                 	} else {
@@ -379,11 +379,11 @@ steal.plugins(
         			Editor.File.destroy({id: element.id}, $.proxy(function() {
         				this._showMessage('Media gel&ouml;scht!');
         				this._removeResource(element.id);
-        			}, this), $.proxy(function(statusCode, errorMessage) {
-              			if(statusCode == 412) {
+        			}, this), $.proxy(function(jqXHR, textStatus, errorThrown) {
+              			if(jqXHR.status == 412) {
             				this._showErrorMessage("Can't delete file: Media has active referrers!");
             			} else {
-            				this._showErrorMessage("Can't delete file: " + errorMessage);
+            				this._showErrorMessage("Can't delete file: " + errorThrown);
             			}
         			}, this));
         		}, this))

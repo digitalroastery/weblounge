@@ -193,9 +193,7 @@ steal.then('jsonix')
 					url: '/system/weblounge/files/' + params.id + '/content/' + params.language,
 					type: 'delete',
 					success: success,
-					error: function(jqXHR, textStatus, errorThrown) {
-						error(jqXHR.status, errorThrown);
-					}
+					error: error
 				});
 			}
 			else if ('id' in params) {
@@ -203,9 +201,7 @@ steal.then('jsonix')
 					url: '/system/weblounge/files/' + params.id,
 					type: 'delete',
 					success: success,
-					error: function(jqXHR, textStatus, errorThrown) {
-						error(jqXHR.status, errorThrown);
-					}
+					error: error
 				});
 			}
 		},
