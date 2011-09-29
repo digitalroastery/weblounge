@@ -23,11 +23,13 @@ package ch.entwine.weblounge.common.impl.site;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.Link;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
+import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.page.Script;
 import ch.entwine.weblounge.common.impl.content.GeneralComposeable;
 import ch.entwine.weblounge.common.impl.content.page.LinkImpl;
 import ch.entwine.weblounge.common.impl.content.page.ScriptImpl;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
@@ -174,14 +176,14 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.site.Action#getUrl(ch.entwine.weblounge.common.site.Environment)
    */
   public WebUrl getUrl(Environment environment) {
     SiteURL siteURL = site.getConnector(environment);
     return new WebUrlImpl(site, UrlUtils.concat(siteURL.toExternalForm(), mountpoint));
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -410,11 +412,14 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    *           if the passed renderer is <code>null</code>
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      PageletRenderer renderer, Object data) throws ActionException {
+      PageletRenderer renderer, Pagelet pagelet) throws ActionException {
     if (renderer == null) {
       String msg = "The renderer passed to include in action '" + this + "' was <null>!";
       throw new ActionException(new IllegalArgumentException(msg));
     }
+
+    if (pagelet != null)
+      request.setAttribute(WebloungeRequest.PAGELET, pagelet);
 
     // Adjust the maximum valid and recheck time and add cache tags
     response.setMaximumValidTime(renderer.getValidTime());
@@ -424,7 +429,22 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     response.addTag(CacheTag.Renderer, renderer.getIdentifier());
 
     // Include renderer in response
-    renderer.render(request, response);
+    try {
+      renderer.render(request, response);
+    } catch (Throwable t) {
+      String params = RequestUtils.dumpParameters(request);
+      String msg = "Error including '" + renderer + "' in action '" + this + "' on " + request.getUrl() + " " + params;
+      Throwable o = t.getCause();
+      if (o != null) {
+        msg += ": " + o.getMessage();
+        logger.error(msg, o);
+      } else {
+        logger.error(msg, t);
+      }
+      response.invalidate();
+    }
+
+    request.removeAttribute(WebloungeRequest.PAGELET);
     includeCount++;
   }
 
@@ -462,8 +482,8 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    *           if the passed renderer cannot be found.
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      String renderer, Object data) throws ActionException {
-    include(request, response, getModule(), renderer, data);
+      String renderer, Pagelet pagelet) throws ActionException {
+    include(request, response, getModule(), renderer, pagelet);
   }
 
   /**
@@ -484,7 +504,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    *           if the passed renderer cannot be found.
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      String module, String renderer, Object data) throws ActionException {
+      String module, String renderer, Pagelet pagelet) throws ActionException {
     if (module == null)
       throw new ActionException(new IllegalArgumentException("Module is null!"));
     if (renderer == null)
@@ -494,7 +514,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       String msg = "Trying to include renderer from unknown module '" + module + "'";
       throw new ActionException(new IllegalArgumentException(msg));
     }
-    include(request, response, m, renderer, data);
+    include(request, response, m, renderer, pagelet);
   }
 
   /**
@@ -515,7 +535,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    *           if the passed renderer cannot be found.
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      Module module, String renderer, Object data) throws ActionException {
+      Module module, String renderer, Pagelet pagelet) throws ActionException {
     if (module == null)
       throw new ActionException(new IllegalArgumentException("Module is null!"));
     if (renderer == null)
@@ -526,7 +546,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       throw new ActionException(new IllegalArgumentException(msg));
     }
     logger.debug("Including renderer {}", renderer);
-    include(request, response, r, data);
+    include(request, response, r, pagelet);
   }
 
   /**

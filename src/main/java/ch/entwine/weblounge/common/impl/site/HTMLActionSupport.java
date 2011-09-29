@@ -399,10 +399,10 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
 
     // Clean the headers collection and write to the response what's left
     for (HTMLHeadElement header : processedHeaders) {
-      if (headers.contains(header)) {
-        headers.remove(header);
-        headers.add(header);
-      }
+      // if (headers.contains(header)) {
+      // headers.remove(header);
+      // headers.add(header);
+      // }
       response.getWriter().println(header.toXml());
     }
 
