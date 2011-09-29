@@ -141,7 +141,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     SearchQuery q = new SearchQueryImpl(site);
 
     q.withType(Page.TYPE);
-    q.withVersion(version);
+    if (version != -1)
+      q.withVersion(version);
 
     // Path
     if (StringUtils.isNotBlank(path))
