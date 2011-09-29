@@ -94,6 +94,10 @@ public class PageInputDocument extends ResourceInputDocument {
     preview.append("</composer>");
     addField(PREVIEW_XML, preview.toString(), false);
 
+    // Add work version fields
+
+    // TODO add work fields
+
   }
 
   /**

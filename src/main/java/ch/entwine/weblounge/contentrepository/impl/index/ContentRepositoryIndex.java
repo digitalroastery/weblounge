@@ -296,15 +296,14 @@ public class ContentRepositoryIndex {
         idIdx.set(address, id);
         versionIdx.add(id, version);
         pathIdx.set(address, path);
+        languageIdx.set(id, resource.languages());
         if (version == Resource.LIVE) {
-          languageIdx.set(id, resource.languages());
           if (resource.isIndexed())
             searchIdx.add(resource);
           else
             searchIdx.delete(uri);
-        } else {
-          if (!languageIdx.hasLanguage(address))
-            languageIdx.set(id, null);
+        } else if (version == Resource.WORK) {
+          searchIdx.addWorkVersion(resource);
         }
       } catch (ContentRepositoryException e) {
         throw e;
@@ -324,6 +323,8 @@ public class ContentRepositoryIndex {
           searchIdx.add(resource);
         else
           searchIdx.delete(uri);
+      } else if (version == Resource.WORK) {
+        searchIdx.addWorkVersion(resource);
       }
 
       // Make sure we are returning the full uri in case anything was missing

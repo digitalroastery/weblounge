@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SearchRequest;
@@ -54,6 +55,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -194,6 +196,62 @@ public class SearchIndex {
     ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
     if (serializer == null) {
       throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
+    }
+
+    // Post the updated data to the search index
+    try {
+      List<ResourceMetadata<?>> metadata = serializer.toMetadata(resource);
+      SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
+      update(doc);
+      return true;
+    } catch (Throwable t) {
+      throw new ContentRepositoryException("Cannot update resource " + resource + " in index", t);
+    }
+  }
+
+  /**
+   * Posts the work version of the resource to the search index.
+   * 
+   * @param resource
+   *          the resource to add to the index
+   * @throws ContentRepositoryException
+   *           if posting the new resource to solr fails
+   */
+  public boolean addWorkVersion(Resource<?> resource)
+      throws ContentRepositoryException {
+    logger.debug("Adding work version of resource {} to search index", resource);
+
+    // Have the serializer create an input document
+    String resourceType = resource.getURI().getType();
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+    if (serializer == null) {
+      throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
+    }
+
+    // See if a live resource is already part of the index
+    Site site = resource.getURI().getSite();
+    String id = resource.getURI().getIdentifier();
+    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
+    SearchResult result = getByQuery(q);
+    List<ResourceMetadata<?>> finalMetadata = new ArrayList<ResourceMetadata<?>>();
+    List<String> liveMetadataKeys = new ArrayList<String>();
+
+    // If there is a live version, read the data and add the work data later on
+    if (result.getDocumentCount() > 0) {
+      List<ResourceMetadata<?>> liveMetadata = serializer.toMetadata(result.getItems()[0]);
+      liveMetadataKeys = new ArrayList<String>();
+      for (ResourceMetadata<?> metadataItem : liveMetadata) {
+        liveMetadataKeys.add(metadataItem.getName());
+      }
+      finalMetadata.addAll(liveMetadata);
+    }
+
+    // Get the metadata for the work version
+    List<ResourceMetadata<?>> workMetadata = serializer.toMetadata(resource);
+    for (ResourceMetadata<?> metadataItem : workMetadata) {
+      if (!liveMetadataKeys.contains(metadataItem.getName())) {
+        finalMetadata.add(metadataItem);
+      }
     }
 
     // Post the updated data to the search index
