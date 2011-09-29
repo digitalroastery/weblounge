@@ -58,6 +58,8 @@ steal.plugins(
         	switch (this.options.mode) {
 	      	  case 0:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-designer'));
+	      		  $(document.body).css('overflow', 'visible');
+	      		  $(document.body).css('position', 'relative');
 	      		  if(!this.disabled) {
 	      			  this.find('img.wbl-add').show();
 	      			  this.find('img.wbl-more').show();
@@ -66,10 +68,11 @@ steal.plugins(
 	      		  this.find('span.wbl-editmode').show();
 	      		  this.find('span.wbl-language').show();
 	      		  this.find('div#wbl-pageOptions').show();
-	      		  $(document.body).css('overflow', 'visible');
 	      		  break;
 	      	  case 1:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-pages'));
+	      		  $(document.body).css('overflow', 'hidden');
+	      		  $(document.body).css('position', 'static');
 	      		  this.find('img.wbl-add').hide();
 	      		  this.find('img.wbl-more').hide();
 	      		  this.find('img.wbl-pageSettings').hide();
@@ -77,10 +80,11 @@ steal.plugins(
 	      		  this.find('span.wbl-editmode').hide();
 	      		  this.find('div#wbl-pageOptions').hide();
 	      		  window.scrollTo(0, 0);
-	      		  $(document.body).css('overflow', 'hidden');
 	      		  break;
 	      	  case 2:
 	      		  this._toggleTab(this.find('.wbl-tab.wbl-media'));
+	      		  $(document.body).css('overflow', 'hidden');
+	      		  $(document.body).css('position', 'static');
 	      		  this.find('img.wbl-pageSettings').hide();
 	      		  this.find('img.wbl-add').hide();
 	      		  this.find('img.wbl-more').hide();
@@ -88,7 +92,6 @@ steal.plugins(
 	      		  this.find('span.wbl-editmode').hide();
 	      		  this.find('div#wbl-pageOptions').hide();
 	      		  window.scrollTo(0, 0);
-	      		  $(document.body).css('overflow', 'hidden');
 	      		  break;
         	}
         },
