@@ -4,6 +4,7 @@
 <html>
 	<head>
 		<title>Weblounge Test Site</title>
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
 		<webl:generator/>
 		<webl:workbench/>
 		<webl:headers/>

@@ -98,13 +98,13 @@ public class FilesEndpointTest extends IntegrationTestBase {
 
     testCreateFile(serverUrl);
     testDeleteFile(serverUrl);
-    
+
     testCreateFileWithoutPath(serverUrl);
     testDeleteFile(serverUrl);
-    
+
     testUploadFile(serverUrl);
     testDeleteFile(serverUrl);
-    
+
     testUploadFileByPath(serverUrl);
 
     testUpdateFile(serverUrl);
@@ -288,7 +288,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     // Test Conflict
     logger.debug("Creating new file at existing path {}", createFileRequest.getURI());
     httpClient = new DefaultHttpClient();
@@ -299,7 +299,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
     HttpGet getFileRequest = new HttpGet(UrlUtils.concat(requestUrl, fileId));
     logger.debug("Requesting file at {}", getFileRequest.getURI());
@@ -316,7 +316,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
   }
-  
+
   /**
    * Creates a new file resource with path on the server.
    * 
@@ -334,7 +334,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
       HttpResponse response = TestUtils.request(httpClient, createFileRequest, null);
       assertEquals(HttpServletResponse.SC_CREATED, response.getStatusLine().getStatusCode());
       assertEquals(0, response.getEntity().getContentLength());
-      
+
       // Extract the id of the new page
       assertNotNull(response.getHeaders("Location"));
       String locationHeader = response.getHeaders("Location")[0].getValue();
@@ -345,7 +345,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
     HttpGet getFileRequest = new HttpGet(UrlUtils.concat(requestUrl, fileId));
     logger.debug("Requesting file at {}", getFileRequest.getURI());
@@ -354,7 +354,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
     try {
       HttpResponse response = TestUtils.request(httpClient, getFileRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      
+
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(fileId, XPathHelper.valueOf(pageXml, "/file/@id"));
       assertNull(XPathHelper.valueOf(pageXml, "/image/@path"));
@@ -410,7 +410,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
 
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(fileId, XPathHelper.valueOf(pageXml, "/image/@id"));
-      assertEquals("/" + fileId + "/", XPathHelper.valueOf(pageXml, "/image/@path"));
+      assertNull(XPathHelper.valueOf(pageXml, "/image/@path"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -569,18 +569,18 @@ public class FilesEndpointTest extends IntegrationTestBase {
     String requestUrl = UrlUtils.concat(serverUrl, FILES_ENDPOINT_PATH);
     HttpPost updateFileRequest = new HttpPost(UrlUtils.concat(requestUrl, fileId, "content", "fr"));
     HttpClient httpClient = new DefaultHttpClient();
-    
+
     MultipartEntity multipartEntity = new MultipartEntity();
     String filename = "newFileContent.jpg";
     multipartEntity.addPart(requestUrl, new InputStreamBody(getClass().getResourceAsStream(imageFile), mimetypeGerman, filename));
     updateFileRequest.setEntity(multipartEntity);
-    
+
     logger.info("Updating filecontent at {}", updateFileRequest.getURI());
     try {
       HttpResponse response = httpClient.execute(updateFileRequest);
       assertEquals(HttpServletResponse.SC_CREATED, response.getStatusLine().getStatusCode());
       assertEquals(0, response.getEntity().getContentLength());
-      
+
       // Extract the id of the new page
       assertNotNull(response.getHeaders("Location"));
       String locationHeader = response.getHeaders("Location")[0].getValue();
