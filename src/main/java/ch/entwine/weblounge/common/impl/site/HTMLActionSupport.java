@@ -23,7 +23,6 @@ package ch.entwine.weblounge.common.impl.site;
 import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Composer;
-import ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.Link;
 import ch.entwine.weblounge.common.content.page.Page;
@@ -50,9 +49,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 /**
  * This class is the default implementation for an <code>HTMLAction</code>. The
@@ -159,7 +157,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
 
     if (targetPath != null)
       this.pageURI = new PageURIImpl(site, targetPath);
-    if (templateId != null)
+    if (templateId != null && template != null)
       this.template = site.getTemplate(templateId);
   }
 
@@ -345,6 +343,20 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
 
   /**
    * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.impl.content.GeneralComposeable#getHTMLHeaders()
+   */
+  @Override
+  public HTMLHeadElement[] getHTMLHeaders() {
+    List<HTMLHeadElement> headerList = new ArrayList<HTMLHeadElement>();
+    headerList.addAll(Arrays.asList(super.getHTMLHeaders()));
+    if (runtimeHeaders != null)
+      headerList.addAll(runtimeHeaders);
+    return headerList.toArray(new HTMLHeadElement[headerList.size()]);
+  }
+
+  /**
+   * {@inheritDoc}
    * <p>
    * This implementation asks the action to return the include headers
    * <code>&lt;script&gt;</code> and <code>&lt;link&gt;</code> by calling
@@ -361,55 +373,10 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   public int startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
 
-    // The headers returned by getHTMLHeaders() may contain configured as well
-    // as unconfigured (containing ${module.root} in their paths) elements. This
-    // is why we need to make sure that we are not writing duplicates to the
-    // response by configuring all elements and then removing duplicates.
-
-    Set<HTMLHeadElement> processedHeaders = new HashSet<HTMLHeadElement>();
-
-    // Configure the elements and add them to a set
-    for (HTMLHeadElement header : getHTMLHeaders()) {
-      if (header instanceof DeclarativeHTMLHeadElement)
-        ((DeclarativeHTMLHeadElement) header).configure(request, site, module);
-      processedHeaders.add(header);
-    }
-
-    // Configure the runtime head elements and add them
-    for (HTMLHeadElement header : runtimeHeaders) {
-      if (header instanceof DeclarativeHTMLHeadElement)
-        ((DeclarativeHTMLHeadElement) header).configure(request, site, module);
-      processedHeaders.add(header);
-    }
-
-    // Add pagelet renderer includes
-    for (Pagelet p : page.getPagelets()) {
-      Module module = site.getModule(p.getModule());
-      if (module == null)
-        continue;
-      PageletRenderer renderer = module.getRenderer(p.getIdentifier());
-      if (renderer == null)
-        continue;
-      for (HTMLHeadElement header : renderer.getHTMLHeaders()) {
-        if (header instanceof DeclarativeHTMLHeadElement)
-          ((DeclarativeHTMLHeadElement) header).configure(request, site, module);
-        processedHeaders.add(header);
-      }
-    }
-
-    // Clean the headers collection and write to the response what's left
-    for (HTMLHeadElement header : processedHeaders) {
-      // if (headers.contains(header)) {
-      // headers.remove(header);
-      // headers.add(header);
-      // }
-      response.getWriter().println(header.toXml());
-    }
-
     // Take note that headers have been passed
     headersPassed = true;
 
-    return SKIP_HEADER;
+    return EVAL_HEADER;
   }
 
   /**

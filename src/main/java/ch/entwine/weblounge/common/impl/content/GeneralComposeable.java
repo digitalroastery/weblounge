@@ -23,11 +23,10 @@ package ch.entwine.weblounge.common.impl.content;
 import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.Composeable;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
-import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.site.Environment;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base implementation for composeable objects like page templates or images.
@@ -53,7 +52,7 @@ public class GeneralComposeable implements Composeable {
   protected Environment environment = Environment.Production;
 
   /** HTML head elements */
-  protected Set<HTMLHeadElement> headers = null;
+  protected List<HTMLHeadElement> headers = null;
 
   /**
    * Creates a new composeable instance with a recheck time of a day and a valid
@@ -214,8 +213,9 @@ public class GeneralComposeable implements Composeable {
    */
   public void addHTMLHeader(HTMLHeadElement header) {
     if (headers == null)
-      headers = new HashSet<HTMLHeadElement>();
-    headers.add(header);
+      headers = new ArrayList<HTMLHeadElement>();
+    if (!headers.contains(header))
+      headers.add(header);
   }
 
   /**
@@ -236,9 +236,9 @@ public class GeneralComposeable implements Composeable {
    */
   public HTMLHeadElement[] getHTMLHeaders() {
     if (headers != null) {
-      return headers.toArray(new HTMLInclude[headers.size()]);
+      return headers.toArray(new HTMLHeadElement[headers.size()]);
     }
-    return new HTMLInclude[] {};
+    return new HTMLHeadElement[] {};
   }
 
   /**
