@@ -123,10 +123,7 @@ public class HTMLHeaderTag extends WebloungeTag {
     if (action != null) {
       Module module = action.getModule();
       for (HTMLHeadElement header : action.getHTMLHeaders()) {
-        if (header instanceof DeclarativeHTMLHeadElement)
-          ((DeclarativeHTMLHeadElement) header).configure(request, site, module);
-        if (!headElements.contains(header))
-          headElements.add(header);
+        addHeadElement(header, site, module);
       }
     }
 
@@ -144,6 +141,8 @@ public class HTMLHeaderTag extends WebloungeTag {
         linkToJQueryTools.append(WebloungeSharedResources.JQUERY_TOOLS_VERSION);
         linkToJQueryTools.append("/jquery.tools.min.js");
         pageContext.getOut().print("<script src=\"" + linkToJQueryTools + "\" type=\"text/javascript\"></script>");
+      } else if (RequestUtils.isEditingState(request)) {
+        pageContext.getOut().print("<meta http-equiv=\"Content-type\" content=\"text/html;charset=UTF-8\" />");
       }
       for (HTMLHeadElement s : headElements) {
         pageContext.getOut().println(s.toXml());
