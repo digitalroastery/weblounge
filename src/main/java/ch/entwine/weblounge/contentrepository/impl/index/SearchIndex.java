@@ -224,9 +224,8 @@ public class SearchIndex {
     // Have the serializer create an input document
     String resourceType = resource.getURI().getType();
     ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
-    if (serializer == null) {
+    if (serializer == null)
       throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
-    }
 
     // See if a live resource is already part of the index
     Site site = resource.getURI().getSite();
@@ -256,8 +255,7 @@ public class SearchIndex {
 
     // Post the updated data to the search index
     try {
-      List<ResourceMetadata<?>> metadata = serializer.toMetadata(resource);
-      SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
+      SolrInputDocument doc = updateDocument(new SolrInputDocument(), finalMetadata);
       update(doc);
       return true;
     } catch (Throwable t) {

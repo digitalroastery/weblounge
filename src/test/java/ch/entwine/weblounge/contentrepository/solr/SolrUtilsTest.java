@@ -103,12 +103,12 @@ public class SolrUtilsTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils#serializeUser(ch.entwine.weblounge.common.security.User)}.
+   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils#serializeUserId(ch.entwine.weblounge.common.security.User)}.
    */
   @Test
   public void testSerializeUser() {
     User user = new WebloungeUserImpl("heiri");
-    assertEquals("heiri", SolrUtils.serializeUser(user));
+    assertEquals("heiri", SolrUtils.serializeUserId(user));
   }
 
 }

@@ -473,13 +473,22 @@
     <field name="preview_xml" type="string" indexed="false" stored="true" required="false" />
 
     <!-- Workflow-specific fields -->
+    <field name="owned_by" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+    <field name="owned_by_name" type="string" indexed="true" stored="true" required="false" multiValued="true" />
     <field name="created" type="date" indexed="true" stored="true" required="false" />
-    <field name="created_by" type="string" indexed="true" stored="true" required="false" />
+    <field name="created_by" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+    <field name="created_by_name" type="string" indexed="true" stored="true" required="false" multiValued="true" />
     <field name="modified" type="date" indexed="true" stored="true" required="false" />
-    <field name="modified_by" type="string" indexed="true" stored="true" required="false" />
+    <field name="modified_by" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+    <field name="modified_by_name" type="string" indexed="true" stored="true" required="false" multiValued="true" />
     <field name="published_from" type="date" indexed="true" stored="true" required="false" />
     <field name="published_to" type="date" indexed="true" stored="true" required="false" />
-    <field name="published_by" type="string" indexed="true" stored="true" required="false" />
+    <field name="published_by" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+    <field name="published_by_name" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+    
+    <!-- Resource security -->
+    <field name="locked_by" type="string" indexed="true" stored="true" required="false" />
+    <field name="locked_by_name" type="string" indexed="true" stored="true" required="false" />
 
     <!-- Language sensitive page-level content -->
     <field name="description" type="string" indexed="true" stored="false" required="false" multiValued="true" />
@@ -500,6 +509,7 @@
     <dynamicField name="pagelet_contents_composer_*" type="text" indexed="true" stored="true" multiValued="true"/>
     <dynamicField name="pagelet_contents_position_*" type="text" indexed="true" stored="true" multiValued="true"/>
     <field name="pagelet_properties" type="text" indexed="true" stored="false" multiValued="true"/>
+    <field name="pagelet_property_value" type="string" indexed="true" stored="false" multiValued="true"/>
     <dynamicField name="pagelet_xml_*" type="text" indexed="false" stored="true" multiValued="true"/>
 
     <!-- Dynamic fields for resource content -->

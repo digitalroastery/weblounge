@@ -123,10 +123,24 @@ public final class SolrUtils {
    *          the user
    * @return the serialized user
    */
-  public static String serializeUser(User user) {
+  public static String serializeUserId(User user) {
     if (user == null)
       return null;
     return user.getLogin();
+  }
+
+  /**
+   * Serializes the user name to a string or to <code>null</code> if
+   * <code>null</code> was passed to this method.
+   * 
+   * @param user
+   *          the user
+   * @return the serialized user name
+   */
+  public static String serializeUserName(User user) {
+    if (user == null)
+      return null;
+    return user.getName();
   }
 
 }

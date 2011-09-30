@@ -84,11 +84,17 @@ public interface SolrFields {
   /** Creator field name */
   String CREATED_BY = "created_by";
 
+  /** Creator name field name */
+  String CREATED_BY_NAME = "created_by_name";
+
   /** Modified field name */
   String MODIFIED = "modified";
 
   /** Modifier field name */
   String MODIFIED_BY = "modified_by";
+
+  /** Modifier name field name */
+  String MODIFIED_BY_NAME = "modified_by_name";
 
   /** Publishing start date field name */
   String PUBLISHED_FROM = "published_from";
@@ -99,6 +105,21 @@ public interface SolrFields {
   /** Publisher field name */
   String PUBLISHED_BY = "published_by";
 
+  /** Publisher name field name */
+  String PUBLISHED_BY_NAME = "published_by_name";
+
+  /** Editor field name */
+  String LOCKED_BY = "locked_by";
+
+  /** Editor name field name */
+  String LOCKED_BY_NAME = "locked_by_name";
+
+  /** Owner field name */
+  String OWNED_BY = "owned_by";
+
+  /** Owner name field name */
+  String OWNED_BY_NAME = "owned_by_name";
+
   /** Pagelet text and properties values */
   String PAGELET_CONTENTS = "pagelet_contents";
 
@@ -107,6 +128,9 @@ public interface SolrFields {
 
   /** Pagelet properties field name */
   String PAGELET_PROPERTIES = "pagelet_properties";
+
+  /** Pagelet property value field name */
+  String PAGELET_PROPERTY_VALUE = "pagelet_property_value";
 
   /** Pagelet xml field name (composer) */
   String PAGELET_XML_COMPOSER = "pagelet_xml_composer_{0}";

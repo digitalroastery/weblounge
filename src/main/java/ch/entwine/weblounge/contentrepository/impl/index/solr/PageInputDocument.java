@@ -20,14 +20,23 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index.solr;
 
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.OWNED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.OWNED_BY_NAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS_LOCALIZED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTY_VALUE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER_POSITION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML_COMPOSER;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML_COMPOSER_POSITION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY_NAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
 
 import ch.entwine.weblounge.common.content.page.Composer;
@@ -114,13 +123,29 @@ public class PageInputDocument extends ResourceInputDocument {
     for (Pagelet p : composer.getPagelets()) {
       for (Language l : p.languages()) {
         addField(PAGELET_CONTENTS, serializeContent(p, l), true);
-        addField(getLocalizedFieldName(PAGELET_CONTENTS_LOCALIZED, l), serializeContent(p, l), l, true);
+        addField(getLocalizedFieldName(PAGELET_CONTENTS_LOCALIZED, l), serializeContent(p, l), true);
       }
+
+      for (String property : p.getPropertyNames()) {
+        addField(PAGELET_PROPERTY_VALUE, p.getProperty(property), true);
+      }
+
       addField(PAGELET_PROPERTIES, serializeProperties(p), false);
       addField(MessageFormat.format(PAGELET_XML_COMPOSER, composerId), p.toXml(), false);
       addField(MessageFormat.format(PAGELET_XML_COMPOSER_POSITION, i), p.toXml(), false);
       addField(MessageFormat.format(PAGELET_TYPE_COMPOSER, composerId), p.getModule() + "/" + p.getIdentifier(), false);
       addField(MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, i), p.getModule() + "/" + p.getIdentifier(), false);
+
+      // Workflow related
+      addField(OWNED_BY, SolrUtils.serializeUserId(p.getOwner()), false);
+      addField(OWNED_BY_NAME, SolrUtils.serializeUserName(p.getOwner()), true);
+      addField(CREATED_BY, SolrUtils.serializeUserId(p.getCreator()), false);
+      addField(CREATED_BY_NAME, SolrUtils.serializeUserName(p.getCreator()), true);
+      addField(MODIFIED_BY, SolrUtils.serializeUserId(p.getModifier()), false);
+      addField(MODIFIED_BY_NAME, SolrUtils.serializeUserName(p.getModifier()), true);
+      addField(PUBLISHED_BY, SolrUtils.serializeUserId(p.getPublisher()), false);
+      addField(PUBLISHED_BY_NAME, SolrUtils.serializeUserName(p.getPublisher()), true);
+
       i++;
     }
   }

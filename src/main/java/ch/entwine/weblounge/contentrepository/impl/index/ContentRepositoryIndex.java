@@ -251,28 +251,42 @@ public class ContentRepositoryIndex {
     String path = uri.getPath();
     String type = uri.getType();
     long version = uri.getVersion();
+    long address = -1;
 
     // Make sure we are not asked to add a resource to the index that has the
     // same id as an existing one
     if (id != null) {
-      for (long address : idIdx.locate(id)) {
-        if (id.equals(uriIdx.getId(address)) && versionIdx.hasVersion(address, version))
-          throw new ContentRepositoryException("Resource id '" + id + "' already exists");
+      for (long a : idIdx.locate(id)) {
+        String idxId = uriIdx.getId(a);
+        if (id.equals(idxId)) {
+          if (versionIdx.hasVersion(a, version))
+            throw new ContentRepositoryException("Resource id '" + id + "' already exists");
+          String p = uriIdx.getPath(a);
+          if (path == null && p != null) {
+            path = uriIdx.getPath(a);
+            resource.getURI().setPath(path);
+          }
+          address = a;
+        }
       }
     }
 
     // Make sure we are not asked to add a resource to the index that has the
     // same path as an existing one
     if (path != null) {
-      for (long address : pathIdx.locate(path)) {
-        if (path.equals(uriIdx.getPath(address)) && versionIdx.hasVersion(address, version))
-          throw new ContentRepositoryException("Resource path '" + path + "' already exists");
+      for (long a : pathIdx.locate(path)) {
+        String idxPath = uriIdx.getPath(a);
+        if (path.equals(idxPath)) {
+          if (versionIdx.hasVersion(a, version))
+            throw new ContentRepositoryException("Resource path '" + path + "' already exists");
+          String i = uriIdx.getId(a);
+          if (id == null && i != null) {
+            id = uriIdx.getId(a);
+            resource.getURI().setIdentifier(id);
+          }
+          address = a;
+        }
       }
-    }
-
-    long address = -1;
-    if (id != null || path != null) {
-      address = toURIEntry(uri);
     }
 
     // If there is no address, we are about to add a new resource
@@ -286,7 +300,9 @@ public class ContentRepositoryIndex {
         uri.setIdentifier(id);
       }
 
-      // Make sure we have a path
+      // Use the id as a temporary path. Note that we don't add the path
+      // to the resource uri. Otherwise, the path would be added to the search
+      // index as well.
       if (path == null) {
         path = id;
       }
@@ -326,12 +342,6 @@ public class ContentRepositoryIndex {
       } else if (version == Resource.WORK) {
         searchIdx.addWorkVersion(resource);
       }
-
-      // Make sure we are returning the full uri in case anything was missing
-      if (resource.getIdentifier() == null)
-        resource.setIdentifier(uriIdx.getId(address));
-      if (resource.getPath() == null)
-        resource.setPath(uriIdx.getPath(address));
     }
 
     // Seems to be an existing resource, so it's an update rather than an

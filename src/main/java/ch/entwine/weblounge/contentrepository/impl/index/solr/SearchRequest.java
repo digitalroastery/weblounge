@@ -149,7 +149,7 @@ public class SearchRequest {
 
     // Creator
     if (query.getCreator() != null) {
-      and(solrQuery, CREATED_BY, SolrUtils.serializeUser(query.getCreator()), true, true);
+      and(solrQuery, CREATED_BY, SolrUtils.serializeUserId(query.getCreator()), true, true);
     }
 
     // Creation date
@@ -159,7 +159,7 @@ public class SearchRequest {
 
     // Modifier
     if (query.getModifier() != null) {
-      and(solrQuery, MODIFIED_BY, SolrUtils.serializeUser(query.getModifier()), true, true);
+      and(solrQuery, MODIFIED_BY, SolrUtils.serializeUserId(query.getModifier()), true, true);
     }
 
     // Modification date
@@ -174,7 +174,7 @@ public class SearchRequest {
 
     // Publisher
     if (query.getPublisher() != null) {
-      and(solrQuery, PUBLISHED_BY, SolrUtils.serializeUser(query.getPublisher()), true, true);
+      and(solrQuery, PUBLISHED_BY, SolrUtils.serializeUserId(query.getPublisher()), true, true);
     }
 
     // Publication date

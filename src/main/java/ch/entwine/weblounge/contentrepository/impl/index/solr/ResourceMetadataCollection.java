@@ -79,41 +79,6 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
     } else {
       m.addValue(fieldValue);
     }
-
-  }
-
-  /**
-   * Adds the field and its value to the indicated field of the search index as
-   * well as to the language-sensitive fulltext field. The implementation
-   * performs a <code>null</code> test and silently returns if <code>null</code>
-   * was passed in.
-   * 
-   * @param fieldName
-   *          the field name
-   * @param fieldValue
-   *          the value
-   * @param language
-   *          the language
-   * @param addToFulltext
-   *          <code>true</code> to add the contents to the fulltext field as
-   *          well
-   */
-  @SuppressWarnings("unchecked")
-  public void addField(String fieldName, Object fieldValue, Language language,
-      boolean addToFulltext) {
-    if (fieldName == null)
-      throw new IllegalArgumentException("Field name cannot be null");
-    if (fieldValue == null)
-      return;
-
-    ResourceMetadata<Object> m = (ResourceMetadata<Object>)metadata.get(fieldValue);
-    if (m == null) {
-      m = new ResourceMetadataImpl<Object>(fieldName);
-      metadata.put(fieldName, m);
-    }
-
-    m.setAddToFulltext(addToFulltext);
-    m.addValue(fieldValue);
   }
 
   /**
