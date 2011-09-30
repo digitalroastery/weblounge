@@ -410,7 +410,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
 
       pageXml = TestUtils.parseXMLResponse(response);
       assertEquals(fileId, XPathHelper.valueOf(pageXml, "/image/@id"));
-      assertNull(XPathHelper.valueOf(pageXml, "/image/@path"));
+      assertEquals("/" + fileId + "/", XPathHelper.valueOf(pageXml, "/image/@path"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
