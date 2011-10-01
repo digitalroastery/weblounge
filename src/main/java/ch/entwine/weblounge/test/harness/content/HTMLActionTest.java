@@ -28,6 +28,7 @@ import static org.junit.Assert.fail;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.site.HTMLAction;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.test.util.TestSiteUtils;
 
@@ -53,13 +54,22 @@ public class HTMLActionTest extends IntegrationTestBase {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(HTMLActionTest.class);
 
+  /** Title of the alternate template */
+  private static final String ALTERNATE_TEMPLATE_TITLE = "Weblounge Test Site Alternate Representation";
+
   /** The paths to test */
   private static final String[] requestPaths = new String[] {
       "/greeting/",
       "/greeting/html" };
 
+  /** The deault path to action */
+  private static final String defaultActionPath = "/greeting";
+
+  /** The path to action configured to render on a specific template */
+  private static final String templatedActionPath = "/greeting-templated";
+
   /** The path to targeted action */
-  private static final String targetedActionPath = "/greeting-targeted/";
+  private static final String targetedActionPath = "/greeting-targeted";
 
   /**
    * Creates a new instance of the <code>HTML</code> action test.
@@ -89,6 +99,8 @@ public class HTMLActionTest extends IntegrationTestBase {
     testParametersAndLanguage(serverUrl);
     testConfiguredTargetPage(serverUrl);
     testOverridenTargetPage(serverUrl);
+    testConfiguredTemplate(serverUrl);
+    testOverridenTemplate(serverUrl);
   }
 
   /**
@@ -210,7 +222,7 @@ public class HTMLActionTest extends IntegrationTestBase {
     logger.info("Testing action target page overriding");
 
     StringBuffer requestUrl = new StringBuffer(targetedActionPath);
-    requestUrl.append("?target-url=/");
+    requestUrl.append("?").append(HTMLAction.TARGET_PAGE).append("=/");
     HttpGet request = new HttpGet(UrlUtils.concat(serverUrl, requestUrl.toString()));
 
     // Send the request and make sure it ends up on the expected page
@@ -226,6 +238,73 @@ public class HTMLActionTest extends IntegrationTestBase {
       // Make sure it is rendered on the home page
       String testSuiteTitle = XPathHelper.valueOf(xml, "/html/body/h1");
       assertEquals("Action is not rendered on start page", "Welcome to the Weblounge 3.0 testpage!", testSuiteTitle);
+
+    } catch (Throwable e) {
+      fail("Request to " + request.getURI() + " failed" + e.getMessage());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+  }
+
+  /**
+   * Tests whether actions are rendered using templates as configured in
+   * module.xml
+   * 
+   * @param serverUrl
+   *          the server url
+   */
+  private void testConfiguredTemplate(String serverUrl) {
+    logger.info("Preparing test of greeter action with configured template");
+
+    HttpGet request = new HttpGet(UrlUtils.concat(serverUrl, templatedActionPath));
+
+    // Send the request and make sure it ends up on the expected page
+    logger.info("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+      // Get the document contents
+      Document xml = TestUtils.parseXMLResponse(response);
+
+      // Make sure it is rendered on the home page
+      String templateTitle = XPathHelper.valueOf(xml, "/html/head/title");
+      assertEquals("Action is not rendered on alternate template", ALTERNATE_TEMPLATE_TITLE, templateTitle);
+
+    } catch (Throwable e) {
+      fail("Request to " + request.getURI() + " failed" + e.getMessage());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+  }
+
+  /**
+   * Tests whether action template can be overwritten.
+   * 
+   * @param serverUrl
+   *          the server url
+   */
+  private void testOverridenTemplate(String serverUrl) {
+    logger.info("Preparing test of greeter action with overridden template");
+
+    StringBuffer requestUrl = new StringBuffer(defaultActionPath);
+    requestUrl.append("?").append(HTMLAction.TARGET_TEMPLATE).append("=alternate");
+    HttpGet request = new HttpGet(UrlUtils.concat(serverUrl, requestUrl.toString()));
+
+    // Send the request and make sure it ends up on the expected page
+    logger.info("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+      // Get the document contents
+      Document xml = TestUtils.parseXMLResponse(response);
+
+      // Make sure it is rendered on the home page
+      String templateTitle = XPathHelper.valueOf(xml, "/html/head/title");
+      assertEquals("Action is not rendered on alternate template", ALTERNATE_TEMPLATE_TITLE, templateTitle);
 
     } catch (Throwable e) {
       fail("Request to " + request.getURI() + " failed" + e.getMessage());

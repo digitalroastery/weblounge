@@ -1,10 +1,10 @@
 <module id="test" xmlns="http://www.entwinemedia.com/weblounge/3.0/module"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
-  
+
   <enable>true</enable>
   <name>Testmodul</name>
-  
+
   <pagelets>
     <pagelet id="content" composeable="false">
       <name>Page content</name>
@@ -33,12 +33,12 @@
       <renderer>file://${module.root}/pagelets/i18n.jsp</renderer>
     </pagelet>
   </pagelets>
-  
+
   <actions>
     <action id="greeter.html">
       <name>Greetings</name>
       <class>ch.entwine.weblounge.test.site.GreeterHTMLAction</class>
-      <mountpoint>/greeting/</mountpoint>
+      <mountpoint>/greeting</mountpoint>
       <includes>
         <script src="file://${module.root}/scripts/greeting.js"
           type="text/javascript" />
@@ -47,8 +47,18 @@
     <action id="greeter.html-targeted">
       <name>Greetings</name>
       <class>ch.entwine.weblounge.test.site.GreeterHTMLAction</class>
-      <mountpoint>/greeting-targeted/</mountpoint>
+      <mountpoint>/greeting-targeted</mountpoint>
       <page>/test/htmlaction</page>
+      <includes>
+        <script src="file://${module.root}/scripts/greeting.js"
+          type="text/javascript" />
+      </includes>
+    </action>
+    <action id="greeter.html-templated">
+      <name>Greetings</name>
+      <class>ch.entwine.weblounge.test.site.GreeterHTMLAction</class>
+      <mountpoint>/greeting-templated</mountpoint>
+      <template>alternate</template>
       <includes>
         <script src="file://${module.root}/scripts/greeting.js"
           type="text/javascript" />
@@ -65,7 +75,7 @@
       <mountpoint>/greeting/json</mountpoint>
     </action>
   </actions>
-  
+
   <jobs>
     <job id="startup">
       <name>Job title</name>
@@ -77,33 +87,14 @@
       <class>ch.entwine.weblounge.test.site.GreeterJob</class>
       <schedule>*/10 * * * *</schedule>
     </job>
-    <!--  UNCOMMENT TO ACTIVATE
-    <job id="mailpublisher">
-      <name>Mail Aggregator</name>
-      <class>ch.entwine.weblounge.bridge.mail.MailAggregator</class>
-      <schedule>* * * * *</schedule>
-      <options>
-        <option>
-          <name>provider</name>
-          <value>pop3</value>
-        </option>
-        <option>
-          <name>host</name>
-          <value>mail.digitalcafe.ch</value>
-        </option>
-        <option>
-          <name>login</name>
-          <value>weblounge</value>
-        </option>
-        <option>
-          <name>password</name>
-          <value>test</value>
-        </option>
-      </options>
-    </job>
-    -->
+    <!-- UNCOMMENT TO ACTIVATE <job id="mailpublisher"> <name>Mail Aggregator</name> 
+      <class>ch.entwine.weblounge.bridge.mail.MailAggregator</class> <schedule>* 
+      * * * *</schedule> <options> <option> <name>provider</name> <value>pop3</value> 
+      </option> <option> <name>host</name> <value>mail.digitalcafe.ch</value> </option> 
+      <option> <name>login</name> <value>weblounge</value> </option> <option> <name>password</name> 
+      <value>test</value> </option> </options> </job> -->
   </jobs>
-  
+
   <imagestyles>
     <imagestyle id="none">
       <name>Original size</name>
@@ -138,5 +129,5 @@
       <height>250</height>
     </imagestyle>
   </imagestyles>
-  
+
 </module>

@@ -30,7 +30,12 @@
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
     </template>
-    <template id="welcome" composeable="false" default="true">
+    <template id="alternate" composeable="true">
+      <name>Default template</name>
+      <renderer>file://${site.root}/templates/alternate.jsp</renderer>
+      <stage>main</stage>
+    </template>
+    <template id="welcome" composeable="false">
       <name>Welcome page</name>
       <renderer>file://${site.root}/templates/welcome.jsp</renderer>
       <stage>main</stage>
