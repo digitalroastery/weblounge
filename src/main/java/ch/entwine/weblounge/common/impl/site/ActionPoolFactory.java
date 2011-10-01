@@ -106,9 +106,9 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
         ResourceURI uri = htmlBlueprint.getPageURI();
         htmlAction.setPageURI(new PageURIImpl(uri.getSite(), uri.getPath()));
       }
-  
-      // Page template
-      htmlAction.setTemplate(htmlBlueprint.getTemplate());
+
+      // Default page template
+      htmlAction.setDefaultTemplate(htmlBlueprint.getDefaultTemplate());
     }
     
     // Name

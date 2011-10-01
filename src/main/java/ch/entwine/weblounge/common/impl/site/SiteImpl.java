@@ -1460,13 +1460,29 @@ public class SiteImpl implements Site {
 
     // templates
     NodeList templateNodes = XPathHelper.selectList(config, "ns:templates/ns:template", xpathProcessor);
+    PageTemplate firstTemplate = null;
     for (int i = 0; i < templateNodes.getLength(); i++) {
       PageTemplate template = PageTemplateImpl.fromXml(templateNodes.item(i), xpathProcessor);
       boolean isDefault = ConfigurationUtils.isDefault(templateNodes.item(i));
-      if (isDefault)
+      if (isDefault && site.getDefaultTemplate() != null) {
+        logger.warn("Site '{}' defines more than one default templates", site.getIdentifier());
+      } else if (isDefault) {
         site.setDefaultTemplate(template);
-      else
+        logger.debug("Site '{}' uses default template '{}'", site.getIdentifier(), template.getIdentifier());
+      } else {
         site.addTemplate(template);
+        logger.debug("Added template '{}' to site '{}'", template.getIdentifier(), site.getIdentifier());
+      }
+      if (firstTemplate == null)
+        firstTemplate = template;
+    }
+
+    // Make sure we have a default template
+    if (site.getDefaultTemplate() == null) {
+      if (firstTemplate == null)
+        throw new IllegalStateException("Site '" + site.getIdentifier() + "' does not specify any page templates");
+      logger.warn("Site '{}' does not specify a default template. Using '{}'", site.getIdentifier(), firstTemplate.getIdentifier());
+      site.setDefaultTemplate(firstTemplate);
     }
 
     // administrator

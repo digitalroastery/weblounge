@@ -801,7 +801,7 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#setTemplate(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.file.Page#setDefaultTemplate(java.lang.String)
    */
   public void setTemplate(String template) {
     if (!isHeaderLoaded)

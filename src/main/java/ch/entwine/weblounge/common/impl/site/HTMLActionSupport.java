@@ -72,11 +72,14 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   /** The page uri, deducted from targetPath */
   protected ResourceURI pageURI = null;
 
-  /** The page template id */
-  protected String templateId = null;
+  /** The default page template id */
+  protected String defaultTemplateId = null;
 
   /** The stage renderer id */
   protected String stageRendererId = null;
+
+  /** The page template */
+  protected PageTemplate defaultTemplate = null;
 
   /** The page template */
   protected PageTemplate template = null;
@@ -136,6 +139,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   public void passivate() {
     super.passivate();
     page = null;
+    template = null;
     runtimeHeaders = null;
     infoMessages = null;
     warningMessages = null;
@@ -157,8 +161,8 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
 
     if (targetPath != null)
       this.pageURI = new PageURIImpl(site, targetPath);
-    if (templateId != null && template != null)
-      this.template = site.getTemplate(templateId);
+    if (defaultTemplateId != null && defaultTemplate == null)
+      setDefaultTemplate(site.getTemplate(defaultTemplateId));
   }
 
   /**
@@ -233,10 +237,10 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Action#setTemplate(ch.entwine.weblounge.common.content.page.PageTemplate)
+   * @see ch.entwine.weblounge.common.site.HTMLAction#setDefaultTemplate(ch.entwine.weblounge.common.content.page.PageTemplate)
    */
-  public void setTemplate(PageTemplate template) {
-    this.template = template;
+  public void setDefaultTemplate(PageTemplate template) {
+    this.defaultTemplate = template;
   }
 
   /**
@@ -248,8 +252,35 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    *          the template identifier
    * @see #setTemplate(PageTemplate)
    */
-  void setTemplate(String template) {
-    this.templateId = template;
+  void setDefaultTemplate(String template) {
+    this.defaultTemplateId = template;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.HTMLAction#getDefaultTemplate()
+   */
+  public PageTemplate getDefaultTemplate() {
+    if (defaultTemplate != null)
+      return defaultTemplate;
+
+    // At configuration time, only the template is known
+    if (defaultTemplateId != null) {
+      defaultTemplate = site.getTemplate(defaultTemplateId);
+      return defaultTemplate;
+    }
+
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.HTMLAction#setDefaultTemplate(ch.entwine.weblounge.common.content.page.PageTemplate)
+   */
+  public void setTemplate(PageTemplate template) {
+    this.template = template;
   }
 
   /**
@@ -720,8 +751,8 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
     // template
     if (template != null)
       b.append("<template>").append(template).append("</template>");
-    else if (templateId != null)
-      b.append("<template>").append(templateId).append("</template>");
+    else if (defaultTemplateId != null)
+      b.append("<template>").append(defaultTemplateId).append("</template>");
 
     // Recheck time
     if (recheckTime >= 0) {

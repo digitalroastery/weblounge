@@ -65,7 +65,7 @@ public class HTMLActionSupportTest extends ActionSupportTest {
 
   /** The page template */
   protected PageTemplate pageTemplate = null;
-  
+
   /** A renderer */
   protected PageletRenderer renderer = null;
 
@@ -77,7 +77,7 @@ public class HTMLActionSupportTest extends ActionSupportTest {
     super.setUp();
     htmlAction = (HTMLActionSupport) action;
     htmlAction.setPageURI(pageURI);
-    htmlAction.setTemplate(site.getTemplate(template));
+    htmlAction.setDefaultTemplate(site.getTemplate(template));
     htmlAction.setPage(page);
     htmlAction.setModule(module);
   }
@@ -90,18 +90,18 @@ public class HTMLActionSupportTest extends ActionSupportTest {
    */
   protected void setUpPreliminaries() throws Exception {
     super.setUpPreliminaries();
-    
+
     pageTemplate = new PageTemplateImpl(template, new URL("file:///template.jsp"));
 
     // site
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getTemplate(template)).andReturn(pageTemplate);
-    EasyMock.expect(site.getConnector((Environment)EasyMock.anyObject())).andReturn(new SiteURLImpl(new URL(siteUrl)));
+    EasyMock.expect(site.getConnector((Environment) EasyMock.anyObject())).andReturn(new SiteURLImpl(new URL(siteUrl)));
     EasyMock.replay(site);
 
-    // Renderer 
+    // Renderer
     renderer = new PageletRendererImpl("renderer");
-    
+
     // module
     module.addRenderer(renderer);
 
@@ -124,7 +124,7 @@ public class HTMLActionSupportTest extends ActionSupportTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.ActionSupport#getPage()}.
+   * {@link ch.entwine.weblounge.common.impl.site.HTMLActionSupport#getPage()}.
    */
   @Test
   public void testGetPage() {
@@ -134,7 +134,8 @@ public class HTMLActionSupportTest extends ActionSupportTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.ActionSupport#getPageURI()}.
+   * {@link ch.entwine.weblounge.common.impl.site.HTMLActionSupport#getPageURI()}
+   * .
    */
   @Test
   public void testGetPageURI() {
@@ -145,23 +146,26 @@ public class HTMLActionSupportTest extends ActionSupportTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.ActionSupport#getTemplate()}.
+   * {@link ch.entwine.weblounge.common.impl.site.HTMLActionSupport#getDefaultTemplate()}
+   * .
    */
   @Test
-  public void testGetTemplate() {
-    assertEquals(pageTemplate, htmlAction.getTemplate());
+  public void testGetDefaultTemplate() {
+    assertEquals(pageTemplate, htmlAction.getDefaultTemplate());
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.ActionSupport#passivate()}.
+   * {@link ch.entwine.weblounge.common.impl.site.HTMLActionSupport#passivate()}
+   * .
    */
   @Test
   public void testPassivate() {
     super.testPassivate();
 
     assertEquals(pageURI, htmlAction.getPageURI());
-    assertNotNull(template, htmlAction.getTemplate());
+    assertNotNull(htmlAction.getDefaultTemplate());
+    assertNull(htmlAction.getTemplate());
 
     // These should have gone away
     assertNull(htmlAction.getPage());

@@ -801,7 +801,7 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setTemplate(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.image.Page#setDefaultTemplate(java.lang.String)
    */
   public void setTemplate(String template) {
     if (!isHeaderLoaded)

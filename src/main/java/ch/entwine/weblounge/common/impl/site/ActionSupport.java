@@ -673,14 +673,20 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     action.setPath(mountpoint);
     // TODO: handle /, /*
 
-    if (action instanceof HTMLActionSupport) {
-      // content url
-      String targetUrl = XPathHelper.valueOf(config, "m:page", xpathProcessor);
+    // content url
+    String targetUrl = XPathHelper.valueOf(config, "m:page", xpathProcessor);
+    if (StringUtils.isNotBlank(targetUrl)) {
+      if (!(action instanceof HTMLActionSupport))
+        throw new IllegalStateException("Target page configuration for '" + action.getIdentifier() + "' requires subclassing HTMLActionSupport");
       ((HTMLActionSupport) action).setPageURI(targetUrl);
+    }
 
-      // template
-      String targetTemplate = XPathHelper.valueOf(config, "m:template", xpathProcessor);
-      ((HTMLActionSupport) action).setTemplate(targetTemplate);
+    // template
+    String targetTemplate = XPathHelper.valueOf(config, "m:template", xpathProcessor);
+    if (StringUtils.isNotBlank(targetTemplate)) {
+      if (!(action instanceof HTMLActionSupport))
+        throw new IllegalStateException("Target template configuration for '" + action.getIdentifier() + "' requires subclassing HTMLActionSupport");
+      ((HTMLActionSupport) action).setDefaultTemplate(targetTemplate);
     }
 
     // recheck time
