@@ -36,6 +36,7 @@ import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityExcept
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
@@ -1339,8 +1340,16 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
 
     SearchResult result = null;
+    Page pageByPath = null;
     try {
-      result = repository.find(q);
+      if (q.getVersion() == Resource.WORK && q.getPath() != null) {
+        ResourceURI uri = new PageURIImpl(q.getSite(), q.getPath(), q.getVersion());
+        pageByPath = (Page) repository.get(uri);
+        int count = pageByPath != null ? 1 : 0;
+        result = new SearchResultImpl(q, count, count);
+      } else {
+        result = repository.find(q);
+      }
     } catch (ContentRepositoryException e) {
       throw new WebApplicationException();
     }
@@ -1353,13 +1362,22 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     buf.append("page=\"").append(result.getPage()).append("\" ");
     buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
     buf.append(">");
-    for (SearchResultItem item : result.getItems()) {
-      String xml = null;
-      if (details)
-        xml = ((PageSearchResultItemImpl) item).getResourceXml();
-      else
-        xml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
+    if (pageByPath != null) {
+      String xml = pageByPath.toXml();
+      if (!details) {
+        xml = xml.replaceAll("<body>.*</body>", "");
+        xml = xml.replaceAll("<body/>", "");
+      }
       buf.append(xml);
+    } else {
+      for (SearchResultItem item : result.getItems()) {
+        String xml = null;
+        if (details)
+          xml = ((PageSearchResultItemImpl) item).getResourceXml();
+        else
+          xml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
+        buf.append(xml);
+      }
     }
     buf.append("</pages>");
 

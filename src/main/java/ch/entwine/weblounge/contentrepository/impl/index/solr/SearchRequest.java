@@ -118,6 +118,11 @@ public class SearchRequest {
       and(solrQuery, ID, query.getIdentifier(), true, true);
     }
 
+    // Version
+    if (query.getVersion() >= 0) {
+      and(solrQuery, SolrFields.VERSION, Long.toString(query.getVersion()), false, false);
+    }
+
     // Path
     if (query.getPath() != null) {
       and(solrQuery, PATH, query.getPath(), true, true);
