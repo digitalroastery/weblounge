@@ -36,7 +36,8 @@ import java.io.IOException;
  * <ol>
  * <li>The request is directly targeted at the action's mountpoint</li>
  * <li>The action supports the
- * {@link ch.entwine.weblounge.common.request.RequestFlavor#HTML} request flavor</li>
+ * {@link ch.entwine.weblounge.common.request.RequestFlavor#HTML} request flavor
+ * </li>
  * <li>The client specifies that same flavor in his request</li>
  * </ol>
  * <p>
@@ -68,8 +69,11 @@ import java.io.IOException;
  */
 public interface HTMLAction extends Action {
 
-  /** The target url */
-  String TARGET = "target-url";
+  /** Request parameter name to specify the target page */
+  String TARGET_PAGE = "target-page";
+
+  /** Request parameter name to specify the target template */
+  String TARGET_TEMPLATE = "target-template";
 
   /** Constant indicating that the header includes should be evaluated */
   int EVAL_HEADER = 0;
@@ -265,5 +269,22 @@ public interface HTMLAction extends Action {
    * @return the page template
    */
   PageTemplate getTemplate();
+
+  /**
+   * Sets the page template that is used by this action by default to render the
+   * action content.
+   * 
+   * @param template
+   *          the default page template
+   */
+  void setDefaultTemplate(PageTemplate template);
+
+  /**
+   * Returns the default page template that is used to render the action content
+   * or <code>null</code> if no default template has been specified.
+   * 
+   * @return the default page template
+   */
+  PageTemplate getDefaultTemplate();
 
 }
