@@ -1,0 +1,1089 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<module id="league">
+
+	<!--
+	The following entry specifies the module class that will be instantiated for
+	this module.
+	
+	Put your own class here instead of the systems default implementation to
+	allow for custom module behaviour.
+	
+	Default is ch.o2it.weblounge.core.module.ModuleImpl.
+	-->
+	
+	<class>ch.o2it.weblounge.core.module.ModuleImpl</class>
+	
+	<!--
+	Set this value to "true" if this module should be enabled
+	and accessible to the world, "false" otherwise.
+	-->
+
+	<enable>true</enable>
+
+	<!--
+	The module description that will be visible in the system
+	configuration pages.
+	-->
+
+	<name language="en">League</name>
+	<name language="de">Spielbetrieb Liga</name>
+	<name language="fr">Concours</name>
+	<name language="it">Campionato</name>
+
+	<!--
+	The performance section allows the definition of a load factor.
+	Depending on this factor, the module will be equipped with an according
+	number of resources, including internal cache and pool sizes.
+	-->
+
+	<performance>
+		<loadfactor>10</loadfactor>
+	</performance>
+
+	<!--
+	Following comes the definition of renderers. Although they
+	may be addressed directly and without defining them here using
+	absolute paths, their definition is recommended since only those
+	defined here are beeing listed in the system dialogs.
+	
+	A valid renderer definition includes a unique identifier, the
+	path to the renderer and at its name at least in the site
+	default language. Note that the file paths are relative to the
+	module root folder unless they start with a leading slash.
+	-->
+
+	<renderers>	
+		<renderer id="errors" composeable="false">
+			<name language="en">Shows error messages</name>
+			<name language="de">Zeigt Fehlermeldungen</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/error/errors.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="missingparameter" composeable="false">
+			<name language="en">Missing Parameter</name>
+			<name language="de">Fehlende Parameter</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/error/parameter.jsp</file>
+			</jsp>
+		</renderer>	
+		<renderer id="league_playoff_quicklinks" composeable="true">
+			<name language="en">Link to playoff series</name>
+			<name language="de">Links zu Playoffs</name>
+			<name language="fr">Links zu Playoffs</name>
+			<name language="it">Links zu Playoffs</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/quicklinks/playoff.jsp</file>
+			</jsp>
+			<valid>86400000</valid>	<!-- 1 day -->
+			<recheck>86400000</recheck>
+		</renderer>			
+		<renderer id="league_link" composeable="true">
+			<name language="en">Link to league action</name>
+			<name language="de">Link auf league Action</name>
+			<name language="fr">Link auf league Action</name>
+			<name language="it">Link auf league Action</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/quicklinks/link.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/quicklinks/link_editor.jsp</jsp>
+			</editor>
+			<valid>86400000</valid>	<!-- 1 day -->
+			<recheck>86400000</recheck>
+		</renderer>			
+		<renderer id="liveticker_quicklinks" composeable="true">
+			<name language="en">Liveticker Quicklinks</name>
+			<name language="de">Liveticker Quicklinks</name>
+			<name language="fr">Liveticker Quicklinks</name>
+			<name language="it">Liveticker Quicklinks</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/quicklinks/liveticker.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/table/league_editor.jsp</jsp>
+			</editor>
+			<valid>1200000</valid>	<!-- 20' -->
+			<recheck>300000</recheck>  <!-- 5' -->
+		</renderer>		
+		<renderer id="table_small" composeable="true">
+			<name language="en">Standings small</name>
+			<name language="de">Tabelle klein</name>
+			<name language="fr">Tableau petit</name>
+			<name language="it">Tabella picola</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/table/table_small.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/results/nl_editor.jsp</jsp>
+			</editor>
+			<valid>3600000</valid>	<!-- 1 h -->
+			<recheck>3600000</recheck>
+		</renderer>
+		<renderer id="table_topleagues" composeable="true">
+			<name language="en">Standings top leagues</name>
+			<name language="de">Tabelle Topligen</name>
+			<name language="fr">Tableau hautes leagues</name>
+			<name language="it">Tabella top ligas</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/table/table_topleagues.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/table/table_topleagues_editor.jsp</jsp>
+			</editor>
+			<valid>3600000</valid>	<!-- 1 h -->
+			<recheck>600000</recheck>  <!-- 10' -->
+		</renderer>
+		<renderer id="results" composeable="false">
+			<name language="en">Results</name>
+			<name language="de">Resultate</name>
+			<name language="fr">Resultats</name>
+			<name language="it">Resultati</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/results/results.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="cupresults" composeable="true">
+			<name language="en">Cup results</name>
+			<name language="de">Cup-Resultate</name>
+			<name language="fr">Coupe resultats</name>
+			<name language="it">Coppa resultati</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/results/cup.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/results/cup_editor.jsp</jsp>
+			</editor>
+			<valid>3600000</valid>	<!-- 1h -->
+			<recheck>3600000</recheck>
+		</renderer>
+		<renderer id="overview_cup" composeable="true">
+			<name language="en">Cup overview</name>
+			<name language="de">Cup-Überblick</name>
+			<name language="fr">Coupe resultats</name>
+			<name language="it">Coppa resultati</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/overview/overview_cup.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/results/cup_editor.jsp</jsp>
+			</editor>
+			<valid>3600000</valid>	<!-- 1h -->
+			<recheck>3600000</recheck>
+		</renderer>
+		<renderer id="games" composeable="false">
+			<name language="en">Game Schedule</name>
+			<name language="de">Spielkalender</name>
+			<name language="fr">Spielkalender</name>
+			<name language="it">Spielkalender</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/game/games.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="groups" composeable="false">
+			<name language="en">Group overview</name>
+			<name language="de">Gruppeneinteilung</name>
+			<name language="fr">Gruppeneinteilung</name>
+			<name language="it">Gruppeneinteilung</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/overview/groups.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="table" composeable="false">
+			<name language="en">Standings</name>
+			<name language="de">Tabelle</name>
+			<name language="fr">Tableau</name>
+			<name language="it">Tabella</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/table/table.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="overview" composeable="false">
+			<name language="en">Overview</name>
+			<name language="de">Übersicht</name>
+			<name language="fr">Übersicht</name>
+			<name language="it">Übersicht</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/overview/overview.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="overview_nl" composeable="true">
+			<name language="en">Overview NL</name>
+			<name language="de">Übersicht NL</name>
+			<name language="fr">Übersicht NL</name>
+			<name language="it">Übersicht NL</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/overview/overview_nl.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/results/nl_editor.jsp</jsp>
+			</editor>
+			<valid>3600000</valid>	<!-- 1 h -->
+			<recheck>600000</recheck>  <!-- 10' -->
+		</renderer>
+		<renderer id="round_preview" composeable="true">
+			<name language="en">Round preview NL</name>
+			<name language="de">Runden-Übersicht NL</name>
+			<name language="fr">Runden-Übersicht NL</name>
+			<name language="it">Runden-Übersicht NL</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/overview/round_preview.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/overview/round_preview_editor.jsp</jsp>
+			</editor>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="club" composeable="false">
+			<name language="en">Club</name>
+			<name language="de">Verein</name>
+			<name language="fr">Club</name>
+			<name language="it">Club</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/club/club.jsp</file>
+			</jsp>
+			<valid>1800000</valid>	<!-- 10' -->
+			<recheck>1800000</recheck>
+		</renderer>
+		<renderer id="club_season" composeable="false">
+			<name language="en">Club: season chooser</name>
+			<name language="de">Verein: Saisonauswahl</name>
+			<name language="fr">Club: season chooser</name>
+			<name language="it">Club: season chooser</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/club/club_season.jsp</file>
+			</jsp>
+			<valid>21600000</valid>	<!-- 120' -->
+			<recheck>21600000</recheck>
+		</renderer>
+		<renderer id="portrait_team" composeable="false">
+			<name language="en">Team's portrait</name>
+			<name language="de">Mannschaftsportrait</name>
+			<name language="fr">Portrait d'equipe</name>
+			<name language="it">Portrait della squadra</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/portrait/portrait_team.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="portrait_team_col2" composeable="false">
+			<name language="en">Team's portrait part 2</name>
+			<name language="de">Mannschaftsportrait 2. Teil</name>
+			<name language="fr">Portrait d'equipe 2</name>
+			<name language="it">Portrait della squadra 2</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/portrait/portrait_team_col2.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="portrait_player" composeable="false">
+			<name language="en">Player's portrait</name>
+			<name language="de">Spielerportrait</name>
+			<name language="fr">Portrait de joueur</name>
+			<name language="it">Portrait di giocatore</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/portrait/portrait_player.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="scorer" composeable="false">
+			<name language="en">Scorerliste</name>
+			<name language="de">Skorerliste</name>
+			<name language="fr">Scorerliste</name>
+			<name language="it">Scorerliste</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/results/scorer.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="scorer_small" composeable="true">
+			<name language="en">Scorer list small</name>
+			<name language="de">Skorerliste klein</name>
+			<name language="fr">Scorerliste klein</name>
+			<name language="it">Scorerliste klein</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/results/scorer_small.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/table/league_editor.jsp</jsp>
+			</editor>
+			<valid>86400000</valid>	<!-- 1 day -->
+			<recheck>86400000</recheck>
+		</renderer>
+		<renderer id="spectators_league" composeable="true">
+			<name language="en">Zuschauerzahlen</name>
+			<name language="de">Zuschauerzahlen</name>
+			<name language="fr">Zuschauerzahlen</name>
+			<name language="it">Zuschauerzahlen</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/results/spectators_league.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/results/spectators_editor.jsp</jsp>
+			</editor>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="spectators_club" composeable="false">
+			<name language="en">Zuschauerzahlen pro Team</name>
+			<name language="de">Zuschauerzahlen pro Team</name>
+			<name language="fr">Zuschauerzahlen pro Team</name>
+			<name language="it">Zuschauerzahlen pro Team</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/results/spectators_club.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="playoffs" composeable="false">
+			<name language="en">Playoffs</name>
+			<name language="de">Playoffs</name>
+			<name language="fr">Playoffs</name>
+			<name language="it">Playoffs</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/game/playoffs.jsp</file>
+			</jsp>
+			<valid>604800000</valid>	<!-- 1 week -->
+			<recheck>604800000</recheck>
+		</renderer>
+		<renderer id="playoffs_small" composeable="true">
+			<name language="en">Playoffs small</name>
+			<name language="de">Playoffs klein</name>
+			<name language="fr">Playoffs klein</name>
+			<name language="it">Playoffs klein</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/game/playoffs_small.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/results/nl_editor.jsp</jsp>
+			</editor>
+			<valid>1200000</valid>	<!-- 20' -->
+			<recheck>1200000</recheck>
+		</renderer>
+		<renderer id="playoffs_nl" composeable="true">
+			<name language="en">Playoffs NL</name>
+			<name language="de">Playoffs NL</name>
+			<name language="fr">Playoffs NL</name>
+			<name language="it">Playoffs NL</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/game/playoffs_nl.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/results/nl_editor.jsp</jsp>
+			</editor>
+			<valid>1200000</valid>	<!-- 20' -->
+			<recheck>1200000</recheck>
+		</renderer>
+<!-- 	OBSOLETE:
+		<renderer id="liveticker" composeable="false"> 
+			<name language="en">Live ticker</name>
+			<name language="de">Live Ticker</name>
+			<name language="fr">Live Ticker</name>
+			<name language="it">Live Ticker</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/liveticker/liveticker.jsp</file>
+			</jsp>
+			<valid>604800000</valid>
+			<recheck>604800000</recheck>
+		</renderer>  -->		
+		<renderer id="telegram_compact" composeable="true">
+			<name language="en">Match telegram small</name>
+			<name language="de">Spieltelegramm klein</name>
+			<name language="fr">Spieltelegramm klein</name>
+			<name language="it">Spieltelegramm klein</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/results/telegram_compact.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/table/league_editor.jsp</jsp>
+			</editor>
+			<valid>5400000</valid>	<!-- 30' -->
+			<recheck>5400000</recheck>
+		</renderer>
+		<renderer id="results_check_chooser" composeable="true">
+			<name language="en">Results check (box)</name>
+			<name language="de">Übersicht Resultatmeldung (Box)</name>
+			<name language="fr">Übersicht Resultatmeldung (Box)</name>
+			<name language="it">Übersicht Resultatmeldung (Box)</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/transmission/resultscheck_chooser.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="results_check" composeable="false">
+			<name language="en">Results check</name>
+			<name language="de">Übersicht Resultatmeldung</name>
+			<name language="fr">Übersicht Resultatmeldung</name>
+			<name language="it">Übersicht Resultatmeldung</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/transmission/resultscheck.jsp</file>
+			</jsp>
+		</renderer>
+		<!-- move to portal: -->
+		<renderer id="mailtelegram_chooser" composeable="false">
+			<name language="en">Mail Telegram (box)</name>
+			<name language="de">Telegrammversand (Box)</name>
+			<name language="fr">Telegrammversand (Box)</name>
+			<name language="it">Telegrammversand (Box)</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/transmission/mailtelegram_chooser.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="mailtelegram" composeable="false">
+			<name language="en">Mail Telegram</name>
+			<name language="de">Telegrammversand</name>
+			<name language="fr">Telegrammversand</name>
+			<name language="it">Telegrammversand</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/transmission/mailtelegram.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="regform" composeable="false">
+			<name language="en">Registration</name>
+			<name language="de">Registration</name>
+			<name language="fr">Registration</name>
+			<name language="it">Registration</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/registration/form.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="regalready" composeable="false">
+			<name language="en">Registration</name>
+			<name language="de">Registration</name>
+			<name language="fr">Registration</name>
+			<name language="it">Registration</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/registration/already.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="regmissing" composeable="false">
+			<name language="en">Registration</name>
+			<name language="de">Registration</name>
+			<name language="fr">Registration</name>
+			<name language="it">Registration</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/registration/missing.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="regsuccess" composeable="false">
+			<name language="en">Registration</name>
+			<name language="de">Registration</name>
+			<name language="fr">Registration</name>
+			<name language="it">Registration</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/registration/success.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="regerror" composeable="false">
+			<name language="en">Registration</name>
+			<name language="de">Registration</name>
+			<name language="fr">Registration</name>
+			<name language="it">Registration</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/registration/error.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="regheader" composeable="false">
+			<name language="en">Registration</name>
+			<name language="de">Registration</name>
+			<name language="fr">Registration</name>
+			<name language="it">Registration</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/registration/header.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="parameterassistant" composeable="true">
+			<name language="en">Parameter assistant</name>
+			<name language="de">Parameter Assistent</name>
+			<name language="fr">Assistant des paramètres</name>
+			<name language="it">Assistente parametri</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/club/parameterAssistant.jsp</file>
+			</jsp>
+			<valid>86400000</valid>	<!-- 1 day -->
+			<recheck>86400000</recheck>
+		</renderer>
+		<!-- move to leagueadmin: -->
+		<renderer id="mailjobregistration" composeable="false">
+			<name language="en">Mail job registration</name>
+			<name language="de">Registrierung Resultatversand</name>
+			<name language="fr">Registrierung Resultatversand</name>
+			<name language="it">Registrierung Resultatversand</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/transmission/mailjobinput.jsp</file>
+			</jsp>
+			<valid>86400000</valid>	<!-- 1 day -->
+			<recheck>86400000</recheck>
+		</renderer>
+		<renderer id="mailjoboutput" composeable="false">
+			<name language="en">Mail job feedback</name>
+			<name language="de">Feedback Resultatversand</name>
+			<name language="fr">Feedback Resultatversand</name>
+			<name language="it">Feedback Resultatversand</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/transmission/mailjoboutput.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="gamepreview" composeable="false">
+			<name language="en">game preview (in detail)</name>
+			<name language="de">Spielvorschau (Details)</name>
+			<name language="fr">game preview (in detail)</name>
+			<name language="it">game preview (in detail)</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/game/gamepreview.jsp</file>
+			</jsp>
+			<valid>86400000</valid>	<!-- 1 day -->
+			<recheck>86400000</recheck>
+		</renderer>
+		<renderer id="spielservice_chooser" composeable="true">
+			<name language="en">Spielservice Chooser</name>
+			<name language="de">Spielservice Auswahl</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/quicklinks/spielservice_chooser.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/quicklinks/spielservice_chooser_editor.jsp</jsp>
+			</editor>
+			<valid>86400000</valid>	<!-- 1 day -->
+			<recheck>86400000</recheck>
+		</renderer>
+		<renderer id="gamedetails.main" composeable="false">
+			<name language="en">Game details</name>
+			<name language="de">Spieldetails</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/gamedetails/main.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="gamedetails.lineup" composeable="false">
+			<name language="en">Game details: line-up</name>
+			<name language="de">Spieldetails: Aufstellung</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/gamedetails/lineup.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="gamedetails.referees" composeable="false">
+			<name language="en">Game details: referees</name>
+			<name language="de">Spieldetails: Schiedsrichter</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/gamedetails/referees.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="gamedetails.location" composeable="false">
+			<name language="en">Game details: gym</name>
+			<name language="de">Spieldetails: Sporthalle</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/gamedetails/location.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="gamedetails.last_games" composeable="false">
+			<name language="en">Game details: last games</name>
+			<name language="de">Spieldetails: letzte Begegnungen</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/gamedetails/last_games.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="advertising" composeable="false">
+			<name language="en">Advertising (league)</name>
+			<name language="de">Liga-Werbung</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/overview/advertising.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="liveticker.ajax.quicklinks" composeable="false">
+			<name language="en">Liveticker Ajax Quicklinks</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/liveticker/ajax/quicklinks.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="liveticker.ajax.result" composeable="false">
+			<name language="en">Liveticker Ajax Result</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/liveticker/ajax/result.jsp</file>
+			</jsp>
+		</renderer>
+		<renderer id="gamereport" composeable="true">
+			<name language="en">Game report</name>
+			<name language="de">Spielbericht</name>
+			<jsp>
+				<methods>html</methods>
+				<file>jsp/game/gamereport.jsp</file>
+			</jsp>
+			<editor>
+				<jsp>jsp/game/gamereport_editor.jsp</jsp>
+			</editor>
+			<valid>86400000</valid>	<!-- 1 day -->
+			<recheck>86400000</recheck>
+		</renderer>
+	</renderers>
+
+	<!--
+	Actions represent urls that are mounted into the defining site. An action
+	may take requests and process them in various ways by either writing back
+	a response or forwarding the request to another site url.
+	-->
+
+	<actions>
+		<action id="league.games">
+			<name language="en">Spielplan</name>
+			<name language="de">Spielplan</name>
+			<name language="fr">Spielplan</name>
+			<name language="it">Spielplan</name>
+			<mountpoint>spielbetrieb/spiel</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.GamesAction</class>
+			</handler>
+		</action>
+
+		<action id="league.groups">
+			<name language="en">Gruppeneinteilung</name>
+			<name language="de">Gruppeneinteilung</name>
+			<name language="fr">Gruppeneinteilung</name>
+			<name language="it">Gruppeneinteilung</name>
+			<mountpoint>spielbetrieb/gruppe</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.GroupsAction</class>
+			</handler>
+		</action>
+
+		<action id="league.tables">
+			<name language="en">Standings</name>
+			<name language="de">Tabellen</name>
+			<name language="fr">Tableaux</name>
+			<name language="it">Tabellen</name>
+			<mountpoint>spielbetrieb/tabelle</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.TableAction</class>
+			</handler>
+		</action>
+
+		<action id="league.overview">
+			<name language="en">Spielservice</name>
+			<name language="de">Spielservice</name>
+			<name language="fr">Spielservice</name>
+			<name language="it">Spielservice</name>
+			<mountpoint>spielbetrieb/resultatservice</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.OverviewAction</class>
+			</handler>
+		</action>
+
+		<action id="league.playoffs">
+			<name language="en">Playoff Results</name>
+			<name language="de">Resultate Playoffs</name>
+			<name language="fr">Resultat Playoff</name>
+			<name language="it">Resultati Playoff</name>
+			<mountpoint>spielbetrieb/playoff</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.PlayoffResultsAction</class>
+			</handler>
+		</action>
+
+		<action id="league.results">
+			<name language="en">Results</name>
+			<name language="de">Resultate</name>
+			<name language="fr">Resultats</name>
+			<name language="it">Resultati</name>
+			<mountpoint>spielbetrieb/resultat</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.ResultsAction</class>
+			</handler>
+		</action>
+
+		<action id="league.results.cup">
+			<name language="en">Cup results</name>
+			<name language="de">Cup-Resultate</name>
+			<name language="fr">Coupe resultats</name>
+			<name language="it">Coppa resultati</name>
+			<mountpoint>spielbetrieb/resultat/cup</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.CupAction</class>
+			</handler>
+		</action>
+
+		<action id="league.liveticker">
+			<name language="en">Liveticker</name>
+			<name language="de">Liveticker</name>
+			<name language="fr">Liveticker</name>
+			<name language="it">Liveticker</name>
+			<mountpoint>spielbetrieb/liveticker</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.LivetickerAction</class>
+				<options>
+					<option>
+						<name>target</name>
+						<value>main</value>
+					</option>
+				</options>
+			</handler>
+		</action>
+
+		<action id="league.club">
+			<name language="en">Club overview</name>
+			<name language="de">Spielservice Club</name>
+			<name language="fr">Spielservice Club</name>
+			<name language="it">Spielservice Club</name>
+			<mountpoint>/spielbetrieb/verein</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.club.ClubAction</class>
+			</handler>
+		</action>
+
+		<action id="league.parameter">
+			<name language="en">Parameter assistant</name>
+			<name language="de">Parameter Assistent</name>
+			<name language="fr">Parameter Assistent</name>
+			<name language="it">Parameter Assistent</name>
+			<mountpoint>/spielbetrieb/verein/parameterassistant</mountpoint>
+			<target>/spielbetrieb/parameterassistant</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.club.ParameterAssistantAction</class>
+			</handler>
+		</action>
+
+		<action id="league.portrait.team">
+			<name language="en">Club portrait</name>
+			<name language="de">Portrait Club</name>
+			<name language="fr">Portrait Club</name>
+			<name language="it">Portrait Club</name>
+			<mountpoint>/spielbetrieb/portrait/team</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.portrait.TeamPortraitAction</class>
+			</handler>
+		</action>
+
+		<action id="league.portrait.player">
+			<name language="en">Player portrait</name>
+			<name language="de">Spielerportrait</name>
+			<name language="fr">Spielerportrait</name>
+			<name language="it">Spielerportrait</name>
+			<mountpoint>/spielbetrieb/portrait/spieler</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.portrait.PlayerPortraitAction</class>
+			</handler>
+		</action>
+
+		<action id="league.portrait.image">
+			<name language="en">Player portrait</name>
+			<name language="de">Spielerportrait</name>
+			<name language="fr">Spielerportrait</name>
+			<name language="it">Spielerportrait</name>
+			<mountpoint>/portrait/image</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.portrait.ImageAction</class>
+			</handler>
+		</action>
+
+		<action id="league.scorer">
+			<name language="en">Scorer</name>
+			<name language="de">Skorer</name>
+			<name language="fr">Scorer</name>
+			<name language="it">Scorer</name>
+			<mountpoint>spielbetrieb/skorer</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.league.ScorerAction</class>
+			</handler>
+		</action>
+
+		<action id="league.spectators.league">
+			<name language="en">Spectators</name>
+			<name language="de">Zuschauer</name>
+			<name language="fr">Zuschauer</name>
+			<name language="it">Spettatori</name>
+			<mountpoint>spielbetrieb/zuschauer/liga</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.league.SpectatorLeagueAction</class>
+			</handler>
+		</action>
+
+		<action id="league.spectators.club">
+			<name language="en">Spectators</name>
+			<name language="de">Zuschauer</name>
+			<name language="fr">Zuschauer</name>
+			<name language="it">Spettatori</name>
+			<mountpoint>spielbetrieb/zuschauer/club</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.league.SpectatorClubAction</class>
+			</handler>
+		</action>
+		
+		<action id="league.gamedetails">
+			<name language="en">Game details</name>
+			<name language="de">Spieldetails</name>
+			<mountpoint>spielbetrieb/spieldetails</mountpoint>
+			<target>/spielbetrieb</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.GamedetailsAction</class>
+			</handler>
+		</action>
+
+		<action id="league.livegamedetails">
+			<name language="en">Live game details</name>
+			<name language="de">Liveticker Details</name>
+			<mountpoint>spielbetrieb/liveticker_details</mountpoint>
+			<target>/spielbetrieb/livetickerdetails</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.LiveGameDetailsAction</class>
+				<options>
+					<option>
+						<name>target</name>
+						<value>main</value>
+					</option>
+				</options>
+			</handler>
+		</action>
+
+		<action id="resultsCheck">
+			<name language="en">Results check</name>
+			<name language="de">Übersicht Resultatmeldung</name>
+			<name language="fr">Übersicht Resultatmeldung</name>
+			<name language="it">Übersicht Resultatmeldung</name>
+			<mountpoint>spielbetrieb/admin/resultate</mountpoint>
+			<target>/spielbetrieb/admin</target>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.transmission.ResultsCheckAction</class>
+				<options>
+					<option>
+						<name>target</name>
+						<value>main</value>
+					</option>
+				</options>
+			</handler>
+		</action>
+
+		<action id="mailTelegram">
+			<name language="en">Mail Telegram</name>
+			<name language="de">Versand Spieltelegramme</name>
+			<name language="fr">Versand Spieltelegramme</name>
+			<name language="it">Versand Spieltelegramme</name>
+			<mountpoint>spielbetrieb/admin/telegramme</mountpoint>
+			<target>/spielbetrieb/admin</target>
+			<valid>5000</valid>	<!-- 5sec -->
+			<recheck>5000</recheck>	<!-- 5sec -->
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.transmission.MailTelegramAction</class>
+				<options>
+					<option>
+						<name>target</name>
+						<value>main</value>
+					</option>
+				</options>
+			</handler>
+		</action>
+
+		<action id="mailerRegistration">
+			<name language="en">Result mailer registration</name>
+			<name language="de">Registrierung Resultatversand</name>
+			<name language="fr">Registrierung Resultatversand</name>
+			<name language="it">Registrierung Resultatversand</name>
+			<mountpoint>service/resultmailer/registration</mountpoint>
+			<target>/service</target>
+			<valid>5000</valid>	<!-- 5sec -->
+			<recheck>5000000</recheck>	<!-- 5000sec -->
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.transmission.ResultsMailerRegistrationAction</class>
+				<options>
+					<option>
+						<name>target</name>
+						<value>main</value>
+					</option>
+				</options>
+			</handler>
+		</action>
+
+		<action id="legueServiceRegistration">
+			<name language="en">Webservice Registration</name>
+			<name language="de">Webservice Registration</name>
+			<name language="fr">Webservice Registration</name>
+			<name language="it">Webservice Registration</name>
+			<mountpoint>/webservices/register</mountpoint>
+			<target>/</target>
+			<valid>0</valid>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.webservice.WebserviceRegistrationAction</class>
+				<options>
+					<option>
+						<name>target</name>
+						<value>main</value>
+					</option>
+				</options>
+			</handler>
+		</action>
+		
+		<action id="JSONAction">
+			<name language="en">JSONAction</name>
+			<mountpoint>/spielbetrieb/json</mountpoint>
+			<target>/</target>
+			<valid>0</valid>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.LeagueJSONAction</class>
+				<options/>
+			</handler>
+		</action>
+
+		<action id="LivetickerJSONAction">
+			<name language="en">Liveticker JSON Action</name>
+			<mountpoint>/spielbetrieb/liveticker/json</mountpoint>
+			<target>/</target>
+			<valid>60000</valid>	<!-- 1min -->
+			<recheck>120000</recheck>	<!-- 2min -->
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.LivetickerJSONAction</class>
+				<options/>
+			</handler>
+		</action>
+
+		<action id="LivetickerAjaxAction">
+			<name language="en">LivetickerAjaxAction</name>
+			<mountpoint>/spielbetrieb/liveticker/ajax</mountpoint>
+			<target>/</target>
+			<valid>0</valid>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.result.LivetickerAjaxAction</class>
+				<options/>
+			</handler>
+		</action>
+		
+		<action id="ICalendarAction">
+			<name language="en">iCalendar Action</name>
+			<mountpoint>/spielbetrieb/icalendar</mountpoint>
+			<target>/</target>
+			<valid>0</valid>
+			<handler>
+				<methods>html</methods>
+				<class>ch.swissunihockey.weblounge.module.league.ICalendarAction</class>
+				<options/>
+			</handler>
+		</action>
+
+	</actions>
+
+	<!--
+	Webservices represent urls that are mounted into the defining site and are
+	capable of handling soap request.
+	-->
+
+   	<webservices/>
+
+	<!--
+	Wizards are used to gather information from the user step by step. Wizards
+	may be used to implement a quiz or any complex gathering of data.
+	-->
+
+	<wizards/>
+
+	<!--
+	The following section configures the module services that are beeing
+	started and stopped along with the module.
+	-->
+	
+	<services/>
+
+</module>
