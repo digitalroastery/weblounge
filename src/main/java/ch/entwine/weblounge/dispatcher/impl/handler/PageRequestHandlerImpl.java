@@ -346,8 +346,8 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     Site site = request.getSite();
 
     // Check if a target-page parameter was passed
-    if (request.getParameter(HTMLAction.TARGET) != null) {
-      String targetUrl = request.getParameter(HTMLAction.TARGET);
+    if (request.getParameter(HTMLAction.TARGET_PAGE) != null) {
+      String targetUrl = request.getParameter(HTMLAction.TARGET_PAGE);
       try {
         String decocedTargetUrl = null;
         String encoding = request.getCharacterEncoding();
@@ -385,19 +385,20 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
   protected PageTemplate getPageTemplate(Page page, WebloungeRequest request)
       throws IllegalStateException {
     Site site = request.getSite();
-    String templateId = (String) request.getAttribute(WebloungeRequest.TEMPLATE);
-    PageTemplate template = null;
-    if (templateId != null) {
+
+    // Has a template been defined already (e. g. by an action handler)?
+    PageTemplate template = (PageTemplate) request.getAttribute(WebloungeRequest.TEMPLATE);
+
+    // Apparently not...
+    if (template == null) {
+      String templateId = page.getTemplate();
       template = site.getTemplate(templateId);
       if (template == null) {
-        throw new IllegalStateException("Page template " + templateId + " specified by request was not found");
-      }
-    } else {
-      template = site.getTemplate(page.getTemplate());
-      if (template == null) {
-        throw new IllegalStateException("Page template " + templateId + " specified by page " + page + " was not found");
+        logger.warn("Page {} specified a non-existing template '{}'", page.getURI(), templateId);
+        template = site.getDefaultTemplate();
       }
     }
+
     template.setEnvironment(request.getEnvironment());
     return template;
   }

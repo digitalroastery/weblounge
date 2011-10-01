@@ -326,7 +326,6 @@ public final class DispatchUtils {
     try {
       if (!response.isCommitted()) {
         response.setStatus(status);
-        response.getOutputStream().flush();
       }
     } catch (Throwable t) {
       logger.debug("Unable to send response status {} to client", status);
@@ -371,7 +370,6 @@ public final class DispatchUtils {
       response.invalidate();
       if (!response.isCommitted()) {
         response.sendError(status, msg);
-        response.getOutputStream().flush();
       }
     } catch (Throwable t) {
       logger.debug("Error when sending back error message {}: {}", status, t.getMessage());

@@ -300,6 +300,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       WebloungeResponse response) {
 
     WebUrl url = request.getUrl();
+    Site site = request.getSite();
 
     // Load the target page used to render the action
     Page page = null;
@@ -316,7 +317,9 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     // Get hold of the page template
     PageTemplate template = null;
     try {
-      template = getPageTemplate(page, request);
+      template = getTargetTemplate(action, page, request);
+      if (template == null)
+        template = site.getDefaultTemplate();
     } catch (IllegalStateException e) {
       logger.warn(e.getMessage());
       DispatchUtils.sendInternalError(request, response);
@@ -326,6 +329,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     try {
       request.setAttribute(WebloungeRequest.ACTION, action);
       request.setAttribute(WebloungeRequest.PAGE, page);
+      request.setAttribute(WebloungeRequest.TEMPLATE, template);
 
       // Prepare the action
       if (action instanceof HTMLAction) {
@@ -487,38 +491,75 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    * template was specified in the request but cannot be found or used for some
    * reason, an {@link IllegalStateException} is thrown.
    * 
+   * @param action
+   *          the action
    * @param page
    *          the page
    * @param request
    *          the request
+   * 
    * @return the template
    * @throws IllegalStateException
    *           if the template cannot be found
    */
-  protected PageTemplate getPageTemplate(Page page, WebloungeRequest request)
-      throws IllegalStateException {
+  protected PageTemplate getTargetTemplate(Action action, Page page,
+      WebloungeRequest request) throws IllegalStateException {
+
     Site site = request.getSite();
-    String templateId = (String) request.getAttribute(WebloungeRequest.TEMPLATE);
     PageTemplate template = null;
-    if (templateId != null) {
+    String templateId = null;
+
+    // Does the request specify an ad-hoc template?
+    if (request.getAttribute(WebloungeRequest.TEMPLATE) != null) {
+      templateId = (String) request.getAttribute(WebloungeRequest.TEMPLATE);
       template = site.getTemplate(templateId);
-      if (template == null) {
-        throw new IllegalStateException("Page template " + templateId + " specified by request was not found");
-      }
-    } else if (page != null) {
-      template = site.getTemplate(page.getTemplate());
-      if (template == null) {
-        throw new IllegalStateException("Page template for page " + page + " was not found");
-      }
+      if (template == null)
+        throw new IllegalStateException("Page template '" + templateId + "' specified by request attribute was not found");
     }
+
+    // Does the request specify an ad-hoc template?
+    if (template == null && request.getParameter(HTMLAction.TARGET_TEMPLATE) != null) {
+      templateId = request.getParameter(HTMLAction.TARGET_TEMPLATE);
+      template = site.getTemplate(templateId);
+      if (template == null)
+        throw new IllegalStateException("Page template '" + templateId + "' specified by request parameter was not found");
+    }
+
+    // See if the action handler specifies a template
+    if (template == null && action instanceof HTMLAction) {
+      HTMLAction htmlAction = (HTMLAction) action;
+      template = htmlAction.getTemplate();
+      if (template == null)
+        logger.debug("Action '{}' did not define a page template", action.getIdentifier());
+    }
+
+    // See if the action handler specifies a default template
+    if (template == null && action instanceof HTMLAction) {
+      HTMLAction htmlAction = (HTMLAction) action;
+      template = htmlAction.getDefaultTemplate();
+      if (template == null)
+        logger.debug("Action '{}' did not define a default page template", action.getIdentifier());
+    }
+
+    // By default, the page will have to deliver on the template
+    if (template == null && page != null) {
+      template = site.getTemplate(page.getTemplate());
+      if (template == null)
+        throw new IllegalStateException("Page template '" + templateId + "' for page '" + page + "' was not found");
+    }
+
+    // Did we end up finding a template?
+    if (template == null)
+      return null;
+
     template.setEnvironment(request.getEnvironment());
     return template;
   }
 
   /**
    * Tries to determine the target page for the action result. The
-   * <code>target-url</code> request parameter will be considered as well as the
-   * action configuration. In any case, the site's homepage will be the
+   * <code>target-page</code> request parameter will be considered as well as
+   * the action configuration. In any case, the site's homepage will be the
    * fallback.
    * <p>
    * Should a target page be configured either through the request or through
@@ -542,18 +583,18 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     boolean targetForced = false;
 
     // Check if a target-page parameter was passed
-    if (request.getParameter(HTMLAction.TARGET) != null) {
-      String targetUrl = request.getParameter(HTMLAction.TARGET);
+    String targetPage = request.getParameter(HTMLAction.TARGET_PAGE);
+    if (targetPage != null) {
       targetForced = true;
       try {
         String decocedTargetUrl = null;
         String encoding = request.getCharacterEncoding();
         if (encoding == null)
           encoding = "utf-8";
-        decocedTargetUrl = URLDecoder.decode(targetUrl, encoding);
+        decocedTargetUrl = URLDecoder.decode(targetPage, encoding);
         target = new PageURIImpl(site, decocedTargetUrl);
       } catch (UnsupportedEncodingException e) {
-        logger.warn("Error while decoding target url {}: {}", targetUrl, e.getMessage());
+        logger.warn("Error while decoding target url {}: {}", targetPage, e.getMessage());
         target = new PageURIImpl(site, "/");
       }
     }
