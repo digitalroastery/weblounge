@@ -78,7 +78,7 @@ public class PageImporterCallback extends AbstractImporterCallback {
         System.out.println("Imported page " + path);
         return true;
       }
-      return false;
+      return true;
     } catch (IOException e) {
       System.err.println("Error creating target file for " + f + ": " + e.getMessage());
       return false;

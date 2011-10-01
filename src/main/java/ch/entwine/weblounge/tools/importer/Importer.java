@@ -389,7 +389,7 @@ public class Importer {
               directories.push(files[i]);
             } else if (!"__contents__.xml".equals(files[i].getName()) && !".DS_Store".equals(files[i].getName()) && !"repository.xml".equals(files[i].getName())) {
               if (!callback.fileImported(files[i])) {
-                // System.err.println("Error importing file " + current);
+                System.err.println("Error importing " + files[i].getPath());
                 errorCount++;
               } else {
                 pageCount++;

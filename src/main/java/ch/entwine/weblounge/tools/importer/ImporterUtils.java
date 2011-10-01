@@ -52,6 +52,7 @@ public class ImporterUtils {
 
   public static String normalizePath(String path) {
     String normalpath = FilenameUtils.removeExtension(path);
+    normalpath += "_" + FilenameUtils.getExtension(path);
     return normalpath;
   }
 

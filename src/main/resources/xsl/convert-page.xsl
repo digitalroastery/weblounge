@@ -31,7 +31,10 @@
       <template>
         <xsl:choose>
           <xsl:when test="string-length(renderer) = 0">
-            default
+            <xsl:text>default</xsl:text>
+          </xsl:when>
+          <xsl:when test="renderer = '2-col'">
+            <xsl:text>home</xsl:text>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="renderer" />
@@ -286,7 +289,7 @@
   <xsl:template name="user">
     <xsl:param name="userid"></xsl:param>
     <xsl:choose>
-      <xsl:when test="$userid = 'www' or $userid = 'rivellagames' or $userid = 'guest'">
+      <xsl:when test="$userid = 'www' or $userid = 'rivellagames' or $userid = 'wfc2011' or $userid = 'portal' or $userid = 'guest'">
         <user>
           <xsl:attribute name="id"><xsl:value-of select="$adminuserid" /></xsl:attribute>
           <xsl:attribute name="realm">weblounge</xsl:attribute>

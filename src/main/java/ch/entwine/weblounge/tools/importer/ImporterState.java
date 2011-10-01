@@ -96,7 +96,7 @@ public class ImporterState {
     } else {
       log_.warn("No UUID found for path ".concat(path));
       invalidPaths.add(path);
-      return uuidStore.get("/").toString();
+      return "";
     }
   }
 

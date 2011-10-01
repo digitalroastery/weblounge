@@ -91,8 +91,12 @@
                 <xsl:value-of select="regex-group(2)" />
               </subject>
               <subject>
-                <xsl:text>portrait:</xsl:text>
-                <xsl:value-of select="regex-group(3)" />
+                <xsl:if test="regex-group(3) = 'nati'">
+                  <xsl:text>natiportrait</xsl:text>
+                </xsl:if>
+                <xsl:if test="regex-group(3) = 'nati'">
+                  <xsl:text>portrait</xsl:text>
+                </xsl:if>
               </subject>
             </xsl:matching-substring>
           </xsl:analyze-string>
@@ -205,7 +209,7 @@
   <xsl:template name="user">
     <xsl:param name="userid"></xsl:param>
     <xsl:choose>
-      <xsl:when test="$userid = 'www' or $userid = 'rivellagames' or $userid = 'guest'">
+      <xsl:when test="$userid = 'www' or $userid = 'rivellagames' or $userid = 'wfc2011' or $userid = 'portal' or $userid = 'guest'">
         <user>
           <xsl:attribute name="id"><xsl:value-of select="$adminuserid" /></xsl:attribute>
           <xsl:attribute name="realm">weblounge</xsl:attribute>
