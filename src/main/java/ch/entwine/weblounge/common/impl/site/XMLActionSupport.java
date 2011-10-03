@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.ActionException;
 import ch.entwine.weblounge.common.site.XMLAction;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -77,7 +78,11 @@ public class XMLActionSupport extends ActionSupport implements XMLAction {
   @Override
   public int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
-    response.setContentType("text/xml;charset=utf-8");
+    String characterEncoding = response.getCharacterEncoding();
+    if (StringUtils.isNotBlank(characterEncoding))
+      response.setContentType("text/html;charset=" + characterEncoding.toLowerCase());
+    else
+      response.setContentType("text/html");
     return EVAL_REQUEST;
   }
 

@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.ActionException;
 import ch.entwine.weblounge.common.site.JSONAction;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
@@ -71,7 +72,11 @@ public class JSONActionSupport extends ActionSupport implements JSONAction {
   @Override
   public int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
-    response.setContentType("text/json;charset=utf-8");
+    String characterEncoding = response.getCharacterEncoding();
+    if (StringUtils.isNotBlank(characterEncoding))
+      response.setContentType("text/html;charset=" + characterEncoding.toLowerCase());
+    else
+      response.setContentType("text/html");
     return EVAL_REQUEST;
   }
 

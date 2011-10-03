@@ -367,7 +367,11 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
-    response.setContentType("text/html;charset=utf-8");
+    String characterEncoding = response.getCharacterEncoding();
+    if (StringUtils.isNotBlank(characterEncoding))
+      response.setContentType("text/html;charset=" + characterEncoding.toLowerCase());
+    else
+      response.setContentType("text/html");
     outputStarted = true;
     return EVAL_REQUEST;
   }
