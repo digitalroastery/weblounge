@@ -70,7 +70,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
   /** Name of the image style parameter */
   protected static final String OPT_IMAGE_STYLE = "style";
-  
+
   /** Length of a UUID */
   protected static final int UUID_LENGTH = 36;
 
@@ -123,7 +123,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       if (path.startsWith(URI_PREFIX)) {
         String uriSuffix = StringUtils.chomp(path.substring(URI_PREFIX.length()), "/");
         uriSuffix = URLDecoder.decode(uriSuffix, "utf-8");
-  
+
         // Check whether we are looking at a uuid or a url path
         if (uriSuffix.length() == UUID_LENGTH) {
           id = uriSuffix;
@@ -137,7 +137,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
             fileName = FilenameUtils.getName(imagePath);
           }
         } else {
-          imagePath = "/" + uriSuffix; 
+          imagePath = "/" + uriSuffix;
           fileName = FilenameUtils.getName(imagePath);
         }
       } else {
@@ -200,13 +200,13 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     } else {
       language = LanguageUtils.getPreferredLanguage(imageResource, request, site);
     }
-    
+
     if (language == null) {
       logger.warn("Image {} does not exist in any supported language", imageURI);
       DispatchUtils.sendNotFound(request, response);
       return true;
     }
-    
+
     // Extract the image style and scale the image
     ImageStyle style = null;
     String styleId = StringUtils.trimToNull(request.getParameter(OPT_IMAGE_STYLE));
@@ -217,7 +217,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
         return true;
       }
     }
-    
+
     // Check the modified headers
     if (!ResourceUtils.hasChanged(request, imageResource, style, language)) {
       logger.debug("Image {} was not modified", imageURI);
@@ -233,11 +233,17 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     String contentType = imageContents.getMimetype();
     if (contentType == null)
       contentType = MediaType.APPLICATION_OCTET_STREAM;
-    response.setContentType(contentType);
+
+    // Set the content type
+    String characterEncoding = response.getCharacterEncoding();
+    if (StringUtils.isNotBlank(characterEncoding))
+      response.setContentType(contentType + "; charset=" + characterEncoding.toLowerCase());
+    else
+      response.setContentType(contentType);
 
     // Add last modified header
     response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource, language).getTime());
-    
+
     // Set Expires header
     response.setDateHeader("Expires", System.currentTimeMillis() + Times.MS_PER_HOUR);
 
@@ -250,7 +256,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // When there is no scaling required, just return the original
     if (style == null || ImageScalingMode.None.equals(style.getScalingMode())) {
-      
+
       // Load the input stream from the repository
       try {
         imageInputStream = contentRepository.getContent(imageURI, language);
@@ -316,13 +322,13 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return true;
     } catch (IOException e) {
       logger.error("Error sending image '{}' to the client: {}", imageURI, e.getMessage());
-      
+
       File f = scaledImageFile;
       while (f != null && f.isDirectory() && f.listFiles().length == 0) {
         FileUtils.deleteQuietly(f);
         f = f.getParentFile();
       }
-      
+
       DispatchUtils.sendInternalError(request, response);
       return true;
     } catch (Throwable t) {

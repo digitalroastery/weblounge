@@ -47,9 +47,6 @@ class BufferedHttpServletResponse extends HttpServletResponseWrapper {
   /** The output stream */
   private BufferedServletOutputStream os = null;
 
-  /** The character encoding of this reply. */
-  private String encoding = null;
-
   /** Whether the getOuputStream has already been called */
   private boolean osCalled = false;
 
@@ -90,9 +87,11 @@ class BufferedHttpServletResponse extends HttpServletResponseWrapper {
       throw new IllegalStateException("An output stream has already been allocated");
 
     // Get the character encoding
-    encoding = getCharacterEncoding();
-    if (encoding == null)
+    String encoding = getCharacterEncoding();
+    if (encoding == null) {
       encoding = DEFAULT_ENCODING;
+      setCharacterEncoding(encoding);
+    }
 
     // Install the writer
     try {
@@ -138,7 +137,6 @@ class BufferedHttpServletResponse extends HttpServletResponseWrapper {
 
         // Set content-related headers
         setContentLength(content.length);
-        setCharacterEncoding(encoding);
 
         // Write the buffered content to the underlying output stream
         super.getOutputStream().write(content);

@@ -268,8 +268,13 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       // Add ETag header
       String eTag = ResourceUtils.getETagValue(page);
       response.setHeader("ETag", eTag);
+
       // Set the content type
-      response.setContentType("text/html");
+      String characterEncoding = response.getCharacterEncoding();
+      if (StringUtils.isNotBlank(characterEncoding))
+        response.setContentType("text/html; charset=" + characterEncoding.toLowerCase());
+      else
+        response.setContentType("text/html");
 
       // Add additional cache tags
       response.addTag(CacheTag.Renderer, template.getIdentifier());

@@ -334,10 +334,16 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     }
 
     // Set the response type
+    String characterEncoding = response.getCharacterEncoding();
+    if (StringUtils.isNotBlank(requestMethod)) {
+      characterEncoding = "; charset=" + characterEncoding.toLowerCase();
+    } else {
+      characterEncoding = "";
+    }
     if ("atom".equalsIgnoreCase("atom"))
-      response.setContentType("application/atom+xml");
+      response.setContentType("application/atom+xml" + characterEncoding);
     else if ("rss".equalsIgnoreCase(feedType))
-      response.setContentType("application/rss+xml");
+      response.setContentType("application/rss+xml" + characterEncoding);
 
     // Set the character encoding
     response.setCharacterEncoding(feed.getEncoding());

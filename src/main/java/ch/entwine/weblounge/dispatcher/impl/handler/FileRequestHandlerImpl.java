@@ -211,7 +211,13 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     String contentType = content.getMimetype();
     if (contentType == null)
       contentType = MediaType.APPLICATION_OCTET_STREAM;
-    response.setContentType(contentType);
+
+    // Set the content type
+    String characterEncoding = response.getCharacterEncoding();
+    if (StringUtils.isNotBlank(characterEncoding))
+      response.setContentType(contentType + "; charset=" + characterEncoding.toLowerCase());
+    else
+      response.setContentType(contentType);
 
     // Add last modified header
     response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(fileResource, language).getTime());
