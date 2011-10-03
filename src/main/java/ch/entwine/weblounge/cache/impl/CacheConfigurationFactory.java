@@ -222,13 +222,18 @@ public class CacheConfigurationFactory implements ManagedService {
     if (configurationAdmin == null)
       return;
     
+    boolean enabled = !ConfigurationUtils.isFalse((String) cacheConfiguration.get(CacheServiceImpl.OPT_ENABLE));
+
     CacheConfiguration configHolder = new CacheConfiguration(site.getIdentifier(), site.getName());
     configHolder.setProperties(createConfiguration(site.getIdentifier(), site.getName()));
 
     // Create the initial properties
-    Configuration configuration = configurationAdmin.createFactoryConfiguration(CacheServiceFactory.SERVICE_PID, null);
-    configuration.update(configHolder.getProperties());
-    configHolder.setConfiguration(configuration);
+    Configuration configuration = null;
+    if (enabled) {
+      configuration = configurationAdmin.createFactoryConfiguration(CacheServiceFactory.SERVICE_PID, null);
+      configuration.update(configHolder.getProperties());
+      configHolder.setConfiguration(configuration);
+    }
 
     configurations.put(site.getIdentifier(), configHolder);
   }
