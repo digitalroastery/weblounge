@@ -103,10 +103,17 @@ public class JSONActionTest extends IntegrationTestBase {
         ObjectMapper jsonMapper = new ObjectMapper();
         TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
         };
-        String responseJson = EntityUtils.toString(response.getEntity(), "utf-8");
+
+        // Find the content encoding
+        Assert.assertNotNull(response.getFirstHeader("Content-Type"));
+        Assert.assertNotNull(response.getFirstHeader("Content-Type").getElements()[0].getParameterByName("charset"));
+        String charset = response.getFirstHeader("Content-Type").getElements()[0].getParameterByName("charset").getValue();
+
+        String responseJson = EntityUtils.toString(response.getEntity());
         HashMap<String, Object> json = jsonMapper.readValue(responseJson, typeRef);
 
-        Assert.assertEquals(greeting, json.get(language));
+        String greetingEncoded = new String(greeting.getBytes(charset));
+        Assert.assertEquals(greetingEncoded, json.get(language));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }

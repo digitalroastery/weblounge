@@ -97,9 +97,17 @@ public class XMLActionTest extends IntegrationTestBase {
       try {
         HttpResponse response = TestUtils.request(httpClient, request, params);
         Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+        // Find the content encoding
+        Assert.assertNotNull(response.getFirstHeader("Content-Type"));
+        Assert.assertNotNull(response.getFirstHeader("Content-Type").getElements()[0].getParameterByName("charset"));
+        String charset = response.getFirstHeader("Content-Type").getElements()[0].getParameterByName("charset").getValue();
+
         Document xml = TestUtils.parseXMLResponse(response);
         String xpath = "/greetings/greeting[@language=\"" + language + "\"]/text()";
-        Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));    
+
+        String greetingEncoded = new String(greeting.getBytes(charset));
+        Assert.assertEquals(greetingEncoded, XPathHelper.valueOf(xml, xpath));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }

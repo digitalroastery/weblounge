@@ -50,6 +50,20 @@ public class GreeterJSONAction extends GreeterHTMLAction implements JSONAction {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.test.site.GreeterHTMLAction#configure(ch.entwine.weblounge.common.request.WebloungeRequest,
+   *      ch.entwine.weblounge.common.request.WebloungeResponse,
+   *      ch.entwine.weblounge.common.request.RequestFlavor)
+   */
+  @Override
+  public void configure(WebloungeRequest request, WebloungeResponse response,
+      RequestFlavor flavor) throws ActionException {
+    super.configure(request, response, flavor);
+    response.setCharacterEncoding("utf-8");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.site.JSONAction#startJSON(ch.entwine.weblounge.common.request.WebloungeRequest,
    *      ch.entwine.weblounge.common.request.WebloungeResponse)
    */
@@ -58,9 +72,12 @@ public class GreeterJSONAction extends GreeterHTMLAction implements JSONAction {
     try {
       String language = RequestUtils.getParameter(request, LANGUAGE_PARAM);
       Map<String, String> data = new HashMap<String, String>();
-      data.put(language, greeting);
+      String encoding = response.getCharacterEncoding();
+      if (encoding == null)
+        encoding = "utf-8";
+      data.put(language, new String(greeting.getBytes(encoding)));
       ObjectMapper mapper = new ObjectMapper();
-      mapper.writeValue(response.getWriter(), data);
+      mapper.writeValue(response.getOutputStream(), data);
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);
     }

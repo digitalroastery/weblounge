@@ -54,12 +54,32 @@ public class GreeterXMLAction extends GreeterHTMLAction implements XMLAction {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.test.site.GreeterActionSupport#startXMLResponse(ch.entwine.weblounge.common.request.WebloungeRequest, ch.entwine.weblounge.common.request.WebloungeResponse)
+   * 
+   * @see ch.entwine.weblounge.test.site.GreeterHTMLAction#configure(ch.entwine.weblounge.common.request.WebloungeRequest,
+   *      ch.entwine.weblounge.common.request.WebloungeResponse,
+   *      ch.entwine.weblounge.common.request.RequestFlavor)
+   */
+  @Override
+  public void configure(WebloungeRequest request, WebloungeResponse response,
+      RequestFlavor flavor) throws ActionException {
+    super.configure(request, response, flavor);
+    response.setCharacterEncoding("utf-8");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.test.site.GreeterActionSupport#startXMLResponse(ch.entwine.weblounge.common.request.WebloungeRequest,
+   *      ch.entwine.weblounge.common.request.WebloungeResponse)
    */
   public void startXML(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
     try {
+
+      String encoding = response.getCharacterEncoding();
+      if (encoding == null)
+        encoding = "utf-8";
+
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       Document doc = docBuilder.newDocument();
       doc.setXmlStandalone(true);
@@ -67,7 +87,7 @@ public class GreeterXMLAction extends GreeterHTMLAction implements XMLAction {
       doc.appendChild(root);
       Element greetingNode = doc.createElement("greeting");
       greetingNode.setAttribute("language", language);
-      greetingNode.appendChild(doc.createTextNode(greeting));
+      greetingNode.appendChild(doc.createTextNode(new String(greeting.getBytes(encoding))));
       root.appendChild(greetingNode);
       TransformerFactory factory = TransformerFactory.newInstance();
       Transformer transformer = factory.newTransformer();
