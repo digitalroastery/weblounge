@@ -20,7 +20,7 @@ public class CacheConfiguration {
   private String name = null;
 
   /** True if the configuration is enabled */
-  private boolean enabled = true;
+  private boolean enabled = false;
 
   /** The configuration properties */
   private Dictionary<Object, Object> properties = null;
@@ -38,7 +38,6 @@ public class CacheConfiguration {
   public CacheConfiguration(String id, String name) {
     this.id = id;
     this.name = name;
-    this.enabled = false;
   }
 
   /**

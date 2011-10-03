@@ -40,7 +40,7 @@ public final class CacheEntry implements Serializable {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CacheEntry.class);
-  
+
   /** Serial version uid */
   private static final long serialVersionUID = 5694887351734158681L;
 
@@ -49,6 +49,9 @@ public final class CacheEntry implements Serializable {
 
   /** The content buffer */
   private byte[] content;
+
+  /** The content encoding */
+  private String encoding = null;
 
   /** The response metadata */
   private CacheableHttpServletResponseHeaders headers = null;
@@ -65,14 +68,18 @@ public final class CacheEntry implements Serializable {
    * Note that some cache information, such as the etag and the last
    * modification dates will be gathered from the response headers if available.
    * 
+   * @param handle
+   *          the cache handle
    * @param content
    *          the content
+   * @param encoding
+   *          the content encoding
    * @param headers
    *          the metadata
    * @throws IllegalArgumentException
    *           if the content or the headers collection is <code>null</code>
    */
-  protected CacheEntry(CacheHandle handle, byte[] content,
+  protected CacheEntry(CacheHandle handle, byte[] content, String encoding,
       CacheableHttpServletResponseHeaders headers) {
     if (handle == null)
       throw new IllegalArgumentException("Handle cannot be null");
@@ -81,6 +88,7 @@ public final class CacheEntry implements Serializable {
     if (headers == null)
       throw new IllegalArgumentException("Headers cannot be null");
     this.key = handle.getKey();
+    this.encoding = encoding;
     this.content = content;
     this.lastModified = handle.getCreationDate();
     this.eTag = createETag(lastModified);
@@ -94,6 +102,15 @@ public final class CacheEntry implements Serializable {
    */
   public String getKey() {
     return key;
+  }
+
+  /**
+   * Returns the content encoding.
+   * 
+   * @return the encoding
+   */
+  public String getEncoding() {
+    return encoding;
   }
 
   /**
@@ -139,7 +156,7 @@ public final class CacheEntry implements Serializable {
       eTag = (String) headers.getHeaders().get("ETag");
     if (headers.containsHeader("Last-Modified")) {
       DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-      String lastModifiedHeader = (String)headers.getHeaders().get("Last-Modified");
+      String lastModifiedHeader = (String) headers.getHeaders().get("Last-Modified");
       try {
         lastModified = df.parse(lastModifiedHeader).getTime();
       } catch (ParseException e) {

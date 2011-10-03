@@ -180,6 +180,7 @@ public class CacheConfigurationFactory implements ManagedService {
     
     if (!configuration.isEnabled()) {
       Configuration c = configurationAdmin.createFactoryConfiguration(CacheServiceFactory.SERVICE_PID);
+      configuration.getProperties().put(CacheServiceImpl.OPT_ENABLE, Boolean.TRUE.toString());
       c.update(configuration.getProperties());
       configuration.setConfiguration(c);
     }

@@ -57,9 +57,6 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    */
   private PrintWriter out = null;
 
-  /** The character encoding of this reply. */
-  private String encoding = null;
-
   /** The cache transaction for this response */
   private CacheTransaction tx = null;
 
@@ -123,9 +120,11 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
       throw new IllegalStateException("An output stream has already been allocated");
 
     // Get the character encoding
-    encoding = getCharacterEncoding();
-    if (encoding == null)
+    String encoding = getCharacterEncoding();
+    if (encoding == null) {
       encoding = DEFAULT_ENCODING;
+      setCharacterEncoding(encoding);
+    }
 
     // Allocate a new writer. If there is a transaction, the output is written
     // to both the original response and the cache output stream.
@@ -223,21 +222,14 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   public void setContentType(String type) {
     super.setContentType(type);
     contentType = type;
-    if (tx != null)
-      tx.getHeaders().setHeader("Content-Type", type);
-
-    /* check whether the encoding has changed */
-    if (encoding == null || !encoding.equals(getCharacterEncoding())) {
-      if (out != null) {
-        out.flush();
-        out = null;
-      }
+    if (tx != null) {
+      tx.getHeaders().setHeader("Content-Type", contentType);
     }
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see javax.servlet.ServletResponseWrapper#flushBuffer()
    */
   @Override
@@ -248,7 +240,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
       out.flush();
     super.flushBuffer();
   }
-  
+
   /**
    * @see javax.servlet.http.HttpServletResponse#addHeader(java.lang.String,
    *      java.lang.String)

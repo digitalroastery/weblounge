@@ -622,10 +622,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Write the response headers
     if (isModified) {
+      entry.getHeaders().apply(response);
       response.setHeader("Cache-Control", "private, max-age=" + validTimeInSeconds + ", must-revalidate");
       response.setContentType(entry.getContentType());
+      response.setCharacterEncoding(entry.getEncoding());
       response.setContentLength(entry.getContent().length);
-      entry.getHeaders().apply(response);
     }
 
     // Set the current date
@@ -702,7 +703,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       if (tx.isValid() && response.isValid() && response.getStatus() == HttpServletResponse.SC_OK) {
         logger.trace("Writing response for {} to the cache", response);
         CacheHandle cacheHdl = tx.getHandle();
-        CacheEntry entry = new CacheEntry(cacheHdl, tx.getContent(), tx.getHeaders());
+        String encoding = cacheableResponse.getCharacterEncoding();
+        CacheEntry entry = new CacheEntry(cacheHdl, tx.getContent(), encoding, tx.getHeaders());
         Element element = new Element(new CacheEntryKey(cacheHdl), entry);
         element.setTimeToLive((int) (cacheHdl.getExpireTime() / 1000));
         cache.put(element);

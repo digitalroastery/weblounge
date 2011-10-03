@@ -76,6 +76,9 @@ public class CacheEntryTest {
   /** Name of the test header */
   protected String testHeaderName = "Test-Header";
 
+  /** The content encoding */
+  protected String encoding = "UTF-8";
+
   /** Test header value */
   protected String testHeaderValue = "header-value";
 
@@ -93,7 +96,7 @@ public class CacheEntryTest {
     headers.setHeader(testHeaderName, testHeaderValue);
     headers.setHeader("Content-Type", contentType);
     handle = new TaggedCacheHandle(tags.getTags(), expirationTime, recheckTime);
-    entry = new CacheEntry(handle, content.getBytes(), headers);
+    entry = new CacheEntry(handle, content.getBytes(), encoding, headers);
   }
 
   /**
@@ -116,7 +119,7 @@ public class CacheEntryTest {
     assertNotNull(eTag);
     Thread.sleep(100);
     CacheHandle newHandle = new TaggedCacheHandle(tags.getTags(), expirationTime, recheckTime);
-    String newETag = new CacheEntry(newHandle, content.getBytes(), headers).getETag();
+    String newETag = new CacheEntry(newHandle, content.getBytes(), encoding, headers).getETag();
     assertFalse(eTag.equals(newETag));
   }
 
@@ -168,7 +171,7 @@ public class CacheEntryTest {
    * Test method for {@link ch.entwine.weblounge.cache.impl.CacheEntry#setHeaders(CacheableHttpServletResponseHeaders)}.
    */
   @Test
-  public void testPassModificationDate() throws Exception {
+  public void testPassModificationDate() {
     Calendar c = Calendar.getInstance();
     c.set(Calendar.MILLISECOND, 0);
     Date modificationDate = c.getTime();
