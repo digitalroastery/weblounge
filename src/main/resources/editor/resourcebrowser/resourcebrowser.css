@@ -412,6 +412,13 @@ img.wbl-overlayPreviewImage {
 	max-height: 600px;
 }
 
+div.wbl-previewOverlay iframe {
+	display: none;
+	width: 1025px;
+	height: 768px;
+	background-color: white;
+}
+
 div.wbl-overlayPreviewContent {
 	display: none;
 	max-width: 800px;

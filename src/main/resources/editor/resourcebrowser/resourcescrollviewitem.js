@@ -17,13 +17,17 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			var overlay = this.element.find("div.wbl-previewOverlay");
 			switch(this.options.resourceType) {
 			case 'pages':
+				var pageURL = this.element.find('a.wbl-pagePath').attr('href') + '?preview&_=' + new Date().getTime();
 				overlay.overlay({
-					top: 50,
-					left: 50,
+					top: 60,
 					load: true,
 					onBeforeLoad: function() {
-						var pageURL = this.element.find('a.wbl-pagePath').attr('href');
-						this.getOverlay().append('<iframe src="/weblounge-pages/' + $(el).attr('id') + '/' + language + '" width="800" height="600" seamless></iframe>');
+						var iframeTag = this.getOverlay().find('iframe');
+						iframeTag.css('width', $(window).width() * 0.8 + 'px');
+						iframeTag.css('height', $(window).height() * 0.8 + 'px');
+						this.getOverlay().css('border', '2px solid #525252');
+						this.getOverlay().css('border-radius', '0px');
+						this.getOverlay().find('iframe').attr('src', pageURL).show();
 					}
 				}).load();
 				break;
@@ -39,7 +43,10 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 						load: true,
 						onBeforeLoad: function() {
 							var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + language;
-							this.getOverlay().find('.wbl-overlayPreviewImage').attr('src', url).show();
+							var imgTag = this.getOverlay().find('img.wbl-overlayPreviewImage');
+							imgTag.css('max-width', $(window).width() * 0.8 + 'px');
+							imgTag.css('max-height', $(window).height() * 0.8 + 'px');
+							imgTag.attr('src', url).show();
 						}
 					}).load();
 					break;
@@ -51,6 +58,8 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 						onBeforeLoad: function() {
 							var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + language;
 							var videoTag = '<video src="' + url + '" width="320" height="240" preload controls></video>';
+//							iframeTag.css('width', $(window).width() * 0.8 + 'px');
+//							iframeTag.css('height', $(window).height() * 0.8 + 'px');
 							this.getOverlay().find('.wbl-overlayPreviewContent').html(videoTag).show();
 						}
 					}).load();
@@ -65,7 +74,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			if(this.options.mode != 'normal' && !isMulti) {
 				$('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
 			}
-			if($(ev.target).is('.wbl-showPage, .wbl-trashPage, .wbl-editPage, .wbl-pagePath')) return;
+			if($(ev.target).is('.wbl-showPage, .wbl-trashPage, .wbl-editPage, .wbl-pagePreview, .wbl-pagePath')) return;
 			el.toggleClass('wbl-marked');
 		},
 		
@@ -113,9 +122,9 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		
 		'hoverenter': function(ev, hover) {
 			if(this.options.mode != 'normal') return;
-//			if(this.options.resourceType == 'pages') {
-//				this.element.find('img.wbl-pagePreview').show();
-//			}
+			if(this.options.resourceType == 'pages') {
+				this.element.find('img.wbl-pagePreview').show();
+			}
 			this.element.find('img.wbl-showPage').show();
 			this.element.find('img.wbl-trashPage').show();
 			this.element.find('img.wbl-editPage').show();
