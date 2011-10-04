@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.page.Script;
+import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.HTMLAction;
@@ -130,6 +131,11 @@ public class HTMLHeaderTag extends WebloungeTag {
     // Write links & scripts to output
     try {
       pageContext.getOut().flush();
+
+      if (request.getParameter(EditingState.WORKBENCH_PREVIEW_PARAM) != null) {
+        needsJQuery = true;
+      }
+
       // Write first jQuery script to output
       if (!RequestUtils.isEditingState(request) && needsJQuery) {
         StringBuffer linkToJQuery = new StringBuffer("/weblounge-shared/scripts/jquery/");
@@ -144,9 +150,15 @@ public class HTMLHeaderTag extends WebloungeTag {
       } else if (RequestUtils.isEditingState(request)) {
         pageContext.getOut().print("<meta http-equiv=\"Content-type\" content=\"text/html;charset=UTF-8\" />");
       }
+
       for (HTMLHeadElement s : headElements) {
         pageContext.getOut().println(s.toXml());
       }
+
+      if (request.getParameter(EditingState.WORKBENCH_PREVIEW_PARAM) != null) {
+        pageContext.getOut().print("<script>$(document).ready(function() { $('form').submit(function(event) { event.preventDefault(); }); $('a').click(function(event) { event.preventDefault(); }); });</script>");
+      }
+
       pageContext.getOut().flush();
     } catch (IOException e) {
       throw new JspException();

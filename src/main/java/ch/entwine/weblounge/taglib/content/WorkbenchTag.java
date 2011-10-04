@@ -81,6 +81,10 @@ public class WorkbenchTag extends WebloungeTag {
       return super.doEndTag();
     }
 
+    if (request.getParameter(EditingState.WORKBENCH_PREVIEW_PARAM) != null) {
+      return super.doEndTag();
+    }
+
     // Is the ?edit parameter in place?
     if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
       Cookie cookie = new Cookie(EditingState.STATE_COOKIE, "true");
