@@ -60,18 +60,4 @@ public interface VideoStream extends Stream {
    */
   ScanType getScanType();
 
-  /**
-   * Returns whether the top or the bottom field is to be scanned first.
-   * 
-   * @return the scan order
-   */
-  ScanOrder getScanOrder();
-
-  /**
-   * Returns the video encoder format.
-   * 
-   * @return the video format
-   */
-  String getFormat();
-
 }

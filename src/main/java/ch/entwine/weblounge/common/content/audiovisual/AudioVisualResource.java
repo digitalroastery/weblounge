@@ -20,41 +20,14 @@
 
 package ch.entwine.weblounge.common.content.audiovisual;
 
-import ch.entwine.weblounge.common.content.file.FileContent;
+import ch.entwine.weblounge.common.content.Resource;
 
 /**
- * Describes the contents of an audio visual resource, including the general
- * attributes such as file size and mime type. In addition, it contains
- * technical information like resolution, bit rate, frame rate etc.
+ * Object representation of a audio visual resource.
  */
-public interface AudiovisualContent extends FileContent {
+public interface AudioVisualResource extends Resource<AudioVisualContent> {
 
-  /**
-   * Returns the audio visual streams contained in this movie.
-   * 
-   * @return the streams
-   */
-  Stream[] getStreams();
-
-  /**
-   * Returns <code>true</code> if the track features an audio stream.
-   * 
-   * @return <code>true</code> if the track has an audio stream
-   */
-  boolean hasAudio();
-
-  /**
-   * Returns <code>true</code> if the track features a video stream.
-   * 
-   * @return <code>true</code> if the track has a video stream
-   */
-  boolean hasVideo();
-
-  /**
-   * Returns the track duration in milliseconds.
-   * 
-   * @return the track duration
-   */
-  long getDuration();
+  /** The resource type */
+  String TYPE = "audiovisual";
 
 }

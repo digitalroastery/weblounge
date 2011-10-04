@@ -32,4 +32,18 @@ public interface Stream {
    */
   String getIdentifier();
 
+  /**
+   * Returns the name of the encoding format.
+   * 
+   * @return the encoding format
+   */
+  String getFormat();
+
+  /**
+   * Returns an xml representation of the stream.
+   * 
+   * @return the xml representation
+   */
+  String toXml();
+
 }

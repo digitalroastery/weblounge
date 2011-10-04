@@ -53,11 +53,4 @@ public interface AudioStream extends Stream {
    */
   Float getBitRate();
 
-  /**
-   * Returns the name of the encoding format.
-   * 
-   * @return the encoding format
-   */
-  String getFormat();
-
 }
