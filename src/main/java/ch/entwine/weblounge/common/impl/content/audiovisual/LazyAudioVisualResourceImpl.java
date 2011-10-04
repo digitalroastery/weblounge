@@ -18,11 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.image;
+package ch.entwine.weblounge.common.impl.content.audiovisual;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.image.ImageContent;
-import ch.entwine.weblounge.common.content.image.ImageResource;
+import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
+import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
@@ -41,73 +41,72 @@ import java.util.Date;
 import java.util.Set;
 
 /**
- * Implementation of a lazy loading image.
+ * Implementation of a lazy loading audio visual.
  */
-public class LazyImageResourceImpl implements ImageResource {
+public class LazyAudioVisualResourceImpl implements AudioVisualResource {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(LazyImageResourceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(LazyAudioVisualResourceImpl.class);
 
-  /** The image content as a byte array containing the image's xml */
-  protected String imageXml = null;
+  /** The content as a byte array containing the audio visual's xml */
+  protected String audiovisualXml = null;
 
-  /** The image content as a byte array containing the image header's xml */
+  /** The content as a byte array containing the audio visual header's xml */
   protected String headerXml = null;
 
-  /** The image content as a byte array containing the image preview's xml */
+  /** The content as a byte array containing the audio visual preview's xml */
   protected String previewXml = null;
 
-  /** The backing image */
-  protected ImageResource image = null;
+  /** The backing audio visual object */
+  protected AudioVisualResource audioVisual = null;
 
-  /** True if the image header was loaded */
+  /** True if the audio visual header was loaded */
   protected boolean isHeaderLoaded = false;
 
-  /** True if the image body was loaded */
+  /** True if the audio visual body was loaded */
   protected boolean isBodyLoaded = false;
 
-  /** The image reader */
-  protected WeakReference<ImageResourceReader> readerRef = null;
+  /** The audio visual reader */
+  protected WeakReference<AudioVisualResourceReader> readerRef = null;
 
-  /** The image uri */
+  /** The audio visual uri */
   protected ResourceURI uri = null;
 
   /**
-   * Creates a new lazy image.
+   * Creates a new lazy audio visual object.
    * 
    * @param uri
-   *          the image uri
-   * @param imageXml
-   *          the full image xml
+   *          the audio visual uri
+   * @param avXml
+   *          the full audio visual xml
    * @param headerXml
    *          the head section's xml
    * @param previewXml
-   *          the image preview's xml
+   *          the audio visual preview's xml
    */
-  public LazyImageResourceImpl(ResourceURI uri, String imageXml,
-      String headerXml,
-      String previewXml) {
+  public LazyAudioVisualResourceImpl(ResourceURI uri, String avXml,
+      String headerXml, String previewXml) {
     this.uri = uri;
-    this.imageXml = imageXml;
+    this.audiovisualXml = avXml;
     this.headerXml = headerXml;
     this.previewXml = previewXml;
   }
 
   /**
-   * Loads the complete image.
+   * Loads the complete audio visual.
    */
-  protected void loadImage() {
+  protected void loadAudioVisual() {
     try {
 
-      // Get a hold of the image reader
-      ImageResourceReader reader = (readerRef != null) ? readerRef.get() : null;
+      // Get a hold of the audio visual reader
+      AudioVisualResourceReader reader = (readerRef != null) ? readerRef.get() : null;
       if (reader == null) {
-        reader = new ImageResourceReader();
+        reader = new AudioVisualResourceReader();
         // No need to keep the reference, since we're done after this
       }
 
-      // Load the image
-      image = reader.read(IOUtils.toInputStream(imageXml, "utf-8"), uri.getSite());
+      // Load the audio visual
+      audioVisual = reader.read(IOUtils.toInputStream(audiovisualXml, "utf-8"), uri.getSite());
       isHeaderLoaded = true;
       isBodyLoaded = true;
       cleanupAfterLoading();
@@ -118,27 +117,27 @@ public class LazyImageResourceImpl implements ImageResource {
   }
 
   /**
-   * Loads the image header only.
+   * Loads the audio visual header only.
    */
-  protected void loadImageHeader() {
+  protected void loadAudioVisualHeader() {
     try {
 
-      // Get a hold of the image reader
-      ImageResourceReader reader = (readerRef != null) ? readerRef.get() : null;
+      // Get a hold of the audio visual reader
+      AudioVisualResourceReader reader = (readerRef != null) ? readerRef.get() : null;
       if (reader == null) {
-        reader = new ImageResourceReader();
-        readerRef = new WeakReference<ImageResourceReader>(reader);
+        reader = new AudioVisualResourceReader();
+        readerRef = new WeakReference<AudioVisualResourceReader>(reader);
       }
 
       // If no separate header was given, then we need to load the whole thing
       // instead.
       if (headerXml == null) {
-        loadImage();
+        loadAudioVisual();
         return;
       }
 
-      // Load the image header
-      image = reader.readHeader(IOUtils.toInputStream(headerXml, "utf-8"), uri.getSite());
+      // Load the audio visual header
+      audioVisual = reader.readHeader(IOUtils.toInputStream(headerXml, "utf-8"), uri.getSite());
       isHeaderLoaded = true;
       if (isHeaderLoaded && isBodyLoaded)
         cleanupAfterLoading();
@@ -152,25 +151,25 @@ public class LazyImageResourceImpl implements ImageResource {
   }
 
   /**
-   * Loads the image body only.
+   * Loads the audio visual body only.
    */
-  protected void loadImageBody() {
+  protected void loadAudioVisualBody() {
     try {
 
-      // Get a hold of the image reader
-      ImageResourceReader reader = (readerRef != null) ? readerRef.get() : null;
+      // Get a hold of the audio visual reader
+      AudioVisualResourceReader reader = (readerRef != null) ? readerRef.get() : null;
       if (reader == null) {
-        reader = new ImageResourceReader();
-        readerRef = new WeakReference<ImageResourceReader>(reader);
+        reader = new AudioVisualResourceReader();
+        readerRef = new WeakReference<AudioVisualResourceReader>(reader);
       }
 
-      // Load the image body
-      image = reader.readBody(IOUtils.toInputStream(imageXml, "utf-8"), uri.getSite());
+      // Load the audio visual body
+      audioVisual = reader.readBody(IOUtils.toInputStream(audiovisualXml, "utf-8"), uri.getSite());
       isBodyLoaded = true;
       if (isHeaderLoaded && isBodyLoaded)
         cleanupAfterLoading();
       else if (headerXml != null)
-        imageXml = null;
+        audiovisualXml = null;
 
     } catch (Throwable e) {
       logger.error("Failed to lazy-load body of {}: {}", uri, e.getMessage());
@@ -183,25 +182,26 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   protected void cleanupAfterLoading() {
     headerXml = null;
-    imageXml = null;
+    audiovisualXml = null;
     previewXml = null;
     if (readerRef != null)
       readerRef.clear();
   }
 
   /**
-   * Returns <code>true</code> if the image header has been loaded already.
+   * Returns <code>true</code> if the audio visual header has been loaded
+   * already.
    * 
-   * @return <code>true</code> if the image header has been loaded
+   * @return <code>true</code> if the audio visual header has been loaded
    */
   public boolean isHeaderLoaded() {
     return isHeaderLoaded;
   }
 
   /**
-   * Returns <code>true</code> if the image body has been loaded already.
+   * Returns <code>true</code> if the audio visual body has been loaded already.
    * 
-   * @return <code>true</code> if the image body has been loaded
+   * @return <code>true</code> if the audio visual body has been loaded
    */
   public boolean isBodyLoaded() {
     return isBodyLoaded;
@@ -210,80 +210,80 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#addSubject(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.Resource#addSubject(java.lang.String)
    */
   public void addSubject(String subject) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.addSubject(subject);
+      loadAudioVisualHeader();
+    audioVisual.addSubject(subject);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getCoverage()
+   * @see ch.entwine.weblounge.common.content.Resource#getCoverage()
    */
   public String getCoverage() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getCoverage();
+      loadAudioVisualHeader();
+    return audioVisual.getCoverage();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getCoverage(ch.entwine.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.Resource#getCoverage(ch.entwine.weblounge.common.language.Language)
    */
   public String getCoverage(Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getCoverage(language);
+      loadAudioVisualHeader();
+    return audioVisual.getCoverage(language);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getCoverage(ch.entwine.weblounge.common.language.Language,
+   * @see ch.entwine.weblounge.common.content.Resource#getCoverage(ch.entwine.weblounge.common.language.Language,
    *      boolean)
    */
   public String getCoverage(Language language, boolean force) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getCoverage(language, force);
+      loadAudioVisualHeader();
+    return audioVisual.getCoverage(language, force);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getDescription()
+   * @see ch.entwine.weblounge.common.content.Resource#getDescription()
    */
   public String getDescription() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getDescription();
+      loadAudioVisualHeader();
+    return audioVisual.getDescription();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getDescription(ch.entwine.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.Resource#getDescription(ch.entwine.weblounge.common.language.Language)
    */
   public String getDescription(Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getDescription(language);
+      loadAudioVisualHeader();
+    return audioVisual.getDescription(language);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getDescription(ch.entwine.weblounge.common.language.Language,
+   * @see ch.entwine.weblounge.common.content.Resource#getDescription(ch.entwine.weblounge.common.language.Language,
    *      boolean)
    */
   public String getDescription(Language language, boolean force) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getDescription(language, force);
+      loadAudioVisualHeader();
+    return audioVisual.getDescription(language, force);
   }
 
   /**
@@ -298,12 +298,12 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getLockOwner()
+   * @see ch.entwine.weblounge.common.content.Resource#getLockOwner()
    */
   public User getLockOwner() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getLockOwner();
+      loadAudioVisualHeader();
+    return audioVisual.getLockOwner();
   }
 
   /**
@@ -318,97 +318,97 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getRights()
+   * @see ch.entwine.weblounge.common.content.Resource#getRights()
    */
   public String getRights() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getRights();
+      loadAudioVisualHeader();
+    return audioVisual.getRights();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getRights(ch.entwine.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.Resource#getRights(ch.entwine.weblounge.common.language.Language)
    */
   public String getRights(Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getRights(language);
+      loadAudioVisualHeader();
+    return audioVisual.getRights(language);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getRights(ch.entwine.weblounge.common.language.Language,
+   * @see ch.entwine.weblounge.common.content.Resource#getRights(ch.entwine.weblounge.common.language.Language,
    *      boolean)
    */
   public String getRights(Language language, boolean force) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getRights(language, force);
+      loadAudioVisualHeader();
+    return audioVisual.getRights(language, force);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getSubjects()
+   * @see ch.entwine.weblounge.common.content.Resource#getSubjects()
    */
   public String[] getSubjects() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getSubjects();
+      loadAudioVisualHeader();
+    return audioVisual.getSubjects();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getTitle()
+   * @see ch.entwine.weblounge.common.content.Resource#getTitle()
    */
   public String getTitle() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getTitle();
+      loadAudioVisualHeader();
+    return audioVisual.getTitle();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getTitle(ch.entwine.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.Resource#getTitle(ch.entwine.weblounge.common.language.Language)
    */
   public String getTitle(Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getTitle(language);
+      loadAudioVisualHeader();
+    return audioVisual.getTitle(language);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getTitle(ch.entwine.weblounge.common.language.Language,
+   * @see ch.entwine.weblounge.common.content.Resource#getTitle(ch.entwine.weblounge.common.language.Language,
    *      boolean)
    */
   public String getTitle(Language language, boolean force) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getTitle(language, force);
+      loadAudioVisualHeader();
+    return audioVisual.getTitle(language, force);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getType()
+   * @see ch.entwine.weblounge.common.content.Resource#getType()
    */
   public String getType() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getType();
+      loadAudioVisualHeader();
+    return audioVisual.getType();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getURI()
+   * @see ch.entwine.weblounge.common.content.Resource#getURI()
    */
   public ResourceURI getURI() {
     return uri;
@@ -426,80 +426,80 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#hasSubject(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.Resource#hasSubject(java.lang.String)
    */
   public boolean hasSubject(String subject) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.hasSubject(subject);
+      loadAudioVisualHeader();
+    return audioVisual.hasSubject(subject);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#isIndexed()
+   * @see ch.entwine.weblounge.common.content.Resource#isIndexed()
    */
   public boolean isIndexed() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.isIndexed();
+      loadAudioVisualHeader();
+    return audioVisual.isIndexed();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#isLocked()
+   * @see ch.entwine.weblounge.common.content.Resource#isLocked()
    */
   public boolean isLocked() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.isLocked();
+      loadAudioVisualHeader();
+    return audioVisual.isLocked();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#isPromoted()
+   * @see ch.entwine.weblounge.common.content.Resource#isPromoted()
    */
   public boolean isPromoted() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.isPromoted();
+      loadAudioVisualHeader();
+    return audioVisual.isPromoted();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#removeSubject(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.Resource#removeSubject(java.lang.String)
    */
   public void removeSubject(String subject) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.removeSubject(subject);
+      loadAudioVisualHeader();
+    audioVisual.removeSubject(subject);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setCoverage(java.lang.String,
+   * @see ch.entwine.weblounge.common.content.Resource#setCoverage(java.lang.String,
    *      ch.entwine.weblounge.common.language.Language)
    */
   public void setCoverage(String coverage, Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setCoverage(coverage, language);
+      loadAudioVisualHeader();
+    audioVisual.setCoverage(coverage, language);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setDescription(java.lang.String,
+   * @see ch.entwine.weblounge.common.content.Resource#setDescription(java.lang.String,
    *      ch.entwine.weblounge.common.language.Language)
    */
   public void setDescription(String description, Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setDescription(description, language);
+      loadAudioVisualHeader();
+    audioVisual.setDescription(description, language);
   }
 
   /**
@@ -514,23 +514,23 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setIndexed(boolean)
+   * @see ch.entwine.weblounge.common.content.Resource#setIndexed(boolean)
    */
   public void setIndexed(boolean index) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setIndexed(index);
+      loadAudioVisualHeader();
+    audioVisual.setIndexed(index);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#lock(ch.entwine.weblounge.common.security.User)
+   * @see ch.entwine.weblounge.common.content.Resource#lock(ch.entwine.weblounge.common.security.User)
    */
   public void lock(User user) throws IllegalStateException {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.lock(user);
+      loadAudioVisualHeader();
+    audioVisual.lock(user);
   }
 
   /**
@@ -541,89 +541,89 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public void setCreated(User user, Date date) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setCreated(user, date);
+      loadAudioVisualHeader();
+    audioVisual.setCreated(user, date);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setModified(ch.entwine.weblounge.common.security.User,
+   * @see ch.entwine.weblounge.common.content.Resource#setModified(ch.entwine.weblounge.common.security.User,
    *      java.util.Date)
    */
   public void setModified(User user, Date date) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setModified(user, date);
+      loadAudioVisualHeader();
+    audioVisual.setModified(user, date);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setPromoted(boolean)
+   * @see ch.entwine.weblounge.common.content.Resource#setPromoted(boolean)
    */
   public void setPromoted(boolean promoted) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setPromoted(promoted);
+      loadAudioVisualHeader();
+    audioVisual.setPromoted(promoted);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setPublished(ch.entwine.weblounge.common.security.User,
+   * @see ch.entwine.weblounge.common.content.Resource#setPublished(ch.entwine.weblounge.common.security.User,
    *      java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setPublished(publisher, from, to);
+      loadAudioVisualHeader();
+    audioVisual.setPublished(publisher, from, to);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setRights(java.lang.String,
+   * @see ch.entwine.weblounge.common.content.Resource#setRights(java.lang.String,
    *      ch.entwine.weblounge.common.language.Language)
    */
   public void setRights(String rights, Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setRights(rights, language);
+      loadAudioVisualHeader();
+    audioVisual.setRights(rights, language);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setTitle(java.lang.String,
+   * @see ch.entwine.weblounge.common.content.Resource#setTitle(java.lang.String,
    *      ch.entwine.weblounge.common.language.Language)
    */
   public void setTitle(String title, Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setTitle(title, language);
+      loadAudioVisualHeader();
+    audioVisual.setTitle(title, language);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setType(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.Resource#setType(java.lang.String)
    */
   public void setType(String type) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setType(type);
+      loadAudioVisualHeader();
+    audioVisual.setType(type);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#unlock()
+   * @see ch.entwine.weblounge.common.content.Resource#unlock()
    */
   public User unlock() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.unlock();
+      loadAudioVisualHeader();
+    return audioVisual.unlock();
   }
 
   /**
@@ -638,12 +638,12 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#toXml()
+   * @see ch.entwine.weblounge.common.content.Resource#toXml()
    */
   public String toXml() {
     if (!isBodyLoaded)
-      loadImageBody();
-    return image.toXml();
+      loadAudioVisualBody();
+    return audioVisual.toXml();
   }
 
   /**
@@ -654,8 +654,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public int compareTo(Localizable o, Language l) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.compareTo(o, l);
+      loadAudioVisualHeader();
+    return audioVisual.compareTo(o, l);
   }
 
   /**
@@ -665,8 +665,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public Set<Language> languages() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.languages();
+      loadAudioVisualHeader();
+    return audioVisual.languages();
   }
 
   /**
@@ -676,8 +676,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public boolean supportsLanguage(Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.supportsLanguage(language);
+      loadAudioVisualHeader();
+    return audioVisual.supportsLanguage(language);
   }
 
   /**
@@ -687,8 +687,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public Language switchTo(Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.switchTo(language);
+      loadAudioVisualHeader();
+    return audioVisual.switchTo(language);
   }
 
   /**
@@ -698,8 +698,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public String toString(Language language) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.toString(language);
+      loadAudioVisualHeader();
+    return audioVisual.toString(language);
   }
 
   /**
@@ -710,8 +710,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public String toString(Language language, boolean force) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.toString(language, force);
+      loadAudioVisualHeader();
+    return audioVisual.toString(language, force);
   }
 
   /**
@@ -721,8 +721,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public void setCreationDate(Date date) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setCreationDate(date);
+      loadAudioVisualHeader();
+    audioVisual.setCreationDate(date);
   }
 
   /**
@@ -732,8 +732,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public Date getCreationDate() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getCreationDate();
+      loadAudioVisualHeader();
+    return audioVisual.getCreationDate();
   }
 
   /**
@@ -743,8 +743,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public boolean isCreatedAfter(Date date) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.isCreatedAfter(date);
+      loadAudioVisualHeader();
+    return audioVisual.isCreatedAfter(date);
   }
 
   /**
@@ -754,8 +754,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public void setCreator(User user) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setCreator(user);
+      loadAudioVisualHeader();
+    audioVisual.setCreator(user);
   }
 
   /**
@@ -765,8 +765,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public User getCreator() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getCreator();
+      loadAudioVisualHeader();
+    return audioVisual.getCreator();
   }
 
   /**
@@ -776,8 +776,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public Date getModificationDate() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getModificationDate();
+      loadAudioVisualHeader();
+    return audioVisual.getModificationDate();
   }
 
   /**
@@ -787,8 +787,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public User getModifier() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getModifier();
+      loadAudioVisualHeader();
+    return audioVisual.getModifier();
   }
 
   /**
@@ -798,8 +798,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public Date getPublishFrom() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getPublishFrom();
+      loadAudioVisualHeader();
+    return audioVisual.getPublishFrom();
   }
 
   /**
@@ -809,8 +809,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public Date getPublishTo() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getPublishTo();
+      loadAudioVisualHeader();
+    return audioVisual.getPublishTo();
   }
 
   /**
@@ -820,8 +820,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public User getPublisher() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getPublisher();
+      loadAudioVisualHeader();
+    return audioVisual.getPublisher();
   }
 
   /**
@@ -831,8 +831,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public boolean isPublished() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.isPublished();
+      loadAudioVisualHeader();
+    return audioVisual.isPublished();
   }
 
   /**
@@ -842,8 +842,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public boolean isPublished(Date date) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.isPublished(date);
+      loadAudioVisualHeader();
+    return audioVisual.isPublished(date);
   }
 
   /**
@@ -853,8 +853,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public void addSecurityListener(SecurityListener listener) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.addSecurityListener(listener);
+      loadAudioVisualHeader();
+    audioVisual.addSecurityListener(listener);
   }
 
   /**
@@ -865,8 +865,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public void allow(Permission permission, Authority authority) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.allow(permission, authority);
+      loadAudioVisualHeader();
+    audioVisual.allow(permission, authority);
   }
 
   /**
@@ -877,8 +877,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public boolean check(Permission permission, Authority authority) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.check(permission, authority);
+      loadAudioVisualHeader();
+    return audioVisual.check(permission, authority);
   }
 
   /**
@@ -889,8 +889,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public boolean check(PermissionSet permissions, Authority authority) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.check(permissions, authority);
+      loadAudioVisualHeader();
+    return audioVisual.check(permissions, authority);
   }
 
   /**
@@ -901,8 +901,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public boolean checkAll(Permission permission, Authority[] authorities) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.checkAll(permission, authorities);
+      loadAudioVisualHeader();
+    return audioVisual.checkAll(permission, authorities);
   }
 
   /**
@@ -913,8 +913,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public boolean checkOne(Permission permission, Authority[] authorities) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.checkOne(permission, authorities);
+      loadAudioVisualHeader();
+    return audioVisual.checkOne(permission, authorities);
   }
 
   /**
@@ -925,8 +925,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public void deny(Permission permission, Authority authority) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.deny(permission, authority);
+      loadAudioVisualHeader();
+    audioVisual.deny(permission, authority);
   }
 
   /**
@@ -936,8 +936,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public User getOwner() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.getOwner();
+      loadAudioVisualHeader();
+    return audioVisual.getOwner();
   }
 
   /**
@@ -947,8 +947,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public Permission[] permissions() {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.permissions();
+      loadAudioVisualHeader();
+    return audioVisual.permissions();
   }
 
   /**
@@ -958,8 +958,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public void removeSecurityListener(SecurityListener listener) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.removeSecurityListener(listener);
+      loadAudioVisualHeader();
+    audioVisual.removeSecurityListener(listener);
   }
 
   /**
@@ -969,8 +969,8 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public void setOwner(User owner) {
     if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setOwner(owner);
+      loadAudioVisualHeader();
+    audioVisual.setOwner(owner);
   }
 
   /**
@@ -987,7 +987,7 @@ public class LazyImageResourceImpl implements ImageResource {
    * 
    * @see ch.entwine.weblounge.common.content.Resource#getContent(ch.entwine.weblounge.common.language.Language)
    */
-  public ImageContent getContent(Language language) {
+  public AudioVisualContent getContent(Language language) {
     return null;
   }
 
@@ -996,7 +996,7 @@ public class LazyImageResourceImpl implements ImageResource {
    * 
    * @see ch.entwine.weblounge.common.content.Resource#getOriginalContent()
    */
-  public ImageContent getOriginalContent() {
+  public AudioVisualContent getOriginalContent() {
     return null;
   }
 
@@ -1005,7 +1005,7 @@ public class LazyImageResourceImpl implements ImageResource {
    * 
    * @see ch.entwine.weblounge.common.content.Resource#removeContent(ch.entwine.weblounge.common.language.Language)
    */
-  public ImageContent removeContent(Language language) {
+  public AudioVisualContent removeContent(Language language) {
     return null;
   }
 
@@ -1014,7 +1014,7 @@ public class LazyImageResourceImpl implements ImageResource {
    * 
    * @see ch.entwine.weblounge.common.content.Resource#contents()
    */
-  public Set<ImageContent> contents() {
+  public Set<AudioVisualContent> contents() {
     return null;
   }
 
@@ -1040,10 +1040,10 @@ public class LazyImageResourceImpl implements ImageResource {
   public int hashCode() {
     return uri.hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
@@ -1056,7 +1056,7 @@ public class LazyImageResourceImpl implements ImageResource {
    * 
    * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
    */
-  public void addContent(ImageContent content) {
+  public void addContent(AudioVisualContent content) {
     // TODO Auto-generated method stub
 
   }
