@@ -59,7 +59,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 					runtime: this.options.runtime,
 					resourceType: this.options.resourceType
 				});
-				scrollViewItem.find('div.wbl-scrollViewItem').editor_resourcescrollviewitem({
+				scrollViewItem.find('div.wbl-scrollViewItem:last').editor_resourcescrollviewitem({
 					page: res, 
 					runtime: this.options.runtime, 
 					language: this.options.language,

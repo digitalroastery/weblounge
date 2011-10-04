@@ -207,16 +207,29 @@ steal.then('jsonix')
 		},
 		
 		/**
-		 * Concat file and image array
+		 * Concat file, image and video array
 		 */
 		concatFiles: function(json) {
+			if($.isEmptyObject(json.value.video)) {
+				json.value.video = [];
+			}
+			if($.isEmptyObject(json.value.image)) {
+				json.value.image = [];
+			}
 			if($.isEmptyObject(json.value.file)) {
-				return json.value.image;
+				json.value.file = [];
 			}
-			else {
-				if($.isEmptyObject(json.value.image)) return json.value.file;
-				return json.value.file.concat(json.value.image);
-			}
+			
+			$.each(json.value.video, function(index, video) {
+				video.type = 'video';
+			});
+			$.each(json.value.image, function(index, image) {
+				image.type = 'image';
+			});
+			$.each(json.value.file, function(index, file) {
+				file.type = 'file';
+			});
+			return new Array().concat(json.value.video, json.value.image, json.value.file);
 		},
 		
 		/**

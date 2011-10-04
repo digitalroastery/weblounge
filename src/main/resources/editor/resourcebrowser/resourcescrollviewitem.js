@@ -9,6 +9,55 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			this.element.find('img.wbl-showPage').hide();
 			this.element.find('img.wbl-trashPage').hide();
 			this.element.find('img.wbl-editPage').hide();
+			this.element.find('img.wbl-pagePreview').hide();
+		},
+		
+		_showResource: function(el) {
+			var language = this.options.language;
+			var overlay = this.element.find("div.wbl-previewOverlay");
+			switch(this.options.resourceType) {
+			case 'pages':
+				overlay.overlay({
+					top: 50,
+					left: 50,
+					load: true,
+					onBeforeLoad: function() {
+						var pageURL = this.element.find('a.wbl-pagePath').attr('href');
+						this.getOverlay().append('<iframe src="/weblounge-pages/' + $(el).attr('id') + '/' + language + '" width="800" height="600" seamless></iframe>');
+					}
+				}).load();
+				break;
+			case 'media':
+				switch(this.options.page.type) {
+				case 'file':
+					var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + language;
+	                window.open(url, "popUp", "width=800,height=600,scrollbars=yes");
+					break;
+				case 'image':
+					overlay.overlay({
+						top: 50,
+						load: true,
+						onBeforeLoad: function() {
+							var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + language;
+							this.getOverlay().find('.wbl-overlayPreviewImage').attr('src', url).show();
+						}
+					}).load();
+					break;
+				case 'video':
+					// TODO Stop video when close
+					overlay.overlay({
+						top: 50,
+						load: true,
+						onBeforeLoad: function() {
+							var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + language;
+							var videoTag = '<video src="' + url + '" width="320" height="240" preload controls></video>';
+							this.getOverlay().find('.wbl-overlayPreviewContent').html(videoTag).show();
+						}
+					}).load();
+					break;
+				}
+				break;
+			}
 		},
 		
 		"click": function(el, ev) {
@@ -43,10 +92,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 				this.element.find('a.wbl-pagePath').click();
 				break;
 			case 'media':
-				var url = '/system/weblounge/files/' + $(el.parent()).attr('id') + '/content/' + this.options.language;
-                window.open(url, "popUp", "width=800,height=600,scrollbars=yes");
-                ev.preventDefault();
-				break;
+				this._showResource(el.parent());
 			}
 		},
 		
@@ -60,14 +106,23 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			this._openSettings(el.parent());
 		},
 		
+		"img.wbl-pagePreview click": function(el, ev) {
+			ev.stopPropagation();
+			this._showResource(el.parent());
+		},
+		
 		'hoverenter': function(ev, hover) {
 			if(this.options.mode != 'normal') return;
+//			if(this.options.resourceType == 'pages') {
+//				this.element.find('img.wbl-pagePreview').show();
+//			}
 			this.element.find('img.wbl-showPage').show();
 			this.element.find('img.wbl-trashPage').show();
 			this.element.find('img.wbl-editPage').show();
 	    },
 	    
 		'hoverleave': function(ev, hover) {
+			this.element.find('img.wbl-pagePreview').hide();
 			this.element.find('img.wbl-showPage').hide();
 			this.element.find('img.wbl-trashPage').hide();
 			this.element.find('img.wbl-editPage').hide();

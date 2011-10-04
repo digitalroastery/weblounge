@@ -349,6 +349,19 @@ img.wbl-pageThumbnail {
 	background-color: white;
 }
 
+.editor_resourcebrowser img.wbl-pagePreview {
+	cursor: pointer;
+	display: inline-block;
+	position:absolute;
+  	top: 30px;
+  	left: 158px;
+	height: 24px;
+	width: 24px;
+	z-index: 1000;
+	border: 1px solid black;
+	background-color: white;
+}
+
 .editor_resourcebrowser div#wbl-addPage {
 	position: relative;
 	float: left;
@@ -364,4 +377,44 @@ img.wbl-pageThumbnail {
 	top: 190px;
 	left: 150px;
 	padding: 0 30px;
+}
+
+div.wbl-previewOverlay {
+	display:none;
+	border: 10px solid #666;
+	background: rgb(82, 82, 82);
+	/* for modern browsers use semi-transparent color on the border. nice! */
+	border: 20px solid rgb(82, 82, 82);
+	/* hot CSS3 features for mozilla and webkit-based browsers (rounded borders) */
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	/* growing background image */
+	color: #fff;
+	/* a little styling */	
+	font-size: 13px;
+	z-index: 5000;
+}
+
+/* default close button positioned on upper right corner */
+div.wbl-previewOverlay .close {
+	background-image: url(images/close.png);
+	position: absolute;
+	right: -15px; 
+	top: -15px;
+	cursor: pointer;
+	height: 35px;
+	width: 35px;
+}
+
+img.wbl-overlayPreviewImage {
+	display: none;
+	max-width: 800px;
+	max-height: 600px;
+}
+
+div.wbl-overlayPreviewContent {
+	display: none;
+	max-width: 800px;
+	max-height: 600px;
+	overflow-y: auto;
 }

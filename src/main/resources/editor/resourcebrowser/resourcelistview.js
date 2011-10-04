@@ -58,7 +58,7 @@ steal.plugins('jquery/view/tmpl')
 					language: this.options.language,
 					resourceType: this.options.resourceType
 				});
-				listViewItem.find('tr.wbl-pageEntry').editor_resourcelistviewitem({
+				listViewItem.find('tr.wbl-pageEntry:last').editor_resourcelistviewitem({
 					page: res,
 					runtime: this.options.runtime, 
 					language: this.options.language,
