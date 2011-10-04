@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
- *  http://entwinemedia.com/weblounge
+ *  Copyright (c) 2011 The Weblounge Team
+ *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -20,41 +20,44 @@
 
 package ch.entwine.weblounge.common.content.audiovisual;
 
-import ch.entwine.weblounge.common.content.file.FileContent;
-
 /**
- * Describes the contents of an audio visual resource, including the general
- * attributes such as file size and mime type. In addition, it contains
- * technical information like resolution, bit rate, frame rate etc.
+ * An audio stream identifies an audio track inside a movie container.
  */
-public interface AudiovisualContent extends FileContent {
+public interface AudioStream extends Stream {
 
   /**
-   * Returns the audio visual streams contained in this movie.
+   * Returns the number of bits per sample.
    * 
-   * @return the streams
+   * @return the number of bits per sample.
    */
-  Stream[] getStreams();
+  Integer getBitDepth();
 
   /**
-   * Returns <code>true</code> if the track features an audio stream.
+   * Returns the number of channels.
    * 
-   * @return <code>true</code> if the track has an audio stream
+   * @return the number of channels
    */
-  boolean hasAudio();
+  Integer getChannels();
 
   /**
-   * Returns <code>true</code> if the track features a video stream.
+   * Returns the number of samples per second.
    * 
-   * @return <code>true</code> if the track has a video stream
+   * @return the number of samples per second
    */
-  boolean hasVideo();
+  Integer getSamplingRate();
 
   /**
-   * Returns the track duration in milliseconds.
+   * Returns the number of bits per second.
    * 
-   * @return the track duration
+   * @return the number of bits per second
    */
-  long getDuration();
+  Float getBitRate();
+
+  /**
+   * Returns the name of the encoding format.
+   * 
+   * @return the encoding format
+   */
+  String getFormat();
 
 }
