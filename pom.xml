@@ -284,11 +284,13 @@
             <Import-Package>
               ch.entwine.weblounge.cache;version=${project.version},
               ch.entwine.weblounge.common.content;version=${project.version},
+              ch.entwine.weblounge.common.content.audiovisual;version=${project.version},
               ch.entwine.weblounge.common.content.file;version=${project.version},
               ch.entwine.weblounge.common.content.image;version=${project.version},
               ch.entwine.weblounge.common.content.page;version=${project.version},
               ch.entwine.weblounge.common.content.repository;version=${project.version},
               ch.entwine.weblounge.common.impl.content;version=${project.version},
+              ch.entwine.weblounge.common.impl.content.audiovisual;version=${project.version},
               ch.entwine.weblounge.common.impl.content.file;version=${project.version},
               ch.entwine.weblounge.common.impl.content.image;version=${project.version},
               ch.entwine.weblounge.common.impl.content.page;version=${project.version},
@@ -398,8 +400,9 @@
               org.apache.solr.core;-split-package:=merge-first
             </Private-Package>
             <Service-Component>
-              OSGI-INF/files-rest-service.xml,
+              OSGI-INF/audiovisual-serializer.xml,
               OSGI-INF/file-serializer.xml,
+              OSGI-INF/files-rest-service.xml,
               OSGI-INF/image-serializer.xml,
               OSGI-INF/pages-rest-service.xml,
               OSGI-INF/page-serializer.xml,
