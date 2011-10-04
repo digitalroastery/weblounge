@@ -27,7 +27,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 						iframeTag.css('height', $(window).height() * 0.8 + 'px');
 						this.getOverlay().css('border', '2px solid #525252');
 						this.getOverlay().css('border-radius', '0px');
-						this.getOverlay().find('iframe').attr('src', pageURL).show();
+						iframeTag.attr('src', pageURL).show();
 					}
 				}).load();
 				break;
@@ -57,10 +57,46 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 						load: true,
 						onBeforeLoad: function() {
 							var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + language;
-							var videoTag = '<video src="' + url + '" width="320" height="240" preload controls></video>';
-//							iframeTag.css('width', $(window).width() * 0.8 + 'px');
-//							iframeTag.css('height', $(window).height() * 0.8 + 'px');
-							this.getOverlay().find('.wbl-overlayPreviewContent').html(videoTag).show();
+							var videoTag = this.getOverlay().find('video');
+							videoTag.css('max-width', $(window).width() * 0.8 + 'px');
+							videoTag.css('max-height', $(window).height() * 0.8 + 'px');
+							videoTag.attr('src', url).show();
+							videoTag.mediaelementplayer({
+//							    // if the <video width> is not specified, this is the default
+//							    defaultVideoWidth: 480,
+//							    // if the <video height> is not specified, this is the default
+//							    defaultVideoHeight: 270,
+//							    // if set, overrides <video width>
+//							    videoWidth: -1,
+//							    // if set, overrides <video height>
+//							    videoHeight: -1,
+//							    // width of audio player
+//							    audioWidth: 400,
+//							    // height of audio player
+//							    audioHeight: 30,
+//							    // initial volume when the player starts
+//							    startVolume: 0.8,
+//							    // useful for <audio> player loops
+//							    loop: false,
+//							    // enables Flash and Silverlight to resize to content size
+//							    enableAutosize: true,
+//							    // the order of controls you want on the control bar (and other plugins below)
+//							    features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
+//							 
+//							    // automatically selects a <track> element
+//							    startLanguage: '',
+//							    // a list of languages to auto-translate via Google
+//							    translations: [],
+//							    // a dropdownlist of automatic translations
+//							    translationSelector: false,
+//							    // key for tranlsations
+//							    googleApiKey: ''
+//							 
+							});
+//							var player = new MediaElementPlayer('#player',/* Options */);
+//							player.pause();
+//							player.setSrc('mynewfile.mp4');
+//							player.play();
 						}
 					}).load();
 					break;
