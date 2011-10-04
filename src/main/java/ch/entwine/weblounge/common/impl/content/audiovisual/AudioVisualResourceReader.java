@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.image;
+package ch.entwine.weblounge.common.impl.content.audiovisual;
 
-import ch.entwine.weblounge.common.content.image.ImageContent;
-import ch.entwine.weblounge.common.content.image.ImageResource;
+import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
+import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
 import ch.entwine.weblounge.common.impl.content.AbstractResourceReaderImpl;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -31,25 +31,26 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
- * Utility class used to parse image data.
+ * Utility class used to parse audio visual data.
  */
-public class ImageResourceReader extends AbstractResourceReaderImpl<ImageContent, ImageResource> {
+public class AudioVisualResourceReader extends AbstractResourceReaderImpl<AudioVisualContent, AudioVisualResource> {
 
-  /** The image content reader */
-  private ImageContentReader contentReader = new ImageContentReader();
+  /** The audio visual content reader */
+  private AudioVisualContentReader contentReader = new AudioVisualContentReader();
 
   /**
    * Creates a new reader that will parse the XML data and store it in the
-   * <code>Image</code> object that is returned by the {@link #read} method.
+   * <code>AudioVisual</code> object that is returned by the {@link #read}
+   * method.
    * 
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public ImageResourceReader() throws ParserConfigurationException,
+  public AudioVisualResourceReader() throws ParserConfigurationException,
       SAXException {
-    super(ImageResource.TYPE);
+    super(AudioVisualResource.TYPE);
   }
 
   /**
@@ -67,8 +68,8 @@ public class ImageResourceReader extends AbstractResourceReaderImpl<ImageContent
    * 
    * @see ch.entwine.weblounge.common.impl.content.AbstractResourceReaderImpl#createResource(ch.entwine.weblounge.common.site.Site)
    */
-  protected ImageResource createResource(Site site) {
-    return new ImageResourceImpl(new ImageResourceURIImpl(site));
+  protected AudioVisualResource createResource(Site site) {
+    return new AudioVisualResourceImpl(new AudioVisualResourceURIImpl(site));
   }
 
   /**
@@ -87,7 +88,7 @@ public class ImageResourceReader extends AbstractResourceReaderImpl<ImageContent
   public void startElement(String uri, String local, String raw,
       Attributes attrs) throws SAXException {
 
-    // file content
+    // resource content
     if ("content".equals(raw) || parserContext.equals(ParserContext.Content)) {
       parserContext = ParserContext.Content;
       contentReader.startElement(uri, local, raw, attrs);
