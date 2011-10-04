@@ -1237,7 +1237,7 @@ public final class RequestUtils {
       String parameterName) throws IllegalArgumentException {
     return getBooleanParameter(request, parameterName, false);
   }
-  
+
   /**
    * Returns <code>true</code> if the editing state is enable, else return
    * <code>false</code>
@@ -1248,6 +1248,8 @@ public final class RequestUtils {
    */
   public static boolean isEditingState(WebloungeRequest request) {
     if (!SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR)) {
+      return false;
+    } else if (request.getParameter(EditingState.WORKBENCH_PREVIEW_PARAM) != null) {
       return false;
     } else if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
       return true;
@@ -1666,7 +1668,7 @@ public final class RequestUtils {
    */
   private static Date parseDate(String datestring) throws ParseException {
     String[] parsePatterns = {
-    // german/swiss date format
+        // german/swiss date format
         "dd.MM.yyyy",
         "dd.MM.yyyy kk:mm",
         "dd.MM.yyyy kk:mm:ss",
