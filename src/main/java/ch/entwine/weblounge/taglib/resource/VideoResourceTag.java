@@ -21,11 +21,11 @@
 package ch.entwine.weblounge.taglib.resource;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
+import ch.entwine.weblounge.common.content.movie.MovieContent;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.impl.content.audiovisual.AudioVisualResourceURIImpl;
+import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -98,9 +98,9 @@ public class VideoResourceTag extends WebloungeTag {
     // specified, and we are not in jsp compilation mode, issue a warning
     ResourceURI uri = null;
     if (StringUtils.isNotBlank(videoId)) {
-      uri = new AudioVisualResourceURIImpl(site, null, videoId);
+      uri = new MovieResourceURIImpl(site, null, videoId);
     } else if (StringUtils.isNotBlank(videoResourcePath)) {
-      uri = new AudioVisualResourceURIImpl(site, videoResourcePath);
+      uri = new MovieResourceURIImpl(site, videoResourcePath);
     } else {
       logger.debug("Neither uuid nor path were specified for video resource");
       return SKIP_BODY;
@@ -117,12 +117,12 @@ public class VideoResourceTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    AudioVisualResource video = null;
-    AudioVisualContent videoContent = null;
+    MovieResource video = null;
+    MovieContent videoContent = null;
 
     // Store the result in the jsp page context
     try {
-      video = (AudioVisualResource) repository.get(uri);
+      video = (MovieResource) repository.get(uri);
       video.switchTo(language);
       videoContent = video.getContent(language);
       if (videoContent == null)

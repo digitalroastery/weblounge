@@ -20,8 +20,8 @@
 
 package ch.entwine.weblounge.taglib.resource;
 
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
+import ch.entwine.weblounge.common.content.movie.MovieContent;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
 
 import javax.servlet.jsp.tagext.TagData;
 import javax.servlet.jsp.tagext.TagExtraInfo;
@@ -46,8 +46,8 @@ public class VideoResourceTagExtraInfo extends TagExtraInfo {
    */
   public VariableInfo[] getVariableInfo(TagData tagData) {
     return new VariableInfo[] {
-        new VariableInfo(VIDEO, AudioVisualResource.class.getName(), true, VariableInfo.NESTED),
-        new VariableInfo(VIDEO_CONTENT, AudioVisualContent.class.getName(), true, VariableInfo.NESTED) };
+        new VariableInfo(VIDEO, MovieResource.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(VIDEO_CONTENT, MovieContent.class.getName(), true, VariableInfo.NESTED) };
   }
 
   /**
