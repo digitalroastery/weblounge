@@ -13,96 +13,63 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		},
 		
 		_showResource: function(el) {
-			var language = this.options.language;
-			var overlay = this.element.find("div.wbl-previewOverlay");
+			var beforeLoad = null;
 			switch(this.options.resourceType) {
 			case 'pages':
 				var pageURL = this.element.find('a.wbl-pagePath').attr('href') + '?preview&_=' + new Date().getTime();
-				overlay.overlay({
-					top: 60,
-					load: true,
-					onBeforeLoad: function() {
-						var iframeTag = this.getOverlay().find('iframe');
-						iframeTag.css('width', $(window).width() * 0.8 + 'px');
-						iframeTag.css('height', $(window).height() * 0.8 + 'px');
-						this.getOverlay().css('border', '2px solid #525252');
-						this.getOverlay().css('border-radius', '0px');
-						iframeTag.attr('src', pageURL).show();
-					}
-				}).load();
+				this._loadOverlay(function() {
+					var iframeTag = this.getOverlay().find('iframe');
+					iframeTag.css('width', $(window).width() * 0.8 + 'px');
+					iframeTag.css('height', $(window).height() * 0.8 + 'px');
+					iframeTag.attr('src', pageURL).show();
+				}, function() {});
 				break;
 			case 'media':
+				var fileResource = new Editor.File({value: this.options.page});
+				var fileContent = fileResource.getContent(this.options.language);
 				switch(this.options.page.type) {
 				case 'file':
-					var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + language;
+					var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + fileContent.language;
 	                window.open(url, "popUp", "width=800,height=600,scrollbars=yes");
 					break;
 				case 'image':
-					overlay.overlay({
-						top: 50,
-						load: true,
-						onBeforeLoad: function() {
-							var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + language;
-							var imgTag = this.getOverlay().find('img.wbl-overlayPreviewImage');
-							imgTag.css('max-width', $(window).width() * 0.8 + 'px');
-							imgTag.css('max-height', $(window).height() * 0.8 + 'px');
-							imgTag.attr('src', url).show();
-						}
-					}).load();
+					this._loadOverlay(function() {
+						var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + fileContent.language;
+						var imgTag = this.getOverlay().find('img.wbl-overlayPreviewImage');
+						imgTag.css('max-width', $(window).width() * 0.8 + 'px');
+						imgTag.css('max-height', $(window).height() * 0.8 + 'px');
+						imgTag.attr('src', url).show();
+					}, function() {});
 					break;
 				case 'movie':
-					// TODO Stop video when close
-					overlay.overlay({
-						top: 50,
-						load: true,
-						onBeforeLoad: function() {
-							var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + language;
-							var videoTag = this.getOverlay().find('video');
-							videoTag.css('max-width', $(window).width() * 0.8 + 'px');
-							videoTag.css('max-height', $(window).height() * 0.8 + 'px');
-							videoTag.attr('src', url).show();
-							videoTag.mediaelementplayer({
-//							    // if the <video width> is not specified, this is the default
-//							    defaultVideoWidth: 480,
-//							    // if the <video height> is not specified, this is the default
-//							    defaultVideoHeight: 270,
-//							    // if set, overrides <video width>
-//							    videoWidth: -1,
-//							    // if set, overrides <video height>
-//							    videoHeight: -1,
-//							    // width of audio player
-//							    audioWidth: 400,
-//							    // height of audio player
-//							    audioHeight: 30,
-//							    // initial volume when the player starts
-//							    startVolume: 0.8,
-//							    // useful for <audio> player loops
-//							    loop: false,
-//							    // enables Flash and Silverlight to resize to content size
-//							    enableAutosize: true,
-//							    // the order of controls you want on the control bar (and other plugins below)
-//							    features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
-//							 
-//							    // automatically selects a <track> element
-//							    startLanguage: '',
-//							    // a list of languages to auto-translate via Google
-//							    translations: [],
-//							    // a dropdownlist of automatic translations
-//							    translationSelector: false,
-//							    // key for tranlsations
-//							    googleApiKey: ''
-//							 
-							});
-//							var player = new MediaElementPlayer('#player',/* Options */);
-//							player.pause();
-//							player.setSrc('mynewfile.mp4');
-//							player.play();
+					var player = null;
+					this._loadOverlay(function() {
+						var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + fileContent.language;
+						var videoTag = this.getOverlay().find('video');
+						videoTag.css('max-width', $(window).width() * 0.8 + 'px');
+						videoTag.css('max-height', $(window).height() * 0.8 + 'px');
+						videoTag.html('<source src="' + url + '" type="' + fileContent.mimetype + '" />').show();
+						
+						player = new MediaElementPlayer(videoTag, {});
+					}, function() {
+						if(player != null) {
+							player.pause();
 						}
-					}).load();
+					});
 					break;
 				}
 				break;
 			}
+
+		},
+		
+		_loadOverlay: function(beforeLoad, beforeClose) {
+			this.element.find("div.wbl-previewOverlay").overlay({
+				top: 60,
+				load: true,
+				onBeforeLoad: beforeLoad,
+				onBeforeClose: beforeClose
+			}).load();
 		},
 		
 		"click": function(el, ev) {

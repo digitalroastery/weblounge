@@ -294,19 +294,24 @@ steal.then('jsonix')
 	    },
 	    
 		/**
-		 * Return the specified Content
+		 * Return the specified Content or the original if not found
 		 * @param {String} language
 		 */
 	    getContent: function(language) {
 	    	if($.isEmptyObject(this.value.body)) return null;
 	    	if($.isEmptyObject(this.value.body.contents)) return null;
-	    	var content;
+	    	var content = null;
+	    	var originalContent = null;
 	    	$.each(this.value.body.contents, function(i, cont) {
 	    		if(cont.language == language) {
 	    			content = cont;
-	    			return false;
+	    		}
+	    		if(originalContent == null || originalContent.created.date > cont.created.date) {
+	    			originalContent = cont;
 	    		}
     		});
+	    	if(content == null)
+	    		return originalContent;
 	    	return content;
 	    },
 		
@@ -353,10 +358,16 @@ steal.then('jsonix')
 				this.value.head.metadata.subject = [];
 			}
 			
-			this.value.head.metadata.title[language] = metadata.title;
-			this.value.head.metadata.description[language] = metadata.description;
-			var content = this.getContent(language);
-			content.author = metadata.author;
+			if(!$.isEmptyObject(metadata.title)) {
+				this.value.head.metadata.title[language] = metadata.title;
+			}
+			if(!$.isEmptyObject(metadata.description)) {
+				this.value.head.metadata.description[language] = metadata.description;
+			}
+			if(!$.isEmptyObject(metadata.author)) {
+				var content = this.getContent(language);
+				content.author = metadata.author;
+			}
 			
 			// Filter out empty values
 			this.value.head.metadata.subject = metadata.tags.split(/\s*,\s*/).filter(function(value) { 
