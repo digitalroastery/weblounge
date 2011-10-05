@@ -50,7 +50,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 						}
 					}).load();
 					break;
-				case 'video':
+				case 'movie':
 					// TODO Stop video when close
 					overlay.overlay({
 						top: 50,

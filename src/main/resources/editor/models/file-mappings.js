@@ -52,6 +52,14 @@ FileMappings.Body.Content = new Jsonix.Model.ClassInfo({
   name: 'FileMappings.Body.Content'
 });
 
+FileMappings.Body.Content.Video = new Jsonix.Model.ClassInfo({
+	name: 'FileMappings.Body.Content.Video'
+});
+
+FileMappings.Body.Content.Audio = new Jsonix.Model.ClassInfo({
+	name: 'FileMappings.Body.Content.Audio'
+});
+
 // <user id="my.id" realm="weblounge">My Name</user>
 FileMappings.User.properties = [new Jsonix.Model.AttributePropertyInfo({
   name: 'id',
@@ -114,6 +122,10 @@ FileMappings.FilesCollection.properties = [new Jsonix.Model.ElementPropertyInfo(
 	typeInfo: FileMappings.FileType
 }), new Jsonix.Model.ElementPropertyInfo({
 	name: 'image',
+	collection: true,
+	typeInfo: FileMappings.FileType
+}), new Jsonix.Model.ElementPropertyInfo({
+	name: 'movie',
 	collection: true,
 	typeInfo: FileMappings.FileType
 })];
@@ -270,7 +282,53 @@ FileMappings.Body.Content.properties = [new Jsonix.Model.AttributePropertyInfo({
 }), new Jsonix.Model.ElementPropertyInfo({
   name: 'exposuretime',
   typeInfo: Jsonix.Schema.XSD.Float.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'duration',
+  typeInfo: Jsonix.Schema.XSD.Long.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'audio',
+  typeInfo: FileMappings.Body.Content.Audio
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'video',
+  typeInfo: FileMappings.Body.Content.Video
 })];
+
+//<audio>...</audio>
+FileMappings.Body.Content.Audio.properties = [new Jsonix.Model.ElementPropertyInfo({
+  name: 'bitdepth',
+  typeInfo: Jsonix.Schema.XSD.Integer.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'bitrate',
+  typeInfo: Jsonix.Schema.XSD.Float.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'channels',
+  typeInfo: Jsonix.Schema.XSD.Integer.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'samplingrate',
+  typeInfo: Jsonix.Schema.XSD.Integer.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'format',
+  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+})];
+
+//<video>...</video>
+FileMappings.Body.Content.Video.properties = [new Jsonix.Model.ElementPropertyInfo({
+	name: 'bitrate',
+	typeInfo: Jsonix.Schema.XSD.Float.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+	name: 'format',
+	typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+	name: 'framerate',
+	typeInfo: Jsonix.Schema.XSD.Float.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+	name: 'resolution',
+	typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+	name: 'scantype',
+	typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+})];
+
 
 FileMappings.typeInfos = [FileMappings.Head];
 FileMappings.elementInfos = [{
@@ -283,6 +341,10 @@ FileMappings.elementInfos = [{
 },
 {
   elementName: new Jsonix.XML.QName('image'),
+  typeInfo: FileMappings.FileType
+},
+{
+  elementName: new Jsonix.XML.QName('movie'),
   typeInfo: FileMappings.FileType
 },
 {

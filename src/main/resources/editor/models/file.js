@@ -210,8 +210,8 @@ steal.then('jsonix')
 		 * Concat file, image and video array
 		 */
 		concatFiles: function(json) {
-			if($.isEmptyObject(json.value.video)) {
-				json.value.video = [];
+			if($.isEmptyObject(json.value.movie)) {
+				json.value.movie = [];
 			}
 			if($.isEmptyObject(json.value.image)) {
 				json.value.image = [];
@@ -220,8 +220,8 @@ steal.then('jsonix')
 				json.value.file = [];
 			}
 			
-			$.each(json.value.video, function(index, video) {
-				video.type = 'video';
+			$.each(json.value.movie, function(index, movie) {
+				movie.type = 'movie';
 			});
 			$.each(json.value.image, function(index, image) {
 				image.type = 'image';
@@ -229,7 +229,7 @@ steal.then('jsonix')
 			$.each(json.value.file, function(index, file) {
 				file.type = 'file';
 			});
-			return new Array().concat(json.value.video, json.value.image, json.value.file);
+			return new Array().concat(json.value.movie, json.value.image, json.value.file);
 		},
 		
 		/**
