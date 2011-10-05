@@ -18,12 +18,12 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.audiovisual;
+package ch.entwine.weblounge.common.impl.content.movie;
 
-import ch.entwine.weblounge.common.content.audiovisual.AudioStream;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
-import ch.entwine.weblounge.common.content.audiovisual.Stream;
-import ch.entwine.weblounge.common.content.audiovisual.VideoStream;
+import ch.entwine.weblounge.common.content.movie.AudioStream;
+import ch.entwine.weblounge.common.content.movie.MovieContent;
+import ch.entwine.weblounge.common.content.movie.Stream;
+import ch.entwine.weblounge.common.content.movie.VideoStream;
 import ch.entwine.weblounge.common.impl.content.file.FileContentImpl;
 import ch.entwine.weblounge.common.language.Language;
 
@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Implementation of audio visual content.
  */
-public class AudioVisualContentImpl extends FileContentImpl implements AudioVisualContent {
+public class MovieContentImpl extends FileContentImpl implements MovieContent {
 
   /** The audio and video streams */
   protected List<Stream> streams = new ArrayList<Stream>();
@@ -44,7 +44,7 @@ public class AudioVisualContentImpl extends FileContentImpl implements AudioVisu
   /**
    * Creates a new audio visual content representation.
    */
-  public AudioVisualContentImpl() {
+  public MovieContentImpl() {
     super();
   }
 
@@ -58,7 +58,7 @@ public class AudioVisualContentImpl extends FileContentImpl implements AudioVisu
    * @param mimetype
    *          the audio visual's mime type
    */
-  public AudioVisualContentImpl(String filename, Language language,
+  public MovieContentImpl(String filename, Language language,
       String mimetype) {
     this(filename, language, mimetype, -1, -1);
   }
@@ -75,7 +75,7 @@ public class AudioVisualContentImpl extends FileContentImpl implements AudioVisu
    * @param duration
    *          the audio visual duration in milliseconds
    */
-  public AudioVisualContentImpl(String filename, Language language,
+  public MovieContentImpl(String filename, Language language,
       String mimetype, long duration) {
     this(filename, language, mimetype, duration, -1);
   }
@@ -94,7 +94,7 @@ public class AudioVisualContentImpl extends FileContentImpl implements AudioVisu
    * @param filesize
    *          the file size in bytes
    */
-  public AudioVisualContentImpl(String filename, Language language,
+  public MovieContentImpl(String filename, Language language,
       String mimetype, long filesize, long duration) {
     super(filename, language, mimetype, filesize);
   }
@@ -112,7 +112,7 @@ public class AudioVisualContentImpl extends FileContentImpl implements AudioVisu
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent#getStreams()
+   * @see ch.entwine.weblounge.common.content.movie.MovieContent#getStreams()
    */
   public Stream[] getStreams() {
     return streams.toArray(new Stream[streams.size()]);
@@ -121,7 +121,7 @@ public class AudioVisualContentImpl extends FileContentImpl implements AudioVisu
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent#hasAudio()
+   * @see ch.entwine.weblounge.common.content.movie.MovieContent#hasAudio()
    */
   public boolean hasAudio() {
     for (Stream stream : streams) {
@@ -134,7 +134,7 @@ public class AudioVisualContentImpl extends FileContentImpl implements AudioVisu
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent#hasVideo()
+   * @see ch.entwine.weblounge.common.content.movie.MovieContent#hasVideo()
    */
   public boolean hasVideo() {
     for (Stream stream : streams) {
@@ -157,7 +157,7 @@ public class AudioVisualContentImpl extends FileContentImpl implements AudioVisu
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent#getDuration()
+   * @see ch.entwine.weblounge.common.content.movie.MovieContent#getDuration()
    */
   public long getDuration() {
     return duration;

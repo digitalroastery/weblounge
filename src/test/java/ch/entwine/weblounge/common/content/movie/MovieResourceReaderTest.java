@@ -18,14 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.audiovisual;
+package ch.entwine.weblounge.common.content.movie;
 
 import static org.junit.Assert.assertEquals;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
-import ch.entwine.weblounge.common.impl.content.audiovisual.AudioVisualResourceReader;
-import ch.entwine.weblounge.common.impl.content.audiovisual.AudioVisualResourceURIImpl;
+import ch.entwine.weblounge.common.impl.content.movie.MovieResourceReader;
+import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -36,12 +36,12 @@ import org.junit.Test;
 import java.net.URL;
 
 /**
- * Test case to test {@link AudioVisualResourceReader}.
+ * Test case to test {@link MovieResourceReader}.
  */
-public class AudioVisualResourceReaderTest {
+public class MovieResourceReaderTest {
 
   /** The audio visual that was read in */
-  protected AudioVisualResource audioVisual = null;
+  protected MovieResource audioVisual = null;
 
   /** The site */
   protected Site site = null;
@@ -50,10 +50,10 @@ public class AudioVisualResourceReaderTest {
   protected ResourceURIImpl avURI = null;
 
   /** Name of the test file */
-  protected String testFile = "/av.xml";
+  protected String testFile = "/movie.xml";
 
   /** The audio visual resource reader */
-  protected AudioVisualResourceReader reader = null;
+  protected MovieResourceReader reader = null;
 
   /**
    * @throws java.lang.Exception
@@ -62,13 +62,13 @@ public class AudioVisualResourceReaderTest {
   public void setUp() throws Exception {
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.replay(site);
-    avURI = new AudioVisualResourceURIImpl(site, "/test", Resource.LIVE);
-    reader = new AudioVisualResourceReader();
+    avURI = new MovieResourceURIImpl(site, "/test", Resource.LIVE);
+    reader = new MovieResourceReader();
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.audiovisual.AudioVisualResourceReader#read(ch.entwine.weblounge.common.content.ResourceURI, java.io.InputStream)}
+   * {@link ch.entwine.weblounge.common.impl.content.movie.MovieResourceReader#read(ch.entwine.weblounge.common.content.ResourceURI, java.io.InputStream)}
    * .
    */
   @Test

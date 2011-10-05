@@ -18,11 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.audiovisual;
+package ch.entwine.weblounge.common.impl.content.movie;
 
 import ch.entwine.weblounge.common.content.MalformedResourceURIException;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Site;
@@ -33,7 +33,7 @@ import ch.entwine.weblounge.common.site.Site;
  * <code>ch.entwine.weblounge.common.content.audiovisual.AudiovisualResource</code>
  * .
  */
-public class AudioVisualResourceURIImpl extends ResourceURIImpl {
+public class MovieResourceURIImpl extends ResourceURIImpl {
 
   /** The serial version uid */
   private static final long serialVersionUID = -4786684576702578116L;
@@ -45,8 +45,8 @@ public class AudioVisualResourceURIImpl extends ResourceURIImpl {
    * @param request
    *          the request
    */
-  public AudioVisualResourceURIImpl(WebloungeRequest request) {
-    super(AudioVisualResource.TYPE, request.getSite(), request.getUrl().getPath(), null, request.getVersion());
+  public MovieResourceURIImpl(WebloungeRequest request) {
+    super(MovieResource.TYPE, request.getSite(), request.getUrl().getPath(), null, request.getVersion());
   }
 
   /**
@@ -58,8 +58,8 @@ public class AudioVisualResourceURIImpl extends ResourceURIImpl {
    * @param version
    *          the version
    */
-  public AudioVisualResourceURIImpl(ResourceURI uri, long version) {
-    super(AudioVisualResource.TYPE, uri.getSite(), uri.getPath(), uri.getIdentifier(), version);
+  public MovieResourceURIImpl(ResourceURI uri, long version) {
+    super(MovieResource.TYPE, uri.getSite(), uri.getPath(), uri.getIdentifier(), version);
   }
 
   /**
@@ -75,9 +75,9 @@ public class AudioVisualResourceURIImpl extends ResourceURIImpl {
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public AudioVisualResourceURIImpl(Site site)
+  public MovieResourceURIImpl(Site site)
       throws MalformedResourceURIException {
-    super(AudioVisualResource.TYPE, site, null);
+    super(MovieResource.TYPE, site, null);
   }
 
   /**
@@ -92,9 +92,9 @@ public class AudioVisualResourceURIImpl extends ResourceURIImpl {
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public AudioVisualResourceURIImpl(Site site, String path)
+  public MovieResourceURIImpl(Site site, String path)
       throws MalformedResourceURIException {
-    super(AudioVisualResource.TYPE, site, path);
+    super(MovieResource.TYPE, site, path);
   }
 
   /**
@@ -112,9 +112,9 @@ public class AudioVisualResourceURIImpl extends ResourceURIImpl {
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public AudioVisualResourceURIImpl(Site site, String path, long version)
+  public MovieResourceURIImpl(Site site, String path, long version)
       throws MalformedResourceURIException {
-    super(AudioVisualResource.TYPE, site, path, version);
+    super(MovieResource.TYPE, site, path, version);
   }
 
   /**
@@ -132,9 +132,9 @@ public class AudioVisualResourceURIImpl extends ResourceURIImpl {
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public AudioVisualResourceURIImpl(Site site, String path, String id)
+  public MovieResourceURIImpl(Site site, String path, String id)
       throws MalformedResourceURIException {
-    super(AudioVisualResource.TYPE, site, path, id);
+    super(MovieResource.TYPE, site, path, id);
   }
 
   /**
@@ -154,9 +154,9 @@ public class AudioVisualResourceURIImpl extends ResourceURIImpl {
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public AudioVisualResourceURIImpl(Site site, String path, String id,
+  public MovieResourceURIImpl(Site site, String path, String id,
       long version) throws MalformedResourceURIException {
-    super(AudioVisualResource.TYPE, site, path, id, version);
+    super(MovieResource.TYPE, site, path, id, version);
   }
 
 }

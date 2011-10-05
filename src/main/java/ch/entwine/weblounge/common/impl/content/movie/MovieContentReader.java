@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.audiovisual;
+package ch.entwine.weblounge.common.impl.content.movie;
 
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
-import ch.entwine.weblounge.common.content.audiovisual.ScanType;
+import ch.entwine.weblounge.common.content.movie.MovieContent;
+import ch.entwine.weblounge.common.content.movie.ScanType;
 import ch.entwine.weblounge.common.impl.content.ResourceContentReaderImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
@@ -43,10 +43,10 @@ import javax.xml.parsers.SAXParser;
  * Utility class used to parse <code>Content</code> data for audio visual
  * objects.
  */
-public class AudioVisualContentReader extends ResourceContentReaderImpl<AudioVisualContent> {
+public class MovieContentReader extends ResourceContentReaderImpl<MovieContent> {
 
   /** Logging facility */
-  protected static final Logger logger = LoggerFactory.getLogger(AudioVisualContentReader.class);
+  protected static final Logger logger = LoggerFactory.getLogger(MovieContentReader.class);
 
   /** The audio stream */
   protected AudioStreamImpl audioStream = null;
@@ -64,7 +64,7 @@ public class AudioVisualContentReader extends ResourceContentReaderImpl<AudioVis
   /**
    * Creates a new content reader that will parse serialized XML version of
    * audio visual content and store it in the
-   * {@link ch.entwine.weblounge.common.content.AudioVisualContent} that is
+   * {@link ch.entwine.weblounge.common.content.MovieContent} that is
    * returned by the {@link #read} method.
    * 
    * @throws ParserConfigurationException
@@ -74,7 +74,7 @@ public class AudioVisualContentReader extends ResourceContentReaderImpl<AudioVis
    * 
    * @see #createFromXml(InputStream)
    */
-  public AudioVisualContentReader() throws ParserConfigurationException,
+  public MovieContentReader() throws ParserConfigurationException,
       SAXException {
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
@@ -92,7 +92,7 @@ public class AudioVisualContentReader extends ResourceContentReaderImpl<AudioVis
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public AudioVisualContent createFromXml(InputStream is) throws SAXException,
+  public MovieContent createFromXml(InputStream is) throws SAXException,
       IOException, ParserConfigurationException {
 
     SAXParser parser = parserRef.get();
@@ -110,11 +110,11 @@ public class AudioVisualContentReader extends ResourceContentReaderImpl<AudioVis
    * @see ch.entwine.weblounge.common.content.ResourceContentReader#createFromContent(java.io.InputStream,
    *      ch.entwine.weblounge.common.language.Language, long, java.lang.String)
    */
-  public AudioVisualContent createFromContent(InputStream is, User user,
+  public MovieContent createFromContent(InputStream is, User user,
       Language language, long size, String fileName, String mimeType)
       throws IOException {
 
-    AudioVisualContent content = new AudioVisualContentImpl(fileName, language, mimeType);
+    MovieContent content = new MovieContentImpl(fileName, language, mimeType);
 
     // Use the logged in user as the author
     content.setCreator(user);
@@ -142,8 +142,8 @@ public class AudioVisualContentReader extends ResourceContentReaderImpl<AudioVis
    * @see ch.entwine.weblounge.common.impl.content.ResourceContentReaderImpl#createContent()
    */
   @Override
-  protected AudioVisualContent createContent() {
-    return new AudioVisualContentImpl();
+  protected MovieContent createContent() {
+    return new MovieContentImpl();
   }
 
   /**
@@ -217,7 +217,7 @@ public class AudioVisualContentReader extends ResourceContentReaderImpl<AudioVis
 
         // size
         else if ("duration".equals(raw)) {
-          ((AudioVisualContentImpl) content).setDuration(Long.parseLong(getCharacters()));
+          ((MovieContentImpl) content).setDuration(Long.parseLong(getCharacters()));
           logger.trace("AudioVisual's duration is {} ms", content.getSize());
         }
 
@@ -231,7 +231,7 @@ public class AudioVisualContentReader extends ResourceContentReaderImpl<AudioVis
       case AudioStream:
 
         if ("audio".equals(raw)) {
-          ((AudioVisualContentImpl) content).addStream(audioStream);
+          ((MovieContentImpl) content).addStream(audioStream);
           context = ParserContext.AudioVisual;
           audioStream = null;
         }
@@ -271,7 +271,7 @@ public class AudioVisualContentReader extends ResourceContentReaderImpl<AudioVis
       case VideoStream:
 
         if ("video".equals(raw)) {
-          ((AudioVisualContentImpl) content).addStream(videoStream);
+          ((MovieContentImpl) content).addStream(videoStream);
           context = ParserContext.AudioVisual;
           videoStream = null;
         }

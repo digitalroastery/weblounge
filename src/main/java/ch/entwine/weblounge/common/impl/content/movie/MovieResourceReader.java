@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.audiovisual;
+package ch.entwine.weblounge.common.impl.content.movie;
 
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
+import ch.entwine.weblounge.common.content.movie.MovieContent;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.impl.content.AbstractResourceReaderImpl;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -33,10 +33,10 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * Utility class used to parse audio visual data.
  */
-public class AudioVisualResourceReader extends AbstractResourceReaderImpl<AudioVisualContent, AudioVisualResource> {
+public class MovieResourceReader extends AbstractResourceReaderImpl<MovieContent, MovieResource> {
 
   /** The audio visual content reader */
-  private AudioVisualContentReader contentReader = new AudioVisualContentReader();
+  private MovieContentReader contentReader = new MovieContentReader();
 
   /**
    * Creates a new reader that will parse the XML data and store it in the
@@ -48,9 +48,9 @@ public class AudioVisualResourceReader extends AbstractResourceReaderImpl<AudioV
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public AudioVisualResourceReader() throws ParserConfigurationException,
+  public MovieResourceReader() throws ParserConfigurationException,
       SAXException {
-    super(AudioVisualResource.TYPE);
+    super(MovieResource.TYPE);
   }
 
   /**
@@ -68,8 +68,8 @@ public class AudioVisualResourceReader extends AbstractResourceReaderImpl<AudioV
    * 
    * @see ch.entwine.weblounge.common.impl.content.AbstractResourceReaderImpl#createResource(ch.entwine.weblounge.common.site.Site)
    */
-  protected AudioVisualResource createResource(Site site) {
-    return new AudioVisualResourceImpl(new AudioVisualResourceURIImpl(site));
+  protected MovieResource createResource(Site site) {
+    return new MovieResourceImpl(new MovieResourceURIImpl(site));
   }
 
   /**

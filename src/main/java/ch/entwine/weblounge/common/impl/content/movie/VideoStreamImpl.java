@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.audiovisual;
+package ch.entwine.weblounge.common.impl.content.movie;
 
-import ch.entwine.weblounge.common.content.audiovisual.ScanType;
-import ch.entwine.weblounge.common.content.audiovisual.VideoStream;
+import ch.entwine.weblounge.common.content.movie.ScanType;
+import ch.entwine.weblounge.common.content.movie.VideoStream;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -73,7 +73,7 @@ public class VideoStreamImpl implements VideoStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.Stream#getIdentifier()
+   * @see ch.entwine.weblounge.common.content.movie.Stream#getIdentifier()
    */
   public String getIdentifier() {
     return identifier;
@@ -92,7 +92,7 @@ public class VideoStreamImpl implements VideoStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.VideoStream#getBitRate()
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#getBitRate()
    */
   public Float getBitRate() {
     return bitRate;
@@ -111,7 +111,7 @@ public class VideoStreamImpl implements VideoStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.VideoStream#getFrameRate()
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#getFrameRate()
    */
   public Float getFrameRate() {
     return frameRate;
@@ -130,7 +130,7 @@ public class VideoStreamImpl implements VideoStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.VideoStream#getFrameWidth()
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#getFrameWidth()
    */
   public Integer getFrameWidth() {
     return frameWidth;
@@ -149,7 +149,7 @@ public class VideoStreamImpl implements VideoStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.VideoStream#getFrameHeight()
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#getFrameHeight()
    */
   public Integer getFrameHeight() {
     return frameHeight;
@@ -168,7 +168,7 @@ public class VideoStreamImpl implements VideoStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.VideoStream#getScanType()
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#getScanType()
    */
   public ScanType getScanType() {
     return scanType;
@@ -187,7 +187,7 @@ public class VideoStreamImpl implements VideoStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.Stream#getFormat()
+   * @see ch.entwine.weblounge.common.content.movie.Stream#getFormat()
    */
   public String getFormat() {
     return format;
@@ -237,7 +237,7 @@ public class VideoStreamImpl implements VideoStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.Stream#toXml()
+   * @see ch.entwine.weblounge.common.content.movie.Stream#toXml()
    */
   public String toXml() {
 

@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.audiovisual;
+package ch.entwine.weblounge.common.impl.content.movie;
 
 import ch.entwine.weblounge.common.content.FileSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
@@ -31,7 +31,7 @@ import ch.entwine.weblounge.common.url.WebUrl;
  * Audio visual implementation of a
  * {@link ch.entwine.weblounge.common.content.SearchResultItem}.
  */
-public class AudioVisualResourceSearchResultItemImpl extends AbstractResourceSearchResultItemImpl implements FileSearchResultItem {
+public class MovieResourceSearchResultItemImpl extends AbstractResourceSearchResultItemImpl implements FileSearchResultItem {
 
   /** The audio visual xml */
   protected String audioVisualXml = null;
@@ -57,7 +57,7 @@ public class AudioVisualResourceSearchResultItemImpl extends AbstractResourceSea
    * @param source
    *          the object that produced the result item
    */
-  public AudioVisualResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
+  public MovieResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
       double relevance, Object source) {
     super(uri, url, relevance, source);
   }
@@ -127,7 +127,7 @@ public class AudioVisualResourceSearchResultItemImpl extends AbstractResourceSea
   public FileResource getFileResource() {
     if (resource == null) {
       ResourceURI uri = new FileResourceURIImpl(url.getSite(), url.getPath(), id);
-      resource = new LazyAudioVisualResourceImpl(uri, audioVisualXml, headerXml, previewXml);
+      resource = new LazyMovieResourceImpl(uri, audioVisualXml, headerXml, previewXml);
     }
     return (FileResource) resource;
   }

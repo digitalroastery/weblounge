@@ -18,11 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.audiovisual;
+package ch.entwine.weblounge.common.impl.content.movie;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
+import ch.entwine.weblounge.common.content.movie.MovieContent;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
@@ -43,10 +43,10 @@ import java.util.Set;
 /**
  * Implementation of a lazy loading audio visual.
  */
-public class LazyAudioVisualResourceImpl implements AudioVisualResource {
+public class LazyMovieResourceImpl implements MovieResource {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(LazyAudioVisualResourceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(LazyMovieResourceImpl.class);
 
   /** The content as a byte array containing the audio visual's xml */
   protected String audiovisualXml = null;
@@ -58,7 +58,7 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
   protected String previewXml = null;
 
   /** The backing audio visual object */
-  protected AudioVisualResource audioVisual = null;
+  protected MovieResource audioVisual = null;
 
   /** True if the audio visual header was loaded */
   protected boolean isHeaderLoaded = false;
@@ -67,7 +67,7 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
   protected boolean isBodyLoaded = false;
 
   /** The audio visual reader */
-  protected WeakReference<AudioVisualResourceReader> readerRef = null;
+  protected WeakReference<MovieResourceReader> readerRef = null;
 
   /** The audio visual uri */
   protected ResourceURI uri = null;
@@ -84,7 +84,7 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
    * @param previewXml
    *          the audio visual preview's xml
    */
-  public LazyAudioVisualResourceImpl(ResourceURI uri, String avXml,
+  public LazyMovieResourceImpl(ResourceURI uri, String avXml,
       String headerXml, String previewXml) {
     this.uri = uri;
     this.audiovisualXml = avXml;
@@ -99,9 +99,9 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
     try {
 
       // Get a hold of the audio visual reader
-      AudioVisualResourceReader reader = (readerRef != null) ? readerRef.get() : null;
+      MovieResourceReader reader = (readerRef != null) ? readerRef.get() : null;
       if (reader == null) {
-        reader = new AudioVisualResourceReader();
+        reader = new MovieResourceReader();
         // No need to keep the reference, since we're done after this
       }
 
@@ -123,10 +123,10 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
     try {
 
       // Get a hold of the audio visual reader
-      AudioVisualResourceReader reader = (readerRef != null) ? readerRef.get() : null;
+      MovieResourceReader reader = (readerRef != null) ? readerRef.get() : null;
       if (reader == null) {
-        reader = new AudioVisualResourceReader();
-        readerRef = new WeakReference<AudioVisualResourceReader>(reader);
+        reader = new MovieResourceReader();
+        readerRef = new WeakReference<MovieResourceReader>(reader);
       }
 
       // If no separate header was given, then we need to load the whole thing
@@ -157,10 +157,10 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
     try {
 
       // Get a hold of the audio visual reader
-      AudioVisualResourceReader reader = (readerRef != null) ? readerRef.get() : null;
+      MovieResourceReader reader = (readerRef != null) ? readerRef.get() : null;
       if (reader == null) {
-        reader = new AudioVisualResourceReader();
-        readerRef = new WeakReference<AudioVisualResourceReader>(reader);
+        reader = new MovieResourceReader();
+        readerRef = new WeakReference<MovieResourceReader>(reader);
       }
 
       // Load the audio visual body
@@ -987,7 +987,7 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
    * 
    * @see ch.entwine.weblounge.common.content.Resource#getContent(ch.entwine.weblounge.common.language.Language)
    */
-  public AudioVisualContent getContent(Language language) {
+  public MovieContent getContent(Language language) {
     return null;
   }
 
@@ -996,7 +996,7 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
    * 
    * @see ch.entwine.weblounge.common.content.Resource#getOriginalContent()
    */
-  public AudioVisualContent getOriginalContent() {
+  public MovieContent getOriginalContent() {
     return null;
   }
 
@@ -1005,7 +1005,7 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
    * 
    * @see ch.entwine.weblounge.common.content.Resource#removeContent(ch.entwine.weblounge.common.language.Language)
    */
-  public AudioVisualContent removeContent(Language language) {
+  public MovieContent removeContent(Language language) {
     return null;
   }
 
@@ -1014,7 +1014,7 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
    * 
    * @see ch.entwine.weblounge.common.content.Resource#contents()
    */
-  public Set<AudioVisualContent> contents() {
+  public Set<MovieContent> contents() {
     return null;
   }
 
@@ -1056,7 +1056,7 @@ public class LazyAudioVisualResourceImpl implements AudioVisualResource {
    * 
    * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
    */
-  public void addContent(AudioVisualContent content) {
+  public void addContent(MovieContent content) {
     // TODO Auto-generated method stub
 
   }

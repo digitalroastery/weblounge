@@ -18,18 +18,18 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.audiovisual;
+package ch.entwine.weblounge.common.impl.content.movie;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
+import ch.entwine.weblounge.common.content.movie.MovieContent;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.impl.content.ResourceImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 
 /**
  * Default implementation of an image resource.
  */
-public class AudioVisualResourceImpl extends ResourceImpl<AudioVisualContent> implements AudioVisualResource {
+public class MovieResourceImpl extends ResourceImpl<MovieContent> implements MovieResource {
 
   /**
    * Creates a new image with the given uri.
@@ -37,7 +37,7 @@ public class AudioVisualResourceImpl extends ResourceImpl<AudioVisualContent> im
    * @param uri
    *          the image uri
    */
-  public AudioVisualResourceImpl(ResourceURI uri) {
+  public MovieResourceImpl(ResourceURI uri) {
     super(new ResourceURIImpl(TYPE, uri.getSite(), uri.getPath(), uri.getIdentifier(), uri.getVersion()));
   }
 

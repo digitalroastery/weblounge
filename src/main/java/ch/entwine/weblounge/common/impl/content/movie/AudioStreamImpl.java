@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.audiovisual;
+package ch.entwine.weblounge.common.impl.content.movie;
 
-import ch.entwine.weblounge.common.content.audiovisual.AudioStream;
-import ch.entwine.weblounge.common.content.audiovisual.VideoStream;
+import ch.entwine.weblounge.common.content.movie.AudioStream;
+import ch.entwine.weblounge.common.content.movie.VideoStream;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -70,7 +70,7 @@ public class AudioStreamImpl implements AudioStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.Stream#getIdentifier()
+   * @see ch.entwine.weblounge.common.content.movie.Stream#getIdentifier()
    */
   public String getIdentifier() {
     return identifier;
@@ -89,7 +89,7 @@ public class AudioStreamImpl implements AudioStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.AudioStream#getBitDepth()
+   * @see ch.entwine.weblounge.common.content.movie.AudioStream#getBitDepth()
    */
   public Integer getBitDepth() {
     return bitDepth;
@@ -108,7 +108,7 @@ public class AudioStreamImpl implements AudioStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.AudioStream#getChannels()
+   * @see ch.entwine.weblounge.common.content.movie.AudioStream#getChannels()
    */
   public Integer getChannels() {
     return channels;
@@ -127,7 +127,7 @@ public class AudioStreamImpl implements AudioStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.AudioStream#getSamplingRate()
+   * @see ch.entwine.weblounge.common.content.movie.AudioStream#getSamplingRate()
    */
   public Integer getSamplingRate() {
     return samplingRate;
@@ -146,7 +146,7 @@ public class AudioStreamImpl implements AudioStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.AudioStream#getBitRate()
+   * @see ch.entwine.weblounge.common.content.movie.AudioStream#getBitRate()
    */
   public Float getBitRate() {
     return bitRate;
@@ -165,7 +165,7 @@ public class AudioStreamImpl implements AudioStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.Stream#getFormat()
+   * @see ch.entwine.weblounge.common.content.movie.Stream#getFormat()
    */
   public String getFormat() {
     return format;
@@ -215,7 +215,7 @@ public class AudioStreamImpl implements AudioStream {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.audiovisual.Stream#toXml()
+   * @see ch.entwine.weblounge.common.content.movie.Stream#toXml()
    */
   public String toXml() {
 
