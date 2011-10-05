@@ -20,8 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index.solr;
 
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
 import ch.entwine.weblounge.common.content.file.FileResource;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
@@ -35,7 +35,7 @@ public class AudioVisualInputDocument extends ResourceInputDocument {
    * @param audioVisual
    *          the audio visual object
    */
-  public AudioVisualInputDocument(AudioVisualResource audioVisual) {
+  public AudioVisualInputDocument(MovieResource audioVisual) {
     init(audioVisual);
   }
 

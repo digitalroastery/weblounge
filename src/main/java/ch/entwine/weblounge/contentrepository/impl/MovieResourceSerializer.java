@@ -33,13 +33,13 @@ import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
-import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
-import ch.entwine.weblounge.common.impl.content.audiovisual.AudioVisualContentReader;
-import ch.entwine.weblounge.common.impl.content.audiovisual.AudioVisualResourceImpl;
-import ch.entwine.weblounge.common.impl.content.audiovisual.AudioVisualResourceReader;
-import ch.entwine.weblounge.common.impl.content.audiovisual.AudioVisualResourceSearchResultItemImpl;
-import ch.entwine.weblounge.common.impl.content.audiovisual.AudioVisualResourceURIImpl;
+import ch.entwine.weblounge.common.content.movie.MovieContent;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
+import ch.entwine.weblounge.common.impl.content.movie.MovieContentReader;
+import ch.entwine.weblounge.common.impl.content.movie.MovieResourceImpl;
+import ch.entwine.weblounge.common.impl.content.movie.MovieResourceReader;
+import ch.entwine.weblounge.common.impl.content.movie.MovieResourceSearchResultItemImpl;
+import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
@@ -64,13 +64,13 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * Implementation of a serializer for image resources.
  */
-public class AudioVisualResourceSerializer extends AbstractResourceSerializer<AudioVisualContent, AudioVisualResource> {
+public class MovieResourceSerializer extends AbstractResourceSerializer<MovieContent, MovieResource> {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(AudioVisualResourceSerializer.class);
+  private static final Logger logger = LoggerFactory.getLogger(MovieResourceSerializer.class);
 
   /** Alternate uri prefix */
-  protected static final String URI_PREFIX = "/weblounge-av/";
+  protected static final String URI_PREFIX = "/weblounge-movies/";
 
   /** The preview generator */
   protected PreviewGenerator previewGenerator = null;
@@ -78,8 +78,8 @@ public class AudioVisualResourceSerializer extends AbstractResourceSerializer<Au
   /**
    * Creates a new image resource serializer.
    */
-  public AudioVisualResourceSerializer() {
-    super(AudioVisualResource.TYPE);
+  public MovieResourceSerializer() {
+    super(MovieResource.TYPE);
     // TODO: Initialize preview generator
   }
 
@@ -88,7 +88,7 @@ public class AudioVisualResourceSerializer extends AbstractResourceSerializer<Au
    * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
    */
-  public String getMimeType(AudioVisualContent resourceContent) {
+  public String getMimeType(MovieContent resourceContent) {
     return resourceContent.getMimetype();
   }
 
@@ -112,8 +112,8 @@ public class AudioVisualResourceSerializer extends AbstractResourceSerializer<Au
    * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
    */
-  public Resource<AudioVisualContent> newResource(Site site) {
-    return new AudioVisualResourceImpl(new AudioVisualResourceURIImpl(site));
+  public Resource<MovieContent> newResource(Site site) {
+    return new MovieResourceImpl(new MovieResourceURIImpl(site));
   }
 
   /**
@@ -123,12 +123,12 @@ public class AudioVisualResourceSerializer extends AbstractResourceSerializer<Au
    *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
    *      ch.entwine.weblounge.common.language.Language)
    */
-  public Resource<AudioVisualContent> newResource(Site site, InputStream is,
+  public Resource<MovieContent> newResource(Site site, InputStream is,
       User user, Language language) {
 
     // TODO: Extract av metadata
 
-    AudioVisualResource avResource = new AudioVisualResourceImpl(new AudioVisualResourceURIImpl(site));
+    MovieResource avResource = new MovieResourceImpl(new MovieResourceURIImpl(site));
     avResource.setCreated(user, new Date());
 
     return avResource;
@@ -140,9 +140,9 @@ public class AudioVisualResourceSerializer extends AbstractResourceSerializer<Au
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractResourceSerializer#createNewReader()
    */
   @Override
-  protected AudioVisualResourceReader createNewReader()
+  protected MovieResourceReader createNewReader()
       throws ParserConfigurationException, SAXException {
-    return new AudioVisualResourceReader();
+    return new MovieResourceReader();
   }
 
   /**
@@ -151,7 +151,7 @@ public class AudioVisualResourceSerializer extends AbstractResourceSerializer<Au
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
    */
   public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
-    return new AudioVisualInputDocument((AudioVisualResource) resource).getMetadata();
+    return new AudioVisualInputDocument((MovieResource) resource).getMetadata();
   }
 
   /**
@@ -162,9 +162,9 @@ public class AudioVisualResourceSerializer extends AbstractResourceSerializer<Au
   public List<ResourceMetadata<?>> toMetadata(SearchResultItem searchResultItem) {
     if (!(searchResultItem instanceof ImageSearchResultItem))
       throw new IllegalArgumentException("This serializer can only handle audio visual search result items");
-    AudioVisualResourceSearchResultItemImpl fsri = (AudioVisualResourceSearchResultItemImpl) searchResultItem;
+    MovieResourceSearchResultItemImpl fsri = (MovieResourceSearchResultItemImpl) searchResultItem;
     String resourceXml = fsri.getResourceXml();
-    AudioVisualResource r;
+    MovieResource r;
     try {
       r = getReader().read(IOUtils.toInputStream(resourceXml), searchResultItem.getSite());
     } catch (SAXException e) {
@@ -191,8 +191,8 @@ public class AudioVisualResourceSerializer extends AbstractResourceSerializer<Au
       if (XML.equals(metadataItem.getName())) {
         String resourceXml = (String) metadataItem.getValues().get(0);
         try {
-          ResourceReader<AudioVisualContent, AudioVisualResource> reader = getReader();
-          AudioVisualResource audioVisual = reader.read(IOUtils.toInputStream(resourceXml, "UTF-8"), site);
+          ResourceReader<MovieContent, MovieResource> reader = getReader();
+          MovieResource audioVisual = reader.read(IOUtils.toInputStream(resourceXml, "UTF-8"), site);
           return audioVisual;
         } catch (SAXException e) {
           logger.warn("Error parsing audio visual resource from metadata", e);
@@ -231,10 +231,10 @@ public class AudioVisualResourceSerializer extends AbstractResourceSerializer<Au
       path = URI_PREFIX + "/" + id;
     }
 
-    ResourceURI uri = new AudioVisualResourceURIImpl(site, path, id, Resource.LIVE);
+    ResourceURI uri = new MovieResourceURIImpl(site, path, id, Resource.LIVE);
     WebUrl url = new WebUrlImpl(site, path);
 
-    AudioVisualResourceSearchResultItemImpl result = new AudioVisualResourceSearchResultItemImpl(uri, url, relevance, site);
+    MovieResourceSearchResultItemImpl result = new MovieResourceSearchResultItemImpl(uri, url, relevance, site);
 
     if (metadataMap.get(XML) != null)
       result.setResourceXml((String) metadataMap.get(XML).getValues().get(0));
@@ -250,9 +250,9 @@ public class AudioVisualResourceSerializer extends AbstractResourceSerializer<Au
    * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getContentReader()
    */
-  public ResourceContentReader<AudioVisualContent> getContentReader()
+  public ResourceContentReader<MovieContent> getContentReader()
       throws ParserConfigurationException, SAXException {
-    return new AudioVisualContentReader();
+    return new MovieContentReader();
   }
 
   /**

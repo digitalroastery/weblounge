@@ -121,7 +121,7 @@ public class SearchIndexTest {
   /** Filename */
   protected String filename = "image.jpg";
 
-  /** Mimetype */
+  /** Mime type */
   protected String mimetype = "image/jpeg";
 
   /** Element key */

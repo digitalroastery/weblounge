@@ -91,7 +91,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
   private static final int DEFAULT_BYTES_PER_ID = 36;
 
   /** Default number of bytes per type */
-  private static final int DEFAULT_BYTES_PER_TYPE = 12;
+  private static final int DEFAULT_BYTES_PER_TYPE = 8;
 
   /** Default number of bytes per path */
   private static final int DEFAULT_BYTES_PER_PATH = 128;
