@@ -117,6 +117,50 @@ steal.plugins('jquery',
 	    		Editor.File.findOne({id: value.resourceId}, $.proxy(function(file) {
 	    			this.file[key] = file;
 	    			this.metadata[key] = file.getMetadata(this.options.language);
+	    			
+	    			var content = file.getContent(this.options.language);
+	    			var divContainer = this.element.find('div.wbl-contentData');
+	    			if(file.name.localPart == 'movie') {
+	    				divContainer.append('<h2>Movie Content:</h2>');
+	    				divContainer.append('Filename: ' + content.filename + '<br />');
+	    				divContainer.append('Mimetype: ' + content.mimetype + '<br />');
+	    				divContainer.append('Size: ' + content.size + '<br />');
+	    				divContainer.append('Duration: ' + content.duration + '<br />');
+	    				if($.isEmptyObject(content.audio)) {
+	    					content.audio = {};
+	    				}
+	    				divContainer.append('Audio Bitdepth: ' + content.audio.bitdepth + '<br />');
+	    				divContainer.append('Audio Bitrate: ' + content.audio.bitrate + '<br />');
+	    				divContainer.append('Audio Channels: ' + content.audio.channels + '<br />');
+	    				divContainer.append('Audio Format: ' + content.audio.format + '<br />');
+	    				divContainer.append('Audio Samplingrate: ' + content.audio.samplingrate + '<br />');
+	    				if($.isEmptyObject(content.video)) {
+	    					content.video = {};
+	    				}
+	    				divContainer.append('Video Bitrate: ' + content.video.bitrate + '<br />');
+	    				divContainer.append('Video Format: ' + content.video.format + '<br />');
+	    				divContainer.append('Video Framerate: ' + content.video.framerate + '<br />');
+	    				divContainer.append('Video Resolution: ' + content.video.resolution + '<br />');
+	    				divContainer.append('Video Scantype: ' + content.video.scantype + '<br />');
+	    			} else if(file.name.localPart == 'image') {
+	    				divContainer.append('<h2>Image Content:</h2>');
+	    				divContainer.append('Filename: ' + content.filename + '<br />');
+	    				divContainer.append('Mimetype: ' + content.mimetype + '<br />');
+	    				divContainer.append('Size: ' + content.size + '<br />');
+	    				divContainer.append('Width: ' + content.width + '<br />');
+	    				divContainer.append('Height: ' + content.height + '<br />');
+	    				divContainer.append('Datetaken: ' + content.datetaken + '<br />');
+	    				divContainer.append('Location: ' + content.location + '<br />');
+	    				if($.isEmptyObject(content.gps)) {
+	    					content.gps = {};
+	    				}
+	    				divContainer.append('GPS Latitude: ' + content.gps.lat + '<br />');
+	    				divContainer.append('GPS Longitude: ' + content.gps.lng + '<br />');
+	    				divContainer.append('Filmspeed: ' + content.filmspeed + '<br />');
+	    				divContainer.append('Fnumber: ' + content.fnumber + '<br />');
+	    				divContainer.append('Focal Width: ' + content.focalwidth + '<br />');
+	    				divContainer.append('Exposure Time: ' + content.exposuretime + '<br />');
+	    			}
 	    			success();
 	    		}, this));
 	    		

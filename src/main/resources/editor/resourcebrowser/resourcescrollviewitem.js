@@ -14,6 +14,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		
 		_showResource: function(el) {
 			var beforeLoad = null;
+			var scrollItem = this.element;
 			switch(this.options.resourceType) {
 			case 'pages':
 				var pageURL = this.element.find('a.wbl-pagePath').attr('href') + '?preview&_=' + new Date().getTime();
@@ -22,7 +23,10 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 					iframeTag.css('width', $(window).width() * 0.8 + 'px');
 					iframeTag.css('height', $(window).height() * 0.8 + 'px');
 					iframeTag.attr('src', pageURL).show();
-				}, function() {});
+					this.getOverlay().appendTo('body');
+				}, function() {
+					this.getOverlay().appendTo(scrollItem);
+				});
 				break;
 			case 'media':
 				var fileResource = new Editor.File({value: this.options.page});
@@ -39,7 +43,10 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 						imgTag.css('max-width', $(window).width() * 0.8 + 'px');
 						imgTag.css('max-height', $(window).height() * 0.8 + 'px');
 						imgTag.attr('src', url).show();
-					}, function() {});
+						this.getOverlay().appendTo('body');
+					}, function() {
+						this.getOverlay().appendTo(scrollItem);
+					});
 					break;
 				case 'movie':
 					var player = null;
@@ -51,10 +58,12 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 						videoTag.html('<source src="' + url + '" type="' + fileContent.mimetype + '" />').show();
 						
 						player = new MediaElementPlayer(videoTag, {});
+						this.getOverlay().appendTo('body');
 					}, function() {
 						if(player != null) {
 							player.pause();
 						}
+						this.getOverlay().appendTo(scrollItem);
 					});
 					break;
 				}
