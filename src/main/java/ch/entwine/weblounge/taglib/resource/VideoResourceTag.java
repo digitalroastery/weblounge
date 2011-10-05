@@ -20,12 +20,12 @@
 
 package ch.entwine.weblounge.taglib.resource;
 
-import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.audiovisual.AudioVisualContent;
+import ch.entwine.weblounge.common.content.audiovisual.AudioVisualResource;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.impl.content.audiovisual.AudioVisualResourceURIImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -37,8 +37,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.jsp.JspException;
 
 /**
- * This tag loads a video resource that is defined by an identifier or a path from the
- * content repository.
+ * This tag loads a video resource that is defined by an identifier or a path
+ * from the content repository.
  * <p>
  * If it is found, the video resource is defined in the jsp context variable
  * <code>video</code>, otherwise, the tag body is skipped altogether.
@@ -68,8 +68,8 @@ public class VideoResourceTag extends WebloungeTag {
   }
 
   /**
-   * Sets the video resource path. If both path and uuid have been defined, the uuid takes
-   * precedence.
+   * Sets the video resource path. If both path and uuid have been defined, the
+   * uuid takes precedence.
    * 
    * @param path
    *          the video resource path
@@ -98,14 +98,14 @@ public class VideoResourceTag extends WebloungeTag {
     // specified, and we are not in jsp compilation mode, issue a warning
     ResourceURI uri = null;
     if (StringUtils.isNotBlank(videoId)) {
-      uri = new ResourceURIImpl(null, site, null, videoId);
+      uri = new AudioVisualResourceURIImpl(site, null, videoId);
     } else if (StringUtils.isNotBlank(videoResourcePath)) {
-      uri = new ResourceURIImpl(null, site, videoResourcePath);
+      uri = new AudioVisualResourceURIImpl(site, videoResourcePath);
     } else {
       logger.debug("Neither uuid nor path were specified for video resource");
       return SKIP_BODY;
     }
-    
+
     // Try to load the video resource from the content repository
     try {
       if (!repository.exists(uri)) {
@@ -117,15 +117,15 @@ public class VideoResourceTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    Resource<?> video = null;
-    ResourceContent videoContent = null;
+    AudioVisualResource video = null;
+    AudioVisualContent videoContent = null;
 
     // Store the result in the jsp page context
     try {
-      video = repository.get(uri);
+      video = (AudioVisualResource) repository.get(uri);
       video.switchTo(language);
       videoContent = video.getContent(language);
-      if(videoContent == null)
+      if (videoContent == null)
         videoContent = video.getOriginalContent();
     } catch (ContentRepositoryException e) {
       logger.warn("Error trying to load video resource " + uri + ": " + e.getMessage(), e);
