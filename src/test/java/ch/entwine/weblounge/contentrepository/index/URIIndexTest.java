@@ -59,7 +59,7 @@ public class URIIndexTest {
   protected int idLength = 36;
 
   /** Number of bytes per type */
-  protected int typeLength = 8;
+  protected int typeLength = 12;
 
   /** Number of bytes per path */
   protected int pathLength = 128;
