@@ -54,6 +54,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,15 +112,19 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   public Resource<FileContent> newResource(Site site) {
     return new FileResourceImpl(new FileResourceURIImpl(site));
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site, java.io.InputStream, ch.entwine.weblounge.common.security.User, ch.entwine.weblounge.common.language.Language)
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
+   *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
+   *      ch.entwine.weblounge.common.language.Language)
    */
   public Resource<FileContent> newResource(Site site, InputStream is,
       User user, Language language) {
-    return newResource(site);
+    Resource<FileContent> fileResource = newResource(site);
+    fileResource.setCreated(user, new Date());
+    return fileResource;
   }
 
   /**
@@ -150,7 +155,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   public List<ResourceMetadata<?>> toMetadata(SearchResultItem searchResultItem) {
     if (!(searchResultItem instanceof FileSearchResultItem))
       throw new IllegalArgumentException("This serializer can only handle file search result items");
-    FileSearchResultItem fsri = (FileSearchResultItem)searchResultItem;
+    FileSearchResultItem fsri = (FileSearchResultItem) searchResultItem;
     String resourceXml = fsri.getResourceXml();
     Site site = searchResultItem.getSite();
     try {

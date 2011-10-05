@@ -1277,10 +1277,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    * @return the mimetype or <code>null</code> if no mimetype could be detected
    */
   private String detectMimeTypeFromFile(String fileName, File uploadedFile) {
-    String mimeType = mimeTypeDetector.detect(fileName);
-    if (!StringUtils.isBlank(mimeType))
-      return mimeType;
-
+    String mimeType = null;
     if (fileName.endsWith(".ogg")) {
       mimeType = "video/ogg";
     } else if (fileName.endsWith(".mp4")) {
@@ -1288,15 +1285,19 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     } else if (fileName.endsWith(".webm")) {
       mimeType = "video/webm";
     } else {
-      InputStream is = null;
-      try {
-        is = new FileInputStream(uploadedFile);
-        mimeType = mimeTypeDetector.detect(is);
-      } catch (IOException e) {
-        logger.warn("Error detecting mime type: {}", e.getMessage());
-      } finally {
-        IOUtils.closeQuietly(is);
-      }
+      mimeType = mimeTypeDetector.detect(fileName);
+    }
+    if (!StringUtils.isBlank(mimeType))
+      return mimeType;
+
+    InputStream is = null;
+    try {
+      is = new FileInputStream(uploadedFile);
+      mimeType = mimeTypeDetector.detect(is);
+    } catch (IOException e) {
+      logger.warn("Error detecting mime type: {}", e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(is);
     }
     return mimeType;
   }
