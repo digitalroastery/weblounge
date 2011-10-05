@@ -18,46 +18,32 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.audiovisual;
+package ch.entwine.weblounge.common.content.movie;
 
 /**
- * A video stream identifies a video track inside a movie container.
+ * This interface represents an audio visual stream.
  */
-public interface VideoStream extends Stream {
+public interface Stream {
 
   /**
-   * Returns the number of bits per second.
+   * Returns the stream identifier.
    * 
-   * @return the bit rate
+   * @return the stream identifier
    */
-  Float getBitRate();
+  String getIdentifier();
 
   /**
-   * Returns the number of frames per second.
+   * Returns the name of the encoding format.
    * 
-   * @return the number of frames per second
+   * @return the encoding format
    */
-  Float getFrameRate();
+  String getFormat();
 
   /**
-   * Returns the frame width in pixel.
+   * Returns an xml representation of the stream.
    * 
-   * @return the frame width
+   * @return the xml representation
    */
-  Integer getFrameWidth();
-
-  /**
-   * Returns the frame height in pixel.
-   * 
-   * @return the frame height in pixel
-   */
-  Integer getFrameHeight();
-
-  /**
-   * Returns whether the video requires interlaced or progressive scanning.
-   * 
-   * @return the scan type
-   */
-  ScanType getScanType();
+  String toXml();
 
 }

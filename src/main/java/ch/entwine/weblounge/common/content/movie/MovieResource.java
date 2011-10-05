@@ -18,16 +18,16 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.audiovisual;
+package ch.entwine.weblounge.common.content.movie;
 
 import ch.entwine.weblounge.common.content.Resource;
 
 /**
- * Object representation of a audio visual resource.
+ * Object representation of an audio visual resource.
  */
-public interface AudioVisualResource extends Resource<AudioVisualContent> {
+public interface MovieResource extends Resource<MovieContent> {
 
   /** The resource type */
-  String TYPE = "audiovisual";
+  String TYPE = "movie";
 
 }

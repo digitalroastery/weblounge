@@ -18,39 +18,34 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.audiovisual;
+package ch.entwine.weblounge.common.content.movie;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
- * An audio stream identifies an audio track inside a movie container.
+ * The scan format of a video is either interlaced or progressive. In interlaced
+ * mode, only every other line of pixels is updated per frame, while in
+ * progressive mode, the whole frame is updated at once.
  */
-public interface AudioStream extends Stream {
+public enum ScanType {
+
+  /** Interlaced */
+  Interlaced,
+
+  /** Progressive */
+  Progressive;
 
   /**
-   * Returns the number of bits per sample.
+   * Creates a new scan type object from the given argument.
    * 
-   * @return the number of bits per sample.
+   * @param value
+   *          the scan type as a string
+   * @return the scan type
+   * @throws IllegalArgumentException
+   *           if no such scan type exists
    */
-  Integer getBitDepth();
-
-  /**
-   * Returns the number of channels.
-   * 
-   * @return the number of channels
-   */
-  Integer getChannels();
-
-  /**
-   * Returns the number of samples per second.
-   * 
-   * @return the number of samples per second
-   */
-  Integer getSamplingRate();
-
-  /**
-   * Returns the number of bits per second.
-   * 
-   * @return the number of bits per second
-   */
-  Float getBitRate();
+  public static ScanType fromString(String value) {
+    return ScanType.valueOf(StringUtils.capitalize(value));
+  }
 
 }

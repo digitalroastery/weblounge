@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.audiovisual;
+package ch.entwine.weblounge.common.content.movie;
 
 import ch.entwine.weblounge.common.content.file.FileContent;
 
@@ -27,7 +27,7 @@ import ch.entwine.weblounge.common.content.file.FileContent;
  * attributes such as file size and mime type. In addition, it contains
  * technical information like resolution, bit rate, frame rate etc.
  */
-public interface AudioVisualContent extends FileContent {
+public interface MovieContent extends FileContent {
 
   /**
    * Returns the audio visual streams contained in this movie.
