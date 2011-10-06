@@ -403,8 +403,6 @@ div.wbl-previewOverlay .close {
 
 img.wbl-overlayPreviewImage {
 	display: none;
-	max-width: 800px;
-	max-height: 600px;
 }
 
 div.wbl-previewOverlay iframe {
@@ -416,8 +414,6 @@ div.wbl-previewOverlay iframe {
 
 div.wbl-previewOverlay video {
 	display: none;
-	max-width: 800px;
-	max-height: 600px;
 }
 
 div.wbl-overlayPreviewContent {

@@ -60,7 +60,7 @@ steal.plugins().then(function($) {
 			var map = new Array({resourceId: resourceItem.attr('id')});
 			$('div#wbl-mediaeditor').editor_mediaeditor({
 				map: map, 
-				language: this.options.language, 
+				language: this.options.language,
 				runtime: this.options.runtime,
 				success: function() {
 					resourceItem.parents('#wbl-mainContainer').trigger('updateLastMedia');

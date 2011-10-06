@@ -23,10 +23,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 					iframeTag.css('width', $(window).width() * 0.8 + 'px');
 					iframeTag.css('height', $(window).height() * 0.8 + 'px');
 					iframeTag.attr('src', pageURL).show();
-					this.getOverlay().appendTo('body');
-				}, function() {
-					this.getOverlay().appendTo(scrollItem);
-				});
+				}, function() {});
 				break;
 			case 'media':
 				var fileResource = new Editor.File({value: this.options.page});
@@ -37,16 +34,15 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 	                window.open(url, "popUp", "width=800,height=600,scrollbars=yes");
 					break;
 				case 'image':
-					this._loadOverlay(function() {
+					this._loadOverlay($.proxy(function() {
 						var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + fileContent.language;
-						var imgTag = this.getOverlay().find('img.wbl-overlayPreviewImage');
-						imgTag.css('max-width', $(window).width() * 0.8 + 'px');
-						imgTag.css('max-height', $(window).height() * 0.8 + 'px');
+						var imgTag = this.element.find("div.wbl-previewOverlay img.wbl-overlayPreviewImage");
+						var height = this._getScaledHeight(fileContent.width, fileContent.height);
+						var width = this._getScaledWidth(fileContent.width, fileContent.height);
 						imgTag.attr('src', url).show();
-						this.getOverlay().appendTo('body');
-					}, function() {
-						this.getOverlay().appendTo(scrollItem);
-					});
+						imgTag.attr('width', width + 'px');
+						imgTag.attr('height', height + 'px');
+					}, this), function() {});
 					break;
 				case 'movie':
 					var player = null;
@@ -58,18 +54,46 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 						videoTag.html('<source src="' + url + '" type="' + fileContent.mimetype + '" />').show();
 						
 						player = new MediaElementPlayer(videoTag, {});
-						this.getOverlay().appendTo('body');
 					}, function() {
 						if(player != null) {
 							player.pause();
 						}
-						this.getOverlay().appendTo(scrollItem);
 					});
 					break;
 				}
 				break;
 			}
 
+		},
+		
+		_getScaledHeight: function(width, height) {
+			var maxWidth = $(window).width() * 0.8;
+			var maxHeight = $(window).height() * 0.8;
+			
+			var scaleX = maxWidth / width;
+			var scaleY = maxHeight / height;
+			var scale = Math.min(scaleX, scaleY);
+			
+			if(scale > 1.0) {
+				return height;
+			} else {
+				return height * scale;
+			}
+		},
+		
+		_getScaledWidth: function(width, height) {
+			var maxWidth = $(window).width() * 0.8;
+			var maxHeight = $(window).height() * 0.8;
+			
+			var scaleX = maxWidth / width;
+			var scaleY = maxHeight / height;
+			var scale = Math.min(scaleX, scaleY);
+			
+			if(scale > 1.0) {
+				return width;
+			} else {
+				return width * scale;
+			}
 		},
 		
 		_loadOverlay: function(beforeLoad, beforeClose) {
