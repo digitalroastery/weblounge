@@ -8,7 +8,7 @@ steal.plugins('jquery',
 		'jqueryui/resizable',
 		'jqueryui/mouse')
 .models('../../models/workbench')
-.views('//editor/mediaeditor/views/init.tmpl')
+.views('//editor/mediaeditor/views/init.tmpl', '//editor/mediaeditor/views/content.tmpl')
 .css('mediaeditor')
 .then(function($) {
 	
@@ -23,7 +23,6 @@ steal.plugins('jquery',
 		 */
 		init: function(el) {
 			$(el).html('//editor/mediaeditor/views/init.tmpl', {map : this.options.map, language: this.options.language, runtime: this.options.runtime});
-			this.img = this.element.find('.wbl-taggerImage img:first').show();
 			
 			// Initialize Buttons
 			this.element.find('div.wbl-buttonLeft:first').hide();
@@ -31,7 +30,7 @@ steal.plugins('jquery',
 				this.element.find('div.wbl-buttonRight:first').hide();
 			}
 			
-			this.index = 1;
+			this.index = 0;
 			this.metadata = new Array();
 			this.file = new Array();
 			
@@ -92,7 +91,7 @@ steal.plugins('jquery',
 						terms.pop();
 						// add the selected item
 						terms.push(ui.item.value);
-						this._saveMetadata(this.img.index(), {inputTags: terms.toString()});
+						this._saveMetadata(this.index, {inputTags: terms.toString()});
 						// add placeholder to get the comma-and-space at the end
 						terms.push("");
 						inputTags.val(terms.join(", "));
@@ -106,7 +105,7 @@ steal.plugins('jquery',
 				this.element.find("input[name=author]").autocomplete({
 					source: userTags,
 					select: $.proxy(function(ev, ui) {
-						this._saveMetadata(this.img.index(), {author: ui.item.value});
+						this._saveMetadata(this.index, {author: ui.item.value});
 					}, this)
 				});
 			}, this));
@@ -117,64 +116,9 @@ steal.plugins('jquery',
 	    		Editor.File.findOne({id: value.resourceId}, $.proxy(function(file) {
 	    			this.file[key] = file;
 	    			this.metadata[key] = file.getMetadata(this.options.language);
-	    			
-	    			var content = file.getContent(this.options.language);
-	    			var divContainer = this.element.find('div.wbl-contentData');
-	    			if(file.name.localPart == 'movie') {
-	    				divContainer.append('<h2>Movie Content:</h2>');
-	    				divContainer.append('Filename: ' + content.filename + '<br />');
-	    				divContainer.append('Mimetype: ' + content.mimetype + '<br />');
-	    				divContainer.append('Size: ' + content.size + '<br />');
-	    				divContainer.append('Duration: ' + content.duration + '<br />');
-	    				if($.isEmptyObject(content.audio)) {
-	    					content.audio = {};
-	    				}
-	    				divContainer.append('Audio Bitdepth: ' + content.audio.bitdepth + '<br />');
-	    				divContainer.append('Audio Bitrate: ' + content.audio.bitrate + '<br />');
-	    				divContainer.append('Audio Channels: ' + content.audio.channels + '<br />');
-	    				divContainer.append('Audio Format: ' + content.audio.format + '<br />');
-	    				divContainer.append('Audio Samplingrate: ' + content.audio.samplingrate + '<br />');
-	    				if($.isEmptyObject(content.video)) {
-	    					content.video = {};
-	    				}
-	    				divContainer.append('Video Bitrate: ' + content.video.bitrate + '<br />');
-	    				divContainer.append('Video Format: ' + content.video.format + '<br />');
-	    				divContainer.append('Video Framerate: ' + content.video.framerate + '<br />');
-	    				divContainer.append('Video Resolution: ' + content.video.resolution + '<br />');
-	    				divContainer.append('Video Scantype: ' + content.video.scantype + '<br />');
-	    			} else if(file.name.localPart == 'image') {
-	    				divContainer.append('<h2>Image Content:</h2>');
-	    				divContainer.append('Filename: ' + content.filename + '<br />');
-	    				divContainer.append('Mimetype: ' + content.mimetype + '<br />');
-	    				divContainer.append('Size: ' + content.size + '<br />');
-	    				divContainer.append('Width: ' + content.width + '<br />');
-	    				divContainer.append('Height: ' + content.height + '<br />');
-	    				divContainer.append('Datetaken: ' + content.datetaken + '<br />');
-	    				divContainer.append('Location: ' + content.location + '<br />');
-	    				if($.isEmptyObject(content.gps)) {
-	    					content.gps = {};
-	    				}
-	    				divContainer.append('GPS Latitude: ' + content.gps.lat + '<br />');
-	    				divContainer.append('GPS Longitude: ' + content.gps.lng + '<br />');
-	    				divContainer.append('Filmspeed: ' + content.filmspeed + '<br />');
-	    				divContainer.append('Fnumber: ' + content.fnumber + '<br />');
-	    				divContainer.append('Focal Width: ' + content.focalwidth + '<br />');
-	    				divContainer.append('Exposure Time: ' + content.exposuretime + '<br />');
-	    			}
+
 	    			success();
 	    		}, this));
-	    		
-				Editor.File.findReferrer({id: value.resourceId}, $.proxy(function(referrer) {
-					if(referrer == undefined) {
-						this.element.find('div.wbl-referrerMediaEditor').html('Keine Verweise');
-						return;
-					}
-					$.each(referrer, $.proxy(function(index, ref) {
-				    	var page = new Page({value: ref});
-						this.element.find('div.wbl-referrerMediaEditor').append(page.getTitle(this.options.language))
-						.append(': <a href="' + page.getPath() + '?_=' + new Date().getTime() + '">' + page.getPath() + '</a><br />');
-					}, this));
-				}, this));
 	    		
 	    	}, this));
 	    },
@@ -185,10 +129,49 @@ steal.plugins('jquery',
 	    		$(this).val('');
 	    	});
 	    	
+	    	var content = this.file[index].getContent(this.options.language);
+	    	var container = this.element.find('.wbl-taggerImage');
+	    	// show image
+	    	if(this.file[index].name.localPart == 'movie') {
+				var videoUrl = '/system/weblounge/files/' + this.file[index].value.id + '/content/' + content.language;
+				container.html('<video height="270px" preload="preload" controls="controls"></video>');
+				var videoTag = container.find('video').html('<source src="' + videoUrl + '" type="' + content.mimetype + '" />');
+				var videoWidth = videoTag.width();
+				videoTag.attr('width', videoWidth + 'px');
+				var left = Math.max((container.outerWidth({margin:true}) - videoWidth) / 2, 0);
+				player = new MediaElementPlayer(videoTag, {});
+				container.find('div.mejs-container').css('left', left + 'px');
+	    	} else if(this.file[index].name.localPart == 'image'){
+	    		var previewUrl = '/system/weblounge/previews/' + this.file[index].value.id + '/locales/' + this.options.language + '/styles/weblounge-ui:preview';
+	    		container.html('<img src="' + previewUrl + '" alt="Vorschaubild" />');
+	    		var imgTag = container.find('img');
+	    		var left = Math.max((container.outerWidth({margin:true}) - imgTag.width()) / 2, 0);
+	    		imgTag.css('left', left + 'px');
+	    	} else {
+	    		container.html('Kein Vorschaubild');
+	    		container.css('text-align', 'center');
+	    	}
+	    	
 	    	// show metadata
 			$.each(this.metadata[index], $.proxy(function(key, value) {
 				this.element.find('div.wbl-metadata input[name=' + key + ']').val(value);
 			},this));
+			
+			// show Referrers
+			Editor.File.findReferrer({id: this.file[index].value.id}, $.proxy(function(referrer) {
+				if(referrer == undefined) {
+					this.element.find('div.wbl-referrerMediaEditor').html('Keine Verweise');
+					return;
+				}
+				$.each(referrer, $.proxy(function(index, ref) {
+			    	var page = new Page({value: ref});
+					this.element.find('div.wbl-referrerMediaEditor').append(page.getTitle(this.options.language))
+					.append(': <a href="' + page.getPath() + '?_=' + new Date().getTime() + '">' + page.getPath() + '</a><br />');
+				}, this));
+			}, this));
+			
+			// show content metadata
+			this.element.find('div.wbl-contentData').html('//editor/mediaeditor/views/content.tmpl', {file: this.file[index], content: content});
 	    },
 	    
 	    _saveMetadata: function(id, params) {
@@ -199,43 +182,39 @@ steal.plugins('jquery',
 	    },
 	    
 	    "div.wbl-metadata input[name=title] change": function(el, ev) {
-	    	this._saveMetadata(this.img.index(), {title: el.val()});
+	    	this._saveMetadata(this.index, {title: el.val()});
 	    },
 	    
 	    "div.wbl-metadata input[name=description] change": function(el, ev) {
-	    	this._saveMetadata(this.img.index(), {description: el.val()});
+	    	this._saveMetadata(this.index, {description: el.val()});
 	    },
 	    
 	    "div.wbl-metadata input[name=tags] change": function(el, ev, test) {
-	    	this._saveMetadata(this.img.index(), {tags: el.val()});
+	    	this._saveMetadata(this.index, {tags: el.val()});
 	    },
 	    
 	    "div.wbl-metadata input[name=author] change": function(el, ev) {
-	    	this._saveMetadata(this.img.index(), {author: el.val()});
+	    	this._saveMetadata(this.index, {author: el.val()});
 	    },
 	    
 	    "div.wbl-buttonLeft click": function(el, ev) {
-	    	var prevImg = this.img.prev();
-	    	if(prevImg.length < 1) return;
-	    	this.img.toggle();
-	    	this.img = prevImg.show();
-	    	if(prevImg.prev().length < 1) el.hide();
-	    	el.next().show();
-	    	this._showMetadata(this.img.index());
+	    	if(this.index == 0) return;
 	    	this.index--;
-	    	this.element.dialog('option', 'title', 'Metadaten eingeben: Datei ' + this.index + ' / ' + this.options.map.length);
+	    	if(this.index == 0) el.hide();
+	    	el.next().show();
+	    	
+	    	this._showMetadata(this.index);
+	    	this.element.dialog('option', 'title', 'Metadaten eingeben: Datei ' + (this.index + 1) + ' / ' + this.options.map.length);
 	    },
 	    
 	    "div.wbl-buttonRight click": function(el, ev) {
-	    	var nextImg = this.img.next();
-	    	if(nextImg.length < 1) return;
-	    	this.img.toggle();
-	    	this.img = nextImg.show();
-	    	if(nextImg.next().length < 1) el.hide();
-	    	el.prev().show();
-	    	this._showMetadata(this.img.index());
+	    	if(this.index + 1 == this.options.map.length) return;
 	    	this.index++;
-	    	this.element.dialog('option', 'title', 'Metadaten eingeben: Datei ' + this.index + ' / ' + this.options.map.length);
+	    	if(this.index + 1 == this.options.map.length) el.hide();
+	    	el.prev().show();
+	    	
+	    	this._showMetadata(this.index);
+	    	this.element.dialog('option', 'title', 'Metadaten eingeben: Datei ' + (this.index + 1) + ' / ' + this.options.map.length);
 	    },
 	    
 	    "img.wbl-copyMetadata click": function(el, ev) {

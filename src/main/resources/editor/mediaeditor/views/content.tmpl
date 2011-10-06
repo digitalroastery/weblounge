@@ -1,0 +1,39 @@
+{{if file.name.localPart == 'movie'}}
+	<h2>Movie Metadaten:</h2>
+	Filename: {{if !$.isEmptyObject(content.filename)}}${content.filename}{{/if}}<br />
+	Mimetype: {{if !$.isEmptyObject(content.mimetype)}}${content.mimetype}{{/if}}<br />
+	Size: {{if !$.isEmptyObject(content.size)}}${content.size}{{/if}}<br />
+	Duration: {{if !$.isEmptyObject(content.duration)}}${content.duration}{{/if}}<br /><br />
+	
+	Audio Bitdepht: {{if !$.isEmptyObject(content.audio) && !$.isEmptyObject(content.audio.bitdepth)}}${content.audio.bitdepth}{{/if}}<br />
+	Audio Bitrate: {{if !$.isEmptyObject(content.audio) && !$.isEmptyObject(content.audio.bitrate)}}${content.audio.bitrate}{{/if}}<br />
+	Audio Channels: {{if !$.isEmptyObject(content.audio) && !$.isEmptyObject(content.audio.channels)}}${content.audio.channels}{{/if}}<br />
+	Audio Format: {{if !$.isEmptyObject(content.audio) && !$.isEmptyObject(content.audio.format)}}${content.audio.format}{{/if}}<br />
+	Audio Samplingrate: {{if !$.isEmptyObject(content.audio) && !$.isEmptyObject(content.audio.samplingrate)}}${content.audio.samplingrate}{{/if}}<br /><br />
+	
+	Video Bitrate: {{if !$.isEmptyObject(content.video) && !$.isEmptyObject(content.video.bitrate)}}${content.video.bitrate}{{/if}}<br />
+	Video Format: {{if !$.isEmptyObject(content.video) && !$.isEmptyObject(content.video.format)}}${content.video.format}{{/if}}<br />
+	Video Framerate: {{if !$.isEmptyObject(content.video) && !$.isEmptyObject(content.video.framerate)}}${content.video.framerate}{{/if}}<br />
+	Video Resolution: {{if !$.isEmptyObject(content.video) && !$.isEmptyObject(content.video.resolution)}}${content.video.resolution}{{/if}}<br />
+	Video Scantype: {{if !$.isEmptyObject(content.video) && !$.isEmptyObject(content.video.scantype)}}${content.video.scantype}{{/if}}<br />
+{{else file.name.localPart == 'image'}}
+	<h2>Image Metadaten:</h2>
+	Filename: {{if !$.isEmptyObject(content.filename)}}${content.filename}{{/if}}<br />
+	Mimetype: {{if !$.isEmptyObject(content.mimetype)}}${content.mimetype}{{/if}}<br />
+	Size: {{if !$.isEmptyObject(content.size)}}${content.size}{{/if}}<br />
+	Width: {{if !$.isEmptyObject(content.width)}}${content.width}{{/if}}<br />
+	Height: {{if !$.isEmptyObject(content.height)}}${content.height}{{/if}}<br />
+	Datetaken: {{if !$.isEmptyObject(content.datetaken)}}${content.datetaken}{{/if}}<br />
+	Location: {{if !$.isEmptyObject(content.location)}}${content.location}{{/if}}<br />
+	
+	GPS Latitude: {{if !$.isEmptyObject(content.gps) && !$.isEmptyObject(content.gps.lat)}}${content.gps.lat}{{/if}}<br />
+	GPS Longitude: {{if !$.isEmptyObject(content.gps) && !$.isEmptyObject(content.gps.lng)}}${content.gps.lng}{{/if}}<br />
+	Filmspeed: {{if !$.isEmptyObject(content.filmspeed)}}${content.filmspeed}{{/if}}<br />
+	Fnumber: {{if !$.isEmptyObject(content.fnumber)}}${content.fnumber}{{/if}}<br />
+	Focal Width: {{if !$.isEmptyObject(content.focalwidth)}}${content.focalwidth}{{/if}}<br />
+	Exposure Time: {{if !$.isEmptyObject(content.exposuretime)}}${content.exposuretime}{{/if}}<br />
+{{else file.name.localPart == 'file'}}
+	<h2>File Metadaten:</h2>
+	Filename: {{if !$.isEmptyObject(content.filename)}}${content.filename}{{/if}}<br />
+	Mimetype: {{if !$.isEmptyObject(content.mimetype)}}${content.mimetype}{{/if}}<br />
+{{/if}}
