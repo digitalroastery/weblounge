@@ -14,7 +14,7 @@
     		Creation Date: ${page.head.created.date.toLocaleString()}<br />
     	{{/if}}
 		{{if page.head.metadata.subject}}
-			Tags: {{each page.head.metadata.subject}} ${$value}, {{/each}}<br/>
+			Tags: {{each page.head.metadata.subject}} ${$value}{{if page.head.metadata.subject.length != ($index + 1)}}, {{/if}}{{/each}}<br/>
 		{{/if}}
 		{{if page.path}}
 			URL: <a href="${page.path}" class="wbl-pagePath" title="Gehe zu Seite">${page.path}</a>

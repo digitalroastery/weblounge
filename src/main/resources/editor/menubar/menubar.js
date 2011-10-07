@@ -316,7 +316,8 @@ steal.plugins(
 		
 		"img.wbl-logout click": function(el, ev) {
 			this._delete_cookie("weblounge.editor");
-			location.href = location.pathname + '?_=' + new Date().getTime();
+			var logouturl = '/system/weblounge/logout?path=';
+			location.href = logouturl + location.pathname;
 		},
 		
 		"li.wbl-newPage click": function(el, ev) {
