@@ -20,18 +20,17 @@
 
 package ch.entwine.weblounge.common.impl.content.movie;
 
-import ch.entwine.weblounge.common.content.FileSearchResultItem;
+import ch.entwine.weblounge.common.content.MovieSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.file.FileResource;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.impl.content.AbstractResourceSearchResultItemImpl;
-import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 /**
  * Audio visual implementation of a
  * {@link ch.entwine.weblounge.common.content.SearchResultItem}.
  */
-public class MovieResourceSearchResultItemImpl extends AbstractResourceSearchResultItemImpl implements FileSearchResultItem {
+public class MovieResourceSearchResultItemImpl extends AbstractResourceSearchResultItemImpl implements MovieSearchResultItem {
 
   /** The audio visual xml */
   protected String audioVisualXml = null;
@@ -60,15 +59,6 @@ public class MovieResourceSearchResultItemImpl extends AbstractResourceSearchRes
   public MovieResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
       double relevance, Object source) {
     super(uri, url, relevance, source);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem#getResourceURI()
-   */
-  public ResourceURI getResourceURI() {
-    return new FileResourceURIImpl(url.getSite(), url.getPath(), id);
   }
 
   /**
@@ -122,14 +112,13 @@ public class MovieResourceSearchResultItemImpl extends AbstractResourceSearchRes
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.FileSearchResultItem#getFileResource()
+   * @see ch.entwine.weblounge.common.content.MovieSearchResultItem#getMovieResource()
    */
-  public FileResource getFileResource() {
+  public MovieResource getMovieResource() {
     if (resource == null) {
-      ResourceURI uri = new FileResourceURIImpl(url.getSite(), url.getPath(), id);
       resource = new LazyMovieResourceImpl(uri, audioVisualXml, headerXml, previewXml);
     }
-    return (FileResource) resource;
+    return (MovieResource) resource;
   }
 
   /**

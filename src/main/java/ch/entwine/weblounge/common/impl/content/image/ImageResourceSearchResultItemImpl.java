@@ -20,18 +20,17 @@
 
 package ch.entwine.weblounge.common.impl.content.image;
 
-import ch.entwine.weblounge.common.content.FileSearchResultItem;
+import ch.entwine.weblounge.common.content.ImageSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.file.FileResource;
+import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.AbstractResourceSearchResultItemImpl;
-import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 /**
  * Default implementation of a
  * {@link ch.entwine.weblounge.common.content.SearchResultItem}.
  */
-public class ImageResourceSearchResultItemImpl extends AbstractResourceSearchResultItemImpl implements FileSearchResultItem {
+public class ImageResourceSearchResultItemImpl extends AbstractResourceSearchResultItemImpl implements ImageSearchResultItem {
 
   /** The image xml */
   protected String imageXml = null;
@@ -60,15 +59,6 @@ public class ImageResourceSearchResultItemImpl extends AbstractResourceSearchRes
   public ImageResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
       double relevance, Object source) {
     super(uri, url, relevance, source);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem#getResourceURI()
-   */
-  public ResourceURI getResourceURI() {
-    return new FileResourceURIImpl(url.getSite(), url.getPath(), id);
   }
 
   /**
@@ -122,24 +112,24 @@ public class ImageResourceSearchResultItemImpl extends AbstractResourceSearchRes
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.FileSearchResultItem#getFileResource()
-   */
-  public FileResource getFileResource() {
-    if (resource == null) {
-      ResourceURI uri = new FileResourceURIImpl(url.getSite(), url.getPath(), id);
-      resource = new LazyImageResourceImpl(uri, imageXml, headerXml, previewXml);
-    }
-    return (FileResource) resource;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     return "Image " + uri.toString();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ImageSearchResultItem#getImageResource()
+   */
+  @Override
+  public ImageResource getImageResource() {
+    if (resource == null) {
+      resource = new LazyImageResourceImpl(uri, imageXml, headerXml, previewXml);
+    }
+    return (ImageResource) resource;
   }
 
 }
