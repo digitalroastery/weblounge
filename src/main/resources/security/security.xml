@@ -39,7 +39,7 @@
 
     <!-- The login processing urls needs to be covered by the filter chain -->
     <sec:intercept-url pattern="^/system/weblounge/login/.*" access="weblounge:guest"/>
-    <sec:intercept-url pattern="^/system/weblounge/logout"/>
+    <sec:intercept-url pattern="^/system/weblounge/logout" access="weblounge:guest"/>
     
     <!-- Secure the management URLs -->
     <sec:intercept-url pattern="/system/console/.*" access="weblounge:systemadministrator"/>
@@ -72,7 +72,7 @@
     <sec:anonymous username="anonymous" granted-authority="weblounge:guest"/>
 
     <!-- Enables log out -->
-    <sec:logout logout-url="/system/weblounge/logout"/>
+    <sec:logout logout-url="/system/weblounge/logout" success-handler-ref="logoutSuccessHandler"/>
 
   </sec:http>
   
@@ -97,6 +97,8 @@
       </map>
     </property>
   </bean>
+  
+  <bean id="logoutSuccessHandler" class="ch.entwine.weblounge.security.WebloungeLogoutSuccessHandler" />
   
   <!-- OSGI Integration -->
  
