@@ -74,7 +74,31 @@ steal.plugins('jquery',
 	    },
 	    
 	    _initAutoComplete: function() {
-	    	Workbench.suggestTags({test: 'tag'}, $.proxy(function(tags) {
+	    	var tags = [
+	    	                     "ActionScript",
+	    	                     "AppleScript",
+	    	                     "Asp",
+	    	                     "BASIC",
+	    	                     "C",
+	    	                     "C++",
+	    	                     "Clojure",
+	    	                     "COBOL",
+	    	                     "ColdFusion",
+	    	                     "Erlang",
+	    	                     "Fortran",
+	    	                     "Groovy",
+	    	                     "Haskell",
+	    	                     "Java",
+	    	                     "JavaScript",
+	    	                     "Lisp",
+	    	                     "Perl",
+	    	                     "PHP",
+	    	                     "Python",
+	    	                     "Ruby",
+	    	                     "Scala",
+	    	                     "Scheme"
+	    	                 ];
+//	    	Workbench.suggestTags({test: 'tag'}, $.proxy(function(tags) {
 				if(tags == null || tags == undefined) return;
 				var inputTags = this.element.find("input[name=tags]").autocomplete({
 					source: function(request, response) {
@@ -98,7 +122,7 @@ steal.plugins('jquery',
 						return false;
 					},this)
 				});
-			}, this));
+//			}, this));
 			
 			Workbench.suggestTags({test: 'user'}, $.proxy(function(userTags) {
 				if(userTags == null || userTags == undefined) return;
@@ -171,7 +195,32 @@ steal.plugins('jquery',
 			}, this));
 			
 			// show content metadata
+			content.duration = this._formatDuration(content.duration);
 			this.element.find('div.wbl-contentData').html('//editor/mediaeditor/views/content.tmpl', {file: this.file[index], content: content});
+	    },
+	    
+	    _formatDuration: function(milis){
+	    	var duration = new Object();
+ 
+	    	duration.days = Math.floor(milis/1000/60/60/24);
+	    	milis -= duration.days*1000*60*60*24;
+ 
+	    	duration.hours = Math.floor(milis/1000/60/60);
+	    	milis -= duration.hours*1000*60*60;
+ 
+	    	duration.minutes = Math.floor(milis/1000/60);
+	    	milis -= duration.minutes*1000*60;
+ 
+	    	duration.seconds = Math.floor(milis/1000);
+	    	return duration.hours + ':' + this._formatNumberLength(duration.minutes, 2) + ':' + this._formatNumberLength(duration.seconds, 2);
+	    },
+	    
+	    _formatNumberLength: function(num, length) {
+	        var number = "" + num;
+	        while (number.length < length) {
+	        	number = "0" + number;
+	        }
+	        return number;
 	    },
 	    
 	    _saveMetadata: function(id, params) {

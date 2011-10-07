@@ -1028,14 +1028,14 @@ b.target.value)},700)}},this))},_initDialogs:function(){this.deleteDialog=a("<di
 "/editor/resourcebrowser/views/duplicate-dialog.html").dialog({modal:true,title:"Seite duplizieren",autoOpen:false,resizable:true,buttons:{Abbrechen:function(){a(this).dialog("close")},OK:a.proxy(function(){this.element.trigger("duplicateResources",[this.options.selectedResources]);this.duplicateDialog.dialog("close")},this)}})},"img deleteResource":function(b,d,c){this.options.selectedResources=c;this.deleteDialog.dialog("open")}})});
 ;
 steal.end();
-steal.plugins("jquery/controller","jquery/event/hover","jquery/controller/view").then("resourceviewitem").then(function(b){Editor.Resourceviewitem.extend("Editor.Resourcescrollviewitem",{init:function(){b.Hover.delay=0;this.element.find("img.wbl-showPage").hide();this.element.find("img.wbl-trashPage").hide();this.element.find("img.wbl-editPage").hide();this.element.find("img.wbl-pagePreview").hide()},_showResource:function(a){var c=this.element;switch(this.options.resourceType){case "pages":var g=
-this.element.find("a.wbl-pagePath").attr("href")+"?preview&_="+(new Date).getTime();this._loadOverlay(function(){var e=this.getOverlay().find("iframe");e.css("width",b(window).width()*0.8+"px");e.css("height",b(window).height()*0.8+"px");e.attr("src",g).show();this.getOverlay().appendTo("body")},function(){this.getOverlay().appendTo(c)});break;case "media":var f=(new Editor.File({value:this.options.page})).getContent(this.options.language);switch(this.options.page.type){case "file":var i="/system/weblounge/files/"+
-b(a).attr("id")+"/content/"+f.language;window.open(i,"popUp","width=800,height=600,scrollbars=yes");break;case "image":this._loadOverlay(function(){var e="/system/weblounge/files/"+b(a).attr("id")+"/content/"+f.language,d=this.getOverlay().find("img.wbl-overlayPreviewImage");d.css("max-width",b(window).width()*0.8+"px");d.css("max-height",b(window).height()*0.8+"px");d.attr("src",e).show();this.getOverlay().appendTo("body")},function(){this.getOverlay().appendTo(c)});break;case "movie":var h=null;
-this._loadOverlay(function(){var e="/system/weblounge/files/"+b(a).attr("id")+"/content/"+f.language,d=this.getOverlay().find("video");d.css("max-width",b(window).width()*0.8+"px");d.css("max-height",b(window).height()*0.8+"px");d.html('<source src="'+e+'" type="'+f.mimetype+'" />').show();h=new MediaElementPlayer(d,{});this.getOverlay().appendTo("body")},function(){h!=null&&h.pause();this.getOverlay().appendTo(c)});break}break}},_loadOverlay:function(a,c){this.element.find("div.wbl-previewOverlay").overlay({top:60,
-load:true,onBeforeLoad:a,onBeforeClose:c}).load()},click:function(a,c){var g=this.options.mode=="editorMultiSelection";this.options.mode!="normal"&&!g&&b("div.wbl-scrollViewItem.wbl-marked").removeClass("wbl-marked");b(c.target).is(".wbl-showPage, .wbl-trashPage, .wbl-editPage, .wbl-pagePreview, .wbl-pagePath")||a.toggleClass("wbl-marked")},dblclick:function(a){switch(this.options.mode){case "normal":this.element.find("img.wbl-showPage").click();break;case "editorMultiSelection":b("div.wbl-scrollViewItem.wbl-marked").removeClass("wbl-marked");
-a.addClass("wbl-marked");b("button.wbl-editorSelectionOK").click();break;case "editorSelection":b("button.wbl-editorSelectionOK").click();break}},"img.wbl-showPage click":function(a,c){c.stopPropagation();switch(this.options.resourceType){case "pages":this.element.find("a.wbl-pagePath").click();break;case "media":this._showResource(a.parent())}},"img.wbl-trashPage click":function(a,c){c.stopPropagation();a.trigger("deleteResource",a.parent())},"img.wbl-editPage click":function(a,c){c.stopPropagation();
-this._openSettings(a.parent())},"img.wbl-pagePreview click":function(a,c){c.stopPropagation();this._showResource(a.parent())},hoverenter:function(){if(this.options.mode=="normal"){this.options.resourceType=="pages"&&this.element.find("img.wbl-pagePreview").show();this.element.find("img.wbl-showPage").show();this.element.find("img.wbl-trashPage").show();this.element.find("img.wbl-editPage").show()}},hoverleave:function(){this.element.find("img.wbl-pagePreview").hide();this.element.find("img.wbl-showPage").hide();
-this.element.find("img.wbl-trashPage").hide();this.element.find("img.wbl-editPage").hide()}})});
+steal.plugins("jquery/controller","jquery/event/hover","jquery/controller/view").then("resourceviewitem").then(function(c){Editor.Resourceviewitem.extend("Editor.Resourcescrollviewitem",{init:function(){c.Hover.delay=0;this.element.find("img.wbl-showPage").hide();this.element.find("img.wbl-trashPage").hide();this.element.find("img.wbl-editPage").hide();this.element.find("img.wbl-pagePreview").hide()},_showResource:function(a){switch(this.options.resourceType){case "pages":var b=this.element.find("a.wbl-pagePath").attr("href")+
+"?preview&_="+(new Date).getTime();this._loadOverlay(function(){var f=this.getOverlay().find("iframe");f.css("width",c(window).width()*0.8+"px");f.css("height",c(window).height()*0.8+"px");f.attr("src",b).show()},function(){});break;case "media":var d=(new Editor.File({value:this.options.page})).getContent(this.options.language);switch(this.options.page.type){case "file":var g="/system/weblounge/files/"+c(a).attr("id")+"/content/"+d.language;window.open(g,"popUp","width=800,height=600,scrollbars=yes");
+break;case "image":this._loadOverlay(c.proxy(function(){var f="/system/weblounge/files/"+c(a).attr("id")+"/content/"+d.language,e=this.element.find("div.wbl-previewOverlay img.wbl-overlayPreviewImage"),i=this._getScaledHeight(d.width,d.height),j=this._getScaledWidth(d.width,d.height);e.attr("src",f).show();e.attr("width",j+"px");e.attr("height",i+"px")},this),function(){});break;case "movie":var h=null;this._loadOverlay(function(){var f="/system/weblounge/files/"+c(a).attr("id")+"/content/"+d.language,
+e=this.getOverlay().find("video");e.css("max-width",c(window).width()*0.8+"px");e.css("max-height",c(window).height()*0.8+"px");e.html('<source src="'+f+'" type="'+d.mimetype+'" />').show();h=new MediaElementPlayer(e,{})},function(){h!=null&&h.pause()});break}break}},_getScaledHeight:function(a,b){var d=c(window).width()*0.8,g=c(window).height()*0.8;a=Math.min(d/a,g/b);return a>1?b:b*a},_getScaledWidth:function(a,b){var d=c(window).width()*0.8,g=c(window).height()*0.8;b=Math.min(d/a,g/b);return b>
+1?a:a*b},_loadOverlay:function(a,b){this.element.find("div.wbl-previewOverlay").overlay({top:60,load:true,onBeforeLoad:a,onBeforeClose:b}).load()},click:function(a,b){var d=this.options.mode=="editorMultiSelection";this.options.mode!="normal"&&!d&&c("div.wbl-scrollViewItem.wbl-marked").removeClass("wbl-marked");c(b.target).is(".wbl-showPage, .wbl-trashPage, .wbl-editPage, .wbl-pagePreview, .wbl-pagePath")||a.toggleClass("wbl-marked")},dblclick:function(a){switch(this.options.mode){case "normal":this.element.find("img.wbl-showPage").click();
+break;case "editorMultiSelection":c("div.wbl-scrollViewItem.wbl-marked").removeClass("wbl-marked");a.addClass("wbl-marked");c("button.wbl-editorSelectionOK").click();break;case "editorSelection":c("button.wbl-editorSelectionOK").click();break}},"img.wbl-showPage click":function(a,b){b.stopPropagation();switch(this.options.resourceType){case "pages":this.element.find("a.wbl-pagePath").click();break;case "media":this._showResource(a.parent())}},"img.wbl-trashPage click":function(a,b){b.stopPropagation();
+a.trigger("deleteResource",a.parent())},"img.wbl-editPage click":function(a,b){b.stopPropagation();this._openSettings(a.parent())},"img.wbl-pagePreview click":function(a,b){b.stopPropagation();this._showResource(a.parent())},hoverenter:function(){if(this.options.mode=="normal"){this.options.resourceType=="pages"&&this.element.find("img.wbl-pagePreview").show();this.element.find("img.wbl-showPage").show();this.element.find("img.wbl-trashPage").show();this.element.find("img.wbl-editPage").show()}},
+hoverleave:function(){this.element.find("img.wbl-pagePreview").hide();this.element.find("img.wbl-showPage").hide();this.element.find("img.wbl-trashPage").hide();this.element.find("img.wbl-editPage").hide()}})});
 ;
 steal.end();
 steal.plugins("jquery/event","jquery/event/livehack").then(function(a){a.Hover=function(){this._delay=a.Hover.delay;this._distance=a.Hover.distance;this._leave=a.Hover.leave};a.extend(a.Hover,{delay:100,distance:10,leave:0});a.extend(a.Hover.prototype,{delay:function(b){this._delay=b;return this},distance:function(b){this._distance=b;return this},leave:function(b){this._leave=b;return this}});var h=a.event;h.setupHelper(["hoverinit","hoverenter","hoverleave","hovermove"],"mouseenter",function(b){var e=
@@ -1277,18 +1277,18 @@ steal.end();
 c.dequeue()})})}})(jQuery);
 ;
 steal.end();
-steal.plugins("jquery","jquery/controller/view","jquery/view","jquery/view/tmpl","jqueryui/autocomplete","jqueryui/dialog","jqueryui/draggable","jqueryui/resizable","jqueryui/mouse").models("../../models/workbench").views("//editor/mediaeditor/views/init.tmpl").css("mediaeditor").then(function(c){c.Controller("Editor.Mediaeditor",{},{init:function(a){c(a).html("//editor/mediaeditor/views/init.tmpl",{map:this.options.map,language:this.options.language,runtime:this.options.runtime});this.img=this.element.find(".wbl-taggerImage img:first").show();
-this.element.find("div.wbl-buttonLeft:first").hide();this.options.map.length<2&&this.element.find("div.wbl-buttonRight:first").hide();this.index=1;this.metadata=[];this.file=[];this._initAutoComplete();this._initDialog();this._loadMetadata(c.proxy(function(){this._showMetadata(0)},this))},_initDialog:function(){this.element.dialog({modal:true,title:"Metadaten eingeben: Datei 1 / "+this.options.map.length,autoOpen:true,resizable:true,buttons:this.options.buttons,width:700,height:650,buttons:{Abbrechen:function(){c(this).dialog("close")},
-Fertig:c.proxy(function(){c.each(this.metadata,c.proxy(function(a,e){this.file[a].saveMetadata(e,this.options.language,null,c.proxy(function(){this.metadata.length==a+1&&c.isFunction(this.options.success)&&this.options.success()},this))},this));this.element.dialog("close")},this)},close:c.proxy(function(){this.element.dialog("destroy");this.destroy()},this)})},_initAutoComplete:function(){Workbench.suggestTags({test:"tag"},c.proxy(function(a){if(!(a==null||a==undefined))var e=this.element.find("input[name=tags]").autocomplete({source:function(f,
-g){g(c.ui.autocomplete.filter(a,f.term.split(/,\s*/).pop()))},focus:function(){return false},select:c.proxy(function(f,g){f=e.val().split(/,\s*/);f.pop();f.push(g.item.value);this._saveMetadata(this.img.index(),{inputTags:f.toString()});f.push("");e.val(f.join(", "));return false},this)})},this));Workbench.suggestTags({test:"user"},c.proxy(function(a){a==null||a==undefined||this.element.find("input[name=author]").autocomplete({source:a,select:c.proxy(function(e,f){this._saveMetadata(this.img.index(),
-{author:f.item.value})},this)})},this))},_loadMetadata:function(a){c.each(this.options.map,c.proxy(function(e,f){Editor.File.findOne({id:f.resourceId},c.proxy(function(g){this.file[e]=g;this.metadata[e]=g.getMetadata(this.options.language);var b=g.getContent(this.options.language),d=this.element.find("div.wbl-contentData");if(g.name.localPart=="movie"){d.append("<h2>Movie Content:</h2>");d.append("Filename: "+b.filename+"<br />");d.append("Mimetype: "+b.mimetype+"<br />");d.append("Size: "+b.size+
-"<br />");d.append("Duration: "+b.duration+"<br />");if(c.isEmptyObject(b.audio))b.audio={};d.append("Audio Bitdepth: "+b.audio.bitdepth+"<br />");d.append("Audio Bitrate: "+b.audio.bitrate+"<br />");d.append("Audio Channels: "+b.audio.channels+"<br />");d.append("Audio Format: "+b.audio.format+"<br />");d.append("Audio Samplingrate: "+b.audio.samplingrate+"<br />");if(c.isEmptyObject(b.video))b.video={};d.append("Video Bitrate: "+b.video.bitrate+"<br />");d.append("Video Format: "+b.video.format+
-"<br />");d.append("Video Framerate: "+b.video.framerate+"<br />");d.append("Video Resolution: "+b.video.resolution+"<br />");d.append("Video Scantype: "+b.video.scantype+"<br />")}else if(g.name.localPart=="image"){d.append("<h2>Image Content:</h2>");d.append("Filename: "+b.filename+"<br />");d.append("Mimetype: "+b.mimetype+"<br />");d.append("Size: "+b.size+"<br />");d.append("Width: "+b.width+"<br />");d.append("Height: "+b.height+"<br />");d.append("Datetaken: "+b.datetaken+"<br />");d.append("Location: "+
-b.location+"<br />");if(c.isEmptyObject(b.gps))b.gps={};d.append("GPS Latitude: "+b.gps.lat+"<br />");d.append("GPS Longitude: "+b.gps.lng+"<br />");d.append("Filmspeed: "+b.filmspeed+"<br />");d.append("Fnumber: "+b.fnumber+"<br />");d.append("Focal Width: "+b.focalwidth+"<br />");d.append("Exposure Time: "+b.exposuretime+"<br />")}a()},this));Editor.File.findReferrer({id:f.resourceId},c.proxy(function(g){g==undefined?this.element.find("div.wbl-referrerMediaEditor").html("Keine Verweise"):c.each(g,
-c.proxy(function(b,d){b=new Page({value:d});this.element.find("div.wbl-referrerMediaEditor").append(b.getTitle(this.options.language)).append(': <a href="'+b.getPath()+"?_="+(new Date).getTime()+'">'+b.getPath()+"</a><br />")},this))},this))},this))},_showMetadata:function(a){this.element.find(":input").each(function(){c(this).val("")});c.each(this.metadata[a],c.proxy(function(e,f){this.element.find("div.wbl-metadata input[name="+e+"]").val(f)},this))},_saveMetadata:function(a,e){c.each(e,c.proxy(function(f,
-g){if(c.isEmptyObject(this.metadata[a]))this.metadata[a]={};this.metadata[a][f]=g},this))},"div.wbl-metadata input[name=title] change":function(a){this._saveMetadata(this.img.index(),{title:a.val()})},"div.wbl-metadata input[name=description] change":function(a){this._saveMetadata(this.img.index(),{description:a.val()})},"div.wbl-metadata input[name=tags] change":function(a){this._saveMetadata(this.img.index(),{tags:a.val()})},"div.wbl-metadata input[name=author] change":function(a){this._saveMetadata(this.img.index(),
-{author:a.val()})},"div.wbl-buttonLeft click":function(a){var e=this.img.prev();if(!(e.length<1)){this.img.toggle();this.img=e.show();e.prev().length<1&&a.hide();a.next().show();this._showMetadata(this.img.index());this.index--;this.element.dialog("option","title","Metadaten eingeben: Datei "+this.index+" / "+this.options.map.length)}},"div.wbl-buttonRight click":function(a){var e=this.img.next();if(!(e.length<1)){this.img.toggle();this.img=e.show();e.next().length<1&&a.hide();a.prev().show();this._showMetadata(this.img.index());
-this.index++;this.element.dialog("option","title","Metadaten eingeben: Datei "+this.index+" / "+this.options.map.length)}},"img.wbl-copyMetadata click":function(a){var e=this;c.each(this.options.map,function(f){switch(a.prev().attr("name")){case "title":e._saveMetadata(f,{title:a.prev().val()});break;case "description":e._saveMetadata(f,{description:a.prev().val()});break;case "tags":e._saveMetadata(f,{tags:a.prev().val()});break;case "author":e._saveMetadata(f,{author:a.prev().val()});break}})}})});
+steal.plugins("jquery","jquery/controller/view","jquery/view","jquery/view/tmpl","jqueryui/autocomplete","jqueryui/dialog","jqueryui/draggable","jqueryui/resizable","jqueryui/mouse").models("../../models/workbench").views("//editor/mediaeditor/views/init.tmpl","//editor/mediaeditor/views/content.tmpl").css("mediaeditor").then(function(d){d.Controller("Editor.Mediaeditor",{},{init:function(a){d(a).html("//editor/mediaeditor/views/init.tmpl",{map:this.options.map,language:this.options.language,runtime:this.options.runtime});
+this.element.find("div.wbl-buttonLeft:first").hide();this.options.map.length<2&&this.element.find("div.wbl-buttonRight:first").hide();this.index=0;this.metadata=[];this.file=[];this._initAutoComplete();this._initDialog();this._loadMetadata(d.proxy(function(){this._showMetadata(0)},this))},_initDialog:function(){this.element.dialog({modal:true,title:"Metadaten eingeben: Datei 1 / "+this.options.map.length,autoOpen:true,resizable:true,buttons:this.options.buttons,width:700,height:650,buttons:{Abbrechen:function(){d(this).dialog("close")},
+Fertig:d.proxy(function(){d.each(this.metadata,d.proxy(function(a,b){this.file[a].saveMetadata(b,this.options.language,null,d.proxy(function(){this.metadata.length==a+1&&d.isFunction(this.options.success)&&this.options.success()},this))},this));this.element.dialog("close")},this)},close:d.proxy(function(){this.element.dialog("destroy");this.destroy()},this)})},_initAutoComplete:function(){var a=["ActionScript","AppleScript","Asp","BASIC","C","C++","Clojure","COBOL","ColdFusion","Erlang","Fortran",
+"Groovy","Haskell","Java","JavaScript","Lisp","Perl","PHP","Python","Ruby","Scala","Scheme"];if(!(a==null||a==undefined)){var b=this.element.find("input[name=tags]").autocomplete({source:function(c,e){e(d.ui.autocomplete.filter(a,c.term.split(/,\s*/).pop()))},focus:function(){return false},select:d.proxy(function(c,e){c=b.val().split(/,\s*/);c.pop();c.push(e.item.value);this._saveMetadata(this.index,{inputTags:c.toString()});c.push("");b.val(c.join(", "));return false},this)});Workbench.suggestTags({test:"user"},
+d.proxy(function(c){c==null||c==undefined||this.element.find("input[name=author]").autocomplete({source:c,select:d.proxy(function(e,f){this._saveMetadata(this.index,{author:f.item.value})},this)})},this))}},_loadMetadata:function(a){d.each(this.options.map,d.proxy(function(b,c){Editor.File.findOne({id:c.resourceId},d.proxy(function(e){this.file[b]=e;this.metadata[b]=e.getMetadata(this.options.language);a()},this))},this))},_showMetadata:function(a){this.element.find(":input").each(function(){d(this).val("")});
+var b=this.file[a].getContent(this.options.language),c=this.element.find(".wbl-taggerImage");if(this.file[a].name.localPart=="movie"){var e="/system/weblounge/files/"+this.file[a].value.id+"/content/"+b.language;c.html('<video height="270px" preload="preload" controls="controls"></video>');e=c.find("video").html('<source src="'+e+'" type="'+b.mimetype+'" />');var f=e.width();e.attr("width",f+"px");f=Math.max((c.outerWidth({margin:true})-f)/2,0);player=new MediaElementPlayer(e,{});c.find("div.mejs-container").css("left",
+f+"px")}else if(this.file[a].name.localPart=="image"){c.html('<img src="'+("/system/weblounge/previews/"+this.file[a].value.id+"/locales/"+this.options.language+"/styles/weblounge-ui:preview")+'" alt="Vorschaubild" />');e=c.find("img");f=Math.max((c.outerWidth({margin:true})-e.width())/2,0);e.css("left",f+"px")}else{c.html("Kein Vorschaubild");c.css("text-align","center")}d.each(this.metadata[a],d.proxy(function(h,g){this.element.find("div.wbl-metadata input[name="+h+"]").val(g)},this));Editor.File.findReferrer({id:this.file[a].value.id},
+d.proxy(function(h){h==undefined?this.element.find("div.wbl-referrerMediaEditor").html("Keine Verweise"):d.each(h,d.proxy(function(g,i){g=new Page({value:i});this.element.find("div.wbl-referrerMediaEditor").append(g.getTitle(this.options.language)).append(': <a href="'+g.getPath()+"?_="+(new Date).getTime()+'">'+g.getPath()+"</a><br />")},this))},this));b.duration=this._formatDuration(b.duration);this.element.find("div.wbl-contentData").html("//editor/mediaeditor/views/content.tmpl",{file:this.file[a],
+content:b})},_formatDuration:function(a){var b={};b.days=Math.floor(a/1E3/60/60/24);a-=b.days*1E3*60*60*24;b.hours=Math.floor(a/1E3/60/60);a-=b.hours*1E3*60*60;b.minutes=Math.floor(a/1E3/60);a-=b.minutes*1E3*60;b.seconds=Math.floor(a/1E3);return b.hours+":"+this._formatNumberLength(b.minutes,2)+":"+this._formatNumberLength(b.seconds,2)},_formatNumberLength:function(a,b){for(a=""+a;a.length<b;)a="0"+a;return a},_saveMetadata:function(a,b){d.each(b,d.proxy(function(c,e){if(d.isEmptyObject(this.metadata[a]))this.metadata[a]=
+{};this.metadata[a][c]=e},this))},"div.wbl-metadata input[name=title] change":function(a){this._saveMetadata(this.index,{title:a.val()})},"div.wbl-metadata input[name=description] change":function(a){this._saveMetadata(this.index,{description:a.val()})},"div.wbl-metadata input[name=tags] change":function(a){this._saveMetadata(this.index,{tags:a.val()})},"div.wbl-metadata input[name=author] change":function(a){this._saveMetadata(this.index,{author:a.val()})},"div.wbl-buttonLeft click":function(a){if(this.index!=
+0){this.index--;this.index==0&&a.hide();a.next().show();this._showMetadata(this.index);this.element.dialog("option","title","Metadaten eingeben: Datei "+(this.index+1)+" / "+this.options.map.length)}},"div.wbl-buttonRight click":function(a){if(this.index+1!=this.options.map.length){this.index++;this.index+1==this.options.map.length&&a.hide();a.prev().show();this._showMetadata(this.index);this.element.dialog("option","title","Metadaten eingeben: Datei "+(this.index+1)+" / "+this.options.map.length)}},
+"img.wbl-copyMetadata click":function(a){var b=this;d.each(this.options.map,function(c){switch(a.prev().attr("name")){case "title":b._saveMetadata(c,{title:a.prev().val()});break;case "description":b._saveMetadata(c,{description:a.prev().val()});break;case "tags":b._saveMetadata(c,{tags:a.prev().val()});break;case "author":b._saveMetadata(c,{author:a.prev().val()});break}})}})});
 ;
 steal.end();
 steal.plugins("jqueryui/core","jqueryui/widget","jqueryui/position","jqueryui/menu").then("../lib/ui/jquery.ui.autocomplete.js");
@@ -1334,23 +1334,7 @@ $.View.preload('editor_mediaeditor_views_init_tmpl',function(data){return (
 function anonymous(jQuery, $item) {
     var $ = jQuery, call, _ = [], $data = $item.data;
     with ($data) {
-        _.push("<div class=\"wbl-buttonLeft\"></div> <div class=\"wbl-buttonRight\"></div> <div class=\"wbl-taggerImage\">   ");
-        if (typeof (map) !== "undefined" && (map) != null) {
-            $.each((typeof (map) === "function" ? (map).call($item) : (map)), function ($index, $value) {
-                with (this) {
-                    _.push("    <img src=\"/system/weblounge/previews/");
-                    if (typeof ($value.resourceId) !== "undefined" && ($value.resourceId) != null) {
-                        _.push($.encode((typeof ($value.resourceId) === "function" ? ($value.resourceId).call($item) : ($value.resourceId))));
-                    }
-                    _.push("/locales/");
-                    if (typeof (language) !== "undefined" && (language) != null) {
-                        _.push($.encode((typeof (language) === "function" ? (language).call($item) : (language))));
-                    }
-                    _.push("/styles/weblounge-ui:preview\" alt=\"\" style=\"display:none\"/>   ");
-                }
-            });
-        }
-        _.push(" </div> <div class=\"wbl-metadata\"> Title: <input type=\"text\" name=\"title\" /> <img src=\"");
+        _.push("<div class=\"wbl-buttonLeft\"></div> <div class=\"wbl-buttonRight\"></div> <div class=\"wbl-taggerImage\"></div> <div class=\"wbl-metadata\"> Title: <input type=\"text\" name=\"title\" /> <img src=\"");
         if (typeof (runtime.getRootPath) !== "undefined" && (runtime.getRootPath) != null) {
             _.push($.encode(runtime.getRootPath()));
         }
@@ -1371,6 +1355,268 @@ function anonymous(jQuery, $item) {
             _.push($.encode(runtime.getRootPath()));
         }
         _.push("/editor/resourcebrowser/images/icon_more.png\" alt=\"&Uuml;bernehmen\" class=\"wbl-copyMetadata\"> <h2>Verweise:</h2> <div class=\"wbl-referrerMediaEditor\"></div> <div class=\"wbl-contentData\"></div> </div>");
+    }
+    return _;
+}
+).call(jQuery, jQuery, {data: data}).join(''); });;
+steal.end();
+$.View.preload('editor_mediaeditor_views_content_tmpl',function(data){return (
+function anonymous(jQuery, $item) {
+    var $ = jQuery, call, _ = [], $data = $item.data;
+    with ($data) {
+        _.push("");
+        if ((typeof (file.name.localPart == "movie") !== "undefined" && (file.name.localPart == "movie") != null) && (typeof (file.name.localPart == "movie") === "function" ? (file.name.localPart == "movie").call($item) : (file.name.localPart == "movie"))) {
+            _.push("  <h2>Movie Metadaten:</h2>  Filename: ");
+            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.filename)) {
+                _.push("");
+                if (typeof (content.filename) !== "undefined" && (content.filename) != null) {
+                    _.push($.encode((typeof (content.filename) === "function" ? (content.filename).call($item) : (content.filename))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Mimetype: ");
+            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.mimetype)) {
+                _.push("");
+                if (typeof (content.mimetype) !== "undefined" && (content.mimetype) != null) {
+                    _.push($.encode((typeof (content.mimetype) === "function" ? (content.mimetype).call($item) : (content.mimetype))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Size: ");
+            if ((typeof (content.size != undefined) !== "undefined" && (content.size != undefined) != null) && (typeof (content.size != undefined) === "function" ? (content.size != undefined).call($item) : (content.size != undefined))) {
+                _.push("");
+                if (typeof (content.size) !== "undefined" && (content.size) != null) {
+                    _.push($.encode((typeof (content.size) === "function" ? (content.size).call($item) : (content.size))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Duration: ");
+            if ((typeof (content.duration != undefined) !== "undefined" && (content.duration != undefined) != null) && (typeof (content.duration != undefined) === "function" ? (content.duration != undefined).call($item) : (content.duration != undefined))) {
+                _.push("");
+                if (typeof (content.duration) !== "undefined" && (content.duration) != null) {
+                    _.push($.encode((typeof (content.duration) === "function" ? (content.duration).call($item) : (content.duration))));
+                }
+                _.push("");
+            }
+            _.push("<br /><br />    Audio Bitdepht: ");
+            if ((typeof (!$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined) !== "undefined" && (!$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined) != null) && (typeof (!$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined) === "function" ? (!$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined).call($item) : (!$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined))) {
+                _.push("");
+                if (typeof (content.audio.bitdepth) !== "undefined" && (content.audio.bitdepth) != null) {
+                    _.push($.encode((typeof (content.audio.bitdepth) === "function" ? (content.audio.bitdepth).call($item) : (content.audio.bitdepth))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Audio Bitrate: ");
+            if ((typeof (!$.isEmptyObject(content.audio) && content.audio.bitrate != undefined) !== "undefined" && (!$.isEmptyObject(content.audio) && content.audio.bitrate != undefined) != null) && (typeof (!$.isEmptyObject(content.audio) && content.audio.bitrate != undefined) === "function" ? (!$.isEmptyObject(content.audio) && content.audio.bitrate != undefined).call($item) : (!$.isEmptyObject(content.audio) && content.audio.bitrate != undefined))) {
+                _.push("");
+                if (typeof (content.audio.bitrate) !== "undefined" && (content.audio.bitrate) != null) {
+                    _.push($.encode((typeof (content.audio.bitrate) === "function" ? (content.audio.bitrate).call($item) : (content.audio.bitrate))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Audio Channels: ");
+            if ((typeof (!$.isEmptyObject(content.audio) && content.audio.channels != undefined) !== "undefined" && (!$.isEmptyObject(content.audio) && content.audio.channels != undefined) != null) && (typeof (!$.isEmptyObject(content.audio) && content.audio.channels != undefined) === "function" ? (!$.isEmptyObject(content.audio) && content.audio.channels != undefined).call($item) : (!$.isEmptyObject(content.audio) && content.audio.channels != undefined))) {
+                _.push("");
+                if (typeof (content.audio.channels) !== "undefined" && (content.audio.channels) != null) {
+                    _.push($.encode((typeof (content.audio.channels) === "function" ? (content.audio.channels).call($item) : (content.audio.channels))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Audio Format: ");
+            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.audio) && !$.isEmptyObject(content.audio.format)) {
+                _.push("");
+                if (typeof (content.audio.format) !== "undefined" && (content.audio.format) != null) {
+                    _.push($.encode((typeof (content.audio.format) === "function" ? (content.audio.format).call($item) : (content.audio.format))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Audio Samplingrate: ");
+            if ((typeof (!$.isEmptyObject(content.audio) && content.audio.samplingrate != undefined) !== "undefined" && (!$.isEmptyObject(content.audio) && content.audio.samplingrate != undefined) != null) && (typeof (!$.isEmptyObject(content.audio) && content.audio.samplingrate != undefined) === "function" ? (!$.isEmptyObject(content.audio) && content.audio.samplingrate != undefined).call($item) : (!$.isEmptyObject(content.audio) && content.audio.samplingrate != undefined))) {
+                _.push("");
+                if (typeof (content.audio.samplingrate) !== "undefined" && (content.audio.samplingrate) != null) {
+                    _.push($.encode((typeof (content.audio.samplingrate) === "function" ? (content.audio.samplingrate).call($item) : (content.audio.samplingrate))));
+                }
+                _.push("");
+            }
+            _.push("<br /><br />    Video Bitrate: ");
+            if ((typeof (!$.isEmptyObject(content.video) && content.audio.bitrate != undefined) !== "undefined" && (!$.isEmptyObject(content.video) && content.audio.bitrate != undefined) != null) && (typeof (!$.isEmptyObject(content.video) && content.audio.bitrate != undefined) === "function" ? (!$.isEmptyObject(content.video) && content.audio.bitrate != undefined).call($item) : (!$.isEmptyObject(content.video) && content.audio.bitrate != undefined))) {
+                _.push("");
+                if (typeof (content.video.bitrate) !== "undefined" && (content.video.bitrate) != null) {
+                    _.push($.encode((typeof (content.video.bitrate) === "function" ? (content.video.bitrate).call($item) : (content.video.bitrate))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Video Format: ");
+            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.video) && !$.isEmptyObject(content.video.format)) {
+                _.push("");
+                if (typeof (content.video.format) !== "undefined" && (content.video.format) != null) {
+                    _.push($.encode((typeof (content.video.format) === "function" ? (content.video.format).call($item) : (content.video.format))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Video Framerate: ");
+            if ((typeof (!$.isEmptyObject(content.video) && content.audio.framerate != undefined) !== "undefined" && (!$.isEmptyObject(content.video) && content.audio.framerate != undefined) != null) && (typeof (!$.isEmptyObject(content.video) && content.audio.framerate != undefined) === "function" ? (!$.isEmptyObject(content.video) && content.audio.framerate != undefined).call($item) : (!$.isEmptyObject(content.video) && content.audio.framerate != undefined))) {
+                _.push("");
+                if (typeof (content.video.framerate) !== "undefined" && (content.video.framerate) != null) {
+                    _.push($.encode((typeof (content.video.framerate) === "function" ? (content.video.framerate).call($item) : (content.video.framerate))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Video Resolution: ");
+            if ((typeof (!$.isEmptyObject(content.video) && content.audio.resolution != undefined) !== "undefined" && (!$.isEmptyObject(content.video) && content.audio.resolution != undefined) != null) && (typeof (!$.isEmptyObject(content.video) && content.audio.resolution != undefined) === "function" ? (!$.isEmptyObject(content.video) && content.audio.resolution != undefined).call($item) : (!$.isEmptyObject(content.video) && content.audio.resolution != undefined))) {
+                _.push("");
+                if (typeof (content.video.resolution) !== "undefined" && (content.video.resolution) != null) {
+                    _.push($.encode((typeof (content.video.resolution) === "function" ? (content.video.resolution).call($item) : (content.video.resolution))));
+                }
+                _.push("");
+            }
+            _.push("<br />  Video Scantype: ");
+            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.video) && !$.isEmptyObject(content.video.scantype)) {
+                _.push("");
+                if (typeof (content.video.scantype) !== "undefined" && (content.video.scantype) != null) {
+                    _.push($.encode((typeof (content.video.scantype) === "function" ? (content.video.scantype).call($item) : (content.video.scantype))));
+                }
+                _.push("");
+            }
+            _.push("<br /> ");
+        } else {
+            if ((typeof (file.name.localPart == "image") !== "undefined" && (file.name.localPart == "image") != null) && (typeof (file.name.localPart == "image") === "function" ? (file.name.localPart == "image").call($item) : (file.name.localPart == "image"))) {
+                _.push("  <h2>Image Metadaten:</h2>  Filename: ");
+                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.filename)) {
+                    _.push("");
+                    if (typeof (content.filename) !== "undefined" && (content.filename) != null) {
+                        _.push($.encode((typeof (content.filename) === "function" ? (content.filename).call($item) : (content.filename))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Mimetype: ");
+                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.mimetype)) {
+                    _.push("");
+                    if (typeof (content.mimetype) !== "undefined" && (content.mimetype) != null) {
+                        _.push($.encode((typeof (content.mimetype) === "function" ? (content.mimetype).call($item) : (content.mimetype))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Size: ");
+                if ((typeof (content.size != undefined) !== "undefined" && (content.size != undefined) != null) && (typeof (content.size != undefined) === "function" ? (content.size != undefined).call($item) : (content.size != undefined))) {
+                    _.push("");
+                    if (typeof (content.size) !== "undefined" && (content.size) != null) {
+                        _.push($.encode((typeof (content.size) === "function" ? (content.size).call($item) : (content.size))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Width: ");
+                if ((typeof (content.width != undefined) !== "undefined" && (content.width != undefined) != null) && (typeof (content.width != undefined) === "function" ? (content.width != undefined).call($item) : (content.width != undefined))) {
+                    _.push("");
+                    if (typeof (content.width) !== "undefined" && (content.width) != null) {
+                        _.push($.encode((typeof (content.width) === "function" ? (content.width).call($item) : (content.width))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Height: ");
+                if ((typeof (content.height != undefined) !== "undefined" && (content.height != undefined) != null) && (typeof (content.height != undefined) === "function" ? (content.height != undefined).call($item) : (content.height != undefined))) {
+                    _.push("");
+                    if (typeof (content.height) !== "undefined" && (content.height) != null) {
+                        _.push($.encode((typeof (content.height) === "function" ? (content.height).call($item) : (content.height))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Datetaken: ");
+                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.datetaken)) {
+                    _.push("");
+                    if (typeof (content.datetaken) !== "undefined" && (content.datetaken) != null) {
+                        _.push($.encode((typeof (content.datetaken) === "function" ? (content.datetaken).call($item) : (content.datetaken))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Location: ");
+                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.location)) {
+                    _.push("");
+                    if (typeof (content.location) !== "undefined" && (content.location) != null) {
+                        _.push($.encode((typeof (content.location) === "function" ? (content.location).call($item) : (content.location))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />    GPS Latitude: ");
+                if ((typeof (!$.isEmptyObject(content.gps) && content.gps.lat != undefined) !== "undefined" && (!$.isEmptyObject(content.gps) && content.gps.lat != undefined) != null) && (typeof (!$.isEmptyObject(content.gps) && content.gps.lat != undefined) === "function" ? (!$.isEmptyObject(content.gps) && content.gps.lat != undefined).call($item) : (!$.isEmptyObject(content.gps) && content.gps.lat != undefined))) {
+                    _.push("");
+                    if (typeof (content.gps.lat) !== "undefined" && (content.gps.lat) != null) {
+                        _.push($.encode((typeof (content.gps.lat) === "function" ? (content.gps.lat).call($item) : (content.gps.lat))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  GPS Longitude: ");
+                if ((typeof (!$.isEmptyObject(content.gps) && content.gps.lng != undefined) !== "undefined" && (!$.isEmptyObject(content.gps) && content.gps.lng != undefined) != null) && (typeof (!$.isEmptyObject(content.gps) && content.gps.lng != undefined) === "function" ? (!$.isEmptyObject(content.gps) && content.gps.lng != undefined).call($item) : (!$.isEmptyObject(content.gps) && content.gps.lng != undefined))) {
+                    _.push("");
+                    if (typeof (content.gps.lng) !== "undefined" && (content.gps.lng) != null) {
+                        _.push($.encode((typeof (content.gps.lng) === "function" ? (content.gps.lng).call($item) : (content.gps.lng))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Filmspeed: ");
+                if ((typeof (content.filmspeed != undefined) !== "undefined" && (content.filmspeed != undefined) != null) && (typeof (content.filmspeed != undefined) === "function" ? (content.filmspeed != undefined).call($item) : (content.filmspeed != undefined))) {
+                    _.push("");
+                    if (typeof (content.filmspeed) !== "undefined" && (content.filmspeed) != null) {
+                        _.push($.encode((typeof (content.filmspeed) === "function" ? (content.filmspeed).call($item) : (content.filmspeed))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Fnumber: ");
+                if ((typeof (content.fnumber != undefined) !== "undefined" && (content.fnumber != undefined) != null) && (typeof (content.fnumber != undefined) === "function" ? (content.fnumber != undefined).call($item) : (content.fnumber != undefined))) {
+                    _.push("");
+                    if (typeof (content.fnumber) !== "undefined" && (content.fnumber) != null) {
+                        _.push($.encode((typeof (content.fnumber) === "function" ? (content.fnumber).call($item) : (content.fnumber))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Focal Width: ");
+                if ((typeof (content.focalwidth != undefined) !== "undefined" && (content.focalwidth != undefined) != null) && (typeof (content.focalwidth != undefined) === "function" ? (content.focalwidth != undefined).call($item) : (content.focalwidth != undefined))) {
+                    _.push("");
+                    if (typeof (content.focalwidth) !== "undefined" && (content.focalwidth) != null) {
+                        _.push($.encode((typeof (content.focalwidth) === "function" ? (content.focalwidth).call($item) : (content.focalwidth))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Exposure Time: ");
+                if ((typeof (content.exposuretime != undefined) !== "undefined" && (content.exposuretime != undefined) != null) && (typeof (content.exposuretime != undefined) === "function" ? (content.exposuretime != undefined).call($item) : (content.exposuretime != undefined))) {
+                    _.push("");
+                    if (typeof (content.exposuretime) !== "undefined" && (content.exposuretime) != null) {
+                        _.push($.encode((typeof (content.exposuretime) === "function" ? (content.exposuretime).call($item) : (content.exposuretime))));
+                    }
+                    _.push("");
+                }
+                _.push("<br /> ");
+            } else {
+                if ((typeof (file.name.localPart == "file") !== "undefined" && (file.name.localPart == "file") != null) && (typeof (file.name.localPart == "file") === "function" ? (file.name.localPart == "file").call($item) : (file.name.localPart == "file"))) {
+                    _.push("  <h2>File Metadaten:</h2>  Filename: ");
+                    if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.filename)) {
+                        _.push("");
+                        if (typeof (content.filename) !== "undefined" && (content.filename) != null) {
+                            _.push($.encode((typeof (content.filename) === "function" ? (content.filename).call($item) : (content.filename))));
+                        }
+                        _.push("");
+                    }
+                    _.push("<br />  Mimetype: ");
+                    if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.mimetype)) {
+                        _.push("");
+                        if (typeof (content.mimetype) !== "undefined" && (content.mimetype) != null) {
+                            _.push($.encode((typeof (content.mimetype) === "function" ? (content.mimetype).call($item) : (content.mimetype))));
+                        }
+                        _.push("");
+                    }
+                    _.push("<br />  Size: ");
+                    if ((typeof (content.size != undefined) !== "undefined" && (content.size != undefined) != null) && (typeof (content.size != undefined) === "function" ? (content.size != undefined).call($item) : (content.size != undefined))) {
+                        _.push("");
+                        if (typeof (content.size) !== "undefined" && (content.size) != null) {
+                            _.push($.encode((typeof (content.size) === "function" ? (content.size).call($item) : (content.size))));
+                        }
+                        _.push("");
+                    }
+                    _.push("<br /> ");
+                }
+            }
+        }
+        _.push("");
     }
     return _;
 }
