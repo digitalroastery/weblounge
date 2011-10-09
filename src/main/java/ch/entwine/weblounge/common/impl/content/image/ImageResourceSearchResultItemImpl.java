@@ -124,7 +124,6 @@ public class ImageResourceSearchResultItemImpl extends AbstractResourceSearchRes
    * 
    * @see ch.entwine.weblounge.common.content.ImageSearchResultItem#getImageResource()
    */
-  @Override
   public ImageResource getImageResource() {
     if (resource == null) {
       resource = new LazyImageResourceImpl(uri, imageXml, headerXml, previewXml);
