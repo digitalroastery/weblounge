@@ -57,4 +57,20 @@ public interface MovieContent extends FileContent {
    */
   long getDuration();
 
+  /**
+   * Sets the duration.
+   * 
+   * @param duration
+   *          the duration
+   */
+  void setDuration(long duration);
+
+  /**
+   * Adds the stream to the audio visual's list of streams.
+   * 
+   * @param stream
+   *          the stream
+   */
+  void addStream(Stream stream);
+
 }

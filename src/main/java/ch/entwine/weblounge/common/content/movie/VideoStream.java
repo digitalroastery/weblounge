@@ -60,4 +60,52 @@ public interface VideoStream extends Stream {
    */
   ScanType getScanType();
 
+  /**
+   * Sets the bit rate.
+   * 
+   * @param bitRate
+   *          the bit rate
+   */
+  void setBitRate(float bitRate);
+
+  /**
+   * Sets the frame rate.
+   * 
+   * @param frameRate
+   *          the frame rate
+   */
+  void setFrameRate(float frameRate);
+
+  /**
+   * Sets the frame width.
+   * 
+   * @param width
+   *          the frame width
+   */
+  void setFrameWidth(int width);
+
+  /**
+   * Sets the frame height.
+   * 
+   * @param height
+   *          the frame height
+   */
+  void setFrameHeight(int height);
+
+  /**
+   * Sets the scan type.
+   * 
+   * @param scanType
+   *          the scan type
+   */
+  void setScanType(ScanType scanType);
+
+  /**
+   * Sets the encoding format.
+   * 
+   * @param format
+   *          the format
+   */
+  void setFormat(String format);
+
 }

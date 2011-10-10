@@ -53,4 +53,44 @@ public interface AudioStream extends Stream {
    */
   Float getBitRate();
 
+  /**
+   * Sets the bit depth.
+   * 
+   * @param bitDepth
+   *          the bit depth
+   */
+  void setBitDepth(int bitDepth);
+
+  /**
+   * Sets the channels.
+   * 
+   * @param channels
+   *          the channels
+   */
+  void setChannels(int channels);
+
+  /**
+   * Sets the sampling rate.
+   * 
+   * @param samplingRate
+   *          the sampling rate
+   */
+  void setSamplingRate(int samplingRate);
+
+  /**
+   * Sets the bit rate.
+   * 
+   * @param bitRate
+   *          the bit rate
+   */
+  void setBitRate(float bitRate);
+
+  /**
+   * Sets the encoding format.
+   * 
+   * @param format
+   *          the format
+   */
+  void setFormat(String format);
+
 }
