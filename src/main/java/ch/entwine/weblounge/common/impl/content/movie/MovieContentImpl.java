@@ -58,8 +58,7 @@ public class MovieContentImpl extends FileContentImpl implements MovieContent {
    * @param mimetype
    *          the audio visual's mime type
    */
-  public MovieContentImpl(String filename, Language language,
-      String mimetype) {
+  public MovieContentImpl(String filename, Language language, String mimetype) {
     this(filename, language, mimetype, -1, -1);
   }
 
@@ -75,8 +74,8 @@ public class MovieContentImpl extends FileContentImpl implements MovieContent {
    * @param duration
    *          the audio visual duration in milliseconds
    */
-  public MovieContentImpl(String filename, Language language,
-      String mimetype, long duration) {
+  public MovieContentImpl(String filename, Language language, String mimetype,
+      long duration) {
     this(filename, language, mimetype, duration, -1);
   }
 
@@ -94,16 +93,15 @@ public class MovieContentImpl extends FileContentImpl implements MovieContent {
    * @param filesize
    *          the file size in bytes
    */
-  public MovieContentImpl(String filename, Language language,
-      String mimetype, long filesize, long duration) {
+  public MovieContentImpl(String filename, Language language, String mimetype,
+      long filesize, long duration) {
     super(filename, language, mimetype, filesize);
   }
 
   /**
-   * Adds the stream to the audio visual's list of streams.
+   * {@inheritDoc}
    * 
-   * @param stream
-   *          the stream
+   * @see ch.entwine.weblounge.common.content.movie.MovieContent#addStream(ch.entwine.weblounge.common.content.movie.Stream)
    */
   public void addStream(Stream stream) {
     streams.add(stream);
@@ -145,10 +143,9 @@ public class MovieContentImpl extends FileContentImpl implements MovieContent {
   }
 
   /**
-   * Sets the duration.
+   * {@inheritDoc}
    * 
-   * @param duration
-   *          the duration
+   * @see ch.entwine.weblounge.common.content.movie.MovieContent#setDuration(long)
    */
   public void setDuration(long duration) {
     this.duration = duration;

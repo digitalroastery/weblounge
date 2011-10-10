@@ -77,10 +77,9 @@ public class AudioStreamImpl implements AudioStream {
   }
 
   /**
-   * Sets the bit depth.
+   * {@inheritDoc}
    * 
-   * @param bitDepth
-   *          the bit depth
+   * @see ch.entwine.weblounge.common.content.movie.AudioStream#setBitDepth(int)
    */
   public void setBitDepth(int bitDepth) {
     this.bitDepth = bitDepth;
@@ -96,10 +95,9 @@ public class AudioStreamImpl implements AudioStream {
   }
 
   /**
-   * Sets the channels.
+   * {@inheritDoc}
    * 
-   * @param channels
-   *          the channels
+   * @see ch.entwine.weblounge.common.content.movie.AudioStream#setChannels(int)
    */
   public void setChannels(int channels) {
     this.channels = channels;
@@ -115,10 +113,9 @@ public class AudioStreamImpl implements AudioStream {
   }
 
   /**
-   * Sets the sampling rate.
+   * {@inheritDoc}
    * 
-   * @param samplingRate
-   *          the sampling rate
+   * @see ch.entwine.weblounge.common.content.movie.AudioStream#setSamplingRate(int)
    */
   public void setSamplingRate(int samplingRate) {
     this.samplingRate = samplingRate;
@@ -134,10 +131,9 @@ public class AudioStreamImpl implements AudioStream {
   }
 
   /**
-   * Sets the bit rate.
+   * {@inheritDoc}
    * 
-   * @param bitRate
-   *          the bit rate
+   * @see ch.entwine.weblounge.common.content.movie.AudioStream#setBitRate(float)
    */
   public void setBitRate(float bitRate) {
     this.bitRate = bitRate;
@@ -153,10 +149,9 @@ public class AudioStreamImpl implements AudioStream {
   }
 
   /**
-   * Sets the encoding format.
+   * {@inheritDoc}
    * 
-   * @param format
-   *          the format
+   * @see ch.entwine.weblounge.common.content.movie.AudioStream#setFormat(java.lang.String)
    */
   public void setFormat(String format) {
     this.format = format;

@@ -80,10 +80,9 @@ public class VideoStreamImpl implements VideoStream {
   }
 
   /**
-   * Sets the bit rate.
+   * {@inheritDoc}
    * 
-   * @param bitRate
-   *          the bit rate
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#setBitRate(float)
    */
   public void setBitRate(float bitRate) {
     this.bitRate = bitRate;
@@ -99,10 +98,9 @@ public class VideoStreamImpl implements VideoStream {
   }
 
   /**
-   * Sets the frame rate.
+   * {@inheritDoc}
    * 
-   * @param frameRate
-   *          the frame rate
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#setFrameRate(float)
    */
   public void setFrameRate(float frameRate) {
     this.frameRate = frameRate;
@@ -118,10 +116,9 @@ public class VideoStreamImpl implements VideoStream {
   }
 
   /**
-   * Sets the frame width.
+   * {@inheritDoc}
    * 
-   * @param width
-   *          the frame width
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#setFrameWidth(int)
    */
   public void setFrameWidth(int width) {
     this.frameWidth = width;
@@ -137,10 +134,9 @@ public class VideoStreamImpl implements VideoStream {
   }
 
   /**
-   * Sets the frame height.
+   * {@inheritDoc}
    * 
-   * @param height
-   *          the frame height
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#setFrameHeight(int)
    */
   public void setFrameHeight(int height) {
     this.frameHeight = height;
@@ -156,10 +152,9 @@ public class VideoStreamImpl implements VideoStream {
   }
 
   /**
-   * Sets the scan type.
+   * {@inheritDoc}
    * 
-   * @param scanType
-   *          the scan type
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#setScanType(ch.entwine.weblounge.common.content.movie.ScanType)
    */
   public void setScanType(ScanType scanType) {
     this.scanType = scanType;
@@ -175,10 +170,9 @@ public class VideoStreamImpl implements VideoStream {
   }
 
   /**
-   * Sets the encoding format.
+   * {@inheritDoc}
    * 
-   * @param format
-   *          the format
+   * @see ch.entwine.weblounge.common.content.movie.VideoStream#setFormat(java.lang.String)
    */
   public void setFormat(String format) {
     this.format = format;
