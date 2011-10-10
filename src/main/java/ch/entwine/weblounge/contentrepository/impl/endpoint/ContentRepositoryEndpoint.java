@@ -125,6 +125,7 @@ public class ContentRepositoryEndpoint {
           logger.warn("Error writing file contents to response", e);
         } finally {
           IOUtils.closeQuietly(is);
+          IOUtils.closeQuietly(os);
         }
       }
     });
@@ -136,8 +137,8 @@ public class ContentRepositoryEndpoint {
         response.type(fileContent.getMimetype());
       else
         response.type(MediaType.APPLICATION_OCTET_STREAM);
-       if (fileContent.getSize() > 0)
-       response.header("Content-Length", fileContent.getSize());
+      if (fileContent.getSize() > 0)
+        response.header("Content-Length", fileContent.getSize());
     }
 
     // Add an e-tag and send the response
@@ -167,8 +168,7 @@ public class ContentRepositoryEndpoint {
       String resourceId, String resourceType) {
     return loadResource(request, resourceId, resourceType, Resource.LIVE);
   }
-  
-  
+
   /**
    * Returns the resource identified by the given request and resource
    * identifier or <code>null</code> if either one of the site, the site's
@@ -193,17 +193,17 @@ public class ContentRepositoryEndpoint {
       logger.debug("Unable to load resource '{}': no sites registered", resourceId);
       return null;
     }
-    
+
     // Extract the site
     Site site = getSite(request);
-    
+
     // Look for the content repository
     ContentRepository contentRepository = site.getContentRepository();
     if (contentRepository == null) {
       logger.warn("No content repository found for site '{}'", site);
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
     }
-    
+
     // Load the resource and return it
     try {
       ResourceURI resourceURI = new ResourceURIImpl(resourceType, site, null, resourceId, version);
