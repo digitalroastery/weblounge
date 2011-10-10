@@ -26,7 +26,7 @@ public class WebloungeLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler
       HttpServletResponse response, Authentication authentication)
       throws IOException, ServletException {
 
-    String targetUrl = DEFAULT_TARGET_PARAMETER;
+    String targetUrl = "/";
     if (request.getParameter(PATH_PARAMETER_NAME) != null) {
       targetUrl = request.getParameter(PATH_PARAMETER_NAME);
     }
