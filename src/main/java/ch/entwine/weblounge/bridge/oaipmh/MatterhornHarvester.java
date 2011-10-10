@@ -26,6 +26,8 @@ import ch.entwine.weblounge.common.scheduler.JobWorker;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -39,14 +41,14 @@ import java.util.Dictionary;
  */
 public class MatterhornHarvester implements JobWorker {
 
+  /** Logging facility */
+  protected static final Logger logger = LoggerFactory.getLogger(MatterhornHarvester.class);
+
   /** Configuration option for the repository to harvest */
   private static final String OPT_REPOSITORY_URL = "repository.url";
 
   /** Configuration option for the flavor of the tracks to use */
   private static final String OPT_TRACK_FLAVORS = "track.flavors";
-
-  /** Name of the oai pmh prefix */
-  private static final String MATTERHORN_REPOSITORY_PREFIX = "matterhorn";
 
   /**
    * {@inheritDoc}
@@ -58,7 +60,6 @@ public class MatterhornHarvester implements JobWorker {
       throws JobException {
 
     Site site = (Site) ctx.get(Site.class.getName());
-    String repositoryPrefix = MATTERHORN_REPOSITORY_PREFIX;
 
     // Get hold of the content repository
     WritableContentRepository contentRepository = null;
@@ -79,26 +80,12 @@ public class MatterhornHarvester implements JobWorker {
       throw new JobException(this, "Repository url '" + repositoryUrl + "' is malformed: " + e.getMessage());
     }
 
+    WebloungeMatterhornRecordHandlerImpl matterhornHandler = new WebloungeMatterhornRecordHandlerImpl(site, contentRepository);
+
     // TODO instantiate a harvester with the given repositoryUrl and
     // repositoryPrefix
 
     // TODO Start harvesting
-
-    // TODO Add and delete to and from the content repository
-    // for (.. : harvestingResultSet) {
-    // String xml = getPayload();
-    // MediaPackage mediaPackage = MediaPackageParser.getFromXml(xml);
-    // TODO: Use dublin core catalog for metadata
-    // TODO: Use tracks with correct flavor for movie
-    // }
-  }
-
-  /**
-   * @return
-   */
-  private String getPayload() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
 }
