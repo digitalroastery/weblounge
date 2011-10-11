@@ -8,7 +8,7 @@
        http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
   <sec:http 
-    create-session="ifRequired"
+    create-session="never"
     servlet-api-provision="true" 
     realm="Weblounge"
     entry-point-ref="userEntryPoint" 
@@ -24,21 +24,28 @@
 
     <!-- Some resources are open to everybody -->
     <sec:intercept-url pattern="^/favicon.ico" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/jquery/.*" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/jqueryui/.*" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/steal/.*" filters="none"/>
+    <sec:intercept-url pattern=".*\.js.*" filters="none"/>
+    <sec:intercept-url pattern=".*\.css.*" filters="none"/>
 
     <!-- Shared resources should not be protected -->
     <sec:intercept-url pattern="^/weblounge-shared/.*" filters="none"/>
 
     <!-- The rest of the editor functionality needs to be protected -->
-    <sec:intercept-url pattern="^/weblounge/.*" access="weblounge:guest"/>
+    <sec:intercept-url pattern="^/weblounge/.*" access="weblounge:editor"/>
 
     <!-- Enable anonymous access to the REST documentation -->
-    <sec:intercept-url pattern="^/system/weblounge/.*/docs" access="weblounge:guest"/>
+    <sec:intercept-url pattern="^/system/weblounge/.*/docs" access="weblounge:siteadministrator"/>
 
     <!-- Secure the REST endpoints -->
-    <sec:intercept-url pattern="^/system/weblounge/.*" access="weblounge:guest"/>
+    <sec:intercept-url pattern="^/system/weblounge/.*" access="weblounge:editor"/>
 
     <!-- The login processing urls needs to be covered by the filter chain -->
     <sec:intercept-url pattern="^/system/weblounge/login/.*" access="weblounge:guest"/>
+
+    <!--  Same is true for logout -->
     <sec:intercept-url pattern="^/system/weblounge/logout" access="weblounge:guest"/>
     
     <!-- Secure the management URLs -->
@@ -52,13 +59,16 @@
     
     <!-- FILTER CONFIGURATION -->
 
-    <!-- Add the security service to the filter chain -->
-    <sec:custom-filter after="SECURITY_CONTEXT_FILTER" ref="webloungeSecurityFilter"/>
+    <!-- Add the site filter to make sure it's available during user lookup -->
+    <sec:custom-filter before="FIRST" ref="siteContextFilter"/>
+
+    <!-- Add the user filter to get everything set up for proper request processing -->
+    <sec:custom-filter after="LAST" ref="userContextFilter"/>
 
     <!-- LOGIN / LOGOUT MECHANISMS -->
 
     <!-- Enable and configure the failure URL for form-based logins -->
-    <sec:form-login login-page="/weblounge/login/login.html" login-processing-url="/system/weblounge/login/form" authentication-failure-url="/weblounge/login/login.html?failed" authentication-success-handler-ref="loginSuccessHandler"/>
+    <sec:form-login login-page="/weblounge/login/login.html" login-processing-url="/system/weblounge/login/form" authentication-failure-url="/weblounge/login/failed.html" authentication-success-handler-ref="loginSuccessHandler"/>
 
     <!-- Enables "remember me" functionality -->
     <sec:remember-me key="weblounge" user-service-ref="userDetailsService"/>
@@ -66,7 +76,8 @@
     <!-- Set the request cache -->
     <sec:request-cache ref="requestCache"/>
     
-    <sec:session-management invalid-session-url="/weblounge/login/login.html"/>
+    <!-- When sessions time out, send the user to a special (re)login form -->
+    <sec:session-management invalid-session-url="/weblounge/login/timeout.html"/>
 
     <!-- If any URLs are to be exposed to anonymous users, the "sec:anonymous" filter must be present -->
     <sec:anonymous username="anonymous" granted-authority="weblounge:guest"/>
@@ -76,8 +87,13 @@
 
   </sec:http>
   
-  <!-- Instantiates the weblounge security filter that will map requests to their site -->
-  <bean id="webloungeSecurityFilter" class="ch.entwine.weblounge.security.WebloungeSecurityFilter">
+  <!-- Instantiates the weblounge site filter that will map requests to their site -->
+  <bean id="siteContextFilter" class="ch.entwine.weblounge.security.SiteContextFilter">
+    <constructor-arg ref="securityService"/>
+  </bean>
+
+  <!-- Instantiates the weblounge user filter that will map requests to users -->
+  <bean id="userContextFilter" class="ch.entwine.weblounge.security.UserContextFilter">
     <constructor-arg ref="securityService"/>
   </bean>
 
@@ -143,7 +159,7 @@
   <bean id="requestCache" class="org.springframework.security.web.savedrequest.NullRequestCache"/>
 
   <!-- Uncomment to enable logging interceptors -->
-  <!-- bean class="org.springframework.security.access.event.LoggerListener" / -->
-  <!-- bean class="org.springframework.security.authentication.event.LoggerListener" / -->
+  <bean class="org.springframework.security.access.event.LoggerListener" />
+  <bean class="org.springframework.security.authentication.event.LoggerListener" />
 
 </beans>

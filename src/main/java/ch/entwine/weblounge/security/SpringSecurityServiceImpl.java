@@ -20,35 +20,14 @@
 
 package ch.entwine.weblounge.security;
 
-import ch.entwine.weblounge.common.impl.security.Guest;
-import ch.entwine.weblounge.common.impl.security.RoleImpl;
-import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.impl.security.UserImpl;
-import ch.entwine.weblounge.common.security.Role;
-import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A Spring Security implementation of {@link SecurityService}.
  */
 public class SpringSecurityServiceImpl implements SecurityService {
-
-  /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(SpringSecurityServiceImpl.class);
 
   /** Login of the generic anonymous user */
   public static final String ANONYMOUS_USER = "anonymous";
@@ -69,7 +48,7 @@ public class SpringSecurityServiceImpl implements SecurityService {
   private static final ThreadLocal<User> userHolder = new ThreadLocal<User>();
 
   /** Whether the system administrator has configured a no-security policy */
-  private boolean wideOpen = false;
+  private boolean enabled = true;
 
   /**
    * {@inheritDoc}
@@ -104,91 +83,26 @@ public class SpringSecurityServiceImpl implements SecurityService {
    * @see ch.entwine.weblounge.common.security.SecurityService#getUser()
    */
   public User getUser() {
-    User delegatedUser = userHolder.get();
-    if (delegatedUser != null) {
-      return delegatedUser;
-    }
-
-    logger.trace("Looking up user from spring security context");
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    User user = null;
-    Set<Role> roles = new HashSet<Role>();
-    Site site = getSite();
-
-    if (wideOpen) {
-      user = new UserImpl(ADMIN_USER, Security.SYSTEM_CONTEXT, ADMIN_NAME);
-      roles.add(SystemRole.SYSTEMADMIN);
-      // user = new UserImpl(ADMIN_USER, site.getIdentifier());
-      // roles.add(getLocalRole(site, SystemRole.SYSTEMADMIN));
-    } else if (auth == null) {
-      logger.debug("No spring security context available, setting current user to anonymous");
-      String realm = site != null ? site.getIdentifier() : Security.SYSTEM_CONTEXT;
-      user = new UserImpl(ANONYMOUS_USER, realm, ANONYMOUS_NAME);
-      roles.add(SystemRole.GUEST);
-      // roles.add(getLocalRole(site, SystemRole.GUEST));
-    } else {
-      Object principal = auth.getPrincipal();
-      if (principal == null) {
-        logger.warn("No principal found in spring security context, setting current user to anonymous");
-        user = new UserImpl(ANONYMOUS_USER, site.getIdentifier());
-        roles.add(getLocalRole(site, SystemRole.GUEST));
-      } else if (principal instanceof UserDetails) {
-        UserDetails userDetails = (UserDetails) principal;
-        user = new UserImpl(userDetails.getUsername());
-
-        Collection<GrantedAuthority> authorities = auth.getAuthorities();
-        if (authorities != null && authorities.size() > 0) {
-          for (GrantedAuthority ga : authorities) {
-            roles.add(new RoleImpl(ga.getAuthority()));
-          }
-        }
-        logger.debug("Principal was identified as '{}'", user.getLogin());
-        
-      } else if (ANONYMOUS_USER.equals(principal)) {
-        user = new Guest(site.getIdentifier());
-        roles.add(SystemRole.GUEST);
-        //roles.add(getLocalRole(site, SystemRole.GUEST));
-      } else {
-        logger.warn("Principal was not compatible with spring security, setting current user to anonymous");
-        user = new Guest(site.getIdentifier());
-        roles.add(SystemRole.GUEST);
-        //roles.add(getLocalRole(site, SystemRole.GUEST));
-      }
-    }
-
-    for (Role role : roles) {
-      user.addPublicCredentials(role);
-    }
-
-    userHolder.set(user);
-    return user;
-  }
-
-  /**
-   * Returns the local role for the given system role or the system role itself,
-   * if no local role was defined.
-   * 
-   * @param site
-   *          the site
-   * @param role
-   *          the system role
-   * @return the local role
-   */
-  private Role getLocalRole(Site site, Role role) {
-    String localRole = site.getLocalRole(role.getIdentifier());
-    if (StringUtils.isNotBlank(localRole))
-      return new RoleImpl(site.getIdentifier(), localRole);
-    return role;
+    return userHolder.get();
   }
 
   /**
    * Whether the user has configured a no-security policy.
    * 
-   * @param wideOpen
-   *          <code>true</code> if there is no security in place
+   * @param enabled
+   *          <code>true</code> if there is a security policy in place
    */
-  void setWideOpen(boolean wideOpen) {
-    this.wideOpen = wideOpen;
+  void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.security.SecurityService#isEnabled()
+   */
+  public boolean isEnabled() {
+    return this.enabled;
   }
 
 }

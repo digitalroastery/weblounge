@@ -142,8 +142,10 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
       throws UsernameNotFoundException, DataAccessException {
 
     Site site = securityService.getSite();
-    if (site == null)
+    if (site == null) {
+      logger.error("Site context not available during user lookup");
       throw new UsernameNotFoundException("No site context available");
+    }
 
     User user = loadUser(name, site);
     if (user == null) {
@@ -164,7 +166,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
           // to the set of granted authorities
           Role[] systemEquivalents = getSystemRoles(r);
           for (Role systemRole : systemEquivalents) {
-            authorities.add(new GrantedAuthorityImpl(systemRole.getContext() + ":" +systemRole.getIdentifier()));
+            authorities.add(new GrantedAuthorityImpl(systemRole.getContext() + ":" + systemRole.getIdentifier()));
             user.addPublicCredentials(systemRole);
           }
         }

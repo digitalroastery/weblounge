@@ -1,5 +1,7 @@
 package ch.entwine.weblounge.security;
 
+import ch.entwine.weblounge.common.url.PathUtils;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
@@ -28,7 +30,7 @@ public class WebloungeLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler
 
     String targetUrl = "/";
     if (request.getParameter(PATH_PARAMETER_NAME) != null) {
-      targetUrl = request.getParameter(PATH_PARAMETER_NAME);
+      targetUrl = PathUtils.concat("/", request.getParameter(PATH_PARAMETER_NAME));
     }
     setDefaultTargetUrl(addTimeStamp(targetUrl));
     super.onLogoutSuccess(request, response, authentication);

@@ -145,7 +145,7 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
     }
 
     // Tell the security service abut the current policy
-    securityService.setWideOpen(!securityEnabled);
+    securityService.setEnabled(securityEnabled);
 
     // Register the security marker
     publishSecurityMarker();
@@ -198,7 +198,7 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
     }
 
     // Tell the security service abut the current policy
-    securityService.setWideOpen(!isEnabled);
+    securityService.setEnabled(isEnabled);
 
     // Store the security enabled setting
     this.securityEnabled = isEnabled;
@@ -250,7 +250,8 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
    */
   private void stopSecurity() {
     logger.info("Disabling spring security");
-    bundle.getBundleContext().removeBundleListener(this);
+    BundleContext bundleCtx = bundle.getBundleContext();
+    bundleCtx.removeBundleListener(this);
     if (securityFilterRegistrations != null) {
       for (Map.Entry<Bundle, ServiceRegistration> entry : securityFilterRegistrations.entrySet()) {
         Bundle bundle = entry.getKey();
@@ -258,6 +259,8 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
         try {
           r.unregister();
           logger.debug("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
+        } catch (IllegalStateException e) {
+          logger.debug("Security context for bundle '{}' was already unregistered", bundle.getSymbolicName());
         } catch (Throwable t) {
           logger.error("Unregistering security context for bundle '{}' failed: {}", bundle.getSymbolicName(), t.getMessage());
         }

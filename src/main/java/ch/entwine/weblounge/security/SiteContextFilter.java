@@ -52,10 +52,10 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Filter that for every request will set the Site on the security service.
  */
-public class WebloungeSecurityFilter implements Filter {
+public class SiteContextFilter implements Filter {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(WebloungeSecurityFilter.class);
+  private static final Logger logger = LoggerFactory.getLogger(SiteContextFilter.class);
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -73,7 +73,7 @@ public class WebloungeSecurityFilter implements Filter {
    * @param securityService
    *          the security service
    */
-  public WebloungeSecurityFilter(SecurityService securityService) {
+  public SiteContextFilter(SecurityService securityService) {
     this.securityService = securityService;
 
     Bundle bundle = FrameworkUtil.getBundle(getClass());
@@ -115,23 +115,25 @@ public class WebloungeSecurityFilter implements Filter {
       FilterChain chain) throws IOException, ServletException {
 
     Site site = null;
+
+    // Extract site from the request
     if (request instanceof HttpServletRequest) {
       HttpServletRequest httpRequest = (HttpServletRequest) request;
       site = findSiteByRequest(httpRequest);
-      if (site != null)
+      if (site != null) {
         logger.debug("Mapped {} to site '{}'", httpRequest.getPathInfo(), site.getIdentifier());
-      else
+      } else {
         logger.debug("No site available for request to {}", httpRequest.getPathInfo());
+      }
     }
 
-    // Set the site on the request for the time being
+    // Set the site on the request
     securityService.setSite(site);
 
     chain.doFilter(request, response);
-    
-    // Done. Make sure the thread is not associated with a site anymore
+
+    // Make sure the thread is not associated with the site anymore
     securityService.setSite(null);
-    securityService.setUser(null);
   }
 
   /**
