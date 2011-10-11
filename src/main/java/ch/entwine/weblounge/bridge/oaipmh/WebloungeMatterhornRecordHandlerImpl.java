@@ -1,5 +1,6 @@
 package ch.entwine.weblounge.bridge.oaipmh;
 
+import ch.entwine.weblounge.bridge.oaipmh.harvester.RecordHandler;
 import ch.entwine.weblounge.common.content.movie.MovieContent;
 import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.content.movie.ScanType;
@@ -17,6 +18,8 @@ import ch.entwine.weblounge.common.site.Site;
 
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilder;
+import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -50,10 +53,13 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
   /** The content repository */
   private final WritableContentRepository contentRepository;
 
+  private final MediaPackageBuilder mediaPackageBuilder;
+
   public WebloungeMatterhornRecordHandlerImpl(Site site,
       WritableContentRepository contentRepository) {
     this.site = site;
     this.contentRepository = contentRepository;
+    mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
   }
 
   /**
@@ -85,6 +91,21 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
    * @see ch.entwine.weblounge.bridge.oaipmh.RecordHandler#handle(org.w3c.dom.Node)
    */
   public void handle(Node record) {
+    // Node mediaPackageNode = ListRecordsResponse.metadataOfRecord(record);
+    // final MediaPackage mediaPackage;
+    // try {
+    // mediaPackage = mediaPackageBuilder.loadFromXml(mediaPackageNode);
+    // } catch (MediaPackageException e) {
+    // throw new RuntimeException(e);
+    // }
+    // logger.info("Harvested mediapackage " +
+    // mediaPackage.getIdentifier().toString());
+    // try {
+    // searchService.add(mediaPackage);
+    // } catch (Exception e) {
+    // throw new RuntimeException(e);
+    // }
+
     // TODO Read the record identifier
 
     // TODO check xml header if record is deleted
