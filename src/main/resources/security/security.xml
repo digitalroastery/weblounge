@@ -8,7 +8,7 @@
        http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
   <sec:http 
-    create-session="never"
+    create-session="ifRequired"
     servlet-api-provision="true" 
     realm="Weblounge"
     entry-point-ref="userEntryPoint" 
@@ -108,7 +108,7 @@
     <property name="securityService" ref="securityService" />
     <property name="welcomePages">
       <map>
-        <entry key="weblounge:editor" value="/?edit" />
+        <entry key="weblounge:editor" value="/weblounge/login/success.html" />
         <entry key="*" value="/index.html" />
       </map>
     </property>

@@ -204,7 +204,7 @@ public class UserContextFilter implements Filter {
    *          the system role
    * @return the local role
    */
-  private Role getLocalRole(Site site, Role role) {
+  protected Role getLocalRole(Site site, Role role) {
     String localRole = site.getLocalRole(role.getIdentifier());
     if (StringUtils.isNotBlank(localRole))
       return new RoleImpl(site.getIdentifier(), localRole);

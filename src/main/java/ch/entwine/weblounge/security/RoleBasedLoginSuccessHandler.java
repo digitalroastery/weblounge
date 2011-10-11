@@ -77,6 +77,8 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
     // Try to send users to an appropriate welcome page based on their roles
     for (Map.Entry<String, String> entry : welcomePages.entrySet()) {
       String roleId = entry.getKey();
+      if (roleId.contains(":"))
+        roleId = roleId.substring(roleId.indexOf(":") + 1);
       String welcomePage = entry.getValue();
       if (SecurityUtils.userHasRole(user, roleId)) {
         response.sendRedirect(addTimeStamp(welcomePage));
