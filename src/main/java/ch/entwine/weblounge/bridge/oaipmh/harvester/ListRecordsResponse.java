@@ -86,6 +86,14 @@ public class ListRecordsResponse extends OaiPmhResponse {
     return xpathNode(createXPath(), recordNode, "//oai20:metadata/*[1]");
   }
 
+  public static boolean statusOfRecord(Node recordNode) {
+    return xpathExists(createXPath(), recordNode, "//oai20:header[@status='deleted']");
+  }
+
+  public static String identifierOfRecord(Node recordNode) {
+    return xpathString(createXPath(), recordNode, "//oai20:header/oai20:identifier/text()");
+  }
+
   /**
    * Get all records performing a complete request resuming any partial
    * responses.

@@ -1,5 +1,6 @@
 package ch.entwine.weblounge.bridge.oaipmh;
 
+import ch.entwine.weblounge.bridge.oaipmh.harvester.ListRecordsResponse;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.RecordHandler;
 import ch.entwine.weblounge.common.content.movie.MovieContent;
 import ch.entwine.weblounge.common.content.movie.MovieResource;
@@ -22,7 +23,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Stream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
@@ -72,53 +72,38 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
   }
 
   /**
-   * Returns <code>true</code> if record was deleted, otherwise
-   * <code>false</code>.
-   * 
-   * @param record
-   *          the record node
-   * @return <code>true</code> if record was deleted, otherwise
-   *         <code>false</code>
-   */
-  private boolean isDeleted(Node record) {
-    // TODO check with xPath if record header has a status="deleted"
-    return false;
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.bridge.oaipmh.RecordHandler#handle(org.w3c.dom.Node)
    */
   public void handle(Node record) {
-    // Node mediaPackageNode = ListRecordsResponse.metadataOfRecord(record);
-    // final MediaPackage mediaPackage;
-    // try {
-    // mediaPackage = mediaPackageBuilder.loadFromXml(mediaPackageNode);
-    // } catch (MediaPackageException e) {
-    // throw new RuntimeException(e);
-    // }
-    // logger.info("Harvested mediapackage " +
-    // mediaPackage.getIdentifier().toString());
-    // try {
-    // searchService.add(mediaPackage);
-    // } catch (Exception e) {
-    // throw new RuntimeException(e);
-    // }
+    String recordIdentifier = ListRecordsResponse.identifierOfRecord(record);
+    boolean isDeleted = ListRecordsResponse.statusOfRecord(record);
 
-    // TODO Read the record identifier
-
-    // TODO check xml header if record is deleted
-    boolean deleted = isDeleted(record);
-
-    // TODO get xml content and parse it to media package
-    String xml = "XML";
-    MediaPackage mediaPackage = null;
-    try {
-      mediaPackage = MediaPackageParser.getFromXml(xml);
-    } catch (MediaPackageException e) {
-      e.printStackTrace();
+    if (isDeleted) {
+      // TODO Delete resource with identifier from contentrepository
+    } else {
+      saveRecordAsMovieResource(record);
     }
+  }
+
+  /**
+   * Load the the {@link MediaPackage} from the record, parse it to a
+   * {@link MovieContent} and save it to the content repository.
+   * 
+   * @param record
+   *          the matterhorn record
+   */
+  private void saveRecordAsMovieResource(Node record) {
+    Node mediaPackageNode = ListRecordsResponse.metadataOfRecord(record);
+    final MediaPackage mediaPackage;
+    try {
+      mediaPackage = mediaPackageBuilder.loadFromXml(mediaPackageNode);
+    } catch (MediaPackageException e) {
+      logger.warn("Error loading mediapackage from record");
+      throw new RuntimeException(e);
+    }
+    logger.info("Harvested mediapackage " + mediaPackage.getIdentifier().toString());
 
     // Add Resource to Repo
     MovieResourceImpl movieResource = parseMovieResource(site, mediaPackage);
@@ -171,14 +156,17 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
    * @return the movie resource
    */
   private MovieContent paresMovieContent(MediaPackage mediaPackage) {
-    Language language = LanguageUtils.getLanguage(mediaPackage.getLanguage());
+    // Language language =
+    // LanguageUtils.getLanguage(mediaPackage.getLanguage());
+    Language language = LanguageUtils.getLanguage("de");
     // TODO: Use tracks with correct flavor for movie
 
     // Set Content
     MediaPackageElement element = mediaPackage.getElements()[0];
     MovieContent content = new MovieContentImpl(element.getURI().toString(), language, element.getMimeType().asString());
     content.setAuthor(mediaPackage.getCreators().toString());
-    content.setSize(element.getSize());
+    if (element.getSize() >= 0)
+      content.setSize(element.getSize());
     content.setDuration(mediaPackage.getDuration());
 
     Track track = mediaPackage.getTracks()[0];
@@ -224,7 +212,9 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
       MediaPackage mediaPackage) {
 
     // TODO: Use dublin core catalog for metadata
-    Language language = LanguageUtils.getLanguage(mediaPackage.getLanguage());
+    // Language language =
+    // LanguageUtils.getLanguage(mediaPackage.getLanguage());
+    Language language = LanguageUtils.getLanguage("de");
 
     MovieResourceImpl movieResource = new MovieResourceImpl(new MovieResourceURIImpl(site));
     movieResource.setCreated(harvesterUser, new Date());

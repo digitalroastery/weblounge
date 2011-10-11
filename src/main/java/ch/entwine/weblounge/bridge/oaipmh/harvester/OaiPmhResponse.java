@@ -75,8 +75,12 @@ public abstract class OaiPmhResponse {
    * expression must return a string (text).
    */
   protected String xpathString(String expr) {
+    return xpathString(xpath, doc, expr);
+  }
+
+  public static String xpathString(XPath xpaht, Node context, String expr) {
     try {
-      return ((String) xpath.evaluate(expr, doc, XPathConstants.STRING)).trim();
+      return ((String) xpaht.evaluate(expr, context, XPathConstants.STRING)).trim();
     } catch (XPathExpressionException e) {
       throw new RuntimeException("malformed xpath expression " + expr, e);
     }
@@ -103,14 +107,22 @@ public abstract class OaiPmhResponse {
    * expression must return a node list.
    */
   protected NodeList xpathNodeList(String expr) {
-    try {
-      return (NodeList) xpath.evaluate(expr, doc, XPathConstants.NODESET);
-    } catch (XPathExpressionException e) {
-      throw new RuntimeException("malformed xpath expression " + expr, e);
-    }
+    return xpathNodeList(xpath, doc, expr);
   }
 
   protected boolean xpathExists(String expr) {
     return xpathNodeList(expr).getLength() > 0;
+  }
+
+  public static boolean xpathExists(XPath xpath, Node context, String expr) {
+    return xpathNodeList(xpath, context, expr).getLength() > 0;
+  }
+
+  public static NodeList xpathNodeList(XPath xpath, Node context, String expr) {
+    try {
+      return (NodeList) xpath.evaluate(expr, context, XPathConstants.NODESET);
+    } catch (XPathExpressionException e) {
+      throw new RuntimeException("malformed xpath expression " + expr, e);
+    }
   }
 }

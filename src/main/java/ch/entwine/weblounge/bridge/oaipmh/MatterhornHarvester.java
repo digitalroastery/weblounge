@@ -20,18 +20,26 @@
 
 package ch.entwine.weblounge.bridge.oaipmh;
 
+import static org.opencastproject.util.data.Option.some;
+
+import ch.entwine.weblounge.bridge.oaipmh.harvester.ListRecordsResponse;
+import ch.entwine.weblounge.bridge.oaipmh.harvester.OaiPmhRepositoryClient;
+import ch.entwine.weblounge.bridge.oaipmh.harvester.RecordHandler;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.scheduler.JobException;
 import ch.entwine.weblounge.common.scheduler.JobWorker;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
+import org.opencastproject.util.data.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.Dictionary;
 
 /**
@@ -80,12 +88,38 @@ public class MatterhornHarvester implements JobWorker {
       throw new JobException(this, "Repository url '" + repositoryUrl + "' is malformed: " + e.getMessage());
     }
 
-    WebloungeMatterhornRecordHandlerImpl matterhornHandler = new WebloungeMatterhornRecordHandlerImpl(site, contentRepository);
+    RecordHandler matterhornHandler = new WebloungeMatterhornRecordHandlerImpl(site, contentRepository);
+    Option<Date> from = some((Date) new Date());
+    // penv =
+    // newPersistenceEnvironment(newEntityManagerFactory(componentContext,
+    // "org.opencastproject.oaipmh.harvester"));
+    try {
+      // DateTime now = new DateTime();
+      harvest(repositoryUrl, from, matterhornHandler);
+      // save the time of the last harvest but with a security delta of 1
+      // minutes
+      // LastHarvested lastHarvested = new LastHarvested(repositoryUrl,
+      // now.minusMinutes(1).toDate());
+      // update(penv, );
+    } catch (Exception e) {
+      logger.error("An error occured while harvesting " + url + ". Skipping this repository for now...", e);
+    }
+  }
 
-    // TODO instantiate a harvester with the given repositoryUrl and
-    // repositoryPrefix
-
-    // TODO Start harvesting
+  private void harvest(String url, Option<Date> from, RecordHandler handler)
+      throws Exception {
+    logger.info("Harvesting " + url + " from " + from + " on thread " + Thread.currentThread());
+    OaiPmhRepositoryClient repositoryClient = OaiPmhRepositoryClient.newHarvester(url);
+    ListRecordsResponse response = repositoryClient.listRecords(handler.getMetadataPrefix(), Option.<Date> none(), Option.<Date> none(), Option.<String> none());
+    if (!response.isError()) {
+      for (Node recordNode : ListRecordsResponse.getAllRecords(response, repositoryClient)) {
+        handler.handle(recordNode);
+      }
+    } else if (response.isErrorNoRecordsMatch()) {
+      logger.info("Repository returned no records.");
+    } else {
+      logger.error("Repository returned error code: " + response.getErrorCode().getOrElse("?"));
+    }
   }
 
 }
