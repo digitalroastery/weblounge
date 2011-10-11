@@ -59,4 +59,12 @@ public interface SecurityService {
    */
   void setUser(User user);
 
+  /**
+   * Returns <code>true</code> if there is a security policy in place,
+   * <code>false</code> otherwise.
+   * 
+   * @return <code>true</code> if security is enabled
+   */
+  boolean isEnabled();
+
 }
