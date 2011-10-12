@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
@@ -47,13 +48,16 @@ import java.util.Dictionary;
  * prefix of the content repository that is configured in the job's
  * configuration options.
  */
-public class MatterhornHarvester implements JobWorker {
+public class WebloungeHarvester implements JobWorker {
 
   /** Logging facility */
-  protected static final Logger logger = LoggerFactory.getLogger(MatterhornHarvester.class);
+  protected static final Logger logger = LoggerFactory.getLogger(WebloungeHarvester.class);
 
   /** Configuration option for the repository to harvest */
   private static final String OPT_REPOSITORY_URL = "repository.url";
+
+  /** Configuration option for the repository to harvest */
+  private static final String OPT_HANDLER_CLASS = "handler.class";
 
   /** Configuration option for the flavor of the tracks to use */
   private static final String OPT_TRACK_FLAVORS = "track.flavors";
@@ -64,6 +68,7 @@ public class MatterhornHarvester implements JobWorker {
    * @see ch.entwine.weblounge.common.scheduler.JobWorker#execute(java.lang.String,
    *      java.util.Dictionary)
    */
+  @SuppressWarnings("unchecked")
   public void execute(String name, Dictionary<String, Serializable> ctx)
       throws JobException {
 
@@ -88,14 +93,33 @@ public class MatterhornHarvester implements JobWorker {
       throw new JobException(this, "Repository url '" + repositoryUrl + "' is malformed: " + e.getMessage());
     }
 
-    RecordHandler matterhornHandler = new WebloungeMatterhornRecordHandlerImpl(site, contentRepository);
+    // Read the configuration value for the handler class
+    String handlerClass = (String) ctx.get(OPT_HANDLER_CLASS);
+    if (StringUtils.isBlank(handlerClass))
+      throw new JobException(this, "Configuration option '" + OPT_HANDLER_CLASS + "' is missing from the job configuration");
+
+    RecordHandler handler;
+    try {
+      Class<? extends WebloungeRecordHandler> c = (Class<? extends WebloungeRecordHandler>) getClass().getClassLoader().loadClass(handlerClass);
+      Class paramTypes[] = new Class[2];
+      paramTypes[0] = Site.class;
+      paramTypes[1] = WritableContentRepository.class;
+      Constructor<? extends WebloungeRecordHandler> constructor = c.getConstructor(paramTypes);
+      Object arglist[] = new Object[2];
+      arglist[0] = site;
+      arglist[1] = contentRepository;
+      handler = constructor.newInstance(arglist);
+    } catch (Throwable t) {
+      throw new IllegalStateException("Unable to instantiate class " + handlerClass + ": " + t.getMessage(), t);
+    }
+
     Option<Date> from = some((Date) new Date());
     // penv =
     // newPersistenceEnvironment(newEntityManagerFactory(componentContext,
     // "org.opencastproject.oaipmh.harvester"));
     try {
       // DateTime now = new DateTime();
-      harvest(repositoryUrl, from, matterhornHandler);
+      harvest(repositoryUrl, from, handler);
       // save the time of the last harvest but with a security delta of 1
       // minutes
       // LastHarvested lastHarvested = new LastHarvested(repositoryUrl,

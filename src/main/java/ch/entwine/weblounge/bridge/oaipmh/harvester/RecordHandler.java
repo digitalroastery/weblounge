@@ -19,7 +19,7 @@ package ch.entwine.weblounge.bridge.oaipmh.harvester;
 import org.w3c.dom.Node;
 
 /**
- * Pluggable component to handle OAI-PMH records harvested by the {@link MatterhornHarvester}.
+ * Pluggable component to handle OAI-PMH records harvested by the {@link WebloungeHarvester}.
  */
 public interface RecordHandler {
 

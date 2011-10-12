@@ -2,21 +2,24 @@ package ch.entwine.weblounge.bridge.oaipmh;
 
 import ch.entwine.weblounge.bridge.oaipmh.harvester.ListRecordsResponse;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.RecordHandler;
+import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
+import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.movie.MovieContent;
 import ch.entwine.weblounge.common.content.movie.MovieResource;
-import ch.entwine.weblounge.common.content.movie.ScanType;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieContentImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.movie.VideoStreamImpl;
-import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
@@ -36,10 +39,10 @@ import java.util.Date;
 /**
  * TODO: Comment WebloungeMatterhornRecordHandlerImpl
  */
-public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
+public class MatterhornRecordHandler extends WebloungeRecordHandler implements RecordHandler {
 
   /** Logging facility */
-  protected static final Logger logger = LoggerFactory.getLogger(WebloungeMatterhornRecordHandlerImpl.class);
+  protected static final Logger logger = LoggerFactory.getLogger(MatterhornRecordHandler.class);
 
   /** User for resource creation */
   private User harvesterUser = new UserImpl("harvester");
@@ -47,18 +50,12 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
   /** Name of the oai pmh prefix */
   private static final String MATTERHORN_REPOSITORY_PREFIX = "matterhorn";
 
-  /** the site */
-  private final Site site;
+  /** The media package builder */
+  private MediaPackageBuilder mediaPackageBuilder;
 
-  /** The content repository */
-  private final WritableContentRepository contentRepository;
-
-  private final MediaPackageBuilder mediaPackageBuilder;
-
-  public WebloungeMatterhornRecordHandlerImpl(Site site,
+  public MatterhornRecordHandler(Site site,
       WritableContentRepository contentRepository) {
-    this.site = site;
-    this.contentRepository = contentRepository;
+    super(site, contentRepository);
     mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
   }
 
@@ -81,9 +78,29 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
     boolean isDeleted = ListRecordsResponse.statusOfRecord(record);
 
     if (isDeleted) {
-      // TODO Delete resource with identifier from contentrepository
+      SearchResult searchResult;
+      SearchQuery q = new SearchQueryImpl(site);
+      q.withSubject(recordIdentifier);
+      try {
+        searchResult = contentRepository.find(q);
+      } catch (ContentRepositoryException e) {
+        logger.error("Error searching for resources with given subject: " + recordIdentifier);
+        throw new RuntimeException(e);
+      }
+      if (searchResult.getHitCount() != 1) {
+        logger.error("The found element size is wrong!, size: " + searchResult.getHitCount());
+        return;
+      }
+      ResourceSearchResultItem resourceResult = (ResourceSearchResultItem) searchResult.getItems()[0];
+      try {
+        contentRepository.delete(resourceResult.getResourceURI());
+      } catch (ContentRepositoryException e) {
+        logger.warn("Illegal state while deleting resource {}: {}", resourceResult.getResourceURI(), e.getMessage());
+      } catch (IOException e) {
+        logger.error("Error deleting resource {}: {}", resourceResult.getResourceURI(), e.getMessage());
+      }
     } else {
-      saveRecordAsMovieResource(record);
+      saveRecordAsMovieResource(record, recordIdentifier);
     }
   }
 
@@ -93,8 +110,10 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
    * 
    * @param record
    *          the matterhorn record
+   * @param recordIdentifier
+   *          the record identifier
    */
-  private void saveRecordAsMovieResource(Node record) {
+  private void saveRecordAsMovieResource(Node record, String recordIdentifier) {
     Node mediaPackageNode = ListRecordsResponse.metadataOfRecord(record);
     final MediaPackage mediaPackage;
     try {
@@ -107,21 +126,24 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
 
     // Add Resource to Repo
     MovieResourceImpl movieResource = parseMovieResource(site, mediaPackage);
+    movieResource.addSubject(recordIdentifier);
     try {
       contentRepository.put(movieResource);
     } catch (IllegalStateException e) {
       logger.warn("Illegal state while adding new resource {}: {}", movieResource.getURI(), e.getMessage());
-      throw e;
-      // TODO Throw exception
+      throw new RuntimeException(e);
     } catch (ContentRepositoryException e) {
       logger.warn("Error adding new resource {}: {}", movieResource.getURI(), e.getMessage());
+      throw new RuntimeException(e);
     } catch (IOException e) {
       logger.warn("Error writing new resource {}: {}", movieResource.getURI(), e.getMessage());
+      throw new RuntimeException(e);
     }
 
     // Add Content to Repo
     MovieContent movieContent = paresMovieContent(mediaPackage);
     try {
+      // new URL(movieContent.getFilename()).openStream()
       contentRepository.putContent(movieResource.getURI(), movieContent, null);
     } catch (IllegalStateException e) {
       logger.warn("Illegal state while adding content to resource {}: {}", movieResource.getURI(), e.getMessage());
@@ -130,6 +152,7 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
       } catch (Throwable t) {
         logger.error("Error deleting orphan resource {}", movieResource.getURI(), t);
       }
+      throw new RuntimeException(e);
     } catch (ContentRepositoryException e) {
       logger.warn("Illegal state while adding content to resource {}: {}", movieResource.getURI(), e.getMessage());
       try {
@@ -137,6 +160,7 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
       } catch (Throwable t) {
         logger.error("Error deleting orphan resource {}", movieResource.getURI(), t);
       }
+      throw new RuntimeException(e);
     } catch (IOException e) {
       logger.warn("Error reading resource content {} from request", movieResource.getURI());
       try {
@@ -144,6 +168,7 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
       } catch (Throwable t) {
         logger.error("Error deleting orphan resource {}", movieResource.getURI(), t);
       }
+      throw new RuntimeException(e);
     }
   }
 
@@ -156,39 +181,56 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
    * @return the movie resource
    */
   private MovieContent paresMovieContent(MediaPackage mediaPackage) {
-    // Language language =
-    // LanguageUtils.getLanguage(mediaPackage.getLanguage());
-    Language language = LanguageUtils.getLanguage("de");
-    // TODO: Use tracks with correct flavor for movie
+    Language language = getISO3Language(mediaPackage.getLanguage());
 
     // Set Content
     MediaPackageElement element = mediaPackage.getElements()[0];
     MovieContent content = new MovieContentImpl(element.getURI().toString(), language, element.getMimeType().asString());
-    content.setAuthor(mediaPackage.getCreators().toString());
-    if (element.getSize() >= 0)
+    StringBuilder author = new StringBuilder();
+    String[] creators = mediaPackage.getCreators();
+    for (int i = 0; i < creators.length; i++) {
+      if (i != 0)
+        author.append(", ");
+      author.append(creators[i]);
+    }
+    content.setAuthor(author.toString());
+    if (element.getSize() != -1)
       content.setSize(element.getSize());
-    content.setDuration(mediaPackage.getDuration());
+    if (mediaPackage.getDuration() != -1)
+      content.setDuration(mediaPackage.getDuration());
 
+    // TODO: Use tracks with correct flavor for movie
     Track track = mediaPackage.getTracks()[0];
     for (Stream stream : track.getStreams()) {
       if (stream instanceof AudioStream) {
         ch.entwine.weblounge.common.content.movie.AudioStream audioStream = new ch.entwine.weblounge.common.impl.content.movie.AudioStreamImpl();
         AudioStream matterhornAudioStream = (AudioStream) stream;
-        audioStream.setBitDepth(matterhornAudioStream.getBitDepth());
-        audioStream.setBitRate(matterhornAudioStream.getBitRate());
-        audioStream.setChannels(matterhornAudioStream.getChannels());
-        audioStream.setFormat(matterhornAudioStream.getFormat());
-        audioStream.setSamplingRate(matterhornAudioStream.getSamplingRate());
+        if (matterhornAudioStream.getBitDepth() != null)
+          audioStream.setBitDepth(matterhornAudioStream.getBitDepth());
+        if (matterhornAudioStream.getBitRate() != null)
+          audioStream.setBitRate(matterhornAudioStream.getBitRate());
+        if (matterhornAudioStream.getChannels() != null)
+          audioStream.setChannels(matterhornAudioStream.getChannels());
+        if (StringUtils.isNotBlank(matterhornAudioStream.getFormat()))
+          audioStream.setFormat(matterhornAudioStream.getFormat());
+        if (matterhornAudioStream.getSamplingRate() != null)
+          audioStream.setSamplingRate(matterhornAudioStream.getSamplingRate());
         content.addStream(audioStream);
       } else if (stream instanceof VideoStream) {
         ch.entwine.weblounge.common.content.movie.VideoStream videoStream = new VideoStreamImpl();
         VideoStream matterhornVideoStream = (VideoStream) stream;
-        videoStream.setBitRate(matterhornVideoStream.getBitRate());
-        videoStream.setFormat(matterhornVideoStream.getFormat());
-        videoStream.setFrameHeight(matterhornVideoStream.getFrameHeight());
-        videoStream.setFrameWidth(matterhornVideoStream.getFrameWidth());
-        videoStream.setFrameRate(matterhornVideoStream.getFrameRate());
-        videoStream.setScanType(ScanType.fromString(matterhornVideoStream.getScanType().toString()));
+        if (matterhornVideoStream.getBitRate() != null)
+          videoStream.setBitRate(matterhornVideoStream.getBitRate());
+        if (StringUtils.isNotBlank(matterhornVideoStream.getFormat()))
+          videoStream.setFormat(matterhornVideoStream.getFormat());
+        if (matterhornVideoStream.getFrameHeight() != null)
+          videoStream.setFrameHeight(matterhornVideoStream.getFrameHeight());
+        if (matterhornVideoStream.getFrameWidth() != null)
+          videoStream.setFrameWidth(matterhornVideoStream.getFrameWidth());
+        if (matterhornVideoStream.getFrameRate() != null)
+          videoStream.setFrameRate(matterhornVideoStream.getFrameRate());
+        // if (matterhornVideoStream.getScanType() != null)
+        // videoStream.setScanType(ScanType.fromString(matterhornVideoStream.getScanType().toString()));
         content.addStream(videoStream);
       }
     }
@@ -212,9 +254,7 @@ public class WebloungeMatterhornRecordHandlerImpl implements RecordHandler {
       MediaPackage mediaPackage) {
 
     // TODO: Use dublin core catalog for metadata
-    // Language language =
-    // LanguageUtils.getLanguage(mediaPackage.getLanguage());
-    Language language = LanguageUtils.getLanguage("de");
+    Language language = getISO3Language(mediaPackage.getLanguage());
 
     MovieResourceImpl movieResource = new MovieResourceImpl(new MovieResourceURIImpl(site));
     movieResource.setCreated(harvesterUser, new Date());
