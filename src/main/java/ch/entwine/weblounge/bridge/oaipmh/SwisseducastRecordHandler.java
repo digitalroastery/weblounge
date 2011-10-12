@@ -1,6 +1,7 @@
 package ch.entwine.weblounge.bridge.oaipmh;
 
-import ch.entwine.weblounge.bridge.oaipmh.harvester.ListRecordsResponse;
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.security.User;
@@ -30,11 +31,33 @@ public class SwisseducastRecordHandler extends WebloungeRecordHandler {
     return SWISSEDUCAST_REPOSITORY_PREFIX;
   }
 
-  public void handle(Node record) {
-    String recordIdentifier = ListRecordsResponse.identifierOfRecord(record);
-    boolean isDeleted = ListRecordsResponse.statusOfRecord(record);
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.bridge.oaipmh.WebloungeRecordHandler#prepareRecord(org.w3c.dom.Node)
+   */
+  protected void prepareRecord(Node record) {
+    // TODO Auto-generated method stub
+  }
 
-    // TODO implement swisseducast parser
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.bridge.oaipmh.WebloungeRecordHandler#parseResource()
+   */
+  protected Resource<?> parseResource(Node record) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.bridge.oaipmh.WebloungeRecordHandler#parseResourceContent()
+   */
+  protected ResourceContent parseResourceContent(Node record) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

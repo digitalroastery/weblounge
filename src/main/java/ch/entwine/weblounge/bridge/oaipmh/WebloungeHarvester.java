@@ -54,13 +54,13 @@ public class WebloungeHarvester implements JobWorker {
   protected static final Logger logger = LoggerFactory.getLogger(WebloungeHarvester.class);
 
   /** Configuration option for the repository to harvest */
-  private static final String OPT_REPOSITORY_URL = "repository.url";
+  public static final String OPT_REPOSITORY_URL = "repository.url";
 
   /** Configuration option for the repository to harvest */
-  private static final String OPT_HANDLER_CLASS = "handler.class";
+  public static final String OPT_HANDLER_CLASS = "handler.class";
 
   /** Configuration option for the flavor of the tracks to use */
-  private static final String OPT_TRACK_FLAVORS = "track.flavors";
+  public static final String OPT_TRACK_FLAVORS = "track.flavors";
 
   /**
    * {@inheritDoc}
@@ -114,9 +114,7 @@ public class WebloungeHarvester implements JobWorker {
     }
 
     Option<Date> from = some((Date) new Date());
-    // penv =
-    // newPersistenceEnvironment(newEntityManagerFactory(componentContext,
-    // "org.opencastproject.oaipmh.harvester"));
+    // newPersistenceEnvironment(Persistence.createEntityManagerFactory("org.opencastproject.oaipmh.harvester"));
     try {
       // DateTime now = new DateTime();
       harvest(repositoryUrl, from, handler);
