@@ -78,12 +78,12 @@ public final class LanguageUtils {
    */
   public static Language getLanguage(Locale locale)
       throws UnknownLanguageException {
-    
+
     Matcher matcher = ACCEPT_LANGUAGE_HEADER.matcher(locale.getLanguage());
     if (matcher.matches()) {
       locale = new Locale(matcher.group(2), matcher.group(1));
     }
-    
+
     Language language = systemLanguages.get(locale.getLanguage());
     if (language == null) {
       language = new LanguageImpl(locale);
@@ -110,6 +110,7 @@ public final class LanguageUtils {
       if (locale.getLanguage().equals(languageCode)) {
         language = new LanguageImpl(new Locale(languageCode, "", ""));
         systemLanguages.put(languageCode, language);
+        break;
       }
     }
     if (language == null)
