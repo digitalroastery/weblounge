@@ -193,6 +193,9 @@ public class SiteImpl implements Site {
   /** Flag to tell whether we are currently shutting down */
   private boolean isShutdownInProgress = false;
 
+  /** The site's bundle context */
+  protected BundleContext bundleContext = null;
+
   /**
    * Creates a new site that is initially disabled. Use {@link #setEnabled()} to
    * enable the site.
@@ -1094,7 +1097,7 @@ public class SiteImpl implements Site {
   @SuppressWarnings("unchecked")
   protected void activate(ComponentContext context) throws Exception {
 
-    BundleContext bundleContext = context.getBundleContext();
+    bundleContext = context.getBundleContext();
     final Bundle bundle = bundleContext.getBundle();
 
     // Fix the site identifier
@@ -1293,6 +1296,7 @@ public class SiteImpl implements Site {
       jobData.put(QuartzJobWorker.CLASS, jobClass);
       jobData.put(QuartzJobWorker.CONTEXT, job.getContext());
       job.getContext().put(Site.class.getName(), this);
+      job.getContext().put(BundleContext.class.getName(), bundleContext);
       JobDetail jobDetail = new JobDetail(jobIdentifier, groupName, QuartzJobWorker.class);
       jobDetail.setJobDataMap(jobData);
 

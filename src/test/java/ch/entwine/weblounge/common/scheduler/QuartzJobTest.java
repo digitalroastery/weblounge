@@ -29,7 +29,6 @@ import ch.entwine.weblounge.common.impl.scheduler.QuartzJob;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -57,7 +56,7 @@ public class QuartzJobTest {
   protected String optionValue = "value";
 
   /** Job context */
-  protected Dictionary<String, Serializable> jobContext = new Hashtable<String, Serializable>();
+  protected Dictionary<String, Object> jobContext = new Hashtable<String, Object>();
 
   /** Job trigger that fires every second */
   protected JobTrigger trigger = null;

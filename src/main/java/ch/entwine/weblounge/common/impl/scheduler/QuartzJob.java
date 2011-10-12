@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
-import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -62,7 +61,7 @@ public final class QuartzJob implements Job {
   protected JobTrigger trigger = null;
 
   /** Job context map */
-  protected Dictionary<String, Serializable> ctx = null;
+  protected Dictionary<String, Object> ctx = null;
 
   /**
    * Creates a new job.
@@ -93,7 +92,7 @@ public final class QuartzJob implements Job {
    *          the job trigger
    */
   public QuartzJob(String identifier, Class<? extends JobWorker> worker,
-      Dictionary<String, Serializable> context, JobTrigger trigger) {
+      Dictionary<String, Object> context, JobTrigger trigger) {
     if (identifier == null)
       throw new IllegalArgumentException("Job identifier must not be null");
     if (worker == null)
@@ -105,7 +104,7 @@ public final class QuartzJob implements Job {
     this.trigger = trigger;
     this.ctx = context;
     if (this.ctx == null)
-      ctx = new Hashtable<String, Serializable>();
+      ctx = new Hashtable<String, Object>();
   }
 
   /**
@@ -174,7 +173,7 @@ public final class QuartzJob implements Job {
    * 
    * @return the context
    */
-  public Dictionary<String, Serializable> getContext() {
+  public Dictionary<String, Object> getContext() {
     return ctx;
   }
 
@@ -260,7 +259,7 @@ public final class QuartzJob implements Job {
       throws IllegalStateException {
 
     CronJobTrigger jobTrigger = null;
-    Dictionary<String, Serializable> ctx = new Hashtable<String, Serializable>();
+    Dictionary<String, Object> ctx = new Hashtable<String, Object>();
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     // Main attributes

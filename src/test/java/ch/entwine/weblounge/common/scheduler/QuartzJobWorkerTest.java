@@ -44,7 +44,6 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -70,7 +69,7 @@ public class QuartzJobWorkerTest {
   protected String schedulerGroup = "testgroup";
 
   /** Job context */
-  protected Dictionary<String, Serializable> jobContext = null;
+  protected Dictionary<String, Object> jobContext = null;
 
   /** Job trigger that fires every second */
   protected JobTrigger trigger = null;
@@ -112,7 +111,7 @@ public class QuartzJobWorkerTest {
   @Before
   public void setUp() throws Exception {
     jobClass = TestJob.class;
-    jobContext = new Hashtable<String, Serializable>();
+    jobContext = new Hashtable<String, Object>();
   }
 
   /**
