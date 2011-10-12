@@ -20,7 +20,6 @@
 
 package ch.entwine.weblounge.common.scheduler;
 
-import java.io.Serializable;
 import java.util.Dictionary;
 
 /**
@@ -97,7 +96,7 @@ public interface Job {
    * 
    * @return the context
    */
-  Dictionary<String, Serializable> getContext();
+  Dictionary<String, Object> getContext();
 
   /**
    * Returns an <code>XML</code> representation of the job, which will look
