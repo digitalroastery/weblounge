@@ -83,15 +83,15 @@ public class ListRecordsResponse extends OaiPmhResponse {
    * </pre>
    */
   public static Node metadataOfRecord(Node recordNode) {
-    return xpathNode(createXPath(), recordNode, "//oai20:metadata/*[1]");
+    return xpathNode(createXPath(), recordNode, "oai20:metadata/*[1]");
   }
 
   public static boolean statusOfRecord(Node recordNode) {
-    return xpathExists(createXPath(), recordNode, "//oai20:header[@status='deleted']");
+    return xpathExists(createXPath(), recordNode, "oai20:header[@status='deleted']");
   }
 
   public static String identifierOfRecord(Node recordNode) {
-    return xpathString(createXPath(), recordNode, "//oai20:header/oai20:identifier/text()");
+    return xpathString(createXPath(), recordNode, "oai20:header/oai20:identifier/text()");
   }
 
   /**

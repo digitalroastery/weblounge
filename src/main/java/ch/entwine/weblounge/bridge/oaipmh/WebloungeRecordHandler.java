@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Base implementation of a weblounge record handler
+ */
 public abstract class WebloungeRecordHandler implements RecordHandler {
 
   /** Logging facility */
@@ -43,6 +46,14 @@ public abstract class WebloungeRecordHandler implements RecordHandler {
   /** ISO3 language map */
   protected final Map<String, Language> iso3Languages = new HashMap<String, Language>();
 
+  /**
+   * Creates a new weblounge record handler
+   * 
+   * @param site
+   *          the site
+   * @param contentRepository
+   *          the content repository
+   */
   public WebloungeRecordHandler(Site site,
       WritableContentRepository contentRepository) {
     this.site = site;

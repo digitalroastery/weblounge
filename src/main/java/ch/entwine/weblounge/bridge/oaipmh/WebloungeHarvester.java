@@ -32,6 +32,11 @@ import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.util.data.Option;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
+import org.osgi.service.prefs.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -40,6 +45,7 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
 
@@ -73,6 +79,7 @@ public class WebloungeHarvester implements JobWorker {
       throws JobException {
 
     Site site = (Site) ctx.get(Site.class.getName());
+    BundleContext bundleContext = (BundleContext) ctx.get(BundleContext.class.getName());
 
     // Get hold of the content repository
     WritableContentRepository contentRepository = null;
@@ -113,26 +120,76 @@ public class WebloungeHarvester implements JobWorker {
       throw new IllegalStateException("Unable to instantiate class " + handlerClass + ": " + t.getMessage(), t);
     }
 
-    Option<Date> from = some((Date) new Date());
-    // newPersistenceEnvironment(Persistence.createEntityManagerFactory("org.opencastproject.oaipmh.harvester"));
+    ServiceReference ref = bundleContext.getServiceReference(PreferencesService.class.getName());
+    if (ref == null) {
+      logger.error("No preferences service available!");
+      throw new RuntimeException("preferences service not found");
+    }
+
+    PreferencesService service = (PreferencesService) bundleContext.getService(ref);
+    Preferences systemPreferences = service.getSystemPreferences();
+
     try {
-      // DateTime now = new DateTime();
-      harvest(repositoryUrl, from, handler);
-      // save the time of the last harvest but with a security delta of 1
-      // minutes
-      // LastHarvested lastHarvested = new LastHarvested(repositoryUrl,
-      // now.minusMinutes(1).toDate());
-      // update(penv, );
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(new Date());
+
+      harvest(repositoryUrl, getLastHarvestDate(systemPreferences, repositoryUrl), handler);
+
+      setLastHarvestDate(systemPreferences, repositoryUrl, cal);
     } catch (Exception e) {
       logger.error("An error occured while harvesting " + url + ". Skipping this repository for now...", e);
     }
+  }
+
+  /**
+   * Set the last harvested Date with a security delta of 1 minutes
+   * 
+   * @param prefs
+   *          the preferences
+   * @param repositoryUrl
+   *          the repository url
+   * @param cal
+   *          the current calender time
+   */
+  private void setLastHarvestDate(Preferences prefs, String repositoryUrl,
+      Calendar cal) {
+    cal.add(Calendar.MINUTE, -1);
+    prefs.putLong(repositoryUrl, cal.getTime().getTime());
+    try {
+      prefs.flush();
+    } catch (BackingStoreException e) {
+      logger.error("Last harvested can't be saved! " + e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Return the last harvested Date or none() if not found.
+   * 
+   * @param prefs
+   *          the preferences
+   * @param url
+   *          the repository url
+   * @return the last harvested Date or none()
+   */
+  private Option<Date> getLastHarvestDate(Preferences prefs, String url) {
+    try {
+      prefs.sync();
+    } catch (BackingStoreException e) {
+      logger.error("Last harvested could not be loaded! " + e.getMessage());
+      throw new RuntimeException(e);
+    }
+    long timestamp = prefs.getLong(url, -1L);
+    if (timestamp == -1L)
+      return Option.<Date> none();
+    return some(new Date(timestamp));
   }
 
   private void harvest(String url, Option<Date> from, RecordHandler handler)
       throws Exception {
     logger.info("Harvesting " + url + " from " + from + " on thread " + Thread.currentThread());
     OaiPmhRepositoryClient repositoryClient = OaiPmhRepositoryClient.newHarvester(url);
-    ListRecordsResponse response = repositoryClient.listRecords(handler.getMetadataPrefix(), Option.<Date> none(), Option.<Date> none(), Option.<String> none());
+    ListRecordsResponse response = repositoryClient.listRecords(handler.getMetadataPrefix(), from, Option.<Date> none(), Option.<String> none());
     if (!response.isError()) {
       for (Node recordNode : ListRecordsResponse.getAllRecords(response, repositoryClient)) {
         handler.handle(recordNode);

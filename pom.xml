@@ -60,12 +60,6 @@
       <artifactId>org.springframework.core</artifactId>
     </dependency>
     
-    <dependency>
-	  <groupId>joda-time</groupId>
-	  <artifactId>joda-time</artifactId>
-	  <version>1.6</version>
-	</dependency>
-    
     <!-- thirdparty -->
 
     <dependency>
@@ -163,6 +157,13 @@
       <version>0.9.1.2</version>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+	  <groupId>joda-time</groupId>
+	  <artifactId>joda-time</artifactId>
+	  <version>1.6</version>
+	  <scope>test</scope>
+	</dependency>
     
   </dependencies>
   <build>

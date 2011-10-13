@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 import java.util.Date;
 
 /**
- * TODO: Comment WebloungeMatterhornRecordHandlerImpl
+ * A Matterhorn specified implementation of a record handler
  */
 public class MatterhornRecordHandler extends WebloungeRecordHandler implements RecordHandler {
 
@@ -46,6 +46,14 @@ public class MatterhornRecordHandler extends WebloungeRecordHandler implements R
   /** The media package */
   private MediaPackage mediaPackage;
 
+  /**
+   * Creates a new matterhorn record handler
+   * 
+   * @param site
+   *          the site
+   * @param contentRepository
+   *          the content repository
+   */
   public MatterhornRecordHandler(Site site,
       WritableContentRepository contentRepository) {
     super(site, contentRepository);
