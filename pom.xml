@@ -94,6 +94,19 @@
     </dependency>
 
     <!-- testing -->
+    
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-contentrepository</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>

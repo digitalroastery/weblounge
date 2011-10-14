@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<OAI-PMH xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd" xmlns="http://www.openarchives.org/OAI/2.0/">
+  <responseDate>2011-10-14T07:18:47Z</responseDate>
+  <request metadataPrefix="matterhorn" verb="ListRecords">http://matterhorn-connect.ethz.ch/oaipmh</request>
+  <ListRecords>
+    <record>
+      <header status="deleted">
+        <identifier>aa2c3988-42fd-4a0b-8ae1-fa61910c3eb3</identifier>
+        <datestamp>2011-10-10</datestamp>
+      </header>
+    </record>
+  </ListRecords>
+</OAI-PMH>
