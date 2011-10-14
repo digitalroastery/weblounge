@@ -11,6 +11,7 @@
 ../../../modules/weblounge-i18n-mygengo/trunk	modules/weblounge-i18n-mygengo
 ../../../modules/weblounge-importer/trunk	modules/weblounge-importer
 ../../../modules/weblounge-kernel/trunk	modules/weblounge-kernel
+../../../modules/weblounge-runtime/trunk	modules/weblounge-runtime
 ../../../modules/weblounge-security/trunk	modules/weblounge-security
 ../../../modules/weblounge-site/trunk	modules/weblounge-site
 ../../../modules/weblounge-system/trunk	modules/weblounge-system

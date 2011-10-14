@@ -104,6 +104,7 @@
         <module>modules/weblounge-dispatcher</module>
         <module>modules/weblounge-i18n-mygengo</module>
         <module>modules/weblounge-kernel</module>
+        <module>modules/weblounge-runtime</module>
         <module>modules/weblounge-security</module>
         <module>modules/weblounge-security-sql</module>
         <module>modules/weblounge-system</module>
