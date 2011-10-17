@@ -48,7 +48,7 @@ SET PAX_CONFMAN_OPTS=-Dbundles.configuration.location=%WEBLOUNGE_HOME%/conf
 SET PAX_LOGGING_OPTS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN
 SET PAX_WEB_OPTS=-Dorg.ops4j.pax.web.config.file=%WEBLOUNGE_HOME%/conf/jetty.xml
 SET WEBLOUNGE_LOGGING_OPTS=-Dweblounge.logdir=%WEBLOUNGE_LOGDIR%
-SET GRAPHICS_OPTS=-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit
+SET GRAPHICS_OPTS=-Djava.awt.headless=true
 SET TEMPDIR_OPTS=-Djava.io.tmpdir=%WEBLOUNGE_TEMPDIR%
 
 REM # Create the debug config
