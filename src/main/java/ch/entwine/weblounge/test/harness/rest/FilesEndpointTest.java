@@ -129,15 +129,15 @@ public class FilesEndpointTest extends IntegrationTestBase {
     HttpGet getFileRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
     logger.debug("Requesting file at {}", getFileRequest.getURI());
     DefaultHttpClient httpClient = new DefaultHttpClient();
-    Document pageXml = null;
+    Document fileXml = null;
     String eTagValue;
     String modifiedValue;
     try {
       HttpResponse response = TestUtils.request(httpClient, getFileRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
 
-      pageXml = TestUtils.parseXMLResponse(response);
-      assertEquals(id, XPathHelper.valueOf(pageXml, "/file/@id"));
+      fileXml = TestUtils.parseXMLResponse(response);
+      assertEquals(id, XPathHelper.valueOf(fileXml, "/file/@id"));
 
       // Test ETag header
       Header eTagHeader = response.getFirstHeader("Etag");
