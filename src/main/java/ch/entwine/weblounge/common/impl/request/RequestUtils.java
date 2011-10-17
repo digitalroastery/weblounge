@@ -23,6 +23,7 @@ package ch.entwine.weblounge.common.impl.request;
 import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.site.ActionSupport;
+import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.site.Action;
@@ -40,7 +41,9 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 /**
  * Utility implementation to deal with <code>HttpRequest</code> objects.
@@ -1711,6 +1714,29 @@ public final class RequestUtils {
     }
     buf.append("]");
     throw new IllegalArgumentException(buf.toString());
+  }
+
+  /**
+   * Returns <code>true</code> if this is a mock request or if it's wrapping
+   * such a request.
+   * 
+   * @param request
+   *          the request
+   * @return <code>true</code> if this is a mock request
+   */
+  public static boolean isMockRequest(ServletRequest request) {
+    if (request instanceof MockHttpServletRequest)
+      return true;
+
+    // Maybe it's wrapped?
+    while (request instanceof HttpServletRequestWrapper) {
+      request = ((HttpServletRequestWrapper) request).getRequest();
+      if (request instanceof MockHttpServletRequest)
+        return true;
+    }
+
+    // Definitely not
+    return false;
   }
 
 }
