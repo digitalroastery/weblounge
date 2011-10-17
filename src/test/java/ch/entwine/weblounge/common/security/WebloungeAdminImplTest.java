@@ -23,7 +23,9 @@ package ch.entwine.weblounge.common.security;
 
 import static org.junit.Assert.assertEquals;
 
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.security.WebloungeAdminImpl;
+import ch.entwine.weblounge.common.site.Site;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +38,24 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   /** Name of the site administrator */
   protected String adminName = null;
   
+  /** Test user */
+  protected UserImpl user = null;
+
+  /** The site object */
+  protected Site mockSite = null;
+
+  /** Login. Static because of the weblounge administrator tests */
+  protected static String login = "john";
+
+  /** Realm */
+  protected String realm = "testland";
+
+  /** Password */
+  protected String password = "pass";
+
+  /** The digest */
+  protected DigestType passwordDigestType = DigestType.md5;
+
   /**
    * @throws java.lang.Exception
    */
@@ -69,58 +89,11 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.security.UserImpl#getName()}.
    */
   @Test
   public void testGetName() {
-    assertEquals(adminName, user.getName());
-  }
-
-  /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
-   */
-  @Test
-  public void testGetNameFirstnameOnly() {
-    user.setLastName(null);
-    assertEquals(adminName, user.getName());
-  }
-
-  /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
-   */
-  @Test
-  public void testGetNameLastnameOnly() {
-    user.setFirstName(null);
-    assertEquals(adminName, user.getName());
-  }
-
-  /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
-   */
-  @Test
-  public void testGetNameNoFirstNoLastname() {
-    user.setFirstName(null);
-    user.setLastName(null);
-    assertEquals(adminName, user.getName());
-  }
-
-  /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.security.WebloungeUserImpl#setFirstName(java.lang.String)}.
-   */
-  @Test
-  public void testSetFirstName() {
-    user.setFirstName("James");
-    assertEquals("James", user.getFirstName());
-    assertEquals(adminName, user.getName());
-  }
-
-  /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.security.WebloungeUserImpl#setLastName(java.lang.String)}.
-   */
-  @Test
-  public void testSetLastName() {
-    user.setLastName("Joyce");
-    assertEquals("Joyce", user.getLastName());
     assertEquals(adminName, user.getName());
   }
 

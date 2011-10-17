@@ -34,8 +34,7 @@ import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
-import ch.entwine.weblounge.common.impl.security.WebloungeAdminImpl;
-import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
+import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.site.SiteImpl;
 import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.language.Language;
@@ -72,7 +71,7 @@ public class SiteImplTest {
   protected final String name = "Main site";
 
   /** Site administrator */
-  protected WebloungeUserImpl administrator = null;
+  protected SiteAdminImpl administrator = null;
 
   /** Site administrator login */
   protected final String administratorLogin = "blogadmin";
@@ -197,7 +196,7 @@ public class SiteImplTest {
     localhost = new SiteURLImpl(new URL("http://localhost:8080"), Environment.Development);
     
     // Administrator
-    administrator = new WebloungeAdminImpl(administratorLogin);
+    administrator = new SiteAdminImpl(administratorLogin);
     administrator.setName(administratorName);
     administrator.setEmail(administratorEmail);
     administrator.addPrivateCredentials(new PasswordImpl(administratorPassword, DigestType.plain));

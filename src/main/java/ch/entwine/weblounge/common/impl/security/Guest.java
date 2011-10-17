@@ -25,7 +25,7 @@ package ch.entwine.weblounge.common.impl.security;
  * is found in the current session. The guest user normally has the smallest set
  * of rights.
  */
-public class Guest extends WebloungeUserImpl {
+public class Guest extends UserImpl {
 
   /**
    * Creates a new guest user for the given site.
