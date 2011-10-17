@@ -103,8 +103,35 @@ public class PageContentTest extends IntegrationTestBase {
    */
   public void execute(String serverUrl) throws Exception {
     testPage(serverUrl);
+    testNonExistingPage(serverUrl);
     testWorkPage(serverUrl);
     testPageAsEditor(serverUrl);
+  }
+
+  /**
+   * Tests for a non-existing page and makes sure that a 404 is returned.
+   * 
+   * @param serverUrl
+   *          the server url
+   */
+  private void testNonExistingPage(String serverUrl) throws Exception {
+    logger.info("Preparing test of non-existing page content");
+
+    String requestUrl = UrlUtils.concat(serverUrl, requestPath, "does-not-exist", "index.html");
+
+    logger.info("Sending request to {}", requestUrl);
+    HttpGet request = new HttpGet(requestUrl);
+
+    // Send and the request and examine the response
+    logger.debug("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
+      TestUtils.parseTextResponse(response);
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
   }
 
   /**
