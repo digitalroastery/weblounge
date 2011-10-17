@@ -22,7 +22,6 @@ package ch.entwine.weblounge.common.impl.request;
 
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
-import ch.entwine.weblounge.common.impl.security.Guest;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
@@ -186,6 +185,15 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       }
     }
 
+    // Get hold of the session
+    HttpSession session = getSession(true);
+
+    // Extract the language from the session (a.k.a an earlier request). Then
+    // make sure the language was put there for the current site.
+    if (language == null && session != null) {
+      language = (Language) session.getAttribute(LANGUAGE);
+    }
+
     // If the url didn't contain language information, or referenced a language
     // that the site doesn't support, let's go for the user's browser
     // preferences
@@ -201,12 +209,6 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       }
     }
 
-    // Extract the language from the session (a.k.a an earlier request). Then
-    // make sure the language was put there for the current site.
-    if (language == null) {
-      language = (Language) getSession(true).getAttribute(LANGUAGE);
-    }
-
     // Still no valid language? Let's go with the site default.
     if (language == null) {
       language = site.getDefaultLanguage();
@@ -219,7 +221,10 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       logger.trace("Selected default system language " + language);
     }
 
-    getSession().setAttribute(LANGUAGE, language);
+    // Store the current selection in the session
+    if (language != null && session != null)
+      session.setAttribute(LANGUAGE, language);
+
     return language;
   }
 
@@ -293,24 +298,6 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getUser()
    */
   public User getUser() {
-    if (user != null)
-      return user;
-
-    if (site == null)
-      throw new IllegalStateException("Site has not been set");
-
-    // Extract the user from the session (a.k.a an earlier request). Then make
-    // sure the user was put there for the current site.
-    user = (User) getSession(true).getAttribute(USER);
-
-    // if no valid user object has been found in the session, it's the
-    // visitor's first access to this site. Therefore, he/she is automatically
-    // being logged in as guest.
-    if (user == null) {
-      logger.debug("New guest at {}", getLocalName());
-      user = new Guest(getSite().getIdentifier());
-    }
-
     return user;
   }
 
@@ -360,7 +347,10 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
     // Handle changes to the users session that might be required should he/she
     // be surfing on another site
-    HttpSession session = getSession(true);
+    HttpSession session = getSession(false);
+    if (session == null)
+      return;
+
     Site oldSite = (Site) session.getAttribute(SITE);
     if (!site.equals(oldSite)) {
       clearSession();
@@ -404,7 +394,6 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * The following things are stored in the session
    * <ul>
    * <li>The current site</li>
-   * <li>The user</li>
    * <li>The selected language</li>
    * </ul>
    * 
@@ -427,8 +416,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * session.
    */
   private void clearSession() {
-    HttpSession session = getSession(true);
-    session.removeAttribute(USER);
+    HttpSession session = getSession(false);
+    if (session == null)
+      return;
     session.removeAttribute(LANGUAGE);
     session.setAttribute(SITE, site);
   }
