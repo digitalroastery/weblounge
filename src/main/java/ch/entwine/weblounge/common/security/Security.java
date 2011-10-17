@@ -48,4 +48,16 @@ public interface Security {
   /** The context for system role definitions */
   String SYSTEM_CONTEXT = "weblounge";
 
+  /** Login of the generic anonymous user */
+  String ANONYMOUS_USER = "anonymous";
+
+  /** Name of the generic anonymous user */
+  String ANONYMOUS_NAME = "Anonymous";
+
+  /** Login of the generic admin user */
+  String ADMIN_USER = "admin";
+
+  /** Name of the generic admin user */
+  String ADMIN_NAME = "Weblounge System Administrator";
+
 }

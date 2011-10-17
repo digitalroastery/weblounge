@@ -27,18 +27,6 @@ import ch.entwine.weblounge.common.site.Site;
  */
 public interface SecurityService {
 
-  /** Login of the generic anonymous user */
-  String ANONYMOUS_USER = "anonymous";
-
-  /** Name of the generic anonymous user */
-  String ANONYMOUS_NAME = "Anonymous";
-
-  /** Login of the generic admin user */
-  String ADMIN_USER = "admin";
-
-  /** Name of the generic admin user */
-  String ADMIN_NAME = "Weblounge System Administrator";
-
   /**
    * Gets the current user, or the local organization's anonymous user if the
    * user has not been authenticated.
