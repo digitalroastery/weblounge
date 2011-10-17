@@ -46,7 +46,10 @@ import java.util.StringTokenizer;
 import javax.servlet.jsp.JspException;
 
 /**
- * TODO: Comment ImageGalleryTag
+ * This tag prints out <code>HTML</code> code tailored to the image gallery
+ * found at TODO: which one?
+ * 
+ * TODO: This tag implementation may not be used anymore and needs cleanpu
  */
 public class ImageGalleryTag extends WebloungeTag {
 
@@ -56,14 +59,24 @@ public class ImageGalleryTag extends WebloungeTag {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ImageGalleryTag.class.getName());
 
+  /** The subjects (tags) to use for image selection */
   private List<String> imageSubjects = null;
 
+  /** The regular image style */
   private String styleNormal = null;
 
+  /** The image style used for the large image version */
   private String styleBig = null;
 
+  /** Image style used for thumbnail previews */
   private String styleThumb = null;
 
+  /**
+   * Sets the subjects (tags) that will be used to select the images.
+   * 
+   * @param subjects
+   *          the subjects
+   */
   public void setSubjects(String subjects) {
     if (imageSubjects == null)
       imageSubjects = new ArrayList<String>();
@@ -73,14 +86,32 @@ public class ImageGalleryTag extends WebloungeTag {
     }
   }
 
+  /**
+   * Sets the image style used to display images at their regular size.
+   * 
+   * @param style
+   *          the style
+   */
   public void setNormalstyle(String style) {
     this.styleNormal = style;
   }
 
+  /**
+   * Sets the image style used to display enlarged versions of the images.
+   * 
+   * @param style
+   *          the image style
+   */
   public void setBigstyle(String style) {
     this.styleBig = style;
   }
 
+  /**
+   * Sets the image style used to display thumbnail previews of the images.
+   * 
+   * @param style
+   *          the image style
+   */
   public void setThumbstyle(String style) {
     this.styleThumb = style;
   }
@@ -121,14 +152,9 @@ public class ImageGalleryTag extends WebloungeTag {
 
     try {
       writer = response.getWriter();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
 
-    for (int i = 0; i < result.getItems().length; i++) {
-      uri = new ImageResourceURIImpl(site, null, result.getItems()[i].getId());
-      try {
+      for (int i = 0; i < result.getItems().length; i++) {
+        uri = new ImageResourceURIImpl(site, null, result.getItems()[i].getId());
         if (repository.exists(uri)) {
           image = (ImageResource) repository.get(uri);
           language = LanguageUtils.getPreferredLanguage(image, request, site);
@@ -150,8 +176,13 @@ public class ImageGalleryTag extends WebloungeTag {
           writer.flush();
 
         }
-      } catch (ContentRepositoryException e) {
       }
+    } catch (ContentRepositoryException e) {
+      logger.error("Error loading image for gallery: " + e.getMessage());
+      throw new JspException(e);
+    } catch (IOException e) {
+      logger.error("Error writing image gallery: " + e.getMessage());
+      throw new JspException(e);
     }
 
     return SKIP_BODY;
