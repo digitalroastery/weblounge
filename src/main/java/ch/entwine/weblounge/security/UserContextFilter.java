@@ -20,11 +20,6 @@
 
 package ch.entwine.weblounge.security;
 
-import static ch.entwine.weblounge.common.security.SecurityService.ADMIN_NAME;
-import static ch.entwine.weblounge.common.security.SecurityService.ADMIN_USER;
-import static ch.entwine.weblounge.common.security.SecurityService.ANONYMOUS_NAME;
-import static ch.entwine.weblounge.common.security.SecurityService.ANONYMOUS_USER;
-
 import ch.entwine.weblounge.common.impl.security.Guest;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
@@ -149,14 +144,14 @@ public class UserContextFilter implements Filter {
     // return securityService.getUser();
 
     if (!securityService.isEnabled()) {
-      user = new UserImpl(ADMIN_USER, Security.SYSTEM_CONTEXT, ADMIN_NAME);
+      user = new UserImpl(Security.ADMIN_USER, Security.SYSTEM_CONTEXT, Security.ADMIN_NAME);
       roles.add(SystemRole.SYSTEMADMIN);
       // user = new UserImpl(ADMIN_USER, site.getIdentifier());
       // roles.add(getLocalRole(site, SystemRole.SYSTEMADMIN));
     } else if (auth == null) {
       logger.debug("No spring security context available, setting current user to anonymous");
       String realm = site != null ? site.getIdentifier() : Security.SYSTEM_CONTEXT;
-      user = new UserImpl(ANONYMOUS_USER, realm, ANONYMOUS_NAME);
+      user = new UserImpl(Security.ANONYMOUS_USER, realm, Security.ANONYMOUS_NAME);
       roles.add(SystemRole.GUEST);
       // roles.add(getLocalRole(site, SystemRole.GUEST));
     } else {
@@ -177,7 +172,7 @@ public class UserContextFilter implements Filter {
         }
         logger.debug("Principal was identified as '{}'", user.getLogin());
 
-      } else if (ANONYMOUS_USER.equals(principal)) {
+      } else if (Security.ANONYMOUS_USER.equals(principal)) {
         user = new Guest(site.getIdentifier());
         // roles.add(getLocalRole(site, SystemRole.GUEST));
       } else {
