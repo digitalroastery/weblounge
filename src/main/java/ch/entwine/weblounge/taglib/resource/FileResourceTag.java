@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -101,9 +102,10 @@ public class FileResourceTag extends WebloungeTag {
       uri = new FileResourceURIImpl(site, null, fileId);
     } else if (StringUtils.isNotBlank(filePath)) {
       uri = new FileResourceURIImpl(site, filePath, null);
-    } else {
-      logger.debug("Neither uuid nor path were specified for file");
+    } else if (RequestUtils.isMockRequest(request)) {
       return SKIP_BODY;
+    } else {
+      throw new JspException("Neither resource id nor resource path were specified");
     }
 
     // Try to load the file from the content repository

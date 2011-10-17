@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -172,10 +173,12 @@ public class ImageResourceTag extends WebloungeTag {
         logger.info("Search returned {} images. Will take no. 1 for further processing.", result.getHitCount());
       if (result.getHitCount() > 0)
         uri = new ImageResourceURIImpl(site, null, result.getItems()[0].getId());
-    }
-    if (uri == null) {
-      // no image found, try to load alternative image
+    } else if (StringUtils.isNotBlank(altImageId)) {
       uri = new ImageResourceURIImpl(site, null, altImageId);
+    } else if (RequestUtils.isMockRequest(request)) {
+      return SKIP_BODY;
+    } else {
+      throw new JspException("Neither image id nor image path were specified");
     }
 
     // Try to load the image from the content repository

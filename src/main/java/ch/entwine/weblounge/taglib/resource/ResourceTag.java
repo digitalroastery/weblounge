@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -101,9 +102,10 @@ public class ResourceTag extends WebloungeTag {
       uri = new ResourceURIImpl(null, site, null, resourceId);
     } else if (StringUtils.isNotBlank(resourcePath)) {
       uri = new ResourceURIImpl(null, site, resourcePath);
-    } else {
-      logger.debug("Neither uuid nor path were specified for resource");
+    } else if (RequestUtils.isMockRequest(request)) {
       return SKIP_BODY;
+    } else {
+      throw new JspException("Neither uuid nor path were specified for resource");
     }
     
     // Try to load the resource from the content repository
