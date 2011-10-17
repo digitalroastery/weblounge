@@ -21,11 +21,10 @@
 package ch.entwine.weblounge.common.security;
 
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import ch.entwine.weblounge.common.impl.security.UserImpl;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.WebloungeAdminImpl;
-import ch.entwine.weblounge.common.site.Site;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,39 +32,17 @@ import org.junit.Test;
 /**
  * Tests the {@link WebloungeAdminImpl}.
  */
-public class WebloungeAdminImplTest extends WebloungeUserImplTest {
-  
-  /** Name of the site administrator */
-  protected String adminName = null;
-  
-  /** Test user */
-  protected UserImpl user = null;
-
-  /** The site object */
-  protected Site mockSite = null;
-
-  /** Login. Static because of the weblounge administrator tests */
-  protected static String login = "john";
-
-  /** Realm */
-  protected String realm = "testland";
-
-  /** Password */
-  protected String password = "pass";
-
-  /** The digest */
-  protected DigestType passwordDigestType = DigestType.md5;
+public class WebloungeAdminImplTest extends UserImplTest {
 
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
-    setUpPrerequisites();
+    this.login = Security.ADMIN_USER;
+    this.realm = Security.SYSTEM_CONTEXT;
+    this.name = Security.ADMIN_NAME;
     user = new WebloungeAdminImpl(login);
-    realm = Security.SYSTEM_CONTEXT;
-    adminName = "Weblounge Administrator";
-    setUpUser();
   }
 
   /**
@@ -80,21 +57,11 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
     }
   }
 
-  /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.security.UserImpl#getRealm()}.
-   */
-  @Test
-  public void testGetRealm() {
-    assertEquals(Security.SYSTEM_CONTEXT, user.getRealm());
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.common.impl.security.UserImpl#getName()}.
-   */
-  @Test
-  public void testGetName() {
-    assertEquals(adminName, user.getName());
+  public void testHasAdminRole() {
+    assertTrue(SecurityUtils.userHasRole(user, SystemRole.SYSTEMADMIN));
+    assertTrue(SecurityUtils.userHasRole(user, SystemRole.SITEADMIN));
+    assertTrue(SecurityUtils.userHasRole(user, SystemRole.EDITOR));
+    assertTrue(SecurityUtils.userHasRole(user, SystemRole.GUEST));
   }
 
 }

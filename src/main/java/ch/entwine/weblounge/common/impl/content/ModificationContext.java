@@ -299,9 +299,33 @@ public class ModificationContext implements Cloneable {
 
     StringBuffer b = new StringBuffer();
     b.append("<modified>");
+
+    // User
     if (modifier != null) {
-      b.append(modifier.toXml());
+      b.append("<user");
+
+      // id
+      b.append(" id=\"");
+      b.append(modifier.getLogin());
+      b.append("\"");
+
+      // realm
+      if (modifier.getRealm() != null) {
+        b.append(" realm=\"");
+        b.append(modifier.getRealm());
+        b.append("\"");
+      }
+
+      b.append(">");
+
+      // name
+      if (modifier.getName() != null) {
+        b.append("<![CDATA[").append(modifier.getName()).append("]]>");
+      }
+
+      b.append("</user>");
     }
+
     if (modificationDate != null) {
       b.append("<date>");
       b.append(WebloungeDateFormat.formatStatic(modificationDate));

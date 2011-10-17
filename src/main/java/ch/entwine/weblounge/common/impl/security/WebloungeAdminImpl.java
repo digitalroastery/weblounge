@@ -36,7 +36,7 @@ public final class WebloungeAdminImpl extends UserImpl {
   public WebloungeAdminImpl(String login) {
     super(login, Security.SYSTEM_CONTEXT);
     addPublicCredentials(SystemRole.SYSTEMADMIN);
-    setName("Weblounge Administrator");
+    setName(Security.ADMIN_NAME);
   }
 
   /**

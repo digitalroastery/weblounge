@@ -364,9 +364,31 @@ public class PublishingContext implements Cloneable {
     StringBuffer b = new StringBuffer();
     b.append("<published>");
 
-    // Publisher
-    if (publisher != null)
-      b.append(publisher.toXml());
+    // User
+    if (publisher != null) {
+      b.append("<user");
+
+      // id
+      b.append(" id=\"");
+      b.append(publisher.getLogin());
+      b.append("\"");
+
+      // realm
+      if (publisher.getRealm() != null) {
+        b.append(" realm=\"");
+        b.append(publisher.getRealm());
+        b.append("\"");
+      }
+
+      b.append(">");
+
+      // name
+      if (publisher.getName() != null) {
+        b.append("<![CDATA[").append(publisher.getName()).append("]]>");
+      }
+
+      b.append("</user>");
+    }
 
     // Start date
     if (startDate != null) {

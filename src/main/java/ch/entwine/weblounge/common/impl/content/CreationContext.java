@@ -246,14 +246,40 @@ public class CreationContext implements Cloneable {
   public String toXml() {
     StringBuffer b = new StringBuffer();
     b.append("<created>");
+
+    // User
     if (creator != null) {
-      b.append(creator.toXml());
+      b.append("<user");
+
+      // id
+      b.append(" id=\"");
+      b.append(creator.getLogin());
+      b.append("\"");
+
+      // realm
+      if (creator.getRealm() != null) {
+        b.append(" realm=\"");
+        b.append(creator.getRealm());
+        b.append("\"");
+      }
+
+      b.append(">");
+
+      // name
+      if (creator.getName() != null) {
+        b.append("<![CDATA[").append(creator.getName()).append("]]>");
+      }
+
+      b.append("</user>");
     }
+
+    // Date
     if (creationDate != null) {
       b.append("<date>");
       b.append(WebloungeDateFormat.formatStatic(creationDate));
       b.append("</date>");
     }
+
     b.append("</created>");
     return b.toString();
   }
