@@ -318,6 +318,8 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     // Notify listeners about starting request
     fireRequestStarted(request, response, site);
 
+    boolean requestServed = false;
+
     // Ask the registered request handler if they are willing to handle
     // the request.
     try {
@@ -326,9 +328,8 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         try {
           logger.trace("Asking {} to serve {}", handler, request);
           if (handler.service(request, response)) {
+            requestServed = true;
             logger.debug("{} served request {}", handler, request);
-
-            // Notify listeners about finished request
             if (response.hasError()) {
               logger.debug("Request processing failed on {}", request);
               fireRequestFailed(request, response, site);
@@ -354,16 +355,17 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
       }
     } finally {
       securityService.setSite(null);
-      response.endResponse();
-      logger.debug("Finished processing of {}", httpRequest.getRequestURI());
+      if (requestServed) {
+        response.endResponse();
+        logger.debug("Finished processing of {}", httpRequest.getRequestURI());
+      } else {
+        logger.debug("No handler found for {}", request);
+        DispatchUtils.sendNotFound(request, response);
+        if (cache != null)
+          cache.invalidate(response);
+        fireRequestFailed(request, response, site);
+      }
     }
-
-    // Apparently, nobody felt responsible for this request
-    logger.debug("No handler found for {}", request);
-    DispatchUtils.sendNotFound(request, response);
-    if (cache != null)
-      cache.invalidate(response);
-    fireRequestFailed(request, response, site);
   }
 
   /**
