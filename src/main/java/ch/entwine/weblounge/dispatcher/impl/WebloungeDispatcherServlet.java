@@ -255,6 +255,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     Site site = securityService.getSite();
     if (site == null) {
       site = getSiteByRequest(httpRequest);
+      securityService.setSite(site);
     }
     
     boolean isSpecial = StringUtils.isNotBlank(httpRequest.getHeader("X-Weblounge-Special"));
@@ -297,8 +298,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     // Wrap request and response
     WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest, siteServlet);
     WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
-    securityService.setSite(site);
-    request.setUser(securityService.getUser());
 
     // See if a site dispatcher was found, and if so, if it's enabled
     if (!site.isOnline() && !isSpecial) {
@@ -324,6 +323,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     // the request.
     try {
       securityService.setSite(site);
+      request.setUser(securityService.getUser());
       for (RequestHandler handler : requestHandler) {
         try {
           logger.trace("Asking {} to serve {}", handler, request);
