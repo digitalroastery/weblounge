@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.security;
 
+import ch.entwine.weblounge.common.impl.security.WebloungeAdminImpl;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -35,6 +36,9 @@ public class SpringSecurityServiceImpl implements SecurityService {
 
   /** Holds the user associated with the current thread */
   private static final ThreadLocal<User> userHolder = new ThreadLocal<User>();
+
+  /** The default system administrator */
+  private User systemAdmin = new WebloungeAdminImpl("admin");
 
   /** Whether the system administrator has configured a no-security policy */
   private boolean enabled = true;
@@ -72,7 +76,10 @@ public class SpringSecurityServiceImpl implements SecurityService {
    * @see ch.entwine.weblounge.common.security.SecurityService#getUser()
    */
   public User getUser() {
-    return userHolder.get();
+    if (enabled)
+      return userHolder.get();
+    else
+      return systemAdmin;
   }
 
   /**
