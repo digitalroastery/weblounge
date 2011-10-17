@@ -48,6 +48,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Filter that for every request will set the Site on the security service.
@@ -124,6 +125,9 @@ public class SiteContextFilter implements Filter {
         logger.debug("Mapped {} to site '{}'", httpRequest.getPathInfo(), site.getIdentifier());
       } else {
         logger.debug("No site available for request to {}", httpRequest.getPathInfo());
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+        return;
       }
     }
 

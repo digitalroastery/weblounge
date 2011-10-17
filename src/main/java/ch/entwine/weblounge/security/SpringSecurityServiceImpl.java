@@ -29,17 +29,6 @@ import ch.entwine.weblounge.common.site.Site;
  */
 public class SpringSecurityServiceImpl implements SecurityService {
 
-  /** Login of the generic anonymous user */
-  public static final String ANONYMOUS_USER = "anonymous";
-
-  /** Name of the generic anonymous user */
-  public static final String ANONYMOUS_NAME = "Anonymous";
-
-  /** Login of the generic admin user */
-  public static final String ADMIN_USER = "admin";
-
-  /** Name of the generic admin user */
-  public static final String ADMIN_NAME = "Weblounge System Administrator";
 
   /** Holds the site associated with the current thread */
   private static final ThreadLocal<Site> siteHolder = new ThreadLocal<Site>();

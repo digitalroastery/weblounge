@@ -20,10 +20,10 @@
 
 package ch.entwine.weblounge.security;
 
-import static ch.entwine.weblounge.security.SpringSecurityServiceImpl.ADMIN_NAME;
-import static ch.entwine.weblounge.security.SpringSecurityServiceImpl.ADMIN_USER;
-import static ch.entwine.weblounge.security.SpringSecurityServiceImpl.ANONYMOUS_NAME;
-import static ch.entwine.weblounge.security.SpringSecurityServiceImpl.ANONYMOUS_USER;
+import static ch.entwine.weblounge.common.security.SecurityService.ADMIN_NAME;
+import static ch.entwine.weblounge.common.security.SecurityService.ADMIN_USER;
+import static ch.entwine.weblounge.common.security.SecurityService.ANONYMOUS_NAME;
+import static ch.entwine.weblounge.common.security.SecurityService.ANONYMOUS_USER;
 
 import ch.entwine.weblounge.common.impl.security.Guest;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
@@ -145,8 +145,8 @@ public class UserContextFilter implements Filter {
     Set<Role> roles = new HashSet<Role>();
 
     // If we just logged in, then the user may have been set already
-    if (securityService.getUser() != null)
-      return securityService.getUser();
+    // if (securityService.getUser() != null)
+    // return securityService.getUser();
 
     if (!securityService.isEnabled()) {
       user = new UserImpl(ADMIN_USER, Security.SYSTEM_CONTEXT, ADMIN_NAME);
