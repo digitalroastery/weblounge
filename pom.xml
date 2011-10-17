@@ -189,7 +189,7 @@
               org.apache.http.util,
               org.codehaus.jackson.map;version="1.8.1",
               org.codehaus.jackson.type;version="1.8.1",
-              org.slf4j;version="1.5.6",
+              org.slf4j;version="[1.5.0,1.6.0)",
               org.w3c.dom,
               org.osgi.framework;version="1.4.0",
               org.osgi.service.component;version="1.1.0",
