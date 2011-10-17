@@ -49,10 +49,11 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
    *      ch.entwine.weblounge.common.security.User,
    *      ch.entwine.weblounge.common.language.Language, Environment)
    */
-  public String getRuntimeInformation(Site site, User user, Language language, Environment environment) {
+  public String getRuntimeInformation(Site site, User user, Language language,
+      Environment environment) {
     if (user == null)
       return null;
-    
+
     StringBuffer b = new StringBuffer();
 
     b.append("<user id=\"" + user.getLogin() + "\"");
@@ -64,16 +65,16 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
     b.append(">");
 
     // First name
-    if (user instanceof WebloungeUser && ((WebloungeUser)user).getFirstName() != null) {
+    if (user instanceof WebloungeUser && ((WebloungeUser) user).getFirstName() != null) {
       b.append("<firstname>");
-      b.append(((WebloungeUser)user).getFirstName());
+      b.append(((WebloungeUser) user).getFirstName());
       b.append("</firstname>");
     }
 
     // First name
-    if (user instanceof WebloungeUser && ((WebloungeUser)user).getLastName() != null) {
+    if (user instanceof WebloungeUser && ((WebloungeUser) user).getLastName() != null) {
       b.append("<lastname>");
-      b.append(((WebloungeUser)user).getLastName());
+      b.append(((WebloungeUser) user).getLastName());
       b.append("</lastname>");
     }
 
@@ -85,23 +86,25 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
     }
 
     // Email
-    if (user instanceof WebloungeUser && ((WebloungeUser)user).getEmail() != null) {
+    if (user instanceof WebloungeUser && ((WebloungeUser) user).getEmail() != null) {
       b.append("<email>");
-      b.append(((WebloungeUser)user).getEmail());
+      b.append(((WebloungeUser) user).getEmail());
       b.append("</email>");
     }
-    
+
     b.append("</user>");
-    
+
     // Add role information
     StringBuffer roles = new StringBuffer();
     for (Role role : SecurityUtils.getRoles(user)) {
-      roles.append("<role context=\"").append(role.getContext()).append("\" ");
-      roles.append("id=\"").append(role.getIdentifier()).append("\">");
-      roles.append("<name><![CDATA[");
-      roles.append(role.toString(language));
-      roles.append("]]></name>");
-      roles.append("</role>");
+      for (Role r : role.getClosure()) {
+        roles.append("<role context=\"").append(r.getContext()).append("\" ");
+        roles.append("id=\"").append(r.getIdentifier()).append("\">");
+        roles.append("<name><![CDATA[");
+        roles.append(r.toString(language));
+        roles.append("]]></name>");
+        roles.append("</role>");
+      }
     }
     if (roles.length() > 0) {
       b.append("<roles>");

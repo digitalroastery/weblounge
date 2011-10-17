@@ -66,7 +66,7 @@ public class RuntimeInformationEndpoint {
   /** The sites that are online */
   protected transient SiteManager sites = null;
 
-  /** List of rutnime information provider */
+  /** List of runtime information provider */
   protected Map<String, RuntimeInformationProvider> runtimeInfoProviders = null;
 
   /** The security service */
@@ -104,8 +104,8 @@ public class RuntimeInformationEndpoint {
         RuntimeInformationProvider provider = entry.getValue();
         String runtimeInformation = provider.getRuntimeInformation(site, user, language, Environment.Production);
         if (StringUtils.isNotBlank(runtimeInformation)) {
-            if (StringUtils.isNotBlank(component))
-              xml.append("<").append(component).append(">");
+          if (StringUtils.isNotBlank(component))
+            xml.append("<").append(component).append(">");
           xml.append(runtimeInformation);
           if (StringUtils.isNotBlank(component))
             xml.append("</").append(component).append(">");
@@ -142,12 +142,13 @@ public class RuntimeInformationEndpoint {
         throw new WebApplicationException(Status.NOT_FOUND);
 
       String runtimeInformation = provider.getRuntimeInformation(site, user, language, Environment.Production);
-      if (StringUtils.isNotBlank(runtimeInformation))
-        if (StringUtils.isNotBlank(component))
-          xml.append("<").append(component).append(">");
-      xml.append(runtimeInformation);
-      if (StringUtils.isNotBlank(component))
+      if (StringUtils.isNotBlank(runtimeInformation)) {
+        xml.append("<").append(component).append(">");
+        xml.append(runtimeInformation);
         xml.append("</").append(component).append(">");
+      } else {
+        xml.append("<").append(component).append("/>");
+      }
     }
 
     xml.append("</runtime>");
