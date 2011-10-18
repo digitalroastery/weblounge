@@ -74,31 +74,31 @@ steal.plugins('jquery',
 	    },
 	    
 	    _initAutoComplete: function() {
-	    	var tags = [
-	    	                     "ActionScript",
-	    	                     "AppleScript",
-	    	                     "Asp",
-	    	                     "BASIC",
-	    	                     "C",
-	    	                     "C++",
-	    	                     "Clojure",
-	    	                     "COBOL",
-	    	                     "ColdFusion",
-	    	                     "Erlang",
-	    	                     "Fortran",
-	    	                     "Groovy",
-	    	                     "Haskell",
-	    	                     "Java",
-	    	                     "JavaScript",
-	    	                     "Lisp",
-	    	                     "Perl",
-	    	                     "PHP",
-	    	                     "Python",
-	    	                     "Ruby",
-	    	                     "Scala",
-	    	                     "Scheme"
-	    	                 ];
-//	    	Workbench.suggestTags({test: 'tag'}, $.proxy(function(tags) {
+//	    	var tags = [
+//	    	                     "ActionScript",
+//	    	                     "AppleScript",
+//	    	                     "Asp",
+//	    	                     "BASIC",
+//	    	                     "C",
+//	    	                     "C++",
+//	    	                     "Clojure",
+//	    	                     "COBOL",
+//	    	                     "ColdFusion",
+//	    	                     "Erlang",
+//	    	                     "Fortran",
+//	    	                     "Groovy",
+//	    	                     "Haskell",
+//	    	                     "Java",
+//	    	                     "JavaScript",
+//	    	                     "Lisp",
+//	    	                     "Perl",
+//	    	                     "PHP",
+//	    	                     "Python",
+//	    	                     "Ruby",
+//	    	                     "Scala",
+//	    	                     "Scheme"
+//	    	                 ];
+	    	Workbench.suggestTags({test: 'tag'}, $.proxy(function(tags) {
 				if(tags == null || tags == undefined) return;
 				var inputTags = this.element.find("input[name=tags]").autocomplete({
 					source: function(request, response) {
@@ -122,7 +122,7 @@ steal.plugins('jquery',
 						return false;
 					},this)
 				});
-//			}, this));
+			}, this));
 			
 			Workbench.suggestTags({test: 'user'}, $.proxy(function(userTags) {
 				if(userTags == null || userTags == undefined) return;
@@ -195,23 +195,24 @@ steal.plugins('jquery',
 			}, this));
 			
 			// show content metadata
-			content.duration = this._formatDuration(content.duration);
-			this.element.find('div.wbl-contentData').html('//editor/mediaeditor/views/content.tmpl', {file: this.file[index], content: content});
+			var duration = this._formatDuration(content.duration);
+			this.element.find('div.wbl-contentData').html('//editor/mediaeditor/views/content.tmpl', {file: this.file[index], content: content, duration: duration});
 	    },
 	    
 	    _formatDuration: function(milis){
 	    	var duration = new Object();
+	    	var temp = milis;
  
-	    	duration.days = Math.floor(milis/1000/60/60/24);
-	    	milis -= duration.days*1000*60*60*24;
+	    	duration.days = Math.floor(temp/1000/60/60/24);
+	    	temp -= duration.days*1000*60*60*24;
  
-	    	duration.hours = Math.floor(milis/1000/60/60);
-	    	milis -= duration.hours*1000*60*60;
+	    	duration.hours = Math.floor(temp/1000/60/60);
+	    	temp -= duration.hours*1000*60*60;
  
-	    	duration.minutes = Math.floor(milis/1000/60);
-	    	milis -= duration.minutes*1000*60;
+	    	duration.minutes = Math.floor(temp/1000/60);
+	    	temp -= duration.minutes*1000*60;
  
-	    	duration.seconds = Math.floor(milis/1000);
+	    	duration.seconds = Math.floor(temp/1000);
 	    	return duration.hours + ':' + this._formatNumberLength(duration.minutes, 2) + ':' + this._formatNumberLength(duration.seconds, 2);
 	    },
 	    

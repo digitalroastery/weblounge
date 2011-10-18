@@ -3,7 +3,7 @@
 	Filename: {{if !$.isEmptyObject(content.filename)}}${content.filename}{{/if}}<br />
 	Mimetype: {{if !$.isEmptyObject(content.mimetype)}}${content.mimetype}{{/if}}<br />
 	Size: {{if content.size != undefined}}${content.size}{{/if}}<br />
-	Duration: {{if content.duration != undefined}}${content.duration}{{/if}}<br /><br />
+	Duration: {{if duration != undefined}}${duration}{{/if}}<br /><br />
 	
 	Audio Bitdepht: {{if !$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined}}${content.audio.bitdepth}{{/if}}<br />
 	Audio Bitrate: {{if !$.isEmptyObject(content.audio) && content.audio.bitrate != undefined}}${content.audio.bitrate}{{/if}}<br />
