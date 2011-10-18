@@ -11,5 +11,6 @@
 	</head>
 	<body>
 		<webl:composer name="main"/>
+		<webl:composer name="bottom"/>
 	</body>
 </html>
