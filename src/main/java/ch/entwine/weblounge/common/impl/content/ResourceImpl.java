@@ -72,6 +72,9 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /** Keywords */
   protected List<String> subjects = null;
 
+  /** Series */
+  protected List<String> series = null;
+
   /** True if this page should show up on the sitemap */
   protected boolean isPromoted = false;
 
@@ -123,6 +126,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     this.publishingCtx = new PublishingContext();
     this.securityCtx = new PageSecurityContext();
     this.subjects = new ArrayList<String>();
+    this.series = new ArrayList<String>();
     this.title = new LocalizableContent<String>(this);
     this.description = new LocalizableContent<String>(this);
     this.coverage = new LocalizableContent<String>(this);
@@ -168,52 +172,52 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#getIdentifier()
    */
   public String getIdentifier() {
     return uri.getIdentifier();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#setIdentifier(java.lang.String)
    */
   public void setIdentifier(String identifier) {
     uri.setIdentifier(identifier);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#getPath()
    */
   public String getPath() {
     return uri.getPath();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#setPath(java.lang.String)
    */
   public void setPath(String path) {
     uri.setPath(path);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#getVersion()
    */
   public long getVersion() {
     return uri.getVersion();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#setVersion(long)
    */
   public void setVersion(long version) {
@@ -232,6 +236,15 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#addSeries(java.lang.String)
+   */
+  public void addSeries(String series) {
+    this.series.add(series);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#removeSubject(java.lang.String)
    */
   public void removeSubject(String subject) {
@@ -241,10 +254,28 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#removeSeries(java.lang.String)
+   */
+  public void removeSeries(String series) {
+    this.series.remove(series);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#hasSubject(java.lang.String)
    */
   public boolean hasSubject(String subject) {
     return subjects.contains(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#hasSeries(java.lang.String)
+   */
+  public boolean hasSeries(String series) {
+    return this.series.contains(series);
   }
 
   /**
@@ -258,8 +289,9 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.content.Resource#setPublished(ch.entwine.weblounge.common.security.User, java.util.Date, java.util.Date)
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#setPublished(ch.entwine.weblounge.common.security.User,
+   *      java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
     publishingCtx.setPublished(publisher, from, to);
@@ -483,8 +515,17 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @return the keywords
    */
   public String[] getSubjects() {
-    String[] kw = new String[ subjects.size() ];
+    String[] kw = new String[subjects.size()];
     return subjects.toArray(kw);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#getSeries()
+   */
+  public String[] getSeries() {
+    return series.toArray(new String[series.size()]);
   }
 
   /**
@@ -845,10 +886,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     contents.addAll(content.values());
     return contents;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.impl.language.LocalizableObject#switchTo(ch.entwine.weblounge.common.language.Language)
    */
   @Override
@@ -951,6 +992,14 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
       b.append("<subject><![CDATA[");
       b.append(s);
       b.append("]]></subject>");
+    }
+
+    // Series
+    Collections.sort(series);
+    for (String s : series) {
+      b.append("<series><![CDATA[");
+      b.append(s);
+      b.append("]]></series>");
     }
 
     // Type

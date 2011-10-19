@@ -84,6 +84,12 @@ public class SearchQueryImpl implements SearchQuery {
   /** The list of required subjects */
   protected List<String> subjects = new ArrayList<String>();
 
+  /** The list of required series */
+  protected List<String> series = new ArrayList<String>();
+
+  /** The source */
+  protected String source = null;
+
   /** The properties */
   protected Map<String, String> properties = new HashMap<String, String>();
 
@@ -1122,6 +1128,44 @@ public class SearchQueryImpl implements SearchQuery {
         return;
     }
     throw new IllegalStateException("Malformed query configuration. No " + c.getClass().getName() + " is expected at this time");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withSource(java.lang.String)
+   */
+  public SearchQuery withSource(String source) {
+    this.source = source;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getSource()
+   */
+  public String getSource() {
+    return source;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withSeries(java.lang.String)
+   */
+  public SearchQuery withSeries(String series) {
+    this.series.add(series);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getSeries()
+   */
+  public String[] getSeries() {
+    return series.toArray(new String[series.size()]);
   }
 
   /**

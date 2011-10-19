@@ -95,8 +95,7 @@ public class LazyFileResourceImpl implements FileResource {
    *          the file preview's xml
    */
   public LazyFileResourceImpl(ResourceURI uri, String fileXml,
-      String headerXml,
-      String previewXml) {
+      String headerXml, String previewXml) {
     this.uri = uri;
     this.fileXml = fileXml;
     this.headerXml = headerXml;
@@ -285,6 +284,17 @@ public class LazyFileResourceImpl implements FileResource {
     if (!isHeaderLoaded)
       loadPageHeader();
     file.addSubject(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#addSeries(java.lang.String)
+   */
+  public void addSeries(String series) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    file.addSeries(series);
   }
 
   /**
@@ -523,6 +533,17 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#getSeries()
+   */
+  public String[] getSeries() {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return file.getSeries();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.file.Page#getTemplate()
    */
   public String getTemplate() {
@@ -608,6 +629,17 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#hasSeries(java.lang.String)
+   */
+  public boolean hasSeries(String series) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return file.hasSeries(series);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.file.Page#isIndexed()
    */
   public boolean isIndexed() {
@@ -671,6 +703,17 @@ public class LazyFileResourceImpl implements FileResource {
     if (!isHeaderLoaded)
       loadPageHeader();
     file.removeSubject(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#removeSeries(java.lang.String)
+   */
+  public void removeSeries(String series) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    file.removeSeries(series);
   }
 
   /**
@@ -1257,10 +1300,10 @@ public class LazyFileResourceImpl implements FileResource {
   public int hashCode() {
     return uri.hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
@@ -1275,7 +1318,6 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void addContent(FileContent content) {
     // TODO Auto-generated method stub
-
   }
 
 }

@@ -249,9 +249,27 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#addSeries(java.lang.String)
+   */
+  public void addSeries(String series) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#removeSubject(java.lang.String)
    */
   public void removeSubject(String subject) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#removeSeries(java.lang.String)
+   */
+  public void removeSeries(String series) {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
@@ -267,9 +285,27 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#hasSeries(java.lang.String)
+   */
+  public boolean hasSeries(String series) {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#getSubjects()
    */
   public String[] getSubjects() {
+    return new String[] {};
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#getSeries()
+   */
+  public String[] getSeries() {
     return new String[] {};
   }
 

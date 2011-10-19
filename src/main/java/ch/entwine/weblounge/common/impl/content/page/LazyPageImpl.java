@@ -284,6 +284,17 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#addSeries(java.lang.String)
+   */
+  public void addSeries(String series) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    page.addSeries(series);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.page.Page#getComposers()
    */
   public Composer[] getComposers() {
@@ -517,6 +528,17 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#getSeries()
+   */
+  public String[] getSeries() {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.getSeries();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.page.Page#getTemplate()
    */
   public String getTemplate() {
@@ -602,6 +624,17 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#hasSeries(java.lang.String)
+   */
+  public boolean hasSeries(String series) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.hasSeries(series);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.page.Page#isIndexed()
    */
   public boolean isIndexed() {
@@ -665,6 +698,17 @@ public class LazyPageImpl implements Page {
     if (!isHeaderLoaded)
       loadPageHeader();
     page.removeSubject(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#removeSeries(java.lang.String)
+   */
+  public void removeSeries(String series) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    page.removeSeries(series);
   }
 
   /**
@@ -1251,10 +1295,10 @@ public class LazyPageImpl implements Page {
   public int hashCode() {
     return uri.hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

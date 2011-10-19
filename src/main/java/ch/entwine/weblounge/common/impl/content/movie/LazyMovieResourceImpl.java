@@ -84,8 +84,8 @@ public class LazyMovieResourceImpl implements MovieResource {
    * @param previewXml
    *          the audio visual preview's xml
    */
-  public LazyMovieResourceImpl(ResourceURI uri, String avXml,
-      String headerXml, String previewXml) {
+  public LazyMovieResourceImpl(ResourceURI uri, String avXml, String headerXml,
+      String previewXml) {
     this.uri = uri;
     this.audiovisualXml = avXml;
     this.headerXml = headerXml;
@@ -216,6 +216,17 @@ public class LazyMovieResourceImpl implements MovieResource {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
     audioVisual.addSubject(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#addSeries(java.lang.String)
+   */
+  public void addSeries(String series) {
+    if (!isHeaderLoaded)
+      loadAudioVisualHeader();
+    audioVisual.addSeries(series);
   }
 
   /**
@@ -363,6 +374,17 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#getSeries()
+   */
+  public String[] getSeries() {
+    if (!isHeaderLoaded)
+      loadAudioVisualHeader();
+    return audioVisual.getSeries();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#getTitle()
    */
   public String getTitle() {
@@ -437,6 +459,17 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#hasSeries(java.lang.String)
+   */
+  public boolean hasSeries(String series) {
+    if (!isHeaderLoaded)
+      loadAudioVisualHeader();
+    return audioVisual.hasSeries(series);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#isIndexed()
    */
   public boolean isIndexed() {
@@ -476,6 +509,17 @@ public class LazyMovieResourceImpl implements MovieResource {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
     audioVisual.removeSubject(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#removeSeries(java.lang.String)
+   */
+  public void removeSeries(String series) {
+    if (!isHeaderLoaded)
+      loadAudioVisualHeader();
+    audioVisual.removeSeries(series);
   }
 
   /**

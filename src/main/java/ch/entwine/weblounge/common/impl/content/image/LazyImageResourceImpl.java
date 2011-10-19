@@ -85,8 +85,7 @@ public class LazyImageResourceImpl implements ImageResource {
    *          the image preview's xml
    */
   public LazyImageResourceImpl(ResourceURI uri, String imageXml,
-      String headerXml,
-      String previewXml) {
+      String headerXml, String previewXml) {
     this.uri = uri;
     this.imageXml = imageXml;
     this.headerXml = headerXml;
@@ -216,6 +215,17 @@ public class LazyImageResourceImpl implements ImageResource {
     if (!isHeaderLoaded)
       loadImageHeader();
     image.addSubject(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#addSeries(java.lang.String)
+   */
+  public void addSeries(String series) {
+    if (!isHeaderLoaded)
+      loadImageHeader();
+    image.addSeries(series);
   }
 
   /**
@@ -363,6 +373,17 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#getSeries()
+   */
+  public String[] getSeries() {
+    if (!isHeaderLoaded)
+      loadImageHeader();
+    return image.getSeries();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.image.Page#getTitle()
    */
   public String getTitle() {
@@ -437,6 +458,17 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#hasSeries(java.lang.String)
+   */
+  public boolean hasSeries(String series) {
+    if (!isHeaderLoaded)
+      loadImageHeader();
+    return image.hasSubject(series);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.image.Page#isIndexed()
    */
   public boolean isIndexed() {
@@ -476,6 +508,17 @@ public class LazyImageResourceImpl implements ImageResource {
     if (!isHeaderLoaded)
       loadImageHeader();
     image.removeSubject(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#removeSeries(java.lang.String)
+   */
+  public void removeSeries(String series) {
+    if (!isHeaderLoaded)
+      loadImageHeader();
+    image.removeSeries(series);
   }
 
   /**
@@ -1040,10 +1083,10 @@ public class LazyImageResourceImpl implements ImageResource {
   public int hashCode() {
     return uri.hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

@@ -170,6 +170,12 @@ public abstract class ResourceContentReaderImpl<T extends ResourceContent> exten
       logger.trace("Content's filename is '{}'", content.getFilename());
     }
 
+    // source
+    else if ("source".equals(raw)) {
+      content.setSource(getCharacters());
+      logger.trace("Content's source is '{}'", content.getSource());
+    }
+
     // author
     else if ("author".equals(raw)) {
       content.setAuthor(getCharacters());

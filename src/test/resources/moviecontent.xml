@@ -1,0 +1,25 @@
+<content language="en">
+  <created>
+    <user id="amelie" realm="testland"><![CDATA[Amélie Poulard]]></user>
+    <date>2009-01-07T20:05:41Z</date>
+  </created>
+  <filename><![CDATA[movie.mov]]></filename>
+  <source>http://entwinemedia.com/moviexyz.ogg</source>
+  <mimetype>video/quicktime</mimetype>
+  <size>745569</size>
+  <duration>1004400000</duration>
+  <audio>
+    <bitdepth>16</bitdepth>
+    <bitrate>98234.0</bitrate>
+    <channels>2</channels>
+    <format>AAC</format>
+    <samplingrate>44100</samplingrate>
+  </audio>
+  <video>
+    <bitrate>540520.0</bitrate>
+    <format>H.264</format>
+    <framerate>25.0</framerate>
+    <resolution>640x480</resolution>
+    <scantype>progressive</scantype>
+  </video>
+</content>

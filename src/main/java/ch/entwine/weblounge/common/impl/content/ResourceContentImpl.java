@@ -36,6 +36,9 @@ public class ResourceContentImpl implements ResourceContent {
   /** The content's name */
   protected String filename = null;
 
+  /** The content's source */
+  protected String source = null;
+
   /** author of the picture */
   protected String author = null;
 
@@ -113,6 +116,24 @@ public class ResourceContentImpl implements ResourceContent {
    */
   public String getFilename() {
     return filename;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceContent#setSource(java.lang.String)
+   */
+  public void setSource(String source) {
+    this.source = source;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceContent#getSource()
+   */
+  public String getSource() {
+    return source;
   }
 
   /**
@@ -302,6 +323,8 @@ public class ResourceContentImpl implements ResourceContent {
     buf.append(creationCtx.toXml());
     if (filename != null)
       buf.append("<filename><![CDATA[").append(filename).append("]]></filename>");
+    if (source != null)
+      buf.append("<source>").append(source).append("</source>");
     if (!StringUtils.isBlank(author))
       buf.append("<author><![CDATA[").append(author).append("]]></author>");
     if (mimetype != null)

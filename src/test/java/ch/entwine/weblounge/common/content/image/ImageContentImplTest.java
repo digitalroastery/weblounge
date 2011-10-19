@@ -62,6 +62,9 @@ public class ImageContentImplTest {
   /** The creation date */
   protected User amelie = new UserImpl("amelie", "testland", "Amélie Poulard");
 
+  /** The source file */
+  protected String source = "http://entwinemedia.com/imagexyz.ogg";
+
   /** The image width */
   protected int width = 2188;
 
@@ -103,6 +106,7 @@ public class ImageContentImplTest {
     image = new ImageContentImpl(filename, german, mimetype, width, height, size);
     image.setAuthor(photographer);
     image.setDateTaken(dateTaken);
+    image.setSource(source);
     image.setLocation(location);
     image.setGpsPosition(gpsLat, gpsLong);
     image.setFilmspeed(filmspeed);
@@ -130,6 +134,16 @@ public class ImageContentImplTest {
   @Test
   public void testGetMimetype() {
     assertEquals(mimetype, image.getMimetype());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.image.ImageContentImpl#getSource()}
+   * .
+   */
+  @Test
+  public void testGetSource() {
+    assertEquals(source, image.getSource());
   }
 
   /**
