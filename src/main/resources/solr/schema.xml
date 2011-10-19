@@ -453,6 +453,7 @@
     <!-- Page-level metadata -->
     <field name="subjects" type="string" multiValued="true" indexed="true" stored="true" required="false" /> 
     <field name="template" type="string" indexed="true" stored="true" required="false" /> 
+    <field name="series" type="string" multiValued="true" indexed="true" stored="true" required="false" />
 
     <!-- Page, page header and page preview -->
     <field name="page_xml" type="string" indexed="false" stored="true" required="false" />
@@ -500,6 +501,7 @@
     <dynamicField name="pagelet_xml_*" type="text" indexed="false" stored="true" multiValued="true"/>
 
     <!-- Dynamic fields for resource content -->
+    <field name="content_source" type="string" indexed="true" stored="true" required="false" />
     <field name="content_mimetype" type="text" indexed="true" stored="false" multiValued="true"/>
     <dynamicField name="content_mimetype_*" type="text" indexed="true" stored="true"/>
     <field name="content_filename" type="text" indexed="true" stored="false" multiValued="true"/>

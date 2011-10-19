@@ -27,7 +27,7 @@ import ch.entwine.weblounge.common.content.movie.MovieResource;
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
  * posting weblounge audio visual objects to solr.
  */
-public class AudioVisualInputDocument extends ResourceInputDocument {
+public class MovieInputDocument extends ResourceInputDocument {
 
   /**
    * Creates an input document for the given audio visual object.
@@ -35,7 +35,7 @@ public class AudioVisualInputDocument extends ResourceInputDocument {
    * @param audioVisual
    *          the audio visual object
    */
-  public AudioVisualInputDocument(MovieResource audioVisual) {
+  public MovieInputDocument(MovieResource audioVisual) {
     init(audioVisual);
   }
 

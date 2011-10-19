@@ -45,6 +45,9 @@ public interface SolrFields {
   /** Template field name */
   String TEMPLATE = "template";
 
+  /** Series field name */
+  String SERIES = "series";
+
   /** Page field name */
   String XML = "page_xml";
 
@@ -147,6 +150,9 @@ public interface SolrFields {
   /** Pagelet type field name (position within composer) */
   String PAGELET_TYPE_COMPOSER_POSITION = "pagelet_type_position_{0}";
 
+  /** Resource content source field name */
+  String CONTENT_SOURCE = "content_source";
+
   /** Resource content filename field name */
   String CONTENT_FILENAME = "content_filename";
 
@@ -170,7 +176,7 @@ public interface SolrFields {
 
   /** Solr ranking score */
   String SCORE = "score";
-  
+
   /** Accumulative, language_sensitive fulltext field */
   String LOCALIZED_FULLTEXT = "fulltext_{0}";
 

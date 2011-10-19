@@ -26,6 +26,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME_LOCALIZED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_SOURCE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.COVERAGE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.COVERAGE_LOCALIZED;
@@ -50,6 +51,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_TO;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SERIES;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECT;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_LOCALIZED;
@@ -84,6 +86,9 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     // Resource-level
     for (String subject : resource.getSubjects())
       addField(SUBJECT, subject, true);
+
+    for (String series : resource.getSeries())
+      addField(SERIES, series, true);
 
     // Creation, modification and publishing information
     addField(OWNED_BY, SolrUtils.serializeUserId(resource.getOwner()), false);
@@ -132,6 +137,7 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
       addField(getLocalizedFieldName(CONTENT_XML, l), content.toXml(), false);
       addField(getLocalizedFieldName(CONTENT_CREATED, l), SolrUtils.serializeDate(content.getCreationDate()), false);
       addField(getLocalizedFieldName(CONTENT_CREATED_BY, l), SolrUtils.serializeUserId(content.getCreator()), false);
+      addField(CONTENT_SOURCE, content.getSource(), true);
       addField(CONTENT_FILENAME, content.getFilename(), true);
       addField(getLocalizedFieldName(CONTENT_FILENAME_LOCALIZED, l), content.getFilename(), false);
       addField(CONTENT_MIMETYPE, content.getMimetype(), true);

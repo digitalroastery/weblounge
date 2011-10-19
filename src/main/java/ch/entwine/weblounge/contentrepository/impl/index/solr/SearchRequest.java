@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.impl.index.solr;
 
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_SOURCE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.FULLTEXT;
@@ -38,6 +39,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SCORE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SERIES;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECT;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_BOOST;
@@ -147,6 +149,11 @@ public class SearchRequest {
       and(solrQuery, SUBJECT, query.getSubjects(), true, true);
     }
 
+    // Series
+    if (query.getSeries().length > 0) {
+      and(solrQuery, SERIES, query.getSeries(), true, true);
+    }
+
     // Template
     if (query.getTemplate() != null) {
       and(solrQuery, TEMPLATE, query.getTemplate(), true, true);
@@ -234,6 +241,11 @@ public class SearchRequest {
     // Content filenames
     if (query.getFilename() != null) {
       and(solrQuery, CONTENT_FILENAME, query.getFilename(), true, true);
+    }
+
+    // Content source
+    if (query.getSource() != null) {
+      and(solrQuery, CONTENT_SOURCE, query.getSource(), true, true);
     }
 
     // Content mime types

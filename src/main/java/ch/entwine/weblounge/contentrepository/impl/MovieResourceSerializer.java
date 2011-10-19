@@ -45,7 +45,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.AudioVisualInputDocument;
+import ch.entwine.weblounge.contentrepository.impl.index.solr.MovieInputDocument;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -151,7 +151,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
    */
   public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
-    return new AudioVisualInputDocument((MovieResource) resource).getMetadata();
+    return new MovieInputDocument((MovieResource) resource).getMetadata();
   }
 
   /**
