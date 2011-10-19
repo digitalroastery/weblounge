@@ -135,6 +135,22 @@ public interface SearchQuery {
   String getTemplate();
 
   /**
+   * Return the resources with the given source.
+   * 
+   * @param source
+   *          the source to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withSource(String source);
+
+  /**
+   * Returns the source or <code>null</code> if no source was specified.
+   * 
+   * @return the source
+   */
+  String getSource();
+
+  /**
    * Return the resources with the given layout.
    * 
    * @param layout
@@ -307,6 +323,24 @@ public interface SearchQuery {
    * @return the subjects
    */
   String[] getSubjects();
+
+  /**
+   * Only returns resources that contain the specified series. Note that this
+   * method may be called multiple times in order to specify more than one
+   * series.
+   * 
+   * @param series
+   *          the series
+   * @return the query extended by this criterion
+   */
+  SearchQuery withSeries(String series);
+
+  /**
+   * Returns the series or an empty array if no series have been specified.
+   * 
+   * @return the series
+   */
+  String[] getSeries();
 
   /**
    * Return only resources that have been created or modified by the specified

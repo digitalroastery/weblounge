@@ -230,6 +230,39 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
   String[] getSubjects();
 
   /**
+   * Adds <code>series</code> to the set of series if it is not already
+   * contained.
+   * 
+   * @param series
+   *          the series to add
+   */
+  void addSeries(String series);
+
+  /**
+   * Removes <tt>series</tt> from the set of series.
+   * 
+   * @param series
+   *          the series to remove
+   */
+  void removeSeries(String series);
+
+  /**
+   * Returns <code>true</code> if <code>series</code> is amongst the series.
+   * 
+   * @param series
+   *          the series
+   * @return <code>true</code> if the resource contains the series
+   */
+  boolean hasSeries(String series);
+
+  /**
+   * Returns the series that are defined for this resource.
+   * 
+   * @return the resource series
+   */
+  String[] getSeries();
+
+  /**
    * Returns the resource title in the current language.
    * 
    * @return the content

@@ -44,6 +44,21 @@ public interface ResourceContent extends Creatable {
   String getFilename();
 
   /**
+   * Sets the resource source.
+   * 
+   * @param source
+   *          the source
+   */
+  void setSource(String source);
+
+  /**
+   * Returns the resource source.
+   * 
+   * @return the source
+   */
+  String getSource();
+
+  /**
    * Returns the name of the author of this resource
    * 
    * @return the author's name
