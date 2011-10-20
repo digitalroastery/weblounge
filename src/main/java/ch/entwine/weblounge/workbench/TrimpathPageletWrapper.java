@@ -36,8 +36,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Wrapper around a {@link ch.entwine.weblounge.common.content.page.Pagelet} that
- * will replace pagelet contents and properties with their trimpath equivalents.
+ * Wrapper around a {@link ch.entwine.weblounge.common.content.page.Pagelet}
+ * that will replace pagelet contents and properties with their trimpath
+ * equivalents.
  */
 public class TrimpathPageletWrapper implements Pagelet {
 
@@ -332,11 +333,30 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#addProperty(java.lang.String,
+   *      java.lang.String)
+   */
+  public void addProperty(String key, String value) {
+    pagelet.addProperty(key, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.page.Pagelet#setProperty(java.lang.String,
    *      java.lang.String)
    */
   public void setProperty(String key, String value) {
     pagelet.setProperty(key, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#removeProperty(java.lang.String)
+   */
+  public void removeProperty(String key) {
+    pagelet.removeProperty(key);
   }
 
   /**
