@@ -106,7 +106,7 @@ public class PageletTag extends WebloungeTag {
         PageletImpl pagelet = new PageletImpl(module.getIdentifier(), rendererId);
         if (properties != null) {
           for (Map.Entry<String, String> property : properties.entrySet()) {
-            pagelet.setProperty(property.getKey(), property.getValue());
+            pagelet.addProperty(property.getKey(), property.getValue());
           }
         }
         if (elements != null) {
