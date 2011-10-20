@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.kernel.command;
 
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
@@ -246,9 +247,9 @@ public class SiteCommand {
       String objectId = args[0];
       // TODO: What if we hit a file or an image?
       if (objectId.startsWith("/"))
-        page = (Page)repository.get(new PageURIImpl(site, args[0]));
+        page = (Page) repository.get(new PageURIImpl(site, args[0]));
       else
-        page = (Page)repository.get(new PageURIImpl(site, null, args[0]));
+        page = (Page) repository.get(new PageURIImpl(site, null, args[0]));
       if (page != null) {
         title("page");
         pad("id", page.getURI().getIdentifier().toString());
@@ -346,6 +347,7 @@ public class SiteCommand {
     // Get hold of the content repository
     ContentRepository repository = site.getContentRepository();
     SearchQuery query = new SearchQueryImpl(site);
+    query.withVersion(Resource.LIVE);
     query.withText(text.toString());
 
     // Is it a page?
