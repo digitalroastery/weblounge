@@ -172,7 +172,10 @@ public class SearchQueryImpl implements SearchQuery {
   protected Order publicationDateSearchOrder = Order.None;
 
   /** The resource versions */
-  protected long version = Resource.LIVE;
+  protected long version = Resource.ANY;
+
+  /** The preferred resource version */
+  protected long preferredVersion = -1L;
 
   /**
    * Creates a new search query that is operating on the given site.
@@ -1054,10 +1057,29 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withPreferredVersion(long)
+   */
+  public SearchQuery withPreferredVersion(long preferredVersion) {
+    this.preferredVersion = preferredVersion;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getVersion()
    */
   public long getVersion() {
     return version;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getPreferredVersion()
+   */
+  public long getPreferredVersion() {
+    return preferredVersion;
   }
 
   /**
