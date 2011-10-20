@@ -214,10 +214,10 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.Pagelet#setProperty(java.lang.String,
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#addProperty(java.lang.String,
    *      java.lang.String)
    */
-  public void setProperty(String key, String value) {
+  public void addProperty(String key, String value) {
     String[] existing = properties.remove(key);
     List<String> values = new ArrayList<String>();
     if (existing != null) {
@@ -226,6 +226,25 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
     }
     values.add(value);
     properties.put(key, values.toArray(new String[values.size()]));
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#setProperty(java.lang.String,
+   *      java.lang.String)
+   */
+  public void setProperty(String key, String value) {
+    properties.put(key, new String[] { value });
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#removeProperty(java.lang.String)
+   */
+  public void removeProperty(String key) {
+    properties.remove(key);
   }
 
   /**

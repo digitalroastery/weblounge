@@ -395,7 +395,7 @@ public class SearchQueryImpl implements SearchQuery {
       throws IllegalStateException {
     ensureConfigurationObject(Pagelet.class);
     Pagelet pagelet = (Pagelet) stack.peek();
-    pagelet.setProperty(propertyName, propertyValue);
+    pagelet.addProperty(propertyName, propertyValue);
     return this;
   }
 

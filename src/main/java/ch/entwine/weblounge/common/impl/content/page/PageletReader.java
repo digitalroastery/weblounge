@@ -206,7 +206,7 @@ public final class PageletReader extends WebloungeContentReader {
     // property
     else if ("property".equals(raw)) {
       String id = (String) clipboard.get("property.id");
-      pagelet.setProperty(id, getCharacters());
+      pagelet.addProperty(id, getCharacters());
       if (logger.isTraceEnabled())
         logger.trace("Setting property '" + id + " to '" + getCharacters() + "'");
     }

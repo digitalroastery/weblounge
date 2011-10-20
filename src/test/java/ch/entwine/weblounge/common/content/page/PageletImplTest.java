@@ -52,7 +52,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Test case for the implementation at {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl}.
+ * Test case for the implementation at
+ * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl}.
  */
 public class PageletImplTest {
 
@@ -91,7 +92,7 @@ public class PageletImplTest {
 
   /** Property values */
   protected String[] multivaluePropertyValue = new String[] { "a", "b" };
-  
+
   /** Name of the content */
   protected String contentName = "title";
 
@@ -114,7 +115,9 @@ public class PageletImplTest {
   protected String[] multivalueGermanContent = new String[] { "Neu", "Technik" };
 
   /** Content values */
-  protected String[] multivalueFrenchContent = new String[] { "Nouveau", "Technique" };
+  protected String[] multivalueFrenchContent = new String[] {
+      "Nouveau",
+      "Technique" };
 
   /** The German language */
   protected Language german = new LanguageImpl(new Locale("de"));
@@ -177,7 +180,7 @@ public class PageletImplTest {
       pagelet.setContent(multivalueContentName, s, french);
     pagelet.setProperty(propertyName, propertyValue);
     for (String s : multivaluePropertyValue)
-      pagelet.setProperty(multivaluePropertyName, s);
+      pagelet.addProperty(multivaluePropertyName, s);
     pagelet.setOwner(john);
     pagelet.setCreated(hans, creationDate);
     pagelet.setModified(hans, germanModificationDate, german);
@@ -197,7 +200,8 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#hashCode()}.
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#hashCode()}
+   * .
    */
   @Test
   public void testHashCode() {
@@ -206,7 +210,8 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getModule()}.
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getModule()}
+   * .
    */
   @Test
   public void testGetModule() {
@@ -215,7 +220,8 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getIdentifier()}.
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getIdentifier()}
+   * .
    */
   @Test
   public void testGetIdentifier() {
@@ -267,7 +273,8 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getOwner()}.
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getOwner()}
+   * .
    */
   @Test
   public void testGetCreator() {
@@ -275,7 +282,9 @@ public class PageletImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getPublishFrom()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getPublishFrom()}
+   * .
    */
   @Test
   public void testGetPublishFrom() {
@@ -283,7 +292,9 @@ public class PageletImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getPublishTo()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getPublishTo()}
+   * .
    */
   @Test
   public void testGetPublishTo() {
@@ -291,7 +302,9 @@ public class PageletImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getPublisher()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getPublisher()}
+   * .
    */
   @Test
   public void testGetPublisher() {
@@ -344,7 +357,8 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#permissions()}.
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#permissions()}
+   * .
    */
   @Test
   @Ignore
@@ -418,7 +432,7 @@ public class PageletImplTest {
     assertEquals(3, pagelet.getContentNames(german).length);
     assertEquals(2, pagelet.getContentNames(french).length);
   }
-  
+
   /**
    * Test method for
    * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#isMultiValueContent(java.lang.String)}
@@ -441,11 +455,11 @@ public class PageletImplTest {
     assertEquals(germanContent, pagelet.getContent(contentName, german, false));
     assertEquals(frenchContent, pagelet.getContent(contentName, french, true));
     assertEquals(frenchContent, pagelet.getContent(contentName, french, false));
-    
+
     // Test unsupported languages
     assertEquals(germanContent, pagelet.getContent(contentName, italian, false));
     assertTrue(pagelet.getContent(contentName, italian, true) == null);
-    
+
     // Test lonely content (credits), available in German only
     assertEquals(lonelyContent, pagelet.getContent(lonelyContentName, german, true));
     assertEquals(lonelyContent, pagelet.getContent(lonelyContentName, german, false));
@@ -464,7 +478,7 @@ public class PageletImplTest {
   public void testGetContentStringLanguage() {
     assertEquals(germanContent, pagelet.getContent(contentName, german));
     assertEquals(frenchContent, pagelet.getContent(contentName, french));
-    
+
     // Test unsupported languages
     assertEquals(germanContent, pagelet.getContent(contentName, italian));
 
@@ -487,7 +501,7 @@ public class PageletImplTest {
     pagelet.switchTo(french);
     assertEquals(frenchContent, pagelet.getContent(contentName));
     assertTrue(pagelet.getContent(lonelyContentName) == null);
-    
+
     // Test unsupported languages.
     // Switching to Italian will actually switch to German (original language)
     pagelet.switchTo(italian);
@@ -509,14 +523,14 @@ public class PageletImplTest {
     assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName, german, true)[1]);
     assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName, german, false)[1]);
 
-     // French
+    // French
     assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, french, true).length);
     assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, french, false).length);
     assertEquals(multivalueFrenchContent[0], pagelet.getMultiValueContent(multivalueContentName, french, true)[0]);
     assertEquals(multivalueFrenchContent[0], pagelet.getMultiValueContent(multivalueContentName, french, false)[0]);
     assertEquals(multivalueFrenchContent[1], pagelet.getMultiValueContent(multivalueContentName, french, true)[1]);
     assertEquals(multivalueFrenchContent[1], pagelet.getMultiValueContent(multivalueContentName, french, false)[1]);
-    
+
     // Test unsupported languages
     assertEquals(0, pagelet.getMultiValueContent(multivalueContentName, italian, true).length);
     assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, italian, false).length);
@@ -535,11 +549,11 @@ public class PageletImplTest {
     assertEquals(multivalueGermanContent[0], pagelet.getMultiValueContent(multivalueContentName, german)[0]);
     assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName, german)[1]);
 
-     // French
+    // French
     assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, french).length);
     assertEquals(multivalueFrenchContent[0], pagelet.getMultiValueContent(multivalueContentName, french)[0]);
     assertEquals(multivalueFrenchContent[1], pagelet.getMultiValueContent(multivalueContentName, french)[1]);
-    
+
     // Test unsupported languages
     assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, italian).length);
     assertEquals(multivalueGermanContent[0], pagelet.getMultiValueContent(multivalueContentName, italian)[0]);
@@ -557,12 +571,12 @@ public class PageletImplTest {
     assertEquals(multivalueGermanContent[0], pagelet.getMultiValueContent(multivalueContentName)[0]);
     assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName)[1]);
 
-     // French
+    // French
     pagelet.switchTo(french);
     assertEquals(2, pagelet.getMultiValueContent(multivalueContentName).length);
     assertEquals(multivalueFrenchContent[0], pagelet.getMultiValueContent(multivalueContentName)[0]);
     assertEquals(multivalueFrenchContent[1], pagelet.getMultiValueContent(multivalueContentName)[1]);
-    
+
     // Test unsupported languages
     // Switching to Italian will actually switch to German (original language)
     pagelet.switchTo(italian);
