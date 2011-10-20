@@ -22,6 +22,7 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.Renderer.RendererType;
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
@@ -247,6 +248,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     // Find the pages that will form the feed
     try {
       SearchQuery query = new SearchQueryImpl(site);
+      query.withVersion(Resource.LIVE);
       query.withType(Page.TYPE);
       query.withLimit(limit);
       query.sortByModificationDate(Order.Descending);
