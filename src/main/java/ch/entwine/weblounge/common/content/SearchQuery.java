@@ -816,10 +816,27 @@ public interface SearchQuery {
   SearchQuery withVersion(long version);
 
   /**
+   * Asks the search index to return only resources with the indicated version
+   * if available else return the available version.
+   * 
+   * @param preferredVersion
+   *          the preferredVersion
+   * @return the search query
+   */
+  SearchQuery withPreferredVersion(long preferredVersion);
+
+  /**
    * Returns the resource version.
    * 
    * @return the version
    */
   long getVersion();
+
+  /**
+   * Return the preferred resource version.
+   * 
+   * @return the preferred version
+   */
+  long getPreferredVersion();
 
 }
