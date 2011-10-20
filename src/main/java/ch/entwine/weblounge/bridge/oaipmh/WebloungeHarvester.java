@@ -65,8 +65,17 @@ public class WebloungeHarvester implements JobWorker {
   /** Configuration option for the repository to harvest */
   public static final String OPT_HANDLER_CLASS = "handler.class";
 
-  /** Configuration option for the flavor of the tracks to use */
-  public static final String OPT_TRACK_FLAVORS = "track.flavors";
+  /** Configuration option for the flavor of the presentation tracks to use */
+  public static final String OPT_PRSENTATION_TRACK_FLAVORS = "presentation-track-flavor";
+
+  /** Configuration option for the flavor of the presenter tracks to use */
+  public static final String OPT_PRESENTER_TRACK_FLAVORS = "presenter-track-flavor";
+
+  /** Configuration option for the flavor of the dublin core episode to use */
+  public static final String OPT_EPISODE_DC_FLAVORS = "episode-dublincore-flavor";
+
+  /** Configuration option for the flavor of the dublin core series to use */
+  public static final String OPT_SERIES_DC_FLAVORS = "series-dublincore-flavor";
 
   /**
    * {@inheritDoc}
@@ -100,6 +109,23 @@ public class WebloungeHarvester implements JobWorker {
       throw new JobException(this, "Repository url '" + repositoryUrl + "' is malformed: " + e.getMessage());
     }
 
+    // Read the configuration value for the flavors
+    String presentationTrackFlavor = (String) ctx.get(OPT_PRSENTATION_TRACK_FLAVORS);
+    if (StringUtils.isBlank(presentationTrackFlavor))
+      throw new JobException(this, "Configuration option '" + OPT_PRSENTATION_TRACK_FLAVORS + "' is missing from the job configuration");
+
+    String presenterTrackFlavor = (String) ctx.get(OPT_PRESENTER_TRACK_FLAVORS);
+    if (StringUtils.isBlank(presenterTrackFlavor))
+      throw new JobException(this, "Configuration option '" + OPT_PRESENTER_TRACK_FLAVORS + "' is missing from the job configuration");
+
+    String dcEpisodeFlavor = (String) ctx.get(OPT_EPISODE_DC_FLAVORS);
+    if (StringUtils.isBlank(dcEpisodeFlavor))
+      throw new JobException(this, "Configuration option '" + OPT_EPISODE_DC_FLAVORS + "' is missing from the job configuration");
+
+    String dcSeriesFlavor = (String) ctx.get(OPT_SERIES_DC_FLAVORS);
+    if (StringUtils.isBlank(dcSeriesFlavor))
+      throw new JobException(this, "Configuration option '" + OPT_SERIES_DC_FLAVORS + "' is missing from the job configuration");
+
     // Read the configuration value for the handler class
     String handlerClass = (String) ctx.get(OPT_HANDLER_CLASS);
     if (StringUtils.isBlank(handlerClass))
@@ -107,14 +133,22 @@ public class WebloungeHarvester implements JobWorker {
 
     RecordHandler handler;
     try {
-      Class<? extends WebloungeRecordHandler> c = (Class<? extends WebloungeRecordHandler>) getClass().getClassLoader().loadClass(handlerClass);
+      Class<? extends AbstractWebloungeRecordHandler> c = (Class<? extends AbstractWebloungeRecordHandler>) getClass().getClassLoader().loadClass(handlerClass);
       Class paramTypes[] = new Class[2];
       paramTypes[0] = Site.class;
       paramTypes[1] = WritableContentRepository.class;
-      Constructor<? extends WebloungeRecordHandler> constructor = c.getConstructor(paramTypes);
+      paramTypes[2] = String.class;
+      paramTypes[3] = String.class;
+      paramTypes[4] = String.class;
+      paramTypes[5] = String.class;
+      Constructor<? extends AbstractWebloungeRecordHandler> constructor = c.getConstructor(paramTypes);
       Object arglist[] = new Object[2];
       arglist[0] = site;
       arglist[1] = contentRepository;
+      arglist[2] = presentationTrackFlavor;
+      arglist[3] = presenterTrackFlavor;
+      arglist[4] = dcEpisodeFlavor;
+      arglist[5] = dcSeriesFlavor;
       handler = constructor.newInstance(arglist);
     } catch (Throwable t) {
       throw new IllegalStateException("Unable to instantiate class " + handlerClass + ": " + t.getMessage(), t);

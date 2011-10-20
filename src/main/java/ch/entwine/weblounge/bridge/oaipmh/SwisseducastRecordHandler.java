@@ -1,8 +1,5 @@
 package ch.entwine.weblounge.bridge.oaipmh;
 
-import static ch.entwine.weblounge.bridge.oaipmh.harvester.OaiPmhResponse.createXPath;
-import static ch.entwine.weblounge.bridge.oaipmh.harvester.OaiPmhResponse.xpathString;
-
 import ch.entwine.weblounge.bridge.oaipmh.harvester.RecordHandler;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
@@ -25,7 +22,7 @@ import java.util.Date;
 /**
  * A Swisseducast LOR implementation of a record handler
  */
-public class SwisseducastRecordHandler extends WebloungeRecordHandler implements RecordHandler {
+public class SwisseducastRecordHandler extends AbstractWebloungeRecordHandler implements RecordHandler {
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(SwisseducastRecordHandler.class);
@@ -58,10 +55,20 @@ public class SwisseducastRecordHandler extends WebloungeRecordHandler implements
    *          the site
    * @param contentRepository
    *          the content repository
+   * @param presentationTrackFlavor
+   *          the presentation track flavor
+   * @param presenterTrackFlavor
+   *          the presenter track flavor
+   * @param dcEpisodeFlavor
+   *          the dublin core episode flavor
+   * @param dcSeriesFlavor
+   *          the dublin core series flavor
    */
   public SwisseducastRecordHandler(Site site,
-      WritableContentRepository contentRepository) {
-    super(site, contentRepository);
+      WritableContentRepository contentRepository,
+      String presentationTrackFlavor, String presenterTrackFlavor,
+      String dcEpisodeFlavor, String dcSeriesFlavor) {
+    super(site, contentRepository, presentationTrackFlavor, presenterTrackFlavor, dcEpisodeFlavor, dcSeriesFlavor);
   }
 
   /**
@@ -76,28 +83,7 @@ public class SwisseducastRecordHandler extends WebloungeRecordHandler implements
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.bridge.oaipmh.WebloungeRecordHandler#prepareRecord(org.w3c.dom.Node)
-   */
-  protected void prepareRecord(Node record) {
-    title = xpathString(createXPath(), record, "//oai20:metadata/oai20:title/text()");
-    creator = xpathString(createXPath(), record, "//oai20:metadata/oai20:creator/text()");
-    licence = xpathString(createXPath(), record, "//oai20:metadata/oai20:licence/text()");
-    source = xpathString(createXPath(), record, "//oai20:metadata/oai20:source/text()");
-    discipline = xpathString(createXPath(), record, "//oai20:metadata/oai20:discipline/text()");
-    contributor = xpathString(createXPath(), record, "//oai20:metadata/oai20:contributor/text()");
-    publisher = xpathString(createXPath(), record, "//oai20:metadata/oai20:publisher/text()");
-    subject = xpathString(createXPath(), record, "//oai20:metadata/oai20:subject/text()");
-    description = xpathString(createXPath(), record, "//oai20:metadata/oai20:description/text()");
-    languageCode = xpathString(createXPath(), record, "//oai20:metadata/oai20:language/text()");
-    alternativeTitle = xpathString(createXPath(), record, "//oai20:metadata/oai20:alternative/text()");
-    extent = xpathString(createXPath(), record, "//oai20:metadata/oai20:extent/text()");
-    type = xpathString(createXPath(), record, "//oai20:metadata/oai20:type/text()");
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.bridge.oaipmh.WebloungeRecordHandler#parseResource()
+   * @see ch.entwine.weblounge.bridge.oaipmh.AbstractWebloungeRecordHandler#parseResource()
    */
   protected Resource<?> parseResource(Node record) {
     Language language = getISO3Language(languageCode);
@@ -116,7 +102,7 @@ public class SwisseducastRecordHandler extends WebloungeRecordHandler implements
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.bridge.oaipmh.WebloungeRecordHandler#parseResourceContent()
+   * @see ch.entwine.weblounge.bridge.oaipmh.AbstractWebloungeRecordHandler#parseResourceContent()
    */
   protected ResourceContent parseResourceContent(Node record) {
     Language language = getISO3Language(languageCode);

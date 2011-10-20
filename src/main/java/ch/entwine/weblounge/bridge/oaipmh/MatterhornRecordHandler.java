@@ -17,10 +17,12 @@ import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.mediapackage.AudioStream;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Stream;
 import org.opencastproject.mediapackage.Track;
@@ -30,9 +32,10 @@ import org.w3c.dom.Node;
 import java.util.Date;
 
 /**
- * A Matterhorn specified implementation of a record handler
+ * A Matterhorn specified implementation of a record handler. This class is not
+ * thread safe.
  */
-public class MatterhornRecordHandler extends WebloungeRecordHandler implements RecordHandler {
+public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler implements RecordHandler {
 
   /** User for resource creation */
   private User harvesterUser = new UserImpl("harvester");
@@ -43,9 +46,6 @@ public class MatterhornRecordHandler extends WebloungeRecordHandler implements R
   /** The media package builder */
   private MediaPackageBuilder mediaPackageBuilder;
 
-  /** The media package */
-  private MediaPackage mediaPackage;
-
   /**
    * Creates a new matterhorn record handler
    * 
@@ -53,10 +53,20 @@ public class MatterhornRecordHandler extends WebloungeRecordHandler implements R
    *          the site
    * @param contentRepository
    *          the content repository
+   * @param presentationTrackFlavor
+   *          the presentation track flavor
+   * @param presenterTrackFlavor
+   *          the presenter track flavor
+   * @param dcEpisodeFlavor
+   *          the dublin core episode flavor
+   * @param dcSeriesFlavor
+   *          the dublin core series flavor
    */
   public MatterhornRecordHandler(Site site,
-      WritableContentRepository contentRepository) {
-    super(site, contentRepository);
+      WritableContentRepository contentRepository,
+      String presentationTrackFlavor, String presenterTrackFlavor,
+      String dcEpisodeFlavor, String dcSeriesFlavor) {
+    super(site, contentRepository, presentationTrackFlavor, presenterTrackFlavor, dcEpisodeFlavor, dcSeriesFlavor);
     mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
   }
 
@@ -72,48 +82,53 @@ public class MatterhornRecordHandler extends WebloungeRecordHandler implements R
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.bridge.oaipmh.WebloungeRecordHandler#prepareRecord(org.w3c.dom.Node)
+   * @see ch.entwine.weblounge.bridge.oaipmh.AbstractWebloungeRecordHandler#parseResource()
    */
-  protected void prepareRecord(Node record) {
+  protected Resource<?> parseResource(Node record) {
     Node mediaPackageNode = ListRecordsResponse.metadataOfRecord(record);
+    MediaPackage mediaPackage;
     try {
       mediaPackage = mediaPackageBuilder.loadFromXml(mediaPackageNode);
     } catch (MediaPackageException e) {
       logger.warn("Error loading mediapackage from record");
       throw new RuntimeException(e);
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.bridge.oaipmh.WebloungeRecordHandler#parseResource()
-   */
-  protected Resource<?> parseResource(Node record) {
-    // TODO: Use dublin core catalog for metadata
     Language language = getISO3Language(mediaPackage.getLanguage());
 
     MovieResourceImpl movieResource = new MovieResourceImpl(new MovieResourceURIImpl(site));
-    movieResource.setCreated(harvesterUser, new Date());
+    movieResource.setCreated(harvesterUser, mediaPackage.getDate());
 
     // Set Header Metadata
     movieResource.setTitle(mediaPackage.getTitle(), language);
-    // movieResource.setDescription(description, language)
     for (String subject : mediaPackage.getSubjects()) {
       movieResource.addSubject(subject);
     }
+
+    Catalog episodeCatalog = mediaPackage.getCatalog(dcEpisodeFlavor);
+
+    Catalog seriesCatalog = mediaPackage.getCatalog(dcSeriesFlavor);
+    // getRightsHolder
     // movieResource.setCoverage(coverage, language)
     // movieResource.setRights(rights, language)
-
     return movieResource;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.bridge.oaipmh.WebloungeRecordHandler#parseResourceContent()
+   * @see ch.entwine.weblounge.bridge.oaipmh.AbstractWebloungeRecordHandler#parseResourceContent()
    */
   protected ResourceContent parseResourceContent(Node record) {
+    Node mediaPackageNode = ListRecordsResponse.metadataOfRecord(record);
+    MediaPackage mediaPackage;
+    try {
+      mediaPackage = mediaPackageBuilder.loadFromXml(mediaPackageNode);
+    } catch (MediaPackageException e) {
+      logger.warn("Error loading mediapackage from record");
+      throw new RuntimeException(e);
+    }
+
     Language language = getISO3Language(mediaPackage.getLanguage());
 
     // Set Content
@@ -126,7 +141,6 @@ public class MatterhornRecordHandler extends WebloungeRecordHandler implements R
         author.append(", ");
       author.append(creators[i]);
     }
-    // element.getTags();
 
     content.setAuthor(author.toString());
     if (element.getSize() != -1)
@@ -135,7 +149,10 @@ public class MatterhornRecordHandler extends WebloungeRecordHandler implements R
       content.setDuration(mediaPackage.getDuration());
 
     // TODO: Use tracks with correct flavor for movie
-    Track track = mediaPackage.getTracks()[0];
+    // ??? presenterTrackFlavor
+    String[] presentationTrack = presentationTrackFlavor.split("/");
+    Track[] tracks = mediaPackage.getTracks(new MediaPackageElementFlavor(presentationTrack[0], presentationTrack[1]));
+    Track track = tracks[0];
     for (Stream stream : track.getStreams()) {
       if (stream instanceof AudioStream) {
         ch.entwine.weblounge.common.content.movie.AudioStream audioStream = new ch.entwine.weblounge.common.impl.content.movie.AudioStreamImpl();

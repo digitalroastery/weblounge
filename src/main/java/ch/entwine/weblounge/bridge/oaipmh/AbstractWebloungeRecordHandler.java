@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * Base implementation of a weblounge record handler
  */
-public abstract class WebloungeRecordHandler implements RecordHandler {
+public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
 
   /** Logging facility */
   protected final Logger logger;
@@ -46,6 +46,18 @@ public abstract class WebloungeRecordHandler implements RecordHandler {
   /** ISO3 language map */
   protected final Map<String, Language> iso3Languages = new HashMap<String, Language>();
 
+  /** Presentation track flavor */
+  protected final String presentationTrackFlavor;
+
+  /** Presenter track flavor */
+  protected final String presenterTrackFlavor;
+
+  /** Dublin core episode flavor */
+  protected final String dcEpisodeFlavor;
+
+  /** Dublin core series flavor */
+  protected final String dcSeriesFlavor;
+
   /**
    * Creates a new weblounge record handler
    * 
@@ -54,10 +66,16 @@ public abstract class WebloungeRecordHandler implements RecordHandler {
    * @param contentRepository
    *          the content repository
    */
-  public WebloungeRecordHandler(Site site,
-      WritableContentRepository contentRepository) {
+  public AbstractWebloungeRecordHandler(Site site,
+      WritableContentRepository contentRepository,
+      String presentationTrackFlavor, String presenterTrackFlavor,
+      String dcEpisodeFlavor, String dcSeriesFlavor) {
     this.site = site;
     this.contentRepository = contentRepository;
+    this.presentationTrackFlavor = presentationTrackFlavor;
+    this.presenterTrackFlavor = presenterTrackFlavor;
+    this.dcEpisodeFlavor = dcEpisodeFlavor;
+    this.dcSeriesFlavor = dcSeriesFlavor;
     logger = LoggerFactory.getLogger(getClass());
   }
 
@@ -90,8 +108,6 @@ public abstract class WebloungeRecordHandler implements RecordHandler {
       deleteResource(resourceResult.getResourceURI());
       logger.info("Deleted harvestet resource " + recordIdentifier);
     } else {
-      prepareRecord(record);
-
       Resource<?> resource = parseResource(record);
       resource.addSubject(recordIdentifier);
       addResource(resource);
@@ -100,15 +116,6 @@ public abstract class WebloungeRecordHandler implements RecordHandler {
       addContent(resource.getURI(), content);
       logger.info("Harvesting resource " + recordIdentifier);
     }
-  }
-
-  /**
-   * Prepare the record before parsing them
-   * 
-   * @param record
-   *          the record
-   */
-  protected void prepareRecord(Node record) {
   }
 
   /**
@@ -148,6 +155,7 @@ public abstract class WebloungeRecordHandler implements RecordHandler {
     }
     if (language == null)
       throw new UnknownLanguageException(languageCode);
+    // TODO: Think about how to handle unsupported languages
     return language;
   }
 

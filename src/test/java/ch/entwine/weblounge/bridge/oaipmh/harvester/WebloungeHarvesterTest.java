@@ -120,7 +120,7 @@ public class WebloungeHarvesterTest {
    */
   @Test
   public void testMatterhornRecordHandler() throws Exception {
-    RecordHandler recordHandler = new MatterhornRecordHandler(site, contentRepository);
+    RecordHandler recordHandler = new MatterhornRecordHandler(site, contentRepository, "presentation/delivery", "presenter/delivery", "dublincore/episode", "dublincore/series");
 
     assertEquals(METADATA_PREFIX, recordHandler.getMetadataPrefix());
     assertEquals(1, contentRepository.getResourceCount());
