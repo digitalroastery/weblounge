@@ -230,7 +230,7 @@ public class SearchIndex {
     // See if a live resource is already part of the index
     Site site = resource.getURI().getSite();
     String id = resource.getURI().getIdentifier();
-    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
+    SearchQuery q = new SearchQueryImpl(site).withVersion(Resource.LIVE).withIdentifier(id);
     SearchResult result = getByQuery(q);
     List<ResourceMetadata<?>> finalMetadata = new ArrayList<ResourceMetadata<?>>();
     List<String> liveMetadataKeys = new ArrayList<String>();
@@ -396,7 +396,7 @@ public class SearchIndex {
       throws ContentRepositoryException {
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
 
-    SearchQuery q = new SearchQueryImpl(uri.getSite()).withIdentifier(uri.getIdentifier());
+    SearchQuery q = new SearchQueryImpl(uri.getSite()).withVersion(uri.getVersion()).withIdentifier(uri.getIdentifier());
     SearchResultItem[] searchResult = getByQuery(q).getItems();
     if (searchResult.length != 1) {
       logger.warn("Resource to be moved not found: {}", uri);

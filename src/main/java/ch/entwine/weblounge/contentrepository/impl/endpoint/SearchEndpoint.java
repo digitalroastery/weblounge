@@ -25,6 +25,7 @@ import static ch.entwine.weblounge.common.impl.util.doc.Status.error;
 import static ch.entwine.weblounge.common.impl.util.doc.Status.ok;
 import static ch.entwine.weblounge.common.impl.util.doc.Status.serviceUnavailable;
 
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
@@ -122,6 +123,7 @@ public class SearchEndpoint {
     SearchQuery query = new SearchQueryImpl(site);
     try {
       query.withText(URLDecoder.decode(terms, "utf-8"));
+      query.withVersion(Resource.LIVE);
       query.withOffset(offset);
       query.withLimit(limit);
     } catch (UnsupportedEncodingException e) {

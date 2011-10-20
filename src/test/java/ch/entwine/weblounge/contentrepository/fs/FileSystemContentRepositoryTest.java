@@ -29,8 +29,10 @@ import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
@@ -40,6 +42,7 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageContentImpl;
@@ -733,6 +736,91 @@ public class FileSystemContentRepositoryTest {
 
       assertEquals(page2Work.languages().size(), repository.getLanguages(work2URI).length);
       assertTrue(page2Work.languages().containsAll(Arrays.asList(repository.getLanguages(work2URI))));
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
+    }
+  }
+
+  /**
+   * Test method for {@link SearchQuery#withoutPublication()}.
+   */
+  @Test
+  public void testWithoutPublication() {
+    ResourceURI workURI = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+    Page work = new PageImpl(workURI);
+    try {
+      repository.put(work);
+
+      SearchQuery q = new SearchQueryImpl(site);
+      q.withoutPublication();
+
+      SearchResult result = repository.find(q);
+      assertEquals(1, result.getHitCount());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
+    }
+  }
+
+  /**
+   * Test method for {@link SearchQuery#withoutModification()}.
+   */
+  @Test
+  public void testWithoutModification() {
+    FileResource fileResource = new FileResourceImpl(documentURI);
+    try {
+      SearchQuery q = new SearchQueryImpl(site);
+      SearchResult result = repository.find(q);
+      assertEquals(1, result.getHitCount());
+
+      repository.put(fileResource);
+
+      q = new SearchQueryImpl(site);
+      q.withoutModification();
+
+      result = repository.find(q);
+      assertEquals(2, result.getHitCount());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
+    }
+  }
+
+  /**
+   * Test method for {@link SearchQuery#withPreferredVersion(long)}.
+   */
+  @Test
+  @Ignore
+  public void testWithPreferredVersion() {
+    ResourceURI workURI = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+    ResourceURI liveURI = new PageURIImpl(site, "/etc/weblounge", Resource.LIVE);
+    Page work = new PageImpl(workURI);
+    Page live = new PageImpl(liveURI);
+
+    try {
+      SearchQuery q = new SearchQueryImpl(site);
+      q.withPreferredVersion(Resource.WORK);
+      SearchResult result = repository.find(q);
+      assertEquals(0, result.getHitCount());
+
+      repository.put(work);
+      result = repository.find(q);
+      assertEquals(1, result.getHitCount());
+      ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
+      assertEquals(Resource.WORK, searchResultItem.getResourceURI().getVersion());
+
+      repository.put(live);
+      result = repository.find(q);
+      assertEquals(1, result.getHitCount());
+      searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
+      assertEquals(Resource.WORK, searchResultItem.getResourceURI().getVersion());
+
+      q.withPreferredVersion(Resource.LIVE);
+      result = repository.find(q);
+      assertEquals(1, result.getHitCount());
+      searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
+      assertEquals(Resource.LIVE, searchResultItem.getResourceURI().getVersion());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());

@@ -278,7 +278,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
     // Load the resource
     if (uri.getVersion() == Resource.LIVE) {
-      SearchQuery q = new SearchQueryImpl(site).withIdentifier(uri.getIdentifier());
+      SearchQuery q = new SearchQueryImpl(site).withVersion(Resource.LIVE).withIdentifier(uri.getIdentifier());
       ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) index.find(q).getItems()[0];
 
       InputStream is = null;

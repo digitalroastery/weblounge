@@ -58,8 +58,8 @@ public final class PagesEndpointDocs {
   public static String createDocumentation(String endpointUrl) {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "pages");
     docs.setTitle("Weblounge Pages");
-    
-    String[] versions = {"0", "1"};
+
+    String[] versions = { "0", "1" };
 
     // GET /
     Endpoint getAllPagesEndpoint = new Endpoint("/", Method.GET, "getallpages");
@@ -72,9 +72,16 @@ public final class PagesEndpointDocs {
     getAllPagesEndpoint.addOptionalParameter(new Parameter("subjects", Parameter.Type.String, "The page subjects, separated by a comma"));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("searchterms", Parameter.Type.String, "search terms to search the pages content"));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
-    String[] sortParams = {"published-asc", "published-desc", "created-asc", "created-desc", "modified-asc", "modified-desc"};
+    String[] sortParams = {
+        "published-asc",
+        "published-desc",
+        "created-asc",
+        "created-desc",
+        "modified-asc",
+        "modified-desc" };
     getAllPagesEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("version", Parameter.Type.String, "The version", "0", versions));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("preferredversion", Parameter.Type.String, "The preferred version", "1", versions));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
@@ -180,7 +187,7 @@ public final class PagesEndpointDocs {
     pageletEndpoint.addOptionalParameter(new Parameter("version", Parameter.Type.String, "The version", "0", versions));
     pageletEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, pageletEndpoint);
-    
+
     // GET /{page}/children
     Endpoint getChildPagesByURIEndpoint = new Endpoint("/{page}/children", Method.GET, "getpagechildren");
     getChildPagesByURIEndpoint.setDescription("Returns children of the page with the given id");

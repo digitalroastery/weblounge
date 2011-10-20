@@ -126,13 +126,15 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    */
   @GET
   @Path("/")
-  public Response getAllPages(@Context HttpServletRequest request,
+  public Response getAllPages(
+      @Context HttpServletRequest request,
       @QueryParam("path") String path,
       @QueryParam("subjects") String subjectstring,
       @QueryParam("searchterms") String searchterms,
       @QueryParam("filter") String filter,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
       @QueryParam("version") @DefaultValue("-1") long version,
+      @QueryParam("preferredversion") @DefaultValue("-1") long preferredVersion,
       @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset,
       @QueryParam("details") @DefaultValue("false") boolean details) {
@@ -144,6 +146,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     q.withType(Page.TYPE);
     if (version != -1)
       q.withVersion(version);
+
+    if (preferredVersion != -1)
+      q.withPreferredVersion(preferredVersion);
 
     // Path
     if (StringUtils.isNotBlank(path))
@@ -219,6 +224,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Create search query
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
+    q.withVersion(Resource.WORK);
 
     // Only take resources that have not been modified
     q.withoutPublication();
@@ -327,6 +333,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
+    q.withVersion(Resource.LIVE);
     q.withType(Page.TYPE);
     q.withPathPrefix(page.getURI().getPath());
 
@@ -372,6 +379,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
+    q.withVersion(Resource.LIVE);
     q.withType(Page.TYPE);
     q.withProperty("resourceid", pageId);
 

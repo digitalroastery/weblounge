@@ -120,8 +120,10 @@ public class SearchRequest {
       and(solrQuery, ID, query.getIdentifier(), true, true);
     }
 
-    // Version
-    if (query.getVersion() >= 0) {
+    // Version / Preferred version
+    if (query.getPreferredVersion() >= 0) {
+      and(solrQuery, SolrFields.VERSION, Long.toString(query.getPreferredVersion()), false, false);
+    } else if (query.getVersion() >= 0) {
       and(solrQuery, SolrFields.VERSION, Long.toString(query.getVersion()), false, false);
     }
 

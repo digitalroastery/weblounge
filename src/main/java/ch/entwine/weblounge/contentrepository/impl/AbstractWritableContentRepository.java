@@ -258,6 +258,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Make sure the resource is not being referenced elsewhere
     SearchQuery searchByResource = new SearchQueryImpl(uri.getSite());
+    searchByResource.withVersion(Resource.LIVE);
     searchByResource.withProperty("resourceid", uri.getIdentifier());
     if (index.find(searchByResource).getItems().length > 0) {
       logger.warn("Resource '{}' is still being referenced", uri);

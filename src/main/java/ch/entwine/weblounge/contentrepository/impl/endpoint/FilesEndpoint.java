@@ -167,6 +167,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Create search query
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
+    q.withVersion(Resource.LIVE);
 
     // Type
     q.withoutType(Page.TYPE);
@@ -248,6 +249,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Create search query
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
+    q.withVersion(Resource.LIVE);
 
     // Only take resources that have not been modified
     q.withoutModification();
@@ -348,6 +350,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
+    q.withVersion(Resource.LIVE);
     q.withType(Page.TYPE);
     q.withProperty("resourceid", resourceId);
 
