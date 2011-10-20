@@ -20,10 +20,11 @@
 
 package ch.entwine.weblounge.taglib.content;
 
+import ch.entwine.weblounge.common.content.PageSearchResultItem;
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -257,6 +258,7 @@ public class PageListTag extends WebloungeTag {
 
       // Specify which pages to load
       SearchQuery query = new SearchQueryImpl(site);
+      query.withVersion(Resource.LIVE);
 
       // Add the keywords
       for (String subject : subjects) {

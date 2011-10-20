@@ -118,6 +118,7 @@ public class ResourceIteratorTag extends WebloungeTag {
     // First time serach resources
     if (searchResult == null) {
       SearchQuery q = new SearchQueryImpl(site);
+      q.withVersion(Resource.LIVE);
       for (String subject : resourceSubjects) {
         q.withSubject(subject);
       }

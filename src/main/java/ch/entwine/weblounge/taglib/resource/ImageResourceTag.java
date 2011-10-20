@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.taglib.resource;
 
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
@@ -159,6 +160,7 @@ public class ImageResourceTag extends WebloungeTag {
       uri = new ImageResourceURIImpl(site, imagePath, null);
     } else if (imageSubjects != null && imageSubjects.size() > 0) {
       SearchQuery query = new SearchQueryImpl(site);
+      query.withVersion(Resource.LIVE);
       query.withType(ImageResource.TYPE);
       for (int i = 0; i < imageSubjects.size(); i++)
         query.withSubject(imageSubjects.get(i));
@@ -204,7 +206,7 @@ public class ImageResourceTag extends WebloungeTag {
       image = (ImageResource) repository.get(uri);
       image.switchTo(language);
       imageContent = image.getContent(language);
-      if(imageContent == null)
+      if (imageContent == null)
         imageContent = image.getOriginalContent();
       imageWidth = imageContent.getWidth();
       imageHeight = imageContent.getHeight();
