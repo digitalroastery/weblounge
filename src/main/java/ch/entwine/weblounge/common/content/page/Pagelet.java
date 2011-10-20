@@ -77,6 +77,17 @@ public interface Pagelet extends Creatable, Publishable, LocalizedModifiable, Se
    * @param value
    *          the property value
    */
+  void addProperty(String key, String value);
+
+  /**
+   * Sets a property to this pagelet. Properties are language independent, so
+   * there is no need to pass the language.
+   * 
+   * @param key
+   *          the property name
+   * @param value
+   *          the property value
+   */
   void setProperty(String key, String value);
 
   /**
@@ -88,6 +99,14 @@ public interface Pagelet extends Creatable, Publishable, LocalizedModifiable, Se
    * @return the property value
    */
   String getProperty(String key);
+
+  /**
+   * Clears the property with name <code>key</code> if exists.
+   * 
+   * @param key
+   *          the property name
+   */
+  void removeProperty(String key);
 
   /**
    * Returns <code>true</code> if this is a multiple value property.
