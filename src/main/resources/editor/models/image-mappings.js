@@ -177,6 +177,10 @@ ImageMappings.Head.Metadata.properties = [new Jsonix.Model.ElementMapPropertyInf
   name: 'subject',
   collection: true,
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'series',
+  collection: true,
+  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
 }), new Jsonix.Model.ElementMapPropertyInfo({
 	name: "description",
 	key : new Jsonix.Model.AttributePropertyInfo({
@@ -229,6 +233,9 @@ ImageMappings.Body.Content.properties = [new Jsonix.Model.AttributePropertyInfo(
   typeInfo: ImageMappings.CreatedModified
 }), new Jsonix.Model.ElementPropertyInfo({
   name: 'filename',
+  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'source',
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
 }), new Jsonix.Model.ElementPropertyInfo({
   name: 'mimetype',

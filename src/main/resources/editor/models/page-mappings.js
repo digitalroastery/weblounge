@@ -177,6 +177,10 @@ PageMappings.Head.Metadata.properties = [new Jsonix.Model.ElementMapPropertyInfo
   name: 'subject',
   collection: true,
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'series',
+  collection: true,
+  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
 }), new Jsonix.Model.ElementMapPropertyInfo({
 	name: "description",
 	key : new Jsonix.Model.AttributePropertyInfo({
