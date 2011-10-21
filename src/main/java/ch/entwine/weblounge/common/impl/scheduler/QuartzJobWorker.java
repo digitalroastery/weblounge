@@ -40,7 +40,7 @@ import java.util.Hashtable;
  * <code>ch.entwine.weblounge.Job</code> key.
  */
 public class QuartzJobWorker implements org.quartz.Job {
-  
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(QuartzJobWorker.class);
 
@@ -68,20 +68,22 @@ public class QuartzJobWorker implements org.quartz.Job {
 
       // Prepare the local job context
       JobDataMap jobData = ctx.getJobDetail().getJobDataMap();
-      Dictionary<String, Serializable> jobContext = (Dictionary<String, Serializable>)jobData.get(CONTEXT);
+      Dictionary<String, Serializable> jobContext = (Dictionary<String, Serializable>) jobData.get(CONTEXT);
       if (jobContext == null) {
         logger.debug("Creating default job context");
         jobContext = new Hashtable<String, Serializable>();
-        jobContext.put(Site.class.getName(), (Site)jobData.get(Site.class.getName()));
+        jobContext.put(Site.class.getName(), (Site) jobData.get(Site.class.getName()));
         jobData.put(CONTEXT, jobContext);
       }
-      
+
       // Execute the worker
       jobInstance.execute(ctx.getJobDetail().getName(), jobContext);
-      
+
     } catch (JobException e) {
+      logger.warn(e.getMessage());
       throw new JobExecutionException(e);
     } catch (Throwable t) {
+      logger.warn(t.getMessage());
       throw new JobExecutionException("Lookup of job implementation failed");
     }
   }

@@ -98,7 +98,7 @@
     </dependency>
 
     <dependency>
-      <groupId>quartz</groupId>
+      <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
     </dependency>
 
@@ -228,8 +228,8 @@
               org.apache.http.client.utils,
               org.apache.http.impl.client,
               org.apache.http.message,
-              org.quartz;version="1.5.2",
-              org.quartz.impl;version="1.5.2",
+              org.quartz;version="[1.6.0,2.0.0)",
+              org.quartz.impl;version="[1.6.0,2.0.0)",
               org.slf4j;version="[1.5.0,1.6.0)",
               org.w3c.dom,
               org.xml.sax,
