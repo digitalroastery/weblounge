@@ -118,7 +118,8 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    *          the page uri
    */
   public ResourceImpl(ResourceURI uri) {
-    super(uri.getSite().getDefaultLanguage());
+    super(null);
+    setDefaultLanguage(uri.getSite().getDefaultLanguage());
     this.uri = uri;
     this.content = new HashMap<Language, T>();
     this.creationCtx = new CreationContext();
