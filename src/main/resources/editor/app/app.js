@@ -23,8 +23,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
 			this._loadCurrentLanguage();
 			this._loadValidateLanguage();
 			
-        	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
-        	Page.findOne({path: path}, this.callback('_initViews'));
+        	Page.findOne({path: window.currentPagePath}, this.callback('_initViews'));
         },
         
         update: function(options) {
@@ -79,8 +78,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         },
         
         _loadCurrentLanguage: function() {
-        	var temp = location.pathname.substring(location.pathname.lastIndexOf('/') + 1, location.pathname.length);
-        	var language = temp.length == 2 ? temp : '';
+        	var language = window.currentLanguage;
         	if(language == '') {
         		language = localStorage['weblounge.editor.' + this.runtime.getId() + '.language'];
         	}
@@ -140,8 +138,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         
         "span changeLanguage": function(el, ev, language) {
         	localStorage['weblounge.editor.' + this.runtime.getId() + '.language'] = language;
-        	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
-        	location.href = path + language + "?edit&_=" + new Date().getTime();
+        	location.href = window.currentPagePath + language + "?edit&_=" + new Date().getTime();
         }
         
 	});

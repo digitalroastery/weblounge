@@ -92,7 +92,7 @@ steal.plugins('jquery',
 						
 						// update pageData
 						this.options.page.saveMetadata(pageData, this.options.language, $.proxy(function() {
-							location.href = this.options.page.getPath() + "?edit&_=" + new Date().getTime();
+							location.href = this.options.page.getPath() + this.options.language + "?edit&_=" + new Date().getTime();
 						}, this));
 						
 						this.element.trigger('closeeditor');

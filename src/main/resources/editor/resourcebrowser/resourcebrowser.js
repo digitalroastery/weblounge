@@ -359,8 +359,8 @@ steal.plugins(
                 			this._removeResource(element.id);
                 			
                 			// Relocate to Root if current page was deleted
-                			if(page.getPath() == location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1)) {
-                				location.href = '/?edit&_=' + new Date().getTime();
+                			if(page.getPath() == window.currentPagePath) {
+                				location.href = window.currentLanguage + '/?edit&_=' + new Date().getTime();
                 			}
                 		}, this), $.proxy(function(jqXHR, textStatus, errorThrown) {
                 			if(jqXHR.status == 412) {
