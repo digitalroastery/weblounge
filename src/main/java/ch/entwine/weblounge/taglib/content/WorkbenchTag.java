@@ -20,9 +20,11 @@
 
 package ch.entwine.weblounge.taglib.content;
 
+import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -90,7 +92,7 @@ public class WorkbenchTag extends WebloungeTag {
       Cookie cookie = new Cookie(EditingState.STATE_COOKIE, "true");
       cookie.setPath("/");
       response.addCookie(cookie);
-      writeWorkbenchScript(getRequest());
+      writeWorkbenchScript(getRequest(), getResponse());
       return super.doEndTag();
     }
 
@@ -99,7 +101,7 @@ public class WorkbenchTag extends WebloungeTag {
       return super.doEndTag();
     for (Cookie cookie : request.getCookies()) {
       if (cookie.getName().equals(EditingState.STATE_COOKIE) && "true".equals(cookie.getValue())) {
-        writeWorkbenchScript(getRequest());
+        writeWorkbenchScript(getRequest(), getResponse());
         break;
       }
     }
@@ -107,8 +109,8 @@ public class WorkbenchTag extends WebloungeTag {
     return super.doEndTag();
   }
 
-  private void writeWorkbenchScript(WebloungeRequest request)
-      throws JspException {
+  private void writeWorkbenchScript(WebloungeRequest request,
+      WebloungeResponse response) throws JspException {
 
     // Determine the environment for the steal.js script
     String environment = null;
@@ -120,7 +122,14 @@ public class WorkbenchTag extends WebloungeTag {
         environment = STEAL_PRODUCTION;
     }
 
+    Page page = (Page) request.getAttribute(WebloungeRequest.PAGE);
+
+    // Add the current path to header for the editor
+    response.addHeader("path", page.getPath());
+
     try {
+      pageContext.getOut().write("<script> window.currentLanguage = '" + request.getLanguage().getIdentifier() + "';");
+      pageContext.getOut().write("window.currentPagePath = '" + page.getPath() + "';</script>");
       pageContext.getOut().write(String.format(WORKBENCH_SCRIPT, workbenchPath, environment));
     } catch (IOException e) {
       throw new JspException(e);
