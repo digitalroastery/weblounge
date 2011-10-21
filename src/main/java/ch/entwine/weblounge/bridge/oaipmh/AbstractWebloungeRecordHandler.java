@@ -93,7 +93,7 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
     if (isDeleted) {
       SearchResult searchResult;
       SearchQuery q = new SearchQueryImpl(site);
-      q.withSubject(recordIdentifier);
+      q.withSource(recordIdentifier);
       try {
         searchResult = contentRepository.find(q);
       } catch (ContentRepositoryException e) {
@@ -109,10 +109,10 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
       logger.info("Deleted harvestet resource " + recordIdentifier);
     } else {
       Resource<?> resource = parseResource(record);
-      resource.addSubject(recordIdentifier);
       addResource(resource);
 
       ResourceContent content = parseResourceContent(record);
+      content.setSource(recordIdentifier);
       addContent(resource.getURI(), content);
       logger.info("Harvesting resource " + recordIdentifier);
     }
@@ -170,6 +170,7 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
   protected void addContent(ResourceURI resourceUri, ResourceContent content) {
     InputStream is = null;
     try {
+      // TODO allow content without an inputstream
       is = new BufferedInputStream(new URL(content.getFilename()).openStream());
       contentRepository.putContent(resourceUri, content, is);
     } catch (IllegalStateException e) {

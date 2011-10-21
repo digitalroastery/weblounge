@@ -134,7 +134,7 @@ public class WebloungeHarvester implements JobWorker {
     RecordHandler handler;
     try {
       Class<? extends AbstractWebloungeRecordHandler> c = (Class<? extends AbstractWebloungeRecordHandler>) getClass().getClassLoader().loadClass(handlerClass);
-      Class paramTypes[] = new Class[2];
+      Class<?> paramTypes[] = new Class[2];
       paramTypes[0] = Site.class;
       paramTypes[1] = WritableContentRepository.class;
       paramTypes[2] = String.class;

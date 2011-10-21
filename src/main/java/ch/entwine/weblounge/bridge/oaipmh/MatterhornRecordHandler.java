@@ -108,6 +108,7 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
     Catalog episodeCatalog = mediaPackage.getCatalog(dcEpisodeFlavor);
 
     Catalog seriesCatalog = mediaPackage.getCatalog(dcSeriesFlavor);
+    // movieResource.addSeries(series)
     // getRightsHolder
     // movieResource.setCoverage(coverage, language)
     // movieResource.setRights(rights, language)
