@@ -152,7 +152,7 @@
     </dependency>
 
     <dependency>
-      <groupId>quartz</groupId>
+      <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
     </dependency>
 
@@ -351,8 +351,8 @@
               org.apache.commons.lang;version="2.6",
               org.apache.commons.io;version="2.0",
               org.apache.tika;version="0.9",
-              org.quartz;version="1.5.2",
-              org.quartz.impl;version="1.5.2",
+              org.quartz;version="[1.6.0,2.0.0)",
+              org.quartz.impl;version="[1.6.0,2.0.0)",
               org.osgi.framework;version="1.4.0",
               org.osgi.service.component;version="1.1.0",
               org.osgi.service.http;version="1.1.0",
