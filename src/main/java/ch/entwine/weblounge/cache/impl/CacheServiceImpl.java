@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.cache.impl;
 
+import ch.entwine.weblounge.cache.CacheListener;
 import ch.entwine.weblounge.cache.CacheService;
 import ch.entwine.weblounge.cache.StreamFilter;
 import ch.entwine.weblounge.cache.impl.handle.TaggedCacheHandle;
@@ -197,6 +198,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** Transactions that are currently being processed */
   protected Map<String, CacheTransaction> transactions = null;
 
+  /** List of registered cache listeners */
+  protected List<CacheListener> cacheListeners = null;
+
   /**
    * Creates a new cache with the given identifier and name.
    * 
@@ -216,7 +220,27 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     this.name = name;
     this.diskStorePath = diskStorePath;
     this.transactions = new HashMap<String, CacheTransaction>();
+    this.cacheListeners = new ArrayList<CacheListener>();
     init(id, name, diskStorePath);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.cache.CacheService#addCacheListener(ch.entwine.weblounge.cache.CacheListener)
+   */
+  public void addCacheListener(CacheListener listener) {
+    if (cacheListeners.contains(listener))
+      cacheListeners.add(listener);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.cache.CacheService#removeCacheListener(ch.entwine.weblounge.cache.CacheListener)
+   */
+  public void removeCacheListener(CacheListener listener) {
+    cacheListeners.remove(listener);
   }
 
   /**
@@ -423,6 +447,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   public void clear() {
     cacheManager.clearAll();
     logger.info("Cache '{}' cleared", id);
+    for (CacheListener listener : cacheListeners) {
+      listener.cacheCleared();
+    }
   }
 
   /**
@@ -709,6 +736,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         element.setTimeToLive((int) (cacheHdl.getExpireTime() / 1000));
         cache.put(element);
         response.setDateHeader("Expires", System.currentTimeMillis() + cacheHdl.getExpireTime());
+
+        // Inform listeners
+        for (CacheListener listener : cacheListeners) {
+          listener.cacheEntryAdded(cacheHdl);
+        }
       } else if (tx.isValid() && response.isValid()) {
         logger.trace("Skip caching of response for {} to the cache: {}", response, response.getStatus());
         response.setDateHeader("Expires", System.currentTimeMillis() + tx.getHandle().getExpireTime());
@@ -763,6 +795,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Load the cache
     Cache cache = cacheManager.getCache(DEFAULT_CACHE);
+    
+    // Inform listeners
+    for (CacheListener listener : cacheListeners) {
+      listener.cacheSetInvalidated(tags);
+    }
 
     // Remove the objects matched by the tags
     long removed = 0;
@@ -838,6 +875,12 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     }
 
     logger.debug("Removed {} from cache '{}'", handle.getKey(), id);
+
+    // Inform listeners
+    for (CacheListener listener : cacheListeners) {
+      listener.cacheEntryRemoved(handle);
+    }
+
   }
 
   /**
