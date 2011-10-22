@@ -51,4 +51,20 @@ public interface CacheService extends ResponseCache {
    */
   void shutdown();
 
+  /**
+   * Adds <code>listener</code> to the list of cache listeners.
+   * 
+   * @param listener
+   *          the cache listener to add
+   */
+  void addCacheListener(CacheListener listener);
+
+  /**
+   * Removes <code>listener</code> from the list of cache listeners.
+   * 
+   * @param listener
+   *          the listener to remove
+   */
+  void removeCacheListener(CacheListener listener);
+
 }
