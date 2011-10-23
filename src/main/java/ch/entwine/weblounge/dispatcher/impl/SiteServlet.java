@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.impl.request.SiteRequestWrapper;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
@@ -86,7 +87,10 @@ public class SiteServlet extends HttpServlet {
   /** Path rules */
   private List<ResourceSet> resourceSets = null;
 
-  /** Tika mimetype library */
+  /** The security service */
+  private SecurityService securityService = null;
+
+  /** Tika mime type library */
   private Tika tika = null;
 
   /** Flag to reflect servlet initialization */
@@ -219,6 +223,7 @@ public class SiteServlet extends HttpServlet {
     } else {
       WebloungeRequestImpl webloungeRequest = new WebloungeRequestImpl(httpRequest);
       webloungeRequest.init(site);
+      webloungeRequest.setUser(securityService.getUser());
       String requestPath = UrlUtils.concat("/site", httpRequest.getPathInfo());
       request = new SiteRequestWrapper(webloungeRequest, requestPath, false);
       response = new WebloungeResponseImpl(httpResponse);
@@ -350,6 +355,16 @@ public class SiteServlet extends HttpServlet {
    */
   public void destroy() {
     jasperServlet.destroy();
+  }
+
+  /**
+   * Sets the security service.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**

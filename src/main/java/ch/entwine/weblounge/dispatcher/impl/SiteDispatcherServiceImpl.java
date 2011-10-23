@@ -22,6 +22,7 @@ package ch.entwine.weblounge.dispatcher.impl;
 
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
@@ -115,6 +116,9 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
   /** The site servlet registrations */
   private Map<Site, ServiceRegistration> servletRegistrations = null;
+
+  /** The security service */
+  private SecurityService securityService = null;
 
   /** The precompiler for java server pages */
   private boolean precompile = true;
@@ -388,6 +392,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     try {
       // Create and register the site servlet
       SiteServlet siteServlet = new SiteServlet(site, siteBundle);
+      siteServlet.setSecurityService(securityService);
       Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
       servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
       servletRegistrationProperties.put("alias", siteRoot);
@@ -634,6 +639,16 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   void setEnvironment(Environment environment) {
     this.environment = environment;
+  }
+
+  /**
+   * Sets the security service.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
 }
