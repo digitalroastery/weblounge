@@ -2,6 +2,7 @@
 <page id="4bb19980-8f98-4873-a813-71b6dfab22as" path="/service/test/" version="live">
   <head>
     <template>home</template>
+    <stationary>true</stationary>
     <layout>news</layout>
     <promote>true</promote>
     <index>true</index>

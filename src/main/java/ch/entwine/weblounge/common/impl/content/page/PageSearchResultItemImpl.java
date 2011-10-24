@@ -27,7 +27,7 @@ import ch.entwine.weblounge.common.impl.content.AbstractResourceSearchResultItem
 import ch.entwine.weblounge.common.url.WebUrl;
 
 /**
- * File specific implementation of a
+ * Page specific implementation of a
  * {@link ch.entwine.weblounge.common.content.SearchResultItem}.
  */
 public class PageSearchResultItemImpl extends AbstractResourceSearchResultItemImpl implements PageSearchResultItem {
@@ -110,13 +110,13 @@ public class PageSearchResultItemImpl extends AbstractResourceSearchResultItemIm
   }
 
   /**
-   * Returns the page object.
+   * {@inheritDoc}
    * 
-   * @return the page
+   * @see ch.entwine.weblounge.common.content.PageSearchResultItem#getPage()
    */
   public Page getPage() {
     if (resource == null) {
-      ResourceURI uri = new PageURIImpl(url.getSite(), url.getPath(), id);
+      ResourceURI uri = new PageURIImpl(url.getSite(), url.getPath(), id, version);
       resource = new LazyPageImpl(uri, pageXml, headerXml, previewXml);
     }
     return (Page) resource;

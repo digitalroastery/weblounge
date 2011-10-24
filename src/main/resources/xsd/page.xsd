@@ -49,6 +49,7 @@
     <xsd:complexType>
       <xsd:all>
         <xsd:element name="template" type="xsd:string" />
+        <xsd:element name="stationary" type="xsd:boolean" />
         <xsd:element name="layout" type="xsd:string" />
         <xsd:element name="promote" type="xsd:boolean" />
         <xsd:element name="index" type="xsd:boolean" />

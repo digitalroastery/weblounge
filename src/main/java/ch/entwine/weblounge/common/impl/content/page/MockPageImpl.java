@@ -240,6 +240,24 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.page.Page#setStationary(boolean)
+   */
+  public void setStationary(boolean stationary) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.Page#isStationary()
+   */
+  public boolean isStationary() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#addSubject(java.lang.String)
    */
   public void addSubject(String subject) {

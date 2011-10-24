@@ -45,8 +45,11 @@ public class SearchResultItemImpl implements SearchResultItem {
   /** The associated site */
   protected Site site = null;
 
-  /** The page id */
+  /** The resource id */
   protected String id = null;
+
+  /** The resource version */
+  protected long version = -1;
 
   /** The title */
   protected String title = null;
@@ -77,6 +80,8 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @param id
    *          the document id
+   * @param version
+   *          the resource version
    * @param site
    *          the site
    * @param url
@@ -86,10 +91,11 @@ public class SearchResultItemImpl implements SearchResultItem {
    * @param source
    *          the object that produced the result item
    */
-  public SearchResultItemImpl(String id, Site site, WebUrl url,
+  public SearchResultItemImpl(String id, long version, Site site, WebUrl url,
       double relevance, Object source) {
     this.site = site;
     this.id = id;
+    this.version = version;
     this.url = url;
     this.source = source;
     this.score = relevance;

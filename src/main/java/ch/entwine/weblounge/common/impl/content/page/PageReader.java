@@ -392,6 +392,11 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
         page.layout = characters.toString();
       }
 
+      // Stationary
+      else if ("stationary".equals(raw)) {
+        page.setStationary("true".equals(characters.toString()));
+      }
+
       // Indexed
       else if ("index".equals(raw)) {
         page.setIndexed("true".equals(characters.toString()));

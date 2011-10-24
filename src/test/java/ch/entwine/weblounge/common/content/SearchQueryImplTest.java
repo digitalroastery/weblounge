@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.content;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -39,6 +40,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -63,7 +65,7 @@ public class SearchQueryImplTest {
 
   /** The maximum number of result items to include */
   protected int limit = 10;
-  
+
   /** The test pagelet */
   protected Pagelet pagelet = null;
 
@@ -149,7 +151,31 @@ public class SearchQueryImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withTemplate(java.lang.String)}
+   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withStationary()}
+   * .
+   */
+  @Test
+  public void testWithStationary() {
+    assertFalse(query.isStationary());
+    query.withStationary();
+    assertTrue(query.isStationary());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withExternalLocation(URL)}
+   * .
+   */
+  @Test
+  public void testWithExternalLocation() throws Exception {
+    URL externalLocation = new URL("http://my.server.com/resource");
+    query.withExternalLocation(externalLocation);
+    assertEquals(externalLocation, query.getExternalLocation());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withTemplate(String)}
    * .
    */
   @Test
@@ -170,7 +196,7 @@ public class SearchQueryImplTest {
     query.withType(type);
     assertEquals(type, query.getType());
   }
-  
+
   /**
    * Test method for
    * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withoutType(java.lang.String)}
@@ -195,11 +221,11 @@ public class SearchQueryImplTest {
     query.withCreationDateBetween(date).and(endDate);
     assertEquals(date, query.getCreationDate());
     assertEquals(endDate, query.getCreationDateEnd());
-    
+
     query.withModificationDateBetween(date).and(endDate);
     assertEquals(date, query.getModificationDate());
     assertEquals(endDate, query.getModificationDateEnd());
-    
+
     query.withPublishingDateBetween(date).and(endDate);
     assertEquals(date, query.getPublishingDate());
     assertEquals(endDate, query.getPublishingDateEnd());
@@ -244,7 +270,7 @@ public class SearchQueryImplTest {
   public void testAndProperty() {
     String propertyName = "propertyName";
     String propertyValue = "propertyValue";
-    
+
     // Test andProperty(key, value) without withPagelet(module, id)
     try {
       query = new SearchQueryImpl(site);
@@ -271,7 +297,7 @@ public class SearchQueryImplTest {
   public void testAndElement() {
     String textName = "textName";
     String textValue = "text";
-    
+
     // Test andText(key, value) without withPagelet(module, id)
     try {
       query = new SearchQueryImpl(site);
@@ -298,7 +324,7 @@ public class SearchQueryImplTest {
   public void testAtPosition() {
     String composer = "main";
     int position = 5;
-    
+
     // Test atPosition(composer) without withPagelet(module, id)
     try {
       query = new SearchQueryImpl(site);
@@ -333,7 +359,7 @@ public class SearchQueryImplTest {
   @Test
   public void testInComposer() {
     String composer = "main";
-    
+
     // Test inComposer(composer) without withPagelet(module, id)
     try {
       query = new SearchQueryImpl(site);

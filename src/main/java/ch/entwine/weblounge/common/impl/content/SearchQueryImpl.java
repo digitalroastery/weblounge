@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,8 +61,8 @@ public class SearchQueryImpl implements SearchQuery {
   /** The object that needs to show up next */
   protected Class<?> expectation = null;
 
-  /** The uuid */
-  protected String id = null;
+  /** The resource identifier */
+  protected String resourceId = null;
 
   /** The path */
   protected String path = null;
@@ -77,6 +78,9 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The layout */
   protected String layout = null;
+  
+  /** Stationary flag */
+  protected boolean stationary = false;
 
   /** The list of required pagelets */
   protected List<Pagelet> pagelets = new ArrayList<Pagelet>();
@@ -86,6 +90,9 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The list of required series */
   protected List<String> series = new ArrayList<String>();
+
+  /** The external location */
+  protected URL externalLocation = null;
 
   /** The source */
   protected String source = null;
@@ -255,7 +262,7 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withIdentifier(String id) {
     if (id == null)
       throw new IllegalArgumentException("Id cannot be null");
-    this.id = id;
+    this.resourceId = id;
     return this;
   }
 
@@ -265,7 +272,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#getIdentifier()
    */
   public String getIdentifier() {
-    return id;
+    return resourceId;
   }
 
   /**
@@ -325,6 +332,25 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public String getLayout() {
     return layout;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withStationary()
+   */
+  public SearchQuery withStationary() {
+    stationary = true;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#isStationary()
+   */
+  public boolean isStationary() {
+    return stationary;
   }
 
   /**
@@ -819,6 +845,25 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public boolean getWithoutPublication() {
     return withoutPublication;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withExternalLocation(java.net.URL)
+   */
+  public SearchQuery withExternalLocation(URL url) {
+    this.externalLocation = url;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getExternalLocation()
+   */
+  public URL getExternalLocation() {
+    return externalLocation;
   }
 
   /**

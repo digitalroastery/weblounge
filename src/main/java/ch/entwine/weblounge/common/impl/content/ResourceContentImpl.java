@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.security.User;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.net.URL;
 import java.util.Date;
 
 /**
@@ -38,6 +39,9 @@ public class ResourceContentImpl implements ResourceContent {
 
   /** The content's source */
   protected String source = null;
+
+  /** The content's external location */
+  protected URL externalLocation = null;
 
   /** author of the picture */
   protected String author = null;
@@ -134,6 +138,24 @@ public class ResourceContentImpl implements ResourceContent {
    */
   public String getSource() {
     return source;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceContent#setExternalLocation(java.net.URL)
+   */
+  public void setExternalLocation(URL externalLocation) {
+    this.externalLocation = externalLocation;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceContent#getExternalLocation()
+   */
+  public URL getExternalLocation() {
+    return externalLocation;
   }
 
   /**

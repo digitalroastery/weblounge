@@ -668,6 +668,17 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.page.Page#isStationary()
+   */
+  public boolean isStationary() {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.isStationary();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.page.Page#removePageContentListener(ch.entwine.weblounge.common.content.page.PageContentListener)
    */
   public void removePageContentListener(PageContentListener listener) {
@@ -834,6 +845,17 @@ public class LazyPageImpl implements Page {
     if (!isHeaderLoaded)
       loadPageHeader();
     page.setRights(rights, language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.Page#setStationary(boolean)
+   */
+  public void setStationary(boolean stationary) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    page.setStationary(stationary);
   }
 
   /**

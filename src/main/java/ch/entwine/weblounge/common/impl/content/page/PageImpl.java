@@ -60,6 +60,9 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
   /** Layout identifier */
   protected String layout = null;
 
+  /** Flag to mark a page as a stationary */
+  protected boolean isStationary = false;
+
   /** The preview pagelets */
   protected List<Pagelet> preview = null;
 
@@ -117,6 +120,24 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
    */
   public void setTemplate(String template) {
     this.template = template;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.Page#setStationary(boolean)
+   */
+  public void setStationary(boolean stationary) {
+    this.isStationary = stationary;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.Page#isStationary()
+   */
+  public boolean isStationary() {
+    return isStationary;
   }
 
   /**
@@ -420,6 +441,9 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
       buffer.append("<template>");
       buffer.append(template);
       buffer.append("</template>");
+    }
+    if (isStationary) {
+      buffer.append("<stationary>true</stationary>");
     }
     if (layout != null) {
       buffer.append("<layout>");
