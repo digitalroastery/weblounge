@@ -422,3 +422,26 @@ div.wbl-overlayPreviewContent {
 	max-height: 600px;
 	overflow-y: auto;
 }
+
+.editor_resourcebrowser div.wbl-imageContainer {
+	width: 300px;
+	height: 200px;
+	overflow: hidden;
+}
+
+.editor_resourcebrowser div.wbl-ribbon {
+	position: relative;
+	top: -180px;
+	left: -115px;
+	height: 20px;
+	transform: rotate(-45deg);
+	-ms-transform: rotate(-45deg);
+	-o-transform: rotate(-45deg);
+	-moz-transform: rotate(-45deg);
+	-webkit-transform: rotate(-45deg);
+	background-color: #9a0000;
+	background: -webkit-gradient(linear, left bottom, left top, from(#9a0000), to(#a90000));
+	text-align: center;
+	color: #fff;
+	line-height: 1.5em;
+}

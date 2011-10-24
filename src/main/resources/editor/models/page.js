@@ -46,6 +46,12 @@ steal.then('jsonix')
 		 */
 		findAll: function(params, success, error) {
 			var url = "/system/weblounge/pages/?sort=created-asc&limit=0&offset=0";
+			if ('version' in params) {
+				url += "&version=" + params.version;
+			}
+			if ('preferredversion' in params) {
+				url += "&preferredversion=" + params.preferredversion;
+			}
 			if ('filter' in params) {
 				url += "&filter=" + params.filter;
 			}
@@ -62,6 +68,12 @@ steal.then('jsonix')
 		 */
 		findRecent: function(params, success, error) {
 			var url = "/system/weblounge/pages/?sort=modified-desc&limit=8&offset=0";
+			if ('version' in params) {
+				url += "&version=" + params.version;
+			}
+			if ('preferredversion' in params) {
+				url += "&preferredversion=" + params.preferredversion;
+			}
 			if ('filter' in params) {
 				url += "&filter=" + params.filter;
 			}
@@ -94,6 +106,12 @@ steal.then('jsonix')
 		 */
 		findBySearch: function(params, success, error) {
 			var url = '/system/weblounge/pages/?searchterms=' + params.search + '&sort=modified-desc&limit=8&offset=0';
+			if ('version' in params) {
+				url += "&version=" + params.version;
+			}
+			if ('preferredversion' in params) {
+				url += "&preferredversion=" + params.preferredversion;
+			}
 			if ('filter' in params) {
 				url += "&filter=" + params.filter;
 			}

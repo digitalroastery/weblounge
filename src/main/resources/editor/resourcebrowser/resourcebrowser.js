@@ -323,7 +323,7 @@ steal.plugins(
     				this.update();
     			}, this));
         	}, this)};
-        	this.lastParams = {search: searchValue};
+        	this.lastParams = {search: searchValue, preferredversion: 1};
         	this._loadResources(this.lastParams, this.lastQuery);
 		},
 		
@@ -431,7 +431,7 @@ steal.plugins(
 					this.update();
 				}, this));
 			}, this)};
-			this.lastParams = {};
+			this.lastParams = {preferredversion: 1};
 			this._loadResources(this.lastParams, this.lastQuery);
 		},
 		
@@ -473,7 +473,7 @@ steal.plugins(
 					this.update();
 				}, this));
 			}, this)};
-			this.lastParams = {};
+			this.lastParams = {preferredversion: 1};
 			this._loadResources(this.lastParams, this.lastQuery);
 		}
 	});

@@ -1,5 +1,10 @@
 <div class="wbl-scrollViewItem wbl-page" id="${page.id}">
-	<img src="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview" alt="" class="wbl-pageThumbnail" />
+	<div class="wbl-imageContainer">
+		<img src="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview" alt="" class="wbl-pageThumbnail" />
+		{{if page.version == 'work'}}
+			<div class="wbl-ribbon">Work</div>
+		{{/if}}
+	</div>
 	{{if !$.isEmptyObject(page.head.metadata.title) && !$.isEmptyObject(page.head.metadata.title[language])}}
 		<h2>${page.head.metadata.title[language]}</h2>
 	{{else}}
