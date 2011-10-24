@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.content;
 
+import java.util.List;
+
 /**
  * This extended <code>SearchResultItem</code> interface is intended for
  * resources that were found in the weblounge search index.
@@ -36,17 +38,27 @@ public interface ResourceSearchResultItem extends SearchResultItem {
   ResourceURI getResourceURI();
 
   /**
+   * Returns the full set of fields from the search index.
+   * 
+   * @return
+   */
+  List<ResourceMetadata<?>> getMetadata();
+
+  /**
+   * Returns the metadata item for the given key or <code>null</code> if that
+   * piece of metadata is not available.
+   * 
+   * @param key
+   *          the metadata key
+   * @return the resource metadata item
+   */
+  ResourceMetadata<?> getMetadataByKey(String key);
+
+  /**
    * Returns the resource's <code>XML</code> representation.
    * 
    * @return the full resource
    */
   String getResourceXml();
-
-  /**
-   * Returns alternate versions of this resource.
-   * 
-   * @return the alternate resource versions
-   */
-  long[] getAlternateVersions();
 
 }
