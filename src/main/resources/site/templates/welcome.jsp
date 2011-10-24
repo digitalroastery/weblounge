@@ -15,7 +15,7 @@
 			i18n: <webl:i18n key="greeting.hello"/> <webl:i18n key="greeting.world"/>
 		</div>
 		<greeter:greeting/>
-		<webl:composer name="main"/>
-		<webl:composer name="bottom"/>
+		<webl:composer id="main"/>
+		<webl:composer id="bottom"/>
 	</body>
 </html>

@@ -10,7 +10,7 @@
 		<webl:headers/>
 	</head>
 	<body>
-		<webl:composer name="main"/>
-		<webl:composer name="bottom"/>
+		<webl:composer id="main"/>
+		<webl:composer id="bottom"/>
 	</body>
 </html>
