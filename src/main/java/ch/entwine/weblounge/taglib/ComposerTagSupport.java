@@ -92,9 +92,6 @@ public class ComposerTagSupport extends WebloungeTag {
   /** True to enable content inheritance */
   protected boolean contentInheritanceEnabled = false;
 
-  /** The composer title */
-  protected String description = null;
-
   /** The underlying page */
   protected Page targetPage = null;
 
@@ -119,16 +116,8 @@ public class ComposerTagSupport extends WebloungeTag {
   /* Request attributes */
   protected final Map<String, Object> attributes = new HashMap<String, Object>();
 
-  /**
-   * Sets the composer identifier.
-   * 
-   * @param value
-   *          the composer identifier
-   */
-  @Override
-  public void setName(String value) {
-    id = value;
-    name = value;
+  public void setId(String id) {
+    this.id = id;
   }
 
   /**
@@ -161,15 +150,6 @@ public class ComposerTagSupport extends WebloungeTag {
    */
   public void setInherit(boolean inherit) {
     contentInheritanceEnabled = inherit;
-  }
-
-  /**
-   * Sets the composer title.
-   * 
-   * @see ch.entwine.weblounge.taglib.WebloungeTag#setTitle(java.lang.String)
-   */
-  public void setDescription(String value) {
-    description = value;
   }
 
   /**
@@ -334,16 +314,16 @@ public class ComposerTagSupport extends WebloungeTag {
             return;
           }
         } catch (SecurityException e) {
-          logger.warn("Composer '" + name + "' was unable to choose homepage as fallback: " + e.getMessage());
+          logger.warn("Composer '" + id + "' was unable to choose homepage as fallback: " + e.getMessage());
           return;
         } catch (ContentRepositoryException e) {
-          logger.warn("Composer '" + name + "' was unable to choose homepage as fallback: " + e.getMessage());
+          logger.warn("Composer '" + id + "' was unable to choose homepage as fallback: " + e.getMessage());
           return;
         }
       }
 
       Page contentProvider = targetPage;
-      Pagelet[] content = contentProvider.getPagelets(name);
+      Pagelet[] content = contentProvider.getPagelets(id);
 
       // If composer is empty and ghost content is enabled, go up the page
       // hierarchy and try to find content for this composer
@@ -367,9 +347,9 @@ public class ComposerTagSupport extends WebloungeTag {
                 logger.debug("Parent page {} could not be loaded", pageUrl);
                 return;
               }
-              content = contentProvider.getPagelets(name);
+              content = contentProvider.getPagelets(id);
             } catch (SecurityException e) {
-              logger.debug("Prevented loading of protected content from inherited page {} for composer {}", pageURI, name);
+              logger.debug("Prevented loading of protected content from inherited page {} for composer {}", pageURI, id);
             }
           }
         }
@@ -469,10 +449,10 @@ public class ComposerTagSupport extends WebloungeTag {
    */
   @Override
   public int doEndTag() throws JspException {
-    logger.debug("Rendering composer " + name);
+    logger.debug("Rendering composer " + id);
 
     Site site = request.getSite();
-    ComposerImpl composer = new ComposerImpl(name);
+    ComposerImpl composer = new ComposerImpl(id);
     JspWriter writer = pageContext.getOut();
 
     Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
@@ -484,7 +464,7 @@ public class ComposerTagSupport extends WebloungeTag {
       try {
 
         // Add tags for this composer
-        response.addTag(CacheTag.Composer, name);
+        response.addTag(CacheTag.Composer, id);
 
         // Flush all output so far
         writer.flush();
@@ -508,7 +488,7 @@ public class ComposerTagSupport extends WebloungeTag {
           if (targetPage != null) {
             String templateId = targetPage.getTemplate();
             PageTemplate template = site.getTemplate(templateId);
-            if (template != null && name.equalsIgnoreCase(template.getStage())) {
+            if (template != null && id.equalsIgnoreCase(template.getStage())) {
               template.setEnvironment(request.getEnvironment());
               if (htmlAction.startStage(request, response, composer) == HTMLAction.SKIP_COMPOSER) {
                 return EVAL_PAGE;
@@ -561,7 +541,7 @@ public class ComposerTagSupport extends WebloungeTag {
       return EVAL_PAGE;
     } catch (Throwable t) {
       response.invalidate();
-      String msg = "Exception when processing composer '" + name + "' on " + getRequest().getRequestedUrl();
+      String msg = "Exception when processing composer '" + id + "' on " + getRequest().getRequestedUrl();
       if (action != null)
         msg += " for action '" + action + "'";
       logger.error(msg, t);
@@ -610,7 +590,7 @@ public class ComposerTagSupport extends WebloungeTag {
 
       // Check publishing dates
       if (!(request.getVersion() == Resource.WORK) && !pagelet.isPublished()) {
-        logger.debug("Skipping pagelet " + position + " in composer " + name + " since it is not yet published");
+        logger.debug("Skipping pagelet " + position + " in composer " + id + " since it is not yet published");
         return;
       }
 
@@ -743,7 +723,6 @@ public class ComposerTagSupport extends WebloungeTag {
     contentIsInherited = false;
     contentProvider = null;
     debug = false;
-    description = null;
     initialized = false;
     pagelets = null;
     renderingState = RenderingState.Outside;
