@@ -49,6 +49,8 @@ public class PageSearchResultItemImpl extends AbstractResourceSearchResultItemIm
    * 
    * @param uri
    *          the page uri
+   * @param alternateVersions
+   *          alternate versions of this resource
    * @param url
    *          the url to show the hit
    * @param relevance
@@ -56,9 +58,9 @@ public class PageSearchResultItemImpl extends AbstractResourceSearchResultItemIm
    * @param source
    *          the object that produced the result item
    */
-  public PageSearchResultItemImpl(ResourceURI uri, WebUrl url,
-      double relevance, Object source) {
-    super(uri, url, relevance, source);
+  public PageSearchResultItemImpl(ResourceURI uri, long[] alternateVersions,
+      WebUrl url, double relevance, Object source) {
+    super(uri, alternateVersions, url, relevance, source);
   }
 
   /**
@@ -116,8 +118,8 @@ public class PageSearchResultItemImpl extends AbstractResourceSearchResultItemIm
    */
   public Page getPage() {
     if (resource == null) {
-      ResourceURI uri = new PageURIImpl(url.getSite(), url.getPath(), id, version);
-      resource = new LazyPageImpl(uri, pageXml, headerXml, previewXml);
+      ResourceURI pageURI = new PageURIImpl(uri.getSite(), uri.getPath(), uri.getIdentifier(), uri.getVersion());
+      resource = new LazyPageImpl(pageURI, pageXml, headerXml, previewXml);
     }
     return (Page) resource;
   }

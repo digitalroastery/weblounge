@@ -163,8 +163,10 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
    * @see ch.entwine.weblounge.common.content.ResourceMetadata#clear()
    */
   public void clear() {
-    values.clear();
-    localizedValues.clear();
+    if (values != null)
+      values.clear();
+    if (localizedValues != null)
+      localizedValues.clear();
   }
 
   /**

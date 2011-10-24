@@ -32,11 +32,16 @@ public abstract class AbstractResourceSearchResultItemImpl extends SearchResultI
   /** The resource uri */
   protected ResourceURI uri = null;
 
+  /** Other available versions of this resource */
+  protected long[] alternateVersions = new long[] {};
+
   /**
    * Creates a new resource search result item.
    * 
    * @param uri
    *          the resource uri
+   * @param alternateVersions
+   *          alternate available versions
    * @param url
    *          the resource url
    * @param relevance
@@ -44,10 +49,14 @@ public abstract class AbstractResourceSearchResultItemImpl extends SearchResultI
    * @param source
    *          the source of this search result item
    */
-  public AbstractResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
-      double relevance, Object source) {
-    super(uri.getIdentifier(), uri.getVersion(), uri.getSite(), url, relevance, source);
+  public AbstractResourceSearchResultItemImpl(ResourceURI uri,
+      long[] alternateVersions, WebUrl url, double relevance, Object source) {
+    super(uri.getIdentifier(), uri.getSite(), url, relevance, source);
     this.uri = uri;
+    if (alternateVersions != null)
+      this.alternateVersions = alternateVersions;
+    else
+      this.alternateVersions = new long[] {};
   }
 
   /**
@@ -66,6 +75,15 @@ public abstract class AbstractResourceSearchResultItemImpl extends SearchResultI
    */
   public String getType() {
     return uri.getType();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem#getAlternateVersions()
+   */
+  public long[] getAlternateVersions() {
+    return alternateVersions;
   }
 
 }

@@ -54,7 +54,7 @@ public class PageSearchResultItemImplTest extends SearchResultItemImplTest {
     setUpPrerequisites();
     pageXml = IOUtils.toString(getClass().getResourceAsStream("/page.xml"));
     ResourceURI uri = new PageURIImpl(site, path, id, Resource.LIVE);
-    pageItem = new PageSearchResultItemImpl(uri, url, relevance, source);
+    pageItem = new PageSearchResultItemImpl(uri, null, url, relevance, source);
     item = pageItem;
     item.setTitle(title);
     item.setPreview(previewData);
@@ -76,7 +76,7 @@ public class PageSearchResultItemImplTest extends SearchResultItemImplTest {
    */
   @Test
   public void testCompareToSearchResultItem() {
-    SearchResultItem nextItem = new SearchResultItemImpl(id, Resource.LIVE, site, url, relevance + 1.0, source);
+    SearchResultItem nextItem = new SearchResultItemImpl(id, site, url, relevance + 1.0, source);
     assertTrue(item.compareTo(nextItem) > 0);
   }
 

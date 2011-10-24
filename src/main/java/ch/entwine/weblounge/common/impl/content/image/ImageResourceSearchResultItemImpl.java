@@ -49,6 +49,8 @@ public class ImageResourceSearchResultItemImpl extends AbstractResourceSearchRes
    * 
    * @param uri
    *          the page uri
+   * @param alternateVersions
+   *          alternate versions of this resource
    * @param url
    *          the url to show the hit
    * @param relevance
@@ -56,9 +58,9 @@ public class ImageResourceSearchResultItemImpl extends AbstractResourceSearchRes
    * @param source
    *          the object that produced the result item
    */
-  public ImageResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
-      double relevance, Object source) {
-    super(uri, url, relevance, source);
+  public ImageResourceSearchResultItemImpl(ResourceURI uri,
+      long[] alternateVersions, WebUrl url, double relevance, Object source) {
+    super(uri, alternateVersions, url, relevance, source);
   }
 
   /**
