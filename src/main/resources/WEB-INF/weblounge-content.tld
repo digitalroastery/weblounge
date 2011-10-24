@@ -36,12 +36,11 @@
 		<tag-class>ch.entwine.weblounge.taglib.content.ComposerTag</tag-class>
 		<body-content>empty</body-content>
 
-		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>id</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>inherit</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>description</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>locked</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 
-		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>name</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>class</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>css</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>lang</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
