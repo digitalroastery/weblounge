@@ -20,25 +20,21 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.HEADER_XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.XML;
 
-import ch.entwine.weblounge.common.content.FileSearchResultItem;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
-import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.content.file.FileResource;
-import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileContentReader;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
@@ -50,7 +46,6 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.FileInputDocument;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -59,7 +54,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -158,43 +152,6 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.SearchResultItem)
-   */
-  public List<ResourceMetadata<?>> toMetadata(SearchResultItem searchResultItem) {
-    if (!(searchResultItem instanceof FileSearchResultItem))
-      throw new IllegalArgumentException("This serializer can only handle file search result items");
-    FileSearchResultItem fsri = (FileSearchResultItem) searchResultItem;
-    String resourceXml = fsri.getResourceXml();
-    Site site = searchResultItem.getSite();
-    try {
-      FileResource r = getReader().read(IOUtils.toInputStream(resourceXml, "UTF-8"), site);
-      List<ResourceMetadata<?>> metadata = toMetadata(r);
-
-      // Add alternate versions
-      if (((ResourceSearchResultItem) searchResultItem).getAlternateVersions().length > 0) {
-        List<Long> alternateVersions = new ArrayList<Long>();
-        for (long version : ((ResourceSearchResultItem) searchResultItem).getAlternateVersions()) {
-          alternateVersions.add(version);
-        }
-        metadata.add(new ResourceMetadataImpl<Long>(SolrSchema.ALTERNATE_VERSION, alternateVersions, null, false));
-      }
-
-      return metadata;
-    } catch (SAXException e) {
-      logger.warn("Error parsing resource " + searchResultItem.getId(), e);
-      return null;
-    } catch (IOException e) {
-      logger.warn("Error parsing resource " + searchResultItem.getId(), e);
-      return null;
-    } catch (ParserConfigurationException e) {
-      logger.warn("Error parsing resource " + searchResultItem.getId(), e);
-      return null;
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
    *      java.util.List)
    */
@@ -227,7 +184,6 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, List)
    */
-  @SuppressWarnings("unchecked")
   public SearchResultItem toSearchResultItem(Site site, double relevance,
       List<ResourceMetadata<?>> metadata) {
 
@@ -242,16 +198,6 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
     // resource version
     long version = (Long) metadataMap.get(VERSION).getValues().get(0);
 
-    // alternate versions
-    long[] alternateVersions = null;
-    if (metadataMap.get(SolrSchema.ALTERNATE_VERSION) != null) {
-      ResourceMetadata<Long> alternateVersionsMetadata = (ResourceMetadata<Long>) metadataMap.get(ALTERNATE_VERSION);
-      alternateVersions = new long[alternateVersionsMetadata.getValues().size()];
-      for (int i = 0; i < alternateVersions.length; i++) {
-        alternateVersions[i] = alternateVersionsMetadata.getValues().get(i);
-      }
-    }
-
     // path
     String path = null;
     if (metadataMap.get(PATH) != null)
@@ -263,7 +209,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
     ResourceURI uri = new FileResourceURIImpl(site, path, id, version);
     WebUrl url = new WebUrlImpl(site, path);
 
-    FileResourceSearchResultItemImpl result = new FileResourceSearchResultItemImpl(uri, alternateVersions, url, relevance, site);
+    FileResourceSearchResultItemImpl result = new FileResourceSearchResultItemImpl(uri, url, relevance, site, metadata);
 
     if (metadataMap.get(XML) != null)
       result.setFileXml((String) metadataMap.get(XML).getValues().get(0));

@@ -30,6 +30,7 @@ import static org.apache.solr.client.solrj.request.AbstractUpdateRequest.ACTION.
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
+import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
@@ -216,10 +217,11 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     String id = uri.getIdentifier();
     SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
     for (SearchResultItem existingResource : getByQuery(q).getItems()) {
-      List<ResourceMetadata<?>> solrFields = serializer.toMetadata(existingResource);
+      List<ResourceMetadata<?>> solrFields = ((ResourceSearchResultItem) existingResource).getMetadata();
+      ResourceMetadata<Long> versionField = null;
       for (ResourceMetadata<?> field : solrFields) {
         if (field.getName().equals(ALTERNATE_VERSION)) {
-          ResourceMetadata<Long> versionField = (ResourceMetadata<Long>) field;
+          versionField = (ResourceMetadata<Long>) field;
           List<Long> versions = ((ResourceMetadata<Long>) field).getValues();
           versionField.clear();
 
@@ -231,6 +233,8 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
           }
         }
       }
+      if (versionField != null && versionField.getValues().size() == 0)
+        solrFields.remove(versionField);
       SolrInputDocument doc = updateDocument(new SolrInputDocument(), solrFields);
       update(doc);
     }
@@ -263,7 +267,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
     List<Long> existingVersions = new ArrayList<Long>();
     for (SearchResultItem existingResource : getByQuery(q).getItems()) {
-      List<ResourceMetadata<?>> existingResourceMetadata = serializer.toMetadata(existingResource);
+      List<ResourceMetadata<?>> existingResourceMetadata = ((ResourceSearchResultItem) existingResource).getMetadata();
       boolean alternateVersionsFound = false;
       for (ResourceMetadata<?> field : existingResourceMetadata) {
         if (field.getName().equals(ALTERNATE_VERSION)) {
@@ -443,7 +447,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     }
 
     // Set the path
-    List<ResourceMetadata<?>> metadata = serializer.toMetadata(searchResult[0]);
+    List<ResourceMetadata<?>> metadata = ((ResourceSearchResultItem) searchResult[0]).getMetadata();
     Resource<?> resource = serializer.toResource(uri.getSite(), metadata);
     resource.setPath(path);
     metadata = serializer.toMetadata(resource);

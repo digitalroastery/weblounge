@@ -27,6 +27,7 @@ import org.apache.solr.client.solrj.impl.BinaryResponseParser;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrException;
+import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
@@ -109,8 +110,8 @@ public class SolrRequester {
   }
 
   /**
-   * Processes a solr request. If the request doesn't specify a handler, it
-   * is processed using the default <code>select</code> handler.
+   * Processes a solr request. If the request doesn't specify a handler, it is
+   * processed using the default <code>select</code> handler.
    * 
    * @param request
    *          the request
@@ -124,7 +125,7 @@ public class SolrRequester {
     String handlerName = query.getQueryType();
     if (StringUtils.isBlank(handlerName))
       handlerName = "search";
-    
+
     // Make sure the handler has been configured
     SolrRequestHandler handler = core.getRequestHandler(handlerName);
     if (handler == null)
@@ -132,7 +133,8 @@ public class SolrRequester {
 
     SolrQueryResponse rsp = new SolrQueryResponse();
     SolrParams params = SolrParams.toSolrParams(query.toNamedList());
-    SolrQueryRequest request = new SolrQueryRequestBase(core, params) { };
+    SolrQueryRequest request = new SolrQueryRequestBase(core, params) {
+    };
     core.execute(handler, request, rsp);
 
     if (rsp.getException() != null) {
@@ -168,6 +170,14 @@ public class SolrRequester {
     SolrParams params = request.getParams();
     if (params == null) {
       params = new ModifiableSolrParams();
+    }
+
+    // Remove fields that may have been added through search metadata
+    // transformations
+    if (request.getDocuments() != null) {
+      for (SolrInputDocument doc : request.getDocuments()) {
+        doc.removeField("score");
+      }
     }
 
     // Extract the handler from the path or params

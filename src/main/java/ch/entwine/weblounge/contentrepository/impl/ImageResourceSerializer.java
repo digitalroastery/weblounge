@@ -20,25 +20,21 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.HEADER_XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.XML;
 
-import ch.entwine.weblounge.common.content.ImageSearchResultItem;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
-import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
-import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageContentReader;
 import ch.entwine.weblounge.common.impl.content.image.ImageMetadata;
 import ch.entwine.weblounge.common.impl.content.image.ImageMetadataUtils;
@@ -53,7 +49,6 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.ImageInputDocument;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -64,7 +59,6 @@ import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -182,44 +176,6 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.SearchResultItem)
-   */
-  public List<ResourceMetadata<?>> toMetadata(SearchResultItem searchResultItem) {
-    if (!(searchResultItem instanceof ImageSearchResultItem))
-      throw new IllegalArgumentException("This serializer can only handle image search result items");
-    ImageSearchResultItem fsri = (ImageSearchResultItem) searchResultItem;
-    String resourceXml = fsri.getResourceXml();
-    ImageResource r;
-    try {
-      r = getReader().read(IOUtils.toInputStream(resourceXml), searchResultItem.getSite());
-    } catch (SAXException e) {
-      logger.warn("Error parsing image resource " + searchResultItem.getId(), e);
-      return null;
-    } catch (IOException e) {
-      logger.warn("Error parsing image resource " + searchResultItem.getId(), e);
-      return null;
-    } catch (ParserConfigurationException e) {
-      logger.warn("Error parsing image resource " + searchResultItem.getId(), e);
-      return null;
-    }
-
-    List<ResourceMetadata<?>> metadata = toMetadata(r);
-
-    // Add alternate versions information
-    if (((ResourceSearchResultItem) searchResultItem).getAlternateVersions().length > 0) {
-      List<Long> alternateVersions = new ArrayList<Long>();
-      for (long version : ((ResourceSearchResultItem) searchResultItem).getAlternateVersions()) {
-        alternateVersions.add(version);
-      }
-      metadata.add(new ResourceMetadataImpl<Long>(SolrSchema.ALTERNATE_VERSION, alternateVersions, null, false));
-    }
-
-    return metadata;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
    *      java.util.List)
    */
@@ -252,7 +208,6 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, List)
    */
-  @SuppressWarnings("unchecked")
   public SearchResultItem toSearchResultItem(Site site, double relevance,
       List<ResourceMetadata<?>> metadata) {
 
@@ -267,16 +222,6 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     // resource version
     long version = (Long) metadataMap.get(VERSION).getValues().get(0);
 
-    // alternate versions
-    long[] alternateVersions = null;
-    if (metadataMap.get(SolrSchema.ALTERNATE_VERSION) != null) {
-      ResourceMetadata<Long> alternateVersionsMetadata = (ResourceMetadata<Long>) metadataMap.get(ALTERNATE_VERSION);
-      alternateVersions = new long[alternateVersionsMetadata.getValues().size()];
-      for (int i = 0; i < alternateVersions.length; i++) {
-        alternateVersions[i] = alternateVersionsMetadata.getValues().get(i);
-      }
-    }
-
     // path
     String path = null;
     if (metadataMap.get(PATH) != null)
@@ -288,7 +233,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     ResourceURI uri = new ImageResourceURIImpl(site, path, id, version);
     WebUrl url = new WebUrlImpl(site, path);
 
-    ImageResourceSearchResultItemImpl result = new ImageResourceSearchResultItemImpl(uri, alternateVersions, url, relevance, site);
+    ImageResourceSearchResultItemImpl result = new ImageResourceSearchResultItemImpl(uri, url, relevance, site, metadata);
 
     if (metadataMap.get(XML) != null)
       result.setResourceXml((String) metadataMap.get(XML).getValues().get(0));

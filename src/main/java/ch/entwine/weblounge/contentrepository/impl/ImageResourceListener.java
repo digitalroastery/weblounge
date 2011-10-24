@@ -21,19 +21,9 @@
 package ch.entwine.weblounge.contentrepository.impl;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
-import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
-import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.content.image.ImagePreviewGenerator;
-import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.site.Module;
-import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceListener;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A listener for the life cycle of image resources that will perform certain
@@ -101,27 +91,27 @@ public class ImageResourceListener implements ResourceListener<ImageResource> {
    * @param resource
    *          the image resource
    */
-  private void createPreviews(ImageResource resource) {
-    Site site = resource.getURI().getSite();
-    List<ImageStyle> styles = new ArrayList<ImageStyle>();
-    
-    // Find all styles
-    for (Module m : site.getModules()) {
-      styles.addAll(Arrays.asList(m.getImageStyles()));
-    }
-
-    // Create the preview images
-    for (Language language : resource.languages()) {
-      for (ImageStyle style : styles) {
-        InputStream is = null;
-        try {
-          ImageContent content = resource.getContent(language);
-          //previewGenerator.createPreview(null, style, null, null);
-        } finally {
-          
-        }
-      }
-    }
-  }
+  // private void createPreviews(ImageResource resource) {
+  // Site site = resource.getURI().getSite();
+  // List<ImageStyle> styles = new ArrayList<ImageStyle>();
+  //
+  // // Find all styles
+  // for (Module m : site.getModules()) {
+  // styles.addAll(Arrays.asList(m.getImageStyles()));
+  // }
+  //
+  // // Create the preview images
+  // for (Language language : resource.languages()) {
+  // for (ImageStyle style : styles) {
+  // InputStream is = null;
+  // try {
+  // ImageContent content = resource.getContent(language);
+  // //previewGenerator.createPreview(null, style, null, null);
+  // } finally {
+  //
+  // }
+  // }
+  // }
+  // }
 
 }

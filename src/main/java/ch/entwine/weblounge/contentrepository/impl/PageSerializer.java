@@ -20,7 +20,6 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.HEADER_XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PREVIEW_XML;
@@ -28,18 +27,15 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.XML;
 
-import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
-import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PagePreviewGenerator;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
@@ -51,7 +47,6 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.PageInputDocument;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema;
 
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.ComponentContext;
@@ -61,7 +56,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,43 +160,6 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.SearchResultItem)
-   */
-  public List<ResourceMetadata<?>> toMetadata(SearchResultItem searchResultItem) {
-    if (!(searchResultItem instanceof PageSearchResultItem))
-      throw new IllegalArgumentException("This serializer can only handle page search result items");
-    PageSearchResultItem pageSearchResultItem = (PageSearchResultItem) searchResultItem;
-    String resourceXml = pageSearchResultItem.getResourceXml();
-
-    try {
-      Page page = getReader().read(IOUtils.toInputStream(resourceXml, "UTF-8"), searchResultItem.getSite());
-      List<ResourceMetadata<?>> metadata = toMetadata(page);
-
-      // Add alternate versions information
-      if (((ResourceSearchResultItem) searchResultItem).getAlternateVersions().length > 0) {
-        List<Long> alternateVersions = new ArrayList<Long>();
-        for (long version : ((ResourceSearchResultItem) searchResultItem).getAlternateVersions()) {
-          alternateVersions.add(version);
-        }
-        metadata.add(new ResourceMetadataImpl<Long>(SolrSchema.ALTERNATE_VERSION, alternateVersions, null, false));
-      }
-
-      return metadata;
-    } catch (SAXException e) {
-      logger.warn("Error parsing page " + searchResultItem.getId(), e);
-      return null;
-    } catch (IOException e) {
-      logger.warn("Error parsing page " + searchResultItem.getId(), e);
-      return null;
-    } catch (ParserConfigurationException e) {
-      logger.warn("Error parsing page " + searchResultItem.getId(), e);
-      return null;
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
    *      java.util.List)
    */
@@ -235,7 +192,6 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, List)
    */
-  @SuppressWarnings("unchecked")
   public SearchResultItem toSearchResultItem(Site site, double relevance,
       List<ResourceMetadata<?>> metadata) {
 
@@ -253,20 +209,10 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
     // resource version
     long version = (Long) metadataMap.get(VERSION).getValues().get(0);
 
-    // alternate versions
-    long[] alternateVersions = null;
-    if (metadataMap.get(SolrSchema.ALTERNATE_VERSION) != null) {
-      ResourceMetadata<Long> alternateVersionsMetadata = (ResourceMetadata<Long>) metadataMap.get(ALTERNATE_VERSION);
-      alternateVersions = new long[alternateVersionsMetadata.getValues().size()];
-      for (int i = 0; i < alternateVersions.length; i++) {
-        alternateVersions[i] = alternateVersionsMetadata.getValues().get(i);
-      }
-    }
-
     ResourceURI uri = new PageURIImpl(site, path, id, version);
     WebUrl url = new WebUrlImpl(site, path);
 
-    PageSearchResultItemImpl result = new PageSearchResultItemImpl(uri, alternateVersions, url, relevance, site);
+    PageSearchResultItemImpl result = new PageSearchResultItemImpl(uri, url, relevance, site, metadata);
 
     if (metadataMap.get(XML) != null)
       result.setResourceXml((String) metadataMap.get(XML).getValues().get(0));
