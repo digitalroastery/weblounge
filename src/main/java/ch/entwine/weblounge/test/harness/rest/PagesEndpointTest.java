@@ -292,7 +292,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
 
     String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
     HttpPost createPageRequest = new HttpPost(requestUrl);
-    String newPageId = null;
+    String referringPageId = null;
 
     // Create a new page and add a pagelet with a link to the original page
     logger.debug("Creating new page");
@@ -306,15 +306,15 @@ public class PagesEndpointTest extends IntegrationTestBase {
       assertNotNull(response.getHeaders("Location"));
       String locationHeader = response.getHeaders("Location")[0].getValue();
       assertTrue(locationHeader.startsWith(serverUrl));
-      newPageId = locationHeader.substring(locationHeader.lastIndexOf("/") + 1);
-      logger.debug("Id of the new page is {}", newPageId);
+      referringPageId = locationHeader.substring(locationHeader.lastIndexOf("/") + 1);
+      logger.debug("Id of the new page is {}", referringPageId);
 
       httpClient.getConnectionManager().shutdown();
       httpClient = new DefaultHttpClient();
 
       // Load the created page
-      String newPageUrl = UrlUtils.concat(requestUrl, newPageId, "?version=1");
-      HttpGet getPageRequest = new HttpGet(newPageUrl);
+      String referringPageUrl = UrlUtils.concat(requestUrl, referringPageId, "?version=1");
+      HttpGet getPageRequest = new HttpGet(referringPageUrl);
       response = TestUtils.request(httpClient, getPageRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       String pageXml = TestUtils.parseTextResponse(response);
@@ -323,7 +323,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
       httpClient = new DefaultHttpClient();
 
       // Lock the page
-      HttpPut lockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, newPageId, "lock"));
+      HttpPut lockPageRequest = new HttpPut(UrlUtils.concat(requestUrl, referringPageId, "lock"));
       logger.info("Locking the page at {}", requestUrl);
       response = TestUtils.request(httpClient, lockPageRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
@@ -337,14 +337,14 @@ public class PagesEndpointTest extends IntegrationTestBase {
       String pageletPublication = "<published><user id=\"hans\" realm=\"testland\"><![CDATA[Hans Muster]]></user><from>2009-01-07T19:05:41Z</from></published>";
       String pageletProperties = "<properties><property id=\"resourceid\"><![CDATA[" + pageId + "]]></property></properties>";
       pageXml = pageXml.replaceAll("<body/>", "<body><composer id=\"main\"><pagelet module=\"navigation\" id=\"link\">" + pageletSecurity + pageletCreation + pageletPublication + pageletProperties + "</pagelet></composer></body>");
-      HttpPut updatePageRequest = new HttpPut(newPageUrl);
+      HttpPut updatePageRequest = new HttpPut(referringPageUrl);
       String[][] params = new String[][] { { "content", pageXml } };
-      logger.info("Updating page at {}", newPageUrl);
+      logger.info("Updating page at {}", referringPageUrl);
       response = TestUtils.request(httpClient, updatePageRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
 
       // Publish it
-      HttpPut publishPageRequest = new HttpPut(UrlUtils.concat(requestUrl, newPageId, "publish"));
+      HttpPut publishPageRequest = new HttpPut(UrlUtils.concat(requestUrl, referringPageId, "publish"));
       httpClient = new DefaultHttpClient();
       logger.info("Publishing the page at {}", requestUrl);
       response = TestUtils.request(httpClient, publishPageRequest, null);
@@ -364,13 +364,13 @@ public class PagesEndpointTest extends IntegrationTestBase {
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       Document referrer = TestUtils.parseXMLResponse(response);
       assertEquals(1, XPathHelper.selectList(referrer, "/pages/page").getLength());
-      assertEquals(newPageId, XPathHelper.valueOf(referrer, "/pages/page/@id"));
+      assertEquals(referringPageId, XPathHelper.valueOf(referrer, "/pages/page/@id"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
 
     // Delete the new page
-    HttpDelete deleteRequest = new HttpDelete(UrlUtils.concat(requestUrl, newPageId));
+    HttpDelete deleteRequest = new HttpDelete(UrlUtils.concat(requestUrl, referringPageId));
     httpClient = new DefaultHttpClient();
 
     // Delete the page
