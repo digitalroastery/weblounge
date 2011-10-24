@@ -129,7 +129,7 @@ public class EnvironmentService implements ManagedService {
 
     // Environment
     Environment env = null;
-    String environmentValue = (String) properties.get(OPT_ENVIRONMENT);
+    String environmentValue = StringUtils.trimToNull((String) properties.get(OPT_ENVIRONMENT));
     if (StringUtils.isNotBlank(environmentValue)) {
       try {
         env = Environment.valueOf(StringUtils.capitalize(environmentValue));
