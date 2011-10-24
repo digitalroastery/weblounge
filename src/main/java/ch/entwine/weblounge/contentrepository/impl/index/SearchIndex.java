@@ -66,7 +66,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A Solr-based search index implementation.
@@ -446,11 +448,20 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       return false;
     }
 
-    // Set the path
+    // Prepare the search metadata as a map, keep a reference to the path
     List<ResourceMetadata<?>> metadata = ((ResourceSearchResultItem) searchResult[0]).getMetadata();
+    Map<String, ResourceMetadata<?>> metadataMap = new HashMap<String, ResourceMetadata<?>>();
+    for (ResourceMetadata<?> m : metadata) {
+      metadataMap.put(m.getName(), m);
+    }
+
+    // Add the updated metadata, keep the rest
     Resource<?> resource = serializer.toResource(uri.getSite(), metadata);
     resource.setPath(path);
-    metadata = serializer.toMetadata(resource);
+    for (ResourceMetadata<?> m : serializer.toMetadata(resource)) {
+      metadataMap.put(m.getName(), m);
+    }
+    metadata = new ArrayList<ResourceMetadata<?>>(metadataMap.values());
 
     // Read the current resource and post the updated data to the search index
     try {
