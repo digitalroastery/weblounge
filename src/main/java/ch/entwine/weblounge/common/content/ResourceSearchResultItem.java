@@ -42,4 +42,11 @@ public interface ResourceSearchResultItem extends SearchResultItem {
    */
   String getResourceXml();
 
+  /**
+   * Returns alternate versions of this resource.
+   * 
+   * @return the alternate resource versions
+   */
+  long[] getAlternateVersions();
+
 }
