@@ -379,7 +379,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
-    // q.withVersion(Resource.LIVE);
+    q.withVersion(Resource.LIVE);
     q.withProperty("resourceid", pageId);
 
     ContentRepository repository = getContentRepository(site, false);
