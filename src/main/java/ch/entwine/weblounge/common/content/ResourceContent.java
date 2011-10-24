@@ -46,7 +46,7 @@ public interface ResourceContent extends Creatable {
   String getFilename();
 
   /**
-   * Sets the resource source.
+   * Sets the identifier that was used when the content was initially acquired.
    * 
    * @param source
    *          the source
@@ -54,7 +54,7 @@ public interface ResourceContent extends Creatable {
   void setSource(String source);
 
   /**
-   * Returns the resource source.
+   * Returns the resource content's original identifier.
    * 
    * @return the source
    */
