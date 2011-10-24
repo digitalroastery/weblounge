@@ -26,7 +26,7 @@ package ch.entwine.weblounge.contentrepository;
 public interface VersionedContentRepositoryIndex {
 
   /** Version of this index */
-  int INDEX_VERSION = 3003;
+  int INDEX_VERSION = 3005;
 
   /**
    * Returns the index's version number. If that number is different from
