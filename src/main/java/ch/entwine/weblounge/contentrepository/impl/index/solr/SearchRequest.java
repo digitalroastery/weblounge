@@ -391,7 +391,13 @@ public class SearchRequest {
         String name = entry.getKey();
         ResourceMetadata<Object> m = new ResourceMetadataImpl<Object>(name);
         // TODO: Add values with more care (localized, correct type etc.)
-        m.addValue(entry.getValue());
+        if (entry.getValue() instanceof List) {
+          for (Object v : ((List<?>) entry.getValue())) {
+            m.addValue(v);
+          }
+        } else {
+          m.addValue(entry.getValue());
+        }
         metadata.add(m);
       }
 

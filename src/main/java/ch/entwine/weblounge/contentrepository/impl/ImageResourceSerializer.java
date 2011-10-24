@@ -20,9 +20,11 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.HEADER_XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.XML;
 
 import ch.entwine.weblounge.common.content.ImageSearchResultItem;
@@ -31,10 +33,12 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
+import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
+import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageContentReader;
 import ch.entwine.weblounge.common.impl.content.image.ImageMetadata;
 import ch.entwine.weblounge.common.impl.content.image.ImageMetadataUtils;
@@ -60,6 +64,7 @@ import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -197,7 +202,19 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
       logger.warn("Error parsing image resource " + searchResultItem.getId(), e);
       return null;
     }
-    return toMetadata(r);
+
+    List<ResourceMetadata<?>> metadata = toMetadata(r);
+
+    // Add alternate versions information
+    if (((ResourceSearchResultItem) searchResultItem).getAlternateVersions().length > 0) {
+      List<Long> alternateVersions = new ArrayList<Long>();
+      for (long version : ((ResourceSearchResultItem) searchResultItem).getAlternateVersions()) {
+        alternateVersions.add(version);
+      }
+      metadata.add(new ResourceMetadataImpl<Long>(SolrSchema.ALTERNATE_VERSION, alternateVersions, null, false));
+    }
+
+    return metadata;
   }
 
   /**
@@ -235,6 +252,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, List)
    */
+  @SuppressWarnings("unchecked")
   public SearchResultItem toSearchResultItem(Site site, double relevance,
       List<ResourceMetadata<?>> metadata) {
 
@@ -243,8 +261,23 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
       metadataMap.put(metadataItem.getName(), metadataItem);
     }
 
+    // resource id
     String id = (String) metadataMap.get(RESOURCE_ID).getValues().get(0);
-    long version = (Long) metadataMap.get(SolrSchema.VERSION).getValues().get(0);
+
+    // resource version
+    long version = (Long) metadataMap.get(VERSION).getValues().get(0);
+
+    // alternate versions
+    long[] alternateVersions = null;
+    if (metadataMap.get(SolrSchema.ALTERNATE_VERSION) != null) {
+      ResourceMetadata<Long> alternateVersionsMetadata = (ResourceMetadata<Long>) metadataMap.get(ALTERNATE_VERSION);
+      alternateVersions = new long[alternateVersionsMetadata.getValues().size()];
+      for (int i = 0; i < alternateVersions.length; i++) {
+        alternateVersions[i] = alternateVersionsMetadata.getValues().get(i);
+      }
+    }
+
+    // path
     String path = null;
     if (metadataMap.get(PATH) != null)
       path = (String) metadataMap.get(PATH).getValues().get(0);
@@ -255,7 +288,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     ResourceURI uri = new ImageResourceURIImpl(site, path, id, version);
     WebUrl url = new WebUrlImpl(site, path);
 
-    ImageResourceSearchResultItemImpl result = new ImageResourceSearchResultItemImpl(uri, url, relevance, site);
+    ImageResourceSearchResultItemImpl result = new ImageResourceSearchResultItemImpl(uri, alternateVersions, url, relevance, site);
 
     if (metadataMap.get(XML) != null)
       result.setResourceXml((String) metadataMap.get(XML).getValues().get(0));

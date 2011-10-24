@@ -43,8 +43,8 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SearchRequest;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrRequester;
+import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SuggestRequest;
 
 import org.apache.commons.io.FileUtils;
@@ -218,14 +218,14 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     for (SearchResultItem existingResource : getByQuery(q).getItems()) {
       List<ResourceMetadata<?>> solrFields = serializer.toMetadata(existingResource);
       for (ResourceMetadata<?> field : solrFields) {
-        if (field.getName().equals(SolrSchema.ALTERNATE_VERSION)) {
+        if (field.getName().equals(ALTERNATE_VERSION)) {
           ResourceMetadata<Long> versionField = (ResourceMetadata<Long>) field;
           List<Long> versions = ((ResourceMetadata<Long>) field).getValues();
           versionField.clear();
 
           // Add the remaining versions back
           for (Long l : versions) {
-            if (l != uri.getVersion()) {
+            if (l.longValue() != uri.getVersion()) {
               versionField.addValue(l);
             }
           }

@@ -309,9 +309,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     String originalPathPrefix = uri.getPath();
 
     // Move the resource itself
-    // TODO: Replace with search in path index. Like this, moving non-published
-    // resources will fail
-    SearchQuery q = new SearchQueryImpl(site).withType(Page.TYPE).withPathPrefix(originalPathPrefix);
+    SearchQuery q = new SearchQueryImpl(site).withPreferredVersion(Resource.LIVE).withPathPrefix(originalPathPrefix);
     SearchResult result = index.find(q);
     if (result.getDocumentCount() == 0) {
       logger.warn("Trying to move non existing resource {}", uri);
@@ -340,7 +338,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
         // Load the resource, adjust the path and store it again
         Resource<?> r = get(movedURI);
-        movedURI.setPath(newPath);
+        r.getURI().setPath(newPath);
         storeResource(r);
 
         // Update the index

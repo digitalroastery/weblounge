@@ -20,9 +20,11 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.HEADER_XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.XML;
 
 import ch.entwine.weblounge.common.content.ImageSearchResultItem;
@@ -31,10 +33,12 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
+import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.movie.MovieContent;
 import ch.entwine.weblounge.common.content.movie.MovieResource;
+import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieContentReader;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceReader;
@@ -55,6 +59,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -181,7 +186,19 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
       logger.warn("Error parsing audio visual resource " + searchResultItem.getId(), e);
       return null;
     }
-    return toMetadata(r);
+
+    List<ResourceMetadata<?>> metadata = toMetadata(r);
+
+    // Add alternate versions information
+    if (((ResourceSearchResultItem) searchResultItem).getAlternateVersions().length > 0) {
+      List<Long> alternateVersions = new ArrayList<Long>();
+      for (long version : ((ResourceSearchResultItem) searchResultItem).getAlternateVersions()) {
+        alternateVersions.add(version);
+      }
+      metadata.add(new ResourceMetadataImpl<Long>(SolrSchema.ALTERNATE_VERSION, alternateVersions, null, false));
+    }
+
+    return metadata;
   }
 
   /**
@@ -219,6 +236,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, List)
    */
+  @SuppressWarnings("unchecked")
   public SearchResultItem toSearchResultItem(Site site, double relevance,
       List<ResourceMetadata<?>> metadata) {
 
@@ -227,8 +245,23 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
       metadataMap.put(metadataItem.getName(), metadataItem);
     }
 
+    // resource id
     String id = (String) metadataMap.get(RESOURCE_ID).getValues().get(0);
-    long version = (Long) metadataMap.get(SolrSchema.VERSION).getValues().get(0);
+
+    // resource version
+    long version = (Long) metadataMap.get(VERSION).getValues().get(0);
+
+    // alternate versions
+    long[] alternateVersions = null;
+    if (metadataMap.get(SolrSchema.ALTERNATE_VERSION) != null) {
+      ResourceMetadata<Long> alternateVersionsMetadata = (ResourceMetadata<Long>) metadataMap.get(ALTERNATE_VERSION);
+      alternateVersions = new long[alternateVersionsMetadata.getValues().size()];
+      for (int i = 0; i < alternateVersions.length; i++) {
+        alternateVersions[i] = alternateVersionsMetadata.getValues().get(i);
+      }
+    }
+
+    // path
     String path = null;
     if (metadataMap.get(PATH) != null)
       path = (String) metadataMap.get(PATH).getValues().get(0);
@@ -239,7 +272,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
     ResourceURI uri = new MovieResourceURIImpl(site, path, id, version);
     WebUrl url = new WebUrlImpl(site, path);
 
-    MovieResourceSearchResultItemImpl result = new MovieResourceSearchResultItemImpl(uri, url, relevance, site);
+    MovieResourceSearchResultItemImpl result = new MovieResourceSearchResultItemImpl(uri, alternateVersions, url, relevance, site);
 
     if (metadataMap.get(XML) != null)
       result.setResourceXml((String) metadataMap.get(XML).getValues().get(0));

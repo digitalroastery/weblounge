@@ -625,8 +625,7 @@ public class ContentRepositoryIndex {
     pathIdx.set(address, newURI.getPath());
 
     for (long version : versions) {
-      if (version == Resource.LIVE)
-        searchIdx.move(uri, newURI.getPath());
+      searchIdx.move(new ResourceURIImpl(uri, version), newURI.getPath());
     }
   }
 
