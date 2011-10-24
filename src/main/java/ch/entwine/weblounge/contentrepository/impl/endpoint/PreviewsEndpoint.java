@@ -56,10 +56,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -113,7 +115,8 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
   public Response getPreview(@Context HttpServletRequest request,
       @PathParam("resource") String resourceId,
       @PathParam("language") String languageId,
-      @PathParam("style") String styleId) {
+      @PathParam("style") String styleId,
+      @QueryParam("version") @DefaultValue("0") long version) {
 
     // Check the parameters
     if (resourceId == null)
@@ -121,7 +124,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
 
     // Get the resource
     final Site site = getSite(request);
-    final Resource<?> resource = loadResource(request, resourceId, null);
+    final Resource<?> resource = loadResource(request, resourceId, null, version);
     if (resource == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
@@ -205,6 +208,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       basename = resource.getIdentifier();
     String suffix = previewGenerator.getSuffix(resource, language, style);
     filename.append(basename);
+    filename.append("-").append(version);
     filename.append("-").append(language.getIdentifier());
     if (StringUtils.isNotBlank(suffix)) {
       filename.append(".").append(suffix);

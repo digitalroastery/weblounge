@@ -55,6 +55,8 @@ public final class PreviewsEndpointDocs {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "previews");
     docs.setTitle("Weblounge Previews");
 
+    String[] versions = { "0", "1" };
+
     // GET /{resource}/locales/{language}/styles/{styleid}
     Endpoint getScaleLocalizedImage = new Endpoint("/{resource}/locales/{language}/styles/{style}", Method.GET, "localizedstyledimage");
     getScaleLocalizedImage.setDescription("Returns a scaled version of the resource with the given identifier and language");
@@ -68,6 +70,7 @@ public final class PreviewsEndpointDocs {
     getScaleLocalizedImage.addPathParameter(new Parameter("resource", Parameter.Type.String, "The resource identifier"));
     getScaleLocalizedImage.addPathParameter(new Parameter("language", Parameter.Type.String, "The language identifier"));
     getScaleLocalizedImage.addPathParameter(new Parameter("style", Parameter.Type.String, "The image style identifier"));
+    getScaleLocalizedImage.addOptionalParameter(new Parameter("version", Parameter.Type.String, "The version", "0", versions));
     getScaleLocalizedImage.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getScaleLocalizedImage);
 

@@ -433,7 +433,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     storeResource(resource);
 
     // Create the preview images. Don't if the site is currently being created.
-    if (updatePreviews && connected && !initializing && resource.getURI().getVersion() == Resource.LIVE)
+    if (updatePreviews && connected && !initializing)
       createPreviews(resource);
 
     return resource;
@@ -481,7 +481,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     index.update(resource);
 
     // Create the preview images
-    if (connected && !initializing && resource.getURI().getVersion() == Resource.LIVE)
+    if (connected && !initializing)
       createPreviews(resource);
 
     // Make sure related stuff gets thrown out of the cache
@@ -649,6 +649,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         else
           basename = resource.getIdentifier();
         filename.append(basename);
+        filename.append("-").append(resource.getVersion());
         filename.append("-").append(language.getIdentifier());
 
         String suffix = previewGenerator.getSuffix(resource, language, style);
