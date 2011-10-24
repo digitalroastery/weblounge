@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.security.User;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URL;
 import java.util.Date;
 
 /**
@@ -61,6 +62,9 @@ public class FileContentImplTest {
   /** The source file */
   protected String source = "http://entwinmedia.com/filexyz.ogg";
 
+  /** The external location */
+  protected String externalLocation = "http://www.youtube.com/watch?v=UF8uR6Z6KLc";
+
   /** The creation date */
   protected Date creationDate = new Date(1231358741000L);
 
@@ -78,6 +82,7 @@ public class FileContentImplTest {
     content = new FileContentImpl(filename, german, mimetype, size);
     content.setMimetype(mimetype);
     content.setSource(source);
+    content.setExternalLocation(new URL(externalLocation));
     content.setAuthor(author);
     ((FileContentImpl) content).setCreated(creationDate, amelie);
   }
@@ -120,6 +125,16 @@ public class FileContentImplTest {
   @Test
   public void testGetSource() {
     assertEquals(source, content.getSource());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileContentImpl#getExternalLocation()}
+   * .
+   */
+  @Test
+  public void testGetExternalLocation() {
+    assertEquals(externalLocation, content.getExternalLocation().toExternalForm());
   }
 
   /**

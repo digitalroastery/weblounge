@@ -35,6 +35,8 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -174,6 +176,16 @@ public abstract class ResourceContentReaderImpl<T extends ResourceContent> exten
     else if ("source".equals(raw)) {
       content.setSource(getCharacters());
       logger.trace("Content's source is '{}'", content.getSource());
+    }
+
+    // external
+    else if ("external".equals(raw)) {
+      try {
+        content.setExternalLocation(new URL(getCharacters()));
+      } catch (MalformedURLException e) {
+        throw new SAXException(e);
+      }
+      logger.trace("Content's external location is '{}'", content.getSource());
     }
 
     // author

@@ -347,6 +347,8 @@ public class ResourceContentImpl implements ResourceContent {
       buf.append("<filename><![CDATA[").append(filename).append("]]></filename>");
     if (source != null)
       buf.append("<source>").append(source).append("</source>");
+    if (externalLocation != null)
+      buf.append("<external>").append(externalLocation).append("</external>");
     if (!StringUtils.isBlank(author))
       buf.append("<author><![CDATA[").append(author).append("]]></author>");
     if (mimetype != null)
