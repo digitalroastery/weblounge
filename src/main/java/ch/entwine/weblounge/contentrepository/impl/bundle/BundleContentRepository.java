@@ -320,6 +320,9 @@ public class BundleContentRepository extends AbstractContentRepository implement
     // Make sure the version matches the implementation
     if (index.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
       logger.warn("Index version does not match implementation, triggering reindex");
+      FileUtils.deleteQuietly(idxRootDir);
+      FileUtils.forceMkdir(idxRootDir);
+      index = new BundleContentRepositoryIndex(idxRootDir);
     }
 
     // Is there an existing index?

@@ -208,7 +208,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
       idx.seek(IDX_START_OF_HEADER);
       this.indexVersion = idx.readInt();
       if (indexVersion != INDEX_VERSION)
-        logger.warn("URI index version mismatch (found {}, expected {}), consider reindex", indexVersion, INDEX_VERSION);
+        logger.debug("URI index version mismatch (found {}, expected {}), consider reindex", indexVersion, INDEX_VERSION);
       this.bytesPerId = idx.readInt();
       this.bytesPerType = idx.readInt();
       this.bytesPerPath = idx.readInt();
@@ -597,7 +597,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     this.bytesPerSlot = bytesPerId + bytesPerType + bytesPerPath;
     this.entries = 0;
 
-    logger.info("Creating uri index with {} bytes per entry", bytesPerSlot);
+    logger.debug("Creating uri index with {} bytes per entry", bytesPerSlot);
 
     // Write header
     idx.seek(IDX_START_OF_HEADER);

@@ -200,7 +200,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
       idx.seek(IDX_START_OF_HEADER);
       this.indexVersion = idx.readInt();
       if (indexVersion != INDEX_VERSION)
-        logger.warn("Version index version mismatch (found {}, expected {}), consider reindex", indexVersion, INDEX_VERSION);
+        logger.debug("Version index version mismatch (found {}, expected {}), consider reindex", indexVersion, INDEX_VERSION);
       this.bytesPerId = idx.readInt();
       this.versionsPerEntry = idx.readInt();
       this.slots = idx.readLong();
@@ -596,7 +596,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
     this.slots = 0;
     this.entries = 0;
 
-    logger.info("Creating version index with {} bytes per entry", slotSizeInBytes);
+    logger.debug("Creating version index with {} bytes per entry", slotSizeInBytes);
 
     // Write header
     idx.seek(IDX_START_OF_HEADER);

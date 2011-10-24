@@ -20,10 +20,10 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.HEADER_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.HEADER_XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.XML;
 
 import ch.entwine.weblounge.common.content.ImageSearchResultItem;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
@@ -49,6 +49,7 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.ImageInputDocument;
+import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -167,7 +168,10 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
    */
   public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
-    return new ImageInputDocument((ImageResource) resource).getMetadata();
+    if (resource != null) {
+      return new ImageInputDocument((ImageResource) resource).getMetadata();
+    }
+    return null;
   }
 
   /**
@@ -239,7 +243,8 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
       metadataMap.put(metadataItem.getName(), metadataItem);
     }
 
-    String id = (String) metadataMap.get(ID).getValues().get(0);
+    String id = (String) metadataMap.get(RESOURCE_ID).getValues().get(0);
+    long version = (Long) metadataMap.get(SolrSchema.VERSION).getValues().get(0);
     String path = null;
     if (metadataMap.get(PATH) != null)
       path = (String) metadataMap.get(PATH).getValues().get(0);
@@ -247,7 +252,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
       path = URI_PREFIX + "/" + id;
     }
 
-    ResourceURI uri = new ImageResourceURIImpl(site, path, id, Resource.LIVE);
+    ResourceURI uri = new ImageResourceURIImpl(site, path, id, version);
     WebUrl url = new WebUrlImpl(site, path);
 
     ImageResourceSearchResultItemImpl result = new ImageResourceSearchResultItemImpl(uri, url, relevance, site);

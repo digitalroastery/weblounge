@@ -46,6 +46,7 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
@@ -217,6 +218,17 @@ public class SearchIndexTest {
   @After
   public void tearDown() throws Exception {
     idx.clear();
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#getIndexVersion()}
+   * .
+   */
+  @Test
+  public void testGetIndexVersion() {
+    populateIndex();
+    assertEquals(VersionedContentRepositoryIndex.INDEX_VERSION, idx.getIndexVersion());
   }
 
   /**
@@ -603,7 +615,8 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#clear()}.
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#clear()}
+   * .
    */
   @Test
   public void testClear() {

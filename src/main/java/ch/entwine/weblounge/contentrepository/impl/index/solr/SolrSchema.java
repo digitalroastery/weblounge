@@ -23,9 +23,13 @@ package ch.entwine.weblounge.contentrepository.impl.index.solr;
 /**
  * Interface defining the mapping between data and field names in solr.
  */
-public interface SolrFields {
+public interface SolrSchema {
 
+  /** The unique identifier */
   String ID = "id";
+
+  /** Resource identifier */
+  String RESOURCE_ID = "resourceid";
 
   /** Path field name */
   String PATH = "path";
@@ -39,11 +43,17 @@ public interface SolrFields {
   /** Version field name */
   String VERSION = "version";
 
+  /** Alternate version field name */
+  String ALTERNATE_VERSION = "alternate_version";
+
   /** Subjects field name */
   String SUBJECT = "subjects";
 
   /** Template field name */
   String TEMPLATE = "template";
+
+  /** Stationary field name */
+  String STATIONARY = "stationary";
 
   /** Series field name */
   String SERIES = "series";
@@ -152,6 +162,9 @@ public interface SolrFields {
 
   /** Resource content source field name */
   String CONTENT_SOURCE = "content_source";
+
+  /** Resource content external representation field name */
+  String CONTENT_EXTERNAL_REPRESENTATION = "content_external_representation";
 
   /** Resource content filename field name */
   String CONTENT_FILENAME = "content_filename";

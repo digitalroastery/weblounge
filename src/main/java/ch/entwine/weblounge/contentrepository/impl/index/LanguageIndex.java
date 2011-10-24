@@ -205,7 +205,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
     try {
       this.indexVersion = idx.readInt();
       if (indexVersion != INDEX_VERSION)
-        logger.warn("Language index version mismatch (found {}, expected {}), consider reindex", indexVersion, INDEX_VERSION);
+        logger.debug("Language index version mismatch (found {}, expected {}), consider reindex", indexVersion, INDEX_VERSION);
       this.bytesPerId = idx.readInt();
       this.languagesPerSlot = idx.readInt();
       this.slots = idx.readLong();
@@ -652,7 +652,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
     this.slots = 0;
     this.entries = 0;
 
-    logger.info("Creating language index with {} bytes per entry", bytesPerSlot);
+    logger.debug("Creating language index with {} bytes per entry", bytesPerSlot);
 
     // Write header
     idx.seek(IDX_START_OF_HEADER);

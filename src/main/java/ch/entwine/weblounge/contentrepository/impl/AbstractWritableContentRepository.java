@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import ch.entwine.weblounge.cache.ResponseCacheTracker;
 import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;

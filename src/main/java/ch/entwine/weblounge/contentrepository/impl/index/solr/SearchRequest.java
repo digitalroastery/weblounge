@@ -20,31 +20,33 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index.solr;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_SOURCE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.FULLTEXT;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PARENT_ELEMENTS;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SCORE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SERIES;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECT;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_BOOST;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_LOCALIZED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_EXTERNAL_REPRESENTATION;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_FILENAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_MIMETYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_SOURCE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CREATED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CREATED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.FULLTEXT;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.MODIFIED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.MODIFIED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_CONTENTS;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_PROPERTIES;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_TYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_TYPE_COMPOSER;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PARENT_ELEMENTS;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_FROM;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.SCORE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.SERIES;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.SUBJECT;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TEMPLATE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TITLE_BOOST;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TITLE_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TYPE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils.clean;
 
 import ch.entwine.weblounge.common.content.ResourceMetadata;
@@ -58,6 +60,7 @@ import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.entwine.weblounge.contentrepository.impl.index.SearchIndex;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -115,16 +118,19 @@ public class SearchRequest {
     // Build the solr query string
     StringBuilder solrQuery = new StringBuilder();
 
-    // Id
+    // Hide the root entry
+    andNot(solrQuery, ID, Long.toString(SearchIndex.ROOT_ID), true, true);
+
+    // Resource id
     if (query.getIdentifier() != null) {
-      and(solrQuery, ID, query.getIdentifier(), true, true);
+      and(solrQuery, RESOURCE_ID, query.getIdentifier(), true, true);
     }
 
     // Version / Preferred version
     if (query.getPreferredVersion() >= 0) {
-      and(solrQuery, SolrFields.VERSION, Long.toString(query.getPreferredVersion()), false, false);
+      andNot(solrQuery, SolrSchema.ALTERNATE_VERSION, Long.toString(query.getPreferredVersion()), false, false);
     } else if (query.getVersion() >= 0) {
-      and(solrQuery, SolrFields.VERSION, Long.toString(query.getVersion()), false, false);
+      and(solrQuery, SolrSchema.VERSION, Long.toString(query.getVersion()), false, false);
     }
 
     // Path
@@ -159,6 +165,11 @@ public class SearchRequest {
     // Template
     if (query.getTemplate() != null) {
       and(solrQuery, TEMPLATE, query.getTemplate(), true, true);
+    }
+
+    // Stationary
+    if (query.isStationary()) {
+      and(solrQuery, SolrSchema.STATIONARY, Boolean.TRUE.toString(), false, false);
     }
 
     // Creator
@@ -250,6 +261,11 @@ public class SearchRequest {
       and(solrQuery, CONTENT_SOURCE, query.getSource(), true, true);
     }
 
+    // Content external location
+    if (query.getExternalLocation() != null) {
+      and(solrQuery, CONTENT_EXTERNAL_REPRESENTATION, query.getExternalLocation().toExternalForm(), true, true);
+    }
+
     // Content mime types
     if (query.getMimetype() != null) {
       and(solrQuery, CONTENT_MIMETYPE, query.getMimetype(), true, true);
@@ -292,10 +308,10 @@ public class SearchRequest {
     if (!SearchQuery.Order.None.equals(query.getPublishingDateSortOrder())) {
       switch (query.getPublishingDateSortOrder()) {
         case Ascending:
-          q.addSortField(SolrFields.PUBLISHED_FROM, ORDER.asc);
+          q.addSortField(SolrSchema.PUBLISHED_FROM, ORDER.asc);
           break;
         case Descending:
-          q.addSortField(SolrFields.PUBLISHED_FROM, ORDER.desc);
+          q.addSortField(SolrSchema.PUBLISHED_FROM, ORDER.desc);
           break;
         case None:
         default:
@@ -307,10 +323,10 @@ public class SearchRequest {
     else if (!SearchQuery.Order.None.equals(query.getModificationDateSortOrder())) {
       switch (query.getModificationDateSortOrder()) {
         case Ascending:
-          q.addSortField(SolrFields.MODIFIED, ORDER.asc);
+          q.addSortField(SolrSchema.MODIFIED, ORDER.asc);
           break;
         case Descending:
-          q.addSortField(SolrFields.MODIFIED, ORDER.desc);
+          q.addSortField(SolrSchema.MODIFIED, ORDER.desc);
           break;
         case None:
         default:
@@ -322,10 +338,10 @@ public class SearchRequest {
     else if (!SearchQuery.Order.None.equals(query.getCreationDateSortOrder())) {
       switch (query.getCreationDateSortOrder()) {
         case Ascending:
-          q.addSortField(SolrFields.MODIFIED, ORDER.asc);
+          q.addSortField(SolrSchema.MODIFIED, ORDER.asc);
           break;
         case Descending:
-          q.addSortField(SolrFields.MODIFIED, ORDER.desc);
+          q.addSortField(SolrSchema.MODIFIED, ORDER.desc);
           break;
         case None:
         default:
@@ -485,7 +501,7 @@ public class SearchRequest {
   private StringBuilder andNot(StringBuilder buf, String fieldName,
       String fieldValue, boolean quote, boolean clean) {
     if (buf.length() > 0)
-      buf.append(" AND "); // notice the minus sign
+      buf.append(" AND ");
     buf.append("-"); // notice the minus sign
     buf.append(StringUtils.trim(fieldName));
     buf.append(":");

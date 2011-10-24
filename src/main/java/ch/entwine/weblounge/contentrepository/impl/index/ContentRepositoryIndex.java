@@ -125,8 +125,9 @@ public class ContentRepositoryIndex {
     int pathIdxVersion = pathIdx.getIndexVersion();
     int versionIdxVersion = versionIdx.getIndexVersion();
     int languageIdxVersion = languageIdx.getIndexVersion();
-    if (idIdxVersion != version || pathIdxVersion != version || versionIdxVersion != version || languageIdxVersion != version) {
-      logger.warn("Version mismatch detected in structural index");
+    int searchIdxVersion = searchIdx.getIndexVersion();
+    if (idIdxVersion != version || pathIdxVersion != version || versionIdxVersion != version || languageIdxVersion != version || searchIdxVersion != version) {
+      logger.info("Version mismatch detected in structural index");
       return -1;
     }
     return version;
@@ -313,14 +314,10 @@ public class ContentRepositoryIndex {
         versionIdx.add(id, version);
         pathIdx.set(address, path);
         languageIdx.set(id, resource.languages());
-        if (version == Resource.LIVE) {
-          if (resource.isIndexed())
-            searchIdx.add(resource);
-          else
-            searchIdx.delete(uri);
-        } else if (version == Resource.WORK) {
-          searchIdx.addWorkVersion(resource);
-        }
+        if (resource.isIndexed())
+          searchIdx.add(resource);
+        else
+          searchIdx.delete(uri);
       } catch (ContentRepositoryException e) {
         throw e;
       } catch (Throwable t) {
@@ -335,13 +332,11 @@ public class ContentRepositoryIndex {
       // Handle live indices
       if (version == Resource.LIVE) {
         languageIdx.set(address, resource.languages());
-        if (resource.isIndexed())
-          searchIdx.add(resource);
-        else
-          searchIdx.delete(uri);
-      } else if (version == Resource.WORK) {
-        searchIdx.addWorkVersion(resource);
       }
+      if (resource.isIndexed())
+        searchIdx.add(resource);
+      else
+        searchIdx.delete(uri);
     }
 
     // Seems to be an existing resource, so it's an update rather than an
@@ -411,6 +406,7 @@ public class ContentRepositoryIndex {
       languageIdx.set(address, null);
       versionIdx.delete(address, version);
     } else {
+      searchIdx.delete(uri);
       versionIdx.delete(address, version);
     }
 

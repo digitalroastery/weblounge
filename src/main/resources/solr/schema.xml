@@ -446,13 +446,18 @@
 
     <!-- The resource id. This is the unique identifier. -->
     <field name="id" type="string" indexed="true" stored="true" required="true" />
+
+    <!-- Resource header -->    
+    <field name="resourceid" type="string" indexed="true" stored="true" required="true" />
     <field name="path" type="string" indexed="true" stored="true" required="false" />
     <field name="type" type="string" indexed="true" stored="true" required="true" />
     <field name="version" type="long" indexed="true" stored="true" required="true" />
+    <field name="alternate_version" type="long" multiValued="true" indexed="true" stored="true" required="false" />
 
     <!-- Page-level metadata -->
     <field name="subjects" type="string" multiValued="true" indexed="true" stored="true" required="false" /> 
     <field name="template" type="string" indexed="true" stored="true" required="false" /> 
+    <field name="stationary" type="boolean" indexed="true" stored="true" required="false" /> 
     <field name="series" type="string" multiValued="true" indexed="true" stored="true" required="false" />
 
     <!-- Page, page header and page preview -->
@@ -502,6 +507,7 @@
 
     <!-- Dynamic fields for resource content -->
     <field name="content_source" type="string" indexed="true" stored="true" required="false" />
+    <field name="content_external_representation" type="string" indexed="true" stored="true" required="false" />
     <field name="content_mimetype" type="text" indexed="true" stored="false" multiValued="true"/>
     <dynamicField name="content_mimetype_*" type="text" indexed="true" stored="true"/>
     <field name="content_filename" type="text" indexed="true" stored="false" multiValued="true"/>

@@ -20,24 +20,24 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index.solr;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.OWNED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.OWNED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS_LOCALIZED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTY_VALUE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML_COMPOSER;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML_COMPOSER_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CREATED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CREATED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.MODIFIED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.MODIFIED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.OWNED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.OWNED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_CONTENTS;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_CONTENTS_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_PROPERTIES;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_PROPERTY_VALUE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_TYPE_COMPOSER;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_XML_COMPOSER;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_XML_COMPOSER_POSITION;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PREVIEW_XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TEMPLATE;
 
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
@@ -77,6 +77,7 @@ public class PageInputDocument extends ResourceInputDocument {
 
     // Page-level
     addField(TEMPLATE, page.getTemplate(), false);
+    addField(SolrSchema.STATIONARY, page.isStationary(), false);
 
     // Determine the stage composer
     String stage = null;
@@ -102,11 +103,6 @@ public class PageInputDocument extends ResourceInputDocument {
     }
     preview.append("</composer>");
     addField(PREVIEW_XML, preview.toString(), false);
-
-    // Add work version fields
-
-    // TODO add work fields
-
   }
 
   /**

@@ -32,7 +32,7 @@ import java.util.Date;
 public final class SolrUtils {
 
   /** The solr supported date format. **/
-  protected static DateFormat dateFormat = new SimpleDateFormat(SolrFields.SOLR_DATE_FORMAT);
+  protected static DateFormat dateFormat = new SimpleDateFormat(SolrSchema.SOLR_DATE_FORMAT);
 
   /** The solr supported date format for days **/
   protected static DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");

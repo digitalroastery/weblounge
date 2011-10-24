@@ -473,6 +473,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
         logger.warn("Uri '{}' is not part of the repository index", uri);
         return null;
       }
+      uri.setIdentifier(id);
     }
     path = appendIdToPath(uri.getIdentifier(), path);
     return new File(path.toString());
@@ -696,8 +697,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     }
 
     // Make sure the version matches the implementation
-    else if (index.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
-      logger.warn("Index version does not match implementation, triggering reindex");
+    else if (index.getIndexVersion() < VersionedContentRepositoryIndex.INDEX_VERSION) {
+      logger.info("Index needs to be updated, triggering reindex");
+      index();
+    } else if (index.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
+      logger.warn("Index needs to be downgraded, triggering reindex");
       index();
     }
 

@@ -20,7 +20,13 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.LOCALIZED_FULLTEXT;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ALTERNATE_VERSION;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.LOCALIZED_FULLTEXT;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
+import static org.apache.solr.client.solrj.request.AbstractUpdateRequest.ACTION.COMMIT;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
@@ -29,13 +35,15 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SearchRequest;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields;
+import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrRequester;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SuggestRequest;
 
@@ -47,6 +55,7 @@ import org.apache.solr.client.solrj.request.AbstractUpdateRequest.ACTION;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrInputField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +70,7 @@ import java.util.List;
 /**
  * A Solr-based search index implementation.
  */
-public class SearchIndex {
+public class SearchIndex implements VersionedContentRepositoryIndex {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchIndex.class);
@@ -71,6 +80,12 @@ public class SearchIndex {
 
   /** Directory name of the solr configuration directory */
   private static final String DATA_DIR = "data";
+
+  /** Identifier of the root entry */
+  public static final long ROOT_ID = 0L;
+
+  /** Type of the root entry */
+  private static final String ROOT_TYPE = "index";
 
   /** Connection to the solr database */
   private SolrRequester solrConnection = null;
@@ -83,6 +98,9 @@ public class SearchIndex {
 
   /** The solr root */
   protected File solrRoot = null;
+
+  /** The version number */
+  protected int indexVersion = -1;
 
   /**
    * Creates a search index that puts solr into the given root directory. If the
@@ -121,6 +139,15 @@ public class SearchIndex {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex#getIndexVersion()
+   */
+  public int getIndexVersion() {
+    return indexVersion;
+  }
+
+  /**
    * Makes a request to solr and returns the result set.
    * 
    * @param query
@@ -156,28 +183,59 @@ public class SearchIndex {
   }
 
   /**
-   * Removes the entry with the given <code>id</code> from the database. The
-   * entry can either be a resource or a resource.
+   * Removes the entry with the given <code>id</code> from the database.
    * 
-   * @param id
+   * @param resourceId
    *          identifier of the resource or resource
    * @throws ContentRepositoryException
    *           if removing the resource from solr fails
    */
+  @SuppressWarnings("unchecked")
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
     logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
 
     UpdateRequest solrRequest = new UpdateRequest();
     StringBuilder query = new StringBuilder();
-    query.append("id:").append(uri.getIdentifier()).append(" AND version:").append(uri.getVersion());
+    query.append(RESOURCE_ID).append(":").append(uri.getIdentifier()).append(" AND ").append(VERSION).append(":").append(uri.getVersion());
     solrRequest.setAction(ACTION.COMMIT, true, true);
     solrRequest.deleteByQuery(query.toString());
     try {
       solrConnection.update(solrRequest);
-      return true;
     } catch (Throwable t) {
       throw new ContentRepositoryException("Unable to clear solr index", t);
     }
+
+    // Have the serializer create an input document
+    String resourceType = uri.getType();
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+    if (serializer == null)
+      throw new ContentRepositoryException("No serializer found for " + uri);
+
+    // Add information on this version to existing variants of this resource
+    Site site = uri.getSite();
+    String id = uri.getIdentifier();
+    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
+    for (SearchResultItem existingResource : getByQuery(q).getItems()) {
+      List<ResourceMetadata<?>> solrFields = serializer.toMetadata(existingResource);
+      for (ResourceMetadata<?> field : solrFields) {
+        if (field.getName().equals(SolrSchema.ALTERNATE_VERSION)) {
+          ResourceMetadata<Long> versionField = (ResourceMetadata<Long>) field;
+          List<Long> versions = ((ResourceMetadata<Long>) field).getValues();
+          versionField.clear();
+
+          // Add the remaining versions back
+          for (Long l : versions) {
+            if (l != uri.getVersion()) {
+              versionField.addValue(l);
+            }
+          }
+        }
+      }
+      SolrInputDocument doc = updateDocument(new SolrInputDocument(), solrFields);
+      update(doc);
+    }
+
+    return true;
   }
 
   /**
@@ -188,38 +246,9 @@ public class SearchIndex {
    * @throws ContentRepositoryException
    *           if posting the new resource to solr fails
    */
+  @SuppressWarnings("unchecked")
   public boolean add(Resource<?> resource) throws ContentRepositoryException {
     logger.debug("Adding resource {} to search index", resource);
-
-    // Have the serializer create an input document
-    String resourceType = resource.getURI().getType();
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
-    if (serializer == null) {
-      throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
-    }
-
-    // Post the updated data to the search index
-    try {
-      List<ResourceMetadata<?>> metadata = serializer.toMetadata(resource);
-      SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
-      update(doc);
-      return true;
-    } catch (Throwable t) {
-      throw new ContentRepositoryException("Cannot update resource " + resource + " in index", t);
-    }
-  }
-
-  /**
-   * Posts the work version of the resource to the search index.
-   * 
-   * @param resource
-   *          the resource to add to the index
-   * @throws ContentRepositoryException
-   *           if posting the new resource to solr fails
-   */
-  public boolean addWorkVersion(Resource<?> resource)
-      throws ContentRepositoryException {
-    logger.debug("Adding work version of resource {} to search index", resource);
 
     // Have the serializer create an input document
     String resourceType = resource.getURI().getType();
@@ -227,35 +256,37 @@ public class SearchIndex {
     if (serializer == null)
       throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
 
-    // See if a live resource is already part of the index
-    Site site = resource.getURI().getSite();
-    String id = resource.getURI().getIdentifier();
-    SearchQuery q = new SearchQueryImpl(site).withVersion(Resource.LIVE).withIdentifier(id);
-    SearchResult result = getByQuery(q);
-    List<ResourceMetadata<?>> finalMetadata = new ArrayList<ResourceMetadata<?>>();
-    List<String> liveMetadataKeys = new ArrayList<String>();
-
-    // If there is a live version, read the data and add the work data later on
-    if (result.getDocumentCount() > 0) {
-      List<ResourceMetadata<?>> liveMetadata = serializer.toMetadata(result.getItems()[0]);
-      liveMetadataKeys = new ArrayList<String>();
-      for (ResourceMetadata<?> metadataItem : liveMetadata) {
-        liveMetadataKeys.add(metadataItem.getName());
+    // Add information on this version to existing variants of this resource
+    ResourceURI uri = resource.getURI();
+    Site site = uri.getSite();
+    String id = uri.getIdentifier();
+    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
+    List<Long> existingVersions = new ArrayList<Long>();
+    for (SearchResultItem existingResource : getByQuery(q).getItems()) {
+      List<ResourceMetadata<?>> existingResourceMetadata = serializer.toMetadata(existingResource);
+      boolean alternateVersionsFound = false;
+      for (ResourceMetadata<?> field : existingResourceMetadata) {
+        if (field.getName().equals(ALTERNATE_VERSION)) {
+          alternateVersionsFound = true;
+          ((ResourceMetadata<Long>) field).addValue(uri.getVersion());
+        } else if (field.getName().equals(VERSION)) {
+          existingVersions.add(((ResourceMetadata<Long>) field).getValues().get(0));
+        }
       }
-      finalMetadata.addAll(liveMetadata);
-    }
-
-    // Get the metadata for the work version
-    List<ResourceMetadata<?>> workMetadata = serializer.toMetadata(resource);
-    for (ResourceMetadata<?> metadataItem : workMetadata) {
-      if (!liveMetadataKeys.contains(metadataItem.getName())) {
-        finalMetadata.add(metadataItem);
+      if (!alternateVersionsFound) {
+        ResourceMetadata<Long> altVersions = new ResourceMetadataImpl<Long>(ALTERNATE_VERSION);
+        altVersions.addValue(uri.getVersion());
+        existingResourceMetadata.add(altVersions);
       }
+      SolrInputDocument doc = updateDocument(new SolrInputDocument(), existingResourceMetadata);
+      update(doc);
     }
 
     // Post the updated data to the search index
     try {
-      SolrInputDocument doc = updateDocument(new SolrInputDocument(), finalMetadata);
+      List<ResourceMetadata<?>> metadata = serializer.toMetadata(resource);
+      metadata.add(new ResourceMetadataImpl<Long>(ALTERNATE_VERSION, existingVersions, null, false));
+      SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
       update(doc);
       return true;
     } catch (Throwable t) {
@@ -313,7 +344,7 @@ public class SearchIndex {
 
         // Add to fulltext?
         if (entry.addToFulltext()) {
-          String fulltext = StringUtils.trimToEmpty((String) doc.getFieldValue(SolrFields.FULLTEXT));
+          String fulltext = StringUtils.trimToEmpty((String) doc.getFieldValue(SolrSchema.FULLTEXT));
           if (value.getClass().isArray()) {
             Object[] fieldValues = (Object[]) value;
             for (Object v : fieldValues) {
@@ -324,7 +355,7 @@ public class SearchIndex {
                 fulltext,
                 value.toString() }, " ");
           }
-          doc.setField(SolrFields.FULLTEXT, fulltext);
+          doc.setField(SolrSchema.FULLTEXT, fulltext);
         }
       }
 
@@ -486,6 +517,45 @@ public class SearchIndex {
 
     solrConnection = new SolrRequester(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
     solrRequester = new SearchRequest(solrConnection);
+
+    // Determine the index version
+    if (configExists && dataExists) {
+      StringBuffer q = new StringBuffer(ID).append(":").append(ROOT_ID);
+      QueryResponse r = solrConnection.request(q.toString());
+      if (r.getResults().isEmpty()) {
+        indexVersion = -1;
+        logger.warn("Index does not contain version information, triggering reindex");
+      } else {
+        indexVersion = Integer.parseInt(r.getResults().get(0).getFieldValue(VERSION).toString());
+        logger.info("Search index version is {}", indexVersion);
+      }
+    } else {
+      indexVersion = INDEX_VERSION;
+      SolrInputDocument doc = new SolrInputDocument();
+      doc.put(ID, createSolrInputField(ID, Long.toString(ROOT_ID)));
+      doc.put(RESOURCE_ID, createSolrInputField(RESOURCE_ID, Long.toString(ROOT_ID)));
+      doc.put(TYPE, createSolrInputField(TYPE, ROOT_TYPE));
+      doc.put(VERSION, createSolrInputField(VERSION, Integer.toString(indexVersion)));
+      UpdateRequest updateRequest = new UpdateRequest();
+      updateRequest.add(doc);
+      updateRequest.setAction(COMMIT, false, false);
+      solrConnection.update(updateRequest);
+    }
+  }
+
+  /**
+   * Creates an ad-hoc solr input field.
+   * 
+   * @param name
+   *          the field name
+   * @param value
+   *          the field value
+   * @return the field
+   */
+  private SolrInputField createSolrInputField(String name, Object value) {
+    SolrInputField field = new SolrInputField(name);
+    field.setValue(value, 0.0f);
+    return field;
   }
 
   /**
@@ -517,6 +587,7 @@ public class SearchIndex {
       copyBundleResourceToFile("/solr/solrconfig.xml", solrConfigDir);
       copyBundleResourceToFile("/solr/stopwords.txt", solrConfigDir);
       copyBundleResourceToFile("/solr/synonyms.txt", solrConfigDir);
+
     } catch (IOException e) {
       throw new RuntimeException("Error setting up solr index at " + solrRoot, e);
     }

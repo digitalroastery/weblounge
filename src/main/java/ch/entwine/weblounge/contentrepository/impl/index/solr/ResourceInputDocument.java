@@ -20,47 +20,49 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index.solr;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_CREATED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_CREATED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME_LOCALIZED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE_LOCALIZED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_SOURCE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.COVERAGE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.COVERAGE_LOCALIZED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.DESCRIPTION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.DESCRIPTION_LOCALIZED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.HEADER_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.LOCKED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.LOCKED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.OWNED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.OWNED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_TO;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS_LOCALIZED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SERIES;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECT;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_LOCALIZED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.VERSION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_CREATED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_CREATED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_FILENAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_FILENAME_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_MIMETYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_MIMETYPE_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_SOURCE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.COVERAGE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.COVERAGE_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CREATED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CREATED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CREATED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.DESCRIPTION;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.DESCRIPTION_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.HEADER_XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.LOCKED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.LOCKED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.MODIFIED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.MODIFIED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.MODIFIED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.OWNED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.OWNED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_FROM;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_TO;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RIGHTS;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RIGHTS_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.SERIES;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.SUBJECT;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TITLE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TITLE_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.XML;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;
@@ -78,10 +80,13 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
    *          the resource
    */
   protected void init(Resource<?> resource) {
-    addField(ID, resource.getURI().getIdentifier(), true);
-    addField(PATH, resource.getURI().getPath(), true);
-    addField(TYPE, resource.getURI().getType(), true);
-    addField(VERSION, resource.getURI().getVersion(), false);
+    ResourceURI uri = resource.getURI();
+
+    addField(ID, uri.getIdentifier() + uri.getVersion(), true);
+    addField(RESOURCE_ID, uri.getIdentifier(), true);
+    addField(PATH, uri.getPath(), true);
+    addField(TYPE, uri.getType(), true);
+    addField(VERSION, uri.getVersion(), false);
 
     // Resource-level
     for (String subject : resource.getSubjects())

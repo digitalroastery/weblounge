@@ -20,10 +20,10 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index.solr;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrFields.VERSION;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 
@@ -52,7 +52,7 @@ public class ResourceURIInputDocument extends ResourceMetadataCollection {
    *          the resource uri
    */
   private void init(ResourceURI uri) {
-    addField(ID, uri.getIdentifier(), false);
+    addField(RESOURCE_ID, uri.getIdentifier(), false);
     addField(PATH, uri.getPath(), true);
     addField(TYPE, uri.getType(), false);
     addField(VERSION, uri.getVersion(), false);

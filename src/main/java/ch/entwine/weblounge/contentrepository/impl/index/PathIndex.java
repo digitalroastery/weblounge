@@ -176,7 +176,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
       idx.seek(IDX_START_OF_HEADER);
       this.indexVersion = idx.readInt();
       if (indexVersion != INDEX_VERSION)
-        logger.warn("Path index version mismatch (found {}, expected {}), consider reindex", indexVersion, INDEX_VERSION);
+        logger.debug("Path index version mismatch (found {}, expected {}), consider reindex", indexVersion, INDEX_VERSION);
       this.entriesPerSlot = idx.readInt();
       this.slots = idx.readLong();
       this.entries = idx.readLong();
@@ -442,7 +442,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
 
     long totalEntries = slots * entriesPerSlot;
 
-    logger.info("Creating path index with {} entries ({} slots, {} entries per slot)", new Object[] {
+    logger.debug("Creating path index with {} entries ({} slots, {} entries per slot)", new Object[] {
         totalEntries,
         slots,
         entriesPerSlot });

@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.fs;
 
+import static ch.entwine.weblounge.common.content.Resource.WORK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -29,7 +30,6 @@ import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
-import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
@@ -333,7 +333,7 @@ public class FileSystemContentRepositoryTest {
    */
   @Test
   public void testDeleteResourceURIBoolean() {
-    ResourceURI workURI = new PageURIImpl(site, page1path, page1uuid, Resource.WORK);
+    ResourceURI workURI = new PageURIImpl(site, page1path, page1uuid, WORK);
     Page workPage = new PageImpl(workURI);
     int resources = populateRepository();
     int revisions = resources;
@@ -634,7 +634,7 @@ public class FileSystemContentRepositoryTest {
       assertEquals(page1URI.getIdentifier(), r.getIdentifier());
       assertNull(repository.get(new PageURIImpl(site, "/abc")));
       assertNull(repository.get(new PageURIImpl(site, null, "a-b-c-d")));
-      assertNull(repository.get(new PageURIImpl(page1URI, Resource.WORK)));
+      assertNull(repository.get(new PageURIImpl(page1URI, WORK)));
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error trying to get resource");
@@ -676,7 +676,7 @@ public class FileSystemContentRepositoryTest {
   public void testGetVersions() {
     ResourceURI live1URI = new PageURIImpl(site, "/weblounge");
     ResourceURI live2URI = new PageURIImpl(site, "/etc/weblounge");
-    ResourceURI work2URI = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+    ResourceURI work2URI = new PageURIImpl(site, "/etc/weblounge", WORK);
 
     Page page1Live = new PageImpl(live1URI);
     Page page2Live = new PageImpl(live2URI);
@@ -707,7 +707,7 @@ public class FileSystemContentRepositoryTest {
   public void testGetLanguages() {
     ResourceURI live1URI = new PageURIImpl(site, "/weblounge");
     ResourceURI live2URI = new PageURIImpl(site, "/etc/weblounge");
-    ResourceURI work2URI = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+    ResourceURI work2URI = new PageURIImpl(site, "/etc/weblounge", WORK);
 
     Page page1Live = new PageImpl(live1URI);
     page1Live.setTitle("title", english);
@@ -747,7 +747,7 @@ public class FileSystemContentRepositoryTest {
    */
   @Test
   public void testWithoutPublication() {
-    ResourceURI workURI = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+    ResourceURI workURI = new PageURIImpl(site, "/etc/weblounge", WORK);
     Page work = new PageImpl(workURI);
     try {
       repository.put(work);
@@ -781,46 +781,6 @@ public class FileSystemContentRepositoryTest {
 
       result = repository.find(q);
       assertEquals(2, result.getHitCount());
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail(t.getMessage());
-    }
-  }
-
-  /**
-   * Test method for {@link SearchQuery#withPreferredVersion(long)}.
-   */
-  @Test
-  @Ignore
-  public void testWithPreferredVersion() {
-    ResourceURI workURI = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
-    ResourceURI liveURI = new PageURIImpl(site, "/etc/weblounge", Resource.LIVE);
-    Page work = new PageImpl(workURI);
-    Page live = new PageImpl(liveURI);
-
-    try {
-      SearchQuery q = new SearchQueryImpl(site);
-      q.withPreferredVersion(Resource.WORK);
-      SearchResult result = repository.find(q);
-      assertEquals(0, result.getHitCount());
-
-      repository.put(work);
-      result = repository.find(q);
-      assertEquals(1, result.getHitCount());
-      ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
-      assertEquals(Resource.WORK, searchResultItem.getResourceURI().getVersion());
-
-      repository.put(live);
-      result = repository.find(q);
-      assertEquals(1, result.getHitCount());
-      searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
-      assertEquals(Resource.WORK, searchResultItem.getResourceURI().getVersion());
-
-      q.withPreferredVersion(Resource.LIVE);
-      result = repository.find(q);
-      assertEquals(1, result.getHitCount());
-      searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
-      assertEquals(Resource.LIVE, searchResultItem.getResourceURI().getVersion());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -892,7 +852,7 @@ public class FileSystemContentRepositoryTest {
     int count = populateRepository();
     assertEquals(count, repository.getVersionCount() - 1);
 
-    ResourceURI page1WorkURI = new PageURIImpl(page1URI, Resource.WORK);
+    ResourceURI page1WorkURI = new PageURIImpl(page1URI, WORK);
     Page page2Work = new PageImpl(page1WorkURI);
 
     try {
@@ -919,7 +879,7 @@ public class FileSystemContentRepositoryTest {
 
     // Create pages and uris
     ResourceURI uriLive = new PageURIImpl(site, "/etc/weblounge");
-    ResourceURI uriWork = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+    ResourceURI uriWork = new PageURIImpl(site, "/etc/weblounge", WORK);
 
     // Add the pages to the index
     repository.put(new PageImpl(uriLive));
@@ -971,7 +931,7 @@ public class FileSystemContentRepositoryTest {
 
     // Create pages and uris
     ResourceURI uriLive = new PageURIImpl(site, "/etc/weblounge");
-    ResourceURI uriWork = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+    ResourceURI uriWork = new PageURIImpl(site, "/etc/weblounge", WORK);
 
     // Add the pages to the index
     repository.put(new PageImpl(uriLive));
