@@ -33,6 +33,9 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Test case for {@link SearchResultItemPageImpl}.
  */
@@ -44,6 +47,9 @@ public class PageSearchResultItemImplTest extends SearchResultItemImplTest {
   /** The page xml */
   protected String pageXml = null;
 
+  /** The resource metadata */
+  protected List<ResourceMetadata<?>> metadata = null;
+
   /**
    * Setup for the test.
    * 
@@ -52,9 +58,10 @@ public class PageSearchResultItemImplTest extends SearchResultItemImplTest {
   @Before
   public void setUp() throws Exception {
     setUpPrerequisites();
+    metadata = new ArrayList<ResourceMetadata<?>>();
     pageXml = IOUtils.toString(getClass().getResourceAsStream("/page.xml"));
     ResourceURI uri = new PageURIImpl(site, path, id, Resource.LIVE);
-    pageItem = new PageSearchResultItemImpl(uri, null, url, relevance, source);
+    pageItem = new PageSearchResultItemImpl(uri, url, relevance, source, metadata);
     item = pageItem;
     item.setTitle(title);
     item.setPreview(previewData);

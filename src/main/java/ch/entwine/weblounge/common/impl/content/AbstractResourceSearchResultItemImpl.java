@@ -20,9 +20,15 @@
 
 package ch.entwine.weblounge.common.impl.content;
 
+import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.url.WebUrl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Base implementation for search result items that represent resources.
@@ -32,31 +38,31 @@ public abstract class AbstractResourceSearchResultItemImpl extends SearchResultI
   /** The resource uri */
   protected ResourceURI uri = null;
 
-  /** Other available versions of this resource */
-  protected long[] alternateVersions = new long[] {};
+  /** The resource metadata */
+  protected Map<String, ResourceMetadata<?>> metadata = null;
 
   /**
    * Creates a new resource search result item.
    * 
    * @param uri
    *          the resource uri
-   * @param alternateVersions
-   *          alternate available versions
    * @param url
    *          the resource url
    * @param relevance
    *          the relevance inside the current search
    * @param source
    *          the source of this search result item
+   * @param metadata
+   *          the search metadata
    */
-  public AbstractResourceSearchResultItemImpl(ResourceURI uri,
-      long[] alternateVersions, WebUrl url, double relevance, Object source) {
+  public AbstractResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
+      double relevance, Object source, List<ResourceMetadata<?>> metadata) {
     super(uri.getIdentifier(), uri.getSite(), url, relevance, source);
     this.uri = uri;
-    if (alternateVersions != null)
-      this.alternateVersions = alternateVersions;
-    else
-      this.alternateVersions = new long[] {};
+    this.metadata = new HashMap<String, ResourceMetadata<?>>();
+    for (ResourceMetadata<?> m : metadata) {
+      this.metadata.put(m.getName(), m);
+    }
   }
 
   /**
@@ -80,10 +86,19 @@ public abstract class AbstractResourceSearchResultItemImpl extends SearchResultI
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem#getAlternateVersions()
+   * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem#getMetadata()
    */
-  public long[] getAlternateVersions() {
-    return alternateVersions;
+  public List<ResourceMetadata<?>> getMetadata() {
+    return new ArrayList<ResourceMetadata<?>>(metadata.values());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem#getMetadataByKey(java.lang.String)
+   */
+  public ResourceMetadata<?> getMetadataByKey(String key) {
+    return metadata.get(key);
   }
 
 }

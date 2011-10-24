@@ -21,10 +21,13 @@
 package ch.entwine.weblounge.common.impl.content.movie;
 
 import ch.entwine.weblounge.common.content.MovieSearchResultItem;
+import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.impl.content.AbstractResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.url.WebUrl;
+
+import java.util.List;
 
 /**
  * Audio visual implementation of a
@@ -49,18 +52,18 @@ public class MovieResourceSearchResultItemImpl extends AbstractResourceSearchRes
    * 
    * @param uri
    *          the audio visual uri
-   * @param alternateVersions
-   *          alternate versions of this resource
    * @param url
    *          the url to show the hit
    * @param relevance
    *          the score inside the search result
    * @param source
    *          the object that produced the result item
+   * @param metadata
+   *          the search metadata
    */
-  public MovieResourceSearchResultItemImpl(ResourceURI uri,
-      long[] alternateVersions, WebUrl url, double relevance, Object source) {
-    super(uri, alternateVersions, url, relevance, source);
+  public MovieResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
+      double relevance, Object source, List<ResourceMetadata<?>> metadata) {
+    super(uri, url, relevance, source, metadata);
   }
 
   /**

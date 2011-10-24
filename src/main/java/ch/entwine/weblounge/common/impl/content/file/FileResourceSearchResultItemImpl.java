@@ -21,10 +21,13 @@
 package ch.entwine.weblounge.common.impl.content.file;
 
 import ch.entwine.weblounge.common.content.FileSearchResultItem;
+import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.impl.content.AbstractResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.url.WebUrl;
+
+import java.util.List;
 
 /**
  * Default implementation of a
@@ -49,18 +52,18 @@ public class FileResourceSearchResultItemImpl extends AbstractResourceSearchResu
    * 
    * @param uri
    *          the page uri
-   * @param alternateVersions
-   *          alternate versions of this resource
    * @param url
    *          the url to show the hit
    * @param relevance
    *          the score inside the search result
    * @param source
    *          the object that produced the result item
+   * @param metadata
+   *          the search metadata
    */
-  public FileResourceSearchResultItemImpl(ResourceURI uri,
-      long[] alternateVersions, WebUrl url, double relevance, Object source) {
-    super(uri, alternateVersions, url, relevance, source);
+  public FileResourceSearchResultItemImpl(ResourceURI uri, WebUrl url,
+      double relevance, Object source, List<ResourceMetadata<?>> metadata) {
+    super(uri, url, relevance, source, metadata);
   }
 
   /**
