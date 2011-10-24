@@ -60,6 +60,7 @@ public final class PathUtils {
         throw new IllegalArgumentException("Path element cannot be null");
       String element = adjustSeparator(s);
       element = removeDoubleSeparator(element);
+      element = cleanSpecializedCharacter(element);
 
       if (b.length() == 0) {
         b.append(element);
@@ -73,6 +74,15 @@ public final class PathUtils {
     }
 
     return b.toString();
+  }
+
+  /**
+   * Checks that the path only contains permitted characters. If not, wrong ones
+   * are replaced.
+   */
+  private static String cleanSpecializedCharacter(String path) {
+    path = path.replaceAll(".", "-");
+    return path.replaceAll(":", "-");
   }
 
   /**
