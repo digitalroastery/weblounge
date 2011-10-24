@@ -535,14 +535,19 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
     // Determine the index version
     if (configExists && dataExists) {
-      StringBuffer q = new StringBuffer(ID).append(":").append(ROOT_ID);
-      QueryResponse r = solrConnection.request(q.toString());
-      if (r.getResults().isEmpty()) {
+      try {
+        StringBuffer q = new StringBuffer(ID).append(":").append(ROOT_ID);
+        QueryResponse r = solrConnection.request(q.toString());
+        if (r.getResults().isEmpty()) {
+          logger.warn("Index does not contain version information, triggering reindex");
+          indexVersion = -1;
+        } else {
+          indexVersion = Integer.parseInt(r.getResults().get(0).getFieldValue(VERSION).toString());
+          logger.info("Search index version is {}", indexVersion);
+        }
+      } catch (Exception e) {
+        logger.warn("Index version information cannot be determined ({}), triggering reindex", e.getMessage());
         indexVersion = -1;
-        logger.warn("Index does not contain version information, triggering reindex");
-      } else {
-        indexVersion = Integer.parseInt(r.getResults().get(0).getFieldValue(VERSION).toString());
-        logger.info("Search index version is {}", indexVersion);
       }
     } else {
       indexVersion = INDEX_VERSION;

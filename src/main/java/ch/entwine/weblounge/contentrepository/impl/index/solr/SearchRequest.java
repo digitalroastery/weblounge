@@ -179,7 +179,7 @@ public class SearchRequest {
 
     // Creation date
     if (query.getCreationDate() != null) {
-      and(solrQuery, CREATED, SolrUtils.selectDay(query.getCreationDate()), false, false);
+      and(solrQuery, CREATED, SolrUtils.selectDay(query.getCreationDate()), false, true);
     }
 
     // Modifier
@@ -189,7 +189,7 @@ public class SearchRequest {
 
     // Modification date
     if (query.getModificationDate() != null) {
-      and(solrQuery, MODIFIED, SolrUtils.selectDay(query.getModificationDate()), false, false);
+      and(solrQuery, MODIFIED, SolrUtils.selectDay(query.getModificationDate()), false, true);
     }
 
     // Without Modification
@@ -204,7 +204,7 @@ public class SearchRequest {
 
     // Publication date
     if (query.getPublishingDate() != null) {
-      and(solrQuery, PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, false);
+      and(solrQuery, PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, true);
     }
 
     // Without Publication

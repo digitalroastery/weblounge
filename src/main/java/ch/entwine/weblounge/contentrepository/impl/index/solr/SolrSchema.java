@@ -26,10 +26,10 @@ package ch.entwine.weblounge.contentrepository.impl.index.solr;
 public interface SolrSchema {
 
   /** The unique identifier */
-  String ID = "id";
+  String ID = "solr_id";
 
   /** Resource identifier */
-  String RESOURCE_ID = "resourceid";
+  String RESOURCE_ID = "id";
 
   /** Path field name */
   String PATH = "path";

@@ -444,11 +444,11 @@
        when adding a document.
    -->
 
-    <!-- The resource id. This is the unique identifier. -->
-    <field name="id" type="string" indexed="true" stored="true" required="true" />
+    <!-- The document id. This is the unique identifier. -->
+    <field name="solr_id" type="string" indexed="true" stored="true" required="true" />
 
     <!-- Resource header -->    
-    <field name="resourceid" type="string" indexed="true" stored="true" required="true" />
+    <field name="id" type="string" indexed="true" stored="true" required="true" />
     <field name="path" type="string" indexed="true" stored="true" required="false" />
     <field name="type" type="string" indexed="true" stored="true" required="true" />
     <field name="version" type="long" indexed="true" stored="true" required="true" />
@@ -516,19 +516,21 @@
     <dynamicField name="content_created_by_*" type="text" indexed="true" stored="true"/>
     <dynamicField name="content_xml_*" type="text" indexed="false" stored="true"/>
 
+    <!-- Additional utility fields -->
+    <field name="path_elements" type="path_elements" indexed="true" stored="false"/>
+
     <!-- Language sensitive fulltext search -->
     <dynamicField name="fulltext_*" type="text_rev" indexed="true" stored="false"/>
 
     <!-- A fulltext copy field. -->
     <field name="fulltext" type="text_rev" indexed="true" stored="false"/>
-    
+
     <!-- Suggest fields -->
+    <!-- 
     <field name="path_suggest" type="suggest" indexed="true" stored="false"/>
     <field name="subject_suggest" type="suggest" multiValued="true" indexed="true" stored="false"/>
     <field name="fulltext_suggest" type="suggest" indexed="true" stored="false"/>
-    
-    <!-- Additional utility fields -->
-    <field name="path_elements" type="path_elements" indexed="true" stored="false"/>
+    -->
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
@@ -541,9 +543,9 @@
   <!-- Field to use to determine and enforce document uniqueness. 
       Unless this field is marked with required="false", it will be a required field
   -->
-  <uniqueKey>id</uniqueKey>
+  <uniqueKey>solr_id</uniqueKey>
 
- <!-- field for the QueryParser to use when an explicit fieldname is absent
+ <!-- field for the QueryParser to use when an explicit field name is absent
  -->
  <defaultSearchField>fulltext</defaultSearchField>
 
@@ -564,10 +566,12 @@
  <copyField source="pagelet_contents_*" dest="fulltext"/>
  -->
  
+ <!--
  <copyField source="fulltext" dest="fulltext_suggest"/>
  <copyField source="path" dest="path_suggest"/>
  <copyField source="subjects" dest="subject_suggest"/>
  <copyField source="path" dest="path_elements"/>
+ -->
 
  <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine
