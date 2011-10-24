@@ -22,6 +22,8 @@ package ch.entwine.weblounge.common.content;
 
 import ch.entwine.weblounge.common.language.Language;
 
+import java.net.URL;
+
 /**
  * Resource content represents the actual content of a resource.
  */
@@ -57,6 +59,21 @@ public interface ResourceContent extends Creatable {
    * @return the source
    */
   String getSource();
+
+  /**
+   * Sets the resource content's external location.
+   * 
+   * @param location
+   *          the external location
+   */
+  void setExternalLocation(URL location);
+
+  /**
+   * Returns the resource content's external location.
+   * 
+   * @return the external location
+   */
+  URL getExternalLocation();
 
   /**
    * Returns the name of the author of this resource

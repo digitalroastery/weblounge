@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
+import java.net.URL;
 import java.util.Date;
 import java.util.Map;
 
@@ -135,6 +136,20 @@ public interface SearchQuery {
   String getTemplate();
 
   /**
+   * Return resources which are marked as stationaries.
+   * 
+   * @return the query extended by this criterion
+   */
+  SearchQuery withStationary();
+
+  /**
+   * Returns <code>true</code> if stationary resources should be included.
+   * 
+   * @return <code>true</code> to include stationaries
+   */
+  boolean isStationary();
+
+  /**
    * Return the resources with the given source.
    * 
    * @param source
@@ -149,6 +164,24 @@ public interface SearchQuery {
    * @return the source
    */
   String getSource();
+
+  /**
+   * Return the resources which have an external representation at the given
+   * url.
+   * 
+   * @param source
+   *          the source to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withExternalLocation(URL url);
+
+  /**
+   * Returns the source or <code>null</code> if no external location was
+   * specified.
+   * 
+   * @return the source
+   */
+  URL getExternalLocation();
 
   /**
    * Return the resources with the given layout.

@@ -75,6 +75,22 @@ public interface Page extends Resource<ResourceContent> {
   String getTemplate();
 
   /**
+   * Turns this page into a stationary.
+   * 
+   * @param stationary
+   *          the stationary
+   */
+  void setStationary(boolean stationary);
+
+  /**
+   * Returns <code>true</code> if this page is a stationary, <code>false</code>
+   * if it's a regular page.
+   * 
+   * @return <code>true</code> if this is a stationary
+   */
+  boolean isStationary();
+
+  /**
    * Returns the composer identified by <code>composerId</code> or
    * <code>null</code> if that composer is not found.
    * 
