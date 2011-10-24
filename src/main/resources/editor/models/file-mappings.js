@@ -254,6 +254,9 @@ FileMappings.Body.Content.properties = [new Jsonix.Model.AttributePropertyInfo({
   name: 'source',
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
 }), new Jsonix.Model.ElementPropertyInfo({
+  name: 'external',
+  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+}),new Jsonix.Model.ElementPropertyInfo({
   name: 'mimetype',
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
 }), new Jsonix.Model.ElementPropertyInfo({

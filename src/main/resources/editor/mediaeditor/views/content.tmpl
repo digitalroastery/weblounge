@@ -1,6 +1,8 @@
 {{if file.name.localPart == 'movie'}}
 	<h2>Movie Metadaten:</h2>
 	Filename: {{if !$.isEmptyObject(content.filename)}}${content.filename}{{/if}}<br />
+	Source: {{if !$.isEmptyObject(content.source)}}${content.source}{{/if}}<br />
+	External: {{if !$.isEmptyObject(content.external)}}${content.external}{{/if}}<br />
 	Mimetype: {{if !$.isEmptyObject(content.mimetype)}}${content.mimetype}{{/if}}<br />
 	Size: {{if content.size != undefined}}${content.size}{{/if}}<br />
 	Duration: {{if duration != undefined}}${duration}{{/if}}<br /><br />
@@ -19,6 +21,8 @@
 {{else file.name.localPart == 'image'}}
 	<h2>Image Metadaten:</h2>
 	Filename: {{if !$.isEmptyObject(content.filename)}}${content.filename}{{/if}}<br />
+	Source: {{if !$.isEmptyObject(content.source)}}${content.source}{{/if}}<br />
+	External: {{if !$.isEmptyObject(content.external)}}${content.external}{{/if}}<br />
 	Mimetype: {{if !$.isEmptyObject(content.mimetype)}}${content.mimetype}{{/if}}<br />
 	Size: {{if content.size != undefined}}${content.size}{{/if}}<br />
 	Width: {{if content.width != undefined}}${content.width}{{/if}}<br />
@@ -35,6 +39,8 @@
 {{else file.name.localPart == 'file'}}
 	<h2>File Metadaten:</h2>
 	Filename: {{if !$.isEmptyObject(content.filename)}}${content.filename}{{/if}}<br />
+	Source: {{if !$.isEmptyObject(content.source)}}${content.source}{{/if}}<br />
+	External: {{if !$.isEmptyObject(content.external)}}${content.external}{{/if}}<br />
 	Mimetype: {{if !$.isEmptyObject(content.mimetype)}}${content.mimetype}{{/if}}<br />
 	Size: {{if content.size != undefined}}${content.size}{{/if}}<br />
 {{/if}}

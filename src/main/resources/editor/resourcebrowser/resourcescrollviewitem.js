@@ -17,7 +17,11 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			var scrollItem = this.element;
 			switch(this.options.resourceType) {
 			case 'pages':
-				var pageURL = this.element.find('a.wbl-pagePath').attr('href') + '?preview&_=' + new Date().getTime();
+				var pageURL = this.element.find('a.wbl-pagePath').attr('href');
+				if(this.options.page.version == 'work') {
+					pageURL += 'work.html';
+				}
+				pageURL += '?preview&_=' + new Date().getTime();
 				this._loadOverlay(function() {
 					var iframeTag = this.getOverlay().find('iframe');
 					iframeTag.css('width', $(window).width() * 0.8 + 'px');
