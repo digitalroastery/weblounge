@@ -162,7 +162,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
     String html = null;
     try {
       URL pageURL = new URL(UrlUtils.concat(site.getConnector(environment).toExternalForm(), PAGE_HANDLER_PREFIX, uri.getIdentifier()));
-      html = render(pageURL, site, environment, language);
+      html = render(pageURL, site, environment, language, resource.getVersion());
       if (StringUtils.isBlank(html)) {
         logger.warn("Error rendering preview of page " + uri.getPath());
         return;
@@ -251,6 +251,8 @@ public class PagePreviewGenerator implements PreviewGenerator {
    *          the environment
    * @param language
    *          the language
+   * @param version
+   *          the version
    * @return the rendered <code>HTML</code>
    * @throws ServletException
    *           if rendering fails
@@ -258,7 +260,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
    *           if reading from the servlet fails
    */
   private String render(URL rendererURL, Site site, Environment environment,
-      Language language) throws ServletException, IOException {
+      Language language, long version) throws ServletException, IOException {
     Servlet servlet = siteServlets.get(site.getIdentifier());
 
     String httpContextURI = UrlUtils.concat("/weblounge-sites", site.getIdentifier());
@@ -284,7 +286,11 @@ public class PagePreviewGenerator implements PreviewGenerator {
     } else {
       HttpClient httpClient = new DefaultHttpClient();
       try {
-        rendererURL = new URL(UrlUtils.concat(rendererURL.toExternalForm(), "index_" + language.getIdentifier() + ".html"));
+        if (version == Resource.WORK) {
+          rendererURL = new URL(UrlUtils.concat(rendererURL.toExternalForm(), "work_" + language.getIdentifier() + ".html"));
+        } else {
+          rendererURL = new URL(UrlUtils.concat(rendererURL.toExternalForm(), "index_" + language.getIdentifier() + ".html"));
+        }
         HttpGet getRequest = new HttpGet(rendererURL.toExternalForm());
         getRequest.addHeader(new BasicHeader("X-Weblounge-Special", "Page-Preview"));
         HttpResponse response = httpClient.execute(getRequest);
