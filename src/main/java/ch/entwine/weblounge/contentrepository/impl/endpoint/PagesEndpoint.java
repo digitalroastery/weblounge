@@ -439,17 +439,18 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI pageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
+    ResourceURI workURI = new PageURIImpl(site, null, pageId, Resource.WORK);
 
     // Does the page exist?
     Page currentPage = null;
     try {
-      if (!contentRepository.exists(pageURI)) {
-        throw new WebApplicationException(Status.NOT_FOUND);
+      if (!contentRepository.exists(workURI)) {
+        logger.warn("Attempt to update a page without creating a work version first");
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
-      currentPage = (Page) contentRepository.get(pageURI);
+      currentPage = (Page) contentRepository.get(workURI);
     } catch (ContentRepositoryException e) {
-      logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
+      logger.warn("Error lookup up page {} from repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
@@ -489,22 +490,22 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         contentRepository.move(currentPage.getURI(), page.getURI());
       }
     } catch (SecurityException e) {
-      logger.warn("Tried to update page {} of site '{}' without permission", pageURI, site);
+      logger.warn("Tried to update page {} of site '{}' without permission", workURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
-      logger.warn("Error reading updated page {} from request", pageURI);
+      logger.warn("Error reading updated page {} from request", workURI);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (ParserConfigurationException e) {
-      logger.warn("Error configuring parser to read updated page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error configuring parser to read updated page {}: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (SAXException e) {
-      logger.warn("Error parsing updated page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error parsing updated page {}: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.BAD_REQUEST);
     } catch (IllegalStateException e) {
-      logger.warn("Error updating page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error updating page {}: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     } catch (ContentRepositoryException e) {
-      logger.warn("Error updating page {}: {}", pageURI, e.getMessage());
+      logger.warn("Error updating page {}: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
