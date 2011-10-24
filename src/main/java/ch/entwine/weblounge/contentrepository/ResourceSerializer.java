@@ -85,11 +85,17 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
       SAXException;
 
   /**
-   * Returns the list of metadata, used to add the resource to the search index.
+   * Returns the list of metadata to be added to the search index or
+   * <code>null</code> if nothing needs to be added.
+   * <p>
+   * Implementations are free to either provide a merged version of live and
+   * work version or simply return the plain live version.
+   * <p>
+   * Note that either one of <code>liveResource</code> and
+   * <code>workResource</code> may be <code>null</code>.
    * 
    * @param resource
-   *          the resource
-   * @return the resource metadata
+   *          the live resource
    */
   List<ResourceMetadata<?>> toMetadata(Resource<?> resource);
 
