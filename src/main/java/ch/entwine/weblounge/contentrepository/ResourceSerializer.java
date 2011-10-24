@@ -100,15 +100,6 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
   List<ResourceMetadata<?>> toMetadata(Resource<?> resource);
 
   /**
-   * Takes a search result item and turns it into a set of metadata.
-   * 
-   * @param searchResultItem
-   *          the search result item
-   * @return the list of metadata
-   */
-  List<ResourceMetadata<?>> toMetadata(SearchResultItem searchResultItem);
-
-  /**
    * Takes the metadata and returns the resource representation.
    * 
    * @param site
