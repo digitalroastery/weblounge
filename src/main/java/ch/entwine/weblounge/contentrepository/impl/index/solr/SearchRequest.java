@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index.solr;
 
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_EXTERNAL_REPRESENTATION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_FILENAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_MIMETYPE;
@@ -42,11 +43,13 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.SCORE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.SERIES;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.STATIONARY;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.SUBJECT;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TEMPLATE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TITLE_BOOST;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TITLE_LOCALIZED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils.clean;
 
 import ch.entwine.weblounge.common.content.ResourceMetadata;
@@ -128,9 +131,9 @@ public class SearchRequest {
 
     // Version / Preferred version
     if (query.getPreferredVersion() >= 0) {
-      andNot(solrQuery, SolrSchema.ALTERNATE_VERSION, Long.toString(query.getPreferredVersion()), false, false);
+      andNot(solrQuery, ALTERNATE_VERSION, Long.toString(query.getPreferredVersion()), false, false);
     } else if (query.getVersion() >= 0) {
-      and(solrQuery, SolrSchema.VERSION, Long.toString(query.getVersion()), false, false);
+      and(solrQuery, VERSION, Long.toString(query.getVersion()), false, false);
     }
 
     // Path
@@ -169,7 +172,7 @@ public class SearchRequest {
 
     // Stationary
     if (query.isStationary()) {
-      and(solrQuery, SolrSchema.STATIONARY, Boolean.TRUE.toString(), false, false);
+      and(solrQuery, STATIONARY, Boolean.TRUE.toString(), false, false);
     }
 
     // Creator
@@ -179,7 +182,7 @@ public class SearchRequest {
 
     // Creation date
     if (query.getCreationDate() != null) {
-      and(solrQuery, CREATED, SolrUtils.selectDay(query.getCreationDate()), false, true);
+      and(solrQuery, CREATED, SolrUtils.selectDay(query.getCreationDate()), false, false);
     }
 
     // Modifier
@@ -189,7 +192,7 @@ public class SearchRequest {
 
     // Modification date
     if (query.getModificationDate() != null) {
-      and(solrQuery, MODIFIED, SolrUtils.selectDay(query.getModificationDate()), false, true);
+      and(solrQuery, MODIFIED, SolrUtils.selectDay(query.getModificationDate()), false, false);
     }
 
     // Without Modification
@@ -204,7 +207,7 @@ public class SearchRequest {
 
     // Publication date
     if (query.getPublishingDate() != null) {
-      and(solrQuery, PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, true);
+      and(solrQuery, PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, false);
     }
 
     // Without Publication
@@ -308,10 +311,10 @@ public class SearchRequest {
     if (!SearchQuery.Order.None.equals(query.getPublishingDateSortOrder())) {
       switch (query.getPublishingDateSortOrder()) {
         case Ascending:
-          q.addSortField(SolrSchema.PUBLISHED_FROM, ORDER.asc);
+          q.addSortField(PUBLISHED_FROM, ORDER.asc);
           break;
         case Descending:
-          q.addSortField(SolrSchema.PUBLISHED_FROM, ORDER.desc);
+          q.addSortField(PUBLISHED_FROM, ORDER.desc);
           break;
         case None:
         default:
@@ -323,10 +326,10 @@ public class SearchRequest {
     else if (!SearchQuery.Order.None.equals(query.getModificationDateSortOrder())) {
       switch (query.getModificationDateSortOrder()) {
         case Ascending:
-          q.addSortField(SolrSchema.MODIFIED, ORDER.asc);
+          q.addSortField(MODIFIED, ORDER.asc);
           break;
         case Descending:
-          q.addSortField(SolrSchema.MODIFIED, ORDER.desc);
+          q.addSortField(MODIFIED, ORDER.desc);
           break;
         case None:
         default:
@@ -338,10 +341,10 @@ public class SearchRequest {
     else if (!SearchQuery.Order.None.equals(query.getCreationDateSortOrder())) {
       switch (query.getCreationDateSortOrder()) {
         case Ascending:
-          q.addSortField(SolrSchema.MODIFIED, ORDER.asc);
+          q.addSortField(MODIFIED, ORDER.asc);
           break;
         case Descending:
-          q.addSortField(SolrSchema.MODIFIED, ORDER.desc);
+          q.addSortField(MODIFIED, ORDER.desc);
           break;
         case None:
         default:

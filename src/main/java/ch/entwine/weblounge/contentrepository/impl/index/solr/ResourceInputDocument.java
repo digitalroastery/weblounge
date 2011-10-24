@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.impl.index.solr;
 
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_CREATED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_CREATED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_EXTERNAL_REPRESENTATION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_FILENAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_FILENAME_LOCALIZED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CONTENT_MIMETYPE;
@@ -36,7 +37,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.DESCRIPTION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.DESCRIPTION_LOCALIZED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.HEADER_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ID;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.LOCKED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.LOCKED_BY_NAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.MODIFIED;
@@ -49,6 +50,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_BY_NAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_FROM;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_TO;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RIGHTS;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RIGHTS_LOCALIZED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.SERIES;
@@ -56,7 +58,6 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TITLE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TITLE_LOCALIZED;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ID;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.XML;
 
@@ -143,6 +144,7 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
       addField(getLocalizedFieldName(CONTENT_CREATED, l), SolrUtils.serializeDate(content.getCreationDate()), false);
       addField(getLocalizedFieldName(CONTENT_CREATED_BY, l), SolrUtils.serializeUserId(content.getCreator()), false);
       addField(CONTENT_SOURCE, content.getSource(), true);
+      addField(CONTENT_EXTERNAL_REPRESENTATION, content.getExternalLocation(), true);
       addField(CONTENT_FILENAME, content.getFilename(), true);
       addField(getLocalizedFieldName(CONTENT_FILENAME_LOCALIZED, l), content.getFilename(), false);
       addField(CONTENT_MIMETYPE, content.getMimetype(), true);
