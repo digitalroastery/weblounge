@@ -640,6 +640,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   protected <T extends ResourceContent> T storeResourceContent(ResourceURI uri,
       T content, InputStream is) throws IOException {
 
+    if (is == null)
+      return content;
+
     File contentFile = uriToContentFile(uri, content);
     OutputStream os = null;
     try {
