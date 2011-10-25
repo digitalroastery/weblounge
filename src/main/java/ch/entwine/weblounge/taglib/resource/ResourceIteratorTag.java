@@ -150,11 +150,16 @@ public class ResourceIteratorTag extends WebloungeTag {
     if (searchResult == null) {
       SearchQuery q = new SearchQueryImpl(site);
       q.withVersion(Resource.LIVE);
-      for (String subject : resourceSubjects) {
-        q.withSubject(subject);
+
+      if (resourceSubjects != null) {
+        for (String subject : resourceSubjects) {
+          q.withSubject(subject);
+        }
       }
-      for (String series : resourceSeries) {
-        q.withSeries(series);
+      if (resourceSeries != null) {
+        for (String series : resourceSeries) {
+          q.withSeries(series);
+        }
       }
       if (creatorStartDate != null)
         q.withCreationDateBetween(creatorStartDate);
