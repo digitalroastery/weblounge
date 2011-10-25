@@ -1,5 +1,6 @@
 package ch.entwine.weblounge.bridge.oaipmh;
 
+import ch.entwine.weblounge.bridge.oaipmh.harvester.HarvesterException;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.ListRecordsResponse;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.RecordHandler;
 import ch.entwine.weblounge.common.content.Resource;
@@ -15,6 +16,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
@@ -29,7 +31,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.w3c.dom.Node;
 
-import java.util.Date;
+import java.net.MalformedURLException;
 
 /**
  * A Matterhorn specified implementation of a record handler. This class is not
@@ -132,9 +134,17 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
 
     Language language = getISO3Language(mediaPackage.getLanguage());
 
+    // TODO: Use tracks with correct flavor for movie
+    // ??? presenterTrackFlavor
+    String[] presentationTrack = presentationTrackFlavor.split("/");
+    MediaPackageElementFlavor elementFlavor = new MediaPackageElementFlavor(presentationTrack[0], presentationTrack[1]);
+
     // Set Content
-    MediaPackageElement element = mediaPackage.getElements()[0];
-    MovieContent content = new MovieContentImpl(element.getURI().toString(), language, element.getMimeType().asString());
+    MediaPackageElement[] mediaPackageElements = mediaPackage.getElementsByFlavor(elementFlavor);
+    if (mediaPackageElements.length < 1)
+      return null;
+    MediaPackageElement element = mediaPackageElements[0];
+    MovieContent content = new MovieContentImpl(FilenameUtils.getBaseName(element.getURI().toString()), language, element.getMimeType().asString());
     StringBuilder author = new StringBuilder();
     String[] creators = mediaPackage.getCreators();
     for (int i = 0; i < creators.length; i++) {
@@ -143,16 +153,21 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
       author.append(creators[i]);
     }
 
+    try {
+      content.setExternalLocation(element.getURI().toURL());
+    } catch (MalformedURLException e) {
+      logger.debug("No record url for element {}", element.getIdentifier());
+      throw new HarvesterException("No record url for element: " + element.getIdentifier());
+    }
     content.setAuthor(author.toString());
     if (element.getSize() != -1)
       content.setSize(element.getSize());
     if (mediaPackage.getDuration() != -1)
       content.setDuration(mediaPackage.getDuration());
 
-    // TODO: Use tracks with correct flavor for movie
-    // ??? presenterTrackFlavor
-    String[] presentationTrack = presentationTrackFlavor.split("/");
     Track[] tracks = mediaPackage.getTracks(new MediaPackageElementFlavor(presentationTrack[0], presentationTrack[1]));
+    if (tracks.length < 1)
+      return null;
     Track track = tracks[0];
     for (Stream stream : track.getStreams()) {
       if (stream instanceof AudioStream) {
@@ -190,8 +205,7 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
 
     // Use the logged in user as the author
     content.setCreator(harvesterUser);
-    content.setCreationDate(new Date());
+    content.setCreationDate(mediaPackage.getDate());
     return content;
   }
-
 }

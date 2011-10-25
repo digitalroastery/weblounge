@@ -21,10 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -109,9 +107,12 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
       logger.info("Deleted harvestet resource " + recordIdentifier);
     } else {
       Resource<?> resource = parseResource(record);
-      addResource(resource);
-
       ResourceContent content = parseResourceContent(record);
+
+      if (resource == null || content == null)
+        return;
+
+      addResource(resource);
       content.setSource(recordIdentifier);
       addContent(resource.getURI(), content);
       logger.info("Harvesting resource " + recordIdentifier);
@@ -170,9 +171,7 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
   protected void addContent(ResourceURI resourceUri, ResourceContent content) {
     InputStream is = null;
     try {
-      // TODO allow content without an inputstream
-      is = new BufferedInputStream(new URL(content.getFilename()).openStream());
-      contentRepository.putContent(resourceUri, content, is);
+      contentRepository.putContent(resourceUri, content, null);
     } catch (IllegalStateException e) {
       logger.warn("Illegal state while adding content to resource {}: {}", resourceUri, e.getMessage());
       try {
