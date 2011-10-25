@@ -74,7 +74,7 @@ public class ComposerTag extends ComposerTagSupport {
     long version = request.getVersion();
     Page targetPage = getTargetPage();
     Page contentPage = getContentProvider();
-    
+
     boolean isLocked = targetPage != null && targetPage.isLocked();
     boolean isLockedByCurrentUser = targetPage != null && isLocked && user.equals(targetPage.getLockOwner());
     boolean isWorkVersion = version == Resource.WORK;
@@ -106,20 +106,21 @@ public class ComposerTag extends ComposerTagSupport {
   protected int beforePagelet(Pagelet pagelet, int position, JspWriter writer)
       throws IOException, ContentRepositoryException,
       ContentRepositoryUnavailableException {
-    
+
     if (RequestUtils.isEditingState(request)) {
-      
+
       boolean hasEditor = false;
-      
+
       Site site = getTargetPage().getURI().getSite();
       Module module = site.getModule(pagelet.getModule());
       if (module != null) {
-         PageletRenderer renderer = module.getRenderer(pagelet.getIdentifier());
-         if(renderer.getEditor() != null) hasEditor = true;
+        PageletRenderer renderer = module.getRenderer(pagelet.getIdentifier());
+        if (renderer.getEditor() != null)
+          hasEditor = true;
       }
-      
+
       // if pagelet has no editor add a cssClass noEditor
-      if(hasEditor) {
+      if (hasEditor) {
         writer.println("<div class=\"pagelet\">");
       } else {
         writer.println("<div class=\"pagelet wbl-noEditor\">");
@@ -143,7 +144,7 @@ public class ComposerTag extends ComposerTagSupport {
     if (RequestUtils.isEditingState(request)) {
       request.setAttribute(WebloungeRequest.PAGE, targetPage);
       request.setAttribute(WebloungeRequest.PAGELET, pagelet);
-      request.setAttribute(WebloungeRequest.COMPOSER, new ComposerImpl(name));
+      request.setAttribute(WebloungeRequest.COMPOSER, new ComposerImpl(id));
       writer.println("</div>");
       writer.flush();
     }
