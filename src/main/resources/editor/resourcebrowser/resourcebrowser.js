@@ -290,7 +290,7 @@ steal.plugins(
          */
         "div click": function(el, ev) {
         	ev.stopPropagation();
-        	if(!el.is(this.element.find('div.wbl-scrollViewItem'))) {
+        	if(!(el.is(this.element.find('div.wbl-scrollViewItem')) || el.is(this.element.find('div.wbl-imageContainer')))) {
         		this.element.find('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
         	}
         	

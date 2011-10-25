@@ -167,10 +167,9 @@
 img.wbl-pageThumbnail {
 	height: 200px;
 	width: 300px;
-	box-shadow: 2px 2px 2px #444;
 }
 
-.wbl-page.wbl-marked img.wbl-pageThumbnail {
+.wbl-page.wbl-marked div.wbl-imageContainer {
 	background-color: #ddccb5;
 	border-radius: 5px;
 	border: 2px solid red;
@@ -427,6 +426,7 @@ div.wbl-overlayPreviewContent {
 	width: 300px;
 	height: 200px;
 	overflow: hidden;
+	box-shadow: 2px 2px 2px #444;
 }
 
 .editor_resourcebrowser div.wbl-ribbon {
