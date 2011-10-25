@@ -39,8 +39,10 @@
     <tag-class>ch.entwine.weblounge.taglib.resource.ResourceIteratorTag</tag-class>
     <tei-class>ch.entwine.weblounge.taglib.resource.ResourceIteratorTagExtraInfo</tei-class>
     <body-content>JSP</body-content>
-    <attribute><name>subjects</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>subjects</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>series</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>startdate</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
   </tag>
   
   <tag>
