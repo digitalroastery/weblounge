@@ -245,7 +245,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
           int imageHeight = image.getHeight();
           assertTrue((int) (scaledHeight) == imageHeight || (int) (scaledHeight) + 1 == imageHeight || (int) (scaledHeight) - 1 == imageHeight);
           assertTrue((int) (scaledWidth) == imageWidth || (int) (scaledWidth) + 1 == imageWidth || (int) (scaledWidth) - 1 == imageWidth);
-          fileName.append("-en");
+          fileName.append("-0-en");
         } else {
           response.getEntity().consumeContent();
         }
@@ -301,7 +301,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
         assertEquals(1, response.getHeaders("Content-Disposition").length);
 
         // Test filename
-        StringBuilder fileName = new StringBuilder(pageId).append("-fr.png");
+        StringBuilder fileName = new StringBuilder(pageId).append("-0-fr.png");
         String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
         assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
 
