@@ -81,7 +81,6 @@ public final class PathUtils {
    * are replaced.
    */
   private static String cleanSpecializedCharacter(String path) {
-    path = path.replaceAll("\\.", "-");
     return path.replaceAll(":", "-");
   }
 
