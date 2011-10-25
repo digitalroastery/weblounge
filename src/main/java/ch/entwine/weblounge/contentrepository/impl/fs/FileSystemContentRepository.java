@@ -322,6 +322,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                   Language l = c.getLanguage();
                   String filename = l.getIdentifier() + "." + FilenameUtils.getExtension(c.getFilename());
                   String srcFile = PathUtils.concat(f.getParentFile().getAbsolutePath(), filename);
+                  File sourceFile = new File(srcFile);
+                  if (!sourceFile.exists()) {
+                    if (c.getExternalLocation() == null)
+                      logger.warn("Found file resource {} with missing content!", resource.getIdentifier());
+                    continue;
+                  }
                   String destFile = PathUtils.concat(indexedFile.getParentFile().getAbsolutePath(), filename);
                   FileUtils.copyFile(new File(srcFile), new File(destFile));
                 }
