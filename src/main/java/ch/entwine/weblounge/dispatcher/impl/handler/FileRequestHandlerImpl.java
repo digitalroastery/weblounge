@@ -109,7 +109,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     try {
       String id = null;
       String filePath = null;
-      
+
       if (path.startsWith(URI_PREFIX)) {
         String uriSuffix = StringUtils.chomp(path.substring(URI_PREFIX.length()), "/");
         uriSuffix = URLDecoder.decode(uriSuffix, "utf-8");
@@ -127,7 +127,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
             fileName = FilenameUtils.getName(filePath);
           }
         } else {
-          filePath = "/" + uriSuffix; 
+          filePath = "/" + uriSuffix;
           fileName = FilenameUtils.getName(filePath);
         }
       } else {
@@ -151,7 +151,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       DispatchUtils.sendInternalError(request, response);
       return true;
     }
- 
+
     // Try to serve the file
     logger.debug("File handler agrees to handle {}", path);
 
@@ -190,7 +190,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     } else {
       language = LanguageUtils.getPreferredLanguage(fileResource, request, site);
     }
-    
+
     if (language == null) {
       logger.warn("File {} does not exist in any supported language", fileURI);
       DispatchUtils.sendNotFound(request, response);
@@ -205,9 +205,20 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       DispatchUtils.sendNotModified(request, response);
       return true;
     }
-    
+
     // Add mime type header
     FileContent content = fileResource.getContent(language);
+
+    // If the content is hosted externally, send a redirect and be done with it
+    if (content.getExternalLocation() != null) {
+      try {
+        response.sendRedirect(content.getExternalLocation().toExternalForm());
+      } catch (IOException e) {
+        logger.debug("Client ignore redirect to {}", content.getExternalLocation());
+      }
+      return true;
+    }
+
     String contentType = content.getMimetype();
     if (contentType == null)
       contentType = MediaType.APPLICATION_OCTET_STREAM;
@@ -228,7 +239,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     // Add ETag header
     String eTag = ResourceUtils.getETagValue(fileResource);
     response.setHeader("ETag", eTag);
-    
+
     // Set the Expires header
     response.setDateHeader("Expires", System.currentTimeMillis() + Times.MS_PER_HOUR);
 
