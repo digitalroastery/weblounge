@@ -134,6 +134,9 @@ public class FileImplTest {
   /** The subjects */
   protected String[] subjects = new String[] { "This subject", "Other subject" };
 
+  /** The series */
+  protected String[] series = new String[] { "233-0326-11L", "252-0206-00L" };
+
   /** The English file name */
   protected String englishFilename = "image.jpg";
 
@@ -176,6 +179,8 @@ public class FileImplTest {
     file.setType(fileType);
     for (String subject : subjects)
       file.addSubject(subject);
+    for (String series : this.series)
+      file.addSeries(series);
 
     FileContentImpl germanContent = new FileContentImpl(germanFilename, german, germanMimetype, germanFilesize);
     germanContent.setCreated(creationDate, amelie);
@@ -227,6 +232,17 @@ public class FileImplTest {
   public void testRemoveSubject() {
     file.removeSubject(subjects[0]);
     assertEquals(subjects.length - 1, file.getSubjects().length);
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#removeSeries(java.lang.String)}
+   * .
+   */
+  @Test
+  public void testRemoveSeries() {
+    file.removeSeries(series[0]);
+    assertEquals(series.length - 1, file.getSeries().length);
   }
 
   /**
@@ -450,13 +466,33 @@ public class FileImplTest {
 
   /**
    * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#hasSeries(String)}
+   * .
+   */
+  @Test
+  public void testHasSeries() {
+    assertTrue(file.hasSeries(series[0]));
+    assertFalse(file.hasSeries("xxx"));
+  }
+
+  /**
+   * Test method for
    * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#getSubjects()}
    * .
    */
   @Test
   public void testGetSubjects() {
     assertEquals(subjects.length, file.getSubjects().length);
+  }
 
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#getSeries()}
+   * .
+   */
+  @Test
+  public void testGetSeries() {
+    assertEquals(series.length, file.getSeries().length);
   }
 
   /**

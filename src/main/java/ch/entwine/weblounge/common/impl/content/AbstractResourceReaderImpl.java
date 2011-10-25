@@ -382,6 +382,11 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
         resource.addSubject(characters.toString());
       }
 
+      // Series
+      else if ("series".equals(raw)) {
+        resource.addSeries(characters.toString());
+      }
+
       // Pagelock
       else if ("locked".equals(raw)) {
         User user = (User) clipboard.remove("user");
