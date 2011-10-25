@@ -55,6 +55,12 @@ public class ResourceIteratorTag extends WebloungeTag {
   /** The subjects */
   private List<String> resourceSubjects = null;
 
+  /** The series */
+  private List<String> resourceSeries = null;
+
+  /** The resource id */
+  private String resourceId = null;
+
   /** The minimum creation start date */
   private Date creatorStartDate = null;
 
@@ -82,6 +88,31 @@ public class ResourceIteratorTag extends WebloungeTag {
     StringTokenizer st = new StringTokenizer(subjects, ",;");
     while (st.hasMoreTokens()) {
       resourceSubjects.add(st.nextToken());
+    }
+  }
+
+  /**
+   * Sets the resource identifier for the search.
+   * 
+   * @param id
+   *          the resource identifier to serach
+   */
+  public void setUuid(String id) {
+    resourceId = id;
+  }
+
+  /**
+   * Sets the series for the search.
+   * 
+   * @param series
+   *          the series to search
+   */
+  public void setSeries(String series) {
+    if (resourceSeries == null)
+      resourceSeries = new ArrayList<String>();
+    StringTokenizer st = new StringTokenizer(series, ",;");
+    while (st.hasMoreTokens()) {
+      resourceSeries.add(st.nextToken());
     }
   }
 
@@ -122,8 +153,13 @@ public class ResourceIteratorTag extends WebloungeTag {
       for (String subject : resourceSubjects) {
         q.withSubject(subject);
       }
+      for (String series : resourceSeries) {
+        q.withSeries(series);
+      }
       if (creatorStartDate != null)
         q.withCreationDateBetween(creatorStartDate);
+      if (resourceId != null)
+        q.withIdentifier(resourceId);
       try {
         searchResult = repository.find(q);
       } catch (ContentRepositoryException e) {
@@ -238,6 +274,8 @@ public class ResourceIteratorTag extends WebloungeTag {
     resourceSubjects = null;
     repository = null;
     creatorStartDate = null;
+    resourceId = null;
+    resourceSeries = null;
   }
 
 }
