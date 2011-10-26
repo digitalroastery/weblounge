@@ -1,4 +1,5 @@
 steal.plugins('jquery/controller',
+		'jquery/event/hover',
 		'jqueryui/sortable',
 		'jqueryui/mouse')
 .models('../../models/page')
@@ -34,13 +35,6 @@ steal.plugins('jquery/controller',
         cursor: 'move',
         cursorAt: { top: -8, left: -10 },
         revert: true,
-        over: $.proxy(function(event, ui) {
-        	$(this.element).addClass('wbl-composerBorder');
-        }, this),
-        out: $.proxy(function(event, ui) {
-        	if($(this.element).hasClass('empty')) return;
-        	$(this.element).removeClass('wbl-composerBorder');
-        }, this),
         start: $.proxy(function(event, ui) {
         	this.element.find('img.wbl-iconEditing').remove();
         	this.element.find('img.wbl-iconRemove').remove();
@@ -160,7 +154,16 @@ steal.plugins('jquery/controller',
     
     _disablePagelets: function() {
     	$('.composer').editor_composer('disable');
-    }
+    },
+    
+	'hoverenter': function(el, ev) {
+		$(this.element).addClass('wbl-composerBorder');
+    },
+    
+	'hoverleave': function(el, ev) {
+    	if($(this.element).hasClass('empty')) return;
+    	$(this.element).removeClass('wbl-composerBorder');
+    },
     
   });
 

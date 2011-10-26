@@ -107,7 +107,6 @@ steal.plugins('jquery',
 				},this)
 			});
 			
-			$("body").find('div.ui-widget-overlay').css("position","fixed");
 			this.element.find("form#wbl-validatePageSettings").validate();
 		},
 	

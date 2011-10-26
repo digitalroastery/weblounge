@@ -2,6 +2,8 @@
 #weblounge-editor {
    	font-family: arial,verdana,tahoma;
 	font-size: 12px;
+	display: block;
+	height: 45px;
 }
 
 /* global */
@@ -13,11 +15,6 @@ div.DataTables_sort_wrapper span {
     border: red 2px solid;
     border-radius: 999px;
     z-index: 9999;
-}
-
-/* make space for the menubar */
-body {
-  margin-top: 45px;
 }
 
 /* general dialog declarations */

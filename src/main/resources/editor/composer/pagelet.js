@@ -121,7 +121,6 @@ steal.plugins('jqueryui/dialog',
 		
 		if(scripts.length < 1) {
 			this.editorDialog.dialog('open');
-			$("body").find('div.ui-widget-overlay').css("position","fixed");
 		}
     },
     
@@ -129,7 +128,6 @@ steal.plugins('jqueryui/dialog',
     	this.scriptIndex++;
 		if(size == this.scriptIndex) {
 			this.editorDialog.dialog('open');
-			$("body").find('div.ui-widget-overlay').css("position","fixed");
 		}
     },
     

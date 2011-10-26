@@ -40,9 +40,8 @@
 }
 
 .editor_composer .wbl-pageletPlaceholder {
-    border: 2px dashed black;
+ 	border-top: solid 2px #FF0000;
     color: #363636;
-	height: 1.5em; line-height: 1.2em;
 }
 
 .editor_composer.wbl-nojQuery div.pagelet:hover {

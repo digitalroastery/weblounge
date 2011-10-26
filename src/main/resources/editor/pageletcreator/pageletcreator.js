@@ -98,9 +98,21 @@ steal.plugins('jquery',
 			}).disableSelection();
 	    },
 	    
+	    _bodyAbsoluteTop: function(pixel) {
+			$('body > *').each(function(index, elem) {
+				if($(elem).css('position') == 'absolute') {
+					var cssTop = $(elem).css('top');
+					if(cssTop == '') return;
+					var top = parseFloat(cssTop);
+					$(elem).css('top', pixel + 'px');
+				}
+			});
+	    },
+	    
 	    update: function() {
 	    	if(!this.enabled) return;
-	    	$("body").css("margin-top","185px");
+	    	$("div#weblounge-editor").css("height","185px");
+	    	this._bodyAbsoluteTop(185);
 	    	this.element.show();
 	    	this._calculateHeight();
 	    },
@@ -116,7 +128,8 @@ steal.plugins('jquery',
 	    
 	    _hide: function() {
 	    	this.element.hide();
-	    	$("body").css("margin-top","45px");
+	    	$("div#weblounge-editor").css("height","45px");
+	    	this._bodyAbsoluteTop(45);
 	    },
 	    
 	    _loadContent: function(modules) {
@@ -140,10 +153,12 @@ steal.plugins('jquery',
 	    	var lastTop = elements.last().position().top;
 	    	if(firstTop == lastTop) {
 	    		this.element.find('div.wbl-panes').css('height', '80px');
-	    		$("body").css("margin-top","185px");
+	    		$("div#weblounge-editor").css("height","185px");
+	    		this._bodyAbsoluteTop(185);
 	    	} else {
 	    		this.element.find('div.wbl-panes').css('height', '120px');
-	    		$("body").css("margin-top","225px");
+	    		$("div#weblounge-editor").css("height","225px");
+	    		this._bodyAbsoluteTop(225);
 	    	}
 	    }
 	    
