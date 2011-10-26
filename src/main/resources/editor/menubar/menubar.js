@@ -199,7 +199,7 @@ steal.plugins(
         		this.element.find('a.wbl-pages').hide();
         		this.element.find('a.wbl-media').click();
         		browser = this.element.parent().find('#wbl-mediabrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection);
-        	} else if(resourceMode == 'file' || resourceMode == 'image' || resourceMode == 'video') {
+        	} else if(resourceMode == 'file' || resourceMode == 'image' || resourceMode == 'movie') {
         		this.element.find('a.wbl-pages').hide();
         		this.element.find('a.wbl-media').click();
         		browser = this.element.parent().find('#wbl-mediabrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection, resourceMode);

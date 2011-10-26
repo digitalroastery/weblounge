@@ -163,7 +163,7 @@ steal.plugins('jquery/controller',
 	'hoverleave': function(el, ev) {
     	if($(this.element).hasClass('empty')) return;
     	$(this.element).removeClass('wbl-composerBorder');
-    },
+    }
     
   });
 
