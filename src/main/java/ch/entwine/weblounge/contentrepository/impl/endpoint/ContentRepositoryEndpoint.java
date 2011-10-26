@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,6 +97,15 @@ public class ContentRepositoryEndpoint {
     ResourceContent resourceContent = resource.getContent(language);
     if (resourceContent == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    // If the content is hosted externally, send a redirect and be done with it
+    if (resourceContent.getExternalLocation() != null) {
+      try {
+        return Response.temporaryRedirect(resourceContent.getExternalLocation().toURI()).build();
+      } catch (URISyntaxException e) {
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
     }
 
     Site site = getSite(request);
