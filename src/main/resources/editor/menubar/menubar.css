@@ -161,23 +161,6 @@ div.wbl-overlayIcons span.wbl-more {
     left: 310px;
 }
 
-.editor_menubar #wbl-trashcan {
-	position: relative;
-	left: 100px;
-	padding: 10px 50px;
-	background: url('images/trashcan.png') no-repeat center;
-	border: 2px solid grey;
-	visibility: hidden;
-}
-
-.editor_menubar .wbl-trashcanHover {
-	background: url('images/trashcan_hover.png') no-repeat center !important;
-}
-
-.editor_menubar .wbl-trashcanActive {
-	visibility: visible !important;
-}
-
 .editor_menubar .wbl-profileMenu {
 	margin-right: 40px;
 }

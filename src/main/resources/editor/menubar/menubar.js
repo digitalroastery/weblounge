@@ -7,6 +7,7 @@ steal.plugins(
 	'editor/pageletcreator',
 	'editor/pageheadeditor',
 	'jqueryui/dialog',
+	'jqueryui/datepicker',
 	'jqueryui/draggable',
 	'jqueryui/droppable',
 	'jqueryui/resizable',
@@ -39,7 +40,6 @@ steal.plugins(
             $(el).html('//editor/menubar/views/menubar.tmpl', {runtime: this.options.runtime, current: this.options.language});
             this._updateView();
             this._initDialogs();
-            this._initDragDrop();
             $('#wbl-pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
             this._initPageLocking();
         },
@@ -142,18 +142,6 @@ steal.plugins(
 				}
 			});
 			
-        },
-        
-        _initDragDrop: function() {
-    		this.element.find("#wbl-trashcan").droppable({
-    			accept: "div.pagelet",
-    			activeClass: "wbl-trashcanActive",
-    			hoverClass: "wbl-trashcanHover",
-    			tolerance: "pointer",
-    			drop: $.proxy(function(event, ui) {
-    				ui.draggable.remove();
-    			}, this)
-    		});
         },
         
         _initPageLocking: function() {
