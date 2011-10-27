@@ -27,7 +27,6 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
-import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
@@ -60,6 +59,12 @@ public class ResourceIteratorTag extends WebloungeTag {
 
   /** The series */
   private List<String> resourceSeries = null;
+
+  /** The types to include */
+  private List<String> includeTypes = null;
+
+  /** The types to exclude */
+  private List<String> excludeTypes = null;
 
   /** The resource id */
   private String resourceId = null;
@@ -123,6 +128,36 @@ public class ResourceIteratorTag extends WebloungeTag {
   }
 
   /**
+   * Sets the types to search for.
+   * 
+   * @param types
+   *          the types
+   */
+  public void setIncludetypes(String types) {
+    if (includeTypes == null)
+      includeTypes = new ArrayList<String>();
+    StringTokenizer st = new StringTokenizer(types, ",;");
+    while (st.hasMoreTokens()) {
+      includeTypes.add(st.nextToken());
+    }
+  }
+
+  /**
+   * Sets the types to exclude in the serach.
+   * 
+   * @param types
+   *          the types to exlude
+   */
+  public void setExcludetypes(String types) {
+    if (excludeTypes == null)
+      excludeTypes = new ArrayList<String>();
+    StringTokenizer st = new StringTokenizer(types, ",;");
+    while (st.hasMoreTokens()) {
+      excludeTypes.add(st.nextToken());
+    }
+  }
+
+  /**
    * Set the minimum creation date to search from
    * 
    * @param startDate
@@ -166,11 +201,14 @@ public class ResourceIteratorTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    // First time serach resources
+    // First time search resources
     if (searchResult == null) {
       SearchQuery q = new SearchQueryImpl(site);
-      q.withoutType(Page.TYPE);
-      q.withVersion(Resource.LIVE);
+      if (includeTypes != null)
+        q.withTypes(includeTypes.toArray(new String[includeTypes.size()]));
+
+      if (excludeTypes != null)
+        q.withTypes(excludeTypes.toArray(new String[excludeTypes.size()]));
 
       if (order != null)
         q.sortByCreationDate(order);
@@ -309,6 +347,8 @@ public class ResourceIteratorTag extends WebloungeTag {
     resourceId = null;
     order = null;
     resourceSeries = null;
+    excludeTypes = null;
+    includeTypes = null;
   }
 
 }

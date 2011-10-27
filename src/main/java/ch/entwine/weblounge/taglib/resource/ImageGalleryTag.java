@@ -135,7 +135,7 @@ public class ImageGalleryTag extends WebloungeTag {
 
     SearchQuery query = new SearchQueryImpl(site);
     query.withVersion(Resource.LIVE);
-    query.withType(ImageResource.TYPE);
+    query.withTypes(ImageResource.TYPE);
     for (int i = 0; i < imageSubjects.size(); i++)
       query.withSubject(imageSubjects.get(i));
     SearchResult result;
