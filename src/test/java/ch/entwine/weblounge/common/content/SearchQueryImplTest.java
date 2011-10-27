@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.content;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -187,25 +188,25 @@ public class SearchQueryImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withType(java.lang.String)}
+   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withTypess(java.lang.String)}
    * .
    */
   @Test
-  public void testWithType() {
-    String type = "page";
-    query.withType(type);
-    assertEquals(type, query.getType());
+  public void testWithTypes() {
+    String[] types = new String[] { "page" };
+    query.withTypes(types);
+    assertArrayEquals(types, query.getTypes());
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withoutType(java.lang.String)}
+   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withoutTypess(java.lang.String)}
    */
   @Test
-  public void testWithoutType() {
-    String withoutType = "page";
-    query.withoutType(withoutType);
-    assertEquals(withoutType, query.getWithoutType());
+  public void testWithoutTypes() {
+    String[] withoutTypes = new String[] { "page" };
+    query.withoutTypes(withoutTypes);
+    assertArrayEquals(withoutTypes, query.getWithoutTypes());
   }
 
   /**

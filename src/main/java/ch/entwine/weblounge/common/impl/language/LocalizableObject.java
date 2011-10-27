@@ -263,6 +263,8 @@ public class LocalizableObject implements Localizable {
     else if (behavior.equals(Original)) {
       if (getOriginalLanguage() != null)
         currentLanguage = getOriginalLanguage();
+      else if (languages.size() > 0)
+        throw new IllegalStateException("Language resolution failed for " + this);
     }
 
     // The selected language is not available. Use the default language instead
@@ -349,6 +351,8 @@ public class LocalizableObject implements Localizable {
       throws IllegalStateException {
     if (Default.equals(behavior) && defaultLanguage == null)
       throw new IllegalStateException("Must specify default language first");
+    if (Original.equals(behavior) && originalLanguage == null && languages.size() > 0)
+      throw new IllegalStateException("Must specify original language first");
     this.behavior = behavior;
   }
 

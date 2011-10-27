@@ -67,18 +67,18 @@ public class SearchQueryImpl implements SearchQuery {
   /** The path */
   protected String path = null;
 
-  /** The type */
-  protected String type = null;
+  /** The types */
+  protected List<String> types = new ArrayList<String>();
 
-  /** The type to block */
-  protected String withoutType = null;
+  /** The types to block */
+  protected List<String> withoutTypes = new ArrayList<String>();
 
   /** The template */
   protected String template = null;
 
   /** The layout */
   protected String layout = null;
-  
+
   /** Stationary flag */
   protected boolean stationary = false;
 
@@ -356,20 +356,24 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#withType(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withTypes(java.lang.String)
    */
-  public SearchQuery withType(String type) {
-    this.type = type;
+  public SearchQuery withTypes(String... types) {
+    for (String type : types) {
+      this.types.add(type);
+    }
     return this;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#withoutType(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withoutTypes(java.lang.String)
    */
-  public SearchQuery withoutType(String type) {
-    this.withoutType = type;
+  public SearchQuery withoutTypes(String... types) {
+    for (String type : types) {
+      this.withoutTypes.add(type);
+    }
     return this;
   }
 
@@ -378,17 +382,17 @@ public class SearchQueryImpl implements SearchQuery {
    * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getType()
    */
-  public String getType() {
-    return type;
+  public String[] getTypes() {
+    return types.toArray(new String[types.size()]);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#getWithoutType()
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getWithoutTypes()
    */
-  public String getWithoutType() {
-    return withoutType;
+  public String[] getWithoutTypes() {
+    return withoutTypes.toArray(new String[withoutTypes.size()]);
   }
 
   /**
