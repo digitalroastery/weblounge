@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,20 +152,23 @@ public class ResourceIteratorTag extends WebloungeTag {
       SearchQuery q = new SearchQueryImpl(site);
       q.withVersion(Resource.LIVE);
 
-      if (resourceSubjects != null) {
-        for (String subject : resourceSubjects) {
-          q.withSubject(subject);
-        }
-      }
-      if (resourceSeries != null) {
-        for (String series : resourceSeries) {
-          q.withSeries(series);
-        }
-      }
-      if (creatorStartDate != null)
-        q.withCreationDateBetween(creatorStartDate);
-      if (resourceId != null)
+      if (StringUtils.isNotBlank(resourceId)) {
         q.withIdentifier(resourceId);
+      } else {
+        if (resourceSubjects != null) {
+          for (String subject : resourceSubjects) {
+            q.withSubject(subject);
+          }
+        }
+        if (resourceSeries != null) {
+          for (String series : resourceSeries) {
+            q.withSeries(series);
+          }
+        }
+        if (creatorStartDate != null)
+          q.withCreationDateBetween(creatorStartDate);
+      }
+
       try {
         searchResult = repository.find(q);
       } catch (ContentRepositoryException e) {
