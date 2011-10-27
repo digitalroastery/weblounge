@@ -200,37 +200,37 @@ public interface SearchQuery {
   String getLayout();
 
   /**
-   * Return the resources with the given type.
+   * Return the resources with the given types.
    * 
-   * @param type
-   *          the resource type to look up
+   * @param types
+   *          the resource types to look up
    * @return the query extended by this criterion
    */
-  SearchQuery withType(String type);
+  SearchQuery withTypes(String... types);
 
   /**
-   * Returns the resources except the ones with the given type.
+   * Returns the resources except the ones with the given types.
    * 
-   * @param type
-   *          the resource type to block
+   * @param types
+   *          the resource types to block
    * @return the query extended by this criterion
    */
-  SearchQuery withoutType(String type);
+  SearchQuery withoutTypes(String... types);
 
   /**
-   * Returns the resource type or <code>null</code> if no type was specified.
+   * Returns the resource types or or an empty array if no types was specified.
    * 
    * @return the type
    */
-  String getType();
+  String[] getTypes();
 
   /**
-   * Returns the blocked resource type or <code>null</code> if no type was
+   * Returns the blocked resource types or or an empty array if no types was
    * specified.
    * 
    * @return the type
    */
-  String getWithoutType();
+  String[] getWithoutTypes();
 
   /**
    * Return resources that contain the given text either in the page header or
