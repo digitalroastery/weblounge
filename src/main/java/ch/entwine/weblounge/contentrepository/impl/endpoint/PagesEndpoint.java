@@ -143,7 +143,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
 
-    q.withType(Page.TYPE);
+    q.withTypes(Page.TYPE);
     if (version != -1)
       q.withVersion(version);
 
@@ -230,7 +230,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     q.withoutPublication();
 
     // Type
-    q.withType(Page.TYPE);
+    q.withTypes(Page.TYPE);
 
     // Filter query
     if (StringUtils.isNotBlank(filter))
@@ -334,7 +334,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
     q.withVersion(Resource.LIVE);
-    q.withType(Page.TYPE);
+    q.withTypes(Page.TYPE);
     q.withPathPrefix(page.getURI().getPath());
 
     ContentRepository repository = getContentRepository(site, false);

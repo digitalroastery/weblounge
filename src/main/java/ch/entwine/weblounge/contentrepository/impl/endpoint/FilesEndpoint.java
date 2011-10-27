@@ -170,9 +170,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     q.withVersion(Resource.LIVE);
 
     // Type
-    q.withoutType(Page.TYPE);
+    q.withoutTypes(Page.TYPE);
     if (StringUtils.isNotBlank(type))
-      q.withType(type);
+      q.withTypes(type);
 
     // Path
     if (StringUtils.isNotBlank(path))
@@ -255,9 +255,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     q.withoutModification();
 
     // Type
-    q.withoutType(Page.TYPE);
+    q.withoutTypes(Page.TYPE);
     if (StringUtils.isNotBlank(type))
-      q.withType(type);
+      q.withTypes(type);
 
     // Filter query
     if (StringUtils.isNotBlank(filter))
@@ -351,7 +351,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
     q.withVersion(Resource.LIVE);
-    q.withType(Page.TYPE);
+    q.withTypes(Page.TYPE);
     q.withProperty("resourceid", resourceId);
 
     ContentRepository repository = getContentRepository(site, false);

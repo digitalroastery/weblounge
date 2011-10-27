@@ -146,13 +146,13 @@ public class SearchRequest {
     }
 
     // Type
-    if (query.getType() != null) {
-      and(solrQuery, TYPE, query.getType(), true, true);
+    if (query.getTypes().length > 0) {
+      and(solrQuery, TYPE, query.getTypes(), true, true);
     }
 
     // Without type
-    if (query.getWithoutType() != null) {
-      andNot(solrQuery, TYPE, query.getWithoutType(), true, true);
+    if (query.getWithoutTypes().length > 0) {
+      andNot(solrQuery, TYPE, query.getWithoutTypes(), true, true);
     }
 
     // Subjects
@@ -341,10 +341,10 @@ public class SearchRequest {
     else if (!SearchQuery.Order.None.equals(query.getCreationDateSortOrder())) {
       switch (query.getCreationDateSortOrder()) {
         case Ascending:
-          q.addSortField(MODIFIED, ORDER.asc);
+          q.addSortField(CREATED, ORDER.asc);
           break;
         case Descending:
-          q.addSortField(MODIFIED, ORDER.desc);
+          q.addSortField(CREATED, ORDER.desc);
           break;
         case None:
         default:
@@ -522,6 +522,48 @@ public class SearchRequest {
       buf.append(StringUtils.trim(fieldValue));
     if (quote)
       buf.append("\"");
+    return buf;
+  }
+
+  /**
+   * Encodes field name and values as part of a solr query:
+   * <tt>AND -(fieldName : fieldValue[0] OR fieldName : fieldValue[1] ...)</tt>.
+   * 
+   * @param buf
+   *          the <code>StringBuilder</code> to append to
+   * @param fieldName
+   *          the field name
+   * @param fieldValues
+   *          the field value
+   * @param quote
+   *          <code>true</code> to put the field values in quotes
+   * @param clean
+   *          <code>true</code> to escape solr special characters in the field
+   *          value
+   * @return the encoded query part
+   */
+  private StringBuilder andNot(StringBuilder buf, String fieldName,
+      String[] fieldValues, boolean quote, boolean clean) {
+    if (buf.length() > 0)
+      buf.append(" AND ");
+    buf.append("-"); // notice the minus sign
+    buf.append(StringUtils.trim(fieldName));
+    buf.append(":(");
+    boolean first = true;
+    for (String value : fieldValues) {
+      if (!first)
+        buf.append(" OR ");
+      if (quote)
+        buf.append("\"");
+      if (clean)
+        buf.append(StringUtils.trim(clean(value)));
+      else
+        buf.append(StringUtils.trim(value));
+      if (quote)
+        buf.append("\"");
+      first = false;
+    }
+    buf.append(")");
     return buf;
   }
 
