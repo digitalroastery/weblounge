@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
@@ -168,6 +169,7 @@ public class ResourceIteratorTag extends WebloungeTag {
     // First time serach resources
     if (searchResult == null) {
       SearchQuery q = new SearchQueryImpl(site);
+      q.withoutType(Page.TYPE);
       q.withVersion(Resource.LIVE);
 
       if (order != null)
