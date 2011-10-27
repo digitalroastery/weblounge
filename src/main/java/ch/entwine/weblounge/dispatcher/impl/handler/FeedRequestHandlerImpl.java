@@ -249,7 +249,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     try {
       SearchQuery query = new SearchQueryImpl(site);
       query.withVersion(Resource.LIVE);
-      query.withType(Page.TYPE);
+      query.withTypes(Page.TYPE);
       query.withLimit(limit);
       query.sortByModificationDate(Order.Descending);
       for (String subject : subjects) {
