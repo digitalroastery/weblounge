@@ -44,6 +44,8 @@
     <attribute><name>startdate</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>order</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>includetypes</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>excludetypes</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
   </tag>
   
   <tag>
