@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
@@ -76,6 +77,9 @@ public class ResourceIteratorTag extends WebloungeTag {
 
   /** The content repository */
   private ContentRepository repository = null;
+
+  /** The result order */
+  private Order order = null;
 
   /**
    * Sets the subjects for the search.
@@ -132,6 +136,20 @@ public class ResourceIteratorTag extends WebloungeTag {
   }
 
   /**
+   * Set the sort order for the search
+   * 
+   * @param order
+   *          the sort order
+   */
+  public void setOrder(String order) {
+    try {
+      this.order = Order.valueOf(order);
+    } catch (Exception e) {
+      logger.debug("Unable to parse order '{}'", order);
+    }
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
@@ -151,6 +169,9 @@ public class ResourceIteratorTag extends WebloungeTag {
     if (searchResult == null) {
       SearchQuery q = new SearchQueryImpl(site);
       q.withVersion(Resource.LIVE);
+
+      if (order != null)
+        q.sortByCreationDate(order);
 
       if (StringUtils.isNotBlank(resourceId)) {
         q.withIdentifier(resourceId);
@@ -284,6 +305,7 @@ public class ResourceIteratorTag extends WebloungeTag {
     repository = null;
     creatorStartDate = null;
     resourceId = null;
+    order = null;
     resourceSeries = null;
   }
 
