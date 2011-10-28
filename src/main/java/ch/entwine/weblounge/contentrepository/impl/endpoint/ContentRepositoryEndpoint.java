@@ -132,7 +132,9 @@ public class ContentRepositoryEndpoint {
         try {
           IOUtils.copy(is, os);
         } catch (IOException e) {
-          logger.warn("Error writing file contents to response", e);
+          Throwable cause = e.getCause();
+          if (cause == null || !"Broken pipe".equals(cause.getMessage()))
+            logger.warn("Error writing file contents to response", e);
         } finally {
           IOUtils.closeQuietly(is);
           IOUtils.closeQuietly(os);
