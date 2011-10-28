@@ -40,7 +40,7 @@ import java.net.MalformedURLException;
 public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler implements RecordHandler {
 
   /** User for resource creation */
-  private User harvesterUser = new UserImpl("harvester");
+  private User harvesterUser = new UserImpl("harvester", "videolounge", "Harvester");
 
   /** Name of the oai pmh prefix */
   private static final String MATTERHORN_REPOSITORY_PREFIX = "matterhorn";

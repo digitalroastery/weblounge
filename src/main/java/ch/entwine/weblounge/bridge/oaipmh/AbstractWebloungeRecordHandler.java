@@ -88,24 +88,22 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
 
     logger.info("Start harvesting resource " + recordIdentifier);
 
+    SearchResult searchResult = searchSource(recordIdentifier);
+
     if (isDeleted) {
-      SearchResult searchResult;
-      SearchQuery q = new SearchQueryImpl(site);
-      q.withSource(recordIdentifier);
-      try {
-        searchResult = contentRepository.find(q);
-      } catch (ContentRepositoryException e) {
-        logger.error("Error searching for resources with given subject: " + recordIdentifier);
-        throw new RuntimeException(e);
-      }
       if (searchResult.getHitCount() != 1) {
-        logger.error("The found element size is wrong!, size: " + searchResult.getHitCount());
+        logger.warn("The found element size is wrong!, size: " + searchResult.getHitCount());
         return;
       }
       ResourceSearchResultItem resourceResult = (ResourceSearchResultItem) searchResult.getItems()[0];
       deleteResource(resourceResult.getResourceURI());
       logger.info("Deleted harvestet resource " + recordIdentifier);
     } else {
+      if (searchResult.getHitCount() > 0) {
+        logger.warn("The element to harvest is already in the contentrepository {}", recordIdentifier);
+        return;
+      }
+
       Resource<?> resource = parseResource(record);
       ResourceContent content = parseResourceContent(record);
 
@@ -117,6 +115,26 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
       addContent(resource.getURI(), content);
       logger.info("Harvesting resource " + recordIdentifier);
     }
+  }
+
+  /**
+   * Search a page with the resource identifier.
+   * 
+   * @param sourceIdentifier
+   *          the record identifier
+   * @return the search result
+   */
+  private SearchResult searchSource(String sourceIdentifier) {
+    SearchResult searchResult;
+    SearchQuery q = new SearchQueryImpl(site);
+    q.withSource(sourceIdentifier);
+    try {
+      searchResult = contentRepository.find(q);
+    } catch (ContentRepositoryException e) {
+      logger.error("Error searching for resources with given subject: " + sourceIdentifier);
+      throw new RuntimeException(e);
+    }
+    return searchResult;
   }
 
   /**
