@@ -566,7 +566,7 @@ public final class ImageStyleUtils {
         // Do the cropping
         IMOperation cropOperation = new IMOperation();
         cropOperation.addImage(scaledFile.getAbsolutePath());
-        cropOperation.crop(croppedLeft, croppedTop, croppedWidth, croppedHeight);
+        cropOperation.crop(croppedWidth, croppedHeight, croppedLeft, croppedTop);
         cropOperation.addImage(croppedFile.getAbsolutePath());
         imageMagick.run(cropOperation);
         finalFile = croppedFile;
