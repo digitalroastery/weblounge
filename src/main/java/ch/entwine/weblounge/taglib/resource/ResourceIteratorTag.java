@@ -208,7 +208,7 @@ public class ResourceIteratorTag extends WebloungeTag {
         q.withTypes(includeTypes.toArray(new String[includeTypes.size()]));
 
       if (excludeTypes != null)
-        q.withTypes(excludeTypes.toArray(new String[excludeTypes.size()]));
+        q.withoutTypes(excludeTypes.toArray(new String[excludeTypes.size()]));
 
       if (order != null)
         q.sortByCreationDate(order);
