@@ -116,15 +116,6 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   }
 
   /**
-   * Initializes reloading of cached request information.
-   */
-  public void validate() {
-    user = null;
-    url = null;
-    language = null;
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getEnvironment()
@@ -169,9 +160,8 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // get an object back form getUrl().
     language = url.getLanguage();
 
-    // If no language has been found in the session, it's the visitor's first
-    // access to this site. First thing we do is take a look at the url, where
-    // language information might be encoded, e. g. index_en.xml
+    // Take a look at the url, where language information might be encoded,
+    // e. g. index_en.xml
     if (language == null) {
       Matcher m = LANG_EXTRACTOR_REGEX.matcher(getRequestURI());
       if (m.find()) {
@@ -256,10 +246,6 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // might all be encoded in the path.
     this.url = new WebUrlImpl(site, getRequestURI());
 
-    // The language may be part of the path, so let's give that a try
-    if (language == null)
-      language = url.getLanguage();
-
     this.requestedUrl = url;
     return url;
   }
@@ -290,6 +276,16 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    */
   public void setUser(User user) {
     this.user = user;
+  }
+
+  /**
+   * Sets this request's language.
+   * 
+   * @param language
+   *          the language
+   */
+  public void setLanguage(Language language) {
+    this.language = language;
   }
 
   /**
