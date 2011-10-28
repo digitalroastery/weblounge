@@ -185,6 +185,11 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
    */
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
+    if (properties == null) {
+      logger.debug("No customized security configuration found");
+      return;
+    }
+
     String enabledProperty = (String) properties.get(OPT_ENABLED);
     boolean isEnabled = ConfigurationUtils.isTrue(enabledProperty, true);
 
