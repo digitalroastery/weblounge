@@ -247,7 +247,8 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
 
       // Did scaling work? If not, cleanup and tell the user
       if (scaledResourceFile.length() == 0) {
-        File f = scaledResourceFile;
+        FileUtils.deleteQuietly(scaledResourceFile);
+        File f = scaledResourceFile.getParentFile();
         while (f != null && f.isDirectory() && f.listFiles().length == 0) {
           FileUtils.deleteQuietly(f);
           f = f.getParentFile();

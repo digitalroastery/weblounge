@@ -582,8 +582,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @return the resource
    */
   protected Resource<?> loadResource(ResourceURI uri) throws IOException {
-    InputStream is = new BufferedInputStream(openStreamToResource(uri));
+    InputStream is = null;
     try {
+      is = new BufferedInputStream(openStreamToResource(uri));
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
@@ -605,8 +606,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   protected Resource<?> loadResource(ResourceURI uri, URL contentUrl)
       throws IOException {
-    InputStream is = new BufferedInputStream(contentUrl.openStream());
+    InputStream is = null;
     try {
+      is = new BufferedInputStream(contentUrl.openStream());
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);

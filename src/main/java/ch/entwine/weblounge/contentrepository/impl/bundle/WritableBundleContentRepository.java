@@ -36,6 +36,7 @@ import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepositor
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.service.cm.ConfigurationException;
@@ -202,10 +203,15 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
               resource.removeContent(c.getLanguage());
             put(resource);
             for (ResourceContent c : content) {
-              InputStream is = loadResourceContentFromBundle(uri, c);
-              if (is == null)
-                throw new ContentRepositoryException("Resource content " + c + " missing from repository");
-              putContent(uri, c, is);
+              InputStream is = null;
+              try {
+                is = loadResourceContentFromBundle(uri, c);
+                if (is == null && c.getExternalLocation() == null)
+                  throw new ContentRepositoryException("Resource content " + c + " missing from repository");
+                putContent(uri, c, is);
+              } finally {
+                IOUtils.closeQuietly(is);
+              }
             }
           }
         } catch (IOException e) {

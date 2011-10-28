@@ -545,7 +545,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
           indexVersion = Integer.parseInt(r.getResults().get(0).getFieldValue(VERSION).toString());
           logger.info("Search index version is {}", indexVersion);
         }
-      } catch (Exception e) {
+      } catch (Throwable e) {
         logger.warn("Index version information cannot be determined ({}), triggering reindex", e.getMessage());
         indexVersion = -1;
       }
@@ -623,9 +623,10 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    *          the configuration directory
    */
   private void copyBundleResourceToFile(String classpath, File dir) {
-    InputStream is = SearchIndex.class.getResourceAsStream(classpath);
+    InputStream is = null;
     FileOutputStream fos = null;
     try {
+      is = SearchIndex.class.getResourceAsStream(classpath);
       File file = new File(dir, FilenameUtils.getName(classpath));
       fos = new FileOutputStream(file);
       IOUtils.copy(is, fos);

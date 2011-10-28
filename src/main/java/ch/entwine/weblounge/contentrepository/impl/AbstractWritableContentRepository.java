@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -76,7 +77,7 @@ import java.util.List;
 public abstract class AbstractWritableContentRepository extends AbstractContentRepository implements WritableContentRepository {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(AbstractWritableContentRepository.class);
+  static final Logger logger = LoggerFactory.getLogger(AbstractWritableContentRepository.class);
 
   /** The image style tracker */
   private ImageStyleTracker imageStyleTracker = null;
@@ -658,23 +659,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         }
 
         // Create the preview
-        File previewFile = createPreview(resource, style, environment, language, filename.toString(), previewGenerator);
-
-        if (previewFile != null)
-          logger.debug("Created {} preview '{}' for {}", new Object[] {
-              language.getDescription(),
-              style.getIdentifier(),
-              resource });
-        else
-          logger.debug("Preview generation '{}' for {} failed", new Object[] {
-              style.getIdentifier(),
-              resource });
+        createPreview(resource, style, environment, language, filename.toString(), previewGenerator);
       }
-
-      logger.debug("All {} previews created for {} {}", new Object[] {
-          language.getDescription(),
-          resourceType,
-          resource });
     }
   }
 
@@ -694,92 +680,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *          the original filename
    * @param previewGenerator
    *          the preview generator
-   * @return the preview file
    */
-  private File createPreview(Resource<?> resource, ImageStyle style,
+  private void createPreview(Resource<?> resource, ImageStyle style,
       Environment environment, Language language, String filename,
       PreviewGenerator previewGenerator) {
-    ResourceURI resourceURI = resource.getURI();
-    String resourceType = resourceURI.getType();
-
-    InputStream resourceInputStream = null;
-    InputStream contentRepositoryIs = null;
-    FileOutputStream fos = null;
-    File scaledResourceFile = null;
-
-    try {
-      scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
-
-      // Find the modification date
-      long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
-
-      // Create the file if it doesn't exist or if it is outdated
-      if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
-        contentRepositoryIs = getContent(resourceURI, language);
-        fos = new FileOutputStream(scaledResourceFile);
-        logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
-        previewGenerator.createPreview(resource, environment, language, style, contentRepositoryIs, fos);
-        if (scaledResourceFile.length() > 0) {
-          scaledResourceFile.setLastModified(lastModified);
-        } else {
-          File f = scaledResourceFile;
-          while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-            FileUtils.deleteQuietly(f);
-            f = f.getParentFile();
-          }
-        }
-      }
-
-      return scaledResourceFile;
-    } catch (ContentRepositoryException e) {
-      logger.error("Error loading {} {} '{}' from {}: {}", new Object[] {
-          language,
-          resourceType,
-          resource,
-          this,
-          e.getMessage() });
-      logger.error(e.getMessage(), e);
-      IOUtils.closeQuietly(resourceInputStream);
-
-      File f = scaledResourceFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
-      return null;
-    } catch (IOException e) {
-      logger.warn("Error creating preview for {} '{}': {}", new Object[] {
-          resourceType,
-          resourceURI,
-          e.getMessage() });
-      IOUtils.closeQuietly(resourceInputStream);
-
-      File f = scaledResourceFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
-      return null;
-    } catch (Throwable t) {
-      logger.warn("Error creating preview for {} '{}': {}", new Object[] {
-          resourceType,
-          resourceURI,
-          t.getMessage() });
-      IOUtils.closeQuietly(resourceInputStream);
-
-      File f = scaledResourceFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
-      return null;
-    } finally {
-      IOUtils.closeQuietly(contentRepositoryIs);
-      IOUtils.closeQuietly(fos);
-    }
+    PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, resource, style, environment, language, filename, previewGenerator);
+    Thread t = new Thread(previewWorker);
+    t.start();
   }
 
   /**
@@ -817,6 +724,142 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         dir = new File(dir, language.getIdentifier());
       FileUtils.deleteQuietly(dir);
     }
+  }
+
+  /**
+   * Worker implementation that creates a preview in a separate thread.
+   */
+  private static class PreviewGeneratorWorker implements Runnable {
+
+    private ContentRepository contentRepository = null;
+    private Resource<?> resource = null;
+    private ImageStyle style = null;
+    private Environment environment = null;
+    private Language language = null;
+    private String filename = null;
+    private PreviewGenerator previewGenerator = null;
+
+    /**
+     * Creates a new preview worker who will create the corresponding previews
+     * for the given resource and style.
+     * 
+     * @param resource
+     *          the resource
+     * @param style
+     *          the image style
+     * @param environment
+     *          the current environment
+     * @param language
+     *          the language
+     * @param filename
+     *          the filename
+     * @param previewGenerator
+     *          the preview generator to use
+     */
+    public PreviewGeneratorWorker(ContentRepository repository,
+        Resource<?> resource, ImageStyle style, Environment environment,
+        Language language, String filename, PreviewGenerator previewGenerator) {
+      this.contentRepository = repository;
+      this.resource = resource;
+      this.style = style;
+      this.environment = environment;
+      this.language = language;
+      this.filename = filename;
+      this.previewGenerator = previewGenerator;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Runnable#run()
+     */
+    public void run() {
+      ResourceURI resourceURI = resource.getURI();
+      String resourceType = resourceURI.getType();
+
+      InputStream resourceInputStream = null;
+      InputStream contentRepositoryIs = null;
+      FileOutputStream fos = null;
+      File scaledResourceFile = null;
+
+      try {
+        scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
+
+        // Find the modification date
+        long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
+
+        // Create the file if it doesn't exist or if it is outdated
+        if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
+          ResourceContent content = resource.getContent(language);
+          contentRepositoryIs = contentRepository.getContent(resourceURI, language);
+
+          // Is this local content?
+          if (contentRepositoryIs == null && content != null && content.getExternalLocation() != null) {
+            contentRepositoryIs = content.getExternalLocation().openStream();
+          }
+
+          fos = new FileOutputStream(scaledResourceFile);
+          logger.debug("Creating preview of '{}' at {}", resource, scaledResourceFile);
+          previewGenerator.createPreview(resource, environment, language, style, contentRepositoryIs, fos);
+          if (scaledResourceFile.length() > 0) {
+            scaledResourceFile.setLastModified(lastModified);
+          } else {
+            File f = scaledResourceFile;
+            while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+              FileUtils.deleteQuietly(f);
+              f = f.getParentFile();
+            }
+          }
+        }
+
+      } catch (ContentRepositoryException e) {
+        logger.error("Error loading {} {} '{}' from {}: {}", new Object[] {
+            language,
+            resourceType,
+            resource,
+            this,
+            e.getMessage() });
+        logger.error(e.getMessage(), e);
+        IOUtils.closeQuietly(resourceInputStream);
+
+        File f = scaledResourceFile;
+        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+          FileUtils.deleteQuietly(f);
+          f = f.getParentFile();
+        }
+
+      } catch (IOException e) {
+        logger.warn("Error creating preview for {} '{}': {}", new Object[] {
+            resourceType,
+            resourceURI,
+            e.getMessage() });
+        IOUtils.closeQuietly(resourceInputStream);
+
+        File f = scaledResourceFile;
+        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+          FileUtils.deleteQuietly(f);
+          f = f.getParentFile();
+        }
+
+      } catch (Throwable t) {
+        logger.warn("Error creating preview for {} '{}': {}", new Object[] {
+            resourceType,
+            resourceURI,
+            t.getMessage() });
+        IOUtils.closeQuietly(resourceInputStream);
+
+        File f = scaledResourceFile;
+        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+          FileUtils.deleteQuietly(f);
+          f = f.getParentFile();
+        }
+
+      } finally {
+        IOUtils.closeQuietly(contentRepositoryIs);
+        IOUtils.closeQuietly(fos);
+      }
+    }
+
   }
 
 }
