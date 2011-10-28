@@ -33,7 +33,6 @@ import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
-import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
@@ -64,7 +63,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -96,6 +94,9 @@ public class ContentRepositoryIndexTest {
   /** The site */
   protected Site site = null;
   
+  /** Page template */
+  protected PageTemplate template = null;
+
   /** English */
   protected Language english = LanguageUtils.getLanguage("en"); 
 
@@ -117,12 +118,15 @@ public class ContentRepositoryIndexTest {
     FileUtils.deleteDirectory(indexRootDirectory);
     idx = new FileSystemContentRepositoryIndex(indexRootDirectory);
 
-    PageTemplate t = new PageTemplateImpl("home", new URL("http://localhost/home.jsp"));
-    t.setStage("main");
+    // Template
+    template = EasyMock.createNiceMock(PageTemplate.class);
+    EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
+    EasyMock.expect(template.getStage()).andReturn("main").anyTimes();
+    EasyMock.replay(template);
 
     site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getTemplate((String)EasyMock.anyObject())).andReturn(t).anyTimes();
-    EasyMock.expect(site.getDefaultTemplate()).andReturn(t).anyTimes();
+    EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
+    EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
     EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
     EasyMock.replay(site);
 
@@ -229,10 +233,20 @@ public class ContentRepositoryIndexTest {
     ResourceURI uri1 = new PageURIImpl(site, "/weblounge");
     ResourceURI uri2Live = new PageURIImpl(site, "/etc/weblounge");
     ResourceURI uri2Work = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+
+    Page page1 = new PageImpl(uri1);
+    page1.setTemplate(template.getIdentifier());
+
+    Page page2Live = new PageImpl(uri2Live);
+    page2Live.setTemplate(template.getIdentifier());
+
+    Page page2Work = new PageImpl(uri2Work);
+    page2Work.setTemplate(template.getIdentifier());
+
     try {
-      idx.add(new PageImpl(uri1));
-      idx.add(new PageImpl(uri2Live));
-      idx.add(new PageImpl(uri2Work));
+      idx.add(page1);
+      idx.add(page2Live);
+      idx.add(page2Work);
       long[] revisions = idx.getRevisions(uri1);
       assertEquals(1, revisions.length);
       assertEquals(Resource.LIVE, revisions[0]);
@@ -256,10 +270,12 @@ public class ContentRepositoryIndexTest {
 
     Page page1Live = new PageImpl(live1URI);
     page1Live.setTitle("title", english);
+    page1Live.setTemplate(template.getIdentifier());
     
     Page page2Live = new PageImpl(live2URI);
     page2Live.setTitle("title", english);
     page2Live.setTitle("titel", german);
+    page2Live.setTemplate(template.getIdentifier());
     
     try {
       // Add the pages to the index

@@ -335,6 +335,7 @@ public class FileSystemContentRepositoryTest {
   public void testDeleteResourceURIBoolean() {
     ResourceURI workURI = new PageURIImpl(site, page1path, page1uuid, WORK);
     Page workPage = new PageImpl(workURI);
+    workPage.setTemplate(template.getIdentifier());
     int resources = populateRepository();
     int revisions = resources;
 
@@ -682,6 +683,10 @@ public class FileSystemContentRepositoryTest {
     Page page2Live = new PageImpl(live2URI);
     Page page2Work = new PageImpl(work2URI);
 
+    page1Live.setTemplate(template.getIdentifier());
+    page2Live.setTemplate(template.getIdentifier());
+    page2Work.setTemplate(template.getIdentifier());
+
     try {
       // Add the pages to the index
       repository.put(page1Live);
@@ -711,15 +716,18 @@ public class FileSystemContentRepositoryTest {
 
     Page page1Live = new PageImpl(live1URI);
     page1Live.setTitle("title", english);
+    page1Live.setTemplate(template.getIdentifier());
 
     Page page2Live = new PageImpl(live2URI);
     page2Live.setTitle("title", english);
     page2Live.setTitle("titel", german);
+    page2Live.setTemplate(template.getIdentifier());
 
     Page page2Work = new PageImpl(work2URI);
     page2Work.setTitle("title", english);
     page2Work.setTitle("titel", german);
     page2Work.setTitle("titre", french);
+    page2Work.setTemplate(template.getIdentifier());
 
     try {
       // Add the pages to the index
@@ -749,6 +757,7 @@ public class FileSystemContentRepositoryTest {
   public void testWithoutPublication() {
     ResourceURI workURI = new PageURIImpl(site, "/etc/weblounge", WORK);
     Page work = new PageImpl(workURI);
+    work.setTemplate(template.getIdentifier());
     try {
       repository.put(work);
 
@@ -854,6 +863,7 @@ public class FileSystemContentRepositoryTest {
 
     ResourceURI page1WorkURI = new PageURIImpl(page1URI, WORK);
     Page page2Work = new PageImpl(page1WorkURI);
+    page2Work.setTemplate(template.getIdentifier());
 
     try {
       repository.put(page2Work);
@@ -879,11 +889,15 @@ public class FileSystemContentRepositoryTest {
 
     // Create pages and uris
     ResourceURI uriLive = new PageURIImpl(site, "/etc/weblounge");
+    Page pageLive = new PageImpl(uriLive);
+    pageLive.setTemplate(template.getIdentifier());
     ResourceURI uriWork = new PageURIImpl(site, "/etc/weblounge", WORK);
+    Page pageWork = new PageImpl(uriWork);
+    pageWork.setTemplate(template.getIdentifier());
 
     // Add the pages to the index
-    repository.put(new PageImpl(uriLive));
-    repository.put(new PageImpl(uriWork));
+    repository.put(pageLive);
+    repository.put(pageWork);
 
     // Create the users
     User editor1 = new UserImpl("editor1");
@@ -931,11 +945,15 @@ public class FileSystemContentRepositoryTest {
 
     // Create pages and uris
     ResourceURI uriLive = new PageURIImpl(site, "/etc/weblounge");
+    Page pageLive = new PageImpl(uriLive);
+    pageLive.setTemplate(template.getIdentifier());
     ResourceURI uriWork = new PageURIImpl(site, "/etc/weblounge", WORK);
+    Page pageWork = new PageImpl(uriWork);
+    pageWork.setTemplate(template.getIdentifier());
 
     // Add the pages to the index
-    repository.put(new PageImpl(uriLive));
-    repository.put(new PageImpl(uriWork));
+    repository.put(pageLive);
+    repository.put(pageWork);
 
     // Create the users
     User editor1 = new UserImpl("editor1");

@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
@@ -167,13 +168,22 @@ public class DocumentVersionTest {
     ResourceURI liveAndWorkWorkURI = new PageURIImpl(site, "/liveandwork", WORK);
     ResourceURI workOnlyURI = new PageURIImpl(site, "/workonly", WORK);
 
+    Page liveOnly = new PageImpl(liveOnlyURI);
+    liveOnly.setTemplate(template.getIdentifier());
+    Page liveAndWorkLive = new PageImpl(liveAndWorkLiveURI);
+    liveAndWorkLive.setTemplate(template.getIdentifier());
+    Page liveAndWorkWork = new PageImpl(liveAndWorkWorkURI);
+    liveAndWorkWork.setTemplate(template.getIdentifier());
+    Page workOnly = new PageImpl(workOnlyURI);
+    workOnly.setTemplate(template.getIdentifier());
+
     SearchQuery workPreferredQuery = new SearchQueryImpl(site).withPreferredVersion(WORK).sortByCreationDate(Order.Ascending);
     SearchQuery livePreferredQuery = new SearchQueryImpl(site).withPreferredVersion(LIVE).sortByCreationDate(Order.Ascending);
     SearchQuery workOnlyQuery = new SearchQueryImpl(site).withVersion(WORK).sortByCreationDate(Order.Ascending);
     SearchQuery liveOnlyQuery = new SearchQueryImpl(site).withVersion(LIVE).sortByCreationDate(Order.Ascending);
 
     // Add the live only live page
-    repository.put(new PageImpl(liveOnlyURI));
+    repository.put(liveOnly);
     assertEquals(0, repository.find(workOnlyQuery).getHitCount());
     assertEquals(1, repository.find(liveOnlyQuery).getHitCount());
     result = repository.find(workPreferredQuery);
@@ -185,7 +195,7 @@ public class DocumentVersionTest {
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
 
     // Add the work only work page
-    repository.put(new PageImpl(workOnlyURI));
+    repository.put(workOnly);
     assertEquals(1, repository.find(workOnlyQuery).getHitCount());
     assertEquals(1, repository.find(liveOnlyQuery).getHitCount());
     result = repository.find(workPreferredQuery);
@@ -198,7 +208,7 @@ public class DocumentVersionTest {
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
 
     // Add the live and work live page
-    repository.put(new PageImpl(liveAndWorkLiveURI));
+    repository.put(liveAndWorkLive);
     assertEquals(1, repository.find(workOnlyQuery).getHitCount());
     assertEquals(2, repository.find(liveOnlyQuery).getHitCount());
     result = repository.find(workPreferredQuery);
@@ -213,7 +223,7 @@ public class DocumentVersionTest {
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
 
     // Add the live and work work page
-    repository.put(new PageImpl(liveAndWorkWorkURI));
+    repository.put(liveAndWorkWork);
     assertEquals(2, repository.find(workOnlyQuery).getHitCount());
     assertEquals(2, repository.find(liveOnlyQuery).getHitCount());
     result = repository.find(workPreferredQuery);

@@ -564,24 +564,17 @@
  <copyField source="pagelet_contents_*" dest="fulltext"/>
  -->
  
+ <!-- Create individual path elements from full paths -->
+ <copyField source="path" dest="path_elements"/>
+ 
+ <!-- Enable auto suggest -->
  <copyField source="fulltext" dest="fulltext_suggest"/>
  <copyField source="path" dest="path_suggest"/>
  <copyField source="subjects" dest="subject_suggest"/>
- <copyField source="path" dest="path_elements"/>
 
  <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine
       for most applications.  -->
  <similarity class="org.apache.lucene.search.DefaultSimilarity"/>
-
- <!-- ... OR ...
-      Specify a SimilarityFactory class name implementation
-      allowing parameters to be used.
- -->
- <!--
- <similarity class="com.example.solr.CustomSimilarityFactory">
-   <str name="paramkey">param value</str>
- </similarity>
- -->
 
 </schema>

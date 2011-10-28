@@ -29,7 +29,7 @@ import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
 import org.apache.solr.client.solrj.response.SpellCheckResponse.Correction;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.MapSolrParams;
-import org.apache.solr.handler.component.SpellCheckComponent;
+import org.apache.solr.common.params.SpellingParams;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -142,11 +142,12 @@ public class SuggestRequest {
     
     Map<String, String> params = new HashMap<String, String>();
     params.put(CommonParams.ROWS, Integer.toString(count));
-    params.put(SpellCheckComponent.SPELLCHECK_PREFIX + "dictionary", dictionary);
-    params.put(SpellCheckComponent.SPELLCHECK_ONLY_MORE_POPULAR, Boolean.toString(onlyMorePopular));
-    params.put(SpellCheckComponent.SPELLCHECK_MAX_COLLATION_TRIES, Integer.toString(1));
-    params.put(SpellCheckComponent.SPELLCHECK_COLLATE_EXTENDED_RESULTS, Boolean.toString(collate));
-    params.put(SpellCheckComponent.SPELLCHECK_COLLATE, Boolean.toString(collate));
+    params.put(SpellingParams.SPELLCHECK_PREFIX + "field", dictionary);
+    params.put(SpellingParams.SPELLCHECK_PREFIX + "dictionary", dictionary);
+    params.put(SpellingParams.SPELLCHECK_ONLY_MORE_POPULAR, Boolean.toString(onlyMorePopular));
+    params.put(SpellingParams.SPELLCHECK_MAX_COLLATION_TRIES, Integer.toString(1));
+    params.put(SpellingParams.SPELLCHECK_COLLATE_EXTENDED_RESULTS, Boolean.toString(collate));
+    params.put(SpellingParams.SPELLCHECK_COLLATE, Boolean.toString(collate));
     
     query.add(new MapSolrParams(params));
 

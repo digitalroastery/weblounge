@@ -263,7 +263,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     searchByResource.withVersion(Resource.LIVE);
     searchByResource.withProperty("resourceid", uri.getIdentifier());
     if (index.find(searchByResource).getItems().length > 0) {
-      logger.warn("Resource '{}' is still being referenced", uri);
+      logger.debug("Resource '{}' is still being referenced", uri);
       throw new ReferentialIntegrityException(uri.getIdentifier());
     }
 
