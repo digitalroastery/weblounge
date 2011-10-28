@@ -347,7 +347,7 @@ public class PagePreviewTag extends WebloungeTag {
 
     // If there is no page body, the doAfterBody() method will not be executed.
     // Therefore, make sure we do it here.
-    if (pageletIndex < pagePreview.size()) {
+    if (pagePreview != null && pageletIndex < pagePreview.size()) {
       while (doAfterBody() == EVAL_BODY_AGAIN) {
         ;
       }
