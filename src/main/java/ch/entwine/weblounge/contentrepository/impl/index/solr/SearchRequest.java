@@ -76,6 +76,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -182,7 +183,7 @@ public class SearchRequest {
 
     // Creation date
     if (query.getCreationDate() != null) {
-      and(solrQuery, CREATED, SolrUtils.selectDay(query.getCreationDate()), false, false);
+      and(solrQuery, CREATED, SolrUtils.serializeDateRange(query.getCreationDate(), new Date()), false, false);
     }
 
     // Modifier
