@@ -325,11 +325,16 @@ public class SiteManager {
 
     // Stop the site if it's running
     try {
-      if (site.isOnline())
+      if (site.isOnline()) {
         site.stop();
+      }
     } catch (Throwable t) {
       logger.error("Error stopping site '{}'", site.getIdentifier(), t);
     }
+
+    // Remove the site's content repository. Note that the content repository
+    // will be disconnected by the content repository tracker
+    site.setContentRepository(null);
 
     // Tell the content repository factory to remove the repository
     Configuration configuration = repositoryConfigurations.get(site.getIdentifier());
