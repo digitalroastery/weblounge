@@ -21,14 +21,12 @@
 package ch.entwine.weblounge.workbench;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -36,9 +34,7 @@ import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.workbench.suggest.PageSuggestion;
-import ch.entwine.weblounge.workbench.suggest.SubjectSuggestion;
-import ch.entwine.weblounge.workbench.suggest.UserSuggestion;
+import ch.entwine.weblounge.workbench.suggest.SimpleSuggestion;
 
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
@@ -108,41 +104,6 @@ public class WorkbenchService {
   }
 
   /**
-   * Returns a list of users From the given site that are suggested based on
-   * what is passed in as <code>text</code>. If <code>limit</code> is
-   * 
-   * @param site
-   *          the site
-   * @param text
-   *          the starting test
-   * @param limit
-   *          the maximum number of users to return
-   * @return the list of suggested users
-   * @throws IllegalStateException
-   *           if the content repository is not available
-   * @throws ContentRepositoryException
-   *           if querying fails
-   */
-  public List<UserSuggestion> suggestUsers(Site site, String text, int limit)
-      throws IllegalStateException {
-    List<UserSuggestion> users = new ArrayList<UserSuggestion>();
-    SearchQuery search = new SearchQueryImpl(site);
-    // search.withUser(text + "*");
-    // search.withUserFacet();
-
-    // Get hold of the site's content repository
-    ContentRepository contentRepository = site.getContentRepository();
-    if (contentRepository == null) {
-      logger.warn("No content repository found for site '{}'", site);
-      return null;
-    }
-
-    // TODO: implement search
-
-    return users;
-  }
-
-  /**
    * Returns a list of tags from the given site that are suggested based on what
    * is passed in as <code>text</code>. If <code>limit</code> is larger than
    * <code>0</code>, then this is the maximum number of facet values returned.
@@ -159,46 +120,20 @@ public class WorkbenchService {
    * @throws ContentRepositoryException
    *           if querying fails
    */
-  public List<SubjectSuggestion> suggestTags(Site site, String text, int limit)
+  public List<SimpleSuggestion> suggestTags(Site site, String text, int limit)
       throws IllegalStateException {
-    List<SubjectSuggestion> tags = new ArrayList<SubjectSuggestion>();
+    List<SimpleSuggestion> tags = new ArrayList<SimpleSuggestion>();
     List<String> suggestions;
     try {
-      suggestions = site.suggest("subject", text, limit);
+      suggestions = site.getContentRepository().suggest("subject", text, limit);
       for (String s : suggestions) {
-        tags.add(new SubjectSuggestion(limit, s));
+        tags.add(new SimpleSuggestion("subject", s));
       }
     } catch (ContentRepositoryException e) {
-      logger.warn("Error loading tag suggestions for '" + text + "'", e);
+      logger.warn("Error loading subject suggestions for '" + text + "'", e);
       return null;
     }
     return tags;
-  }
-
-  /**
-   * Returns a list of pages from the given site that are suggested based on
-   * what is passed in as <code>text</code>. If <code>limit</code> is
-   * 
-   * @param site
-   *          the site
-   * @param text
-   *          the starting test
-   * @param limit
-   *          the maximum number of pages to return
-   * @return the list of suggested pages
-   * @throws IllegalStateException
-   *           if the content repository is not available
-   * @throws ContentRepositoryException
-   *           if querying fails
-   */
-  public List<PageSuggestion> suggestPages(Site site, String text, int limit)
-      throws IllegalStateException {
-    List<PageSuggestion> pages = new ArrayList<PageSuggestion>();
-    SearchQuery search = new SearchQueryImpl(site);
-    // search.withPage(text + "*");
-    // search.withPageFacet();
-    // TODO: implement search
-    return pages;
   }
 
   /**

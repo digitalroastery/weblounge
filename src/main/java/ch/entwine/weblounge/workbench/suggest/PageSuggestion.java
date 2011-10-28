@@ -74,4 +74,14 @@ public class PageSuggestion extends SuggestionBase {
     return xml.toString();
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return url;
+  }
+
 }

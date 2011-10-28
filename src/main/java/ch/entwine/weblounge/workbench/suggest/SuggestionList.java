@@ -63,7 +63,7 @@ public class SuggestionList<T extends Suggestion> extends ArrayList<T> {
   public String toXml() {
     StringBuffer xml = new StringBuffer();
     xml.append("<suggestions>");
-    xml.append("<hint><[CDATA[").append(hint).append("]]></hint>");
+    xml.append("<seed><[CDATA[").append(hint).append("]]></seed>");
     for (T suggestion : this) {
       xml.append(suggestion.toXml(hint, highlightTag));
     }

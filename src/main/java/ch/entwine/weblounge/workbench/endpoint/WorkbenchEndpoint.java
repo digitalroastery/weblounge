@@ -30,7 +30,7 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.SiteManager;
 import ch.entwine.weblounge.workbench.PageletEditor;
 import ch.entwine.weblounge.workbench.WorkbenchService;
-import ch.entwine.weblounge.workbench.suggest.SubjectSuggestion;
+import ch.entwine.weblounge.workbench.suggest.SimpleSuggestion;
 import ch.entwine.weblounge.workbench.suggest.SuggestionList;
 
 import java.io.IOException;
@@ -152,14 +152,14 @@ public class WorkbenchEndpoint {
    */
   @GET
   @Produces(MediaType.TEXT_XML)
-  @Path("/suggest/subjects/{hint}")
+  @Path("/suggest/subjects/{seed}")
   public Response suggestSubjects(@Context HttpServletRequest request,
-      @PathParam("hint") String hint,
+      @PathParam("seed") String seed,
       @QueryParam("highlight") String highlightTag,
       @QueryParam("limit") int limit) {
-    SuggestionList<SubjectSuggestion> list = new SuggestionList<SubjectSuggestion>("subjects", hint, highlightTag);
+    SuggestionList<SimpleSuggestion> list = new SuggestionList<SimpleSuggestion>("subjects", seed, highlightTag);
     try {
-      list.addAll(workbench.suggestTags(getSite(request), hint, limit));
+      list.addAll(workbench.suggestTags(getSite(request), seed, limit));
       return Response.ok(list.toXml()).build();
     } catch (IllegalStateException e) {
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);

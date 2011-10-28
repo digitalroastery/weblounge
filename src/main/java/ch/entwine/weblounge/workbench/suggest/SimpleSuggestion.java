@@ -23,30 +23,32 @@ package ch.entwine.weblounge.workbench.suggest;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * A subject suggestion includes everything that is needed to display a suggested
- * list of subjects based on some input text.
+ * A subject suggestion includes everything that is needed to display a
+ * suggested list of subjects based on some input text.
  */
-public class SubjectSuggestion extends SuggestionBase {
-
-  /** The number of occurrences */
-  protected int count = 0;
+public class SimpleSuggestion extends SuggestionBase {
 
   /** The subject name */
-  protected String name = null;
+  protected String suggestion = null;
+
+  /** The type of suggestion */
+  protected String type = null;
 
   /**
    * Creates a new suggestion containing a subject's details.
    * 
-   * @param count
-   *          the subject count
-   * @param name
+   * @param type
+   *          of suggestion
+   * @param suggestion
    *          the subject name
    */
-  public SubjectSuggestion(int count, String name) {
-    if (StringUtils.isBlank(name))
-      throw new IllegalArgumentException("Name must not be null");
-    this.count = count;
-    this.name = name;
+  public SimpleSuggestion(String type, String suggestion) {
+    if (StringUtils.isBlank(type))
+      throw new IllegalArgumentException("Type must not be null");
+    if (StringUtils.isBlank(suggestion))
+      throw new IllegalArgumentException("Suggestion must not be null");
+    this.type = type;
+    this.suggestion = suggestion;
   }
 
   /**
@@ -57,10 +59,20 @@ public class SubjectSuggestion extends SuggestionBase {
    */
   public String toXml(String hint, String highlightTag) {
     StringBuffer xml = new StringBuffer();
-    xml.append("<subject count=\"").append(count).append("\">");
-    xml.append("<name><[CDATA[").append(name).append("]]></name>");
-    xml.append("</subject>");
+    xml.append("<").append(type).append(">");
+    xml.append("<[CDATA[").append(suggestion);
+    xml.append("</").append(type).append(">");
     return xml.toString();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return suggestion;
   }
 
 }
