@@ -558,7 +558,7 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Updates the contents of the given resource.
+   * Updates the resource in the search index.
    * 
    * @param resource
    *          the resource to update
@@ -571,14 +571,14 @@ public class ContentRepositoryIndex {
       ContentRepositoryException {
     ResourceURI uri = resource.getURI();
 
-    // We are only interested in live versions
-    if (uri.getVersion() != Resource.LIVE)
-      return;
-
     if (resource.isIndexed())
       searchIdx.update(resource);
     else
       searchIdx.delete(uri);
+
+    // We are only interested in live versions
+    if (uri.getVersion() != Resource.LIVE)
+      return;
 
     long address = toURIEntry(uri);
     languageIdx.set(address, null);

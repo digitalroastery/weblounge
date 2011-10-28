@@ -308,6 +308,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * @throws ContentRepositoryException
    *           if posting the updated resource to solr fails
    */
+  @SuppressWarnings("unchecked")
   public boolean update(Resource<?> resource) throws ContentRepositoryException {
     logger.debug("Updating resource {} in search index", resource);
 
@@ -319,9 +320,27 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       return false;
     }
 
+    // Add information on this version to existing variants of this resource
+    ResourceURI uri = resource.getURI();
+    Site site = uri.getSite();
+    String id = uri.getIdentifier();
+    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
+    List<Long> alternateVersions = new ArrayList<Long>();
+    for (SearchResultItem existingResource : getByQuery(q).getItems()) {
+      List<ResourceMetadata<?>> existingResourceMetadata = ((ResourceSearchResultItem) existingResource).getMetadata();
+      for (ResourceMetadata<?> field : existingResourceMetadata) {
+        if (field.getName().equals(VERSION)) {
+          Long version = ((ResourceMetadata<Long>) field).getValues().get(0);
+          if (version != uri.getVersion())
+            alternateVersions.add(version);
+        }
+      }
+    }
+
     // Post the updated data to the search index
     try {
       List<ResourceMetadata<?>> metadata = serializer.toMetadata(resource);
+      metadata.add(new ResourceMetadataImpl<Long>(ALTERNATE_VERSION, alternateVersions, null, false));
       SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
       update(doc);
       return true;

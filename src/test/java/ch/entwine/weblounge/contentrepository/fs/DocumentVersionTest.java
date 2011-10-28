@@ -38,6 +38,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
@@ -224,6 +225,21 @@ public class DocumentVersionTest {
 
     // Add the live and work work page
     repository.put(liveAndWorkWork);
+    assertEquals(2, repository.find(workOnlyQuery).getHitCount());
+    assertEquals(2, repository.find(liveOnlyQuery).getHitCount());
+    result = repository.find(workPreferredQuery);
+    assertEquals(3, result.getHitCount());
+    assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
+    assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
+    assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
+    result = repository.find(livePreferredQuery);
+    assertEquals(3, result.getHitCount());
+    assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
+    assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
+    assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
+
+    // Lock the page, which will trigger a call to index.update()
+    repository.lock(liveAndWorkWorkURI, new UserImpl("user"));
     assertEquals(2, repository.find(workOnlyQuery).getHitCount());
     assertEquals(2, repository.find(liveOnlyQuery).getHitCount());
     result = repository.find(workPreferredQuery);
