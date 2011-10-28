@@ -8,9 +8,7 @@ import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.movie.MovieContentImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
-import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.slf4j.Logger;
@@ -26,9 +24,6 @@ public class SwisseducastRecordHandler extends AbstractWebloungeRecordHandler im
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(SwisseducastRecordHandler.class);
-
-  /** User for resource creation */
-  private User harvesterUser = new UserImpl("harvester");
 
   /** Name of the oai pmh prefix */
   private static final String SWISSEDUCAST_REPOSITORY_PREFIX = "chor_dc";

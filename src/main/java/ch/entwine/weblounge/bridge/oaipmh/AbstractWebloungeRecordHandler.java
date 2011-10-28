@@ -8,12 +8,17 @@ import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.movie.MovieResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
+import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.IOUtils;
@@ -23,6 +28,8 @@ import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -40,6 +47,9 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
 
   /** The content repository */
   protected final WritableContentRepository contentRepository;
+
+  /** User for resource creation */
+  protected User harvesterUser = new UserImpl("harvester", "videolounge", "Harvester");
 
   /** ISO3 language map */
   protected final Map<String, Language> iso3Languages = new HashMap<String, Language>();
@@ -85,6 +95,15 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
   public void handle(Node record) {
     String recordIdentifier = ListRecordsResponse.identifierOfRecord(record);
     boolean isDeleted = ListRecordsResponse.statusOfRecord(record);
+    String dateString = ListRecordsResponse.dateOfRecord(record);
+
+    Date date;
+    try {
+      date = WebloungeDateFormat.parseStatic(dateString);
+    } catch (ParseException e) {
+      logger.debug("Unable to parse date '{}'", dateString);
+      return;
+    }
 
     logger.info("Start harvesting resource " + recordIdentifier);
 
@@ -99,21 +118,36 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
       deleteResource(resourceResult.getResourceURI());
       logger.info("Deleted harvestet resource " + recordIdentifier);
     } else {
-      if (searchResult.getHitCount() > 0) {
-        logger.warn("The element to harvest is already in the contentrepository {}", recordIdentifier);
-        return;
+      if (searchResult.getHitCount() == 1) {
+        MovieResourceSearchResultItemImpl movieResultItem = (MovieResourceSearchResultItemImpl) searchResult.getItems()[0];
+        MovieResource movieResource = movieResultItem.getMovieResource();
+
+        if (!date.after(movieResource.getPublishFrom()))
+          return;
+        logger.warn("Update harvested element {}", recordIdentifier);
+
+        Resource<?> resource = parseResource(record);
+        resource.setPublished(harvesterUser, date, null);
+        ResourceContent content = parseResourceContent(record);
+        removeContents(resource);
+        resource.getURI().setIdentifier(movieResource.getIdentifier());
+        addResource(resource);
+        addContent(resource.getURI(), content);
+      } else if (searchResult.getHitCount() > 1) {
+        logger.error("The repository contains already more than one element of {}", recordIdentifier);
+      } else {
+        Resource<?> resource = parseResource(record);
+        resource.setPublished(harvesterUser, date, null);
+        ResourceContent content = parseResourceContent(record);
+
+        if (resource == null || content == null)
+          return;
+
+        addResource(resource);
+        content.setSource(recordIdentifier);
+        addContent(resource.getURI(), content);
+        logger.info("Harvesting resource " + recordIdentifier);
       }
-
-      Resource<?> resource = parseResource(record);
-      ResourceContent content = parseResourceContent(record);
-
-      if (resource == null || content == null)
-        return;
-
-      addResource(resource);
-      content.setSource(recordIdentifier);
-      addContent(resource.getURI(), content);
-      logger.info("Harvesting resource " + recordIdentifier);
     }
   }
 
@@ -216,6 +250,31 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
       throw new RuntimeException(e);
     } finally {
       IOUtils.closeQuietly(is);
+    }
+  }
+
+  /**
+   * Remove all contents from the resource and repository
+   * 
+   * @param resource
+   *          the resource
+   */
+  private void removeContents(Resource<?> resource) {
+    for (ResourceContent existingContent : resource.contents()) {
+      Language language = existingContent.getLanguage();
+      resource.removeContent(language);
+      try {
+        contentRepository.deleteContent(resource.getURI(), resource.getContent(language));
+      } catch (IllegalStateException e) {
+        logger.warn("Illegal state while deleting the resource {}: {}", resource.getURI(), e.getMessage());
+        throw new RuntimeException(e);
+      } catch (ContentRepositoryException e) {
+        logger.warn("Error deleting the resource {}: {}", resource.getURI(), e.getMessage());
+        throw new RuntimeException(e);
+      } catch (IOException e) {
+        logger.warn("Error writing the resource {}: {}", resource.getURI(), e.getMessage());
+        throw new RuntimeException(e);
+      }
     }
   }
 

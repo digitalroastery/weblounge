@@ -94,6 +94,10 @@ public class ListRecordsResponse extends OaiPmhResponse {
     return xpathString(createXPath(), recordNode, "oai20:header/oai20:identifier/text()");
   }
 
+  public static String dateOfRecord(Node recordNode) {
+    return xpathString(createXPath(), recordNode, "oai20:header/oai20:datestamp/text()");
+  }
+
   /**
    * Get all records performing a complete request resuming any partial
    * responses.

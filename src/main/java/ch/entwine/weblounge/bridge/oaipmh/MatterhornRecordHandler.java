@@ -11,9 +11,7 @@ import ch.entwine.weblounge.common.impl.content.movie.MovieContentImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.movie.VideoStreamImpl;
-import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.FilenameUtils;
@@ -38,9 +36,6 @@ import java.net.MalformedURLException;
  * thread safe.
  */
 public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler implements RecordHandler {
-
-  /** User for resource creation */
-  private User harvesterUser = new UserImpl("harvester", "videolounge", "Harvester");
 
   /** Name of the oai pmh prefix */
   private static final String MATTERHORN_REPOSITORY_PREFIX = "matterhorn";
