@@ -58,6 +58,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.im4java</groupId>
+      <artifactId>im4java</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -280,13 +286,15 @@
               com.springsource.javax.media.jai.codec;inline=true,
               core-renderer;inline=true,
               freemarker;inline=true,
-              metadata-extractor
+              metadata-extractor;inline=true,
+              im4java;inline=true
             </Embed-Dependency>
             <Private-Package>
               com.drew.metadata,
               freemarker.core,
               freemarker.template,
-              javax.media.jai
+              javax.media.jai,
+              org.im4java.core
             </Private-Package>
           </instructions>
         </configuration>

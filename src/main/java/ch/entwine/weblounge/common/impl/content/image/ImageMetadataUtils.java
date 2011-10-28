@@ -29,6 +29,7 @@ import com.drew.metadata.exif.ExifDirectory;
 import com.drew.metadata.exif.GpsDirectory;
 import com.drew.metadata.iptc.IptcDirectory;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,11 +64,15 @@ public final class ImageMetadataUtils {
    * @return extracted meta information
    */
   public static ImageMetadata extractMetadata(File img) {
+    BufferedInputStream is = null;
     try {
-      return extractMetadata(new BufferedInputStream(new FileInputStream(img)));
+      is = new BufferedInputStream(new FileInputStream(img));
+      return extractMetadata(is);
     } catch (FileNotFoundException e) {
       logger.warn("Tried to extract image metadata from none existing file '{}'", img.getName());
       return null;
+    } finally {
+      IOUtils.closeQuietly(is);
     }
   }
 
