@@ -426,7 +426,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
-    if (cache != null) {
+    if (cache != null && updatePreviews && resource.getURI().getVersion() == Resource.LIVE) {
       cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, resource.getURI().getIdentifier()) });
     }
 
