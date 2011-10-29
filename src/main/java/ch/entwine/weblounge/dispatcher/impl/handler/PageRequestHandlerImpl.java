@@ -211,7 +211,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       }
 
       // Create the set of tags that identify the page
-      CacheTagSet cacheTags = createCacheTags(request);
+      CacheTagSet cacheTags = createPrimaryCacheTags(request);
 
       // Check if the page is already part of the cache. If so, our task is
       // already done!
@@ -236,6 +236,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
       // Add the cache tags (in addition to what the action handler might have
       // set already)
+      cacheTags.add(CacheTag.Resource, page.getURI().getIdentifier());
       response.addTags(cacheTags);
 
       // Set the default maximum render and valid times for pages
@@ -415,7 +416,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
    *          the request
    * @return the cache tags
    */
-  protected CacheTagSet createCacheTags(WebloungeRequest request) {
+  protected CacheTagSet createPrimaryCacheTags(WebloungeRequest request) {
     CacheTagSet cacheTags = new CacheTagSet();
     cacheTags.add(CacheTag.Url, request.getUrl().getPath());
     cacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
