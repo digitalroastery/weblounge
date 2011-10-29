@@ -1435,7 +1435,6 @@
     <lst name="spellchecker">
       <str name="name">default</str>
       <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
-      <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookup</str>
       <str name="field">fulltext_suggest</str>
       <float name="threshold">0.005</float>
       <str name="buildOnCommit">true</str>
@@ -1443,7 +1442,6 @@
     <lst name="spellchecker">
       <str name="name">path</str>
       <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
-      <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookup</str>
       <str name="field">path_suggest</str>
       <float name="threshold">0.005</float>
       <str name="buildOnCommit">true</str>
@@ -1451,7 +1449,6 @@
     <lst name="spellchecker">
       <str name="name">subject</str>
       <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
-      <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookup</str>
       <str name="field">subject_suggest</str>
       <float name="threshold">0.005</float>
       <str name="buildOnCommit">true</str>
