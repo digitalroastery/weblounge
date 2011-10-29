@@ -138,7 +138,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
     String requestURI = pathInfo;
 
     // Adjust the url
-    this.url = new WebUrlImpl(request.getUrl(), url);
+    this.url = new WebUrlImpl((WebUrlImpl) request.getUrl(), url);
 
     if (include) {
       attrs = new HashMap<String, Object>(5);
@@ -369,6 +369,15 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
    */
   public Language getLanguage() {
     return ((WebloungeRequest) getRequest()).getLanguage();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.WebloungeRequest#getSessionLanguage()
+   */
+  public Language getSessionLanguage() {
+    return ((WebloungeRequest) getRequest()).getSessionLanguage();
   }
 
   /**

@@ -83,11 +83,14 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   /** Language used for this site and request */
   protected Language language = null;
 
+  /** Language found in the session when the request started */
+  protected Language sessionLanguage = null;
+
   /** Target url */
-  protected WebUrl url = null;
+  protected WebUrlImpl url = null;
 
   /** Url that was originally requested */
-  protected WebUrl requestedUrl = null;
+  protected WebUrlImpl requestedUrl = null;
 
   /** The request environment */
   protected Environment environment = null;
@@ -102,6 +105,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    */
   public WebloungeRequestImpl(HttpServletRequest request, Servlet servlet) {
     super(request);
+    HttpSession session = request.getSession();
+    if (session != null)
+      this.sessionLanguage = (Language) session.getAttribute(LANGUAGE);
     this.siteServlet = servlet;
   }
 
@@ -154,7 +160,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // The language might very well be encoded as part of the path, so asking
     // for the url might give us the language for free.
     if (url == null)
-      url = getUrl();
+      url = (WebUrlImpl) getUrl();
 
     // There is no url without a path, so we can safely assume that we will
     // get an object back form getUrl().
@@ -221,6 +227,17 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.request.WebloungeRequest#getSessionLanguage()
+   */
+  public Language getSessionLanguage() {
+    if (sessionLanguage == null)
+      return getLanguage();
+    return sessionLanguage;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getSite()
    */
   public Site getSite() {
@@ -264,7 +281,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
     // If the requested url has not been stored so far, it will anyway be equal
     // to what getUrl() returns
-    requestedUrl = getUrl();
+    requestedUrl = (WebUrlImpl) getUrl();
     return requestedUrl;
   }
 
@@ -286,6 +303,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    */
   public void setLanguage(Language language) {
     this.language = language;
+    this.getSession().setAttribute(LANGUAGE, language);
   }
 
   /**
@@ -305,7 +323,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   public long getVersion() {
     if (url != null)
       return url.getVersion();
-    return getUrl().getVersion();
+    return ((WebUrlImpl) getUrl()).getVersion();
   }
 
   /**
@@ -318,7 +336,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     if (url != null)
       flavor = url.getFlavor();
     else
-      flavor = getUrl().getFlavor();
+      flavor = ((WebUrlImpl) getUrl()).getFlavor();
     // TODO: Look at accepts-header (text/json, text/xml, text/...)
     return flavor != null ? flavor : RequestFlavor.ANY;
   }

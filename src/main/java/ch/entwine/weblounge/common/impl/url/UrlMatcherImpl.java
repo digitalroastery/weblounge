@@ -67,9 +67,9 @@ public class UrlMatcherImpl implements UrlMatcher {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.url.UrlMatcher#matches(ch.entwine.weblounge.common.url.WebUrl)
+   * @see ch.entwine.weblounge.common.url.UrlMatcher#matches(ch.entwine.weblounge.common.url.WebUrl, RequestFlavor)
    */
-  public boolean matches(WebUrl url) {
+  public boolean matches(WebUrl url, RequestFlavor flavor) {
     if (!site.equals(url.getSite()))
       return false;
     String path = url.normalize(false, false, false, false);
@@ -77,7 +77,6 @@ public class UrlMatcherImpl implements UrlMatcher {
     if (!path.startsWith(this.path) && !normalizedPath.startsWith(this.path))
       return false;
     // TODO: check for extension
-    RequestFlavor flavor = url.getFlavor();
     if (!flavors.contains(flavor) && !flavor.equals(RequestFlavor.ANY))
       return false;
     return true;

@@ -21,9 +21,7 @@
 package ch.entwine.weblounge.common.impl.url;
 
 import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.Path;
@@ -67,6 +65,9 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
 
   /** The language */
   protected Language language = null;
+
+  /** True if the language is encoded on the path */
+  protected boolean languageIsPathEncoded = false;
 
   /** The link */
   private transient String link = null;
@@ -225,7 +226,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @param path
    *          the new path
    */
-  public WebUrlImpl(WebUrl url, String path) {
+  public WebUrlImpl(WebUrlImpl url, String path) {
     super(path, url.getPathSeparator());
     this.site = url.getSite();
     this.version = url.getVersion();
@@ -422,6 +423,15 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.url.WebUrl#hasLanguagePathSegment()
+   */
+  public boolean hasLanguagePathSegment() {
+    return languageIsPathEncoded;
+  }
+
+  /**
    * Returns the hash code for this url. The method includes the super
    * implementation and adds sensitivity for the site and the url extension.
    * 
@@ -439,8 +449,8 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object object) {
-    if (object instanceof WebUrl) {
-      WebUrl url = (WebUrl) object;
+    if (object instanceof WebUrlImpl) {
+      WebUrlImpl url = (WebUrlImpl) object;
       if (!super.equals(object))
         return false;
       if (version != url.getVersion())
@@ -558,17 +568,8 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
         Language language = site.getLanguage(l);
         if (language != null) {
           this.language = language;
+          this.languageIsPathEncoded = true;
           group--;
-        } else {
-          try {
-            language = LanguageUtils.getLanguage(l);
-            if (language != null) {
-              this.language = site.getDefaultLanguage();
-              group--;
-            }
-          } catch (UnknownLanguageException e) {
-            // Nothing to do, definitely not a language identifier
-          }
         }
       }
 

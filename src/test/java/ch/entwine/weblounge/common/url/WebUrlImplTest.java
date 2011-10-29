@@ -342,7 +342,7 @@ public class WebUrlImplTest {
    */
   @Test
   public void testNormalizeBooleanBooleanBoolean() {
-    WebUrl url = flavoredLocalizedVersionedUrl;
+    WebUrlImpl url = flavoredLocalizedVersionedUrl;
     String fullUrl = UrlUtils.concat(siteUrl.toExternalForm(), flavoredLocalizedVersionedPath);
     assertEquals(fullUrl, url.normalize(true, true, true, true));
 
