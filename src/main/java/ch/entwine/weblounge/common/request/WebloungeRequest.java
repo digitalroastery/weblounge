@@ -95,6 +95,14 @@ public interface WebloungeRequest extends HttpServletRequest {
   Language getLanguage();
 
   /**
+   * Returns the requested language as found in the session and is thereby not
+   * influenced by language parameters on the current url path.
+   * 
+   * @return the requested language
+   */
+  Language getSessionLanguage();
+
+  /**
    * Returns the site that is serving this request.
    * 
    * @return the requested site

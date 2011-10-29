@@ -21,7 +21,6 @@
 package ch.entwine.weblounge.common.url;
 
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.site.Site;
 
 /**
@@ -104,32 +103,6 @@ public interface WebUrl extends Path {
   String getLink(String flavor);
 
   /**
-   * Returns the version of this url. Possible versions are:
-   * <ul>
-   * <li>{@link ch.entwine.weblounge.common.content.Resource#LIVE}</li>
-   * <li>{@link ch.entwine.weblounge.common.content.Resource#WORK}</li>
-   * </ul>
-   * 
-   * @return the url version
-   */
-  long getVersion();
-
-  /**
-   * Returns the language version of this url.
-   * 
-   * @return the language
-   */
-  Language getLanguage();
-
-  /**
-   * Returns the url flavor. For example, in case of "index.xml" the flavor will
-   * be <code>XML</code>.
-   * 
-   * @return the url flavor
-   */
-  RequestFlavor getFlavor();
-
-  /**
    * Returns a normalized version of this url. A normalized version is defined
    * by these properties:
    * <ul>
@@ -168,5 +141,13 @@ public interface WebUrl extends Path {
    */
   String normalize(boolean includeHost, boolean includeVersion,
       boolean includeLanguage, boolean includeFlavor);
+
+  /**
+   * Returns <code>true</code> if the language had originally been encoded into
+   * the url, as in <code>/my/path/en</code>.
+   * 
+   * @return <code>true</code> if the language was encoded in the path
+   */
+  boolean hasLanguagePathSegment();
 
 }

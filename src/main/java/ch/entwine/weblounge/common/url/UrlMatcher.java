@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.url;
 
+import ch.entwine.weblounge.common.request.RequestFlavor;
+
 /**
  * The matcher is used to define a space of urls within a certain domain. For
  * example, matchers are used to register an action with a certain url, e. g.
@@ -34,11 +36,13 @@ public interface UrlMatcher {
    * 
    * @param url
    *          the url to match against this url space
+   * @param flavor
+   *          the request flavor
    * @return <code>true</code> if <code>url</code> is within the defined url
    *         space
    */
-  boolean matches(WebUrl url);
-  
+  boolean matches(WebUrl url, RequestFlavor flavor);
+
   /**
    * Returns the url's mountpoint.
    * 
