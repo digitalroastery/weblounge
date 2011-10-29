@@ -176,7 +176,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
     // Try to get hold of an action pool
     ActionPool pool = null;
-    pool = getActionForUrl(url);
+    pool = getActionForUrl(url, flavor);
     if (pool == null) {
       logger.debug("No action found to handle {}", url);
       return false;
@@ -648,9 +648,11 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    * 
    * @param url
    *          the url
+   * @param flavor
+   *          the request flavor
    * @return the handler
    */
-  private ActionPool getActionForUrl(WebUrl url) {
+  private ActionPool getActionForUrl(WebUrl url, RequestFlavor flavor) {
     String normalizedUrl = url.normalize(true, false, false, true);
 
     // Try to use the url cache
@@ -663,7 +665,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     int maxMatchLength = 0;
     for (Entry<UrlMatcher, ActionPool> entry : actions.entrySet()) {
       UrlMatcher matcher = entry.getKey();
-      if (matcher.matches(url)) {
+      if (matcher.matches(url, flavor)) {
         ActionPool pool = entry.getValue();
         int matchLength = matcher.getMountpoint().length();
         if (matchLength > maxMatchLength) {
