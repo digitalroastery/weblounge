@@ -37,6 +37,7 @@ import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.request.Http11Constants;
 import ch.entwine.weblounge.common.impl.request.Http11Utils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -45,6 +46,7 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.HTMLAction;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.dispatcher.PageRequestHandler;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
@@ -146,27 +148,75 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
           return false;
         }
 
-        // Load the page
+        ResourceURI requestURI = null;
+        ResourceURI requestedURI = null;
+
+        // Load the page. Note that we are taking care of the special case where
+        // a user may have created a page with a url that matches a valid
+        // language identifier, in which case it would have been stripped from
+        // request.getUrl().
         try {
           if (action != null) {
             pageURI = getPageURIForAction(action, request);
+            requestURI = pageURI;
           } else if (path.startsWith(URI_PREFIX)) {
             String uriSuffix = StringUtils.substringBefore(path.substring(URI_PREFIX.length()), "/");
             uriSuffix = URLDecoder.decode(uriSuffix, "utf-8");
-            pageURI = new PageURIImpl(site, null, uriSuffix, request.getVersion());
+            ResourceURI uri = new PageURIImpl(site, null, uriSuffix, request.getVersion());
+            requestURI = uri;
+            WebUrl requestedUrl = request.getRequestedUrl();
+            if (requestedUrl.hasLanguagePathSegment()) {
+              String requestedPath = UrlUtils.concat(path, request.getLanguage().getIdentifier());
+              String requestedUriSuffix = StringUtils.substringBefore(requestedPath.substring(URI_PREFIX.length()), "/");
+              requestedUriSuffix = URLDecoder.decode(requestedUriSuffix, "utf-8");
+              requestedURI = new PageURIImpl(site, requestedUriSuffix, null, request.getVersion());
+            }
           } else {
-            pageURI = new PageURIImpl(request);
-            if (isEditing)
-              pageURI.setVersion(Resource.WORK);
+            long version = isEditing ? Resource.WORK : Resource.LIVE;
+            ResourceURI uri = new PageURIImpl(request);
+            uri.setVersion(version);
+            requestURI = uri;
+            WebUrl requestedUrl = request.getRequestedUrl();
+            if (requestedUrl.hasLanguagePathSegment()) {
+              String requestedPath = UrlUtils.concat(path, request.getLanguage().getIdentifier());
+              requestedPath = URLDecoder.decode(requestedPath, "utf-8");
+              requestedURI = new PageURIImpl(site, requestedPath, null, version);
+            }
+          }
+
+          // Is this a request with potential path clashes?
+          if (requestedURI != null) {
+            long version = requestedURI.getVersion();
+            if (contentRepository.existsInAnyVersion(requestedURI)) {
+              if (!isEditing && version == Resource.LIVE && contentRepository.exists(requestedURI)) {
+                pageURI = requestedURI;
+                ((WebloungeRequestImpl) request).setLanguage(request.getSessionLanguage());
+              } else if (isEditing && version == Resource.WORK && !contentRepository.exists(requestedURI)) {
+                requestedURI.setVersion(Resource.LIVE);
+                pageURI = requestedURI;
+                ((WebloungeRequestImpl) request).setLanguage(request.getSessionLanguage());
+              }
+            }
           }
 
           // Does the page exist?
-          if (!contentRepository.existsInAnyVersion(pageURI))
-            return false;
-          else if (!isEditing && !contentRepository.exists(pageURI))
+          if (pageURI == null) {
+            long version = requestURI.getVersion();
+            if (contentRepository.existsInAnyVersion(requestURI)) {
+              if (!isEditing && version == Resource.LIVE && contentRepository.exists(requestURI)) {
+                pageURI = requestURI;
+              } else if (isEditing && version == Resource.WORK && !contentRepository.exists(requestURI)) {
+                requestURI.setVersion(Resource.LIVE);
+                pageURI = requestURI;
+              }
+            }
+          }
+
+          // Did we find a matching uri?
+          if (pageURI == null) {
             DispatchUtils.sendNotFound(request, response);
-          else if (isEditing && !contentRepository.exists(pageURI))
-            pageURI.setVersion(Resource.LIVE);
+            return true;
+          }
 
           page = (Page) contentRepository.get(pageURI);
           if (page == null) {
