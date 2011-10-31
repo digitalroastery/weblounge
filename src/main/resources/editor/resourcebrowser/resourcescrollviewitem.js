@@ -50,15 +50,25 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 					break;
 				case 'movie':
 					var player = null;
-					this._loadOverlay(function() {
+					this._loadOverlay($.proxy(function() {
 						var url = '/system/weblounge/files/' + $(el).attr('id') + '/content/' + fileContent.language;
-						var videoTag = this.getOverlay().find('video');
-						videoTag.css('max-width', $(window).width() * 0.8 + 'px');
-						videoTag.css('max-height', $(window).height() * 0.8 + 'px');
+						var videoTag = this.element.find("div.wbl-previewOverlay video");
+						
+						if(fileContent.video == undefined || fileContent.video.resolution == undefined) {
+							videoTag.css('max-width', $(window).width() * 0.8 + 'px');
+							videoTag.css('max-height', $(window).height() * 0.8 + 'px');
+						} else {
+							var resolution = fileContent.video.resolution.split('x');
+							var height = this._getScaledHeight(resolution[0], resolution[1]);
+							var width = this._getScaledWidth(resolution[0], resolution[1]);
+							
+							videoTag.attr('width', width + 'px');
+							videoTag.attr('height', height + 'px');
+						}
 						videoTag.html('<source src="' + url + '" type="' + fileContent.mimetype + '" />').show();
 						
 						player = new MediaElementPlayer(videoTag, {});
-					}, function() {
+					}, this), function() {
 						if(player != null) {
 							player.pause();
 						}

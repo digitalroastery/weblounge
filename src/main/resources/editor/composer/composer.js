@@ -157,10 +157,12 @@ steal.plugins('jquery/controller',
     },
     
 	'hoverenter': function(el, ev) {
+		if(!$(this.element).hasClass('wbl-nojQuery')) return;
 		$(this.element).addClass('wbl-composerBorder');
     },
     
 	'hoverleave': function(el, ev) {
+		if(!$(this.element).hasClass('wbl-nojQuery')) return;
     	if($(this.element).hasClass('empty')) return;
     	$(this.element).removeClass('wbl-composerBorder');
     }

@@ -200,6 +200,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    _formatDuration: function(milis){
+	    	if(milis == undefined) return;
 	    	var duration = new Object();
 	    	var temp = milis;
  

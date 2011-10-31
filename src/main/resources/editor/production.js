@@ -1105,13 +1105,13 @@ b.target.value)},700)}},this))},_initDialogs:function(){this.deleteDialog=a("<di
 ;
 steal.end();
 steal.plugins("jquery/controller","jquery/event/hover","jquery/controller/view").then("resourceviewitem").then(function(c){Editor.Resourceviewitem.extend("Editor.Resourcescrollviewitem",{init:function(){c.Hover.delay=0;this.element.find("img.wbl-showPage").hide();this.element.find("img.wbl-trashPage").hide();this.element.find("img.wbl-editPage").hide();this.element.find("img.wbl-pagePreview").hide()},_showResource:function(a){switch(this.options.resourceType){case "pages":var b=this.element.find("a.wbl-pagePath").attr("href");
-if(this.options.page.version=="work")b+="work.html";b+="?preview&_="+(new Date).getTime();this._loadOverlay(function(){var f=this.getOverlay().find("iframe");f.css("width",c(window).width()*0.8+"px");f.css("height",c(window).height()*0.8+"px");f.attr("src",b).show()},function(){});break;case "media":var d=(new Editor.File({value:this.options.page})).getContent(this.options.language);switch(this.options.page.type){case "file":var g="/system/weblounge/files/"+c(a).attr("id")+"/content/"+d.language;
-window.open(g,"popUp","width=800,height=600,scrollbars=yes");break;case "image":this._loadOverlay(c.proxy(function(){var f="/system/weblounge/files/"+c(a).attr("id")+"/content/"+d.language,e=this.element.find("div.wbl-previewOverlay img.wbl-overlayPreviewImage"),i=this._getScaledHeight(d.width,d.height),j=this._getScaledWidth(d.width,d.height);e.attr("src",f).show();e.attr("width",j+"px");e.attr("height",i+"px")},this),function(){});break;case "movie":var h=null;this._loadOverlay(function(){var f=
-"/system/weblounge/files/"+c(a).attr("id")+"/content/"+d.language,e=this.getOverlay().find("video");e.css("max-width",c(window).width()*0.8+"px");e.css("max-height",c(window).height()*0.8+"px");e.html('<source src="'+f+'" type="'+d.mimetype+'" />').show();h=new MediaElementPlayer(e,{})},function(){h!=null&&h.pause()});break}break}},_getScaledHeight:function(a,b){var d=c(window).width()*0.8,g=c(window).height()*0.8;a=Math.min(d/a,g/b);return a>1?b:b*a},_getScaledWidth:function(a,b){var d=c(window).width()*
-0.8,g=c(window).height()*0.8;b=Math.min(d/a,g/b);return b>1?a:a*b},_loadOverlay:function(a,b){this.element.find("div.wbl-previewOverlay").overlay({top:60,load:true,onBeforeLoad:a,onBeforeClose:b}).load()},click:function(a,b){var d=this.options.mode=="editorMultiSelection";this.options.mode!="normal"&&!d&&c("div.wbl-scrollViewItem.wbl-marked").removeClass("wbl-marked");c(b.target).is(".wbl-showPage, .wbl-trashPage, .wbl-editPage, .wbl-pagePreview, .wbl-pagePath")||a.toggleClass("wbl-marked")},dblclick:function(a){switch(this.options.mode){case "normal":this.element.find("img.wbl-showPage").click();
-break;case "editorMultiSelection":c("div.wbl-scrollViewItem.wbl-marked").removeClass("wbl-marked");a.addClass("wbl-marked");c("button.wbl-editorSelectionOK").click();break;case "editorSelection":c("button.wbl-editorSelectionOK").click();break}},"img.wbl-showPage click":function(a,b){b.stopPropagation();switch(this.options.resourceType){case "pages":this.element.find("a.wbl-pagePath").click();break;case "media":this._showResource(a.parent())}},"img.wbl-trashPage click":function(a,b){b.stopPropagation();
-a.trigger("deleteResource",a.parent())},"img.wbl-editPage click":function(a,b){b.stopPropagation();this._openSettings(a.parent())},"img.wbl-pagePreview click":function(a,b){b.stopPropagation();this._showResource(a.parent())},hoverenter:function(){if(this.options.mode=="normal"){this.options.resourceType=="pages"&&this.element.find("img.wbl-pagePreview").show();this.element.find("img.wbl-showPage").show();this.element.find("img.wbl-trashPage").show();this.element.find("img.wbl-editPage").show()}},
-hoverleave:function(){this.element.find("img.wbl-pagePreview").hide();this.element.find("img.wbl-showPage").hide();this.element.find("img.wbl-trashPage").hide();this.element.find("img.wbl-editPage").hide()}})});
+if(this.options.page.version=="work")b+="work.html";b+="?preview&_="+(new Date).getTime();this._loadOverlay(function(){var g=this.getOverlay().find("iframe");g.css("width",c(window).width()*0.8+"px");g.css("height",c(window).height()*0.8+"px");g.attr("src",b).show()},function(){});break;case "media":var d=(new Editor.File({value:this.options.page})).getContent(this.options.language);switch(this.options.page.type){case "file":var h="/system/weblounge/files/"+c(a).attr("id")+"/content/"+d.language;
+window.open(h,"popUp","width=800,height=600,scrollbars=yes");break;case "image":this._loadOverlay(c.proxy(function(){var g="/system/weblounge/files/"+c(a).attr("id")+"/content/"+d.language,e=this.element.find("div.wbl-previewOverlay img.wbl-overlayPreviewImage"),f=this._getScaledHeight(d.width,d.height),i=this._getScaledWidth(d.width,d.height);e.attr("src",g).show();e.attr("width",i+"px");e.attr("height",f+"px")},this),function(){});break;case "movie":var j=null;this._loadOverlay(c.proxy(function(){var g=
+"/system/weblounge/files/"+c(a).attr("id")+"/content/"+d.language,e=this.element.find("div.wbl-previewOverlay video");if(d.video==undefined||d.video.resolution==undefined){e.css("max-width",c(window).width()*0.8+"px");e.css("max-height",c(window).height()*0.8+"px")}else{var f=d.video.resolution.split("x"),i=this._getScaledHeight(f[0],f[1]);f=this._getScaledWidth(f[0],f[1]);e.attr("width",f+"px");e.attr("height",i+"px")}e.html('<source src="'+g+'" type="'+d.mimetype+'" />').show();j=new MediaElementPlayer(e,
+{})},this),function(){j!=null&&j.pause()});break}break}},_getScaledHeight:function(a,b){var d=c(window).width()*0.8,h=c(window).height()*0.8;a=Math.min(d/a,h/b);return a>1?b:b*a},_getScaledWidth:function(a,b){var d=c(window).width()*0.8,h=c(window).height()*0.8;b=Math.min(d/a,h/b);return b>1?a:a*b},_loadOverlay:function(a,b){this.element.find("div.wbl-previewOverlay").overlay({top:60,load:true,onBeforeLoad:a,onBeforeClose:b}).load()},click:function(a,b){var d=this.options.mode=="editorMultiSelection";
+this.options.mode!="normal"&&!d&&c("div.wbl-scrollViewItem.wbl-marked").removeClass("wbl-marked");c(b.target).is(".wbl-showPage, .wbl-trashPage, .wbl-editPage, .wbl-pagePreview, .wbl-pagePath")||a.toggleClass("wbl-marked")},dblclick:function(a){switch(this.options.mode){case "normal":this.element.find("img.wbl-showPage").click();break;case "editorMultiSelection":c("div.wbl-scrollViewItem.wbl-marked").removeClass("wbl-marked");a.addClass("wbl-marked");c("button.wbl-editorSelectionOK").click();break;
+case "editorSelection":c("button.wbl-editorSelectionOK").click();break}},"img.wbl-showPage click":function(a,b){b.stopPropagation();switch(this.options.resourceType){case "pages":this.element.find("a.wbl-pagePath").click();break;case "media":this._showResource(a.parent())}},"img.wbl-trashPage click":function(a,b){b.stopPropagation();a.trigger("deleteResource",a.parent())},"img.wbl-editPage click":function(a,b){b.stopPropagation();this._openSettings(a.parent())},"img.wbl-pagePreview click":function(a,
+b){b.stopPropagation();this._showResource(a.parent())},hoverenter:function(){if(this.options.mode=="normal"){this.options.resourceType=="pages"&&this.element.find("img.wbl-pagePreview").show();this.element.find("img.wbl-showPage").show();this.element.find("img.wbl-trashPage").show();this.element.find("img.wbl-editPage").show()}},hoverleave:function(){this.element.find("img.wbl-pagePreview").hide();this.element.find("img.wbl-showPage").hide();this.element.find("img.wbl-trashPage").hide();this.element.find("img.wbl-editPage").hide()}})});
 ;
 steal.end();
 steal.plugins("jquery/event","jquery/event/livehack").then(function(a){a.Hover=function(){this._delay=a.Hover.delay;this._distance=a.Hover.distance;this._leave=a.Hover.leave};a.extend(a.Hover,{delay:100,distance:10,leave:0});a.extend(a.Hover.prototype,{delay:function(b){this._delay=b;return this},distance:function(b){this._distance=b;return this},leave:function(b){this._leave=b;return this}});var h=a.event;h.setupHelper(["hoverinit","hoverenter","hoverleave","hovermove"],"mouseenter",function(b){var e=
@@ -1360,10 +1360,10 @@ e){e(d.ui.autocomplete.filter(a,c.term.split(/,\s*/).pop()))},focus:function(){r
 this)})},this))},_loadMetadata:function(a){d.each(this.options.map,d.proxy(function(b,c){Editor.File.findOne({id:c.resourceId},d.proxy(function(e){this.file[b]=e;this.metadata[b]=e.getMetadata(this.options.language);a()},this))},this))},_showMetadata:function(a){this.element.find(":input").each(function(){d(this).val("")});var b=this.file[a].getContent(this.options.language),c=this.element.find(".wbl-taggerImage");if(this.file[a].name.localPart=="movie"){var e="/system/weblounge/files/"+this.file[a].value.id+
 "/content/"+b.language;c.html('<video height="270px" preload="preload" controls="controls"></video>');e=c.find("video").html('<source src="'+e+'" type="'+b.mimetype+'" />');var f=e.width();e.attr("width",f+"px");f=Math.max((c.outerWidth({margin:true})-f)/2,0);player=new MediaElementPlayer(e,{});c.find("div.mejs-container").css("left",f+"px")}else if(this.file[a].name.localPart=="image"){c.html('<img src="'+("/system/weblounge/previews/"+this.file[a].value.id+"/locales/"+this.options.language+"/styles/weblounge-ui:preview")+
 '" alt="Vorschaubild" />');e=c.find("img");f=Math.max((c.outerWidth({margin:true})-e.width())/2,0);e.css("left",f+"px")}else{c.html("Kein Vorschaubild");c.css("text-align","center")}d.each(this.metadata[a],d.proxy(function(h,g){this.element.find("div.wbl-metadata input[name="+h+"]").val(g)},this));Editor.File.findReferrer({id:this.file[a].value.id},d.proxy(function(h){h==undefined?this.element.find("div.wbl-referrerMediaEditor").html("Keine Verweise"):d.each(h,d.proxy(function(g,i){g=new Page({value:i});
-this.element.find("div.wbl-referrerMediaEditor").append(g.getTitle(this.options.language)).append(': <a href="'+g.getPath()+"?_="+(new Date).getTime()+'">'+g.getPath()+"</a><br />")},this))},this));c=this._formatDuration(b.duration);this.element.find("div.wbl-contentData").html("//editor/mediaeditor/views/content.tmpl",{file:this.file[a],content:b,duration:c})},_formatDuration:function(a){var b={};a=a;b.days=Math.floor(a/1E3/60/60/24);a-=b.days*1E3*60*60*24;b.hours=Math.floor(a/1E3/60/60);a-=b.hours*
-1E3*60*60;b.minutes=Math.floor(a/1E3/60);a-=b.minutes*1E3*60;b.seconds=Math.floor(a/1E3);return b.hours+":"+this._formatNumberLength(b.minutes,2)+":"+this._formatNumberLength(b.seconds,2)},_formatNumberLength:function(a,b){for(a=""+a;a.length<b;)a="0"+a;return a},_saveMetadata:function(a,b){d.each(b,d.proxy(function(c,e){if(d.isEmptyObject(this.metadata[a]))this.metadata[a]={};this.metadata[a][c]=e},this))},"div.wbl-metadata input[name=title] change":function(a){this._saveMetadata(this.index,{title:a.val()})},
-"div.wbl-metadata input[name=description] change":function(a){this._saveMetadata(this.index,{description:a.val()})},"div.wbl-metadata input[name=tags] change":function(a){this._saveMetadata(this.index,{tags:a.val()})},"div.wbl-metadata input[name=author] change":function(a){this._saveMetadata(this.index,{author:a.val()})},"div.wbl-buttonLeft click":function(a){if(this.index!=0){this.index--;this.index==0&&a.hide();a.next().show();this._showMetadata(this.index);this.element.dialog("option","title",
-"Metadaten eingeben: Datei "+(this.index+1)+" / "+this.options.map.length)}},"div.wbl-buttonRight click":function(a){if(this.index+1!=this.options.map.length){this.index++;this.index+1==this.options.map.length&&a.hide();a.prev().show();this._showMetadata(this.index);this.element.dialog("option","title","Metadaten eingeben: Datei "+(this.index+1)+" / "+this.options.map.length)}},"img.wbl-copyMetadata click":function(a){var b=this;d.each(this.options.map,function(c){switch(a.prev().attr("name")){case "title":b._saveMetadata(c,
+this.element.find("div.wbl-referrerMediaEditor").append(g.getTitle(this.options.language)).append(': <a href="'+g.getPath()+"?_="+(new Date).getTime()+'">'+g.getPath()+"</a><br />")},this))},this));c=this._formatDuration(b.duration);this.element.find("div.wbl-contentData").html("//editor/mediaeditor/views/content.tmpl",{file:this.file[a],content:b,duration:c})},_formatDuration:function(a){if(a!=undefined){var b={};a=a;b.days=Math.floor(a/1E3/60/60/24);a-=b.days*1E3*60*60*24;b.hours=Math.floor(a/1E3/
+60/60);a-=b.hours*1E3*60*60;b.minutes=Math.floor(a/1E3/60);a-=b.minutes*1E3*60;b.seconds=Math.floor(a/1E3);return b.hours+":"+this._formatNumberLength(b.minutes,2)+":"+this._formatNumberLength(b.seconds,2)}},_formatNumberLength:function(a,b){for(a=""+a;a.length<b;)a="0"+a;return a},_saveMetadata:function(a,b){d.each(b,d.proxy(function(c,e){if(d.isEmptyObject(this.metadata[a]))this.metadata[a]={};this.metadata[a][c]=e},this))},"div.wbl-metadata input[name=title] change":function(a){this._saveMetadata(this.index,
+{title:a.val()})},"div.wbl-metadata input[name=description] change":function(a){this._saveMetadata(this.index,{description:a.val()})},"div.wbl-metadata input[name=tags] change":function(a){this._saveMetadata(this.index,{tags:a.val()})},"div.wbl-metadata input[name=author] change":function(a){this._saveMetadata(this.index,{author:a.val()})},"div.wbl-buttonLeft click":function(a){if(this.index!=0){this.index--;this.index==0&&a.hide();a.next().show();this._showMetadata(this.index);this.element.dialog("option",
+"title","Metadaten eingeben: Datei "+(this.index+1)+" / "+this.options.map.length)}},"div.wbl-buttonRight click":function(a){if(this.index+1!=this.options.map.length){this.index++;this.index+1==this.options.map.length&&a.hide();a.prev().show();this._showMetadata(this.index);this.element.dialog("option","title","Metadaten eingeben: Datei "+(this.index+1)+" / "+this.options.map.length)}},"img.wbl-copyMetadata click":function(a){var b=this;d.each(this.options.map,function(c){switch(a.prev().attr("name")){case "title":b._saveMetadata(c,
 {title:a.prev().val()});break;case "description":b._saveMetadata(c,{description:a.prev().val()});break;case "tags":b._saveMetadata(c,{tags:a.prev().val()});break;case "author":b._saveMetadata(c,{author:a.prev().val()});break}})}})});
 ;
 steal.end();
@@ -1443,7 +1443,7 @@ function anonymous(jQuery, $item) {
         _.push("");
         if ((typeof (file.name.localPart == "movie") !== "undefined" && (file.name.localPart == "movie") != null) && (typeof (file.name.localPart == "movie") === "function" ? (file.name.localPart == "movie").call($item) : (file.name.localPart == "movie"))) {
             _.push("  <h2>Movie Metadaten:</h2>  Filename: ");
-            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.filename)) {
+            if ((typeof (content.filename != undefined) !== "undefined" && (content.filename != undefined) != null) && (typeof (content.filename != undefined) === "function" ? (content.filename != undefined).call($item) : (content.filename != undefined))) {
                 _.push("");
                 if (typeof (content.filename) !== "undefined" && (content.filename) != null) {
                     _.push($.encode((typeof (content.filename) === "function" ? (content.filename).call($item) : (content.filename))));
@@ -1451,7 +1451,7 @@ function anonymous(jQuery, $item) {
                 _.push("");
             }
             _.push("<br />  Source: ");
-            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.source)) {
+            if ((typeof (content.source != undefined) !== "undefined" && (content.source != undefined) != null) && (typeof (content.source != undefined) === "function" ? (content.source != undefined).call($item) : (content.source != undefined))) {
                 _.push("");
                 if (typeof (content.source) !== "undefined" && (content.source) != null) {
                     _.push($.encode((typeof (content.source) === "function" ? (content.source).call($item) : (content.source))));
@@ -1459,7 +1459,7 @@ function anonymous(jQuery, $item) {
                 _.push("");
             }
             _.push("<br />  External: ");
-            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.external)) {
+            if ((typeof (content.external != undefined) !== "undefined" && (content.external != undefined) != null) && (typeof (content.external != undefined) === "function" ? (content.external != undefined).call($item) : (content.external != undefined))) {
                 _.push("");
                 if (typeof (content.external) !== "undefined" && (content.external) != null) {
                     _.push($.encode((typeof (content.external) === "function" ? (content.external).call($item) : (content.external))));
@@ -1467,7 +1467,7 @@ function anonymous(jQuery, $item) {
                 _.push("");
             }
             _.push("<br />  Mimetype: ");
-            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.mimetype)) {
+            if ((typeof (content.mimetype != undefined) !== "undefined" && (content.mimetype != undefined) != null) && (typeof (content.mimetype != undefined) === "function" ? (content.mimetype != undefined).call($item) : (content.mimetype != undefined))) {
                 _.push("");
                 if (typeof (content.mimetype) !== "undefined" && (content.mimetype) != null) {
                     _.push($.encode((typeof (content.mimetype) === "function" ? (content.mimetype).call($item) : (content.mimetype))));
@@ -1490,91 +1490,107 @@ function anonymous(jQuery, $item) {
                 }
                 _.push("");
             }
-            _.push("<br /><br />    Audio Bitdepht: ");
-            if ((typeof (!$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined) !== "undefined" && (!$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined) != null) && (typeof (!$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined) === "function" ? (!$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined).call($item) : (!$.isEmptyObject(content.audio) && content.audio.bitdepth != undefined))) {
-                _.push("");
-                if (typeof (content.audio.bitdepth) !== "undefined" && (content.audio.bitdepth) != null) {
-                    _.push($.encode((typeof (content.audio.bitdepth) === "function" ? (content.audio.bitdepth).call($item) : (content.audio.bitdepth))));
+            _.push("<br /><br />    ");
+            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.audio)) {
+                _.push("  Audio Bitdepht: ");
+                if ((typeof (content.audio.bitdepth != undefined) !== "undefined" && (content.audio.bitdepth != undefined) != null) && (typeof (content.audio.bitdepth != undefined) === "function" ? (content.audio.bitdepth != undefined).call($item) : (content.audio.bitdepth != undefined))) {
+                    _.push("");
+                    if (typeof (content.audio.bitdepth) !== "undefined" && (content.audio.bitdepth) != null) {
+                        _.push($.encode((typeof (content.audio.bitdepth) === "function" ? (content.audio.bitdepth).call($item) : (content.audio.bitdepth))));
+                    }
+                    _.push("");
                 }
-                _.push("");
-            }
-            _.push("<br />  Audio Bitrate: ");
-            if ((typeof (!$.isEmptyObject(content.audio) && content.audio.bitrate != undefined) !== "undefined" && (!$.isEmptyObject(content.audio) && content.audio.bitrate != undefined) != null) && (typeof (!$.isEmptyObject(content.audio) && content.audio.bitrate != undefined) === "function" ? (!$.isEmptyObject(content.audio) && content.audio.bitrate != undefined).call($item) : (!$.isEmptyObject(content.audio) && content.audio.bitrate != undefined))) {
-                _.push("");
-                if (typeof (content.audio.bitrate) !== "undefined" && (content.audio.bitrate) != null) {
-                    _.push($.encode((typeof (content.audio.bitrate) === "function" ? (content.audio.bitrate).call($item) : (content.audio.bitrate))));
+                _.push("<br />  Audio Bitrate: ");
+                if ((typeof (content.audio.bitrate != undefined) !== "undefined" && (content.audio.bitrate != undefined) != null) && (typeof (content.audio.bitrate != undefined) === "function" ? (content.audio.bitrate != undefined).call($item) : (content.audio.bitrate != undefined))) {
+                    _.push("");
+                    if (typeof (content.audio.bitrate) !== "undefined" && (content.audio.bitrate) != null) {
+                        _.push($.encode((typeof (content.audio.bitrate) === "function" ? (content.audio.bitrate).call($item) : (content.audio.bitrate))));
+                    }
+                    _.push("");
                 }
-                _.push("");
-            }
-            _.push("<br />  Audio Channels: ");
-            if ((typeof (!$.isEmptyObject(content.audio) && content.audio.channels != undefined) !== "undefined" && (!$.isEmptyObject(content.audio) && content.audio.channels != undefined) != null) && (typeof (!$.isEmptyObject(content.audio) && content.audio.channels != undefined) === "function" ? (!$.isEmptyObject(content.audio) && content.audio.channels != undefined).call($item) : (!$.isEmptyObject(content.audio) && content.audio.channels != undefined))) {
-                _.push("");
-                if (typeof (content.audio.channels) !== "undefined" && (content.audio.channels) != null) {
-                    _.push($.encode((typeof (content.audio.channels) === "function" ? (content.audio.channels).call($item) : (content.audio.channels))));
+                _.push("<br />  Audio Channels: ");
+                if ((typeof (content.audio.channels != undefined) !== "undefined" && (content.audio.channels != undefined) != null) && (typeof (content.audio.channels != undefined) === "function" ? (content.audio.channels != undefined).call($item) : (content.audio.channels != undefined))) {
+                    _.push("");
+                    if (typeof (content.audio.channels) !== "undefined" && (content.audio.channels) != null) {
+                        _.push($.encode((typeof (content.audio.channels) === "function" ? (content.audio.channels).call($item) : (content.audio.channels))));
+                    }
+                    _.push("");
                 }
-                _.push("");
-            }
-            _.push("<br />  Audio Format: ");
-            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.audio) && !$.isEmptyObject(content.audio.format)) {
-                _.push("");
-                if (typeof (content.audio.format) !== "undefined" && (content.audio.format) != null) {
-                    _.push($.encode((typeof (content.audio.format) === "function" ? (content.audio.format).call($item) : (content.audio.format))));
+                _.push("<br />  Audio Format: ");
+                if ((typeof (content.audio.format != undefined) !== "undefined" && (content.audio.format != undefined) != null) && (typeof (content.audio.format != undefined) === "function" ? (content.audio.format != undefined).call($item) : (content.audio.format != undefined))) {
+                    _.push("");
+                    if (typeof (content.audio.format) !== "undefined" && (content.audio.format) != null) {
+                        _.push($.encode((typeof (content.audio.format) === "function" ? (content.audio.format).call($item) : (content.audio.format))));
+                    }
+                    _.push("");
                 }
-                _.push("");
-            }
-            _.push("<br />  Audio Samplingrate: ");
-            if ((typeof (!$.isEmptyObject(content.audio) && content.audio.samplingrate != undefined) !== "undefined" && (!$.isEmptyObject(content.audio) && content.audio.samplingrate != undefined) != null) && (typeof (!$.isEmptyObject(content.audio) && content.audio.samplingrate != undefined) === "function" ? (!$.isEmptyObject(content.audio) && content.audio.samplingrate != undefined).call($item) : (!$.isEmptyObject(content.audio) && content.audio.samplingrate != undefined))) {
-                _.push("");
-                if (typeof (content.audio.samplingrate) !== "undefined" && (content.audio.samplingrate) != null) {
-                    _.push($.encode((typeof (content.audio.samplingrate) === "function" ? (content.audio.samplingrate).call($item) : (content.audio.samplingrate))));
+                _.push("<br />  Audio Samplingrate: ");
+                if ((typeof (content.audio.samplingrate != undefined) !== "undefined" && (content.audio.samplingrate != undefined) != null) && (typeof (content.audio.samplingrate != undefined) === "function" ? (content.audio.samplingrate != undefined).call($item) : (content.audio.samplingrate != undefined))) {
+                    _.push("");
+                    if (typeof (content.audio.samplingrate) !== "undefined" && (content.audio.samplingrate) != null) {
+                        _.push($.encode((typeof (content.audio.samplingrate) === "function" ? (content.audio.samplingrate).call($item) : (content.audio.samplingrate))));
+                    }
+                    _.push("");
                 }
-                _.push("");
+                _.push("<br /><br />  ");
             }
-            _.push("<br /><br />    Video Bitrate: ");
-            if ((typeof (!$.isEmptyObject(content.video) && content.audio.bitrate != undefined) !== "undefined" && (!$.isEmptyObject(content.video) && content.audio.bitrate != undefined) != null) && (typeof (!$.isEmptyObject(content.video) && content.audio.bitrate != undefined) === "function" ? (!$.isEmptyObject(content.video) && content.audio.bitrate != undefined).call($item) : (!$.isEmptyObject(content.video) && content.audio.bitrate != undefined))) {
-                _.push("");
-                if (typeof (content.video.bitrate) !== "undefined" && (content.video.bitrate) != null) {
-                    _.push($.encode((typeof (content.video.bitrate) === "function" ? (content.video.bitrate).call($item) : (content.video.bitrate))));
+            _.push("    ");
+            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.video)) {
+                _.push("  Video Bitrate: ");
+                if ((typeof (content.video.bitrate != undefined) !== "undefined" && (content.video.bitrate != undefined) != null) && (typeof (content.video.bitrate != undefined) === "function" ? (content.video.bitrate != undefined).call($item) : (content.video.bitrate != undefined))) {
+                    _.push("");
+                    if (typeof (content.video.bitrate) !== "undefined" && (content.video.bitrate) != null) {
+                        _.push($.encode((typeof (content.video.bitrate) === "function" ? (content.video.bitrate).call($item) : (content.video.bitrate))));
+                    }
+                    _.push("");
                 }
-                _.push("");
-            }
-            _.push("<br />  Video Format: ");
-            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.video) && !$.isEmptyObject(content.video.format)) {
-                _.push("");
-                if (typeof (content.video.format) !== "undefined" && (content.video.format) != null) {
-                    _.push($.encode((typeof (content.video.format) === "function" ? (content.video.format).call($item) : (content.video.format))));
+                _.push("<br />  Video Format: ");
+                if ((typeof (content.video.format != undefined) !== "undefined" && (content.video.format != undefined) != null) && (typeof (content.video.format != undefined) === "function" ? (content.video.format != undefined).call($item) : (content.video.format != undefined))) {
+                    _.push("");
+                    if (typeof (content.video.format) !== "undefined" && (content.video.format) != null) {
+                        _.push($.encode((typeof (content.video.format) === "function" ? (content.video.format).call($item) : (content.video.format))));
+                    }
+                    _.push("");
                 }
-                _.push("");
-            }
-            _.push("<br />  Video Framerate: ");
-            if ((typeof (!$.isEmptyObject(content.video) && content.audio.framerate != undefined) !== "undefined" && (!$.isEmptyObject(content.video) && content.audio.framerate != undefined) != null) && (typeof (!$.isEmptyObject(content.video) && content.audio.framerate != undefined) === "function" ? (!$.isEmptyObject(content.video) && content.audio.framerate != undefined).call($item) : (!$.isEmptyObject(content.video) && content.audio.framerate != undefined))) {
-                _.push("");
-                if (typeof (content.video.framerate) !== "undefined" && (content.video.framerate) != null) {
-                    _.push($.encode((typeof (content.video.framerate) === "function" ? (content.video.framerate).call($item) : (content.video.framerate))));
+                _.push("<br />  Video Framerate: ");
+                if ((typeof (content.video.framerate != undefined) !== "undefined" && (content.video.framerate != undefined) != null) && (typeof (content.video.framerate != undefined) === "function" ? (content.video.framerate != undefined).call($item) : (content.video.framerate != undefined))) {
+                    _.push("");
+                    if (typeof (content.video.framerate) !== "undefined" && (content.video.framerate) != null) {
+                        _.push($.encode((typeof (content.video.framerate) === "function" ? (content.video.framerate).call($item) : (content.video.framerate))));
+                    }
+                    _.push("");
                 }
-                _.push("");
-            }
-            _.push("<br />  Video Resolution: ");
-            if ((typeof (!$.isEmptyObject(content.video) && content.audio.resolution != undefined) !== "undefined" && (!$.isEmptyObject(content.video) && content.audio.resolution != undefined) != null) && (typeof (!$.isEmptyObject(content.video) && content.audio.resolution != undefined) === "function" ? (!$.isEmptyObject(content.video) && content.audio.resolution != undefined).call($item) : (!$.isEmptyObject(content.video) && content.audio.resolution != undefined))) {
-                _.push("");
-                if (typeof (content.video.resolution) !== "undefined" && (content.video.resolution) != null) {
-                    _.push($.encode((typeof (content.video.resolution) === "function" ? (content.video.resolution).call($item) : (content.video.resolution))));
+                _.push("<br />  Video Resolution: ");
+                if ((typeof (content.video.resolution != undefined) !== "undefined" && (content.video.resolution != undefined) != null) && (typeof (content.video.resolution != undefined) === "function" ? (content.video.resolution != undefined).call($item) : (content.video.resolution != undefined))) {
+                    _.push("");
+                    if (typeof (content.video.resolution) !== "undefined" && (content.video.resolution) != null) {
+                        _.push($.encode((typeof (content.video.resolution) === "function" ? (content.video.resolution).call($item) : (content.video.resolution))));
+                    }
+                    _.push("");
                 }
-                _.push("");
-            }
-            _.push("<br />  Video Scantype: ");
-            if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.video) && !$.isEmptyObject(content.video.scantype)) {
-                _.push("");
-                if (typeof (content.video.scantype) !== "undefined" && (content.video.scantype) != null) {
-                    _.push($.encode((typeof (content.video.scantype) === "function" ? (content.video.scantype).call($item) : (content.video.scantype))));
+                _.push("<br />  Video Scantype: ");
+                if ((typeof (content.video.scantype != undefined) !== "undefined" && (content.video.scantype != undefined) != null) && (typeof (content.video.scantype != undefined) === "function" ? (content.video.scantype != undefined).call($item) : (content.video.scantype != undefined))) {
+                    _.push("");
+                    if (typeof (content.video.scantype) !== "undefined" && (content.video.scantype) != null) {
+                        _.push($.encode((typeof (content.video.scantype) === "function" ? (content.video.scantype).call($item) : (content.video.scantype))));
+                    }
+                    _.push("");
                 }
-                _.push("");
+                _.push("<br />  ");
             }
-            _.push("<br /> ");
+            _.push(" ");
         } else {
             if ((typeof (file.name.localPart == "image") !== "undefined" && (file.name.localPart == "image") != null) && (typeof (file.name.localPart == "image") === "function" ? (file.name.localPart == "image").call($item) : (file.name.localPart == "image"))) {
-                _.push("  <h2>Image Metadaten:</h2>  Filename: ");
-                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.filename)) {
+                _.push("  <h2>Image Metadaten:</h2>  Width: ");
+                if ((typeof (content.width != undefined) !== "undefined" && (content.width != undefined) != null) && (typeof (content.width != undefined) === "function" ? (content.width != undefined).call($item) : (content.width != undefined))) {
+                    _.push("");
+                    if (typeof (content.width) !== "undefined" && (content.width) != null) {
+                        _.push($.encode((typeof (content.width) === "function" ? (content.width).call($item) : (content.width))));
+                    }
+                    _.push("");
+                }
+                _.push("<br />  Filename: ");
+                if ((typeof (content.filename != undefined) !== "undefined" && (content.filename != undefined) != null) && (typeof (content.filename != undefined) === "function" ? (content.filename != undefined).call($item) : (content.filename != undefined))) {
                     _.push("");
                     if (typeof (content.filename) !== "undefined" && (content.filename) != null) {
                         _.push($.encode((typeof (content.filename) === "function" ? (content.filename).call($item) : (content.filename))));
@@ -1582,7 +1598,7 @@ function anonymous(jQuery, $item) {
                     _.push("");
                 }
                 _.push("<br />  Source: ");
-                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.source)) {
+                if ((typeof (content.source != undefined) !== "undefined" && (content.source != undefined) != null) && (typeof (content.source != undefined) === "function" ? (content.source != undefined).call($item) : (content.source != undefined))) {
                     _.push("");
                     if (typeof (content.source) !== "undefined" && (content.source) != null) {
                         _.push($.encode((typeof (content.source) === "function" ? (content.source).call($item) : (content.source))));
@@ -1590,7 +1606,7 @@ function anonymous(jQuery, $item) {
                     _.push("");
                 }
                 _.push("<br />  External: ");
-                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.external)) {
+                if ((typeof (content.external != undefined) !== "undefined" && (content.external != undefined) != null) && (typeof (content.external != undefined) === "function" ? (content.external != undefined).call($item) : (content.external != undefined))) {
                     _.push("");
                     if (typeof (content.external) !== "undefined" && (content.external) != null) {
                         _.push($.encode((typeof (content.external) === "function" ? (content.external).call($item) : (content.external))));
@@ -1598,7 +1614,7 @@ function anonymous(jQuery, $item) {
                     _.push("");
                 }
                 _.push("<br />  Mimetype: ");
-                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.mimetype)) {
+                if ((typeof (content.mimetype != undefined) !== "undefined" && (content.mimetype != undefined) != null) && (typeof (content.mimetype != undefined) === "function" ? (content.mimetype != undefined).call($item) : (content.mimetype != undefined))) {
                     _.push("");
                     if (typeof (content.mimetype) !== "undefined" && (content.mimetype) != null) {
                         _.push($.encode((typeof (content.mimetype) === "function" ? (content.mimetype).call($item) : (content.mimetype))));
@@ -1613,14 +1629,6 @@ function anonymous(jQuery, $item) {
                     }
                     _.push("");
                 }
-                _.push("<br />  Width: ");
-                if ((typeof (content.width != undefined) !== "undefined" && (content.width != undefined) != null) && (typeof (content.width != undefined) === "function" ? (content.width != undefined).call($item) : (content.width != undefined))) {
-                    _.push("");
-                    if (typeof (content.width) !== "undefined" && (content.width) != null) {
-                        _.push($.encode((typeof (content.width) === "function" ? (content.width).call($item) : (content.width))));
-                    }
-                    _.push("");
-                }
                 _.push("<br />  Height: ");
                 if ((typeof (content.height != undefined) !== "undefined" && (content.height != undefined) != null) && (typeof (content.height != undefined) === "function" ? (content.height != undefined).call($item) : (content.height != undefined))) {
                     _.push("");
@@ -1630,7 +1638,7 @@ function anonymous(jQuery, $item) {
                     _.push("");
                 }
                 _.push("<br />  Datetaken: ");
-                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.datetaken)) {
+                if ((typeof (content.datetaken != undefined) !== "undefined" && (content.datetaken != undefined) != null) && (typeof (content.datetaken != undefined) === "function" ? (content.datetaken != undefined).call($item) : (content.datetaken != undefined))) {
                     _.push("");
                     if (typeof (content.datetaken) !== "undefined" && (content.datetaken) != null) {
                         _.push($.encode((typeof (content.datetaken) === "function" ? (content.datetaken).call($item) : (content.datetaken))));
@@ -1638,30 +1646,34 @@ function anonymous(jQuery, $item) {
                     _.push("");
                 }
                 _.push("<br />  Location: ");
-                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.location)) {
+                if ((typeof (content.location != undefined) !== "undefined" && (content.location != undefined) != null) && (typeof (content.location != undefined) === "function" ? (content.location != undefined).call($item) : (content.location != undefined))) {
                     _.push("");
                     if (typeof (content.location) !== "undefined" && (content.location) != null) {
                         _.push($.encode((typeof (content.location) === "function" ? (content.location).call($item) : (content.location))));
                     }
                     _.push("");
                 }
-                _.push("<br />    GPS Latitude: ");
-                if ((typeof (!$.isEmptyObject(content.gps) && content.gps.lat != undefined) !== "undefined" && (!$.isEmptyObject(content.gps) && content.gps.lat != undefined) != null) && (typeof (!$.isEmptyObject(content.gps) && content.gps.lat != undefined) === "function" ? (!$.isEmptyObject(content.gps) && content.gps.lat != undefined).call($item) : (!$.isEmptyObject(content.gps) && content.gps.lat != undefined))) {
-                    _.push("");
-                    if (typeof (content.gps.lat) !== "undefined" && (content.gps.lat) != null) {
-                        _.push($.encode((typeof (content.gps.lat) === "function" ? (content.gps.lat).call($item) : (content.gps.lat))));
+                _.push("<br />    ");
+                if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.gps)) {
+                    _.push("  GPS Latitude: ");
+                    if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.gps.lat)) {
+                        _.push("");
+                        if (typeof (content.gps.lat) !== "undefined" && (content.gps.lat) != null) {
+                            _.push($.encode((typeof (content.gps.lat) === "function" ? (content.gps.lat).call($item) : (content.gps.lat))));
+                        }
+                        _.push("");
                     }
-                    _.push("");
-                }
-                _.push("<br />  GPS Longitude: ");
-                if ((typeof (!$.isEmptyObject(content.gps) && content.gps.lng != undefined) !== "undefined" && (!$.isEmptyObject(content.gps) && content.gps.lng != undefined) != null) && (typeof (!$.isEmptyObject(content.gps) && content.gps.lng != undefined) === "function" ? (!$.isEmptyObject(content.gps) && content.gps.lng != undefined).call($item) : (!$.isEmptyObject(content.gps) && content.gps.lng != undefined))) {
-                    _.push("");
-                    if (typeof (content.gps.lng) !== "undefined" && (content.gps.lng) != null) {
-                        _.push($.encode((typeof (content.gps.lng) === "function" ? (content.gps.lng).call($item) : (content.gps.lng))));
+                    _.push("<br />  GPS Longitude: ");
+                    if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.gps.lng)) {
+                        _.push("");
+                        if (typeof (content.gps.lng) !== "undefined" && (content.gps.lng) != null) {
+                            _.push($.encode((typeof (content.gps.lng) === "function" ? (content.gps.lng).call($item) : (content.gps.lng))));
+                        }
+                        _.push("");
                     }
-                    _.push("");
+                    _.push("<br />  ");
                 }
-                _.push("<br />  Filmspeed: ");
+                _.push("  Filmspeed: ");
                 if ((typeof (content.filmspeed != undefined) !== "undefined" && (content.filmspeed != undefined) != null) && (typeof (content.filmspeed != undefined) === "function" ? (content.filmspeed != undefined).call($item) : (content.filmspeed != undefined))) {
                     _.push("");
                     if (typeof (content.filmspeed) !== "undefined" && (content.filmspeed) != null) {
@@ -1697,7 +1709,7 @@ function anonymous(jQuery, $item) {
             } else {
                 if ((typeof (file.name.localPart == "file") !== "undefined" && (file.name.localPart == "file") != null) && (typeof (file.name.localPart == "file") === "function" ? (file.name.localPart == "file").call($item) : (file.name.localPart == "file"))) {
                     _.push("  <h2>File Metadaten:</h2>  Filename: ");
-                    if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.filename)) {
+                    if ((typeof (content.filename != undefined) !== "undefined" && (content.filename != undefined) != null) && (typeof (content.filename != undefined) === "function" ? (content.filename != undefined).call($item) : (content.filename != undefined))) {
                         _.push("");
                         if (typeof (content.filename) !== "undefined" && (content.filename) != null) {
                             _.push($.encode((typeof (content.filename) === "function" ? (content.filename).call($item) : (content.filename))));
@@ -1705,7 +1717,7 @@ function anonymous(jQuery, $item) {
                         _.push("");
                     }
                     _.push("<br />  Source: ");
-                    if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.source)) {
+                    if ((typeof (content.source != undefined) !== "undefined" && (content.source != undefined) != null) && (typeof (content.source != undefined) === "function" ? (content.source != undefined).call($item) : (content.source != undefined))) {
                         _.push("");
                         if (typeof (content.source) !== "undefined" && (content.source) != null) {
                             _.push($.encode((typeof (content.source) === "function" ? (content.source).call($item) : (content.source))));
@@ -1713,7 +1725,7 @@ function anonymous(jQuery, $item) {
                         _.push("");
                     }
                     _.push("<br />  External: ");
-                    if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.external)) {
+                    if ((typeof (content.external != undefined) !== "undefined" && (content.external != undefined) != null) && (typeof (content.external != undefined) === "function" ? (content.external != undefined).call($item) : (content.external != undefined))) {
                         _.push("");
                         if (typeof (content.external) !== "undefined" && (content.external) != null) {
                             _.push($.encode((typeof (content.external) === "function" ? (content.external).call($item) : (content.external))));
@@ -1721,7 +1733,7 @@ function anonymous(jQuery, $item) {
                         _.push("");
                     }
                     _.push("<br />  Mimetype: ");
-                    if ((typeof (!$.isEmptyObject) !== "undefined" && (!$.isEmptyObject) != null) && !$.isEmptyObject(content.mimetype)) {
+                    if ((typeof (content.mimetype != undefined) !== "undefined" && (content.mimetype != undefined) != null) && (typeof (content.mimetype != undefined) === "function" ? (content.mimetype != undefined).call($item) : (content.mimetype != undefined))) {
                         _.push("");
                         if (typeof (content.mimetype) !== "undefined" && (content.mimetype) != null) {
                             _.push($.encode((typeof (content.mimetype) === "function" ? (content.mimetype).call($item) : (content.mimetype))));
@@ -2052,6 +2064,13 @@ typeInfo:Jsonix.Schema.XSD.DateTime.INSTANCE}),new Jsonix.Model.ElementPropertyI
 new Jsonix.Model.ElementPropertyInfo({name:"exposuretime",typeInfo:Jsonix.Schema.XSD.Float.INSTANCE})];ImageMappings.typeInfos=[ImageMappings.Head];ImageMappings.elementInfos=[{elementName:new Jsonix.XML.QName("images"),typeInfo:ImageMappings.ImagesCollection},{elementName:new Jsonix.XML.QName("image"),typeInfo:ImageMappings.ImageType},{elementName:new Jsonix.XML.QName("head"),typeInfo:ImageMappings.Head},{elementName:new Jsonix.XML.QName("content"),typeInfo:ImageMappings.Body.Content}];
 ;
 steal.end();
+steal.plugins("jquery/controller","jquery/event/hover","jqueryui/sortable","jqueryui/mouse").models("../../models/page").css("composer").then("pagelet").then(function(a){a.Controller("Editor.Composer",{defaults:{connectWith:".composer",page:{}}},{init:function(e){this.id=this.element.attr("id");this.element.addClass("wbl-nojQuery");a(e).sortable({connectWith:this.options.connectWith,distance:15,placeholder:"wbl-pageletPlaceholder",items:"div.pagelet",tolerance:"pointer",cursor:"move",cursorAt:{top:-8,
+left:-10},revert:true,start:a.proxy(function(c,b){this.element.find("img.wbl-iconEditing").remove();this.element.find("img.wbl-iconRemove").remove();this._disablePagelets();if(!b.item.hasClass("wbl-draggable")){c=b.item.attr("index");b.item.next();c=this.options.page.getPagelet(this.id,c);c=jQuery.extend(true,{},c);b.helper.data("pagelet",c)}},this),stop:a.proxy(function(){this._enablePagelets()},this),update:a.proxy(function(c,b){var f=this.options.page,g=this.id;this.element.hasClass("empty")&&
+f.createComposer(g);c=jQuery.extend(true,[],f.getComposer(g).pagelets);if(b.item.hasClass("wbl-draggable")){var i={id:b.item.attr("id"),module:b.item.attr("module"),locale:[],properties:{property:{}},created:{user:{id:this.options.runtime.getUserLogin(),name:this.options.runtime.getUserName(),realm:this.options.runtime.getId()},date:new Date}};c.splice(b.item.index(),0,i);b.item.after('<div class="pagelet editor_pagelet" >');var h=b.item.next();b.item.remove()}else c=a.map(this.element.find(".pagelet"),
+function(d){var j=a(d).attr("index");d=a(d).data("pagelet");if(d!=undefined)return d;return f.getPagelet(g,j)});f.updateComposer(g,c);this.update();b.item.hasClass("wbl-draggable")&&Workbench.getPageletEditor({id:f.value.id,language:this.options.language,composer:g,pagelet:h.attr("index")},a.proxy(function(d){a(d).find("editor:first").length||h.addClass("wbl-noEditor");h.editor_pagelet("_openPageEditor",d,true)},this))},this)});a(e).find("div.pagelet").editor_pagelet({composer:{id:this.id,page:this.options.page,
+language:this.options.language,runtime:this.options.runtime}})},update:function(){var e=this.element.find("div.pagelet");if(e.length){this.element.removeClass("empty");e.editor_pagelet({composer:{id:this.id,page:this.options.page,language:this.options.language,runtime:this.options.runtime}})}else this.element.addClass("empty")},disable:function(){a(this.element).removeClass("wbl-nojQuery");a(this.element).sortable("disable");a(this.element).find("div.pagelet").editor_pagelet("disable").css("min-height",
+"")},enable:function(){a(this.element).addClass("wbl-nojQuery");a(this.element).sortable("enable");a(this.element).find("div.pagelet").editor_pagelet("enable").css("min-height","35px")},_enablePagelets:function(){a(".composer").editor_composer("enable")},_disablePagelets:function(){a(".composer").editor_composer("disable")},hoverenter:function(){a(this.element).hasClass("wbl-nojQuery")&&a(this.element).addClass("wbl-composerBorder")},hoverleave:function(){if(a(this.element).hasClass("wbl-nojQuery"))a(this.element).hasClass("empty")||
+a(this.element).removeClass("wbl-composerBorder")}})});
 ;
 steal.end();
 steal.plugins("jqueryui/core","jqueryui/widget","jqueryui/mouse").then("../lib/ui/jquery.ui.sortable.js");
