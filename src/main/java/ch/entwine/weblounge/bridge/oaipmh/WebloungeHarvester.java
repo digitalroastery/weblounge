@@ -25,17 +25,24 @@ import static org.opencastproject.util.data.Option.some;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.ListRecordsResponse;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.OaiPmhRepositoryClient;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.RecordHandler;
+import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchQuery.Order;
+import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
+import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.movie.MovieResourceSearchResultItemImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.scheduler.JobException;
 import ch.entwine.weblounge.common.scheduler.JobWorker;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.util.data.Option;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.prefs.BackingStoreException;
-import org.osgi.service.prefs.Preferences;
 import org.osgi.service.prefs.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +52,6 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
 
@@ -131,24 +137,28 @@ public class WebloungeHarvester implements JobWorker {
     if (StringUtils.isBlank(handlerClass))
       throw new JobException(this, "Configuration option '" + OPT_HANDLER_CLASS + "' is missing from the job configuration");
 
+    UserImpl harvesterUser = new UserImpl(name, site.getIdentifier(), "Harvester");
+
     RecordHandler handler;
     try {
       Class<? extends AbstractWebloungeRecordHandler> c = (Class<? extends AbstractWebloungeRecordHandler>) getClass().getClassLoader().loadClass(handlerClass);
-      Class<?> paramTypes[] = new Class[6];
+      Class<?> paramTypes[] = new Class[7];
       paramTypes[0] = Site.class;
       paramTypes[1] = WritableContentRepository.class;
-      paramTypes[2] = String.class;
+      paramTypes[2] = User.class;
       paramTypes[3] = String.class;
       paramTypes[4] = String.class;
       paramTypes[5] = String.class;
+      paramTypes[6] = String.class;
       Constructor<? extends AbstractWebloungeRecordHandler> constructor = c.getConstructor(paramTypes);
       Object arglist[] = new Object[6];
       arglist[0] = site;
       arglist[1] = contentRepository;
-      arglist[2] = presentationTrackFlavor;
-      arglist[3] = presenterTrackFlavor;
-      arglist[4] = dcEpisodeFlavor;
-      arglist[5] = dcSeriesFlavor;
+      arglist[2] = harvesterUser;
+      arglist[3] = presentationTrackFlavor;
+      arglist[4] = presenterTrackFlavor;
+      arglist[5] = dcEpisodeFlavor;
+      arglist[6] = dcSeriesFlavor;
       handler = constructor.newInstance(arglist);
     } catch (Throwable t) {
       throw new IllegalStateException("Unable to instantiate class " + handlerClass + ": " + t.getMessage(), t);
@@ -160,63 +170,29 @@ public class WebloungeHarvester implements JobWorker {
       throw new RuntimeException("preferences service not found");
     }
 
-    PreferencesService service = (PreferencesService) bundleContext.getService(ref);
-    Preferences systemPreferences = service.getSystemPreferences();
+    SearchResult searchResult;
+    SearchQuery q = new SearchQueryImpl(site);
+    q.withTypes(MovieResource.TYPE);
+    q.sortByPublishingDate(Order.Descending);
+    q.withPublisher(harvesterUser);
+    try {
+      searchResult = contentRepository.find(q);
+    } catch (ContentRepositoryException e) {
+      logger.error("Error searching for resources with harvester publisher.");
+      throw new RuntimeException(e);
+    }
+
+    Option<Date> harvestingDate = Option.<Date> none();
+    if (searchResult.getHitCount() > 0) {
+      MovieResourceSearchResultItemImpl resultItem = (MovieResourceSearchResultItemImpl) searchResult.getItems()[0];
+      harvestingDate = some(resultItem.getMovieResource().getPublishFrom());
+    }
 
     try {
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(new Date());
-
-      harvest(repositoryUrl, getLastHarvestDate(systemPreferences, repositoryUrl), handler);
-
-      setLastHarvestDate(systemPreferences, repositoryUrl, cal);
+      harvest(repositoryUrl, harvestingDate, handler);
     } catch (Exception e) {
       logger.error("An error occured while harvesting " + url + ". Skipping this repository for now...", e);
     }
-  }
-
-  /**
-   * Set the last harvested Date with a security delta of 1 minutes
-   * 
-   * @param prefs
-   *          the preferences
-   * @param repositoryUrl
-   *          the repository url
-   * @param cal
-   *          the current calender time
-   */
-  private void setLastHarvestDate(Preferences prefs, String repositoryUrl,
-      Calendar cal) {
-    cal.add(Calendar.MINUTE, -1);
-    prefs.putLong(repositoryUrl, cal.getTime().getTime());
-    try {
-      prefs.flush();
-    } catch (BackingStoreException e) {
-      logger.error("Last harvested can't be saved! " + e.getMessage());
-      throw new RuntimeException(e);
-    }
-  }
-
-  /**
-   * Return the last harvested Date or none() if not found.
-   * 
-   * @param prefs
-   *          the preferences
-   * @param url
-   *          the repository url
-   * @return the last harvested Date or none()
-   */
-  private Option<Date> getLastHarvestDate(Preferences prefs, String url) {
-    try {
-      prefs.sync();
-    } catch (BackingStoreException e) {
-      logger.error("Last harvested could not be loaded! " + e.getMessage());
-      throw new RuntimeException(e);
-    }
-    long timestamp = prefs.getLong(url, -1L);
-    if (timestamp == -1L)
-      return Option.<Date> none();
-    return some(new Date(timestamp));
   }
 
   private void harvest(String url, Option<Date> from, RecordHandler handler)

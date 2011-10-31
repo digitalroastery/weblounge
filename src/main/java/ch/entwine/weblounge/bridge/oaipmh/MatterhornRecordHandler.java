@@ -4,7 +4,6 @@ import ch.entwine.weblounge.bridge.oaipmh.harvester.HarvesterException;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.ListRecordsResponse;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.RecordHandler;
 import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.movie.MovieContent;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.movie.MovieContentImpl;
@@ -12,6 +11,7 @@ import ch.entwine.weblounge.common.impl.content.movie.MovieResourceImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.movie.VideoStreamImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.FilenameUtils;
@@ -50,6 +50,8 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
    *          the site
    * @param contentRepository
    *          the content repository
+   * @param harvesterUser
+   *          the harvester user
    * @param presentationTrackFlavor
    *          the presentation track flavor
    * @param presenterTrackFlavor
@@ -60,10 +62,10 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
    *          the dublin core series flavor
    */
   public MatterhornRecordHandler(Site site,
-      WritableContentRepository contentRepository,
+      WritableContentRepository contentRepository, User harvesterUser,
       String presentationTrackFlavor, String presenterTrackFlavor,
       String dcEpisodeFlavor, String dcSeriesFlavor) {
-    super(site, contentRepository, presentationTrackFlavor, presenterTrackFlavor, dcEpisodeFlavor, dcSeriesFlavor);
+    super(site, contentRepository, harvesterUser, presentationTrackFlavor, presenterTrackFlavor, dcEpisodeFlavor, dcSeriesFlavor);
     mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
   }
 
@@ -81,7 +83,7 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
    * 
    * @see ch.entwine.weblounge.bridge.oaipmh.AbstractWebloungeRecordHandler#parseResource()
    */
-  protected Resource<?> parseResource(Node record) {
+  protected Resource<MovieContent> parseResource(Node record) {
     Node mediaPackageNode = ListRecordsResponse.metadataOfRecord(record);
     MediaPackage mediaPackage;
     try {
@@ -122,7 +124,7 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
    * 
    * @see ch.entwine.weblounge.bridge.oaipmh.AbstractWebloungeRecordHandler#parseResourceContent()
    */
-  protected ResourceContent parseResourceContent(Node record) {
+  protected MovieContent parseResourceContent(Node record) {
     Node mediaPackageNode = ListRecordsResponse.metadataOfRecord(record);
     MediaPackage mediaPackage;
     try {

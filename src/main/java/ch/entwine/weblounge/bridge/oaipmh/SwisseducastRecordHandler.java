@@ -2,13 +2,13 @@ package ch.entwine.weblounge.bridge.oaipmh;
 
 import ch.entwine.weblounge.bridge.oaipmh.harvester.RecordHandler;
 import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.movie.MovieContent;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.movie.MovieContentImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.slf4j.Logger;
@@ -44,12 +44,14 @@ public class SwisseducastRecordHandler extends AbstractWebloungeRecordHandler im
   private String extent;
 
   /**
-   * Creates a new swisseducast record handler.
+   * Creates a new swisseducast record handler
    * 
    * @param site
    *          the site
    * @param contentRepository
    *          the content repository
+   * @param harvesterUser
+   *          the harvester user
    * @param presentationTrackFlavor
    *          the presentation track flavor
    * @param presenterTrackFlavor
@@ -60,10 +62,10 @@ public class SwisseducastRecordHandler extends AbstractWebloungeRecordHandler im
    *          the dublin core series flavor
    */
   public SwisseducastRecordHandler(Site site,
-      WritableContentRepository contentRepository,
+      WritableContentRepository contentRepository, User harvesterUser,
       String presentationTrackFlavor, String presenterTrackFlavor,
       String dcEpisodeFlavor, String dcSeriesFlavor) {
-    super(site, contentRepository, presentationTrackFlavor, presenterTrackFlavor, dcEpisodeFlavor, dcSeriesFlavor);
+    super(site, contentRepository, harvesterUser, presentationTrackFlavor, presenterTrackFlavor, dcEpisodeFlavor, dcSeriesFlavor);
   }
 
   /**
@@ -80,7 +82,7 @@ public class SwisseducastRecordHandler extends AbstractWebloungeRecordHandler im
    * 
    * @see ch.entwine.weblounge.bridge.oaipmh.AbstractWebloungeRecordHandler#parseResource()
    */
-  protected Resource<?> parseResource(Node record) {
+  protected Resource<MovieContent> parseResource(Node record) {
     Language language = getISO3Language(languageCode);
 
     MovieResourceImpl movieResource = new MovieResourceImpl(new MovieResourceURIImpl(site));
@@ -99,7 +101,7 @@ public class SwisseducastRecordHandler extends AbstractWebloungeRecordHandler im
    * 
    * @see ch.entwine.weblounge.bridge.oaipmh.AbstractWebloungeRecordHandler#parseResourceContent()
    */
-  protected ResourceContent parseResourceContent(Node record) {
+  protected MovieContent parseResourceContent(Node record) {
     Language language = getISO3Language(languageCode);
 
     // Set Content

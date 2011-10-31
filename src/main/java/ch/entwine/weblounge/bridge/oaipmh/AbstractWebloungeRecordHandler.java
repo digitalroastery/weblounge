@@ -8,14 +8,13 @@ import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.movie.MovieContent;
 import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
-import ch.entwine.weblounge.common.impl.security.UserImpl;
-import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.security.User;
@@ -49,7 +48,7 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
   protected final WritableContentRepository contentRepository;
 
   /** User for resource creation */
-  protected User harvesterUser = new UserImpl("harvester", "videolounge", "Harvester");
+  protected User harvesterUser;
 
   /** ISO3 language map */
   protected final Map<String, Language> iso3Languages = new HashMap<String, Language>();
@@ -67,19 +66,30 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
   protected final String dcSeriesFlavor;
 
   /**
-   * Creates a new weblounge record handler
+   * Creates a new abstract weblounge record handler
    * 
    * @param site
    *          the site
    * @param contentRepository
    *          the content repository
+   * @param harvesterUser
+   *          the harvester user
+   * @param presentationTrackFlavor
+   *          the presentation track flavor
+   * @param presenterTrackFlavor
+   *          the presenter track flavor
+   * @param dcEpisodeFlavor
+   *          the dublin core episode flavor
+   * @param dcSeriesFlavor
+   *          the dublin core series flavor
    */
   public AbstractWebloungeRecordHandler(Site site,
-      WritableContentRepository contentRepository,
+      WritableContentRepository contentRepository, User harvesterUser,
       String presentationTrackFlavor, String presenterTrackFlavor,
       String dcEpisodeFlavor, String dcSeriesFlavor) {
     this.site = site;
     this.contentRepository = contentRepository;
+    this.harvesterUser = harvesterUser;
     this.presentationTrackFlavor = presentationTrackFlavor;
     this.presenterTrackFlavor = presenterTrackFlavor;
     this.dcEpisodeFlavor = dcEpisodeFlavor;
@@ -99,8 +109,8 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
 
     Date date;
     try {
-      date = WebloungeDateFormat.parseStatic(dateString);
-    } catch (ParseException e) {
+      date = OaiPmhUtil.fromUtc(dateString);
+    } catch (ParseException e1) {
       logger.debug("Unable to parse date '{}'", dateString);
       return;
     }
@@ -126,11 +136,15 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
           return;
         logger.warn("Update harvested element {}", recordIdentifier);
 
-        Resource<?> resource = parseResource(record);
-        resource.setPublished(harvesterUser, date, null);
-        ResourceContent content = parseResourceContent(record);
-        removeContents(resource);
+        Resource<MovieContent> resource = parseResource(record);
         resource.getURI().setIdentifier(movieResource.getIdentifier());
+        resource.setPublished(harvesterUser, date, null);
+        removeContents(resource);
+
+        MovieContent content = parseResourceContent(record);
+        content.setSource(recordIdentifier);
+        resource.addContent(content);
+
         addResource(resource);
         addContent(resource.getURI(), content);
       } else if (searchResult.getHitCount() > 1) {
@@ -176,14 +190,14 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
    * 
    * @return the resource content to add to the repository
    */
-  protected abstract ResourceContent parseResourceContent(Node record);
+  protected abstract MovieContent parseResourceContent(Node record);
 
   /**
    * Parse the record to a {@link Resource}
    * 
    * @return the resource to add to the repository
    */
-  protected abstract Resource<?> parseResource(Node record);
+  protected abstract Resource<MovieContent> parseResource(Node record);
 
   /**
    * Parse a matterhorn iso3 language string to a weblounge language.

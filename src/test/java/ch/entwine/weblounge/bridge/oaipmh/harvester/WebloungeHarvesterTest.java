@@ -9,6 +9,7 @@ import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Environment;
@@ -26,7 +27,6 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -120,15 +120,16 @@ public class WebloungeHarvesterTest {
    * @throws Exception
    */
   @Test
-  @Ignore
   public void testMatterhornRecordHandler() throws Exception {
-    RecordHandler recordHandler = new MatterhornRecordHandler(site, contentRepository, "presentation/delivery", "presenter/delivery", "dublincore/episode", "dublincore/series");
+    UserImpl harvesterUser = new UserImpl("testlogin", site.getIdentifier(), "Harvester");
+    RecordHandler recordHandler = new MatterhornRecordHandler(site, contentRepository, harvesterUser, "presentation/delivery", "presenter/delivery", "dublincore/episode", "dublincore/series");
 
     assertEquals(METADATA_PREFIX, recordHandler.getMetadataPrefix());
     assertEquals(1, contentRepository.getResourceCount());
 
     URL resource = this.getClass().getResource("test.webm");
 
+    // Adds new records to content repository
     ListRecordsResponse response = new ListRecordsResponse(loadDoc("matterhorn-list-records-response.xml"));
     if (!response.isError()) {
       NodeList records = response.getRecords();
@@ -139,6 +140,18 @@ public class WebloungeHarvesterTest {
 
     assertEquals(3, contentRepository.getResourceCount());
 
+    // Update records
+    response = new ListRecordsResponse(loadDoc("matterhorn-modified-list-records-response.xml"));
+    if (!response.isError()) {
+      NodeList records = response.getRecords();
+      for (int i = 0; i < records.getLength(); i++) {
+        recordHandler.handle(replaceSource(records.item(i), resource));
+      }
+    }
+
+    assertEquals(3, contentRepository.getResourceCount());
+
+    // Remove deleted records to content repository
     response = new ListRecordsResponse(loadDoc("matterhorn-deleted-list-records-response.xml"));
     if (!response.isError()) {
       NodeList records = response.getRecords();
