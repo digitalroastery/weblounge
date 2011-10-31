@@ -776,14 +776,17 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
       // export content
       MapEntryComparator comparator = new MapEntryComparator();
       SortedSet<Map.Entry<String, String[]>> entrySet = new TreeSet<Map.Entry<String, String[]>>(comparator);
-      entrySet.addAll(content.get(l).entrySet());
-      for (Map.Entry<String, String[]> e : entrySet) {
-        for (String value : getMultiValueContent(e.getKey(), l)) {
-          b.append("<text id=\"");
-          b.append(e.getKey());
-          b.append("\"><![CDATA[");
-          b.append(value);
-          b.append("]]></text>");
+      Map<String, String[]> c = content.get(l);
+      if (c != null) {
+        entrySet.addAll(c.entrySet());
+        for (Map.Entry<String, String[]> e : entrySet) {
+          for (String value : getMultiValueContent(e.getKey(), l)) {
+            b.append("<text id=\"");
+            b.append(e.getKey());
+            b.append("\"><![CDATA[");
+            b.append(value);
+            b.append("]]></text>");
+          }
         }
       }
       b.append("</locale>");

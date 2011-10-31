@@ -65,8 +65,8 @@ public final class PageletReader extends WebloungeContentReader {
   /**
    * Creates a new pagelet reader that will parse serialized XML version of a
    * pagelet and store it in the
-   * {@link ch.entwine.weblounge.common.content.page.Pagelet} that is returned by
-   * the {@link #read} method.
+   * {@link ch.entwine.weblounge.common.content.page.Pagelet} that is returned
+   * by the {@link #read} method.
    * 
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
@@ -165,6 +165,7 @@ public final class PageletReader extends WebloungeContentReader {
       if ("true".equals(attrs.getValue("original")))
         pagelet.setOriginalLanguage(l);
       pagelet.modificationCtx.switchTo(l);
+      pagelet.enableLanguage(l);
       clipboard.put("language", l);
     }
 
