@@ -195,6 +195,9 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
                 requestedURI.setVersion(Resource.LIVE);
                 pageURI = requestedURI;
                 ((WebloungeRequestImpl) request).setLanguage(request.getSessionLanguage());
+              } else if (isEditing && version == Resource.WORK && !contentRepository.exists(requestedURI)) {
+                pageURI = requestedURI;
+                ((WebloungeRequestImpl) request).setLanguage(request.getSessionLanguage());
               }
             }
           }
@@ -207,6 +210,8 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
                 pageURI = requestURI;
               } else if (isEditing && version == Resource.WORK && !contentRepository.exists(requestURI)) {
                 requestURI.setVersion(Resource.LIVE);
+                pageURI = requestURI;
+              } else if (isEditing && version == Resource.WORK && contentRepository.exists(requestURI)) {
                 pageURI = requestURI;
               }
             }
