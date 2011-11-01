@@ -33,6 +33,8 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,7 +64,7 @@ public class SearchQueryImpl implements SearchQuery {
   protected Class<?> expectation = null;
 
   /** The resource identifier */
-  protected String resourceId = null;
+  protected List<String> resourceId = new ArrayList<String>();
 
   /** The path */
   protected String path = null;
@@ -260,9 +262,9 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withIdentifier(java.lang.String)
    */
   public SearchQuery withIdentifier(String id) {
-    if (id == null)
+    if (StringUtils.isBlank(id))
       throw new IllegalArgumentException("Id cannot be null");
-    this.resourceId = id;
+    this.resourceId.add(id);
     return this;
   }
 
@@ -271,8 +273,8 @@ public class SearchQueryImpl implements SearchQuery {
    * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getIdentifier()
    */
-  public String getIdentifier() {
-    return resourceId;
+  public String[] getIdentifier() {
+    return resourceId.toArray(new String[resourceId.size()]);
   }
 
   /**

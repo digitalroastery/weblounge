@@ -127,15 +127,22 @@ public class SearchQueryImplTest {
   }
 
   /**
-   * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withIdentifier(java.lang.String)}
-   * .
+   * Test method for {@link
+   * ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withIdentifier(
+   * java.util.ArrayList.ArrayList<String>())} .
    */
   @Test
   public void testWithId() {
-    String id = "4bb19980-8f98-4873-a813-71b6dfab22af";
-    query.withIdentifier(id);
-    assertEquals(id, query.getIdentifier());
+    String[] id = new String[] {
+        "4bb19980-8f98-4873-a813-71b6dfab22af",
+        "5bb19980-8f98-4873-a813-71b6dfab22af",
+        "6bb19980-8f98-4873-a813-71b6dfab22af",
+        "7bb19980-8f98-4873-a813-71b6dfab22af" };
+
+    for (String i : id)
+      query.withIdentifier(i);
+
+    assertArrayEquals(id, query.getIdentifier());
   }
 
   /**
