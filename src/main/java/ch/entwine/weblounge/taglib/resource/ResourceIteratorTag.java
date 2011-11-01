@@ -34,7 +34,6 @@ import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +66,7 @@ public class ResourceIteratorTag extends WebloungeTag {
   private List<String> excludeTypes = null;
 
   /** The resource id */
-  private String resourceId = null;
+  private List<String> resourceId = null;
 
   /** The minimum creation start date */
   private Date creatorStartDate = null;
@@ -106,10 +105,15 @@ public class ResourceIteratorTag extends WebloungeTag {
    * Sets the resource identifier for the search.
    * 
    * @param id
-   *          the resource identifier to serach
+   *          the resource identifier to search
    */
   public void setUuid(String id) {
-    resourceId = id;
+    if (resourceId == null)
+      resourceId = new ArrayList<String>();
+    StringTokenizer st = new StringTokenizer(id, ",;");
+    while (st.hasMoreTokens()) {
+      resourceId.add(st.nextToken());
+    }
   }
 
   /**
@@ -213,8 +217,9 @@ public class ResourceIteratorTag extends WebloungeTag {
       if (order != null)
         q.sortByCreationDate(order);
 
-      if (StringUtils.isNotBlank(resourceId)) {
-        q.withIdentifier(resourceId);
+      if (resourceId != null) {
+        for (String id : resourceId)
+          q.withIdentifier(id);
       } else {
         if (resourceSubjects != null) {
           for (String subject : resourceSubjects) {
