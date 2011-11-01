@@ -234,6 +234,7 @@ public class PageContentTest extends IntegrationTestBase {
 
     logger.info("Sending request to the work version of {}", requestUrl);
     HttpGet request = new HttpGet(requestUrl);
+    request.addHeader("Cookie", "weblounge.editor=true");
 
     // Send and the request and examine the response
     logger.debug("Sending request to {}", request.getURI());
