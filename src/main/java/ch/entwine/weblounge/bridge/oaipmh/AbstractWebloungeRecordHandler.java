@@ -51,7 +51,7 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
   protected User harvesterUser;
 
   /** ISO3 language map */
-  protected final Map<String, Language> iso3Languages = new HashMap<String, Language>();
+  protected final Map<String, Language> languages = new HashMap<String, Language>();
 
   /** Presentation track flavor */
   protected final String presentationTrackFlavor;
@@ -211,16 +211,14 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
    */
   protected Language getLanguage(String languageCode)
       throws UnknownLanguageException {
-    Language language = iso3Languages.get(languageCode);
+    Language language = languages.get(languageCode);
     if (language != null)
       return language;
     for (Locale locale : Locale.getAvailableLocales()) {
-      if (locale.getISO3Language().equals(languageCode)) {
+      if (locale.getISO3Language().equals(languageCode) || locale.getLanguage().equals(languageCode)) {
         language = new LanguageImpl(new Locale(locale.getLanguage(), "", ""));
-        iso3Languages.put(languageCode, language);
+        languages.put(languageCode, language);
         break;
-      } else if (locale.getLanguage().equals(languageCode)) {
-        language = new LanguageImpl(new Locale(locale.getLanguage(), "", ""));
       }
     }
     if (language == null)
