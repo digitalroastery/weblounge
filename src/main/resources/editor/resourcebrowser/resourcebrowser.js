@@ -301,6 +301,13 @@ steal.plugins(
 				selectedElements = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
 			}
 			
+			// Enable or disable delete button
+			if(selectedElements.length > 0) {
+				$('button.wbl-delete').button("enable");
+			} else {
+				$('button.wbl-delete').button("disable");
+			}
+			
         	if(this.editorSelectionMode == true && selectedElements.length > 0) {
         		$('button.wbl-editorSelectionOK').button('option', 'disabled', false);
         	} else if(this.editorSelectionMode == true) {

@@ -31,6 +31,13 @@ steal.plugins('jquery/controller',
 				});
 				$(el).attr('checked', 'checked');
 			}
+			
+			// Enable or disable delete button
+			if(this.element.parent().find('input:checked').length > 0) {
+				$('button.wbl-delete').button("enable");
+			} else {
+				$('button.wbl-delete').button("disable");
+			}
 		},
 		
 		"img.wbl-settings click": function(el, ev) {

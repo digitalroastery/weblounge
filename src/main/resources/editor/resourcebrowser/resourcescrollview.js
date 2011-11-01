@@ -74,9 +74,17 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 			if(this.options.selectedResources.length == 1) {
 				this.duplicateDialog.dialog('open');
 			} else if(this.options.selectedResources.length > 1) {
-				this.element.trigger('showMessage', 'Es kann nur eine Seite markiert werden.');
+				if(this.options.resourceType == 'pages') {
+					this.element.trigger('showMessage', 'Es kann nur eine Seite markiert werden.');
+				} else {
+					this.element.trigger('showMessage', 'Es kann nur ein Media markiert werden.');
+				}
 			} else {
-				this.element.trigger('showMessage', 'Es wurde keine Seite markiert.');
+				if(this.options.resourceType == 'pages') {
+					this.element.trigger('showMessage', 'Es wurde keine Seite markiert.');
+				} else {
+					this.element.trigger('showMessage', 'Es wurde kein Media markiert.');
+				}
 			}
 		},
 		
@@ -85,7 +93,11 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 			if(this.options.selectedResources.length) {
 				this.deleteDialog.dialog('open');
 			} else {
-				this.element.trigger('showMessage', 'Es wurde keine Seite markiert.');
+				if(this.options.resourceType == 'pages') {
+					this.element.trigger('showMessage', 'Es wurde keine Seite markiert.');
+				} else {
+					this.element.trigger('showMessage', 'Es wurde kein Media markiert.');
+				}
 			}
 		},
 		

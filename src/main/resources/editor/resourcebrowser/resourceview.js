@@ -35,6 +35,7 @@ steal.plugins('jquery/controller',
 			$('button.wbl-delete').button({icons: {primary: "ui-icon-trash"}, text: false});
 			$('button.wbl-duplicate').button({icons: {primary: "ui-icon-copy"}, text: false});
 			$('button.wbl-favorize').button({icons: {primary: "ui-icon-star"}, text: false });
+			$('button.wbl-delete').button("disable");
 		},
 		
 		_initFilter: function() {
@@ -55,11 +56,21 @@ steal.plugins('jquery/controller',
 		},
 		
 		_initDialogs: function() {
+			var deleteDialogTitle;
+			var deleteDialogText;
+			if(this.options.resourceType == 'pages') {
+				deleteDialogTitle = 'Seite(n) l&ouml;schen';
+				deleteDialogText = '<p>M&ouml;chten Sie diese Seite(n) wirklich l&ouml;schen?</p>';
+			} else {
+				deleteDialogTitle = 'Media l&ouml;schen';
+				deleteDialogText = '<p>M&ouml;chten Sie diese Media wirklich l&ouml;schen?</p>';
+			}
+			
 			this.deleteDialog = $('<div></div>')
-			.load(this.options.runtime.getRootPath() + '/editor/resourcebrowser/views/delete-dialog.html')
+			.html(deleteDialogText)
 			.dialog({
 				modal: true,
-				title: 'Seite(n) l&ouml;schen',
+				title: deleteDialogTitle,
 				autoOpen: false,
 				resizable: true,
 				buttons: {
