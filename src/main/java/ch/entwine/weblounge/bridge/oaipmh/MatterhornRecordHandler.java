@@ -93,7 +93,7 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
       throw new RuntimeException(e);
     }
 
-    Language language = getISO3Language(mediaPackage.getLanguage());
+    Language language = getLanguage(mediaPackage.getLanguage());
 
     MovieResourceImpl movieResource = new MovieResourceImpl(new MovieResourceURIImpl(site));
     movieResource.setCreated(harvesterUser, mediaPackage.getDate());
@@ -134,7 +134,7 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
       throw new RuntimeException(e);
     }
 
-    Language language = getISO3Language(mediaPackage.getLanguage());
+    Language language = getLanguage(mediaPackage.getLanguage());
 
     // TODO: Use tracks with correct flavor for movie
     // ??? presenterTrackFlavor

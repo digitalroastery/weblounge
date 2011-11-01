@@ -42,8 +42,6 @@ import ch.entwine.weblounge.common.site.Site;
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.util.data.Option;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.prefs.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -151,7 +149,7 @@ public class WebloungeHarvester implements JobWorker {
       paramTypes[5] = String.class;
       paramTypes[6] = String.class;
       Constructor<? extends AbstractWebloungeRecordHandler> constructor = c.getConstructor(paramTypes);
-      Object arglist[] = new Object[6];
+      Object arglist[] = new Object[7];
       arglist[0] = site;
       arglist[1] = contentRepository;
       arglist[2] = harvesterUser;
@@ -162,12 +160,6 @@ public class WebloungeHarvester implements JobWorker {
       handler = constructor.newInstance(arglist);
     } catch (Throwable t) {
       throw new IllegalStateException("Unable to instantiate class " + handlerClass + ": " + t.getMessage(), t);
-    }
-
-    ServiceReference ref = bundleContext.getServiceReference(PreferencesService.class.getName());
-    if (ref == null) {
-      logger.error("No preferences service available!");
-      throw new RuntimeException("preferences service not found");
     }
 
     SearchResult searchResult;

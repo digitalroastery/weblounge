@@ -83,7 +83,7 @@ public class SwisseducastRecordHandler extends AbstractWebloungeRecordHandler im
    * @see ch.entwine.weblounge.bridge.oaipmh.AbstractWebloungeRecordHandler#parseResource()
    */
   protected Resource<MovieContent> parseResource(Node record) {
-    Language language = getISO3Language(languageCode);
+    Language language = getLanguage(languageCode);
 
     MovieResourceImpl movieResource = new MovieResourceImpl(new MovieResourceURIImpl(site));
     movieResource.setCreated(harvesterUser, new Date());
@@ -102,7 +102,7 @@ public class SwisseducastRecordHandler extends AbstractWebloungeRecordHandler im
    * @see ch.entwine.weblounge.bridge.oaipmh.AbstractWebloungeRecordHandler#parseResourceContent()
    */
   protected MovieContent parseResourceContent(Node record) {
-    Language language = getISO3Language(languageCode);
+    Language language = getLanguage(languageCode);
 
     // Set Content
     MovieContent content = new MovieContentImpl(source, language, "video/");

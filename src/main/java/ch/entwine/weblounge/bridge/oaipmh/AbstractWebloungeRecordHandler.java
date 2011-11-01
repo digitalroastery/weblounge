@@ -200,15 +200,16 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
   protected abstract Resource<MovieContent> parseResource(Node record);
 
   /**
-   * Parse a matterhorn iso3 language string to a weblounge language.
+   * Parse a matterhorn iso3 or two letter language string to a weblounge
+   * language.
    * 
    * @param languageCode
-   *          the matterhorn iso3 language
+   *          the matterhorn iso3 or two letter language
    * @return the weblounge language
    * @throws UnknownLanguageException
    *           if language was not found
    */
-  protected Language getISO3Language(String languageCode)
+  protected Language getLanguage(String languageCode)
       throws UnknownLanguageException {
     Language language = iso3Languages.get(languageCode);
     if (language != null)
@@ -218,11 +219,12 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
         language = new LanguageImpl(new Locale(locale.getLanguage(), "", ""));
         iso3Languages.put(languageCode, language);
         break;
+      } else if (locale.getLanguage().equals(languageCode)) {
+        language = new LanguageImpl(new Locale(locale.getLanguage(), "", ""));
       }
     }
     if (language == null)
       throw new UnknownLanguageException(languageCode);
-    // TODO: Think about how to handle unsupported languages
     return language;
   }
 
