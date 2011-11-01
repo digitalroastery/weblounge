@@ -126,7 +126,7 @@ public class SearchRequest {
     andNot(solrQuery, ID, Long.toString(SearchIndex.ROOT_ID), true, true);
 
     // Resource id
-    if (query.getIdentifier() != null) {
+    if (query.getIdentifier().length > 0) {
       and(solrQuery, RESOURCE_ID, query.getIdentifier(), true, true);
     }
 
