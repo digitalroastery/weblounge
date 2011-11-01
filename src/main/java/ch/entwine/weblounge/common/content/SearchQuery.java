@@ -90,18 +90,18 @@ public interface SearchQuery {
   /**
    * Return the resources with the given identifier.
    * 
-   * @param id
+   * @param resourceId
    *          the identifier to look up
    * @return the query extended by this criterion
    */
-  SearchQuery withIdentifier(String id);
+  SearchQuery withIdentifier(String resourceId);
 
   /**
    * Returns the identifier or <code>null</code> if no identifier was specified.
    * 
    * @return the identifier
    */
-  String getIdentifier();
+  String[] getIdentifier();
 
   /**
    * Return the resources with the given path.
