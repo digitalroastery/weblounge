@@ -290,4 +290,13 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     return getName();
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.dispatcher.RequestHandler#getPriority()
+   */
+  public int getPriority() {
+    return 0;
+  }
+
 }

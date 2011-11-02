@@ -521,4 +521,13 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     return getName();
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.dispatcher.RequestHandler#getPriority()
+   */
+  public int getPriority() {
+    return -1;
+  }
+
 }

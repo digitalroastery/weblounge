@@ -40,9 +40,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.Servlet;
@@ -84,7 +87,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private List<DispatchListener> dispatcher = null;
 
   /** List of dispatcher listeners */
-  private List<RequestHandler> requestHandler = null;
+  private Set<RequestHandler> requestHandler = null;
 
   /** List with well known urls and files */
   private static List<String> wellknownFiles = new ArrayList<String>();
@@ -106,7 +109,15 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   WebloungeDispatcherServlet() {
     requestListeners = new CopyOnWriteArrayList<RequestListener>();
     dispatcher = new CopyOnWriteArrayList<DispatchListener>();
-    requestHandler = new CopyOnWriteArrayList<RequestHandler>();
+    requestHandler = new TreeSet<RequestHandler>(new Comparator<RequestHandler>() {
+      public int compare(RequestHandler handler1, RequestHandler handler2) {
+        int compare = Integer.valueOf(handler2.getPriority()).compareTo(Integer.valueOf(handler1.getPriority()));
+        // FIXME if 0 is returned the request handler will not be added?!
+        if (compare == 0)
+          return 1;
+        return compare;
+      }
+    });
     caches = new HashMap<String, ResponseCache>();
   }
 
@@ -257,7 +268,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
       site = getSiteByRequest(httpRequest);
       securityService.setSite(site);
     }
-    
+
     boolean isSpecial = StringUtils.isNotBlank(httpRequest.getHeader("X-Weblounge-Special"));
     if (site == null) {
       if (!wellknownFiles.contains(httpRequest.getRequestURI()))
@@ -405,7 +416,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   void removeRequestListener(RequestListener listener) {
     requestListeners.remove(listener);
   }
-  
+
   /**
    * Adds <code>listener</code> to the list of dispatch listeners if it has not
    * already been registered. The listener is called every time the current
@@ -440,9 +451,8 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    *          the request handler
    */
   void addRequestHandler(RequestHandler handler) {
-    if (!requestHandler.contains(handler)) {
-      requestHandler.add(handler);
-    }
+    requestHandler.add(handler);
+    requestHandler.size();
   }
 
   /**
