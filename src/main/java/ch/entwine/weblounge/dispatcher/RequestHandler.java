@@ -34,13 +34,14 @@ import ch.entwine.weblounge.common.request.WebloungeResponse;
 public interface RequestHandler {
 
   /** The processing mode */
-  public enum Mode { Default, Cached, Head };
+  public enum Mode {
+    Default, Cached, Head
+  };
 
   /**
    * Service method of the <code>RequestHandler</code>. The method takes a
    * <code>HttpServletRequest</code> and the corresponding <code>
-	 * HttpServletResponse</code>
-   * object to service the request.
+   * HttpServletResponse</code> object to service the request.
    * <p>
    * This method should return <code>true</code> if the handler is decided to
    * handle the request, <code>false</code> otherwise.
@@ -52,6 +53,13 @@ public interface RequestHandler {
    * @return <code>true</code> if this handler processed the request
    */
   boolean service(WebloungeRequest request, WebloungeResponse response);
+
+  /**
+   * Returns the priority which will be used when handling requests.
+   * 
+   * @return the handler priority
+   */
+  int getPriority();
 
   /**
    * Returns the request handler name.
