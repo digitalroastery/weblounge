@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Stream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.util.MimeType;
 import org.w3c.dom.Node;
 
 import java.net.MalformedURLException;
@@ -142,10 +143,17 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
     MediaPackageElementFlavor elementFlavor = new MediaPackageElementFlavor(presentationTrack[0], presentationTrack[1]);
 
     // Set Content
-    MediaPackageElement[] mediaPackageElements = mediaPackage.getElementsByFlavor(elementFlavor);
-    if (mediaPackageElements.length < 1)
+    MimeType mimeType = new MimeType("video", "webm");
+    MediaPackageElement element = null;
+    for (MediaPackageElement elem : mediaPackage.getElementsByFlavor(elementFlavor)) {
+      if (elem.getMimeType().equals(mimeType)) {
+        element = elem;
+        break;
+      }
+    }
+    if (element == null)
       return null;
-    MediaPackageElement element = mediaPackageElements[0];
+
     MovieContent content = new MovieContentImpl(FilenameUtils.getBaseName(element.getURI().toString()), language, element.getMimeType().asString());
     StringBuilder author = new StringBuilder();
     String[] creators = mediaPackage.getCreators();
@@ -167,10 +175,16 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
     if (mediaPackage.getDuration() != -1)
       content.setDuration(mediaPackage.getDuration());
 
-    Track[] tracks = mediaPackage.getTracks(new MediaPackageElementFlavor(presentationTrack[0], presentationTrack[1]));
-    if (tracks.length < 1)
+    Track track = null;
+    for (Track tr : mediaPackage.getTracks(new MediaPackageElementFlavor(presentationTrack[0], presentationTrack[1]))) {
+      if (tr.getMimeType().equals(mimeType)) {
+        track = tr;
+        break;
+      }
+    }
+
+    if (track == null)
       return null;
-    Track track = tracks[0];
     for (Stream stream : track.getStreams()) {
       if (stream instanceof AudioStream) {
         ch.entwine.weblounge.common.content.movie.AudioStream audioStream = new ch.entwine.weblounge.common.impl.content.movie.AudioStreamImpl();

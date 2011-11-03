@@ -41,7 +41,6 @@ import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.util.data.Option;
-import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -92,7 +91,6 @@ public class WebloungeHarvester implements JobWorker {
       throws JobException {
 
     Site site = (Site) ctx.get(Site.class.getName());
-    BundleContext bundleContext = (BundleContext) ctx.get(BundleContext.class.getName());
 
     // Get hold of the content repository
     WritableContentRepository contentRepository = null;
