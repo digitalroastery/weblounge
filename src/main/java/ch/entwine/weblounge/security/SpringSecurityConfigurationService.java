@@ -25,10 +25,7 @@ import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Security;
 
 import org.apache.commons.lang.StringUtils;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -43,9 +40,7 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Map;
 
 import javax.servlet.Filter;
 
@@ -56,7 +51,7 @@ import javax.servlet.Filter;
  * After the configuration is read, the service registers a {@link Filter} which
  * enforces the security policy at runtime.
  */
-public class SpringSecurityConfigurationService implements BundleListener, ManagedService {
+public class SpringSecurityConfigurationService implements ManagedService {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SpringSecurityConfigurationService.class);
@@ -79,8 +74,8 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
   /** The related spring security service */
   protected SpringSecurityServiceImpl securityService = null;
 
-  /** The current bundle */
-  protected Bundle bundle = null;
+  /** The current bundle context */
+  protected BundleContext bundleCtx = null;
 
   /** The spring security filter */
   protected Filter securityFilter = null;
@@ -95,7 +90,7 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
   protected boolean securityEnabled = true;
 
   /** The security filter registration */
-  protected Map<Bundle, ServiceRegistration> securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
+  protected ServiceRegistration securityFilterRegistration = null;
 
   /**
    * Callback from the OSGi environment on service activation.
@@ -109,9 +104,7 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
    */
   void activate(ComponentContext ctx) throws IOException,
       ConfigurationException {
-    BundleContext bundleCtx = ctx.getBundleContext();
-    bundle = ctx.getBundleContext().getBundle();
-    securityFilterRegistrations = new HashMap<Bundle, ServiceRegistration>();
+    bundleCtx = ctx.getBundleContext();
 
     // Try to get hold of the service configuration
     ServiceReference configAdminRef = bundleCtx.getServiceReference(ConfigurationAdmin.class.getName());
@@ -158,12 +151,10 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
    *          the component context
    */
   void deactivate(ComponentContext ctx) {
-    ctx.getBundleContext().removeBundleListener(this);
-
     logger.info("Tearing down spring security");
 
     // Unregister the security filters
-    if (securityFilterRegistrations != null) {
+    if (securityFilterRegistration != null) {
       stopSecurity();
     }
 
@@ -172,7 +163,7 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
       try {
         securityMarker.unregister();
       } catch (Throwable t) {
-        logger.error("Unregistering security context for bundle '{}' failed: {}", bundle.getSymbolicName(), t.getMessage());
+        logger.error("Unregistering security context failed: {}", t.getMessage());
       }
     }
 
@@ -233,11 +224,16 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
    */
   private void startSecurity() {
     logger.info("Enabling spring security");
-    for (Bundle b : bundle.getBundleContext().getBundles()) {
-      if (b.getState() == Bundle.ACTIVE || b.getState() == Bundle.STARTING)
-        registerSecurityFilter(b);
+    Dictionary<String, String> props = new Hashtable<String, String>();
+    props.put("urlPatterns", "/*");
+    props.put("contextId", "weblounge"); // TOOD: Use constant
+    props.put("security", "Weblounge");
+    try {
+      securityFilterRegistration = bundleCtx.registerService(Filter.class.getName(), securityFilter, props);
+      logger.debug("Spring security context registered");
+    } catch (Throwable t) {
+      logger.error("Error registering security context: {}", t.getMessage());
     }
-    bundle.getBundleContext().addBundleListener(this);
   }
 
   /**
@@ -246,7 +242,7 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
   private void publishSecurityMarker() {
     Dictionary<String, String> securityProperties = new Hashtable<String, String>();
     securityProperties.put(OPT_ENCODING, passwordEncoding.toString().toLowerCase());
-    bundle.getBundleContext().registerService(Security.class.getName(), new Security() {
+    bundleCtx.registerService(Security.class.getName(), new Security() {
     }, securityProperties);
   }
 
@@ -255,80 +251,15 @@ public class SpringSecurityConfigurationService implements BundleListener, Manag
    */
   private void stopSecurity() {
     logger.info("Disabling spring security");
-    BundleContext bundleCtx = bundle.getBundleContext();
-    bundleCtx.removeBundleListener(this);
-    if (securityFilterRegistrations != null) {
-      for (Map.Entry<Bundle, ServiceRegistration> entry : securityFilterRegistrations.entrySet()) {
-        Bundle bundle = entry.getKey();
-        ServiceRegistration r = entry.getValue();
-        try {
-          r.unregister();
-          logger.debug("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
-        } catch (IllegalStateException e) {
-          logger.debug("Security context for bundle '{}' was already unregistered", bundle.getSymbolicName());
-        } catch (Throwable t) {
-          logger.error("Unregistering security context for bundle '{}' failed: {}", bundle.getSymbolicName(), t.getMessage());
-        }
+    if (securityFilterRegistration != null) {
+      try {
+        securityFilterRegistration.unregister();
+        logger.debug("Spring security context unregistered");
+      } catch (IllegalStateException e) {
+        logger.debug("Security context was already unregistered");
+      } catch (Throwable t) {
+        logger.error("Unregistering security context", t.getMessage());
       }
-    }
-  }
-
-  /**
-   * Removes the registered filter from our list of filter registrations. As
-   * this method is called only if the bundle is unregistered, all the services
-   * associated with it will have been unregistered already, so there is no work
-   * for us to do.
-   * 
-   * @param bundle
-   *          the stopped bundle
-   */
-  private void unregisterSecurityFilter(Bundle bundle) {
-    ServiceRegistration r = securityFilterRegistrations.remove(bundle);
-    if (r == null)
-      return;
-    logger.debug("Spring security context unregistered for bundle '{}'", bundle.getSymbolicName());
-  }
-
-  /**
-   * Registers a new security filter instance for the bundle that just started.
-   * 
-   * @param bundle
-   *          the bundle
-   */
-  private void registerSecurityFilter(Bundle bundle) {
-    BundleContext ctx = bundle.getBundleContext();
-
-    // Only care about other weblounge bundles
-    if (bundle == this.bundle || !bundle.getSymbolicName().startsWith("ch.entwine.weblounge"))
-      return;
-
-    Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put("urlPatterns", "/*");
-    props.put("security", "Weblounge");
-    try {
-      ServiceRegistration registration = ctx.registerService(Filter.class.getName(), securityFilter, props);
-      securityFilterRegistrations.put(bundle, registration);
-      logger.debug("Spring security context registered for bundle '{}'", bundle.getSymbolicName());
-    } catch (Throwable t) {
-      logger.error("Error registering security context for bundle '{}': {}", bundle.getSymbolicName(), t.getMessage());
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.framework.BundleListener#bundleChanged(org.osgi.framework.BundleEvent)
-   */
-  public void bundleChanged(BundleEvent event) {
-    switch (event.getType()) {
-      case BundleEvent.STARTED:
-        registerSecurityFilter(event.getBundle());
-        break;
-      case BundleEvent.STOPPED:
-        unregisterSecurityFilter(event.getBundle());
-        break;
-      default:
-        break;
     }
   }
 
