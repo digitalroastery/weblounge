@@ -23,6 +23,7 @@ import ch.entwine.weblounge.cache.CacheService;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.dispatcher.DispatcherService;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
+import ch.entwine.weblounge.dispatcher.SharedHttpContext;
 import ch.entwine.weblounge.dispatcher.SiteDispatcherService;
 
 import org.osgi.framework.BundleContext;
@@ -90,6 +91,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     Dictionary<String, String> initParams = new Hashtable<String, String>();
     // initParams.put("alias", "/");
     initParams.put("servlet-name", "default");
+    initParams.put(SharedHttpContext.PROPERTY_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
     initParams.put("urlPatterns", "/*");
     dispatcherServiceRegistration = bundleContext.registerService(Servlet.class.getName(), dispatcher, initParams);
 

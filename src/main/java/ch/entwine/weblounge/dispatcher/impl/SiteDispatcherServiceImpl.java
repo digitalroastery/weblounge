@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.dispatcher.ActionRequestHandler;
 import ch.entwine.weblounge.dispatcher.DispatcherConfiguration;
+import ch.entwine.weblounge.dispatcher.SharedHttpContext;
 import ch.entwine.weblounge.dispatcher.SiteDispatcherService;
 import ch.entwine.weblounge.dispatcher.impl.http.WebXml;
 import ch.entwine.weblounge.kernel.SiteManager;
@@ -397,6 +398,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
       servletRegistrationProperties.put("alias", siteRoot);
       servletRegistrationProperties.put("servlet-name", site.getIdentifier());
+      servletRegistrationProperties.put(SharedHttpContext.PROPERTY_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
       servletRegistrationProperties.put(OPT_JASPER_SCRATCHDIR, PathUtils.concat(jasperConfig.get(OPT_JASPER_SCRATCHDIR), site.getIdentifier()));
       ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
       servletRegistrations.put(site, servletRegistration);

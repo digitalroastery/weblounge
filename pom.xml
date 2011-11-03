@@ -109,6 +109,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.ops4j.pax.web</groupId>
+      <artifactId>pax-web-extender-whiteboard</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+
+    <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
     </dependency>
@@ -234,6 +240,7 @@
               OSGI-INF/file-requesthandler.xml,
               OSGI-INF/image-requesthandler.xml,
               OSGI-INF/page-requesthandler.xml,
+              OSGI-INF/shared-httpcontext.xml,
               OSGI-INF/site-dispatcher-service.xml
             </Service-Component>
           </instructions>
