@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.kernel.publisher;
 
 import ch.entwine.weblounge.common.url.UrlUtils;
+import ch.entwine.weblounge.dispatcher.SharedHttpContext;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
@@ -241,6 +242,8 @@ public class EndpointPublishingService implements ManagedService {
       CXFNonSpringServlet servlet = new JAXRSServlet(endpointPath, service);
       Dictionary<String, String> initParams = new Hashtable<String, String>();
       initParams.put("alias", contextPath);
+      initParams.put("servlet-name", service.toString());
+      initParams.put(SharedHttpContext.PROPERTY_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
       ServiceRegistration reg = bundleContext.registerService(Servlet.class.getName(), servlet, initParams);
       endpointRegistrations.put(contextPath, reg);
       logger.debug("Registering {} at {}", service, contextPath);

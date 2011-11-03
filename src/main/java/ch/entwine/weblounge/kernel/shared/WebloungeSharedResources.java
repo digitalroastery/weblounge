@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.kernel.shared;
 
+import ch.entwine.weblounge.dispatcher.SharedHttpContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -187,6 +189,7 @@ public class WebloungeSharedResources implements ManagedService {
   private ServiceRegistration register(String context, File resourcesDir,
       Bundle bundle) {
     Dictionary<String, String> registrationProperties = new Hashtable<String, String>();
+    registrationProperties.put(SharedHttpContext.PROPERTY_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
     registrationProperties.put("alias", context);
     registrationProperties.put("servlet-name", "weblounge.sharedresources");
     Servlet servlet = new WebloungeResourcesServlet(resourcesDir, bundle, RESOURCES_BUNDLE_DIR);

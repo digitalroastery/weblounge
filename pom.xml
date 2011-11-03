@@ -30,13 +30,19 @@
 
     <dependency>
       <groupId>ch.entwine.weblounge</groupId>
-      <artifactId>weblounge-common</artifactId>
+      <artifactId>weblounge-dispatcher-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-contentrepository-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-common</artifactId>
       <version>${project.version}</version>
     </dependency>
 

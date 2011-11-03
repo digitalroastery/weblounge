@@ -12,6 +12,7 @@
     <provide interface="ch.entwine.weblounge.kernel.publisher.EndpointPublishingService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
+  <reference name="httpcontext" interface="org.osgi.service.http.HttpContext" target="(contextId=weblounge)" cardinality="1..1" policy="static" />
   <reference name="security" interface="ch.entwine.weblounge.common.security.Security" cardinality="1..1" policy="static" />
 
 </scr:component>
