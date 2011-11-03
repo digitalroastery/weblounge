@@ -25,6 +25,41 @@ div.DataTables_sort_wrapper span {
     padding: 2px;
 }
 
+#wbl-pageleteditor h2 {
+	font-size: 16px;
+	margin-top: 15px;
+	margin-bottom: 3px;
+}
+
+#wbl-pageleteditor h3 {
+	font-size: 14px;
+	margin-top: 10px;
+	margin-bottom: 3px;
+}
+
+#wbl-pageleteditor p{
+	margin-top: 0px;
+	margin-bottom:0px;
+}
+
+#wbl-pageleteditor div.indent{
+	margin-left: 30px;
+}
+
+#wbl-pageleteditor span.editor-sample {
+	font-style: italic;
+	font-size: 10px;
+	color: blue;
+}
+
+#wbl-pageleteditor p {
+	
+}
+
+#wbl-pageleteditor span.required {
+	font-size: 12px;
+}
+
 #wbl-pageleteditor input[type=checkbox] {
     margin-right: 10px
 }
