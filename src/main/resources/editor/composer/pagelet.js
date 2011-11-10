@@ -115,7 +115,13 @@ steal.plugins('jqueryui/dialog',
 					language: this.options.composer.language,
 					runtime: this.options.composer.runtime
 				});
-			}, this)
+			}, this),
+			create: function(event, ui) {
+				$("body").css({ overflow: 'hidden' });
+			},
+			beforeClose: function(event, ui) {
+				$("body").css({ overflow: 'visible' });
+			}
 		});
 		this.editorDialog.find("form#wbl-validate").validate();
 		

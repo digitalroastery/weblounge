@@ -110,6 +110,12 @@ steal.plugins(
 //						this.element.trigger('saveSettings');
 						this.userDialog.dialog('close');
 					},this)
+				},
+				open: function(event, ui) {
+					$(document.body).css('overflow', 'hidden');
+				},
+				beforeClose: function(event, ui) {
+					$(document.body).css('overflow', 'visible');
 				}
 			});
 			
@@ -136,6 +142,12 @@ steal.plugins(
 						});
 						this.publishDialog.dialog('close');
 					},this)
+				},
+				open: function(event, ui) {
+					$(document.body).css('overflow', 'hidden');
+				},
+				beforeClose: function(event, ui) {
+					$(document.body).css('overflow', 'visible');
 				}
 			});
 			
@@ -237,6 +249,7 @@ steal.plugins(
         	this.element.find('img.wbl-pageSettings').show();
         	// Open Designer
         	this.element.find('a.wbl-designer').click();
+        	$(document.body).css('overflow', 'hidden');
         },
         
         _enableEditing: function() {

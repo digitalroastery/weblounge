@@ -104,7 +104,13 @@ steal.plugins('jquery',
 					this.element.trigger('closeeditor');
 					this.element.dialog('destroy');
 					this.destroy();
-				},this)
+				},this),
+				create: function(event, ui) {
+					$("body").css({ overflow: 'hidden' });
+				},
+				beforeClose: function(event, ui) {
+					$("body").css({ overflow: 'visible' });
+				}
 			});
 			
 			this.element.find("form#wbl-validatePageSettings").validate();

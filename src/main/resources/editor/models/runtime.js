@@ -52,6 +52,7 @@ steal.then('jsonix')
 					runtime.site.templates[index] = {};
 					runtime.site.templates[index].id = $(this).attr('id');
 					runtime.site.templates[index].composeable = ($(this).attr('composeable') == "true");
+					runtime.site.templates[index]._default = ($(this).attr('default') == "true");
 				});
 			});
 			return runtime;
@@ -98,7 +99,7 @@ steal.then('jsonix')
 	    getSiteLayouts: function() {
 	    	var layouts = new Array();
 	    	$.each(this.site.templates, function(index, template){
-    		  if(template.composeable) layouts.push(template.id);
+    		  if(template.composeable) layouts.push(template);
     		});
 	    	return layouts;
 	    },

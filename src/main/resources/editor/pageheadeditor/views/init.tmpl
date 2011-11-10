@@ -8,7 +8,7 @@
 	
 	Layout: <select name="layout" >
 		{{each options}}
-			<option value="${$value}">${$value}</option>
+			<option value="${$value.id}">${$value.id}</option>
 	    {{/each}}
 	</select><br /><br />
 	Beschreibung: <input type="text" value="${page.getDescription(language)}" name="description" /><br /><br />

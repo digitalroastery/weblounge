@@ -22,6 +22,7 @@ steal.plugins('jquery',
 	{
 		init : function(el){
 			$(el).html('//editor/pagecreator/views/init.tmpl', {runtime: this.options.runtime});
+//			this.element.find("select[name=layout]").val(this.options.page.getTemplate());
 			
 			var pageData = new Object();
 			this.parent = null;
