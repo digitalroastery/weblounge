@@ -48,13 +48,6 @@ public class ImporterUtils {
 
     replaceSeparatorsWithUnderscores(unfriendlyString.trim())))).toLowerCase();
   }
-  
-
-  public static String normalizePath(String path) {
-    String normalpath = FilenameUtils.removeExtension(path);
-    normalpath += "_" + FilenameUtils.getExtension(path);
-    return normalpath;
-  }
 
   private static String replaceEquivalentsOfSymbols(String unfriendlyString) {
     return LEQUIVALENTS.matcher(OEQUIVALENTS.matcher(DEQUIVALENTS.matcher(IEQUIVALENTS.matcher(EEQUIVALENTS.matcher(unfriendlyString).replaceAll("e")).replaceAll("i")).replaceAll("d")).replaceAll("o")).replaceAll("l");

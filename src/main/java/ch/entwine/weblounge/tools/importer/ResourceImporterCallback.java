@@ -84,7 +84,6 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
       // file is not an image
     }
 
-    String path = ImporterUtils.normalizePath(relpath);
     ImporterState.getInstance().putUUID(relpath, uuid);
 
     String filename = "de.".concat(FilenameUtils.getExtension(f.getName()));
@@ -102,7 +101,7 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
         trans = transFact.newTransformer(xsl);
         trans.setParameter("fileid", relpath);
         trans.setParameter("uuid", uuid.toString());
-        trans.setParameter("path", path);
+        trans.setParameter("path", relpath);
         trans.setParameter("imgwidth", imageInfo.getWidth());
         trans.setParameter("imgheight", imageInfo.getHeight());
         this.transformXml(collXml, resourceXml, trans);
@@ -119,7 +118,7 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
         trans = transFact.newTransformer(xsl);
         trans.setParameter("fileid", relpath);
         trans.setParameter("uuid", uuid.toString());
-        trans.setParameter("path", path);
+        trans.setParameter("path", relpath);
         this.transformXml(collXml, resourceXml, trans);
       } catch (TransformerConfigurationException e) {
         System.err.println(e.getMessage());

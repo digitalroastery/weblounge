@@ -190,6 +190,9 @@
         </xsl:if>
         <xsl:choose>
           <xsl:when test="@module = 'text' and @id='address'">
+            <property id="salutation">
+              <xsl:value-of select="properties/property[@id='anrede']" />
+            </property>
             <property id="name">
               <xsl:value-of select="properties/property[@id='name']" />
             </property>
@@ -242,6 +245,11 @@
             <xsl:if test="not(properties/property[@id='partition']) and properties/property[@id='path']">
               <property id="resourceid">
                 <xsl:value-of select="importer:getUUID(properties/property[@id='path'])" />
+              </property>
+            </xsl:if>
+            <xsl:if test="not(content[@original='true']/text[@id='partition']) and content[@original='true']/text[@id='path']">
+              <property id="resourceid">
+                <xsl:value-of select="importer:getUUID(content[@original='true']/text[@id='path'])" />
               </property>
             </xsl:if>
             <xsl:apply-templates select="./properties/property" />
