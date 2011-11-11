@@ -73,6 +73,12 @@ steal.plugins('jquery',
 						this.element.find("form#wbl-validate").submit();
 						if(!this.element.find("form#wbl-validate").valid()) return;
 						
+						var url = this.element.find('input[name=url]').val();
+						if(url != url.match(/[a-zA-Z0-9_-]*/)) {
+							this.validator.showErrors({"url": "Invalid Charakters for url: use [a-zA-Z0-9_-]"});
+							return;
+						};
+						
 						$.each(this.element.find('form#wbl-validate :input'), function(i, input) {
 							pageData[$(input).attr('name')] = $(input).val();
 						});
@@ -98,7 +104,7 @@ steal.plugins('jquery',
 			});
 			this.nextButton = this.element.parent().find(".ui-dialog-buttonpane span.ui-button-text:contains('Fertig')").parent();
 			this.nextButton.button('option', 'disabled', true);
-			this.element.find("form#wbl-validate").validate();
+			this.validator = this.element.find("form#wbl-validate").validate();
 		},
 		
 		destroy: function() {
@@ -126,8 +132,10 @@ steal.plugins('jquery',
 	    },
 		
 		"input[name=title] change": function(el, ev) {
-			var url = this.element.find('input[name=url]');
-			if(url.val() == '') url.val(encodeURI(el.val().toLowerCase()));
+			var urlInput = this.element.find('input[name=url]');
+			if(urlInput.val() == '') {
+				urlInput.val(encodeURI(el.val().toLowerCase()));
+			}
 		}
 	    
 	})
