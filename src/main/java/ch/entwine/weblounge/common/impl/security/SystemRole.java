@@ -44,10 +44,10 @@ public final class SystemRole extends RoleImpl {
   public static final Role PUBLISHER = new SystemRole("publisher", EDITOR, "Publisher");
 
   /** Site administrator */
-  public static final Role SITEADMIN = new SystemRole("siteadmin", PUBLISHER, "Site Administrator");
+  public static final Role SITEADMIN = new SystemRole("siteadministrator", PUBLISHER, "Site Administrator");
 
   /** Remove role */
-  public static final Role SYSTEMADMIN = new SystemRole("systemadmin", SITEADMIN, "System Administrator");
+  public static final Role SYSTEMADMIN = new SystemRole("systemadministrator", SITEADMIN, "System Administrator");
 
   /** The system roles collection */
   private static Set<Role> roles = new HashSet<Role>();
