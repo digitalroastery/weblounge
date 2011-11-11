@@ -27,7 +27,7 @@ import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.kernel.SiteManager;
+import ch.entwine.weblounge.kernel.site.SiteManager;
 import ch.entwine.weblounge.workbench.PageletEditor;
 import ch.entwine.weblounge.workbench.WorkbenchService;
 import ch.entwine.weblounge.workbench.suggest.SimpleSuggestion;

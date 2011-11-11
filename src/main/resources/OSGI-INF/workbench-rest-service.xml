@@ -10,7 +10,7 @@
     <provide interface="ch.entwine.weblounge.workbench.endpoint.WorkbenchEndpoint" />
   </service>
 
-  <reference name="sites" interface="ch.entwine.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
+  <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
   <reference name="workbench" interface="ch.entwine.weblounge.workbench.WorkbenchService" cardinality="1..1" policy="static" bind="setWorkbench" />
 
 </scr:component>
