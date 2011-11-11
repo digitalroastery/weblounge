@@ -83,6 +83,18 @@
 
     <dependency>
       <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.http.bundle</artifactId>
+      <version>2.0.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ops4j.pax.web</groupId>
+      <artifactId>pax-web-jsp</artifactId>
+      <version>1.0.7</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.webconsole</artifactId>
       <version>3.1.8</version>
     </dependency>
@@ -484,24 +496,26 @@
 
     <!-- Start level 4 -->
 
+    <!-- 
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-jetty-bundle</artifactId>
-      <version>1.0.4</version>
+      <version>1.0.7</version>
     </dependency>
 
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-jsp</artifactId>
-      <version>1.0.4</version>
+      <version>1.0.7</version>
     </dependency>
 
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-extender-whiteboard</artifactId>
-      <version>1.0.4</version>
+      <version>1.0.7</version>
     </dependency>
-
+    -->
+    
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.fileinstall</artifactId>
