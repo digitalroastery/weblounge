@@ -21,17 +21,14 @@
 package ch.entwine.weblounge.dispatcher;
 
 /**
- * Constant definition for the shared <code>HTTP</code> context. Weblounge is
- * using <code>Pax Web</code>, therefore we do have some dependencies on that
- * implementation.
+ * Constant definition for the shared <code>HTTP</code> context.
  */
 public interface SharedHttpContext {
 
   /**
-   * The shared context key. See
-   * {@link org.ops4j.pax.web.extender.whiteboard.ExtenderConstants}
+   * The shared context key as used throughout OSGi.
    */
-  String PROPERTY_HTTP_CONTEXT_ID = "contextId";
+  String PROPERTY_OSGI_HTTP_CONTEXT_ID = "contextId";
 
   /** The shared context identifier */
   String HTTP_CONTEXT_ID = "weblounge";
