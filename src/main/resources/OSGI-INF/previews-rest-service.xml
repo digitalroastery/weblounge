@@ -11,7 +11,7 @@
     <provide interface="ch.entwine.weblounge.contentrepository.impl.endpoint.PreviewsEndpoint" />
   </service>
 
-  <reference name="sites" interface="ch.entwine.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
+  <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
   <reference name="imagestyles" interface="ch.entwine.weblounge.common.content.image.ImageStyle" cardinality="0..n" policy="dynamic" bind="addImageStyle" unbind="removeImageStyle" />
 
 </scr:component>

@@ -40,7 +40,7 @@ import ch.entwine.weblounge.common.impl.util.doc.Parameter;
 import ch.entwine.weblounge.common.impl.util.doc.TestForm;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.kernel.SiteManager;
+import ch.entwine.weblounge.kernel.site.SiteManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

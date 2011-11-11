@@ -10,6 +10,6 @@
     <provide interface="ch.entwine.weblounge.contentrepository.impl.endpoint.SearchEndpoint" />
   </service>
 
-  <reference name="sites" interface="ch.entwine.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
+  <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
 
 </scr:component>
