@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.kernel;
+package ch.entwine.weblounge.kernel.site;
 
 import ch.entwine.weblounge.common.site.Site;
 

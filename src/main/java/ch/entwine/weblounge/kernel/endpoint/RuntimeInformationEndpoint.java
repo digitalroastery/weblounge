@@ -27,8 +27,8 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.kernel.SiteManager;
 import ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider;
+import ch.entwine.weblounge.kernel.site.SiteManager;
 
 import org.apache.commons.lang.StringUtils;
 

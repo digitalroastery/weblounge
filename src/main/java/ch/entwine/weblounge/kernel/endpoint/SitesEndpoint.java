@@ -26,7 +26,7 @@ import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteException;
 import ch.entwine.weblounge.common.site.SiteURL;
-import ch.entwine.weblounge.kernel.SiteManager;
+import ch.entwine.weblounge.kernel.site.SiteManager;
 
 import org.apache.commons.lang.StringUtils;
 

@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.kernel;
+package ch.entwine.weblounge.kernel.site;
 
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
@@ -117,7 +117,7 @@ public class SiteManager {
    *           if component activation fails
    */
   void activate(ComponentContext context) throws Exception {
-    logger.info("Starting site dispatcher");
+    logger.debug("Starting site dispatcher");
 
     BundleContext bundleContext = context.getBundleContext();
     siteTracker = new SiteTracker(this, bundleContext);

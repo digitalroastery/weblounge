@@ -3,10 +3,10 @@
   immediate="true"
   name="Weblounge Site Manager Service">
 
-  <implementation class="ch.entwine.weblounge.kernel.SiteManager" />
+  <implementation class="ch.entwine.weblounge.kernel.site.SiteManager" />
   <property name="service.description" value="Weblounge Site Manager Service" />
   <service>
-    <provide interface="ch.entwine.weblounge.kernel.SiteManager" />
+    <provide interface="ch.entwine.weblounge.kernel.site.SiteManager" />
   </service>
   
   <reference name="configurationadmin" interface="org.osgi.service.cm.ConfigurationAdmin" cardinality="1..1" policy="static" bind="setConfigurationAdmin" />

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  start="activate"
+  stop="deactivate"
+  name="Weblounge Shared Http Context">
+
+  <implementation class="ch.entwine.weblounge.kernel.http.SharedHttpContextImpl" />
+  <property name="service.description" value="Weblounge Shared Http Context" />
+  <property name="contextId" value="weblounge" />
+  <service>
+    <provide interface="org.osgi.service.http.HttpContext" />
+  </service>
+  <reference name="security filter" interface="javax.servlet.Filter" cardinality="0..n" policy="dynamic" bind="addSecurityFilter" unbind="removeSecurityFilter" /> 
+
+</scr:component>
