@@ -24,12 +24,13 @@
 
     <!-- Some resources are open to everybody -->
     <sec:intercept-url pattern="^/favicon.ico" filters="none"/>
+    
     <sec:intercept-url pattern="^/weblounge/jquery/.*" filters="none"/>
     <sec:intercept-url pattern="^/weblounge/jqueryui/.*" filters="none"/>
     <sec:intercept-url pattern="^/weblounge/steal/.*" filters="none"/>
     <sec:intercept-url pattern=".*\.js.*" filters="none"/>
     <sec:intercept-url pattern=".*\.css.*" filters="none"/>
-
+ 
     <!-- Shared resources should not be protected -->
     <sec:intercept-url pattern="^/weblounge-shared/.*" filters="none"/>
 
@@ -77,7 +78,9 @@
     <sec:request-cache ref="requestCache"/>
     
     <!-- When sessions time out, send the user to a special (re)login form -->
-    <sec:session-management invalid-session-url="/weblounge/login/timeout.html"/>
+    <!-- 
+    <sec:session-management invalid-session-url="/weblounge/login/timeout.html" session-fixation-protection="newSession"/>
+     -->
 
     <!-- If any URLs are to be exposed to anonymous users, the "sec:anonymous" filter must be present -->
     <sec:anonymous username="anonymous" granted-authority="weblounge:guest"/>
@@ -88,12 +91,12 @@
   </sec:http>
   
   <!-- Instantiates the weblounge site filter that will map requests to their site -->
-  <bean id="siteContextFilter" class="ch.entwine.weblounge.security.SiteContextFilter">
+  <bean id="siteContextFilter" class="ch.entwine.weblounge.kernel.security.SiteContextFilter">
     <constructor-arg ref="securityService"/>
   </bean>
 
   <!-- Instantiates the weblounge user filter that will map requests to users -->
-  <bean id="userContextFilter" class="ch.entwine.weblounge.security.UserContextFilter">
+  <bean id="userContextFilter" class="ch.entwine.weblounge.kernel.security.UserContextFilter">
     <constructor-arg ref="securityService"/>
   </bean>
 
@@ -104,7 +107,7 @@
     <property name="loginFormUrl" value="/weblounge/login/login.html"/>
   </bean>
 
-  <bean id="loginSuccessHandler" class="ch.entwine.weblounge.security.RoleBasedLoginSuccessHandler">
+  <bean id="loginSuccessHandler" class="ch.entwine.weblounge.kernel.security.RoleBasedLoginSuccessHandler">
     <property name="securityService" ref="securityService" />
     <property name="welcomePages">
       <map>
@@ -114,7 +117,7 @@
     </property>
   </bean>
   
-  <bean id="logoutSuccessHandler" class="ch.entwine.weblounge.security.WebloungeLogoutSuccessHandler" />
+  <bean id="logoutSuccessHandler" class="ch.entwine.weblounge.kernel.security.WebloungeLogoutSuccessHandler" />
   
   <!-- OSGI Integration -->
  
@@ -159,7 +162,9 @@
   <bean id="requestCache" class="org.springframework.security.web.savedrequest.NullRequestCache"/>
 
   <!-- Uncomment to enable logging interceptors -->
+  <!-- 
   <bean class="org.springframework.security.access.event.LoggerListener" />
   <bean class="org.springframework.security.authentication.event.LoggerListener" />
+  -->
 
 </beans>
