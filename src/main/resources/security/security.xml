@@ -23,7 +23,7 @@
     <!-- Editor -->
 
     <!-- Some resources are open to everybody -->
-    <sec:intercept-url pattern="^/favicon.ico" filters="none"/>
+    <sec:intercept-url pattern="^/favicon.ico" access="weblounge:guest"/>
     
     <sec:intercept-url pattern="^/weblounge/jquery/.*" filters="none"/>
     <sec:intercept-url pattern="^/weblounge/jqueryui/.*" filters="none"/>
@@ -32,7 +32,7 @@
     <sec:intercept-url pattern=".*\.css.*" filters="none"/>
  
     <!-- Shared resources should not be protected -->
-    <sec:intercept-url pattern="^/weblounge-shared/.*" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge-shared/.*" access="weblounge:guest"/>
 
     <!-- The rest of the editor functionality needs to be protected -->
     <sec:intercept-url pattern="^/weblounge/.*" access="weblounge:editor"/>
