@@ -4,7 +4,7 @@
   <packaging>bundle</packaging>
   <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-security</artifactId>
-  <name>Weblounge security</name>
+  <name>Weblounge Security</name>
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
