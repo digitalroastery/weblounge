@@ -6,7 +6,7 @@
   
   <implementation class="ch.entwine.weblounge.security.sql.SQLDirectoryProvider" />
   <property name="service.description" value="Weblounge SQL Directory Provider" />
-  <propert name="service.pid" value="ch.entwine.weblounge.sqldirectory" />
+  <property name="service.pid" value="ch.entwine.weblounge.sqldirectory" />
   <service>
     <provide interface="ch.entwine.weblounge.common.security.DirectoryProvider" />
     <provide interface="org.osgi.service.cm.ManagedService" />
