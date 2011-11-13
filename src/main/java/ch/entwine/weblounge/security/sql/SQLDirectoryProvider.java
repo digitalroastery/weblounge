@@ -172,7 +172,10 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
 
     // Create the driver
     try {
-      return dsf.createDriver(null);
+      Driver driver = dsf.createDriver(properties);
+      String url = (String) properties.get(DataSourceFactory.JDBC_URL);
+      logger.info("Connected to user directory {}", url);
+      return driver;
     } catch (SQLException e) {
       logger.error(e.getMessage());
       return null;
