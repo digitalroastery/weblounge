@@ -42,5 +42,6 @@ public interface CacheTag extends Tag {
   String Composer = "composer";
   String Position = "position";
   String Renderer = "renderer";
+  String Subject = "subject";
 
 }
