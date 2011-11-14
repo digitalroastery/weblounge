@@ -21,13 +21,14 @@
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import ch.entwine.weblounge.common.Times;
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.file.FileContent;
-import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
@@ -80,6 +81,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
    * @param response
    *          the weblounge response
    */
+  @SuppressWarnings("unchecked")
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
 
     WebUrl url = request.getUrl();
@@ -105,7 +107,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     // to extract the id from the last part of the path. If not, check if there
     // is a file with the current path.
     ResourceURI fileURI = null;
-    FileResource fileResource = null;
+    Resource<? extends FileContent> fileResource = null;
     try {
       String id = null;
       String filePath = null;
@@ -130,16 +132,22 @@ public final class FileRequestHandlerImpl implements RequestHandler {
           filePath = "/" + uriSuffix;
           fileName = FilenameUtils.getName(filePath);
         }
+        fileURI = new ResourceURIImpl(null, site, filePath, id);
       } else {
         filePath = path;
         fileName = FilenameUtils.getName(filePath);
+        fileURI = new FileResourceURIImpl(site, filePath, null);
       }
 
       // Try to load the resource
-      fileURI = new FileResourceURIImpl(site, filePath, id);
-      fileResource = (FileResource) contentRepository.get(fileURI);
-      if (fileResource == null) {
-        logger.debug("No file found at {}", fileURI);
+      try {
+        fileResource = (Resource<? extends FileContent>) contentRepository.get(fileURI);
+        if (fileResource == null) {
+          logger.debug("No file found at {}", fileURI);
+          return false;
+        }
+      } catch (ClassCastException e) {
+        logger.debug("Resource {} does not extend file resource {}", fileURI);
         return false;
       }
     } catch (ContentRepositoryException e) {
