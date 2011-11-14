@@ -34,6 +34,7 @@ import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -240,6 +241,10 @@ public class ImageResourceTag extends WebloungeTag {
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_SRC, linkToImage);
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_TITLE, image.getTitle(language));
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_DESC, image.getDescription(language));
+    
+    // Add the cache tags to the response
+    response.addTag(CacheTag.Resource, image.getURI().getIdentifier());
+    response.addTag(CacheTag.Url, image.getURI().getPath());
 
     return EVAL_BODY_INCLUDE;
   }

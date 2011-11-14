@@ -244,6 +244,7 @@ public class PagePreviewTag extends WebloungeTag {
 
       pageUrl = new WebUrlImpl(site, page.getURI().getPath());
       response.addTag(CacheTag.Url, pageUrl.getPath());
+      response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
     }
 
     PageTemplate template = site.getTemplate(page.getTemplate());

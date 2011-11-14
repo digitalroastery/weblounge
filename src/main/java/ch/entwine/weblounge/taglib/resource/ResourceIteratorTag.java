@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
+import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -299,6 +300,10 @@ public class ResourceIteratorTag extends WebloungeTag {
     // Store the resource and the resource content in the request
     pageContext.setAttribute(ResourceIteratorTagExtraInfo.RESOURCE, resource);
     pageContext.setAttribute(ResourceIteratorTagExtraInfo.RESOURCE_CONTENT, resourceContent);
+
+    // Add cache tags to the response
+    response.addTag(CacheTag.Resource, resource.getURI().getIdentifier());
+    response.addTag(CacheTag.Url, resource.getURI().getPath());
 
     return resultCode;
   }

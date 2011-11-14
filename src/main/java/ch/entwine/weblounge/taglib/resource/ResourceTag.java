@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -38,8 +39,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.jsp.JspException;
 
 /**
- * This tag loads an resource that is defined by an identifier or a path from the
- * content repository.
+ * This tag loads an resource that is defined by an identifier or a path from
+ * the content repository.
  * <p>
  * If it is found, the resource is defined in the jsp context variable
  * <code>resource</code>, otherwise, the tag body is skipped altogether.
@@ -69,8 +70,8 @@ public class ResourceTag extends WebloungeTag {
   }
 
   /**
-   * Sets the resource path. If both path and uuid have been defined, the uuid takes
-   * precedence.
+   * Sets the resource path. If both path and uuid have been defined, the uuid
+   * takes precedence.
    * 
    * @param path
    *          resource path
@@ -107,7 +108,7 @@ public class ResourceTag extends WebloungeTag {
     } else {
       throw new JspException("Neither uuid nor path were specified for resource");
     }
-    
+
     // Try to load the resource from the content repository
     try {
       if (!repository.exists(uri)) {
@@ -127,7 +128,7 @@ public class ResourceTag extends WebloungeTag {
       resource = repository.get(uri);
       resource.switchTo(language);
       resourceContent = resource.getContent(language);
-      if(resourceContent == null)
+      if (resourceContent == null)
         resourceContent = resource.getOriginalContent();
     } catch (ContentRepositoryException e) {
       logger.warn("Error trying to load resource " + uri + ": " + e.getMessage(), e);
@@ -139,6 +140,10 @@ public class ResourceTag extends WebloungeTag {
     // Store the resource and the resource content in the request
     pageContext.setAttribute(ResourceTagExtraInfo.RESOURCE, resource);
     pageContext.setAttribute(ResourceTagExtraInfo.RESOURCE_CONTENT, resourceContent);
+
+    // Add cache tags to the response
+    response.addTag(CacheTag.Resource, resource.getURI().getIdentifier());
+    response.addTag(CacheTag.Url, resource.getURI().getPath());
 
     return EVAL_BODY_INCLUDE;
   }

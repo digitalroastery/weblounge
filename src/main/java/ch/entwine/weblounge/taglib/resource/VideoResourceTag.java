@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -139,6 +140,10 @@ public class VideoResourceTag extends WebloungeTag {
     // Store the resource and the resource content in the request
     pageContext.setAttribute(VideoResourceTagExtraInfo.VIDEO, video);
     pageContext.setAttribute(VideoResourceTagExtraInfo.VIDEO_CONTENT, videoContent);
+
+    // Add cache tags to the response
+    response.addTag(CacheTag.Resource, video.getURI().getIdentifier());
+    response.addTag(CacheTag.Url, video.getURI().getPath());
 
     return EVAL_BODY_INCLUDE;
   }

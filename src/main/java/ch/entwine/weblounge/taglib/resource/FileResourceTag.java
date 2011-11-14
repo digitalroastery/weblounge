@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -139,6 +140,10 @@ public class FileResourceTag extends WebloungeTag {
     // Store the file and the file content in the request
     pageContext.setAttribute(FileResourceTagExtraInfo.FILE, file);
     pageContext.setAttribute(FileResourceTagExtraInfo.FILE_CONTENT, fileContent);
+    
+    // Add cache tags to response
+    response.addTag(CacheTag.Resource, file.getURI().getIdentifier());
+    response.addTag(CacheTag.Url, file.getURI().getPath());
 
     return EVAL_BODY_INCLUDE;
   }

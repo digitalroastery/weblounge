@@ -307,6 +307,7 @@ public class PageListTag extends WebloungeTag {
       this.url = url;
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW_PAGE, page);
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW, preview);
+      response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
       if (url != null)
         response.addTag(CacheTag.Url, url.getPath());
     }

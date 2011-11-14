@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -135,6 +136,10 @@ public class PageTag extends WebloungeTag {
 
     // Store the page and the page content in the request
     pageContext.setAttribute(PageTagExtraInfo.PAGE, page);
+    
+    // Add the cache tags to the response
+    response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
+    response.addTag(CacheTag.Url, page.getURI().getPath());
 
     return EVAL_BODY_INCLUDE;
   }
