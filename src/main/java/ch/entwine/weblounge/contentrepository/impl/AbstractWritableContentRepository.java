@@ -427,7 +427,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
     if (cache != null && updatePreviews && resource.getURI().getVersion() == Resource.LIVE) {
-      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, resource.getURI().getIdentifier()) });
+      List<CacheTag> tags = new ArrayList<CacheTag>();
+
+      // resource id
+      tags.add(new CacheTagImpl(CacheTag.Resource, resource.getURI().getIdentifier()));
+
+      // subjects, so that resource lists get updated
+      for (String subject : resource.getSubjects())
+        tags.add(new CacheTagImpl(CacheTag.Subject, subject));
+
+      cache.invalidate(tags.toArray(new CacheTagImpl[tags.size()]));
     }
 
     // Write the updated resource to disk
