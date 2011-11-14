@@ -2,6 +2,8 @@ package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.url.PathUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
@@ -14,6 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 
 public class WebloungeLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
 
+  /** The logging facility */
+  private static Logger logger = LoggerFactory.getLogger(RoleBasedLoginSuccessHandler.class);
+
+  /** Parameter name for the path to got to after logout */
   private static final String PATH_PARAMETER_NAME = "path";
 
   /**
@@ -32,6 +38,9 @@ public class WebloungeLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler
     if (request.getParameter(PATH_PARAMETER_NAME) != null) {
       targetUrl = PathUtils.concat("/", request.getParameter(PATH_PARAMETER_NAME));
     }
+
+    logger.info("User '{}' logged out", authentication.getName());
+
     setDefaultTargetUrl(addTimeStamp(targetUrl));
     super.onLogoutSuccess(request, response, authentication);
   }

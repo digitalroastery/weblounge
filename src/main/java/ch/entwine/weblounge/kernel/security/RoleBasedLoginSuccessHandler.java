@@ -73,7 +73,7 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
     User user = securityService.getUser();
     boolean isEditor = SecurityUtils.userHasRole(user, SystemRole.EDITOR);
 
-    logger.info("{} ('{}') logged in", user.getName(), user.getLogin());
+    logger.info("User '{}' logged in", user.getLogin());
 
     // If the user was intending to edit a page, let him do just that
     if (isEditor && StringUtils.isNotBlank(request.getParameter("edit"))) {
