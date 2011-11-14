@@ -39,7 +39,10 @@ public class WebloungeLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler
       targetUrl = PathUtils.concat("/", request.getParameter(PATH_PARAMETER_NAME));
     }
 
-    logger.info("User '{}' logged out", authentication.getName());
+    // Authentication can be null, e. g. if a user presses "logout" even though
+    // his session has already been expired
+    if (authentication != null)
+      logger.info("User '{}' logged out", authentication.getName());
 
     setDefaultTargetUrl(addTimeStamp(targetUrl));
     super.onLogoutSuccess(request, response, authentication);
