@@ -21,6 +21,7 @@ package ch.entwine.weblounge.security.sql;
 
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
@@ -80,6 +81,9 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
   /** SQL query used to load the roles of a user account */
   private static final String SQL_QUERY_UA_ROLES = "SELECT r.context, r.rolename FROM user_account_roles r INNER JOIN user_accounts ua ON r.user_account_id =  ua.id WHERE ua.user_id = ? AND  ua.site_id = ?";
 
+  /** Configuration option for the database driver */
+  private static final String OPT_DB_DRIVER = "sqldirectory.driver";
+
   /** Configuration option for the database server and database */
   private static final String OPT_DB_URL = "sqldirectory.url";
 
@@ -124,17 +128,19 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
     connectionProperties = null;
 
     // Read the updated properties
+    String driver = StringUtils.trimToNull((String) properties.get(OPT_DB_DRIVER));
     String url = StringUtils.trimToNull((String) properties.get(OPT_DB_URL));
     String user = StringUtils.trimToNull((String) properties.get(OPT_DB_USER));
     String password = StringUtils.trimToNull((String) properties.get(OPT_DB_PASSWORD));
 
-    if (url == null) {
+    if (driver == null || url == null) {
       logger.info("Database provider is not configured");
       return;
     }
 
     // Store url and properties
     connectionProperties = new Properties();
+    connectionProperties.put(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS, driver);
     connectionProperties.put(DataSourceFactory.JDBC_URL, url);
     if (user != null)
       connectionProperties.put(DataSourceFactory.JDBC_USER, user);
@@ -154,32 +160,40 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
    * @return the database driver
    */
   private Driver connect(Properties properties) {
-    String filter = "(osgi.jdbc.driver.class=com.mysql.jdbc.Driver)";
+    String url = (String) properties.get(DataSourceFactory.JDBC_URL);
+    String driverClass = (String) properties.get(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS);
+
     ServiceReference[] sr;
     DataSourceFactory dsf = null;
+    String filter = "(osgi.jdbc.driver.class=" + driverClass + ")";
     try {
       sr = bundleCtx.getServiceReferences(DataSourceFactory.class.getName(), filter);
-      if (sr != null && sr.length > 0) {
-        dsf = (DataSourceFactory) bundleCtx.getService(sr[0]);
-      } else {
-        logger.debug("No DataSourceFactory found.");
+      if (sr == null || sr.length == 0) {
+        logger.warn("No Data source factory found for class {} and user directory {}", driverClass, url);
         return null;
       }
+      dsf = (DataSourceFactory) bundleCtx.getService(sr[0]);
     } catch (InvalidSyntaxException e) {
       logger.error(e.getMessage());
       return null;
     }
 
     // Create the driver
+    Driver driver = null;
     try {
-      Driver driver = dsf.createDriver(properties);
-      String url = (String) properties.get(DataSourceFactory.JDBC_URL);
+      driver = dsf.createDriver(properties);
       logger.info("Connected to user directory {}", url);
-      return driver;
     } catch (SQLException e) {
-      logger.error(e.getMessage());
-      return null;
+      logger.debug("Connection to user directory {} failed: {}", url, e.getMessage());
+      try {
+        driver = dsf.createDriver(null);
+        logger.info("Connected to user directory {}", url);
+      } catch (SQLException e1) {
+        logger.warn("Connection to user directory {} failed: {}", url, e.getMessage());
+      }
     }
+
+    return driver;
   }
 
   /**
@@ -234,6 +248,7 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
       if (rs.next()) {
         user = new UserImpl(login, "weblounge", rs.getString(2) + " " + rs.getString(3));
         user.addPrivateCredentials(new PasswordImpl(rs.getString(5), DigestType.plain));
+        user.addPublicCredentials(SystemRole.GUEST);
       }
     } catch (SQLException e) {
       logger.error(e.getMessage());
@@ -297,39 +312,27 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
   }
 
   /**
-   * Returns a <code>ServiceReference</code> to the
-   * <code>EntityManagerFactory</code>
+   * Returns the directory's entity manager or <code>null</code> if the entity
+   * manager is not available.
    * 
-   * @return The service reference
-   * @throws Exception
-   *           If no service reference could be found
+   * @return the entity manager
    */
-  protected ServiceReference getEntityManagerFactoryServiceReference()
-      throws Exception {
+  protected EntityManager getEntityManager() {
     String filter = "(" + EntityManagerFactoryBuilder.JPA_UNIT_NAME + "=security.sql)";
     ServiceReference[] sr;
+
     try {
       sr = bundleCtx.getServiceReferences(EntityManagerFactory.class.getName(), filter);
     } catch (InvalidSyntaxException e) {
-      logger.error(e.getMessage());
-      throw new Exception("EntityManagerFactory service could not be fetched.");
+      throw new IllegalStateException("EntityManagerFactory service could not be fetched using filter '" + filter + "'");
     }
-    if (sr != null && sr.length > 0)
-      return sr[0];
-    else
-      throw new Exception("EntityManagerFactory service is not available.");
-  }
 
-  /**
-   * Returns the directory's entity manager.
-   * 
-   * @return the entity manager
-   * @throws Exception
-   *           TODO: Comment
-   */
-  protected EntityManager getEntityManager() throws Exception {
-    ServiceReference sr = getEntityManagerFactoryServiceReference();
-    EntityManagerFactory emf = (EntityManagerFactory) bundleCtx.getService(sr);
+    if (sr == null || sr.length == 0) {
+      logger.warn("EntityManagerFactory service is not available.");
+      return null;
+    }
+
+    EntityManagerFactory emf = (EntityManagerFactory) bundleCtx.getService(sr[0]);
     return emf.createEntityManager();
   }
 
@@ -337,14 +340,14 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
    * Gets a connection from the database and returns it. If no connection is
    * available, <code>null</code> is returned instead.
    * 
-   * TODO: Add pooling TODO: Remove fixed connection pool
+   * TODO: Add pooling
    * 
    * @return the connection or <code>null</code> if no connection is available
    */
   protected Connection getDBConnection() {
     if (databaseDriver == null)
       return null;
-    String url = connectionProperties.getProperty(OPT_DB_URL);
+    String url = connectionProperties.getProperty(DataSourceFactory.JDBC_URL);
     try {
       return databaseDriver.connect(url, connectionProperties);
     } catch (SQLException e) {
