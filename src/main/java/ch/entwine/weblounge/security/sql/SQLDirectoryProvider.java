@@ -22,12 +22,13 @@ package ch.entwine.weblounge.security.sql;
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.impl.security.UserImpl;
+import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.security.WebloungeUser;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
@@ -217,9 +218,8 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
    */
   public User loadUser(String login, Site site) {
     Connection conn = getDBConnection();
-    if (conn == null) {
+    if (conn == null)
       return null;
-    }
 
     User user = null;
     try {
@@ -248,16 +248,25 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
    *          the database connection
    * @return the user
    */
-  private User loadUser(String login, Site site, Connection conn) {
+  private WebloungeUser loadUser(String login, Site site, Connection conn) {
     ResultSet rs = null;
-    User user = null;
+    WebloungeUser user = null;
     try {
       PreparedStatement ps = conn.prepareStatement(SQL_QUERY_USER_ACCOUNT);
       ps.setString(1, login);
       ps.setString(2, site.getIdentifier());
       rs = ps.executeQuery();
       if (rs.next()) {
-        user = new UserImpl(login, "weblounge", rs.getString(2) + " " + rs.getString(3));
+        String firstname = rs.getString(2);
+        String lastname = rs.getString(3);
+        String email = rs.getString(4);
+        user = new WebloungeUserImpl(login, site.getIdentifier());
+        if (StringUtils.isNotBlank(firstname))
+          user.setFirstName(firstname);
+        if (StringUtils.isNotBlank(lastname))
+          user.setLastName(lastname);
+        if (StringUtils.isNotBlank(email))
+          user.setEmail(firstname);
         user.addPrivateCredentials(new PasswordImpl(rs.getString(5), DigestType.plain));
         user.addPublicCredentials(SystemRole.GUEST);
       }
