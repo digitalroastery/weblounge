@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -236,6 +237,17 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
     return user;
   }
 
+  /**
+   * Loads the user and roles.
+   * 
+   * @param login
+   *          the login
+   * @param site
+   *          the site
+   * @param conn
+   *          the database connection
+   * @return the user
+   */
   private User loadUser(String login, Site site, Connection conn) {
     ResultSet rs = null;
     User user = null;
@@ -244,7 +256,6 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
       ps.setString(1, login);
       ps.setString(2, site.getIdentifier());
       rs = ps.executeQuery();
-
       if (rs.next()) {
         user = new UserImpl(login, "weblounge", rs.getString(2) + " " + rs.getString(3));
         user.addPrivateCredentials(new PasswordImpl(rs.getString(5), DigestType.plain));
@@ -257,6 +268,16 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
     return user;
   }
 
+  /**
+   * Loads the user's role.
+   * 
+   * @param user
+   *          the user
+   * @param site
+   *          the site
+   * @param conn
+   *          the database connection
+   */
   private void loadUserRoles(User user, Site site, Connection conn) {
     ResultSet rs = null;
     try {
@@ -264,9 +285,15 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
       ps.setString(1, user.getLogin());
       ps.setString(2, site.getIdentifier());
       rs = ps.executeQuery();
-
       while (rs.next()) {
-        user.addPublicCredentials(new RoleImpl(rs.getString(1), rs.getString(2)));
+        String realm = rs.getString(1);
+        String roleId = rs.getString(2);
+        Role role = null;
+        if (Security.SYSTEM_CONTEXT.equals(realm) && SystemRole.getRole(roleId) != null)
+          role = SystemRole.getRole(roleId);
+        else
+          role = new RoleImpl(rs.getString(1), rs.getString(2));
+        user.addPublicCredentials(role);
       }
     } catch (SQLException e) {
       logger.error(e.getMessage());
