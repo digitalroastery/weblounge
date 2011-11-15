@@ -75,7 +75,7 @@ steal.plugins('jquery',
 						
 						var url = this.element.find('input[name=url]').val();
 						if(url != url.match(/[a-zA-Z0-9_-]*/)) {
-							this.validator.showErrors({"url": "Invalid Charakters for url: use [a-zA-Z0-9_-]"});
+							this.validator.showErrors({"url": jQuery.validator.messages.friendlyUrl});
 							return;
 						};
 						
@@ -116,6 +116,17 @@ steal.plugins('jquery',
 	    	this.options = options;
 	    	this.element.dialog('open');
 	    },
+	    
+	    _makeFriendlyUrl: function(originalUrl) {
+            var url = originalUrl.toLowerCase()
+            		  .replace(/^\s+|\s+$/g, "")
+            		  .replace(/[_|\s]+/g, "-")
+            		  .replace(/[^a-z\u0400-\u04FF0-9-]+/g, "")
+            		  .replace(/[-]+/g, "-")
+            		  .replace(/^-+|-+$/g, "")
+            		  .replace(/[-]+/g, '-');
+            return url;
+	    },
 		
 	    "button#wbl-pageSelectorButton click": function(el, ev) {
 	    	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', this.element, 'pages', false, $.proxy(function(parentPage) {
@@ -134,7 +145,7 @@ steal.plugins('jquery',
 		"input[name=title] change": function(el, ev) {
 			var urlInput = this.element.find('input[name=url]');
 			if(urlInput.val() == '') {
-				urlInput.val(encodeURI(el.val().toLowerCase()));
+				urlInput.val(this._makeFriendlyUrl(el.val()));
 			}
 		}
 	    
