@@ -116,7 +116,7 @@ public class SharedHttpContextImpl implements HttpContext {
   /**
    * Callback from OSGi to set the security service once it has been published.
    */
-  void removeSecurityFilter() {
+  void removeSecurityService() {
     this.securityService = null;
     logger.info("Disabling requests to protected resources");
   }
