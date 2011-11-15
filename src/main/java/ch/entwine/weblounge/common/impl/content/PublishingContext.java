@@ -245,7 +245,7 @@ public class PublishingContext implements Cloneable {
     date = cutOffMillis(date);
     if (date == null)
       throw new IllegalArgumentException("Date cannot be null");
-    boolean checkFrom = startDate == null || startDate.before(date);
+    boolean checkFrom = startDate != null && startDate.before(date);
     boolean checkTo = endDate == null || endDate.after(date);
     return (checkFrom && checkTo);
   }
