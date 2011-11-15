@@ -69,16 +69,16 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
 
     // First name
     if (user instanceof WebloungeUser && ((WebloungeUser) user).getFirstName() != null) {
-      b.append("<firstname>");
+      b.append("<firstname><![CDATA[");
       b.append(((WebloungeUser) user).getFirstName());
-      b.append("</firstname>");
+      b.append("]]></firstname>");
     }
 
     // First name
     if (user instanceof WebloungeUser && ((WebloungeUser) user).getLastName() != null) {
-      b.append("<lastname>");
+      b.append("<lastname><![CDATA[");
       b.append(((WebloungeUser) user).getLastName());
-      b.append("</lastname>");
+      b.append("]]></lastname>");
     }
 
     // Name, if first name and last name were not given
