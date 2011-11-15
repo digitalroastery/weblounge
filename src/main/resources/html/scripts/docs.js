@@ -98,7 +98,8 @@ var Docs = (function($) {
 	                      var submitParameters = {};
 	                      form.find(".form_param_submit").each(function() {
 	                          var param = $(this);
-	                          submitParameters[param.attr('name')] = param.val();
+	                          if (param.attr('type') != "checkbox" || param.attr('checked') == true)
+	                        	  submitParameters[param.attr('name')] = param.val();
 	                      });
 
 	                      var method = form.find(".form_method").val();
