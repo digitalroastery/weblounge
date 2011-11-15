@@ -91,6 +91,7 @@ steal.plugins('jqueryui/dialog',
 			resizable: true,
 			buttons: {
 				Abbrechen: function() {
+					$("body").css({ overflow: 'visible' });
 					$(this).dialog('close');
 				},
 				OK: $.proxy(function () {
@@ -101,6 +102,7 @@ steal.plugins('jqueryui/dialog',
 					// Save New Pagelet and show Renderer
 					this.options.composer.page.insertPagelet(newPagelet, this.options.composer.id, this.element.index(), this.callback('_showRenderer'));
 					
+					$("body").css({ overflow: 'visible' });
 					this.editorDialog.dialog('destroy');
 				}, this)
 			},
@@ -118,9 +120,6 @@ steal.plugins('jqueryui/dialog',
 			}, this),
 			create: function(event, ui) {
 				$("body").css({ overflow: 'hidden' });
-			},
-			beforeClose: function(event, ui) {
-				$("body").css({ overflow: 'visible' });
 			}
 		});
 		this.editorDialog.find("form#wbl-validate").validate();

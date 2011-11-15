@@ -80,6 +80,7 @@ steal.plugins('jquery',
 				height: 650,
 				buttons: {
 					Abbrechen: $.proxy(function() {
+						$("body").css({ overflow: 'visible' });
 						this.element.dialog('close');
 					}, this),
 					Speichern: $.proxy(function() {
@@ -95,6 +96,7 @@ steal.plugins('jquery',
 							location.href = this.options.page.getPath() + this.options.language + "?edit&_=" + new Date().getTime();
 						}, this));
 						
+						$("body").css({ overflow: 'visible' });
 						this.element.trigger('closeeditor');
 						this.element.dialog('destroy');
 						this.destroy();
@@ -107,9 +109,6 @@ steal.plugins('jquery',
 				},this),
 				create: function(event, ui) {
 					$("body").css({ overflow: 'hidden' });
-				},
-				beforeClose: function(event, ui) {
-					$("body").css({ overflow: 'visible' });
 				}
 			});
 			
