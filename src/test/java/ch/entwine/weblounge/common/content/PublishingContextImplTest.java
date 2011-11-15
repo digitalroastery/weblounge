@@ -102,13 +102,11 @@ public class PublishingContextImplTest {
     Date yesterday = new Date(new Date().getTime() - 86400000L);
     Date tomorrow = new Date(new Date().getTime() + 86400000L);
     ctx.setPublished(null, yesterday, tomorrow);
-//    ctx.setPublishFrom(yesterday);
-//    ctx.setPublishTo(tomorrow);
     assertTrue(ctx.isPublished());
     ctx.setPublishTo(null);
     assertTrue(ctx.isPublished());
     ctx.setPublishFrom(null);
-    assertTrue(ctx.isPublished());
+    assertFalse(ctx.isPublished());
   }
 
   /**
