@@ -20,17 +20,17 @@
 
 package ch.entwine.weblounge.kernel.http;
 
+import ch.entwine.weblounge.common.security.SecurityService;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.web.FilterChainProxy;
 
 import java.io.IOException;
 import java.net.URL;
 
-import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,8 +47,8 @@ public class SharedHttpContextImpl implements HttpContext {
   /** The bundle context */
   protected BundleContext bundleContext = null;
 
-  /** The security filter */
-  protected Filter securityFilter = null;
+  /** The security service */
+  protected SecurityService securityService = null;
 
   /**
    * Callback from OSGi on component activation.
@@ -81,7 +81,7 @@ public class SharedHttpContextImpl implements HttpContext {
    */
   public boolean handleSecurity(HttpServletRequest request,
       HttpServletResponse response) throws IOException {
-    return securityFilter != null;
+    return securityService != null;
   }
 
   /**
@@ -90,7 +90,6 @@ public class SharedHttpContextImpl implements HttpContext {
    * @see org.osgi.service.http.HttpContext#getResource(java.lang.String)
    */
   public URL getResource(String name) {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -100,34 +99,26 @@ public class SharedHttpContextImpl implements HttpContext {
    * @see org.osgi.service.http.HttpContext#getMimeType(java.lang.String)
    */
   public String getMimeType(String name) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   /**
-   * Callback from OSGi to set the security filter once it has been published.
+   * Callback from OSGi to set the security service once it has been published.
    * 
    * @param filter
    *          the spring security filter
    */
-  void addSecurityFilter(Filter filter) {
-    if (filter instanceof FilterChainProxy) {
-      securityFilter = filter;
-      logger.info("Enabling requests to protected resources");
-    }
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+    logger.info("Enabling requests to protected resources");
   }
 
   /**
-   * Callback from OSGi to set the security filter once it has been published.
-   * 
-   * @param filter
-   *          the spring security filter
+   * Callback from OSGi to set the security service once it has been published.
    */
-  void removeSecurityFilter(Filter filter) {
-    if (filter == securityFilter) {
-      securityFilter = null;
-      logger.info("Disabling requests to protected resources");
-    }
+  void removeSecurityFilter() {
+    this.securityService = null;
+    logger.info("Disabling requests to protected resources");
   }
 
 }

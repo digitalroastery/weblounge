@@ -11,6 +11,6 @@
   <service>
     <provide interface="org.osgi.service.http.HttpContext" />
   </service>
-  <reference name="security filter" interface="javax.servlet.Filter" cardinality="0..n" policy="dynamic" bind="addSecurityFilter" unbind="removeSecurityFilter" /> 
+  <reference name="security service" interface="ch.entwine.weblounge.common.security.SecurityService" cardinality="0..1" policy="dynamic" bind="setSecurityService" unbind="removeSecurityService" /> 
 
 </scr:component>
