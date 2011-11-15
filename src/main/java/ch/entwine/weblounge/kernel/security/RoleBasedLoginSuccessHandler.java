@@ -69,8 +69,14 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
       HttpServletResponse response, Authentication authentication)
       throws IOException, ServletException {
 
+    Object principal = authentication.getPrincipal();
+    if (!(principal instanceof SpringSecurityUser)) {
+      super.onAuthenticationSuccess(request, response, authentication);
+      return;
+    }
+
     // Try to process login based on the user's role
-    User user = securityService.getUser();
+    User user = ((SpringSecurityUser) principal).getUser();
     boolean isEditor = SecurityUtils.userHasRole(user, SystemRole.EDITOR);
 
     logger.info("User '{}' logged in", user.getLogin());

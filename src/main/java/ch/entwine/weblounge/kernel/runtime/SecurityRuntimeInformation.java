@@ -28,6 +28,9 @@ import ch.entwine.weblounge.common.security.WebloungeUser;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Returns runtime information on the current user.
  */
@@ -94,21 +97,27 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
 
     b.append("</user>");
 
-    // Add role information
-    StringBuffer roles = new StringBuffer();
+    // Make sure we get rid of duplicates (caused by role inheritance)
+    Set<Role> roles = new HashSet<Role>();
     for (Role role : SecurityUtils.getRoles(user)) {
       for (Role r : role.getClosure()) {
-        roles.append("<role context=\"").append(r.getContext()).append("\" ");
-        roles.append("id=\"").append(r.getIdentifier()).append("\">");
-        roles.append("<name><![CDATA[");
-        roles.append(r.toString(language));
-        roles.append("]]></name>");
-        roles.append("</role>");
+        roles.add(r);
       }
     }
-    if (roles.length() > 0) {
+
+    // Add role information
+    StringBuffer rolesXml = new StringBuffer();
+    for (Role r : roles) {
+      rolesXml.append("<role context=\"").append(r.getContext()).append("\" ");
+      rolesXml.append("id=\"").append(r.getIdentifier()).append("\">");
+      rolesXml.append("<name><![CDATA[");
+      rolesXml.append(r.toString(language));
+      rolesXml.append("]]></name>");
+      rolesXml.append("</role>");
+    }
+    if (rolesXml.length() > 0) {
       b.append("<roles>");
-      b.append(roles.toString());
+      b.append(rolesXml.toString());
       b.append("</roles>");
     }
 

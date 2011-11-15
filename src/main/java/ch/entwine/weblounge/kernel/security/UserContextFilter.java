@@ -160,6 +160,9 @@ public class UserContextFilter implements Filter {
         logger.warn("No principal found in spring security context, setting current user to anonymous");
         user = new Guest(site.getIdentifier());
         // roles.add(getLocalRole(site, SystemRole.GUEST));
+      } else if (principal instanceof SpringSecurityUser) {
+        user = ((SpringSecurityUser) principal).getUser();
+        logger.debug("Principal was identified as '{}'", user.getLogin());
       } else if (principal instanceof UserDetails) {
         UserDetails userDetails = (UserDetails) principal;
         user = new UserImpl(userDetails.getUsername());

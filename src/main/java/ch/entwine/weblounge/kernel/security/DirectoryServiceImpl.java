@@ -151,7 +151,6 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     if (user == null) {
       throw new UsernameNotFoundException(name);
     } else {
-      securityService.setUser(user);
 
       // Collect the set of roles (granted authorities) for this users
       Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
@@ -190,7 +189,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
         throw new DataRetrievalFailureException("User '" + user + "' has no password");
       }
 
-      return new org.springframework.security.core.userdetails.User(user.getLogin(), password, true, true, true, true, authorities);
+      return new SpringSecurityUser(user, password, true, true, true, true, authorities);
     }
   }
 
