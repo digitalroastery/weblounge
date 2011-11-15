@@ -1165,7 +1165,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Finally, perform the publish operation
     try {
-      page.setPublished(user, startDate, endDate);
+      if (!page.isPublished())
+        page.setPublished(user, startDate, endDate);
       page.setModified(user, new Date());
       page.setVersion(Resource.LIVE);
       contentRepository.put(page);
