@@ -19,6 +19,10 @@ steal.then('jsonix')
 			runtime.user.login = userElement.attr('id');
 			runtime.user.realm = userElement.attr('realm');
 			runtime.user.name = userElement.find('name').text();
+			if(userElement.find('firstname').lenght)
+				runtime.user.firstname = userElement.find('firstname').text();
+			if(userElement.find('lastname').lenght)
+				runtime.user.lastname = userElement.find('lastname').text();
 			runtime.user.email = userElement.find('email').text();
 			runtime.site = new Object();
 			runtime.roles = new Array();
@@ -77,6 +81,12 @@ steal.then('jsonix')
 	    },
 	    
 	    getUserName: function() {
+	    	return this.user.name;
+	    },
+	    
+	    getFirstName: function() {
+	    	if(!$.isEmptyObject(this.user.firstname))
+	    		return this.user.firstname;
 	    	return this.user.name;
 	    },
 	    
