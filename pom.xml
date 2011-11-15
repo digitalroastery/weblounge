@@ -131,7 +131,6 @@
         <module>modules/weblounge-contentrepository</module>
         <module>modules/weblounge-dispatcher-api</module>
         <module>modules/weblounge-dispatcher</module>
-        <module>modules/weblounge-importer</module>
         <module>modules/weblounge-kernel</module>
         <module>modules/weblounge-security</module>
         <module>modules/weblounge-security-sql</module>
