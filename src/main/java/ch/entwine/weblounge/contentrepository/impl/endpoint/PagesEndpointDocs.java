@@ -84,7 +84,7 @@ public final class PagesEndpointDocs {
     getAllPagesEndpoint.addOptionalParameter(new Parameter("preferredversion", Parameter.Type.String, "The preferred version", "1", versions));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
-    getAllPagesEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "true"));
     getAllPagesEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getAllPagesEndpoint);
 
