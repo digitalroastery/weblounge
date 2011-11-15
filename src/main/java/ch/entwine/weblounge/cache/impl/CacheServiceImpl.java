@@ -94,6 +94,12 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** The default value for "enable" configuration property */
   private static final boolean DEFAULT_ENABLE = true;
 
+  /** Configuration key for the debugging option */
+  public static final String OPT_DEBUG = OPT_PREFIX + ".debug";
+
+  /** The default value for "debug" configuration property */
+  private static final boolean DEFAULT_DEBUG = true;
+
   /** Configuration key for the cache identifier */
   public static final String OPT_ID = OPT_PREFIX + ".id";
 
@@ -177,6 +183,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /** True if the cache is enabled */
   protected boolean enabled = true;
+
+  /** True if additional response headers are enabled */
+  protected boolean debug = false;
 
   /** The stream filter */
   protected StreamFilter filter = null;
@@ -354,8 +363,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       clear();
     }
 
-    // Disk persistence
+    // Enabled status
     enabled = ConfigurationUtils.isTrue((String) properties.get(OPT_ENABLE), DEFAULT_ENABLE);
+    logger.debug("Cache is {}", diskPersistent ? "enabled" : "disabled");
+
+    debug = ConfigurationUtils.isTrue((String) properties.get(OPT_DEBUG), DEFAULT_DEBUG);
     logger.debug("Cache is {}", diskPersistent ? "enabled" : "disabled");
 
     // Disk persistence
@@ -665,15 +677,19 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     response.setHeader("Etag", entry.getETag());
 
     // Add the X-Cache-Key header
-    StringBuffer cacheKeyHeader = new StringBuffer(name);
-    cacheKeyHeader.append(" (").append(handle.getKey()).append(")");
-    response.addHeader(CACHE_KEY_HEADER, cacheKeyHeader.toString());
+    if (debug) {
+      StringBuffer cacheKeyHeader = new StringBuffer(name);
+      cacheKeyHeader.append(" (").append(handle.getKey()).append(")");
+      response.addHeader(CACHE_KEY_HEADER, cacheKeyHeader.toString());
+    }
 
     // Add the X-Cache-Tags header
-    CacheEntryKey key = (CacheEntryKey) element.getKey();
-    StringBuffer cacheTagsHeader = new StringBuffer(name);
-    cacheTagsHeader.append(" (").append(key.getTags()).append(")");
-    response.addHeader(CACHE_TAGS_HEADER, cacheTagsHeader.toString());
+    if (debug) {
+      CacheEntryKey key = (CacheEntryKey) element.getKey();
+      StringBuffer cacheTagsHeader = new StringBuffer(name);
+      cacheTagsHeader.append(" (").append(key.getTags()).append(")");
+      response.addHeader(CACHE_TAGS_HEADER, cacheTagsHeader.toString());
+    }
 
     // Check the headers first. Maybe we don't need to send anything but
     // a not-modified back
@@ -795,7 +811,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Load the cache
     Cache cache = cacheManager.getCache(DEFAULT_CACHE);
-    
+
     // Inform listeners
     for (CacheListener listener : cacheListeners) {
       listener.cacheSetInvalidated(tags);
