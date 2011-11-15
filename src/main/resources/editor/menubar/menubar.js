@@ -202,6 +202,8 @@ steal.plugins(
         	this.element.find('button.wbl-editorSelectionCancel, button.wbl-editorSelectionOK').button().show();
         	this.element.find('button.wbl-editorSelectionOK').button('option', 'disabled', true);
         	
+        	this.fromTab = this.element.find('a.wbl-tab.wbl-active');
+        	
         	var browser;
         	if(resourceMode == 'pages') {
         		this.element.find('a.wbl-media').hide();
@@ -248,7 +250,7 @@ steal.plugins(
         	this.element.find('span.wbl-right').show();
         	this.element.find('img.wbl-pageSettings').show();
         	// Open Designer
-        	this.element.find('a.wbl-designer').click();
+        	this.fromTab.click();
         	$(document.body).css('overflow', 'hidden');
         },
         
