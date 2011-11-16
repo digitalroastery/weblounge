@@ -104,8 +104,10 @@ public class UserImpl implements User {
     this.login = user.getLogin();
     this.realm = user.getRealm();
     this.name = user.getName();
-    addPublicCredentials(user.getPublicCredentials());
-    addPrivateCredentials(user.getPrivateCredentials());
+    for (Object o : user.getPublicCredentials())
+      addPublicCredentials(o);
+    for (Object o : user.getPrivateCredentials())
+      addPrivateCredentials(o);
   }
 
   /**
