@@ -365,14 +365,4 @@ public class ContentRepositoryEndpoint {
     this.sites = siteManager;
   }
 
-  /**
-   * Callback for OSGi to remove the site manager.
-   * 
-   * @param siteManager
-   *          the site manager
-   */
-  void removeSiteManager(SiteManager siteManager) {
-    this.sites = null;
-  }
-
 }
