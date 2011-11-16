@@ -28,12 +28,20 @@ import ch.entwine.weblounge.common.site.Site;
 public interface SecurityService {
 
   /**
-   * Gets the current user, or the local organization's anonymous user if the
-   * user has not been authenticated.
+   * Gets the current user in a generic form ({@link User}), or the local
+   * organization's anonymous user if the user has not been authenticated.
    * 
    * @return the user
    */
   User getUser();
+
+  /**
+   * Gets the current user including all the details, or the local
+   * organization's anonymous user if the user has not been authenticated.
+   * 
+   * @return the user
+   */
+  User getExtendedUser();
 
   /**
    * Gets the site associated with the current thread context.
