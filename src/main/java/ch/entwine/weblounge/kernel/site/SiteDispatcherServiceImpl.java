@@ -163,17 +163,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       logger.debug("No configuration admin service found while looking for site dispatcher configuration");
     }
 
-    // Create the scratch directory if specified, otherwise jasper will complain
-    scratchDir = jasperConfig.get(OPT_JASPER_SCRATCHDIR);
-    if (scratchDir != null) {
-      try {
-        FileUtils.forceMkdir(new File(PathUtils.trim(scratchDir)));
-        logger.debug("Temporary jsp source files and classes go to {}", scratchDir);
-      } catch (IOException e) {
-        throw new ConfigurationException(OPT_JASPER_SCRATCHDIR, "Unable to create jasper scratch directory at " + scratchDir + ": " + e.getMessage());
-      }
-    }
-
     servletRegistrations = new HashMap<Site, ServiceRegistration>();
 
     logger.debug("Site dispatcher activated");
@@ -268,17 +257,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
         // compiler context configuration. Some keys are camel case, others are
         // lower case.
         jasperConfig.put(key.toLowerCase(), value);
-      }
-    }
-
-    // Create the scratch directory if specified, otherwise jasper will complain
-    String scratchDir = jasperConfig.get(OPT_JASPER_SCRATCHDIR);
-    if (scratchDir != null) {
-      try {
-        FileUtils.forceMkdir(new File(PathUtils.trim(scratchDir)));
-        logger.debug("Temporary jsp source files and classes go to {}", scratchDir);
-      } catch (IOException e) {
-        throw new ConfigurationException(OPT_JASPER_SCRATCHDIR, "Unable to create jasper scratch directory at " + scratchDir + ": " + e.getMessage());
       }
     }
 
@@ -387,6 +365,15 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     String siteContextURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI, DEFAULT_BUNDLE_CONTEXT_ROOT_URI);
     String siteRoot = UrlUtils.concat(contextRoot, siteContextURI, bundleURI);
 
+    // Prepare the Jasper work directory
+    String scratchDir = PathUtils.concat(jasperConfig.get(OPT_JASPER_SCRATCHDIR), site.getIdentifier());
+    try {
+      FileUtils.forceMkdir(new File(scratchDir));
+      logger.debug("Temporary jsp source files and classes go to {}", scratchDir);
+    } catch (IOException e) {
+      logger.warn("Unable to create jasper scratch directory at {}: {}", scratchDir, e.getMessage());
+    }
+
     try {
       // Create and register the site servlet
       SiteServlet siteServlet = new SiteServlet(site, siteBundle);
@@ -396,7 +383,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       servletRegistrationProperties.put("alias", siteRoot);
       servletRegistrationProperties.put("servlet-name", site.getIdentifier());
       servletRegistrationProperties.put(SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
-      servletRegistrationProperties.put("init." + OPT_JASPER_SCRATCHDIR, PathUtils.concat(jasperConfig.get(OPT_JASPER_SCRATCHDIR), site.getIdentifier()));
+      servletRegistrationProperties.put("init." + OPT_JASPER_SCRATCHDIR, scratchDir);
       ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
       servletRegistrations.put(site, servletRegistration);
 
