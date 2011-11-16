@@ -22,11 +22,16 @@ package ch.entwine.weblounge.cache.impl.endpoint;
 
 import ch.entwine.weblounge.cache.impl.CacheConfiguration;
 import ch.entwine.weblounge.cache.impl.CacheConfigurationFactory;
+import ch.entwine.weblounge.cache.impl.CacheServiceImpl;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.site.SiteManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URL;
+import java.util.Dictionary;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -47,6 +52,9 @@ import javax.ws.rs.core.Response.Status;
 @Path("/")
 @Produces(MediaType.APPLICATION_XML)
 public class CacheEndpoint {
+
+  /** The logging facility */
+  private final static Logger logger = LoggerFactory.getLogger(CacheEndpoint.class);
 
   /** The endpoint documentation */
   private String docs = null;
@@ -98,6 +106,12 @@ public class CacheEndpoint {
     Site site = getSite(request);
     CacheConfiguration cache = getCache(site);
 
+    // Is the cache already enabled?
+    if (cache.isEnabled()) {
+      ResponseBuilder response = Response.notModified();
+      return response.build();
+    }
+
     // Enable the cache
     try {
       configFactory.enable(cache);
@@ -130,10 +144,55 @@ public class CacheEndpoint {
     if (cache == null)
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
 
+    // Is the cache already disabled?
+    if (!cache.isEnabled()) {
+      ResponseBuilder response = Response.notModified();
+      return response.build();
+    }
+
     // Disable the cache
     try {
       configFactory.disable(cache);
     } catch (Throwable t) {
+      throw new WebApplicationException();
+    }
+
+    // Send the response
+    ResponseBuilder response = Response.ok();
+    return response.build();
+  }
+
+  /**
+   * Disables the cache for the site determined by the request.
+   * 
+   * @param request
+   *          the request
+   */
+  @DELETE
+  @Path("/content")
+  public Response clear(@Context HttpServletRequest request) {
+
+    // Extract the site
+    Site site = getSite(request);
+    if (site == null)
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+
+    // Get the site's cache
+    CacheConfiguration cache = getCache(site);
+    if (cache == null)
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+
+    // Clear the cache
+    try {
+      Dictionary<Object, Object> properties = cache.getProperties();
+      properties.put(CacheServiceImpl.OPT_CLEAR, "true");
+
+      // Tell the configuration admin service to update the service
+      cache.getConfiguration().update(properties);
+      properties.remove(CacheServiceImpl.OPT_CLEAR);
+      cache.getConfiguration().update(properties);
+    } catch (Throwable t) {
+      logger.error("Error updating cache '{}': {}", site.getIdentifier(), t.getMessage());
       throw new WebApplicationException();
     }
 

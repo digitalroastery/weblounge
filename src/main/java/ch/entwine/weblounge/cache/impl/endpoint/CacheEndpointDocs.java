@@ -65,26 +65,36 @@ public final class CacheEndpointDocs {
     docs.addEndpoint(Endpoint.Type.READ, getStatistics);
 
     // PUT /
-    Endpoint updatePageEndpoint = new Endpoint("/", Method.PUT, "start");
-    updatePageEndpoint.setDescription("Enables caching for the current site");
-    updatePageEndpoint.addFormat(Format.xml());
-    updatePageEndpoint.addStatus(ok("the page was enabled"));
-    updatePageEndpoint.addStatus(notModified("the cache was already enabled"));
-    updatePageEndpoint.addStatus(notFound("the site does not exist"));
-    updatePageEndpoint.addStatus(serviceUnavailable("the site is temporarily offline"));
-    updatePageEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.WRITE, updatePageEndpoint);
+    Endpoint startCacheEndpoint = new Endpoint("/", Method.PUT, "start");
+    startCacheEndpoint.setDescription("Enables caching for the current site");
+    startCacheEndpoint.addFormat(Format.xml());
+    startCacheEndpoint.addStatus(ok("the cache was enabled"));
+    startCacheEndpoint.addStatus(notModified("the cache was already enabled"));
+    startCacheEndpoint.addStatus(notFound("the site does not exist"));
+    startCacheEndpoint.addStatus(serviceUnavailable("the site is temporarily offline"));
+    startCacheEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, startCacheEndpoint);
 
     // DELETE /
-    Endpoint deletePageEndpoint = new Endpoint("/", Method.DELETE, "stop");
-    deletePageEndpoint.setDescription("Enables caching for the current site");
-    deletePageEndpoint.addFormat(Format.xml());
-    deletePageEndpoint.addStatus(ok("the page was enabled"));
-    deletePageEndpoint.addStatus(notModified("the cache was already enabled"));
-    deletePageEndpoint.addStatus(notFound("the site does not exist"));
-    deletePageEndpoint.addStatus(serviceUnavailable("the site is temporarily offline"));
-    deletePageEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.WRITE, deletePageEndpoint);
+    Endpoint stopCacheEndpoint = new Endpoint("/", Method.DELETE, "stop");
+    stopCacheEndpoint.setDescription("Enables caching for the current site");
+    stopCacheEndpoint.addFormat(Format.xml());
+    stopCacheEndpoint.addStatus(ok("the cache was enabled"));
+    stopCacheEndpoint.addStatus(notModified("the cache was already enabled"));
+    stopCacheEndpoint.addStatus(notFound("the site does not exist"));
+    stopCacheEndpoint.addStatus(serviceUnavailable("the site is temporarily offline"));
+    stopCacheEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, stopCacheEndpoint);
+
+    // DELETE /content
+    Endpoint clearCacheEndpoint = new Endpoint("/content", Method.DELETE, "clear");
+    clearCacheEndpoint.setDescription("Clear the cache for the current site");
+    clearCacheEndpoint.addFormat(Format.xml());
+    clearCacheEndpoint.addStatus(ok("the cache was cleared"));
+    clearCacheEndpoint.addStatus(notFound("the site does not exist"));
+    clearCacheEndpoint.addStatus(serviceUnavailable("the site is temporarily offline"));
+    clearCacheEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, clearCacheEndpoint);
 
     return EndpointDocumentationGenerator.generate(docs);
   }
