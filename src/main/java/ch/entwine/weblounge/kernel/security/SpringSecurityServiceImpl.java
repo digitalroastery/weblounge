@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.kernel.security;
 
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.security.WebloungeAdminImpl;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
@@ -30,12 +31,14 @@ import ch.entwine.weblounge.common.site.Site;
  */
 public class SpringSecurityServiceImpl implements SecurityService {
 
-
   /** Holds the site associated with the current thread */
   private static final ThreadLocal<Site> siteHolder = new ThreadLocal<Site>();
 
   /** Holds the user associated with the current thread */
   private static final ThreadLocal<User> userHolder = new ThreadLocal<User>();
+
+  /** Holds the extended user associated with the current thread */
+  private static final ThreadLocal<User> extendedUserHolder = new ThreadLocal<User>();
 
   /** The default system administrator */
   private User systemAdmin = new WebloungeAdminImpl("admin");
@@ -67,7 +70,11 @@ public class SpringSecurityServiceImpl implements SecurityService {
    * @see ch.entwine.weblounge.common.security.SecurityService#setUser(ch.entwine.weblounge.common.security.User)
    */
   public void setUser(User user) {
-    userHolder.set(user);
+    if (user == null)
+      userHolder.set(null);
+    else
+      userHolder.set(new UserImpl(user));
+    extendedUserHolder.set(user);
   }
 
   /**
@@ -78,6 +85,18 @@ public class SpringSecurityServiceImpl implements SecurityService {
   public User getUser() {
     if (enabled)
       return userHolder.get();
+    else
+      return systemAdmin;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.security.SecurityService#getExtendedUser()
+   */
+  public User getExtendedUser() {
+    if (enabled)
+      return extendedUserHolder.get();
     else
       return systemAdmin;
   }

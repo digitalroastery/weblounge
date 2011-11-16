@@ -134,9 +134,8 @@ public class RuntimeInformationEndpoint {
 
     if (sites != null) {
       Site site = getSite(request);
-      User user = securityService.getUser();
+      User user = securityService.getExtendedUser();
       Language language = LanguageUtils.getPreferredLanguage(request, site);
-
       RuntimeInformationProvider provider = runtimeInfoProviders.get(component);
       if (provider == null)
         throw new WebApplicationException(Status.NOT_FOUND);
