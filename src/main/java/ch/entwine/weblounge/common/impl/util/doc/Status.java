@@ -77,6 +77,18 @@ public class Status {
   }
 
   /**
+   * Creates a return status <code>304</code> with the given optional
+   * description.
+   * 
+   * @param description
+   *          detailed meaning of this response status code
+   * @return the status
+   */
+  public static Status notModified(String description) {
+    return new Status(304, description);
+  }
+
+  /**
    * Creates a return status <code>400</code> with the given optional
    * description.
    * 
