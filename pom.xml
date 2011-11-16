@@ -40,6 +40,12 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- osgi support -->
 
     <dependency>
@@ -53,6 +59,11 @@
     </dependency>
 
     <!-- thirdparty -->
+
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>commons-lang</groupId>
@@ -124,11 +135,14 @@
               ch.entwine.weblounge.common.impl.url;version=${project.version},
               ch.entwine.weblounge.common.impl.util.config;version=${project.version},
               ch.entwine.weblounge.common.impl.util.datatype;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.doc;version=${project.version}, 
               ch.entwine.weblounge.common.language;version=${project.version},
               ch.entwine.weblounge.common.request;version=${project.version},
               ch.entwine.weblounge.common.security;version=${project.version},
               ch.entwine.weblounge.common.site;version=${project.version},
               ch.entwine.weblounge.common.url;version=${project.version},
+              ch.entwine.weblounge.kernel;version=${project.version},
+              ch.entwine.weblounge.kernel.site;version=${project.version},
               org.apache.commons.io;version="2.0",
               org.apache.commons.io.output;version="2.0",
               org.apache.commons.lang;version="2.6",
@@ -142,6 +156,8 @@
               javax.naming,
               javax.transaction;resolution:=optional,
               javax.transaction.xa;resolution:=optional, 
+              javax.ws.rs;version="1.0",
+              javax.ws.rs.core;version="1.0",
               javax.xml.parsers,
               org.xml.sax.helpers,
               org.osgi.framework,
@@ -150,7 +166,8 @@
             </Import-Package>
             <Export-Package>
               ch.entwine.weblounge.cache.impl;version=${project.version},
-              ch.entwine.weblounge.cache.impl.command;version=${project.version}
+              ch.entwine.weblounge.cache.impl.command;version=${project.version},
+              ch.entwine.weblounge.cache.impl.endpoint;version=${project.version}
             </Export-Package>
             <Private-Package>
               ch.entwine.weblounge.cache.impl.filter,
@@ -158,6 +175,7 @@
             </Private-Package>
             <Service-Component>
               OSGI-INF/cache-command.xml,
+              OSGI-INF/cache-rest-service.xml,
               OSGI-INF/configuration-factory.xml,
               OSGI-INF/service-factory.xml
             </Service-Component>
