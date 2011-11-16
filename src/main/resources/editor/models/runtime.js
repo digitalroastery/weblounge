@@ -19,9 +19,9 @@ steal.then('jsonix')
 			runtime.user.login = userElement.attr('id');
 			runtime.user.realm = userElement.attr('realm');
 			runtime.user.name = userElement.find('name').text();
-			if(userElement.find('firstname').lenght)
+			if(userElement.find('firstname').length)
 				runtime.user.firstname = userElement.find('firstname').text();
-			if(userElement.find('lastname').lenght)
+			if(userElement.find('lastname').length)
 				runtime.user.lastname = userElement.find('lastname').text();
 			runtime.user.email = userElement.find('email').text();
 			runtime.site = new Object();
