@@ -589,10 +589,14 @@ public class ComposerTagSupport extends WebloungeTag {
       // }
 
       // Check publishing dates
-      if (!(request.getVersion() == Resource.WORK) && !pagelet.isPublished()) {
-        logger.debug("Skipping pagelet " + position + " in composer " + id + " since it is not yet published");
-        return;
-      }
+      // TODO: Fix this. pagelet.isPublished() currently returns false,
+      // as both from and to dates are null (see PublishingCtx)
+      // if (!(request.getVersion() == Resource.WORK) && !pagelet.isPublished())
+      // {
+      // logger.debug("Skipping pagelet " + position + " in composer " + id +
+      // " since it is not yet published");
+      // return;
+      // }
 
       // Select the actual renderer by method and have it render the
       // request. Since renderers are being pooled by the bundle, we

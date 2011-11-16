@@ -21,7 +21,6 @@
 package ch.entwine.weblounge.taglib.content;
 
 import ch.entwine.weblounge.common.content.Renderer;
-import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
@@ -410,10 +409,14 @@ public class PagePreviewTag extends WebloungeTag {
           // }
 
           // Check publishing dates
-          if (!(request.getVersion() == Resource.WORK) && !pagelet.isPublished()) {
-            logger.debug("Skipping pagelet " + index + " in composer " + stage + " since it is not yet published");
-            return false;
-          }
+          // TODO: Fix this. pagelet.isPublished() currently returns false,
+          // as both from and to dates are null (see PublishingCtx)
+          // if (!(request.getVersion() == Resource.WORK) &&
+          // !pagelet.isPublished()) {
+          // logger.debug("Skipping pagelet " + index + " in composer " + stage
+          // + " since it is not yet published");
+          // return false;
+          // }
 
           // Select the renderer's module
           Module m = site.getModule(moduleId);
