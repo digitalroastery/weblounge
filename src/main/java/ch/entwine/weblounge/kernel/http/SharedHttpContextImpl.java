@@ -105,8 +105,8 @@ public class SharedHttpContextImpl implements HttpContext {
   /**
    * Callback from OSGi to set the security service once it has been published.
    * 
-   * @param filter
-   *          the spring security filter
+   * @param securityService
+   *          the security service
    */
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -115,8 +115,11 @@ public class SharedHttpContextImpl implements HttpContext {
 
   /**
    * Callback from OSGi to set the security service once it has been published.
+   * 
+   * @param securityService
+   *          the security service
    */
-  void removeSecurityService() {
+  void removeSecurityService(SecurityService securityService) {
     this.securityService = null;
     logger.info("Disabling requests to protected resources");
   }
