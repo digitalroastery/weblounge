@@ -266,7 +266,7 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
         if (StringUtils.isNotBlank(lastname))
           user.setLastName(lastname);
         if (StringUtils.isNotBlank(email))
-          user.setEmail(firstname);
+          user.setEmail(email);
         user.addPrivateCredentials(new PasswordImpl(rs.getString(5), DigestType.plain));
         user.addPublicCredentials(SystemRole.GUEST);
       }
