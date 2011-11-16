@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.impl.language.LocalizableContent;
 import ch.entwine.weblounge.common.impl.language.LocalizableObject;
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.security.Authority;
@@ -1042,10 +1043,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     // Security
     b.append(securityCtx.toXml());
 
-    // Lock
+    // Lock (wrap in UserImpl to prevent weblounge user details)
     if (lockOwner != null) {
       b.append("<locked>");
-      b.append(lockOwner.toXml());
+      b.append((new UserImpl(lockOwner)).toXml());
       b.append("</locked>");
     }
 

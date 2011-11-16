@@ -514,7 +514,7 @@ public class LocalizedModificationContext extends LocalizableObject implements C
     StringBuffer b = new StringBuffer();
     if (modification != null) {
       b.append("<modified>");
-      b.append(modification.getUser().toXml());
+      b.append((new UserImpl(modification.getUser())).toXml());
       b.append("<date>");
       b.append(WebloungeDateFormat.formatStatic(modification.getDate()));
       b.append("</date>");

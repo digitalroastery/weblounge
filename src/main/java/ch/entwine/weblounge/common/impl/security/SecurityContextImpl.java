@@ -109,7 +109,10 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {this, authority, permission});
+    logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {
+        this,
+        authority,
+        permission });
 
     Set<Authority> a = context.get(permission);
     if (a == null) {
@@ -136,7 +139,10 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {this, authority, permission});
+    logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {
+        this,
+        authority,
+        permission });
     Set<Authority> a = defaultContext.get(permission);
     if (a == null) {
       a = new HashSet<Authority>();
@@ -161,7 +167,10 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {this, authority, permission});
+    logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {
+        this,
+        authority,
+        permission });
 
     deny(permission, authority, context);
     deny(permission, authority, defaultContext);
@@ -252,7 +261,10 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    logger.debug("Request to check permission '{}' for authority '{}' at {}", new Object[] {permission, authority, this});
+    logger.debug("Request to check permission '{}' for authority '{}' at {}", new Object[] {
+        permission,
+        authority,
+        this });
 
     return check(permission, authority, defaultContext) || check(permission, authority, context);
   }
@@ -439,7 +451,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
     // Owner
     if (owner != null) {
       b.append("<owner>");
-      b.append(owner.toXml());
+      b.append((new UserImpl(owner)).toXml());
       b.append("</owner>");
     }
 
@@ -494,7 +506,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    * @see java.lang.Object#clone()
    */
   public Object clone() throws CloneNotSupportedException {
-    SecurityContextImpl ctxt = (SecurityContextImpl)super.clone();
+    SecurityContextImpl ctxt = (SecurityContextImpl) super.clone();
     ctxt.owner = owner;
     ctxt.context.putAll(context);
     ctxt.defaultContext.putAll(defaultContext);

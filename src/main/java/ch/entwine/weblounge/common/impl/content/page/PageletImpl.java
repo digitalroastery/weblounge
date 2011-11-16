@@ -763,8 +763,8 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
       b.append("<modified>");
       User u = modificationCtx.getModifier(l);
       if (u == null)
-        u = new UserImpl(uri.getSite().getAdministrator());
-      b.append(u.toXml());
+        u = uri.getSite().getAdministrator();
+      b.append((new UserImpl(u)).toXml());
       b.append("<date>");
       Date d = modificationCtx.getModificationDate(l);
       if (d == null)
