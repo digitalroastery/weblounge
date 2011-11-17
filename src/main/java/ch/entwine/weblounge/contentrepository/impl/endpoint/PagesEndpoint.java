@@ -43,6 +43,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
+import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
@@ -1151,16 +1152,33 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     Date startDate = null;
     Date endDate = null;
     DateFormat df = new SimpleDateFormat();
-    try {
-      if (StringUtils.isNotBlank(startDateText))
+
+    // Parse the start date
+    if (StringUtils.isNotBlank(startDateText)) {
+      try {
         startDate = df.parse(startDateText);
-      else
-        startDate = new Date();
-      if (StringUtils.isNotBlank(endDateText)) {
-        endDate = df.parse(endDateText);
+      } catch (ParseException e) {
+        try {
+          startDate = WebloungeDateFormat.parseStatic(startDateText);
+        } catch (ParseException e2) {
+          throw new WebApplicationException(Status.BAD_REQUEST);
+        }
       }
-    } catch (ParseException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST);
+    } else {
+      startDate = new Date();
+    }
+
+    // Parse the end date
+    if (StringUtils.isNotBlank(endDateText)) {
+      try {
+        endDate = df.parse(endDateText);
+      } catch (ParseException e) {
+        try {
+          endDate = WebloungeDateFormat.parseStatic(endDateText);
+        } catch (ParseException e2) {
+          throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+      }
     }
 
     // Finally, perform the publish operation
