@@ -187,7 +187,7 @@ steal.plugins(
         	$.cookie(cookieName, null, { path: '/' });
         },
         
-        _editorSelectionMode: function(editor, resourceMode, isMultiSelection, success) {
+        _editorSelectionMode: function(editor, resourceMode, isMultiSelection, success, preSelection) {
         	// Hide Dialog
         	this.editor = editor.parent().hide();
         	$(document).unbind('.dialog-overlay');
@@ -208,15 +208,15 @@ steal.plugins(
         	if(resourceMode == 'pages') {
         		this.element.find('a.wbl-media').hide();
         		this.element.find('a.wbl-pages').click();
-        		browser = this.element.parent().find('#wbl-pagebrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection);
+        		browser = this.element.parent().find('#wbl-pagebrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection, preSelection);
         	} else if(resourceMode == 'media') {
         		this.element.find('a.wbl-pages').hide();
         		this.element.find('a.wbl-media').click();
-        		browser = this.element.parent().find('#wbl-mediabrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection);
+        		browser = this.element.parent().find('#wbl-mediabrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection, preSelection);
         	} else if(resourceMode == 'file' || resourceMode == 'image' || resourceMode == 'movie') {
         		this.element.find('a.wbl-pages').hide();
         		this.element.find('a.wbl-media').click();
-        		browser = this.element.parent().find('#wbl-mediabrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection, resourceMode);
+        		browser = this.element.parent().find('#wbl-mediabrowser').editor_resourcebrowser('_enableEditorSelectionMode', isMultiSelection, preSelection, resourceMode);
         	}
         	
     		this.element.find('button.wbl-editorSelectionCancel').click($.proxy(function() { 

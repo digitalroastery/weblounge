@@ -68,6 +68,16 @@ steal.plugins('jquery/view/tmpl')
 			}, this));
 		},
 		
+		_selectResources: function(selection) {
+			// Find selected resources by id
+			var resources = $.grep(this.element.find('#wbl-listViewContent tr.wbl-pageEntry'), $.proxy(function(elem, index) {
+				return jQuery.inArray($(elem).attr('id'), selection) != -1;
+			}, this));
+			
+			// Mark selected resources
+			$(resources).find('input').attr('checked', 'checked');
+		},
+		
 		"img.wbl-itemFavorize click": function(el, ev) {
 			this.element.trigger('favorizeResources', [el.parents('tr.wbl-pageEntry')]);
 		},

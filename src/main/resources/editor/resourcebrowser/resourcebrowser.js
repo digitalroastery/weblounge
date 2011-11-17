@@ -74,16 +74,31 @@ steal.plugins(
 				text: false });
 		},
 		
-		_enableEditorSelectionMode: function(isMultiSelect, resourceMode) {
+		_enableEditorSelectionMode: function(isMultiSelect, preSelection, resourceMode) {
 			if(!$.isEmptyObject(resourceMode)) {
 				this.resourceMode = resourceMode;
 			}
 			
-			if(this.searchFlag == true) {
-				this.element.find('button.wbl-all').click();
-			} else {
-				this._updateLast();
-			}
+			this.lastQuery = {page: $.proxy(function(params) {
+				Page.findAll(params, $.proxy(function(pages) {
+					this.options.resources = pages;
+					this.searchFlag = false;
+					this._updateEditorSelectionMode(isMultiSelect, preSelection);
+				}, this));
+			}, this), media: $.proxy(function(params) {
+				Editor.File.findAll(params, $.proxy(function(media) {
+					this.options.resources = media;
+					this.searchFlag = false;
+					this._updateEditorSelectionMode(isMultiSelect, preSelection);
+				}, this));
+			}, this)};
+			this.lastParams = {preferredversion: 1};
+			this._loadResources(this.lastParams, this.lastQuery);
+		},
+		
+		_updateEditorSelectionMode: function(isMultiSelect, preSelection) {
+			this.activeElement.show();
+			this.searchBox.hide();
 			
 			var mode = 'editorSelection';
 			if(isMultiSelect) mode = 'editorMultiSelection';
@@ -103,6 +118,27 @@ steal.plugins(
 				runtime: this.options.runtime,
 				mode: mode
 			});
+			
+			this.element.find('nav.wbl-icons button').hide();
+			
+			if(this.activeElement.is(this.scrollView)) {
+				this.scrollView.editor_resourcescrollview('_selectResources', preSelection);
+			} else {
+				this.listView.editor_resourcelistview('_selectResources', preSelection);
+			}
+			
+        	var selectedElements; 
+			if(this.activeElement.hasClass('wbl-thumbnailView')) {
+				selectedElements = this.find('div.wbl-scrollViewItem.wbl-marked');
+			} else if(this.activeElement.hasClass('wbl-listView')) {
+				selectedElements = this.find('tr.wbl-pageEntry input:checked').parents('tr.wbl-pageEntry');
+			}
+			
+        	if(selectedElements.length > 0) {
+        		$('button.wbl-editorSelectionOK').button('option', 'disabled', false);
+        	} else {
+        		$('button.wbl-editorSelectionOK').button('option', 'disabled', true);
+        	}
 		},
 		
 		_disableEditorSelectionMode: function() {

@@ -69,6 +69,21 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 			}, this));
 		},
 		
+		_selectResources: function(selection) {
+			// Find selected resources by id
+			var resources = $.grep(this.element.find('div.wbl-scrollViewItem'), $.proxy(function(elem, index) {
+				return jQuery.inArray($(elem).attr('id'), selection) != -1;
+			}, this));
+			
+			// Mark selected resources
+			$(resources).addClass('wbl-marked');
+			
+			// Move to first selected resource
+			var index = $(resources).index() + 1;
+			this.divScroll.smoothDivScroll("moveToElement", "number", index);
+			this.divScroll.smoothDivScroll("stopAutoScroll");
+		},
+		
 		"button.wbl-duplicate click": function(el, ev) {
 			this.options.selectedResources = this.find('div.wbl-scrollViewItem.wbl-marked');
 			if(this.options.selectedResources.length == 1) {
