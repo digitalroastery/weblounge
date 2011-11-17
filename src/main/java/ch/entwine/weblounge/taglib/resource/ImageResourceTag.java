@@ -155,11 +155,11 @@ public class ImageResourceTag extends WebloungeTag {
     // Create the image uri, either from the id or the path. If none is
     // specified, and we are not in jsp compilation mode, issue a warning
     ResourceURI uri = null;
-    if (StringUtils.isNotBlank(imageId)) {
+    if (StringUtils.isNotBlank(imageId))
       uri = new ImageResourceURIImpl(site, null, imageId);
-    } else if (StringUtils.isNotBlank(imagePath)) {
+    if (uri == null && StringUtils.isNotBlank(imagePath))
       uri = new ImageResourceURIImpl(site, imagePath, null);
-    } else if (imageSubjects != null && imageSubjects.size() > 0) {
+    if (uri == null && imageSubjects != null && imageSubjects.size() > 0) {
       SearchQuery query = new SearchQueryImpl(site);
       query.withVersion(Resource.LIVE);
       query.withTypes(ImageResource.TYPE);
@@ -176,13 +176,13 @@ public class ImageResourceTag extends WebloungeTag {
         logger.info("Search returned {} images. Will take no. 1 for further processing.", result.getHitCount());
       if (result.getHitCount() > 0)
         uri = new ImageResourceURIImpl(site, null, result.getItems()[0].getId());
-    } else if (StringUtils.isNotBlank(altImageId)) {
-      uri = new ImageResourceURIImpl(site, null, altImageId);
-    } else if (RequestUtils.isMockRequest(request)) {
-      return SKIP_BODY;
-    } else {
-      throw new JspException("Neither image id nor image path were specified");
     }
+    if (uri == null && StringUtils.isNotBlank(altImageId))
+      uri = new ImageResourceURIImpl(site, null, altImageId);
+    if (uri == null && RequestUtils.isMockRequest(request))
+      return SKIP_BODY;
+    if (uri == null)
+      throw new JspException("Neither image id nor image path were specified");
 
     // Try to load the image from the content repository
     try {
@@ -241,7 +241,7 @@ public class ImageResourceTag extends WebloungeTag {
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_SRC, linkToImage);
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_TITLE, image.getTitle(language));
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_DESC, image.getDescription(language));
-    
+
     // Add the cache tags to the response
     response.addTag(CacheTag.Resource, image.getURI().getIdentifier());
     response.addTag(CacheTag.Url, image.getURI().getPath());
