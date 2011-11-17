@@ -164,11 +164,13 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     logger.debug("File handler agrees to handle {}", path);
 
     // Is it published?
-    if (!fileResource.isPublished()) {
-      logger.debug("Access to unpublished file {}", fileURI);
-      DispatchUtils.sendNotFound(request, response);
-      return true;
-    }
+    // TODO: Fix this. fileResource.isPublished() currently returns false,
+    // as both from and to dates are null (see PublishingCtx)
+    // if (!fileResource.isPublished()) {
+    // logger.debug("Access to unpublished file {}", fileURI);
+    // DispatchUtils.sendNotFound(request, response);
+    // return true;
+    // }
 
     // Can the page be accessed by the current user?
     User user = request.getUser();

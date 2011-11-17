@@ -166,11 +166,13 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     logger.debug("Image handler agrees to handle {}", path);
 
     // Is it published?
-    if (!imageResource.isPublished()) {
-      logger.debug("Access to unpublished image {}", imageURI);
-      DispatchUtils.sendNotFound(request, response);
-      return true;
-    }
+    // TODO: Fix this. imageResource.isPublished() currently returns false,
+    // as both from and to dates are null (see PublishingCtx)
+    // if (!imageResource.isPublished()) {
+    // logger.debug("Access to unpublished image {}", imageURI);
+    // DispatchUtils.sendNotFound(request, response);
+    // return true;
+    // }
 
     // Can the image be accessed by the current user?
     User user = request.getUser();
