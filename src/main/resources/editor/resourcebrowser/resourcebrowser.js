@@ -24,11 +24,13 @@ steal.plugins(
 		update: function(showSearchBox) {
 			if(showSearchBox == true && !(this.editorSelectionMode == true)) {
 				this.searchFlag = true;
+				this.element.find('div.wbl-view').hide();
 				this.searchBox.show();
 				this.scrollView.hide();
 				this.listView.hide();
 			} 
 			else if(this.searchFlag == false) {
+				this.element.find('div.wbl-view').show();
 				this.activeElement.show();
 				this.searchBox.hide();
 			}
@@ -72,6 +74,7 @@ steal.plugins(
 				disabled: false,
 				icons: {primary: "wbl-iconThumbnails"},
 				text: false });
+			this.element.find('div.wbl-view').hide();
 		},
 		
 		_enableEditorSelectionMode: function(isMultiSelect, preSelection, resourceMode) {
@@ -99,6 +102,7 @@ steal.plugins(
 		_updateEditorSelectionMode: function(isMultiSelect, preSelection) {
 			this.activeElement.show();
 			this.searchBox.hide();
+			this.element.find('div.wbl-view').show();
 			
 			var mode = 'editorSelection';
 			if(isMultiSelect) mode = 'editorMultiSelection';
