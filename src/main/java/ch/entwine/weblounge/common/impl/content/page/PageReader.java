@@ -384,61 +384,61 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
 
       // Template
       if ("template".equals(raw)) {
-        page.template = characters.toString();
+        page.template = getCharacters();
       }
 
       // Layout
       else if ("layout".equals(raw)) {
-        page.layout = characters.toString();
+        page.layout = getCharacters();
       }
 
       // Stationary
       else if ("stationary".equals(raw)) {
-        page.setStationary("true".equals(characters.toString()));
+        page.setStationary("true".equals(getCharacters()));
       }
 
       // Indexed
       else if ("index".equals(raw)) {
-        page.setIndexed("true".equals(characters.toString()));
+        page.setIndexed("true".equals(getCharacters()));
       }
 
       // Promote
       else if ("promote".equals(raw)) {
-        page.setPromoted("true".equals(characters.toString()));
+        page.setPromoted("true".equals(getCharacters()));
       }
 
       // Type
       else if ("type".equals(raw)) {
-        page.setType(characters.toString());
+        page.setType(getCharacters());
       }
 
       // Title
       else if ("title".equals(raw)) {
         Language l = (Language) clipboard.get("language");
-        page.setTitle(characters.toString(), l);
+        page.setTitle(getCharacters(), l);
       }
 
       // Description
       else if ("description".equals(raw)) {
         Language l = (Language) clipboard.get("language");
-        page.setDescription(characters.toString(), l);
+        page.setDescription(getCharacters(), l);
       }
 
       // Coverage
       else if ("coverage".equals(raw)) {
         Language l = (Language) clipboard.get("language");
-        page.setCoverage(characters.toString(), l);
+        page.setCoverage(getCharacters(), l);
       }
 
       // Rights
       else if ("rights".equals(raw)) {
         Language l = (Language) clipboard.get("language");
-        page.setRights(characters.toString(), l);
+        page.setRights(getCharacters(), l);
       }
 
       // Subject
       else if ("subject".equals(raw)) {
-        page.addSubject(characters.toString());
+        page.addSubject(getCharacters());
       }
 
       // Pagelock
