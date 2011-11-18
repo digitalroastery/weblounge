@@ -89,7 +89,9 @@ public final class ImageMetadataUtils {
     try {
       meta = ImageMetadataReader.readMetadata(img);
     } catch (ImageProcessingException e) {
-      logger.warn("Failed to extract image metadata from image", e);
+      if ("File is not the correct format".equals(e.getMessage()))
+        return null;
+      logger.warn("Failed to extract image metadata from image: {}", e.getMessage());
       return null;
     }
 
@@ -105,7 +107,7 @@ public final class ImageMetadataUtils {
       if (iptc.containsTag(IptcDirectory.TAG_HEADLINE))
         imgmeta.setCaption(iptc.getString(IptcDirectory.TAG_HEADLINE));
       if (iptc.containsTag(IptcDirectory.TAG_CAPTION))
-          imgmeta.setLegend(iptc.getString(IptcDirectory.TAG_CAPTION));
+        imgmeta.setLegend(iptc.getString(IptcDirectory.TAG_CAPTION));
       if (iptc.containsTag(IptcDirectory.TAG_BY_LINE))
         imgmeta.setPhotographer(iptc.getString(IptcDirectory.TAG_BY_LINE));
       if (iptc.containsTag(IptcDirectory.TAG_COPYRIGHT_NOTICE))
