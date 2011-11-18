@@ -216,6 +216,8 @@
 	<string name="module.text.paragraph.quote">
 		Zitat
 	</string>
+	<string name="module.text.paragraph.box">Boxen-Layout</string>
+<string name="module.text.paragraph.gradient">Farbverlauf</string>
 
 	<!-- enumeration -->
 	<string name="module.text.enumeration.title">
