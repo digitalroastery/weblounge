@@ -15,14 +15,25 @@ steal.plugins('jquery/view/tmpl')
 			this._initDialogs();
 			this.table = this.element.find('table.wbl-tablesorter');
 			this.pager = this.element.find("#wbl-pager");
-			this._initDataTable(10);
+			this._initDataTable(this._calculatePageSize());
 		},
 		
 		update: function(options) {
 			this._super(options);
 			this.find('tr.wbl-pageEntry').remove();
 			this._initViewItems();
-			this._initDataTable(this.element.find(".wbl-pageSize").val());
+			var size = this._calculatePageSize();
+			this._initDataTable(size);
+			// Hack, adjust table pager size on directly on table config data!
+			this.table[0].config.size = size;
+		},
+		
+		_updateTableSize: function(size) {
+			this.find('tr.wbl-pageEntry').remove();
+			this._initViewItems();
+			this._initDataTable(size);
+			// Hack, adjust table pager size on directly on table config data!
+			this.table[0].config.size = size;
 		},
 		
 		_initDataTable: function(pagingSize) {
@@ -76,6 +87,23 @@ steal.plugins('jquery/view/tmpl')
 			
 			// Mark selected resources
 			$(resources).find('input').attr('checked', 'checked');
+		},
+		
+		_calculatePageSize: function() {
+			var size = 1;
+			var height = $(window).height();
+			var tableHeight = height - 380;
+			if(tableHeight > 0) {
+				size = Math.ceil(tableHeight / 27);
+			}
+			return size;
+		},
+		
+		"{window} resize": function() {
+			var size = this._calculatePageSize();
+			var currentSize = this.element.find('#wbl-listViewContent tr.wbl-pageEntry').length;
+			if(currentSize != size)
+				this._updateTableSize(size);
 		},
 		
 		"img.wbl-itemFavorize click": function(el, ev) {
