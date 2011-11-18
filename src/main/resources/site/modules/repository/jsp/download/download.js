@@ -22,11 +22,10 @@ $.Controller("Editor.Download",
     },
     
     "button#wbl-downloadFileButton click": function(el, ev) {
+    	var preSelection = new Array();
+    	preSelection.push(this.element.find('input#wbl-downloadFile').val());
     	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', $('#wbl-pageleteditor'), 'media', false, $.proxy(function(selectedMedia) {
-    		if(selectedMedia == null) {
-    			this.element.find('img').hide();
-    			return;
-    		}
+    		if(selectedMedia == null) return;
     		var id = selectedMedia[0].value.id;
 			var title = selectedMedia[0].getTitle(this.options.language);
 			var desc = selectedMedia[0].getDescription(this.options.language);
@@ -38,7 +37,7 @@ $.Controller("Editor.Download",
 	    	var inputDesc = this.element.find('input#wbl-downloadDesc');
 			if(title != '' && inputTitle.val() == '') inputTitle.val(title);
 			if(desc != '' && inputDesc.val() == '') inputDesc.val(desc);
-    	}, this));
+    	}, this), preSelection);
     },
     
 });

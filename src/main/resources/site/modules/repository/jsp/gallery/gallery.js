@@ -22,11 +22,9 @@ $.Controller("Editor.Gallery",
     },
     
     "button#wbl-galleryFilesButton click": function(el, ev) {
+    	var preSelection = this.element.find('input#wbl-galleryFiles').val().split(',');
     	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', $('#wbl-pageleteditor'), 'image', true, $.proxy(function(selectedMedia) {
-    		if(selectedMedia == null) {
-    			this.element.find('img').hide();
-    			return;
-    		}
+    		if(selectedMedia == null) return;
     		var ids = new Array();
     		$.each(selectedMedia, function(index, elem) {
     			var id = elem.value.id;
@@ -35,7 +33,7 @@ $.Controller("Editor.Gallery",
     		
     		this.element.find('input#wbl-galleryFiles').val(ids);
     		this._setImage(ids[0]);
-    	}, this));
+    	}, this), preSelection);
     },
     
 });

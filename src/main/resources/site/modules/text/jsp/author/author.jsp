@@ -22,5 +22,7 @@
 		</webl:ifelement>
 	</webl:ifproperty>
 	
+	<webl:ifproperty name="copyrightholder">
     &copy;&nbsp;<webl:property name="year" />&nbsp;<webl:property name="copyrightholder" />
+  </webl:ifproperty>
 </p>

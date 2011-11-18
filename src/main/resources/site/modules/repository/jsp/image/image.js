@@ -22,11 +22,10 @@ $.Controller("Editor.Image",
     },
     
     "button#wbl-imageFileButton click": function(el, ev) {
+    	var preSelection = new Array();
+    	preSelection.push(this.element.find('input#wbl-imageId').val());
     	$('div#wbl-menubar').editor_menubar('_editorSelectionMode', $('#wbl-pageleteditor'), 'image', false, $.proxy(function(selectedMedia) {
-    		if(selectedMedia == null) {
-    			this.element.find('img').hide();
-    			return;
-    		}
+    		if(selectedMedia == null) return;
     		var id = selectedMedia[0].value.id;
 			var title = selectedMedia[0].getTitle(this.options.language);
 			var desc = selectedMedia[0].getDescription(this.options.language);
@@ -42,7 +41,7 @@ $.Controller("Editor.Image",
 			if(title != '' && inputTitle.val() == '') inputTitle.val(title);
 			if(desc != '' && inputDesc.val() == '') inputDesc.val(desc);
 			if(author != '' && inputPhotographer.val() == '') inputPhotographer.val(author);
-    	}, this));
+    	}, this), preSelection);
     },
     
 });
