@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -207,6 +208,7 @@ public class PagePreviewTag extends WebloungeTag {
    */
   @Override
   public int doStartTag() throws JspException {
+    
     Site site = request.getSite();
 
     if (pageId == null) {
@@ -215,8 +217,11 @@ public class PagePreviewTag extends WebloungeTag {
         page = pageListTag.getPage();
         pagePreview = pageListTag.getPagePreview();
         pageUrl = pageListTag.getPageUrl();
+      } else if (RequestUtils.isMockRequest(request)) {
+        // Skip body, if this is a mock-request
+        return SKIP_BODY;
       } else {
-        throw new IllegalStateException("Page preview tag needs either a page id or embedding inside a PageListTag");
+        throw new JspException("Page preview tag needs either a page id or embedding inside a PageListTag");
       }
     } else {
       ContentRepository contentRepository = null;
