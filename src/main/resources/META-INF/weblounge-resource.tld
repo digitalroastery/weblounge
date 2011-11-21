@@ -43,6 +43,7 @@
     <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>subjects</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>altimage</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>altimagepath</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>imagestyle</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
   </tag>
   

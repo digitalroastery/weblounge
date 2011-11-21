@@ -58,6 +58,8 @@ import javax.servlet.jsp.JspException;
  */
 public class ImageResourceTag extends WebloungeTag {
 
+  // TODO: Cleanup setter-names (uuid & altimage --> id & altimageid)
+
   /** Serial version UID */
   private static final long serialVersionUID = 2047795554694030193L;
 
@@ -75,6 +77,9 @@ public class ImageResourceTag extends WebloungeTag {
 
   /** The alternative image identifier */
   private String altImageId = null;
+
+  /** The path of the alternative image */
+  private String altImagePath = null;
 
   /** The image style */
   private String imageStyle = null;
@@ -124,6 +129,16 @@ public class ImageResourceTag extends WebloungeTag {
    */
   public void setAltimage(String altImage) {
     altImageId = altImage;
+  }
+
+  /**
+   * Sets the image path of the alternative image.
+   * 
+   * @param plPath
+   *          path of the image
+   */
+  public void setAltimagepath(String plPath) {
+    altImagePath = plPath;
   }
 
   /**
@@ -179,6 +194,8 @@ public class ImageResourceTag extends WebloungeTag {
     }
     if (uri == null && StringUtils.isNotBlank(altImageId))
       uri = new ImageResourceURIImpl(site, null, altImageId);
+    if (uri == null && StringUtils.isNotBlank(altImagePath))
+      uri = new ImageResourceURIImpl(site, altImagePath, null);
     if (uri == null && RequestUtils.isMockRequest(request))
       return SKIP_BODY;
     if (uri == null)
@@ -278,6 +295,8 @@ public class ImageResourceTag extends WebloungeTag {
     imagePath = null;
     imageStyle = null;
     imageSubjects = null;
+    altImageId = null;
+    altImagePath = null;
   }
 
 }
