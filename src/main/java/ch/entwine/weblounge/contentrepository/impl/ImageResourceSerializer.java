@@ -135,6 +135,9 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     ImageResource imageResource = new ImageResourceImpl(new ImageResourceURIImpl(site));
     imageResource.setCreated(user, new Date());
 
+    if (imageMetadata == null)
+      return imageResource;
+
     if (!StringUtils.isBlank(imageMetadata.getCaption())) {
       imageResource.setTitle(imageMetadata.getCaption(), language);
     }
