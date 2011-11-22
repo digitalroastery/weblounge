@@ -342,7 +342,8 @@ public interface SearchQuery {
   /**
    * Only returns resources that contain the specified subject. Note that this
    * method may be called multiple times in order to specify more than one
-   * subject.
+   * subject combined with logical OR. To combine subjects with logical AND, see
+   * <code>andSubject(String)</code>
    * 
    * @param subject
    *          the subject
@@ -356,6 +357,26 @@ public interface SearchQuery {
    * @return the subjects
    */
   String[] getSubjects();
+
+  /**
+   * Only returns resources that contain the specified subject. Note that this
+   * method may be called multiple times in order to specify more than one
+   * subject combined with logical AND. To combine subjects with logical OR, see
+   * <code>withSubject(String)</code>
+   * 
+   * @param subject
+   *          the subject
+   * @return the query extended by this criterion
+   */
+  SearchQuery andSubject(String subject);
+
+  /**
+   * Returns the subjects which will be conjuncted in the search query or an
+   * empty array if no subjects to conjunct have been specified.
+   * 
+   * @return the subjects
+   */
+  String[] getANDSubjects();
 
   /**
    * Only returns resources that contain the specified series. Note that this
