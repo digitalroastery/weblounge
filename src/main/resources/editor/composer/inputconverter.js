@@ -41,7 +41,7 @@ $.Class.extend('InputConverter',
 	convertRadio: function(input, element, pagelet) {
 		InputConverter.convert(element, pagelet,
 		function() {
-			var value = pagelet.locale.original.text[element[1]].toString();
+			var value = pagelet.locale.current.text[element[1]].toString();
 			if(input.val() == value)
 				input.attr('checked', 'checked');
 			else input.removeAttr('checked');
@@ -60,11 +60,9 @@ $.Class.extend('InputConverter',
 	},
 	
 	convertTextarea: function(textarea, element, pagelet) {
-		// load value with [2] index element:title:0
 		InputConverter.convert(element, pagelet,
 		function() {
-//			if(element[2] != null) lade
-			textarea.html(pagelet.locale.original.text[element[1]].toString());
+			textarea.html(pagelet.locale.current.text[element[1]].toString());
 		}, 
 		function() {
 			textarea.html(pagelet.locale.original.text[element[1]].toString());
