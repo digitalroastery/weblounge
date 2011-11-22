@@ -203,17 +203,21 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
           }
 
           // Does the page exist?
-          if (pageURI == null) {
+          if (pageURI == null && contentRepository.existsInAnyVersion(requestURI)) {
             long version = requestURI.getVersion();
-            if (contentRepository.existsInAnyVersion(requestURI)) {
-              if (!isEditing && version == Resource.LIVE && contentRepository.exists(requestURI)) {
+
+            // If the work version is requested, we need to make sure
+            // a) it exists and b) the user is in editing mode
+            if (version == Resource.WORK && isEditing) {
+              if (contentRepository.exists(requestURI)) {
                 pageURI = requestURI;
-              } else if (isEditing && version == Resource.WORK && !contentRepository.exists(requestURI)) {
+              } else {
                 requestURI.setVersion(Resource.LIVE);
-                pageURI = requestURI;
-              } else if (isEditing && version == Resource.WORK && contentRepository.exists(requestURI)) {
-                pageURI = requestURI;
+                if (contentRepository.exists(requestURI))
+                  pageURI = requestURI;
               }
+            } else if (contentRepository.exists(requestURI)) {
+              pageURI = requestURI;
             }
           }
 
