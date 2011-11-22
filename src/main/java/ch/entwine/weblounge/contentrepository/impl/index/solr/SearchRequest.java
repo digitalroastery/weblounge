@@ -156,9 +156,16 @@ public class SearchRequest {
       andNot(solrQuery, TYPE, query.getWithoutTypes(), true, true);
     }
 
-    // Subjects
+    // Subjects (OR)
     if (query.getSubjects().length > 0) {
       and(solrQuery, SUBJECT, query.getSubjects(), true, true);
+    }
+    
+    // Subjects (AND)
+    if (query.getANDSubjects().length > 0) {
+      for (String subject : query.getANDSubjects()) {
+        and(solrQuery, SUBJECT, subject, true, true);
+      }
     }
 
     // Series
