@@ -87,8 +87,11 @@ public class SearchQueryImpl implements SearchQuery {
   /** The list of required pagelets */
   protected List<Pagelet> pagelets = new ArrayList<Pagelet>();
 
-  /** The list of required subjects */
+  /** The list of required subjects (ONE) */
   protected List<String> subjects = new ArrayList<String>();
+  
+  /** The list of required subjects (ALL) */
+  protected List<String> andSubjects = new ArrayList<String>();
 
   /** The list of required series */
   protected List<String> series = new ArrayList<String>();
@@ -553,6 +556,25 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public String[] getSubjects() {
     return subjects.toArray(new String[subjects.size()]);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#andSubject(java.lang.String)
+   */
+  public SearchQuery andSubject(String subject) {
+    andSubjects.add(subject);
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getANDSubjects()
+   */
+  public String[] getANDSubjects() {
+    return andSubjects.toArray(new String[andSubjects.size()]);
   }
 
   /**
