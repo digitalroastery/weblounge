@@ -179,7 +179,7 @@ public class ImageResourceTag extends WebloungeTag {
       query.withVersion(Resource.LIVE);
       query.withTypes(ImageResource.TYPE);
       for (int i = 0; i < imageSubjects.size(); i++)
-        query.withSubject(imageSubjects.get(i));
+        query.andSubject(imageSubjects.get(i));
       SearchResult result;
       try {
         result = repository.find(query);
