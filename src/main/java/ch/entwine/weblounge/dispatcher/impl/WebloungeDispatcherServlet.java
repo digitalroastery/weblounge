@@ -72,7 +72,10 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private static final Logger logger = LoggerFactory.getLogger(WebloungeDispatcherServlet.class);
 
   /** Value of the X-Powered-By header */
-  private static final String poweredBy = "Weblounge Content Management System";
+  private static final String POWERED_BY = "Weblounge Content Management System";
+  
+  /** Response default encoding */
+  private static final String DEFAULT_RESPONSE_ENCODING = "UTF-8";
 
   /** The sites that are online */
   private transient SiteDispatcherService sites = null;
@@ -321,7 +324,8 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     request.init(site);
     response.setRequest(request);
     response.setResponseCache(cache);
-    response.setHeader("X-Powered-By", poweredBy);
+    response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
+    response.setHeader("X-Powered-By", POWERED_BY);
     response.setHeader("Cache-Control", "private");
     response.setDateHeader("Date", Calendar.getInstance().getTimeInMillis());
 
