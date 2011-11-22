@@ -268,6 +268,8 @@ public class PagePreviewGenerator implements PreviewGenerator {
     String url = rendererURL.toExternalForm();
     int uriInPath = url.indexOf(httpContextURI);
 
+    // Are we trying to render a site resource (e. g. a jsp during
+    // precompilation)?
     if (uriInPath > 0) {
       String pathInfo = url.substring(uriInPath + httpContextURILength);
 

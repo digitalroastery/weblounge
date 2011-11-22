@@ -1250,7 +1250,11 @@ public final class RequestUtils {
    * @return the editing state
    */
   public static boolean isEditingState(WebloungeRequest request) {
-    if (!SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR)) {
+    if (RequestUtils.isMockRequest(request)) {
+      return true;
+    } else if (request.getHeader("X-Weblounge-Special") != null) {
+      return "Page-Preview".equals(request.getHeader("X-Weblounge-Special"));
+    } else if (!SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR)) {
       return false;
     } else if (request.getParameter(EditingState.WORKBENCH_PREVIEW_PARAM) != null) {
       return false;
