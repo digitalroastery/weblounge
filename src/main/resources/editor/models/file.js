@@ -324,8 +324,12 @@ steal.then('jsonix')
 			metadata.title = '';
 			metadata.description = '';
 			metadata.tags = '';
+			metadata.path = '';
 			metadata.author = this.getAuthor(language);
 			
+			if(!$.isEmptyObject(this.value.path)) {
+				metadata.path = this.value.path;
+			}
 			if($.isEmptyObject(this.value.head.metadata)) {
 				this.value.head.metadata = {};
 			}
@@ -358,6 +362,15 @@ steal.then('jsonix')
 				this.value.head.metadata.subject = [];
 			}
 			
+			if(!$.isEmptyObject(metadata.path)) {
+				this.value.path = metadata.path.toLowerCase()
+	            		  .replace(/^\s+|\s+$/g, "")
+	            		  .replace(/[_|\s]+/g, "-")
+	            		  .replace(/[^a-z/\u0400-\u04FF0-9-]+/g, "")
+	            		  .replace(/[-]+/g, "-")
+	            		  .replace(/^-+|-+$/g, "")
+	            		  .replace(/[-]+/g, '-');
+			}
 			if(!$.isEmptyObject(metadata.title)) {
 				this.value.head.metadata.title[language] = metadata.title;
 			}

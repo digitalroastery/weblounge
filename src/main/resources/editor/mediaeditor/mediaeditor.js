@@ -248,6 +248,10 @@ steal.plugins('jquery',
 	    	this._saveMetadata(this.index, {author: el.val()});
 	    },
 	    
+	    "div.wbl-metadata input[name=path] change": function(el, ev) {
+	    	this._saveMetadata(this.index, {path: el.val()});
+	    },
+	    
 	    "div.wbl-buttonLeft click": function(el, ev) {
 	    	if(this.index == 0) return;
 	    	this.index--;
