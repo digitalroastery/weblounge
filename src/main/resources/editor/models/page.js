@@ -376,6 +376,16 @@ steal.then('jsonix')
 	    },
 	    
 	    /**
+	     * Return the lock owner's user name
+	     */
+	    getLockOwner: function() {
+	    	if($.isEmptyObject(this.value.head.locked)) return;
+	    	if(!$.isEmptyObject(this.value.head.locked.user.name))
+	    		return this.value.head.locked.user.name;
+    		return this.value.head.locked.user.id;
+	    },
+	    
+	    /**
 	     * Return the page path
 	     */
 	    getPath: function() {

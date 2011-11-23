@@ -35,6 +35,10 @@
 	margin-right: 5px;
 }
 
+.editor_menubar span.wbl-editmode span.wbl-editmodeText { 
+	vertical-align: middle;
+}
+
 .editor_menubar button.wbl-editorSelectionCancel, .editor_menubar button.wbl-editorSelectionOK {
 	display: none;
 	float: right;

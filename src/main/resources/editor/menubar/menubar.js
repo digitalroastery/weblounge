@@ -160,7 +160,9 @@ steal.plugins(
         	var lockCheckBox = $('input#wbl-editmode', this.element);
         	
         	if(locked && !userLocked) {
+        		lockCheckBox.val(['editmode']);
         		lockCheckBox.attr('disabled', 'disabled');
+        		$('span.wbl-editmodeText', this.element).html('Locked by ' + this.options.page.getLockOwner());
         		this._disableEditing();
         	} 
         	else if(locked && userLocked) {
@@ -393,6 +395,7 @@ steal.plugins(
 				var isWorkVersion = this.options.page.isWorkVersion();
 				this.options.page.lock(this.options.runtime.getUserLogin(), $.proxy(function() {
 					$('input#wbl-editmode', this.element).val(['editmode']);
+					$('span.wbl-editmodeText', this.element).html('Editiermodus');
 					// if version is life set page to work and init composer
 					if(!isWorkVersion) {
 						$('#weblounge-editor').editor_app('_initComposer', this.options.page);

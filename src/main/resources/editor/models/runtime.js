@@ -26,12 +26,11 @@ steal.then('jsonix')
 			runtime.user.email = userElement.find('email').text();
 			runtime.site = new Object();
 			runtime.roles = new Array();
-			$(xml).find('security roles').each(function(index) {
-				var role = $(this).find('role');
+			$(xml).find('security roles role').each(function(index, role) {
 				runtime.roles.push({
-					id: role.attr('id'),
-					context: role.attr('context'),
-					name: role.find('name').text()
+					id: $(role).attr('id'),
+					context: $(role).attr('context'),
+					name: $(role).find('name').text()
 				});
 			});
 			$(xml).find('site').each(function(index) {
@@ -72,7 +71,7 @@ steal.then('jsonix')
 	    isSystemAdmin: function() {
 	    	var isAdmin = false;
 	    	$.each(this.roles, function(index, role) {
-	    		if(role.id == 'systemadmin' && role.context == 'weblounge') {
+	    		if(role.id == 'systemadministrator' && role.context == 'weblounge') {
 	    			isAdmin = true;
 	    			return false;
 	    		}
