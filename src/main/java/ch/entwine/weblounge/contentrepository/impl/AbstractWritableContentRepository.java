@@ -259,12 +259,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Make sure the resource is not being referenced elsewhere
-    SearchQuery searchByResource = new SearchQueryImpl(uri.getSite());
-    searchByResource.withVersion(Resource.LIVE);
-    searchByResource.withProperty("resourceid", uri.getIdentifier());
-    if (index.find(searchByResource).getItems().length > 0) {
-      logger.debug("Resource '{}' is still being referenced", uri);
-      throw new ReferentialIntegrityException(uri.getIdentifier());
+    if (allRevisions || uri.getVersion() == Resource.LIVE) {
+      SearchQuery searchByResource = new SearchQueryImpl(uri.getSite());
+      searchByResource.withVersion(Resource.LIVE);
+      searchByResource.withProperty("resourceid", uri.getIdentifier());
+      if (index.find(searchByResource).getItems().length > 0) {
+        logger.debug("Resource '{}' is still being referenced", uri);
+        throw new ReferentialIntegrityException(uri.getIdentifier());
+      }
     }
 
     // Get the revisions to delete
