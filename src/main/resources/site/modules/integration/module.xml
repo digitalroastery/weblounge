@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module id="integration" xmlns="http://www.entwinemedia.com/weblounge/3.0/module"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
+
+  <enable>true</enable>
+  <name>Integration</name>
+
+  <pagelets>
+    <pagelet id="youtube-movie" composeable="true">
+      <name>YouTube Movie</name>
+      <renderer>file://${module.root}/pagelets/youtube/movie.jsp</renderer>
+      <editor>file://${module.root}/pagelets/youtube/movie_editor.jsp</editor>
+    </pagelet>
+  </pagelets>
+
+</module>

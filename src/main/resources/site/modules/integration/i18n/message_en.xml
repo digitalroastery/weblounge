@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<resources>
+	<!-- youtube -->
+	<string name="module.interactive.youtube.movie">
+		YouTube movie id
+	</string>
+	<string name="module.interactive.youtube.movie.sample">
+		UF8uR6Z6KLc
+	</string>
+</resources>
