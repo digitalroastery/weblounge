@@ -60,7 +60,6 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedOutput;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -271,7 +270,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
         // Create the entry
         SyndEntry entry = new SyndEntryImpl();
         entry.setPublishedDate(page.getPublishFrom());
-        entry.setLink(item.getUrl().getLink());
+        entry.setLink(site.getConnector(request.getEnvironment()).toExternalForm() + item.getUrl().getLink());
         entry.setAuthor(page.getCreator().getName());
         entry.setTitle(page.getTitle());
 
@@ -316,7 +315,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
             SyndContent content = new SyndContentImpl();
             content.setType("text/html");
             content.setMode("escaped");
-            content.setValue(StringEscapeUtils.escapeHtml(rendererContent));
+            content.setValue(rendererContent);
             entryContent.add(content);
           }
         }
@@ -342,13 +341,13 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     } else {
       characterEncoding = "";
     }
-    if ("atom".equalsIgnoreCase("atom"))
+    if (feedType.startsWith("atom"))
       response.setContentType("application/atom+xml" + characterEncoding);
-    else if ("rss".equalsIgnoreCase(feedType))
+    else if (feedType.startsWith("rss"))
       response.setContentType("application/rss+xml" + characterEncoding);
 
     // Set the character encoding
-    response.setCharacterEncoding(feed.getEncoding());
+    feed.setEncoding(response.getCharacterEncoding());
 
     // Write the feed back to the response
     try {
