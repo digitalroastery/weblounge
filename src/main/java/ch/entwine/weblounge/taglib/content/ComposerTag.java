@@ -50,7 +50,7 @@ public class ComposerTag extends ComposerTagSupport {
   private static final long serialVersionUID = 3832079623323702494L;
 
   /** True if the composer should not be editable */
-  protected boolean isLocked = false;
+  protected boolean isComposerLocked = false;
 
   /**
    * Sets the composer to a locked state, preventing editing at all.
@@ -59,7 +59,7 @@ public class ComposerTag extends ComposerTagSupport {
    *          <code>true</code> to lock the composer
    */
   public void setLocked(String value) {
-    isLocked = ConfigurationUtils.isTrue(value);
+    isComposerLocked = ConfigurationUtils.isTrue(value);
   }
 
   /**
@@ -75,21 +75,25 @@ public class ComposerTag extends ComposerTagSupport {
     Page targetPage = getTargetPage();
     Page contentPage = getContentProvider();
 
-    boolean isLocked = targetPage != null && targetPage.isLocked();
-    boolean isLockedByCurrentUser = targetPage != null && isLocked && user.equals(targetPage.getLockOwner());
+    boolean isPageLocked = targetPage != null && targetPage.isLocked();
+    boolean isPageLockedByCurrentUser = targetPage != null && isPageLocked && user.equals(targetPage.getLockOwner());
     boolean isWorkVersion = version == Resource.WORK;
-    boolean allowContentInheritance = contentInheritanceEnabled && !isLockedByCurrentUser && !isWorkVersion;
+    boolean allowContentInheritance = contentInheritanceEnabled && !isPageLockedByCurrentUser && !isWorkVersion;
 
     // Enable / disable content inheritance for this composer
     setInherit(allowContentInheritance);
 
     // Mark inherited composer and ghost content in locked work mode
-    if (isWorkVersion && isLockedByCurrentUser) {
+    if (isWorkVersion && isPageLockedByCurrentUser) {
       if (allowContentInheritance)
         addCssClass(CLASS_INHERIT_CONTENT);
       if (targetPage != null && !targetPage.equals(contentPage))
         addCssClass(CLASS_GHOST_CONTENT);
     }
+    
+    // Mark composer as locked
+    if (isComposerLocked)
+      addCssClass(CLASS_LOCKED);
 
     // Let the default implementation kick in
     super.beforeComposer(writer);
@@ -159,7 +163,7 @@ public class ComposerTag extends ComposerTagSupport {
   @Override
   protected void reset() {
     super.reset();
-    isLocked = false;
+    isComposerLocked = false;
   }
 
 }
