@@ -1,18 +1,18 @@
 $.Class.extend('InputConverter',
 /* @static */
 {
-	convertText: function(input, element, pagelet) {
+	convertText: function(input, element, pagelet, index) {
 		if(element[0] == 'element') {
 			if(InputConverter.existsCurrent(pagelet, element[1])) {
-				input.attr('value', pagelet.locale.current.text[element[1]].toString());
+				input.attr('value', pagelet.locale.current.text[element[1]][index]);
 			}
 			else if(InputConverter.existsOriginal(pagelet, element[1])) {
-				input.attr('value', pagelet.locale.original.text[element[1]].toString());
+				input.attr('value', pagelet.locale.original.text[element[1]][index]);
 			}
 		} 
 		else if(element[0] == 'property') {
 			if(!InputConverter.existsProperty(pagelet, element[1])) return;
-			input.attr('value', pagelet.properties.property[element[1]].toString());
+			input.attr('value', pagelet.properties.property[element[1]][index]);
 		}
 	},
 	
@@ -59,16 +59,16 @@ $.Class.extend('InputConverter',
 		});
 	},
 	
-	convertTextarea: function(textarea, element, pagelet) {
+	convertTextarea: function(textarea, element, pagelet, index) {
 		InputConverter.convert(element, pagelet,
 		function() {
-			textarea.html(pagelet.locale.current.text[element[1]].toString());
+			textarea.html(pagelet.locale.current.text[element[1]][index]);
 		}, 
 		function() {
-			textarea.html(pagelet.locale.original.text[element[1]].toString());
+			textarea.html(pagelet.locale.original.text[element[1]][index]);
 		},
 		function() {
-			textarea.html(pagelet.properties.property[element[1]].toString());
+			textarea.html(pagelet.properties.property[element[1]][index]);
 		});
 	},
 	

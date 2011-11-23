@@ -176,8 +176,11 @@ steal.plugins('jqueryui/dialog',
     		}
     		var element = name.split(':')
     		
+    		// Get the index of the current field
+    		var index = $(editor).find(':input[name="' + name + '"]').index(this);
+    		
     		if($(this).attr('type') == 'text' || $(this).attr('type') == 'hidden') {
-    			InputConverter.convertText($(this), element, pagelet);
+    			InputConverter.convertText($(this), element, pagelet, index);
     		}
     		else if($(this).attr('type') == 'checkbox') {
     			InputConverter.convertCheckbox($(this), element, pagelet);
@@ -186,7 +189,7 @@ steal.plugins('jqueryui/dialog',
     			InputConverter.convertRadio($(this), element, pagelet);
     		}
     		else if(this.tagName == 'TEXTAREA') {
-    			InputConverter.convertTextarea($(this), element, pagelet);
+    			InputConverter.convertTextarea($(this), element, pagelet, index);
     		}
     		else if(this.tagName == 'SELECT') {
     			InputConverter.convertSelect($(this), element, pagelet);
@@ -240,12 +243,15 @@ steal.plugins('jqueryui/dialog',
     			}
     		}
     		else {
-    			// save array with push();
     			if(element[0] == 'property') {
-    				pagelet.properties.property[element[1]] = [input.value];
+    				if($.isEmptyObject(pagelet.properties.property[element[1]]))
+    					pagelet.properties.property[element[1]] = new Array();
+    				pagelet.properties.property[element[1]].push(input.value);
     			} 
     			else if(element[0] == 'element') {
-    				pagelet.locale.current.text[element[1]] = [input.value];
+    				if($.isEmptyObject(pagelet.locale.current.text[element[1]]))
+    					pagelet.locale.current.text[element[1]] = new Array();
+    				pagelet.locale.current.text[element[1]].push(input.value);
     			}
     		}
 		});
