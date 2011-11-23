@@ -6,8 +6,8 @@ $.Class.extend('InputConverter',
 			if(InputConverter.existsCurrent(pagelet, element[1])) {
 				input.attr('value', pagelet.locale.current.text[element[1]].toString());
 			}
-			if(InputConverter.existsOriginal(pagelet, element[1])) {
-				input.attr('placeholder', pagelet.locale.original.text[element[1]].toString());
+			else if(InputConverter.existsOriginal(pagelet, element[1])) {
+				input.attr('value', pagelet.locale.original.text[element[1]].toString());
 			}
 		} 
 		else if(element[0] == 'property') {
