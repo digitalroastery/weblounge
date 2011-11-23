@@ -149,11 +149,11 @@ steal.plugins('jquery/controller',
 	},
     
     _enablePagelets: function() {
-    	$('.composer').editor_composer('enable');
+    	$('.composer:not(.locked)').editor_composer('enable');
     },
     
     _disablePagelets: function() {
-    	$('.composer').editor_composer('disable');
+    	$('.composer:not(.locked)').editor_composer('disable');
     },
     
 	'hoverenter': function(el, ev) {

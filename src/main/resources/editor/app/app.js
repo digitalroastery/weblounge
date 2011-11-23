@@ -69,7 +69,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         },
         
         _initComposer: function(page) {
-        	$('.composer').editor_composer({page: page, language: this.options.language, runtime: this.runtime});
+        	$('.composer:not(.locked)').editor_composer({page: page, language: this.options.language, runtime: this.runtime});
         },
         
         _setRuntime: function(runtime) {

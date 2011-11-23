@@ -259,7 +259,7 @@ steal.plugins(
         _enableEditing: function() {
         	this.disabled = false;
         	if(this.options.page.isWorkVersion())
-        		$('.composer').editor_composer('enable');
+        		$('.composer:not(.locked)').editor_composer('enable');
         	$('#wbl-pageletcreator').editor_pageletcreator('enable');
 //        	this.element.find('img.wbl-add').show();
 //        	this.element.find('img.wbl-more').show();
@@ -269,7 +269,7 @@ steal.plugins(
         _disableEditing: function() {
         	this.disabled = true;
         	if(this.options.page.isWorkVersion())
-        		$('.composer').editor_composer('disable');
+        		$('.composer:not(.locked)').editor_composer('disable');
         	$('#wbl-pageletcreator').editor_pageletcreator('disable');
 //        	this.element.find('img.wbl-add').hide();
 //        	this.element.find('img.wbl-more').hide();

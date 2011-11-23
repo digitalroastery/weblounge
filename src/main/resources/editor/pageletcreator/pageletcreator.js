@@ -93,7 +93,7 @@ steal.plugins('jquery',
 					$(ui.helper).addClass('wbl-draggableHelper');
 				},
 				stop: function(e, ui) {
-					$('.composer').editor_composer('enable');
+					$('.composer:not(.locked)').editor_composer('enable');
 				}
 			}).disableSelection();
 	    },
