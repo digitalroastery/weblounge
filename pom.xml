@@ -102,9 +102,9 @@
     </dependency>
     
     <dependency>
-      <groupId>rome</groupId>
-      <artifactId>rome</artifactId>
-      <version>1.0</version>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.rome</artifactId>
+      <version>1.0_2</version>
     </dependency>
 
     <!-- Transitive dependency to rome -->  
@@ -144,6 +144,9 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.dispatcher</Bundle-SymbolicName>
             <Import-Package>
+              com.sun.syndication.feed.atom;version=1.0,
+              com.sun.syndication.feed.synd;version=1.0,
+              com.sun.syndication.io;version=1.0,
               ch.entwine.weblounge.common;version=${project.version},
               ch.entwine.weblounge.cache;version=${project.version},
               ch.entwine.weblounge.common.content;version=${project.version},
@@ -197,21 +200,6 @@
           	  ch.entwine.weblounge.dispatcher.impl;version=${project.version},
               ch.entwine.weblounge.dispatcher.impl.handler;version=${project.version}
             </Export-Package>
-            <Private-Package>
-              com.sun.syndication.feed,
-              com.sun.syndication.feed.atom,
-              com.sun.syndication.feed.impl,
-              com.sun.syndication.feed.module,
-              com.sun.syndication.feed.module.impl,
-              com.sun.syndication.feed.rss,
-              com.sun.syndication.feed.synd,
-              com.sun.syndication.feed.synd.impl,
-              com.sun.syndication.io,
-              com.sun.syndication.io.impl
-            </Private-Package>
-            <Embed-Dependency>
-              rome
-            </Embed-Dependency>
             <Service-Component>
               OSGI-INF/action-requesthandler.xml,
               OSGI-INF/dispatcher-service.xml,
