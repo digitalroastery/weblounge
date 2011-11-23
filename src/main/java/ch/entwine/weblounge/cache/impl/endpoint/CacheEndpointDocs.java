@@ -77,10 +77,10 @@ public final class CacheEndpointDocs {
 
     // DELETE /
     Endpoint stopCacheEndpoint = new Endpoint("/", Method.DELETE, "stop");
-    stopCacheEndpoint.setDescription("Enables caching for the current site");
+    stopCacheEndpoint.setDescription("Disables caching for the current site");
     stopCacheEndpoint.addFormat(Format.xml());
-    stopCacheEndpoint.addStatus(ok("the cache was enabled"));
-    stopCacheEndpoint.addStatus(notModified("the cache was already enabled"));
+    stopCacheEndpoint.addStatus(ok("the cache was disabled"));
+    stopCacheEndpoint.addStatus(notModified("the cache was already disabled"));
     stopCacheEndpoint.addStatus(notFound("the site does not exist"));
     stopCacheEndpoint.addStatus(serviceUnavailable("the site is temporarily offline"));
     stopCacheEndpoint.setTestForm(new TestForm());
