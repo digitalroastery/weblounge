@@ -271,6 +271,12 @@
       <artifactId>org.apache.servicemix.bundles.javax.mail</artifactId>
       <version>1.4.1_3</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.rome</artifactId>
+      <version>1.0_2</version>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.cxf</groupId>
