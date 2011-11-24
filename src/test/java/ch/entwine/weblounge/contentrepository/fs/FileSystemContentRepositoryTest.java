@@ -402,7 +402,7 @@ public class FileSystemContentRepositoryTest {
     String newPath = "/new/path";
     ResourceURI newURI = new PageURIImpl(site, newPath, page1URI.getIdentifier());
 
-    repository.move(page1URI, newURI);
+    repository.move(page1URI, newURI, false);
     assertEquals(resources, repository.getResourceCount() - 1);
     assertNull(repository.get(new PageURIImpl(site, oldPath)));
     assertNotNull(repository.get(new PageURIImpl(site, newPath)));
@@ -445,7 +445,7 @@ public class FileSystemContentRepositoryTest {
     assertEquals(pages, repository.find(q).getItems().length);
 
     // Move the resources
-    repository.move(rootURI, new PageURIImpl(site, newRoot));
+    repository.move(rootURI, new PageURIImpl(site, newRoot), true);
 
     // Make sure everything is gone from /root
     q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(root);
