@@ -332,6 +332,8 @@ public class ContentRepositoryIndex {
       // Handle live indices
       if (version == Resource.LIVE) {
         languageIdx.set(address, resource.languages());
+        if (path != null)
+          pathIdx.set(address, path);
       }
       if (resource.isIndexed())
         searchIdx.add(resource);
@@ -582,6 +584,8 @@ public class ContentRepositoryIndex {
 
     long address = toURIEntry(uri);
     languageIdx.set(address, null);
+    if (uri.getPath() != null)
+      pathIdx.set(address, uri.getPath());
   }
 
   /**

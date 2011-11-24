@@ -400,12 +400,29 @@ public class FileSystemContentRepositoryTest {
     int resources = populateRepository();
     String oldPath = page1URI.getPath();
     String newPath = "/new/path";
-    ResourceURI newURI = new PageURIImpl(site, newPath, page1URI.getIdentifier());
 
-    repository.move(page1URI, newURI, false);
+    repository.move(page1URI, newPath, false);
     assertEquals(resources, repository.getResourceCount() - 1);
     assertNull(repository.get(new PageURIImpl(site, oldPath)));
     assertNotNull(repository.get(new PageURIImpl(site, newPath)));
+
+    // Test null target path
+    try {
+      repository.move(documentURI, null, false);
+      fail("Managed to move a resource to a null path");
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
+
+    // Test null source path
+    try {
+      documentURI.setPath(null);
+      repository.move(documentURI, newPath, false);
+      fail("Managed to move a resource from a null path");
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
+
   }
 
   /**
@@ -445,7 +462,7 @@ public class FileSystemContentRepositoryTest {
     assertEquals(pages, repository.find(q).getItems().length);
 
     // Move the resources
-    repository.move(rootURI, new PageURIImpl(site, newRoot), true);
+    repository.move(rootURI, newRoot, true);
 
     // Make sure everything is gone from /root
     q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(root);

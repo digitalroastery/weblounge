@@ -37,6 +37,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
@@ -776,22 +777,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       resource.setModified(user, new Date());
       contentRepository.put(resource);
-      // TODO Move Resource if path has changed
-      // boolean hasToMove = false;
-      // if (resource.getURI().getPath() != null) {
-      // hasToMove =
-      // !resource.getURI().getPath().equals(currentResource.getURI().getPath());
-      // } else if (currentResource.getURI().getPath() != null) {
-      // // TODO update path index but do not move, there is nothing to move
-      // hasToMove =
-      // !currentResource.getURI().getPath().equals(resource.getURI().getPath());
-      // }
-      // // If orginalPath == null do not move, instead add index
-      //
-      // if (hasToMove) {
-      // contentRepository.move(currentResource.getURI(), resource.getURI(),
-      // false);
-      // }
+
+      // Check if the resoruce has been moved
+      String currentPath = currentResource.getURI().getPath();
+      String newPath = resource.getURI().getPath();
+      if (currentPath != null && newPath != null && !currentPath.equals(newPath)) {
+        contentRepository.move(currentResource.getURI(), newPath, true);
+      }
     } catch (IOException e) {
       logger.warn("Error reading udpated resource {} from request", resourceURI);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -860,10 +852,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         if (!path.startsWith("/"))
           path = "/" + path;
         WebUrl url = new WebUrlImpl(site, path);
-        resourceURI = new ResourceURIImpl(null, site, url.getPath(), uuid);
+        resourceURI = new GeneralResourceURIImpl(site, url.getPath(), uuid);
 
         // Make sure the resource doesn't exist
-        if (contentRepository.exists(new ResourceURIImpl(null, site, url.getPath()))) {
+        if (contentRepository.exists(new GeneralResourceURIImpl(site, url.getPath()))) {
           logger.warn("Tried to create already existing resource {} in site '{}'", resourceURI, site);
           throw new WebApplicationException(Status.CONFLICT);
         }
@@ -875,7 +867,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
     } else {
-      resourceURI = new ResourceURIImpl(null, site, "/" + uuid.replaceAll("-", ""), uuid);
+      resourceURI = new GeneralResourceURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
     }
 
     URI uri = null;
@@ -1159,7 +1151,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
           resourceURI.setPath(url.getPath());
 
           // Make sure the resource doesn't exist
-          if (contentRepository.exists(new ResourceURIImpl(null, site, url.getPath()))) {
+          if (contentRepository.exists(new GeneralResourceURIImpl(site, url.getPath()))) {
             logger.warn("Tried to create already existing resource {} in site '{}'", resourceURI, site);
             throw new WebApplicationException(Status.CONFLICT);
           }

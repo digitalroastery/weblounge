@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.language.Language;
@@ -207,7 +208,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
     try {
-      ResourceURI uri = new ResourceURIImpl(null, getSite(), null, resourceId);
+      ResourceURI uri = new GeneralResourceURIImpl(getSite(), null, resourceId);
       uri.setType(index.getType(uri));
       uri.setPath(index.getPath(uri));
       return uri;

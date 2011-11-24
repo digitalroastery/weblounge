@@ -489,8 +489,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       page.setModified(user, new Date());
       page.setVersion(Resource.WORK);
       contentRepository.put(page);
-      if (!page.getURI().getPath().equals(currentPage.getURI().getPath())) {
-        contentRepository.move(currentPage.getURI(), page.getURI(), true);
+
+      // Check if the page has been moved
+      String currentPath = currentPage.getURI().getPath();
+      String newPath = page.getURI().getPath();
+      if (currentPath != null && newPath != null && !currentPath.equals(newPath)) {
+        contentRepository.move(currentPage.getURI(), newPath, true);
       }
     } catch (SecurityException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", workURI, site);

@@ -303,18 +303,20 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     for (Resource<?> r : resources) {
       List<ResourceMetadata<?>> resourceMetadata = serializer.toMetadata(r);
       ResourceMetadataImpl<Long> alternateVersions = new ResourceMetadataImpl<Long>(ALTERNATE_VERSION);
-      resourceMetadata.add(alternateVersions);
+      alternateVersions.setAddToFulltext(false);
 
       // Look for alternate versions
+      long currentVersion = r.getURI().getVersion();
       for (Resource<?> v : resources) {
-        if (!v.equals(r)) {
-          alternateVersions.addValue(r.getVersion());
+        long version = v.getURI().getVersion();
+        if (version != currentVersion) {
+          alternateVersions.addValue(version);
         }
       }
 
-      // If alternate versions were found, add the metadata field
-      if (alternateVersions.getValues().size() == 0) {
-        alternateVersions.addValue(r.getURI().getVersion());
+      // If alternate versions were found, add them
+      if (alternateVersions.getValues().size() > 0) {
+        resourceMetadata.add(alternateVersions);
       }
 
       // Write the resource to the index

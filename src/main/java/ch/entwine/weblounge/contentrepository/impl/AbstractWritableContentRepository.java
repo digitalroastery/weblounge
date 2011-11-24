@@ -36,6 +36,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
@@ -303,21 +304,29 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#move(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.content.ResourceURI, boolean)
+   *      String, boolean)
    */
-  public void move(ResourceURI uri, ResourceURI target, boolean moveChildren)
+  public void move(ResourceURI uri, String targetPath, boolean moveChildren)
       throws IOException, ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     String originalPathPrefix = uri.getPath();
+    if (originalPathPrefix == null)
+      throw new IllegalArgumentException("Cannot move resource with null path");
+    if (StringUtils.isEmpty(targetPath))
+      throw new IllegalArgumentException("Cannot move resource to empty path");
+    if (!targetPath.startsWith("/"))
+      throw new IllegalArgumentException("Cannot move resource to relative path '" + targetPath + "'");
+    if (originalPathPrefix.equals(targetPath))
+      return;
+
+    // Locate the resources to move
     Set<ResourceURI> documentsToMove = new HashSet<ResourceURI>();
     documentsToMove.add(uri);
 
-    // Search the resources to move
-    if (moveChildren && originalPathPrefix == null)
-      throw new IllegalStateException("Trying to move resources children without a original path");
-    else if (moveChildren) {
+    // Also move children?
+    if (moveChildren) {
       SearchQuery q = new SearchQueryImpl(site).withPreferredVersion(Resource.LIVE);
       q.withPathPrefix(originalPathPrefix);
 
@@ -327,34 +336,36 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         return;
       }
 
+      // We need to check the prefix again, since the search query will also
+      // match parts of the originalPathPrefix
       for (SearchResultItem searchResult : result.getItems()) {
         if (!(searchResult instanceof ResourceSearchResultItem))
           continue;
         ResourceSearchResultItem rsri = (ResourceSearchResultItem) searchResult;
         String resourcePath = rsri.getResourceURI().getPath();
-
-        // We need to check the prefix again, since the search query will also
-        // match parts of the originalPathPrefix
         if (resourcePath != null && resourcePath.startsWith(originalPathPrefix))
           documentsToMove.add(rsri.getResourceURI());
       }
     }
 
+    // TODO: Include resources that are not part of the search index
+
     // Finally, move all resources
     for (ResourceURI u : documentsToMove) {
       String originalPath = u.getPath();
-      if (originalPath == null)
-        continue;
+      String pathSuffix = originalPath.substring(originalPathPrefix.length());
+      String newPath = null;
 
-      String newPath = originalPath.substring(originalPathPrefix.length());
-      if (StringUtils.isNotBlank(newPath))
-        newPath = UrlUtils.concat(target.getPath(), newPath);
+      // Is the original path just a prefix, or is it an exact match?
+      if (StringUtils.isNotBlank(pathSuffix))
+        newPath = UrlUtils.concat(targetPath, pathSuffix);
       else
-        newPath = target.getPath();
+        newPath = targetPath;
 
-      boolean first = true;
+      // Move every version of the resource, since we want the path to be
+      // in sync across resource versions
       for (long version : index.getRevisions(u)) {
-        ResourceURI movedURI = new ResourceURIImpl(Page.TYPE, site, null, u.getIdentifier(), version);
+        ResourceURI movedURI = new GeneralResourceURIImpl(site, null, u.getIdentifier(), version);
 
         // Load the resource, adjust the path and store it again
         Resource<?> r = get(movedURI);
@@ -362,10 +373,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         storeResource(r);
 
         // Update the index
-        if (first) {
-          index.move(u, newPath);
-          first = false;
-        }
+        index.move(u, newPath);
 
         // Create the preview images
         if (connected && !initializing)
