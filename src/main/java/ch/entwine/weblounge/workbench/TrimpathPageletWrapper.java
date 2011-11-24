@@ -91,7 +91,7 @@ public class TrimpathPageletWrapper implements Pagelet {
     List<String> replacements = new ArrayList<String>();
     for (int i = 0; i < pagelet.getMultiValueContent(element, language, force).length; i++) {
       StringBuilder sb = new StringBuilder();
-      sb.append("${ locale.text").append(element).append("[").append(i).append("] }");
+      sb.append("${ locale.current.text.").append(element).append("[").append(i).append("] }");
       replacements.add(sb.toString());
     }
     return replacements.toArray(new String[replacements.size()]);
