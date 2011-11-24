@@ -59,7 +59,7 @@ public class FilesTest extends IntegrationTestBase {
   private static final long sizeEnglish = 73642L;
 
   /** Mime type of the English version */
-  private static final String mimetypeEnglish = "image/jpeg; charset=iso-8859-1";
+  private static final String mimetypeEnglish = "image/jpeg; charset=utf-8";
 
   /** File name of the English version */
   private static final String filenameEnglish = "porsche.jpg";
@@ -68,7 +68,7 @@ public class FilesTest extends IntegrationTestBase {
   private static final long sizeGerman = 88723L;
 
   /** Mime type of the German version */
-  private static final String mimetypeGerman = "image/jpeg; charset=iso-8859-1";
+  private static final String mimetypeGerman = "image/jpeg; charset=utf-8";
 
   /** File name of the German version */
   private static final String filenameGerman = "porsche.jpg";
