@@ -21,10 +21,10 @@
 package ch.entwine.weblounge.contentrepository.impl;
 
 import ch.entwine.weblounge.cache.ResponseCacheTracker;
-import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.SearchQuery;
@@ -69,7 +69,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Abstract base implementation of a <code>WritableContentRepository</code>.
@@ -301,34 +303,49 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#move(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.content.ResourceURI)
+   *      ch.entwine.weblounge.common.content.ResourceURI, boolean)
    */
-  public void move(ResourceURI uri, ResourceURI target) throws IOException,
-      ContentRepositoryException {
+  public void move(ResourceURI uri, ResourceURI target, boolean moveChildren)
+      throws IOException, ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
-    List<SearchResultItem> documentsToMove = new ArrayList<SearchResultItem>();
     String originalPathPrefix = uri.getPath();
+    Set<ResourceURI> documentsToMove = new HashSet<ResourceURI>();
+    documentsToMove.add(uri);
 
-    // Move the resource itself
-    SearchQuery q = new SearchQueryImpl(site).withPreferredVersion(Resource.LIVE).withPathPrefix(originalPathPrefix);
-    SearchResult result = index.find(q);
-    if (result.getDocumentCount() == 0) {
-      logger.warn("Trying to move non existing resource {}", uri);
-      return;
-    }
-    for (SearchResultItem searchResult : result.getItems()) {
-      documentsToMove.add(searchResult);
+    // Search the resources to move
+    if (moveChildren && originalPathPrefix == null)
+      throw new IllegalStateException("Trying to move resources children without a original path");
+    else if (moveChildren) {
+      SearchQuery q = new SearchQueryImpl(site).withPreferredVersion(Resource.LIVE);
+      q.withPathPrefix(originalPathPrefix);
+
+      SearchResult result = index.find(q);
+      if (result.getDocumentCount() == 0) {
+        logger.warn("Trying to move non existing resource {}", uri);
+        return;
+      }
+
+      for (SearchResultItem searchResult : result.getItems()) {
+        if (!(searchResult instanceof ResourceSearchResultItem))
+          continue;
+        ResourceSearchResultItem rsri = (ResourceSearchResultItem) searchResult;
+        String resourcePath = rsri.getResourceURI().getPath();
+
+        // We need to check the prefix again, since the search query will also
+        // match parts of the originalPathPrefix
+        if (resourcePath != null && resourcePath.startsWith(originalPathPrefix))
+          documentsToMove.add(rsri.getResourceURI());
+      }
     }
 
     // Finally, move all resources
-    for (SearchResultItem searchResult : documentsToMove) {
-      ResourceURI u = ((PageSearchResultItem) searchResult).getResourceURI();
-      String id = searchResult.getId();
+    for (ResourceURI u : documentsToMove) {
       String originalPath = u.getPath();
       if (originalPath == null)
         continue;
+
       String newPath = originalPath.substring(originalPathPrefix.length());
       if (StringUtils.isNotBlank(newPath))
         newPath = UrlUtils.concat(target.getPath(), newPath);
@@ -337,7 +354,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
       boolean first = true;
       for (long version : index.getRevisions(u)) {
-        ResourceURI movedURI = new ResourceURIImpl(Page.TYPE, site, null, id, version);
+        ResourceURI movedURI = new ResourceURIImpl(Page.TYPE, site, null, u.getIdentifier(), version);
 
         // Load the resource, adjust the path and store it again
         Resource<?> r = get(movedURI);

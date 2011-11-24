@@ -380,6 +380,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
+    q.withTypes(Page.TYPE);
     q.withVersion(Resource.LIVE);
     q.withProperty("resourceid", pageId);
 
@@ -483,11 +484,13 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     try {
       PageReader pageReader = new PageReader();
       page = pageReader.read(IOUtils.toInputStream(pageXml, "utf-8"), site);
+      if (StringUtils.isBlank(page.getURI().getPath()))
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
       page.setModified(user, new Date());
       page.setVersion(Resource.WORK);
       contentRepository.put(page);
       if (!page.getURI().getPath().equals(currentPage.getURI().getPath())) {
-        contentRepository.move(currentPage.getURI(), page.getURI());
+        contentRepository.move(currentPage.getURI(), page.getURI(), true);
       }
     } catch (SecurityException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", workURI, site);

@@ -741,17 +741,19 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
+    Resource<?> currentResource;
+    try {
+      currentResource = contentRepository.get(resourceURI);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error reading current resource {} from repository: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
-      try {
-        Resource<?> currentResource = contentRepository.get(resourceURI);
-        String etag = Long.toString(ResourceUtils.getModificationDate(currentResource).getTime());
-        if (!etag.equals(ifMatchHeader)) {
-          throw new WebApplicationException(Status.PRECONDITION_FAILED);
-        }
-      } catch (ContentRepositoryException e) {
-        logger.warn("Error reading current resource {} from repository: {}", resourceURI, e.getMessage());
-        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      String etag = Long.toString(ResourceUtils.getModificationDate(currentResource).getTime());
+      if (!etag.equals(ifMatchHeader)) {
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
     }
 
@@ -774,6 +776,22 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       resource.setModified(user, new Date());
       contentRepository.put(resource);
+      // TODO Move Resource if path has changed
+      // boolean hasToMove = false;
+      // if (resource.getURI().getPath() != null) {
+      // hasToMove =
+      // !resource.getURI().getPath().equals(currentResource.getURI().getPath());
+      // } else if (currentResource.getURI().getPath() != null) {
+      // // TODO update path index but do not move, there is nothing to move
+      // hasToMove =
+      // !currentResource.getURI().getPath().equals(resource.getURI().getPath());
+      // }
+      // // If orginalPath == null do not move, instead add index
+      //
+      // if (hasToMove) {
+      // contentRepository.move(currentResource.getURI(), resource.getURI(),
+      // false);
+      // }
     } catch (IOException e) {
       logger.warn("Error reading udpated resource {} from request", resourceURI);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
