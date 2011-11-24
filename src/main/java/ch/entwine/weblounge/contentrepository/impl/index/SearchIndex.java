@@ -193,7 +193,6 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * @throws ContentRepositoryException
    *           if removing the resource from solr fails
    */
-  @SuppressWarnings("unchecked")
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
     logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
 
@@ -208,38 +207,8 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       throw new ContentRepositoryException("Unable to clear solr index", t);
     }
 
-    // Have the serializer create an input document
-    String resourceType = uri.getType();
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
-    if (serializer == null)
-      throw new ContentRepositoryException("No serializer found for " + uri);
-
-    // Add information on this version to existing variants of this resource
-    Site site = uri.getSite();
-    String id = uri.getIdentifier();
-    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
-    for (SearchResultItem existingResource : getByQuery(q).getItems()) {
-      List<ResourceMetadata<?>> solrFields = ((ResourceSearchResultItem) existingResource).getMetadata();
-      ResourceMetadata<Long> versionField = null;
-      for (ResourceMetadata<?> field : solrFields) {
-        if (field.getName().equals(ALTERNATE_VERSION)) {
-          versionField = (ResourceMetadata<Long>) field;
-          List<Long> versions = ((ResourceMetadata<Long>) field).getValues();
-          versionField.clear();
-
-          // Add the remaining versions back
-          for (Long l : versions) {
-            if (l.longValue() != uri.getVersion()) {
-              versionField.addValue(l);
-            }
-          }
-        }
-      }
-      if (versionField != null && versionField.getValues().size() == 0)
-        solrFields.remove(versionField);
-      SolrInputDocument doc = updateDocument(new SolrInputDocument(), solrFields);
-      update(doc);
-    }
+    // Adjust the version information
+    updateVersions(uri);
 
     return true;
   }
@@ -252,52 +221,10 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * @throws ContentRepositoryException
    *           if posting the new resource to solr fails
    */
-  @SuppressWarnings("unchecked")
   public boolean add(Resource<?> resource) throws ContentRepositoryException {
     logger.debug("Adding resource {} to search index", resource);
-
-    // Have the serializer create an input document
-    String resourceType = resource.getURI().getType();
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
-    if (serializer == null)
-      throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
-
-    // Add information on this version to existing variants of this resource
-    ResourceURI uri = resource.getURI();
-    Site site = uri.getSite();
-    String id = uri.getIdentifier();
-    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
-    List<Long> existingVersions = new ArrayList<Long>();
-    for (SearchResultItem existingResource : getByQuery(q).getItems()) {
-      List<ResourceMetadata<?>> existingResourceMetadata = ((ResourceSearchResultItem) existingResource).getMetadata();
-      boolean alternateVersionsFound = false;
-      for (ResourceMetadata<?> field : existingResourceMetadata) {
-        if (field.getName().equals(ALTERNATE_VERSION)) {
-          alternateVersionsFound = true;
-          ((ResourceMetadata<Long>) field).addValue(uri.getVersion());
-        } else if (field.getName().equals(VERSION)) {
-          existingVersions.add(((ResourceMetadata<Long>) field).getValues().get(0));
-        }
-      }
-      if (!alternateVersionsFound) {
-        ResourceMetadata<Long> altVersions = new ResourceMetadataImpl<Long>(ALTERNATE_VERSION);
-        altVersions.addValue(uri.getVersion());
-        existingResourceMetadata.add(altVersions);
-      }
-      SolrInputDocument doc = updateDocument(new SolrInputDocument(), existingResourceMetadata);
-      update(doc);
-    }
-
-    // Post the updated data to the search index
-    try {
-      List<ResourceMetadata<?>> metadata = serializer.toMetadata(resource);
-      metadata.add(new ResourceMetadataImpl<Long>(ALTERNATE_VERSION, existingVersions, null, false));
-      SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
-      update(doc);
-      return true;
-    } catch (Throwable t) {
-      throw new ContentRepositoryException("Cannot update resource " + resource + " in index", t);
-    }
+    addToIndex(resource);
+    return true;
   }
 
   /**
@@ -308,44 +235,95 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * @throws ContentRepositoryException
    *           if posting the updated resource to solr fails
    */
-  @SuppressWarnings("unchecked")
   public boolean update(Resource<?> resource) throws ContentRepositoryException {
     logger.debug("Updating resource {} in search index", resource);
+    addToIndex(resource);
+    return true;
+  }
+
+  /**
+   * Adds the given resource to the search index.
+   * 
+   * @param resource
+   *          the resource
+   * @throws ContentRepositoryException
+   *           if updating fails
+   */
+  private void addToIndex(Resource<?> resource)
+      throws ContentRepositoryException {
 
     // Have the serializer create an input document
     String resourceType = resource.getURI().getType();
     ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
-    if (serializer == null) {
-      logger.error("Unable to create an input document for {}: no serializer found", resource.getURI());
-      return false;
+    if (serializer == null)
+      throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
+
+    // Add the resource to the index
+    List<ResourceMetadata<?>> resourceMetadata = serializer.toMetadata(resource);
+    SolrInputDocument doc = updateDocument(new SolrInputDocument(), resourceMetadata);
+    try {
+      update(doc);
+    } catch (Throwable t) {
+      throw new ContentRepositoryException("Cannot write resource " + resource + " to index", t);
     }
 
-    // Add information on this version to existing variants of this resource
-    ResourceURI uri = resource.getURI();
+    // Adjust the version information
+    updateVersions(resource.getURI());
+  }
+
+  /**
+   * Aligns the information on alternate resource versions in the search index,
+   * which is needed to support querying by preferred version.
+   * 
+   * @param uri
+   *          uri of the resource to update
+   * @throws ContentRepositoryException
+   *           if updating fails
+   */
+  private void updateVersions(ResourceURI uri)
+      throws ContentRepositoryException {
+
+    String resourceType = uri.getType();
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+    if (serializer == null)
+      throw new ContentRepositoryException("Unable to create an input document for " + uri + ": no serializer found");
+
+    // List all versions of the resource
+    List<Resource<?>> resources = new ArrayList<Resource<?>>();
     Site site = uri.getSite();
     String id = uri.getIdentifier();
     SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
-    List<Long> alternateVersions = new ArrayList<Long>();
     for (SearchResultItem existingResource : getByQuery(q).getItems()) {
-      List<ResourceMetadata<?>> existingResourceMetadata = ((ResourceSearchResultItem) existingResource).getMetadata();
-      for (ResourceMetadata<?> field : existingResourceMetadata) {
-        if (field.getName().equals(VERSION)) {
-          Long version = ((ResourceMetadata<Long>) field).getValues().get(0);
-          if (version != uri.getVersion())
-            alternateVersions.add(version);
-        }
-      }
+      List<ResourceMetadata<?>> resourceMetadata = ((ResourceSearchResultItem) existingResource).getMetadata();
+      resources.add(serializer.toResource(site, resourceMetadata));
     }
 
-    // Post the updated data to the search index
-    try {
-      List<ResourceMetadata<?>> metadata = serializer.toMetadata(resource);
-      metadata.add(new ResourceMetadataImpl<Long>(ALTERNATE_VERSION, alternateVersions, null, false));
-      SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
-      update(doc);
-      return true;
-    } catch (Throwable t) {
-      throw new ContentRepositoryException("Cannot update resource " + resource + " in index", t);
+    // Add the alternate version information to each resource's metadata and
+    // write it back to the search index (including the new one)
+    for (Resource<?> r : resources) {
+      List<ResourceMetadata<?>> resourceMetadata = serializer.toMetadata(r);
+      ResourceMetadataImpl<Long> alternateVersions = new ResourceMetadataImpl<Long>(ALTERNATE_VERSION);
+      resourceMetadata.add(alternateVersions);
+
+      // Look for alternate versions
+      for (Resource<?> v : resources) {
+        if (!v.equals(r)) {
+          alternateVersions.addValue(r.getVersion());
+        }
+      }
+
+      // If alternate versions were found, add the metadata field
+      if (alternateVersions.getValues().size() == 0) {
+        alternateVersions.addValue(r.getURI().getVersion());
+      }
+
+      // Write the resource to the index
+      SolrInputDocument doc = updateDocument(new SolrInputDocument(), resourceMetadata);
+      try {
+        update(doc);
+      } catch (Throwable t) {
+        throw new ContentRepositoryException("Cannot update versions of resource " + uri + " in index", t);
+      }
     }
   }
 

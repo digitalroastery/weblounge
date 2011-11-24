@@ -27,13 +27,19 @@ import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
+import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
@@ -72,16 +78,16 @@ import java.util.UUID;
  * Test case for the {@link ContentRepositoryIndex}.
  */
 public class ContentRepositoryIndexTest {
-  
+
   /** The content repository index */
   protected ContentRepositoryIndex idx = null;
-  
+
   /** The index' root directory */
   protected File indexRootDirectory = null;
 
   /** The structural index' root directory */
   protected File structuralIndexRootDirectory = null;
-  
+
   /** The sample page */
   protected Page page = null;
 
@@ -93,19 +99,19 @@ public class ContentRepositoryIndexTest {
 
   /** The site */
   protected Site site = null;
-  
+
   /** Page template */
   protected PageTemplate template = null;
 
   /** English */
-  protected Language english = LanguageUtils.getLanguage("en"); 
+  protected Language english = LanguageUtils.getLanguage("en");
 
   /** German */
-  protected Language german = LanguageUtils.getLanguage("de"); 
+  protected Language german = LanguageUtils.getLanguage("de");
 
   /** Italian */
-  protected Language french = LanguageUtils.getLanguage("fr"); 
-  
+  protected Language french = LanguageUtils.getLanguage("fr");
+
   /**
    * Sets up data structures for each test case.
    * 
@@ -166,9 +172,11 @@ public class ContentRepositoryIndexTest {
     assertTrue(new File(structuralIndexRootDirectory, URIIndex.URI_IDX_NAME).exists());
     assertTrue(new File(structuralIndexRootDirectory, VersionIndex.VERSION_IDX_NAME).exists());
   }
-  
+
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#add(ch.entwine.weblounge.common.content.ResourceURI)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#add(ch.entwine.weblounge.common.content.ResourceURI)}
+   * .
    */
   @Test
   public void testAdd() {
@@ -181,7 +189,7 @@ public class ContentRepositoryIndexTest {
       t.printStackTrace();
       fail(t.getMessage());
     }
-    
+
     String oldId = page.getURI().getIdentifier();
     String oldPath = page.getURI().getPath();
 
@@ -208,7 +216,44 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#delete(ch.entwine.weblounge.common.content.ResourceURI)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#update(Resource)}
+   * .
+   */
+  @Test
+  public void testUpdate() throws IllegalArgumentException,
+      ContentRepositoryException {
+
+    String propertyName = "testproperty";
+    String propertyValue = "testvalue";
+    Pagelet p = new PageletImpl("testmodule", "testid");
+    p.addProperty(propertyName, propertyValue);
+    page.addPagelet(p, "stage");
+
+    try {
+      idx.add(page);
+      assertEquals(1, idx.size());
+      idx.update(page);
+      assertEquals(1, idx.size());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
+    }
+
+    // Make sure the search index is still consistent after an update. For this,
+    // test one of the constructed fields that are not returned as part of the
+    // search result and therefore are likely to be lost
+
+    SearchQuery q = new SearchQueryImpl(site).withProperty(propertyName, propertyValue);
+    SearchResult result = idx.find(q);
+    assertEquals(1, result.getDocumentCount());
+    assertEquals(page.getURI().getIdentifier(), result.getItems()[0].getId());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#delete(ch.entwine.weblounge.common.content.ResourceURI)}
+   * .
    */
   @Test
   public void testDelete() {
@@ -226,7 +271,9 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getRevisions(ch.entwine.weblounge.common.content.ResourceURI)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getRevisions(ch.entwine.weblounge.common.content.ResourceURI)}
+   * .
    */
   @Test
   public void testGetRevisions() {
@@ -261,7 +308,9 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getLanguages(ch.entwine.weblounge.common.content.ResourceURI)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getLanguages(ch.entwine.weblounge.common.content.ResourceURI)}
+   * .
    */
   @Test
   public void testGetLanguages() {
@@ -271,17 +320,17 @@ public class ContentRepositoryIndexTest {
     Page page1Live = new PageImpl(live1URI);
     page1Live.setTitle("title", english);
     page1Live.setTemplate(template.getIdentifier());
-    
+
     Page page2Live = new PageImpl(live2URI);
     page2Live.setTitle("title", english);
     page2Live.setTitle("titel", german);
     page2Live.setTemplate(template.getIdentifier());
-    
+
     try {
       // Add the pages to the index
       idx.add(page1Live);
       idx.add(page2Live);
-      
+
       // Try to get the languages back
       assertEquals(page1Live.languages().size(), idx.getLanguages(live1URI).length);
       assertEquals(english, idx.getLanguages(live1URI)[0]);
@@ -294,7 +343,9 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#move(ch.entwine.weblounge.common.content.ResourceURI, java.lang.String)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#move(ch.entwine.weblounge.common.content.ResourceURI, java.lang.String)}
+   * .
    */
   @Test
   public void testMove() {
@@ -311,7 +362,9 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#clear()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#clear()}
+   * .
    */
   @Test
   public void testClear() {
@@ -326,7 +379,9 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#exists(ch.entwine.weblounge.common.content.ResourceURI)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#exists(ch.entwine.weblounge.common.content.ResourceURI)}
+   * .
    */
   @Test
   public void testExists() {
@@ -336,7 +391,7 @@ public class ContentRepositoryIndexTest {
       assertTrue(idx.exists(page.getURI()));
       assertTrue(idx.exists(new PageURIImpl(site, "/weblounge")));
       assertFalse(idx.exists(new PageURIImpl(site, "/xxx")));
-      
+
       // This seems strange, but if there is an identifier, we take it
       assertTrue(idx.exists(new PageURIImpl(site, "/xxx", id)));
     } catch (Throwable t) {
@@ -346,7 +401,9 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#list(ch.entwine.weblounge.common.content.ResourceURI, int)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#list(ch.entwine.weblounge.common.content.ResourceURI, int)}
+   * .
    */
   @Test
   @Ignore
@@ -355,7 +412,9 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#list(ch.entwine.weblounge.common.content.ResourceURI, int, long)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#list(ch.entwine.weblounge.common.content.ResourceURI, int, long)}
+   * .
    */
   @Test
   @Ignore
@@ -364,7 +423,9 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#size()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#size()}
+   * .
    */
   @Test
   public void testSize() {
@@ -395,7 +456,7 @@ public class ContentRepositoryIndexTest {
 
       // Clear the index
       idx.clear();
-      
+
       // Add a number of random pages
       List<Page> pages = new ArrayList<Page>();
       for (int i = 0; i < 100; i++) {
@@ -415,7 +476,7 @@ public class ContentRepositoryIndexTest {
         assertEquals(path, uri.getPath());
         assertEquals(i + 1, idx.size());
       }
-      
+
       // Test if everything can be found
       for (Page p : pages) {
         assertTrue(idx.exists(p.getURI()));
@@ -428,16 +489,18 @@ public class ContentRepositoryIndexTest {
       t.printStackTrace();
       fail(t.getMessage());
     }
-    
+
   }
-  
+
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getIndexVersion()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getIndexVersion()}
+   * .
    */
   @Test
   public void testIndexVersion() {
     assertEquals(VersionedContentRepositoryIndex.INDEX_VERSION, idx.getIndexVersion());
-    
+
     // Overwrite the version number with 0, which is an invalid value
     try {
       idx.close();
@@ -455,5 +518,5 @@ public class ContentRepositoryIndexTest {
     }
 
   }
-  
+
 }
