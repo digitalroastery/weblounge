@@ -25,7 +25,7 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.CacheTag;
@@ -100,9 +100,9 @@ public class ResourceTag extends WebloungeTag {
     // specified, and we are not in jsp compilation mode, issue a warning
     ResourceURI uri = null;
     if (StringUtils.isNotBlank(resourceId)) {
-      uri = new ResourceURIImpl(null, site, null, resourceId);
+      uri = new GeneralResourceURIImpl(site, null, resourceId);
     } else if (StringUtils.isNotBlank(resourcePath)) {
-      uri = new ResourceURIImpl(null, site, resourcePath);
+      uri = new GeneralResourceURIImpl(site, resourcePath);
     } else if (RequestUtils.isMockRequest(request)) {
       return SKIP_BODY;
     } else {
