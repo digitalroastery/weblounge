@@ -267,7 +267,7 @@ public class CronJobTriggerTest {
    */
   @Test
   public void testGetHours() {
-    assertEquals(0, minuteTrigger.getHours().length);
+    assertEquals(24, minuteTrigger.getHours().length);
     assertEquals(2, hourTrigger.getHours().length);
     assertEquals(1, dayOfMonthTrigger.getHours().length);
     assertEquals(1, monthTrigger.getHours().length);
@@ -285,11 +285,11 @@ public class CronJobTriggerTest {
    */
   @Test
   public void testGetDaysOfMonth() {
-    assertEquals(0, minuteTrigger.getDaysOfMonth().length);
-    assertEquals(0, hourTrigger.getDaysOfMonth().length);
+    assertEquals(31, minuteTrigger.getDaysOfMonth().length);
+    assertEquals(31, hourTrigger.getDaysOfMonth().length);
     assertEquals(3, dayOfMonthTrigger.getDaysOfMonth().length);
     assertEquals(1, monthTrigger.getDaysOfMonth().length);
-    assertEquals(0, dayOfWeekTrigger.getDaysOfMonth().length);
+    assertEquals(31, dayOfWeekTrigger.getDaysOfMonth().length);
 
     // Additional testing for the day of month trigger
     for (int i = 0; i < daysOfMonth.length; i++)
@@ -302,9 +302,9 @@ public class CronJobTriggerTest {
    */
   @Test
   public void testGetMonths() {
-    assertEquals(0, minuteTrigger.getMonths().length);
-    assertEquals(0, hourTrigger.getMonths().length);
-    assertEquals(0, dayOfMonthTrigger.getMonths().length);
+    assertEquals(12, minuteTrigger.getMonths().length);
+    assertEquals(12, hourTrigger.getMonths().length);
+    assertEquals(12, dayOfMonthTrigger.getMonths().length);
     assertEquals(3, monthTrigger.getMonths().length);
     assertEquals(1, dayOfWeekTrigger.getMonths().length);
 
@@ -320,10 +320,10 @@ public class CronJobTriggerTest {
    */
   @Test
   public void testGetDaysOfWeek() {
-    assertEquals(0, minuteTrigger.getDaysOfWeek().length);
-    assertEquals(0, hourTrigger.getDaysOfWeek().length);
-    assertEquals(0, dayOfMonthTrigger.getDaysOfWeek().length);
-    assertEquals(0, monthTrigger.getDaysOfWeek().length);
+    assertEquals(7, minuteTrigger.getDaysOfWeek().length);
+    assertEquals(7, hourTrigger.getDaysOfWeek().length);
+    assertEquals(7, dayOfMonthTrigger.getDaysOfWeek().length);
+    assertEquals(7, monthTrigger.getDaysOfWeek().length);
     assertEquals(2, dayOfWeekTrigger.getDaysOfWeek().length);
 
     // Additional testing for the day of week trigger
@@ -337,11 +337,11 @@ public class CronJobTriggerTest {
   @Test
   public void testAsteriskOperator() {
     CronJobTrigger trigger = new CronJobTrigger("* * * * *");
-    assertEquals(0, trigger.getMinutes().length);
-    assertEquals(0, trigger.getHours().length);
-    assertEquals(0, trigger.getDaysOfWeek().length);
-    assertEquals(0, trigger.getDaysOfMonth().length);
-    assertEquals(0, trigger.getMonths().length);
+    assertEquals(60, trigger.getMinutes().length);
+    assertEquals(24, trigger.getHours().length);
+    assertEquals(7, trigger.getDaysOfWeek().length);
+    assertEquals(31, trigger.getDaysOfMonth().length);
+    assertEquals(12, trigger.getMonths().length);
   }
 
   /**
@@ -371,7 +371,7 @@ public class CronJobTriggerTest {
     CronJobTrigger trigger = new CronJobTrigger("*/61 * * * *");
     assertEquals(1, trigger.getMinutes().length);
     assertEquals(0, trigger.getMinutes()[0]);
-    assertEquals(0, trigger.getHours().length);
+    assertEquals(24, trigger.getHours().length);
   }
 
   /**
@@ -478,9 +478,9 @@ public class CronJobTriggerTest {
    */
   @Test
   public void testHourly() {
-    CronJobTrigger dailyTrigger = new CronJobTrigger("@hourly");
+    CronJobTrigger hourlyTrigger = new CronJobTrigger("@hourly");
     CronJobTrigger equivalentTrigger = new CronJobTrigger("0 * * * *");
-    assertTrue(compare(dailyTrigger, equivalentTrigger));
+    assertTrue(compare(hourlyTrigger, equivalentTrigger));
   }
 
   /**
