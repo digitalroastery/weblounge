@@ -112,12 +112,13 @@ public interface WritableContentRepository extends ContentRepository {
    *          uri of the resource to move
    * @param target
    *          the target uri
+   * @param moveChildren TODO
    * @throws ContentRepositoryException
    *           if updating the content repository fails
    * @throws IOException
    *           if moving fails due to a database error
    */
-  void move(ResourceURI uri, ResourceURI target)
+  void move(ResourceURI uri, ResourceURI target, boolean moveChildren)
       throws ContentRepositoryException, IOException;
 
   /**
