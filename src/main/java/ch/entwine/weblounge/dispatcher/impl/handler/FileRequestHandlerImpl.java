@@ -28,7 +28,7 @@ import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
@@ -132,7 +132,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
           filePath = "/" + uriSuffix;
           fileName = FilenameUtils.getName(filePath);
         }
-        fileURI = new ResourceURIImpl(null, site, filePath, id);
+        fileURI = new GeneralResourceURIImpl(site, filePath, id);
       } else {
         filePath = path;
         fileName = FilenameUtils.getName(filePath);
