@@ -110,15 +110,18 @@ public interface WritableContentRepository extends ContentRepository {
    * 
    * @param uri
    *          uri of the resource to move
-   * @param target
-   *          the target uri
-   * @param moveChildren TODO
+   * @param path
+   *          the target path
+   * @param moveChildren
+   *          <code>true</code> to also move children of this resource
+   * @throws IllegalArgumentException
+   *           if <code>path</code> is <code>null</code>, empty or relative
    * @throws ContentRepositoryException
    *           if updating the content repository fails
    * @throws IOException
    *           if moving fails due to a database error
    */
-  void move(ResourceURI uri, ResourceURI target, boolean moveChildren)
+  void move(ResourceURI uri, String path, boolean moveChildren)
       throws ContentRepositoryException, IOException;
 
   /**
