@@ -722,6 +722,8 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery withPathPrefix(String path) {
     clearExpectations();
+    if (path.endsWith("/"))
+      path = path.substring(0, path.length() - 1);
     this.pathPrefix = path;
     if (pathPrefix == null)
       throw new IllegalArgumentException("Path prefix must not be null");
