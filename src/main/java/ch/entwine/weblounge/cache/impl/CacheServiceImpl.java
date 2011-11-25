@@ -803,9 +803,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.request.ResponseCache#invalidate(ch.entwine.weblounge.common.request.CacheTag[])
+   * @see ch.entwine.weblounge.common.request.ResponseCache#invalidate(ch.entwine.weblounge.common.request.CacheTag[],
+   *      boolean)
    */
-  public void invalidate(CacheTag[] tags) {
+  public void invalidate(CacheTag[] tags, boolean partialMatches) {
     if (tags == null || tags.length == 0)
       throw new IllegalArgumentException("Tags cannot be null or empty");
 
@@ -819,7 +820,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Remove the objects matched by the tags
     long removed = 0;
-    for (Object key : getKeysForTags(cache, tags)) {
+    for (Object key : getKeysForTags(cache, tags, partialMatches)) {
       if (cache.remove(key))
         removed++;
     }
@@ -828,16 +829,20 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   }
 
   /**
-   * Returns those keys from the given cache that contain at least all the tags
+   * Returns those keys from the given cache that contain all or any of the tags
    * as defined in the <code>tags</code> array.
    * 
    * @param cache
    *          the cache
    * @param tags
    *          the set of tags
+   * @param partialMatches
+   *          <code>true</code> to include partial matches, where only one of
+   *          the tag matches instead of all
    * @return the collection of matching keys
    */
-  private Collection<Object> getKeysForTags(Cache cache, CacheTag[] tags) {
+  private Collection<Object> getKeysForTags(Cache cache, CacheTag[] tags,
+      boolean partialMatches) {
     // Create the parts of the key to look for
     List<String> keyParts = new ArrayList<String>(tags.length);
     for (CacheTag tag : tags) {
@@ -846,17 +851,20 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     }
 
     // Collect those keys that contain all relevant parts
-    Collection<Object> keys = new ArrayList<Object>();
+    Collection<Object> cacheKeys = new ArrayList<Object>();
     key: for (Object k : cache.getKeys()) {
       String key = ((CacheEntryKey) k).tags;
       for (String keyPart : keyParts) {
-        if (!key.contains(keyPart))
+        if (!key.contains(keyPart) && !partialMatches) {
           continue key;
+        } else if (key.contains(keyPart)) {
+          cacheKeys.add(k);
+          continue key;
+        }
       }
-      keys.add(k);
     }
 
-    return keys;
+    return cacheKeys;
   }
 
   /**
