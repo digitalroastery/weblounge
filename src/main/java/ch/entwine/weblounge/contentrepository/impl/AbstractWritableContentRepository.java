@@ -294,7 +294,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
     if (cache != null && (allRevisions || uri.getVersion() == Resource.LIVE)) {
-      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) });
+      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) }, true);
     }
 
     return true;
@@ -384,7 +384,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
     if (cache != null) {
-      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) });
+      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) }, true);
     }
   }
 
@@ -463,7 +463,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       for (String subject : resource.getSubjects())
         tags.add(new CacheTagImpl(CacheTag.Subject, subject));
 
-      cache.invalidate(tags.toArray(new CacheTagImpl[tags.size()]));
+      cache.invalidate(tags.toArray(new CacheTagImpl[tags.size()]), true);
     }
 
     // Write the updated resource to disk
@@ -524,7 +524,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
     if (cache != null) {
-      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) });
+      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) }, true);
     }
 
     return resource;
@@ -570,7 +570,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
     if (cache != null) {
-      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) });
+      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) }, true);
     }
 
     return resource;

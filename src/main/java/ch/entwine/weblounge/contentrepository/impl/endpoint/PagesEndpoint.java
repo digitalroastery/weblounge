@@ -167,8 +167,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       q.withText(searchterms, true);
 
     // Filter query
-    if (StringUtils.isNotBlank(filter))
-      q.withFilter(filter);
+    if (StringUtils.isNotBlank(filter)) {
+      if ("/".equals(filter))
+        q.withPath("/");
+      else
+        q.withFilter(filter);
+    }
 
     // Limit and Offset
     q.withLimit(limit);
