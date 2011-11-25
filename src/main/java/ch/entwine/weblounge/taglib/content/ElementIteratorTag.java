@@ -122,7 +122,6 @@ public class ElementIteratorTag extends WebloungeTag {
       }
 
       setupElementData();
-      Collections.sort(elementValues);
 
       // Are there values to iterate over?
       if (iterations == 0)
