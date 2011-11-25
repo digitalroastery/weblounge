@@ -36,7 +36,6 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -44,6 +43,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.htmlcleaner.CleanerProperties;
+import org.htmlcleaner.HtmlCleaner;
+import org.htmlcleaner.Serializer;
+import org.htmlcleaner.SimpleXmlSerializer;
+import org.htmlcleaner.TagNode;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -58,9 +62,11 @@ import org.xhtmlrenderer.util.FSImageWriter;
 import org.xhtmlrenderer.util.XRLog;
 import org.xhtmlrenderer.util.XRRuntimeException;
 
+import java.awt.HeadlessException;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -173,24 +179,34 @@ public class PagePreviewGenerator implements PreviewGenerator {
       throw new IOException(e);
     }
 
-    File f = null;
-    FileOutputStream fos = null;
+    // Try to convert html to xhtml
+    HtmlCleaner cleaner = new HtmlCleaner();
+    CleanerProperties xhtmlProperties = cleaner.getProperties();
+    TagNode xhtmlNode = cleaner.clean(html);
+    if (xhtmlNode == null) {
+      logger.warn("Error creating well-formed document from page {}", resource);
+      return;
+    }
+
+    File xhtmlFile = null;
     is = new ByteArrayInputStream(html.getBytes("UTF-8"));
 
     // Write the resource content to disk. This step is needed, as the preview
     // generator can only handle files.
     try {
-      f = File.createTempFile("preview", null);
-      fos = new FileOutputStream(f);
-      IOUtils.copy(is, fos);
+      xhtmlFile = File.createTempFile("xhtml", ".xml");
+      Serializer xhtmlSerializer = new SimpleXmlSerializer(xhtmlProperties);
+      xhtmlSerializer.writeToFile(xhtmlNode, xhtmlFile.getAbsolutePath(), "UTF-8");
     } catch (IOException e) {
-      logger.error("Error creating temporary copy of file content at " + f, e);
-      IOUtils.closeQuietly(fos);
-      FileUtils.deleteQuietly(f);
+      logger.error("Error creating temporary copy of file content at " + xhtmlFile, e);
+      FileUtils.deleteQuietly(xhtmlFile);
       throw e;
     } finally {
-      IOUtils.closeQuietly(fos);
+      IOUtils.closeQuietly(is);
     }
+
+    File imageFile = File.createTempFile("xhtml-preview", "." + PREVIEW_FORMAT);
+    FileOutputStream imageFos = null;
 
     // Render the page and write back to client
     try {
@@ -201,7 +217,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
       // this needs to be synchronized
       Java2DRenderer renderer = null;
       synchronized (this) {
-        renderer = new Java2DRenderer(f, screenshotWidth, screenshotHeight);
+        renderer = new Java2DRenderer(xhtmlFile, screenshotWidth, screenshotHeight);
       }
 
       // Configure the renderer
@@ -220,22 +236,41 @@ public class PagePreviewGenerator implements PreviewGenerator {
       // Render the page to an image
       BufferedImage img = renderer.getImage();
       FSImageWriter imageWriter = new FSImageWriter(PREVIEW_FORMAT);
-      ByteArrayOutputStream tos = new ByteArrayOutputStream(screenshotWidth * screenshotHeight);
-      imageWriter.write(img, tos);
+      imageFos = new FileOutputStream(imageFile);
+      imageWriter.write(img, imageFos);
 
-      // Scale the image to the correct size
-      ImageStyleUtils.style(new ByteArrayInputStream(tos.toByteArray()), os, html, style);
     } catch (IOException e) {
-      logger.error("Error creating temporary copy of file content at " + f, e);
+      logger.error("Error creating temporary copy of file content at " + xhtmlFile, e);
       throw e;
     } catch (XRRuntimeException e) {
       logger.warn("Error rendering page content at " + uri + ": " + e.getMessage());
+      throw e;
+    } catch (HeadlessException e) {
+      logger.warn("Headless error rendering page content at " + uri + ": " + e.getMessage());
       throw e;
     } catch (Throwable t) {
       logger.warn("Error rendering page content at " + uri + ": " + t.getMessage(), t);
       throw new IOException(t);
     } finally {
-      FileUtils.deleteQuietly(f);
+      IOUtils.closeQuietly(imageFos);
+      FileUtils.deleteQuietly(xhtmlFile);
+    }
+
+    FileInputStream imageIs = null;
+
+    // Scale the image to the correct size
+    try {
+      imageIs = new FileInputStream(imageFile);
+      ImageStyleUtils.style(imageIs, os, PREVIEW_FORMAT, style);
+    } catch (IOException e) {
+      logger.error("Error creating temporary copy of file content at " + xhtmlFile, e);
+      throw e;
+    } catch (Throwable t) {
+      logger.warn("Error scaling page preview at " + uri + ": " + t.getMessage(), t);
+      throw new IOException(t);
+    } finally {
+      IOUtils.closeQuietly(imageIs);
+      FileUtils.deleteQuietly(imageFile);
     }
 
   }

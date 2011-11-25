@@ -161,6 +161,12 @@
     </dependency>
 
     <dependency>
+      <groupId>net.sourceforge.htmlcleaner</groupId>
+      <artifactId>htmlcleaner</artifactId>
+      <version>2.2</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.xhtmlrenderer</groupId>
       <artifactId>core-renderer</artifactId>
       <version>9176297</version>
@@ -287,7 +293,8 @@
               core-renderer;inline=true,
               freemarker;inline=true,
               metadata-extractor;inline=true,
-              im4java;inline=true
+              im4java;inline=true,
+              htmlcleaner;inline=true
             </Embed-Dependency>
             <Private-Package>
               com.drew.metadata,
