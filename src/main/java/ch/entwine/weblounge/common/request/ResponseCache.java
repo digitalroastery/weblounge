@@ -134,16 +134,25 @@ public interface ResponseCache {
   /**
    * Tells the cache of the given site to throw away the data identified by the
    * given set of tags.
+   * <p>
+   * Note that unless <code>partialMatches</code> is set to <code>true</code>,
+   * only those cache entries are invalidated that match <i>all</i> of the tags
+   * in <code>tags</code>.
+   * 
    * @param tags
    *          the set of tags
+   * @param partialMatches
+   *          <code>true</code> to invalidate cache entries that only contain
+   *          one of the tags instead of all
    * 
    * @return the handles of the removed elements
    */
-  void invalidate(CacheTag[] tags);
+  void invalidate(CacheTag[] tags, boolean partialMatches);
 
   /**
    * Tells the cache of the given site to throw away the data identified by
    * <code>handle</code>.
+   * 
    * @param handle
    *          the cache data identifier
    * 
