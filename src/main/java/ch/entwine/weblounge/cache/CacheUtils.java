@@ -84,13 +84,14 @@ public class CacheUtils {
    * 
    * @param site
    *          the site
+   * @param partialMatches TODO
    * @param tags
    *          the tags
    * @throws IllegalArgumentException
    *           if either one of <code>site</code> or <code>tags</code> is
    *           <code>null</code>
    */
-  public static void invalidate(Site site, CacheTag... tags) {
+  public static void invalidate(Site site, boolean partialMatches, CacheTag... tags) {
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
     if (tags == null || tags.length == 0)
@@ -99,7 +100,7 @@ public class CacheUtils {
     CacheService cache = cacheServices.get(site.getIdentifier());
     if (cache != null) {
       logger.debug("Invalidating entries that are tagged {}", tags);
-      cache.invalidate(tags);
+      cache.invalidate(tags, partialMatches);
     }
   }
 
