@@ -84,6 +84,7 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
 
     logger.info("User '{}' logged in", user.getLogin());
 
+    // Try to redirect the user to the initial url
     HttpSession session = request.getSession(false);
     if (session != null) {
       SavedRequest savedRequest = (SavedRequest) session.getAttribute(WebAttributes.SAVED_REQUEST);
