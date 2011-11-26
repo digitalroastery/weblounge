@@ -29,7 +29,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.SavedRequest;
 
 import java.io.IOException;
 import java.util.Date;
@@ -39,6 +41,7 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * This handler processes the login request once spring security is satisfied
@@ -80,6 +83,15 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
     boolean isEditor = SecurityUtils.userHasRole(user, SystemRole.EDITOR);
 
     logger.info("User '{}' logged in", user.getLogin());
+
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      SavedRequest savedRequest = (SavedRequest) session.getAttribute(WebAttributes.SAVED_REQUEST);
+      if (savedRequest != null) {
+        response.sendRedirect(addTimeStamp(savedRequest.getRedirectUrl()));
+        return;
+      }
+    }
 
     // If the user was intending to edit a page, let him do just that
     if (isEditor && StringUtils.isNotBlank(request.getParameter("edit"))) {

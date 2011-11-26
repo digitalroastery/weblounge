@@ -485,8 +485,7 @@
               OSGI-INF/site-rest-service.xml,
               OSGI-INF/site-runtime-information.xml,
               OSGI-INF/systemdirectory-provider.xml,
-              OSGI-INF/test-command.xml,
-              OSGI-INF/webconsole-plugin.xml,
+              OSGI-INF/test-command.xml
             </Service-Component>
           </instructions>
         </configuration>

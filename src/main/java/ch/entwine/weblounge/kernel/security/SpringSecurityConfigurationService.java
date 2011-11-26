@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.dispatcher.SharedHttpContext;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.felix.webconsole.WebConsoleSecurityProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -81,6 +82,9 @@ public class SpringSecurityConfigurationService implements ManagedService {
   /** The spring security filter */
   protected Filter securityFilter = null;
 
+  /** The web console security */
+  protected WebConsoleSecurityProvider webConsoleProvider = null;
+
   /** The system password encoding */
   protected DigestType passwordEncoding = DEFAULT_ENCODING;
 
@@ -92,6 +96,9 @@ public class SpringSecurityConfigurationService implements ManagedService {
 
   /** The security filter registration */
   protected ServiceRegistration securityFilterRegistration = null;
+
+  /** The registration for the web console security provider */
+  protected ServiceRegistration webConsoleSecurityRegistration = null;
 
   /**
    * Callback from the OSGi environment on service activation.
@@ -130,6 +137,9 @@ public class SpringSecurityConfigurationService implements ManagedService {
 
     // Get the security filter chain from the spring context
     securityFilter = (Filter) springContext.getBean("springSecurityFilterChain");
+
+    // Create the web console security provider
+    webConsoleProvider = new WebloungeWebConsoleSecurityProvider(securityService);
 
     // Activate the security filters
     if (securityEnabled) {
@@ -221,7 +231,8 @@ public class SpringSecurityConfigurationService implements ManagedService {
   }
 
   /**
-   * Activates security by registering a security filter with active bundles.
+   * Activates security by registering both a security filter and a web console
+   * security provider.
    */
   private void startSecurity() {
     logger.info("Enabling spring security");
@@ -234,6 +245,14 @@ public class SpringSecurityConfigurationService implements ManagedService {
       logger.debug("Spring security context registered");
     } catch (Throwable t) {
       logger.error("Error registering security context: {}", t.getMessage());
+    }
+
+    logger.info("Securing the Felix management console");
+    try {
+      webConsoleSecurityRegistration = bundleCtx.registerService(WebConsoleSecurityProvider.class.getName(), webConsoleProvider, null);
+      logger.debug("Web console security provider registered");
+    } catch (Throwable t) {
+      logger.error("Error registering web console security provider: {}", t.getMessage());
     }
   }
 
@@ -248,7 +267,8 @@ public class SpringSecurityConfigurationService implements ManagedService {
   }
 
   /**
-   * Activates security by registering a security filter with active bundles.
+   * Deactivates security by unregistering both the security filter and the web
+   * console security provider.
    */
   private void stopSecurity() {
     logger.info("Disabling spring security");
@@ -260,6 +280,18 @@ public class SpringSecurityConfigurationService implements ManagedService {
         logger.debug("Security context was already unregistered");
       } catch (Throwable t) {
         logger.error("Unregistering security context", t.getMessage());
+      }
+    }
+
+    logger.info("Disabling web console security provider");
+    if (webConsoleSecurityRegistration != null) {
+      try {
+        webConsoleSecurityRegistration.unregister();
+        logger.debug("Web console security provider unregistered");
+      } catch (IllegalStateException e) {
+        logger.debug("Web console security provider was already unregistered");
+      } catch (Throwable t) {
+        logger.error("Unregistering web console security provider", t.getMessage());
       }
     }
   }
