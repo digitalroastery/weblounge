@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
+import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.CacheTag;
@@ -87,7 +88,6 @@ public class ResourceTag extends WebloungeTag {
    */
   public int doStartTag() throws JspException {
     Site site = request.getSite();
-    Language language = request.getLanguage();
 
     ContentRepository repository = site.getContentRepository();
     if (repository == null) {
@@ -123,11 +123,22 @@ public class ResourceTag extends WebloungeTag {
     Resource<?> resource = null;
     ResourceContent resourceContent = null;
 
+    // Try to determine the language
+    Language language = request.getLanguage();
+
     // Store the result in the jsp page context
     try {
       resource = repository.get(uri);
       resource.switchTo(language);
-      resourceContent = resource.getContent(language);
+
+      Language contentLanguage = null;
+      contentLanguage = LanguageUtils.getPreferredContentLanguage(resource, request, site);
+      if (contentLanguage == null) {
+        logger.warn("Resource {} does not have suitable content", resource);
+        return SKIP_BODY;
+      }
+
+      resourceContent = resource.getContent(contentLanguage);
       if (resourceContent == null)
         resourceContent = resource.getOriginalContent();
     } catch (ContentRepositoryException e) {

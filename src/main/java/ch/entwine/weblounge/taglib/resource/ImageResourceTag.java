@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
+import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.CacheTag;
@@ -158,7 +159,6 @@ public class ImageResourceTag extends WebloungeTag {
    */
   public int doStartTag() throws JspException {
     Site site = request.getSite();
-    Language language = request.getLanguage();
 
     ContentRepository repository = site.getContentRepository();
     if (repository == null) {
@@ -219,11 +219,22 @@ public class ImageResourceTag extends WebloungeTag {
     int imageWidth = 0;
     int imageHeight = 0;
 
+    // Try to determine the language
+    Language language = request.getLanguage();
+
     // Load the content
     try {
       image = (ImageResource) repository.get(uri);
       image.switchTo(language);
-      imageContent = image.getContent(language);
+
+      Language contentLanguage = null;
+      contentLanguage = LanguageUtils.getPreferredContentLanguage(image, request, site);
+      if (contentLanguage == null) {
+        logger.warn("Image {} does not have suitable content", image);
+        return SKIP_BODY;
+      }
+
+      imageContent = image.getContent(contentLanguage);
       if (imageContent == null)
         imageContent = image.getOriginalContent();
       imageWidth = imageContent.getWidth();

@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.CacheTag;
@@ -87,7 +88,6 @@ public class FileResourceTag extends WebloungeTag {
    */
   public int doStartTag() throws JspException {
     Site site = request.getSite();
-    Language language = request.getLanguage();
 
     ContentRepository repository = site.getContentRepository();
     if (repository == null) {
@@ -123,13 +123,22 @@ public class FileResourceTag extends WebloungeTag {
     FileResource file = null;
     FileContent fileContent = null;
 
+    // Determine the languages
+    Language language = request.getLanguage();
+
     // Store the result in the jsp page context
     try {
       file = (FileResource) repository.get(uri);
       file.switchTo(language);
-      fileContent = file.getContent(language);
-      if(fileContent == null)
-        fileContent = file.getOriginalContent();
+
+      Language contentLanguage = null;
+      contentLanguage = LanguageUtils.getPreferredContentLanguage(file, request, site);
+      if (contentLanguage == null) {
+        logger.warn("File {} does not have suitable content", file);
+        return SKIP_BODY;
+      }
+
+      fileContent = file.getContent(contentLanguage);
     } catch (ContentRepositoryException e) {
       logger.warn("Error trying to load file " + uri + ": " + e.getMessage(), e);
       return SKIP_BODY;
@@ -140,7 +149,7 @@ public class FileResourceTag extends WebloungeTag {
     // Store the file and the file content in the request
     pageContext.setAttribute(FileResourceTagExtraInfo.FILE, file);
     pageContext.setAttribute(FileResourceTagExtraInfo.FILE_CONTENT, fileContent);
-    
+
     // Add cache tags to response
     response.addTag(CacheTag.Resource, file.getURI().getIdentifier());
     response.addTag(CacheTag.Url, file.getURI().getPath());
