@@ -25,12 +25,6 @@ import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.content.page.PageContentListener;
-import ch.entwine.weblounge.common.content.page.Pagelet;
-import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
-import ch.entwine.weblounge.common.impl.content.page.PageImpl;
-import ch.entwine.weblounge.common.impl.content.page.PagePreviewReader;
-import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.security.Authority;
@@ -65,7 +59,7 @@ public class LazyFileResourceImpl implements FileResource {
   protected String previewXml = null;
 
   /** The backing file */
-  protected PageImpl file = null;
+  protected FileResource file = null;
 
   /** The preview composer */
   protected Composer previewComposer = null;
@@ -77,7 +71,7 @@ public class LazyFileResourceImpl implements FileResource {
   protected boolean isBodyLoaded = false;
 
   /** The file reader */
-  protected WeakReference<PageReader> readerRef = null;
+  protected WeakReference<FileResourceReader> readerRef = null;
 
   /** The file uri */
   protected ResourceURI uri = null;
@@ -109,9 +103,9 @@ public class LazyFileResourceImpl implements FileResource {
     try {
 
       // Get a hold of the file reader
-      PageReader reader = (readerRef != null) ? readerRef.get() : null;
+      FileResourceReader reader = (readerRef != null) ? readerRef.get() : null;
       if (reader == null) {
-        reader = new PageReader();
+        reader = new FileResourceReader();
         // No need to keep the reference, since we're done after this
       }
 
@@ -129,14 +123,14 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * Loads the file header only.
    */
-  protected void loadPageHeader() {
+  protected void loadFileHeader() {
     try {
 
       // Get a hold of the file reader
-      PageReader reader = (readerRef != null) ? readerRef.get() : null;
+      FileResourceReader reader = (readerRef != null) ? readerRef.get() : null;
       if (reader == null) {
-        reader = new PageReader();
-        readerRef = new WeakReference<PageReader>(reader);
+        reader = new FileResourceReader();
+        readerRef = new WeakReference<FileResourceReader>(reader);
       }
 
       // If no separate header was given, then we need to load the whole thing
@@ -163,14 +157,14 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * Loads the file body only.
    */
-  protected void loadPageBody() {
+  protected void loadFileBody() {
     try {
 
       // Get a hold of the file reader
-      PageReader reader = (readerRef != null) ? readerRef.get() : null;
+      FileResourceReader reader = (readerRef != null) ? readerRef.get() : null;
       if (reader == null) {
-        reader = new PageReader();
-        readerRef = new WeakReference<PageReader>(reader);
+        reader = new FileResourceReader();
+        readerRef = new WeakReference<FileResourceReader>(reader);
       }
 
       // Load the file body
@@ -183,28 +177,6 @@ public class LazyFileResourceImpl implements FileResource {
 
     } catch (Throwable e) {
       logger.error("Failed to lazy-load body of {}: {}", uri, e.getMessage());
-      throw new IllegalStateException(e);
-    }
-  }
-
-  /**
-   * Loads the file preview only.
-   */
-  protected void loadPagePreview() {
-    // If no separate preview data was given, then we need to load the whole
-    // thing instead.
-    if (previewXml == null) {
-      loadPageBody();
-      previewComposer = new ComposerImpl(PagePreviewReader.PREVIEW_COMPOSER_NAME, file.getPreview());
-      return;
-    }
-
-    try {
-      PagePreviewReader reader = new PagePreviewReader();
-      previewComposer = reader.read(IOUtils.toInputStream(previewXml, "utf-8"), uri);
-      previewXml = null;
-    } catch (Throwable e) {
-      logger.error("Failed to lazy-load preview of {}", uri);
       throw new IllegalStateException(e);
     }
   }
@@ -242,47 +214,11 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#addPageContentListener(ch.entwine.weblounge.common.content.file.PageContentListener)
-   */
-  public void addPageContentListener(PageContentListener listener) {
-    if (!isHeaderLoaded)
-      loadPageHeader();
-    file.addPageContentListener(listener);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#addPagelet(ch.entwine.weblounge.common.content.file.Pagelet,
-   *      java.lang.String)
-   */
-  public Pagelet addPagelet(Pagelet filelet, String composer) {
-    if (!isBodyLoaded)
-      loadPageBody();
-    return file.addPagelet(filelet, composer);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#addPagelet(ch.entwine.weblounge.common.content.file.Pagelet,
-   *      java.lang.String, int)
-   */
-  public Pagelet addPagelet(Pagelet filelet, String composer, int index)
-      throws IndexOutOfBoundsException {
-    if (!isBodyLoaded)
-      loadPageBody();
-    return file.addPagelet(filelet, composer, index);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.file.Page#addSubject(java.lang.String)
    */
   public void addSubject(String subject) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.addSubject(subject);
   }
 
@@ -293,43 +229,8 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void addSeries(String series) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.addSeries(series);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getComposers()
-   */
-  public Composer[] getComposers() {
-    if (!isBodyLoaded)
-      loadPageBody();
-    return file.getComposers();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getStage()
-   */
-  public Composer getStage() {
-    if (!isHeaderLoaded && isBodyLoaded)
-      loadPageHeader();
-    else if (!isBodyLoaded)
-      loadPage();
-    return file.getStage();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getComposer(java.lang.String)
-   */
-  public Composer getComposer(String composerId) {
-    if (!isBodyLoaded)
-      loadPageBody();
-    return file.getComposer(composerId);
   }
 
   /**
@@ -339,7 +240,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getCoverage() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getCoverage();
   }
 
@@ -350,7 +251,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getCoverage(Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getCoverage(language);
   }
 
@@ -362,7 +263,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getCoverage(Language language, boolean force) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getCoverage(language, force);
   }
 
@@ -373,7 +274,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getDescription() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getDescription();
   }
 
@@ -384,7 +285,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getDescription(Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getDescription(language);
   }
 
@@ -396,7 +297,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getDescription(Language language, boolean force) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getDescription(language, force);
   }
 
@@ -412,57 +313,12 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getLayout()
-   */
-  public String getLayout() {
-    if (!isHeaderLoaded)
-      loadPageHeader();
-    return file.getLayout();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.file.Page#getLockOwner()
    */
   public User getLockOwner() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getLockOwner();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getPagelets()
-   */
-  public Pagelet[] getPagelets() {
-    if (!isBodyLoaded)
-      loadPageBody();
-    return file.getPagelets();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getPagelets(java.lang.String)
-   */
-  public Pagelet[] getPagelets(String composer) {
-    if (!isBodyLoaded)
-      loadPageBody();
-    return file.getPagelets(composer);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getPagelets(java.lang.String,
-   *      java.lang.String, java.lang.String)
-   */
-  public Pagelet[] getPagelets(String composer, String module, String id) {
-    if (!isBodyLoaded)
-      loadPageBody();
-    return file.getPagelets(composer, module, id);
   }
 
   /**
@@ -477,22 +333,11 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getPreview()
-   */
-  public Pagelet[] getPreview() {
-    if (previewComposer == null)
-      loadPagePreview();
-    return previewComposer.getPagelets();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.file.Page#getRights()
    */
   public String getRights() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getRights();
   }
 
@@ -503,7 +348,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getRights(Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getRights(language);
   }
 
@@ -515,7 +360,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getRights(Language language, boolean force) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getRights(language, force);
   }
 
@@ -526,7 +371,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String[] getSubjects() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getSubjects();
   }
 
@@ -537,19 +382,8 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String[] getSeries() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getSeries();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getTemplate()
-   */
-  public String getTemplate() {
-    if (!isHeaderLoaded)
-      loadPageHeader();
-    return file.getTemplate();
   }
 
   /**
@@ -559,7 +393,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getTitle() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getTitle();
   }
 
@@ -570,7 +404,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getTitle(Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getTitle(language);
   }
 
@@ -582,7 +416,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getTitle(Language language, boolean force) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getTitle(language, force);
   }
 
@@ -593,7 +427,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String getType() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getType();
   }
 
@@ -622,7 +456,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean hasSubject(String subject) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.hasSubject(subject);
   }
 
@@ -633,7 +467,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean hasSeries(String series) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.hasSeries(series);
   }
 
@@ -644,7 +478,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean isIndexed() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.isIndexed();
   }
 
@@ -655,7 +489,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean isLocked() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.isLocked();
   }
 
@@ -666,32 +500,8 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean isPromoted() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.isPromoted();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#removePageContentListener(ch.entwine.weblounge.common.content.file.PageContentListener)
-   */
-  public void removePageContentListener(PageContentListener listener) {
-    if (!isHeaderLoaded)
-      loadPageHeader();
-    file.removePageContentListener(listener);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#removePagelet(java.lang.String,
-   *      int)
-   */
-  public Pagelet removePagelet(String composer, int index)
-      throws IndexOutOfBoundsException {
-    if (!isBodyLoaded)
-      loadPageBody();
-    return file.removePagelet(composer, index);
   }
 
   /**
@@ -701,7 +511,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void removeSubject(String subject) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.removeSubject(subject);
   }
 
@@ -712,7 +522,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void removeSeries(String series) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.removeSeries(series);
   }
 
@@ -724,7 +534,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setCoverage(String coverage, Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setCoverage(coverage, language);
   }
 
@@ -736,7 +546,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setDescription(String description, Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setDescription(description, language);
   }
 
@@ -756,19 +566,8 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setIndexed(boolean index) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setIndexed(index);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#setLayout(java.lang.String)
-   */
-  public void setLayout(String layout) {
-    if (!isHeaderLoaded)
-      loadPageHeader();
-    file.setLayout(layout);
   }
 
   /**
@@ -778,7 +577,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void lock(User user) throws IllegalStateException {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.lock(user);
   }
 
@@ -790,7 +589,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setCreated(User user, Date date) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setCreated(user, date);
   }
 
@@ -802,7 +601,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setModified(User user, Date date) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setModified(user, date);
   }
 
@@ -813,7 +612,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setPromoted(boolean promoted) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setPromoted(promoted);
   }
 
@@ -825,7 +624,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setPublished(User publisher, Date from, Date to) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setPublished(publisher, from, to);
   }
 
@@ -837,19 +636,8 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setRights(String rights, Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setRights(rights, language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#setDefaultTemplate(java.lang.String)
-   */
-  public void setTemplate(String template) {
-    if (!isHeaderLoaded)
-      loadPageHeader();
-    file.setTemplate(template);
   }
 
   /**
@@ -860,7 +648,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setTitle(String title, Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setTitle(title, language);
   }
 
@@ -871,7 +659,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setType(String type) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setType(type);
   }
 
@@ -882,7 +670,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public User unlock() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.unlock();
   }
 
@@ -902,7 +690,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String toXml() {
     if (!isBodyLoaded)
-      loadPageBody();
+      loadFileBody();
     return file.toXml();
   }
 
@@ -914,7 +702,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public int compareTo(Localizable o, Language l) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.compareTo(o, l);
   }
 
@@ -925,8 +713,19 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public Set<Language> languages() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.languages();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#contentLanguages()
+   */
+  public Set<Language> contentLanguages() {
+    if (!isBodyLoaded)
+      loadFileBody();
+    return file.contentLanguages();
   }
 
   /**
@@ -936,8 +735,19 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean supportsLanguage(Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.supportsLanguage(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#supportsContentLanguage(ch.entwine.weblounge.common.language.Language)
+   */
+  public boolean supportsContentLanguage(Language language) {
+    if (!isBodyLoaded)
+      loadFileBody();
+    return file.supportsContentLanguage(language);
   }
 
   /**
@@ -947,7 +757,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public Language switchTo(Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.switchTo(language);
   }
 
@@ -958,7 +768,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String toString(Language language) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.toString(language);
   }
 
@@ -970,7 +780,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public String toString(Language language, boolean force) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.toString(language, force);
   }
 
@@ -981,7 +791,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setCreationDate(Date date) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setCreationDate(date);
   }
 
@@ -992,7 +802,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public Date getCreationDate() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getCreationDate();
   }
 
@@ -1003,7 +813,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean isCreatedAfter(Date date) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.isCreatedAfter(date);
   }
 
@@ -1014,7 +824,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setCreator(User user) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setCreator(user);
   }
 
@@ -1025,7 +835,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public User getCreator() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getCreator();
   }
 
@@ -1036,7 +846,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public Date getModificationDate() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getModificationDate();
   }
 
@@ -1047,7 +857,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public User getModifier() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getModifier();
   }
 
@@ -1058,7 +868,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public Date getPublishFrom() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getPublishFrom();
   }
 
@@ -1069,7 +879,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public Date getPublishTo() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getPublishTo();
   }
 
@@ -1080,7 +890,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public User getPublisher() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getPublisher();
   }
 
@@ -1091,7 +901,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean isPublished() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.isPublished();
   }
 
@@ -1102,7 +912,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean isPublished(Date date) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.isPublished(date);
   }
 
@@ -1113,7 +923,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void addSecurityListener(SecurityListener listener) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.addSecurityListener(listener);
   }
 
@@ -1125,7 +935,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void allow(Permission permission, Authority authority) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.allow(permission, authority);
   }
 
@@ -1137,7 +947,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean check(Permission permission, Authority authority) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.check(permission, authority);
   }
 
@@ -1149,7 +959,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean check(PermissionSet permissions, Authority authority) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.check(permissions, authority);
   }
 
@@ -1161,7 +971,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean checkAll(Permission permission, Authority[] authorities) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.checkAll(permission, authorities);
   }
 
@@ -1173,7 +983,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public boolean checkOne(Permission permission, Authority[] authorities) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.checkOne(permission, authorities);
   }
 
@@ -1185,7 +995,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void deny(Permission permission, Authority authority) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.deny(permission, authority);
   }
 
@@ -1196,7 +1006,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public User getOwner() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.getOwner();
   }
 
@@ -1207,7 +1017,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public Permission[] permissions() {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     return file.permissions();
   }
 
@@ -1218,7 +1028,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void removeSecurityListener(SecurityListener listener) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.removeSecurityListener(listener);
   }
 
@@ -1229,7 +1039,7 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setOwner(User owner) {
     if (!isHeaderLoaded)
-      loadPageHeader();
+      loadFileHeader();
     file.setOwner(owner);
   }
 

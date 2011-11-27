@@ -584,6 +584,24 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#contentLanguages()
+   */
+  public Set<Language> contentLanguages() {
+    return new HashSet<Language>();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#supportsContentLanguage(ch.entwine.weblounge.common.language.Language)
+   */
+  public boolean supportsContentLanguage(Language language) {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.language.Localizable#switchTo(ch.entwine.weblounge.common.language.Language)
    */
   public Language switchTo(Language language) {

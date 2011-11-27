@@ -715,12 +715,34 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#contentLanguages()
+   */
+  public Set<Language> contentLanguages() {
+    if (!isBodyLoaded)
+      loadImageBody();
+    return image.contentLanguages();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.language.Localizable#supportsLanguage(ch.entwine.weblounge.common.language.Language)
    */
   public boolean supportsLanguage(Language language) {
     if (!isHeaderLoaded)
       loadImageHeader();
     return image.supportsLanguage(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#supportsContentLanguage(ch.entwine.weblounge.common.language.Language)
+   */
+  public boolean supportsContentLanguage(Language language) {
+    if (!isBodyLoaded)
+      loadImageBody();
+    return image.supportsContentLanguage(language);
   }
 
   /**

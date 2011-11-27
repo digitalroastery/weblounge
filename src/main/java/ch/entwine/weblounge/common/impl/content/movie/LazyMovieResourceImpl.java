@@ -716,12 +716,34 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#contentLanguages()
+   */
+  public Set<Language> contentLanguages() {
+    if (!isBodyLoaded)
+      loadAudioVisualBody();
+    return audioVisual.contentLanguages();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.language.Localizable#supportsLanguage(ch.entwine.weblounge.common.language.Language)
    */
   public boolean supportsLanguage(Language language) {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
     return audioVisual.supportsLanguage(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#supportsContentLanguage(ch.entwine.weblounge.common.language.Language)
+   */
+  public boolean supportsContentLanguage(Language language) {
+    if (!isBodyLoaded)
+      loadAudioVisualBody();
+    return audioVisual.supportsContentLanguage(language);
   }
 
   /**

@@ -471,6 +471,78 @@ public final class LanguageUtils {
   /**
    * Returns the preferred one out of of those languages that are requested by
    * the client through the <code>Accept-Language</code> header and are
+   * supported by both the resource in that there is resource content in that
+   * language and the site.
+   * <p>
+   * The preferred one is defined by the following priorities:
+   * <ul>
+   * <li>Requested by the client</li>
+   * <li>The resource's original language</li>
+   * <li>The site default language</li>
+   * <li>The first language of what is supported by both the resource and the
+   * site</li>
+   * </ul>
+   * 
+   * @param resource
+   *          the resource
+   * @param request
+   *          the http request
+   * @param site
+   *          the site
+   */
+  public static Language getPreferredContentLanguage(Resource<?> resource,
+      HttpServletRequest request, Site site) {
+
+    if (resource == null)
+      throw new IllegalArgumentException("Resource must not be null");
+
+    // Path
+    String[] pathElements = StringUtils.split(request.getRequestURI(), "/");
+    for (String element : pathElements) {
+      for (Language l : resource.contentLanguages()) {
+        if (l.getIdentifier().equals(element)) {
+          return l;
+        }
+      }
+    }
+
+    // Accept-Language header
+    if (request.getHeader("Accept-Language") != null) {
+      Enumeration<?> locales = request.getLocales();
+      while (locales.hasMoreElements()) {
+        Language l = getLanguage((Locale) locales.nextElement());
+        if (!resource.supportsContentLanguage(l))
+          continue;
+        if (!site.supportsLanguage(l))
+          continue;
+        return l;
+      }
+    }
+
+    // Original content
+    if (resource.getOriginalContent() != null) {
+      if (site.supportsLanguage(resource.getOriginalContent().getLanguage()))
+        return resource.getOriginalContent().getLanguage();
+    }
+
+    // Site default language
+    if (resource.supportsContentLanguage(site.getDefaultLanguage())) {
+      return site.getDefaultLanguage();
+    }
+
+    // Any match
+    for (Language l : site.getLanguages()) {
+      if (resource.supportsContentLanguage(l)) {
+        return l;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Returns the preferred one out of of those languages that are requested by
+   * the client through the <code>Accept-Language</code> header and are
    * supported by the site. If there is no match, the site's default language is
    * returned.
    * <p>
@@ -522,6 +594,32 @@ public final class LanguageUtils {
       return null;
     for (Language l : languages) {
       if (localizable.supportsLanguage(l))
+        return l;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the first language out of <code>choices</code> that is supported by
+   * the <code>localizable</code>. If there is no such language,
+   * <code>null</code> is returned.
+   * 
+   * @param localizable
+   *          the localizable object
+   * @param languages
+   *          the prioritized list of possible languages
+   * @return the first matching language or <code>null</code>
+   * @throws IllegalArgumentException
+   *           if <code>localizable</code> is <code>null</code>
+   */
+  public static Language getPreferredContentLanguage(Resource<?> resource,
+      Language... languages) {
+    if (resource == null)
+      throw new IllegalArgumentException("Resource cannot be null");
+    if (languages == null)
+      return null;
+    for (Language l : languages) {
+      if (resource.supportsContentLanguage(l))
         return l;
     }
     return null;

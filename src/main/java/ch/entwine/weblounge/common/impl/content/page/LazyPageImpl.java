@@ -949,12 +949,32 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#contentLanguages()
+   */
+  public Set<Language> contentLanguages() {
+    if (!isBodyLoaded)
+      loadPageBody();
+    return page.contentLanguages();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.language.Localizable#supportsLanguage(ch.entwine.weblounge.common.language.Language)
    */
   public boolean supportsLanguage(Language language) {
     if (!isHeaderLoaded)
       loadPageHeader();
     return page.supportsLanguage(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#supportsContentLanguage(ch.entwine.weblounge.common.language.Language)
+   */
+  public boolean supportsContentLanguage(Language language) {
+    return false;
   }
 
   /**

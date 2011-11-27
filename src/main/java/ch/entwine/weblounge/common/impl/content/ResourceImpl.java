@@ -891,6 +891,24 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#contentLanguages()
+   */
+  public Set<Language> contentLanguages() {
+    return content.keySet();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#supportsContentLanguage(ch.entwine.weblounge.common.language.Language)
+   */
+  public boolean supportsContentLanguage(Language language) {
+    return content.containsKey(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.impl.language.LocalizableObject#switchTo(ch.entwine.weblounge.common.language.Language)
    */
   @Override
