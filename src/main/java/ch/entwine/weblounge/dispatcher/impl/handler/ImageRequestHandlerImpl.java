@@ -186,23 +186,26 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return true;
     }
 
-    // Determine the response language
+    // Determine the response language by filename
     Language language = null;
     if (StringUtils.isNotBlank(fileName)) {
       for (ImageContent c : imageResource.contents()) {
         if (c.getFilename().equalsIgnoreCase(fileName)) {
           if (language != null) {
             logger.debug("Unable to determine language from ambiguous filename");
-            language = LanguageUtils.getPreferredLanguage(imageResource, request, site);
+            language = LanguageUtils.getPreferredContentLanguage(imageResource, request, site);
             break;
           }
           language = c.getLanguage();
         }
       }
+      if (language == null)
+        language = LanguageUtils.getPreferredContentLanguage(imageResource, request, site);
     } else {
-      language = LanguageUtils.getPreferredLanguage(imageResource, request, site);
+      language = LanguageUtils.getPreferredContentLanguage(imageResource, request, site);
     }
 
+    // If the filename did not lead to a language, apply language resolution
     if (language == null) {
       logger.warn("Image {} does not exist in any supported language", imageURI);
       DispatchUtils.sendNotFound(request, response);

@@ -22,7 +22,6 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.file.FileContent;
@@ -184,29 +183,30 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       return true;
     }
 
-    // Determine the response language
+    // Determine the response language by filename
     Language language = null;
     if (StringUtils.isNotBlank(fileName)) {
-      for (ResourceContent c : fileResource.contents()) {
+      for (FileContent c : fileResource.contents()) {
         if (c.getFilename().equalsIgnoreCase(fileName)) {
           if (language != null) {
             logger.debug("Unable to determine language from ambiguous filename");
-            language = LanguageUtils.getPreferredLanguage(fileResource, request, site);
+            language = LanguageUtils.getPreferredContentLanguage(fileResource, request, site);
             break;
           }
           language = c.getLanguage();
         }
       }
+      if (language == null)
+        language = LanguageUtils.getPreferredContentLanguage(fileResource, request, site);
     } else {
-      language = LanguageUtils.getPreferredLanguage(fileResource, request, site);
+      language = LanguageUtils.getPreferredContentLanguage(fileResource, request, site);
     }
 
+    // If the filename did not lead to a language, apply language resolution
     if (language == null) {
       logger.warn("File {} does not exist in any supported language", fileURI);
       DispatchUtils.sendNotFound(request, response);
       return true;
-    } else {
-      fileResource.switchTo(request.getLanguage());
     }
 
     // Check the modified headers
