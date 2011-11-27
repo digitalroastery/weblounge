@@ -546,6 +546,23 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
   Set<T> contents();
 
   /**
+   * Returns <code>true</code> if the given language is supported, i. e. if
+   * there is content available in that language.
+   * 
+   * @param language
+   *          a language
+   * @return <code>true</code> if there is content in that language
+   */
+  boolean supportsContentLanguage(Language language);
+
+  /**
+   * Returns an iteration of all languages that have content associated.
+   * 
+   * @return the supported languages
+   */
+  Set<Language> contentLanguages();
+
+  /**
    * Returns an XML representation of this resource header.
    * 
    * @return an XML representation of this resource header
