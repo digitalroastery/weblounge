@@ -90,7 +90,7 @@ public class SearchRequest {
   private static Logger logger = LoggerFactory.getLogger(SearchRequest.class);
 
   /** The connection to the solr database */
-  private SolrRequester solrConnection = null;
+  private Solr solrConnection = null;
 
   /**
    * Creates a new requester for solr that will be using the given connection
@@ -99,7 +99,7 @@ public class SearchRequest {
    * @param connection
    *          the solr connection
    */
-  public SearchRequest(SolrRequester connection) {
+  public SearchRequest(Solr connection) {
     if (connection == null)
       throw new IllegalStateException("Unable to run queries on null connection");
     this.solrConnection = connection;

@@ -44,7 +44,7 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SearchRequest;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrRequester;
+import ch.entwine.weblounge.contentrepository.impl.index.solr.Solr;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SuggestRequest;
 
@@ -91,7 +91,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   private static final String ROOT_TYPE = "index";
 
   /** Connection to the solr database */
-  private SolrRequester solrConnection = null;
+  private Solr solrServer = null;
 
   /** Solr query execution */
   private SearchRequest solrRequester = null;
@@ -135,7 +135,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    */
   public void close() throws IOException {
     try {
-      solrConnection.destroy();
+      solrServer.shutdown();
     } catch (Throwable t) {
       throw new IOException("Error closing the solr connection", t);
     }
@@ -177,7 +177,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    */
   public void clear() throws IOException {
     try {
-      solrConnection.destroy();
+      solrServer.shutdown();
       initSolr(solrRoot);
       loadSolr(solrRoot);
     } catch (Throwable t) {
@@ -202,7 +202,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     solrRequest.setAction(ACTION.COMMIT, true, true);
     solrRequest.deleteByQuery(query.toString());
     try {
-      solrConnection.update(solrRequest);
+      solrServer.update(solrRequest);
     } catch (Throwable t) {
       throw new ContentRepositoryException("Unable to clear solr index", t);
     }
@@ -413,7 +413,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     solrRequest.setAction(ACTION.COMMIT, true, true);
     solrRequest.add(document);
     try {
-      return solrConnection.update(solrRequest);
+      return solrServer.update(solrRequest);
     } catch (Throwable t) {
       throw new ContentRepositoryException("Cannot update document " + document + " in index", t);
     }
@@ -496,7 +496,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     if (StringUtils.isBlank(dictionary))
       throw new IllegalArgumentException("Dictionary must not be blank");
 
-    SuggestRequest request = new SuggestRequest(solrConnection, dictionary, onlyMorePopular, count, collate);
+    SuggestRequest request = new SuggestRequest(solrServer, dictionary, onlyMorePopular, count, collate);
     try {
       return request.getSuggestions(seed);
     } catch (Throwable t) {
@@ -529,14 +529,14 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       initSolr(solrRoot);
     }
 
-    solrConnection = new SolrRequester(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
-    solrRequester = new SearchRequest(solrConnection);
+    solrServer = new Solr(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
+    solrRequester = new SearchRequest(solrServer);
 
     // Determine the index version
     if (configExists && dataExists) {
       try {
         StringBuffer q = new StringBuffer(ID).append(":").append(ROOT_ID);
-        QueryResponse r = solrConnection.request(q.toString());
+        QueryResponse r = solrServer.request(q.toString());
         if (r.getResults().isEmpty()) {
           logger.warn("Index does not contain version information, triggering reindex");
           indexVersion = -1;
@@ -557,8 +557,8 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       doc.put(VERSION, createSolrInputField(VERSION, Integer.toString(indexVersion)));
       UpdateRequest updateRequest = new UpdateRequest();
       updateRequest.add(doc);
-      updateRequest.setAction(COMMIT, false, false);
-      solrConnection.update(updateRequest);
+      updateRequest.setAction(COMMIT, true, true);
+      solrServer.update(updateRequest);
     }
   }
 

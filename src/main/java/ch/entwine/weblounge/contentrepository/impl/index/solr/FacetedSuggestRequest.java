@@ -50,7 +50,7 @@ public class FacetedSuggestRequest {
   protected int count = 10;
 
   /** The connection to the solr database */
-  private SolrRequester solrConnection = null;
+  private Solr solrConnection = null;
 
   /**
    * Creates a new suggest request which uses the given connection to solr and a
@@ -64,7 +64,7 @@ public class FacetedSuggestRequest {
    * @param count
    *          number of suggestions to return
    */
-  public FacetedSuggestRequest(SolrRequester connection, String dictionary,
+  public FacetedSuggestRequest(Solr connection, String dictionary,
       int count) {
     this.solrConnection = connection;
     this.dictionary = dictionary.toLowerCase();

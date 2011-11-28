@@ -170,7 +170,21 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index()
    */
   public void index() throws ContentRepositoryException {
-    // Temporary path for rebuilt site
+    try {
+      index.clear();
+    } catch (IOException e) {
+      throw new ContentRepositoryException("Error clearing index " + site.getIdentifier(), e);
+    }
+
+    rebuildIndex();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index()
+   */
+  private void rebuildIndex() throws ContentRepositoryException {
     boolean success = true;
 
     try {
@@ -178,7 +192,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       // started yet.
       if (index == null)
         index = loadIndex();
-      index.clear();
 
       logger.info("Creating site index '{}'...", site);
       long time = System.currentTimeMillis();
@@ -702,16 +715,16 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     // Create the index if there is nothing in place so far
     if (index.getResourceCount() <= 0) {
-      index();
+      rebuildIndex();
     }
 
     // Make sure the version matches the implementation
     else if (index.getIndexVersion() < VersionedContentRepositoryIndex.INDEX_VERSION) {
       logger.info("Index needs to be updated, triggering reindex");
-      index();
+      rebuildIndex();
     } else if (index.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
       logger.warn("Index needs to be downgraded, triggering reindex");
-      index();
+      rebuildIndex();
     }
 
     // Is there an existing index?

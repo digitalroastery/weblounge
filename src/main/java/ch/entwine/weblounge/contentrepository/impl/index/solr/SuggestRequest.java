@@ -93,7 +93,7 @@ public class SuggestRequest {
   protected boolean collate = true;
 
   /** The connection to the solr database */
-  private SolrRequester solrConnection = null;
+  private Solr solrConnection = null;
 
   /**
    * Creates a new suggest request which uses the given connection to solr and a
@@ -111,7 +111,7 @@ public class SuggestRequest {
    *          whether to provide a query collated with the first matching
    *          suggestion
    */
-  public SuggestRequest(SolrRequester connection, String dictionary,
+  public SuggestRequest(Solr connection, String dictionary,
       boolean onlyMorePopular, int count, boolean collate) {
     this.solrConnection = connection;
     this.dictionary = dictionary.toLowerCase();
