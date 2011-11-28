@@ -590,7 +590,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
     } catch (Throwable t) {
-      throw new IOException("Error reading resource from " + uri);
+      String version = ResourceUtils.getVersionString(uri.getVersion());
+      throw new IOException("Error reading " + version + " version of " + uri + " (" + uri.getIdentifier() + ")", t);
     } finally {
       IOUtils.closeQuietly(is);
     }
