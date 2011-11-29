@@ -292,7 +292,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
       parserContext = ParserContext.Resource;
       resource.getURI().setType(rootTag);
       resource.getURI().setIdentifier(attrs.getValue("id"));
-      if (attrs.getValue("path") != null)
+      if (StringUtils.isNotBlank(attrs.getValue("path")))
         resource.getURI().setPath(attrs.getValue("path"));
       if (StringUtils.isNotBlank(attrs.getValue("version"))) {
         long version = ResourceUtils.getVersion(attrs.getValue("version"));

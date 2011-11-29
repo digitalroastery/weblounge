@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.security.Permission;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -302,9 +303,9 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
     if ("page".equals(raw)) {
       parserContext = ParserContext.Page;
       page.getURI().setIdentifier(attrs.getValue("id"));
-      if (attrs.getValue("path") != null)
+      if (StringUtils.isNotBlank(attrs.getValue("path")))
         page.getURI().setPath(attrs.getValue("path"));
-      if (attrs.getValue("version") != null) {
+      if (StringUtils.isNotBlank(attrs.getValue("version"))) {
         long version = ResourceUtils.getVersion(attrs.getValue("version"));
         page.getURI().setVersion(version);
       }
