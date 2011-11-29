@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Simple test action that is able to render a greeting on the site template.
  */
@@ -71,11 +73,13 @@ public class GreeterJSONAction extends GreeterHTMLAction implements JSONAction {
       throws IOException, ActionException {
     try {
       String language = RequestUtils.getParameter(request, LANGUAGE_PARAM);
+      if (language == null)
+        throw new ActionException(HttpServletResponse.SC_BAD_REQUEST);
       Map<String, String> data = new HashMap<String, String>();
       String encoding = response.getCharacterEncoding();
       if (encoding == null)
         encoding = "utf-8";
-      data.put(language, new String(greeting.getBytes(encoding)));
+      data.put(language, new String(greeting.getBytes(encoding), encoding));
       ObjectMapper mapper = new ObjectMapper();
       mapper.writeValue(response.getOutputStream(), data);
     } catch (IOException e) {

@@ -94,7 +94,7 @@ public class JSONActionTest extends IntegrationTestBase {
       String[][] params = new String[][] { { "language", language } };
 
       // Send and the request and examine the response
-      logger.debug("Sending request to {}", request.getURI());
+      logger.info("Sending request to {} for {} greeting", request.getURI(), language);
       HttpClient httpClient = new DefaultHttpClient();
       try {
         HttpResponse response = TestUtils.request(httpClient, request, params);
@@ -109,11 +109,12 @@ public class JSONActionTest extends IntegrationTestBase {
         Assert.assertNotNull(response.getFirstHeader("Content-Type").getElements()[0].getParameterByName("charset"));
         String charset = response.getFirstHeader("Content-Type").getElements()[0].getParameterByName("charset").getValue();
 
-        String responseJson = EntityUtils.toString(response.getEntity());
+        String responseJson = EntityUtils.toString(response.getEntity(), charset);
         HashMap<String, Object> json = jsonMapper.readValue(responseJson, typeRef);
 
-        String greetingEncoded = new String(greeting.getBytes(charset));
-        Assert.assertEquals(greetingEncoded, json.get(language));
+        String expectedGeetingEncoded = new String(greeting.getBytes(charset), charset);
+        String actualGeetingEncoded = new String(json.get(language).toString().getBytes(charset), charset);
+        Assert.assertEquals(expectedGeetingEncoded, actualGeetingEncoded);
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
