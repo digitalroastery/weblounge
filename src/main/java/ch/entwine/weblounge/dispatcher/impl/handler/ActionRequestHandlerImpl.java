@@ -338,6 +338,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       }
 
       // Have the action validate the request
+      response.setContentType("text/html");
       action.configure(request, response, RequestFlavor.HTML);
 
       // Have the content delivered
@@ -393,13 +394,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   private void serveXML(Action action, WebloungeRequest request,
       WebloungeResponse response) {
     try {
+      response.setContentType("text/xml");
       action.configure(request, response, RequestFlavor.XML);
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         if (action instanceof XMLAction) {
           ((XMLAction) action).startXML(request, response);
         }
       }
-      response.setContentType("text/xml");
     } catch (EOFException e) {
       logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
     } catch (IOException e) {
@@ -430,13 +431,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   private void serveJSON(Action action, WebloungeRequest request,
       WebloungeResponse response) {
     try {
+      response.setContentType("text/json");
       action.configure(request, response, RequestFlavor.JSON);
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         if (action instanceof JSONAction) {
           ((JSONAction) action).startJSON(request, response);
         }
       }
-      response.setContentType("text/json");
     } catch (EOFException e) {
       logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
     } catch (IOException e) {
