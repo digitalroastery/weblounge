@@ -114,7 +114,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     synchronized (urlCache) {
       for (RequestFlavor flavor : action.getFlavors()) {
         WebUrl actionUrl = new WebUrlImpl(action.getSite(), action.getPath(), Resource.LIVE, flavor);
-        String normalizedUrl = actionUrl.normalize(true, false, false, true);
+        String normalizedUrl = actionUrl.normalize(false, false, false, true);
         urlCache.put(normalizedUrl, pool);
         if (flavors.length() > 0)
           flavors.append(",");
@@ -653,7 +653,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    * @return the handler
    */
   private ActionPool getActionForUrl(WebUrl url, RequestFlavor flavor) {
-    String normalizedUrl = url.normalize(true, false, false, true);
+    String normalizedUrl = url.normalize(false, false, false, true);
 
     // Try to use the url cache
     ActionPool actionPool = urlCache.get(normalizedUrl);
