@@ -53,7 +53,7 @@ public class ImageStyleImplTest {
   protected ImageScalingMode scalingMode = ImageScalingMode.Cover;
 
   /** Is the style composeable? */
-  protected boolean composeable = true;
+  protected boolean composeable = false;
 
   /** The German language */
   protected Language german = LanguageUtils.getLanguage("de");

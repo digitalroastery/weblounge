@@ -79,6 +79,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     this.width = width;
     this.height = height;
     this.scalingMode = scaling;
+    this.composeable = composeable;
     switch (scaling) {
       case Box:
       case Cover:
