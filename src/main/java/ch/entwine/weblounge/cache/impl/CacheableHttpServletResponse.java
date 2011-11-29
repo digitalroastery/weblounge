@@ -24,9 +24,13 @@ import ch.entwine.weblounge.cache.StreamFilter;
 import ch.entwine.weblounge.cache.impl.filter.FilterWriter;
 import ch.entwine.weblounge.common.request.CacheHandle;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.TeeOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -51,6 +55,9 @@ import javax.servlet.http.HttpServletResponseWrapper;
  */
 class CacheableHttpServletResponse extends HttpServletResponseWrapper {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(CacheableHttpServletResponse.class);
+  
   /**
    * Holds the special tee writer that copies the output to the network and to
    * the cache.
@@ -180,10 +187,26 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    * @return the cached transaction for this page
    */
   CacheTransaction endOutput() {
-    if (out != null) {
-      out.flush();
-      out.close();
-      out = null;
+    try {
+      if (out != null) {
+        out.flush();
+        out.close();
+        out = null;
+      } else if (tx != null) {
+        tx.getOutputStream().flush();
+        tx.getOutputStream().close();
+        CacheOutputStream cacheOs = tx.getOutputStream();
+        OutputStream clientOs = getResponse().getOutputStream();
+        ByteArrayInputStream cacheIs = new ByteArrayInputStream(cacheOs.getContent());
+        IOUtils.copy(cacheIs, clientOs);
+        clientOs.flush();
+        clientOs.close();
+      } else {
+        getResponse().getOutputStream().flush();
+        getResponse().getOutputStream().close();
+      }
+    } catch (IOException e) {
+      logger.debug("Can't write cached response back to client: " + e.getMessage());
     }
     return tx;
   }
