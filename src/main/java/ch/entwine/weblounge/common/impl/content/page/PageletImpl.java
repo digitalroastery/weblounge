@@ -549,7 +549,7 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
    * @see ch.entwine.weblounge.common.content.page.Pagelet#getContentNames(ch.entwine.weblounge.common.language.Language)
    */
   public String[] getContentNames(Language language) {
-    Map<String, String[]> languageContent = content.get(language, true);
+    Map<String, String[]> languageContent = content.get(language, false);
     if (languageContent == null)
       return new String[] {};
     return languageContent.keySet().toArray(new String[languageContent.size()]);
