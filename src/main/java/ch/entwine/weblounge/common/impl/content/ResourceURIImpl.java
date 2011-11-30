@@ -290,6 +290,10 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
       ResourceURI uri = (ResourceURI) obj;
       if (!site.equals(uri.getSite()))
         return false;
+      if (type == null && uri.getType() != null)
+        return false;
+      if (type != null && !type.equals(uri.getType()))
+        return false;
       if (path == null && uri.getPath() != null)
         return false;
       if (path != null && !path.equals(uri.getPath()))
