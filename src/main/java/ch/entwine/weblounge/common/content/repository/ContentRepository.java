@@ -168,17 +168,6 @@ public interface ContentRepository {
   ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException;
 
   /**
-   * Returns the resource's languages.
-   * 
-   * @param uri
-   *          the resource uri
-   * @return the languages
-   * @throws ContentRepositoryException
-   *           if looking up the resource languages from the repository fails
-   */
-  Language[] getLanguages(ResourceURI uri) throws ContentRepositoryException;
-
-  /**
    * Returns an iteration of all resources with their uri containing
    * <code>uri</code> as a prefix.
    * 
