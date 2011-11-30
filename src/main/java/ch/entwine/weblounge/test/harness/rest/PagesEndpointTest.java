@@ -115,8 +115,8 @@ public class PagesEndpointTest extends IntegrationTestBase {
     // Lock the page
     testUnlockPage(serverUrl, pageId);
 
-    // Publish the page
-    testPublishPage(serverUrl, pageId);
+    // Publish the page and test retrieval using the page request handler
+    testPublishPage(serverUrl, pageId, pagePath);
 
     // Test retrieving the page through the rest endpoint
     testGetPageById(serverUrl, Resource.LIVE, pageId);
@@ -629,10 +629,13 @@ public class PagesEndpointTest extends IntegrationTestBase {
    *          the server url
    * @param id
    *          the page identifier
+   * @param path
+   *          the page path
    * @throws Exception
    *           if publishing failed
    */
-  private void testPublishPage(String serverUrl, String id) throws Exception {
+  private void testPublishPage(String serverUrl, String id, String path)
+      throws Exception {
     String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages/");
 
     // Lock the page
@@ -674,10 +677,23 @@ public class PagesEndpointTest extends IntegrationTestBase {
     // portion of the publishing start date
     Thread.sleep(1000);
 
+    // Get the page using its id
     String requestByIdUrl = UrlUtils.concat(serverUrl, "/weblounge-pages/", id);
     HttpGet getPageRequest = new HttpGet(requestByIdUrl);
     httpClient = new DefaultHttpClient();
     logger.info("Requesting published page at {}", requestByIdUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Get the page using its path
+    String requestByPathUrl = UrlUtils.concat(serverUrl, path);
+    getPageRequest = new HttpGet(requestByPathUrl);
+    httpClient = new DefaultHttpClient();
+    logger.info("Requesting published page at {}", requestByPathUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());

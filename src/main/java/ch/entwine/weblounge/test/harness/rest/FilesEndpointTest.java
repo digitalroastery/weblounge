@@ -290,7 +290,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
     }
 
     // Test Conflict
-    logger.debug("Creating new file at existing path {}", createFileRequest.getURI());
+    logger.info("Creating new file at existing path {}", createFileRequest.getURI());
     httpClient = new DefaultHttpClient();
     try {
       HttpResponse response = TestUtils.request(httpClient, createFileRequest, params);
