@@ -6,7 +6,6 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 	{
 		init: function(el) {
 			$.Hover.delay = 0;
-			this.element.find('img.wbl-showPage').hide();
 			this.element.find('img.wbl-trashPage').hide();
 			this.element.find('img.wbl-editPage').hide();
 			this.element.find('img.wbl-pagePreview').hide();
@@ -125,7 +124,7 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 				$('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
 			}
 			
-			if(!$(ev.target).is('.wbl-showPage, .wbl-trashPage, .wbl-editPage, .wbl-pagePreview, .wbl-pagePath')) {
+			if(!$(ev.target).is('.wbl-trashPage, .wbl-editPage, .wbl-pagePreview, .wbl-pagePath')) {
 				el.toggleClass('wbl-marked');
 			}
 			
@@ -140,7 +139,14 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 		"dblclick": function(el, ev) {
 			switch(this.options.mode) {
 			case 'normal':
-				this.element.find('img.wbl-showPage').click();
+				ev.stopPropagation();
+				switch(this.options.resourceType) {
+				case 'pages':
+					this.element.find('a.wbl-pagePath').click();
+					break;
+				case 'media':
+					this._showResource(el.parent());
+				}
 				break;
 			case 'editorMultiSelection':
 				$('div.wbl-scrollViewItem.wbl-marked').removeClass('wbl-marked');
@@ -150,17 +156,6 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			case 'editorSelection':
 				$('button.wbl-editorSelectionOK').click();
 				break;
-			}
-		},
-		
-		"img.wbl-showPage click": function(el, ev) {
-			ev.stopPropagation();
-			switch(this.options.resourceType) {
-			case 'pages':
-				this.element.find('a.wbl-pagePath').click();
-				break;
-			case 'media':
-				this._showResource(el.parent());
 			}
 		},
 		
@@ -179,21 +174,17 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			this._showResource(el.parent());
 		},
 		
-		'hoverenter': function(ev, hover) {
+		"hoverenter": function(ev, hover) {
 			if(this.options.mode != 'normal') return;
-			if(this.options.resourceType == 'pages') {
-				this.element.find('img.wbl-pagePreview').show();
-			}
-			this.element.find('img.wbl-showPage').show();
-			this.element.find('img.wbl-trashPage').show();
-			this.element.find('img.wbl-editPage').show();
+			this.element.find('img.wbl-pagePreview').fadeIn('fast');
+			this.element.find('img.wbl-trashPage').fadeIn('fast');
+			this.element.find('img.wbl-editPage').fadeIn('fast');
 	    },
 	    
-		'hoverleave': function(ev, hover) {
-			this.element.find('img.wbl-pagePreview').hide();
-			this.element.find('img.wbl-showPage').hide();
-			this.element.find('img.wbl-trashPage').hide();
-			this.element.find('img.wbl-editPage').hide();
+		"hoverleave": function(ev, hover) {
+			this.element.find('img.wbl-pagePreview').fadeOut('fast');
+			this.element.find('img.wbl-trashPage').fadeOut('fast');
+			this.element.find('img.wbl-editPage').fadeOut('fast');
 	    }
 		
 	});
