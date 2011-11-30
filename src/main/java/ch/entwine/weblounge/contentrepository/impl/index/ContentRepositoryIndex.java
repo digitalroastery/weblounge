@@ -26,7 +26,6 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
-import ch.entwine.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -60,9 +59,6 @@ public class ContentRepositoryIndex {
   /** The version index */
   protected VersionIndex versionIdx = null;
 
-  /** The language index */
-  protected LanguageIndex languageIdx = null;
-
   /** The search index */
   protected SearchIndex searchIdx = null;
 
@@ -86,7 +82,6 @@ public class ContentRepositoryIndex {
     this.idIdx = new IdIndex(new File(rootDir, "structure"), readOnly);
     this.pathIdx = new PathIndex(new File(rootDir, "structure"), readOnly);
     this.versionIdx = new VersionIndex(new File(rootDir, "structure"), readOnly);
-    this.languageIdx = new LanguageIndex(new File(rootDir, "structure"), readOnly);
     this.searchIdx = new SearchIndex(new File(rootDir, "fulltext"), readOnly);
   }
 
@@ -105,13 +100,11 @@ public class ContentRepositoryIndex {
    *          the language index
    */
   public ContentRepositoryIndex(URIIndex uriIndex, IdIndex idIndex,
-      PathIndex pathIndex, VersionIndex versionIndex,
-      LanguageIndex languageIndex) {
+      PathIndex pathIndex, VersionIndex versionIndex) {
     this.uriIdx = uriIndex;
     this.idIdx = idIndex;
     this.pathIdx = pathIndex;
     this.versionIdx = versionIndex;
-    this.languageIdx = languageIndex;
   }
 
   /**
@@ -124,9 +117,8 @@ public class ContentRepositoryIndex {
     int idIdxVersion = idIdx.getIndexVersion();
     int pathIdxVersion = pathIdx.getIndexVersion();
     int versionIdxVersion = versionIdx.getIndexVersion();
-    int languageIdxVersion = languageIdx.getIndexVersion();
     int searchIdxVersion = searchIdx.getIndexVersion();
-    if (idIdxVersion != version || pathIdxVersion != version || versionIdxVersion != version || languageIdxVersion != version || searchIdxVersion != version) {
+    if (idIdxVersion != version || pathIdxVersion != version || versionIdxVersion != version || searchIdxVersion != version) {
       logger.info("Version mismatch detected in structural index");
       return -1;
     }
@@ -174,16 +166,6 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Sets the language index.
-   * 
-   * @param languageIndex
-   *          the language index
-   */
-  protected void setLanguageIndex(LanguageIndex languageIndex) {
-    this.languageIdx = languageIndex;
-  }
-
-  /**
    * Sets the search index.
    * 
    * @param searchIndex
@@ -208,8 +190,6 @@ public class ContentRepositoryIndex {
       pathIdx.close();
     if (versionIdx != null)
       versionIdx.close();
-    if (languageIdx != null)
-      languageIdx.close();
     if (searchIdx != null)
       searchIdx.close();
   }
@@ -249,7 +229,7 @@ public class ContentRepositoryIndex {
 
     ResourceURI uri = resource.getURI();
     String id = uri.getIdentifier();
-    String path = uri.getPath();
+    String path = StringUtils.trimToNull(uri.getPath());
     String type = uri.getType();
     long version = uri.getVersion();
     long address = -1;
@@ -262,8 +242,7 @@ public class ContentRepositoryIndex {
         if (id.equals(idxId)) {
           if (versionIdx.hasVersion(a, version))
             throw new ContentRepositoryException("Resource id '" + id + "' already exists");
-          String p = uriIdx.getPath(a);
-          if (path == null && p != null) {
+          if (path == null) {
             path = uriIdx.getPath(a);
             resource.getURI().setPath(path);
           }
@@ -280,8 +259,7 @@ public class ContentRepositoryIndex {
         if (path.equals(idxPath)) {
           if (versionIdx.hasVersion(a, version))
             throw new ContentRepositoryException("Resource path '" + path + "' already exists");
-          String i = uriIdx.getId(a);
-          if (id == null && i != null) {
+          if (id == null) {
             id = uriIdx.getId(a);
             resource.getURI().setIdentifier(id);
           }
@@ -301,19 +279,12 @@ public class ContentRepositoryIndex {
         uri.setIdentifier(id);
       }
 
-      // Use the id as a temporary path. Note that we don't add the path
-      // to the resource uri. Otherwise, the path would be added to the search
-      // index as well.
-      if (path == null) {
-        path = id;
-      }
-
       try {
         address = uriIdx.add(id, type, path);
         idIdx.set(address, id);
         versionIdx.add(id, version);
-        pathIdx.set(address, path);
-        languageIdx.set(id, resource.languages());
+        if (path != null)
+          pathIdx.set(address, path);
         if (resource.isIndexed())
           searchIdx.add(resource);
         else
@@ -329,12 +300,16 @@ public class ContentRepositoryIndex {
     else if (!versionIdx.hasVersion(address, version)) {
       versionIdx.addVersion(address, version);
 
-      // Handle live indices
+      // Update the path if we are updating the live version
       if (version == Resource.LIVE) {
-        languageIdx.set(address, resource.languages());
+        String oldPath = uri.getPath();
+        uriIdx.update(address, type, path);
+        if (oldPath != null)
+          pathIdx.delete(oldPath, address);
         if (path != null)
           pathIdx.set(address, path);
       }
+
       if (resource.isIndexed())
         searchIdx.add(resource);
       else
@@ -347,6 +322,7 @@ public class ContentRepositoryIndex {
       logger.warn("Existing resource '{}' was passed to add(), redirecting to update()", uri.getIdentifier());
       update(resource);
 
+      // TODO: Why is that needed?
       if (resource.getIdentifier() == null)
         resource.setIdentifier(uriIdx.getId(address));
       if (resource.getPath() == null)
@@ -372,7 +348,7 @@ public class ContentRepositoryIndex {
   public synchronized boolean delete(ResourceURI uri) throws IOException,
       ContentRepositoryException, IllegalArgumentException {
     String id = uri.getIdentifier();
-    String path = uri.getPath();
+    String path = StringUtils.trimToNull(uri.getPath());
     long version = uri.getVersion();
 
     // Locate the entry in question
@@ -392,21 +368,15 @@ public class ContentRepositoryIndex {
     // Are we deleting the one and only version?
     long[] existingVersions = versionIdx.getVersions(address);
 
-    // Adjust/delete the entry
+    // Adjust/delete the entry. If this is the last version of the file, make
+    // sure we remove every evidence
     if (existingVersions.length == 1) {
       searchIdx.delete(uri);
       uriIdx.delete(address);
       idIdx.delete(address, id);
-      if (version == Resource.LIVE) {
+      if (path != null)
         pathIdx.delete(path, address);
-      }
-      languageIdx.delete(address);
       versionIdx.delete(address);
-    } else if (version == Resource.LIVE) {
-      searchIdx.delete(uri);
-      pathIdx.delete(path, address);
-      languageIdx.set(address, null);
-      versionIdx.delete(address, version);
     } else {
       searchIdx.delete(uri);
       versionIdx.delete(address, version);
@@ -435,33 +405,6 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Returns all languages for the specified resource or <code>null</code> if
-   * the resource doesn't exist.
-   * 
-   * @param uri
-   *          the resource uri
-   * @return the languages
-   * @throws IOException
-   *           if accessing the index fails
-   * @throws IllegalArgumentException
-   *           if the uri does not refer to the live version of the resource
-   */
-  public Language[] getLanguages(ResourceURI uri) throws IOException,
-      IllegalArgumentException {
-    if (uri.getVersion() != Resource.LIVE)
-      throw new IllegalArgumentException("The language index only works for live resources");
-
-    // Locate the entry in question
-    long address = toURIEntry(uri);
-
-    // Everything ok?
-    if (address == -1)
-      throw new IllegalArgumentException("Uri " + uri + " was not found");
-
-    return languageIdx.get(address);
-  }
-
-  /**
    * Returns the identifier of the resource with uri <code>uri</code> or
    * <code>null</code> if the uri is not part of the index.
    * 
@@ -478,7 +421,7 @@ public class ContentRepositoryIndex {
   public String getIdentifier(ResourceURI uri) throws IOException,
       IllegalArgumentException {
 
-    String path = uri.getPath();
+    String path = StringUtils.trimToNull(uri.getPath());
     if (path == null)
       throw new IllegalArgumentException("ResourceURI must contain a path");
 
@@ -578,14 +521,22 @@ public class ContentRepositoryIndex {
     else
       searchIdx.delete(uri);
 
-    // We are only interested in live versions
-    if (uri.getVersion() != Resource.LIVE)
-      return;
+    String newPath = StringUtils.trimToNull(uri.getPath());
+    long version = resource.getURI().getVersion();
+    String type = uri.getType();
 
+    // Find the storage address
     long address = toURIEntry(uri);
-    languageIdx.set(address, null);
-    if (uri.getPath() != null)
-      pathIdx.set(address, uri.getPath());
+
+    // Update the path
+    if (version == Resource.LIVE) {
+      String oldPath = uriIdx.getPath(address);
+      uriIdx.update(address, type, newPath);
+      if (oldPath != null)
+        pathIdx.delete(oldPath, address);
+      if (newPath != null)
+        pathIdx.set(address, newPath);
+    }
   }
 
   /**
@@ -607,12 +558,12 @@ public class ContentRepositoryIndex {
 
     // Locate the entry in question
     long address = toURIEntry(uri);
-    long[] versions = getRevisions(uri);
 
     // Everything ok?
     if (address == -1)
       throw new IllegalArgumentException("Uri " + uri + " was not found");
 
+    path = StringUtils.trimToNull(path);
     String oldPath = uri.getPath();
 
     // If this resource did not have a path in the very beginning we can just
@@ -623,14 +574,17 @@ public class ContentRepositoryIndex {
 
     // Do it this way to make sure we have identical path trimming
     ResourceURI newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getIdentifier(), uri.getVersion());
+    path = newURI.getPath();
 
-    uriIdx.update(address, uri.getType(), newURI.getPath());
-    pathIdx.delete(oldPath, address);
-    pathIdx.set(address, newURI.getPath());
-
-    for (long version : versions) {
-      searchIdx.move(new ResourceURIImpl(uri, version), newURI.getPath());
+    if (uri.getVersion() == Resource.LIVE) {
+      uriIdx.update(address, uri.getType(), path);
+      if (oldPath != null)
+        pathIdx.delete(oldPath, address);
+      if (path != null)
+        pathIdx.set(address, path);
     }
+
+    searchIdx.move(uri, path);
   }
 
   /**
@@ -644,7 +598,6 @@ public class ContentRepositoryIndex {
     idIdx.clear();
     pathIdx.clear();
     versionIdx.clear();
-    languageIdx.clear();
     searchIdx.clear();
   }
 
@@ -785,7 +738,7 @@ public class ContentRepositoryIndex {
       throw new IllegalArgumentException("Uri must not be null");
 
     String id = uri.getIdentifier();
-    String path = uri.getPath();
+    String path = StringUtils.trimToNull(uri.getPath());
     String type = uri.getType();
 
     if (id == null && path == null)

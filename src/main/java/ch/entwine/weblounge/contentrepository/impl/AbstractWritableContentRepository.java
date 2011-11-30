@@ -36,7 +36,6 @@ import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
-import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
@@ -343,8 +342,20 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           continue;
         ResourceSearchResultItem rsri = (ResourceSearchResultItem) searchResult;
         String resourcePath = rsri.getResourceURI().getPath();
-        if (resourcePath != null && resourcePath.startsWith(originalPathPrefix))
-          documentsToMove.add(rsri.getResourceURI());
+
+        // Add the document if the paths match and it is not already contained
+        // in our list (never mind path and version, just look at the id)
+        if (resourcePath != null && resourcePath.startsWith(originalPathPrefix)) {
+          boolean existing = false;
+          for (ResourceURI u : documentsToMove) {
+            if (u.getIdentifier().equals(rsri.getResourceURI().getIdentifier())) {
+              existing = true;
+              break;
+            }
+          }
+          if (!existing)
+            documentsToMove.add(rsri.getResourceURI());
+        }
       }
     }
 
@@ -365,15 +376,18 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       // Move every version of the resource, since we want the path to be
       // in sync across resource versions
       for (long version : index.getRevisions(u)) {
-        ResourceURI movedURI = new GeneralResourceURIImpl(site, null, u.getIdentifier(), version);
+        ResourceURI candidateURI = new ResourceURIImpl(u.getType(), site, null, u.getIdentifier(), version);
 
         // Load the resource, adjust the path and store it again
-        Resource<?> r = get(movedURI);
+        Resource<?> r = get(candidateURI);
+        
+        // Store the updated resource
         r.getURI().setPath(newPath);
         storeResource(r);
 
         // Update the index
-        index.move(u, newPath);
+        r.getURI().setPath(originalPath);
+        index.move(r.getURI(), newPath);
 
         // Create the preview images
         if (connected && !initializing)

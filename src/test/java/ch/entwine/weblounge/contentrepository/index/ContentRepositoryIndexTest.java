@@ -54,7 +54,6 @@ import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.IdIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.LanguageIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.PathIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.URIIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.VersionIndex;
@@ -70,7 +69,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -167,7 +165,6 @@ public class ContentRepositoryIndexTest {
   @Test
   public void testFilesystem() {
     assertTrue(new File(structuralIndexRootDirectory, IdIndex.ID_IDX_NAME).exists());
-    assertTrue(new File(structuralIndexRootDirectory, LanguageIndex.LANGUAGE_IDX_NAME).exists());
     assertTrue(new File(structuralIndexRootDirectory, PathIndex.PATH_IDX_NAME).exists());
     assertTrue(new File(structuralIndexRootDirectory, URIIndex.URI_IDX_NAME).exists());
     assertTrue(new File(structuralIndexRootDirectory, VersionIndex.VERSION_IDX_NAME).exists());
@@ -301,41 +298,6 @@ public class ContentRepositoryIndexTest {
       assertEquals(2, revisions.length);
       assertEquals(Resource.LIVE, revisions[0]);
       assertEquals(Resource.WORK, revisions[1]);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail(t.getMessage());
-    }
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getLanguages(ch.entwine.weblounge.common.content.ResourceURI)}
-   * .
-   */
-  @Test
-  public void testGetLanguages() {
-    ResourceURI live1URI = new PageURIImpl(site, "/weblounge");
-    ResourceURI live2URI = new PageURIImpl(site, "/etc/weblounge");
-
-    Page page1Live = new PageImpl(live1URI);
-    page1Live.setTitle("title", english);
-    page1Live.setTemplate(template.getIdentifier());
-
-    Page page2Live = new PageImpl(live2URI);
-    page2Live.setTitle("title", english);
-    page2Live.setTitle("titel", german);
-    page2Live.setTemplate(template.getIdentifier());
-
-    try {
-      // Add the pages to the index
-      idx.add(page1Live);
-      idx.add(page2Live);
-
-      // Try to get the languages back
-      assertEquals(page1Live.languages().size(), idx.getLanguages(live1URI).length);
-      assertEquals(english, idx.getLanguages(live1URI)[0]);
-      assertEquals(page2Live.languages().size(), idx.getLanguages(live2URI).length);
-      assertTrue(page2Live.languages().containsAll(Arrays.asList(idx.getLanguages(live2URI))));
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -482,7 +444,6 @@ public class ContentRepositoryIndexTest {
         assertTrue(idx.exists(p.getURI()));
         assertEquals(p.getURI().getIdentifier(), idx.getIdentifier(p.getURI()));
         assertEquals(p.getURI().getPath(), idx.getPath(p.getURI()));
-        assertEquals(1, idx.getLanguages(p.getURI()).length);
         assertEquals(1, idx.getRevisions(p.getURI()).length);
       }
     } catch (Throwable t) {

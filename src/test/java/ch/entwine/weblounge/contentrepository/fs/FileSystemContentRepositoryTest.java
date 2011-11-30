@@ -81,7 +81,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -714,53 +713,6 @@ public class FileSystemContentRepositoryTest {
       assertEquals(1, repository.getVersions(live1URI).length);
       assertEquals(2, repository.getVersions(live2URI).length);
       assertEquals(2, repository.getVersions(work2URI).length);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail(t.getMessage());
-    }
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#getLanguages(ch.entwine.weblounge.common.content.ResourceURI)}
-   * .
-   */
-  @Test
-  public void testGetLanguages() {
-    ResourceURI live1URI = new PageURIImpl(site, "/weblounge");
-    ResourceURI live2URI = new PageURIImpl(site, "/etc/weblounge");
-    ResourceURI work2URI = new PageURIImpl(site, "/etc/weblounge", WORK);
-
-    Page page1Live = new PageImpl(live1URI);
-    page1Live.setTitle("title", english);
-    page1Live.setTemplate(template.getIdentifier());
-
-    Page page2Live = new PageImpl(live2URI);
-    page2Live.setTitle("title", english);
-    page2Live.setTitle("titel", german);
-    page2Live.setTemplate(template.getIdentifier());
-
-    Page page2Work = new PageImpl(work2URI);
-    page2Work.setTitle("title", english);
-    page2Work.setTitle("titel", german);
-    page2Work.setTitle("titre", french);
-    page2Work.setTemplate(template.getIdentifier());
-
-    try {
-      // Add the pages to the index
-      repository.put(page1Live);
-      repository.put(page2Live);
-      repository.put(page2Work);
-
-      // Try to get the languages back
-      assertEquals(page1Live.languages().size(), repository.getLanguages(live1URI).length);
-      assertEquals(english, repository.getLanguages(live1URI)[0]);
-
-      assertEquals(page2Live.languages().size(), repository.getLanguages(live2URI).length);
-      assertTrue(page2Live.languages().containsAll(Arrays.asList(repository.getLanguages(live2URI))));
-
-      assertEquals(page2Work.languages().size(), repository.getLanguages(work2URI).length);
-      assertTrue(page2Work.languages().containsAll(Arrays.asList(repository.getLanguages(work2URI))));
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());

@@ -60,7 +60,6 @@ import java.nio.CharBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -337,31 +336,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
         uris[i++] = new ResourceURIImpl(uri, r);
       }
       return uris;
-    } catch (IOException e) {
-      throw new ContentRepositoryException(e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getLanguages(ch.entwine.weblounge.common.content.ResourceURI)
-   */
-  public Language[] getLanguages(ResourceURI uri)
-      throws ContentRepositoryException {
-    if (!isStarted())
-      throw new IllegalStateException("Content repository is not connected");
-
-    try {
-      if (uri.getVersion() == Resource.LIVE) {
-        return index.getLanguages(uri);
-      } else {
-        Resource<?> r = loadResource(uri);
-        if (r == null)
-          throw new ContentRepositoryException("Resource " + uri + " cannot be loaded");
-        Set<Language> languages = r.languages();
-        return languages.toArray(new Language[languages.size()]);
-      }
     } catch (IOException e) {
       throw new ContentRepositoryException(e);
     }

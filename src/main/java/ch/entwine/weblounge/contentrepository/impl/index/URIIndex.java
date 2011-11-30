@@ -321,8 +321,6 @@ public class URIIndex implements VersionedContentRepositoryIndex {
       throw new IllegalArgumentException("Id cannot be null");
     if (type == null)
       throw new IllegalArgumentException("Type cannot be null");
-    if (path == null)
-      throw new IllegalArgumentException("Path cannot be null");
 
     // Make sure this is a regular id
     if (id.getBytes().length != bytesPerId)
@@ -332,7 +330,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
 
     // Get the required entry size
     int typeLengthInBytes = type.getBytes().length;
-    int pathLengthInBytes = path.getBytes().length;
+    int pathLengthInBytes = (path != null) ? path.getBytes().length : 0;
 
     // Make sure there is still room left for an additional entry. One entry
     // consists of the uuid, the path and a closing '\n'
@@ -381,7 +379,8 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     idx.write(id.getBytes());
     idx.write(type.getBytes());
     idx.write(new byte[bytesPerType - type.getBytes().length]);
-    idx.write(path.getBytes());
+    if (path != null)
+      idx.write(path.getBytes());
     idx.writeChar('\n');
     idx.write(new byte[bytesPerPath - pathLengthInBytes - 2]);
 
@@ -442,12 +441,10 @@ public class URIIndex implements VersionedContentRepositoryIndex {
       throws IOException {
     if (type == null)
       throw new IllegalArgumentException("Type cannot be null");
-    if (path == null)
-      throw new IllegalArgumentException("Path cannot be null");
     
     // Check if the new path fits the current index
     int typeLengthInBytes = type.getBytes().length;
-    int pathLengthInBytes = path.getBytes().length;
+    int pathLengthInBytes = (path != null) ? path.getBytes().length : 0;
     
     // Make sure there is still room left for an additional entry. One entry
     // consists of the uuid, the path and a closing '\n'
@@ -479,7 +476,8 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     idx.skipBytes(bytesPerId);
     idx.write(type.getBytes());
     idx.write(new byte[bytesPerType - type.getBytes().length]);
-    idx.write(path.getBytes());
+    if (path != null)
+      idx.write(path.getBytes());
     idx.writeChar('\n');
     idx.write(new byte[bytesPerPath - pathLengthInBytes - 2]);
 
@@ -573,6 +571,8 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     int delimiter = line.indexOf('\n');
     if (delimiter < 1)
       throw new IllegalStateException("Found path without delimiter");
+    if (delimiter <= 1)
+      return null;
     return new String(bytes, 0, delimiter - 1);
   }
 

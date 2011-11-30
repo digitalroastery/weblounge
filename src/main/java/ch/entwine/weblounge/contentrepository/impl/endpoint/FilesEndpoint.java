@@ -778,9 +778,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       resource.setModified(user, new Date());
       contentRepository.put(resource);
 
-      // Check if the resoruce has been moved
+      // Check if the resource has been moved
       String currentPath = currentResource.getURI().getPath();
-      String newPath = resource.getURI().getPath();
+      String newPath = StringUtils.trimToNull(resource.getURI().getPath());
       if (currentPath != null && newPath != null && !currentPath.equals(newPath)) {
         contentRepository.move(currentResource.getURI(), newPath, true);
       }
