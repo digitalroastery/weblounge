@@ -344,7 +344,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                   String destFile = PathUtils.concat(indexedFile.getParentFile().getAbsolutePath(), filename);
                   FileUtils.copyFile(new File(srcFile), new File(destFile));
                 }
-                logger.info("Adding {} {} to site index", resourceType, uri.toString());
+                logger.info("Indexing {} {}", resourceType, uri.toString());
                 resourceCount++;
                 foundResource = true;
               }
