@@ -306,6 +306,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
           if (rendererURL != null) {
             String rendererContent = null;
             try {
+              pagelet.switchTo(language);
               rendererContent = loadContents(rendererURL, site, page, composer, pagelet, environment);
             } catch (ServletException e) {
               logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
