@@ -635,6 +635,30 @@ public interface SearchQuery {
   SearchQuery and(Date date);
 
   /**
+   * Return only resources that have been locked by the specified user.
+   * 
+   * @param lockOwner
+   *          the user holding the lock
+   * @return the query extended by this criterion
+   */
+  SearchQuery withLockOwner(User lockOwner);
+
+  /**
+   * Return only resources that have been locked by somebody.
+   * 
+   * @return the query extended by this criterion
+   */
+  SearchQuery withLockOwner();
+
+  /**
+   * Returns the lock owner or <code>null</code> if no lock owner has been
+   * specified.
+   * 
+   * @return the lock owner
+   */
+  User getLockOwner();
+
+  /**
    * Only return resources that are located on or below the given path in the
    * page tree.
    * 
