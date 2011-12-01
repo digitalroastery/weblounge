@@ -3,7 +3,7 @@
 		{{if page.version == 'work'}}
 			<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/empty_thumbnail.png" original="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview?version=1" alt="Vorschaubild" class="wbl-pageThumbnail" />
 			{{if page.isLocked() }}
-			  {{ if page.isLockedUser(runtime.getUserLogin()) }}
+		  		{{if page.isLockedUser(runtime.getUserLogin()) }}
 					<div class="wbl-ribbon ribbon-locked-by-me">Locked</div>
 				{{else}}
 					<div class="wbl-ribbon ribbon-locked-by-others">Locked</div>
