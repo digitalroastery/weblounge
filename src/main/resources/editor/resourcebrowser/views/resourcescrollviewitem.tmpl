@@ -1,10 +1,10 @@
 <div class="wbl-scrollViewItem wbl-page" id="${page.id}">
 	<div class="wbl-imageContainer">
 		{{if page.version == 'work'}}
-			<img src="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview?version=1" alt="Vorschaubild" class="wbl-pageThumbnail" />
+			<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/empty_thumbnail.png" original="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview?version=1" alt="Vorschaubild" class="wbl-pageThumbnail" />
 			<div class="wbl-ribbon">Work</div>
 		{{else}}
-			<img src="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview?version=0" alt="Vorschaubild" class="wbl-pageThumbnail" />
+			<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/empty_thumbnail.png" original="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview?version=0" alt="Vorschaubild" class="wbl-pageThumbnail" />
 		{{/if}}
 	</div>
 	{{if !$.isEmptyObject(page.head.metadata.title) && !$.isEmptyObject(page.head.metadata.title[language])}}
