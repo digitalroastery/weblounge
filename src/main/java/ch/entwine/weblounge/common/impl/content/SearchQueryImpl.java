@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -50,6 +51,9 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** Name of the stage composer */
   public static final String STAGE_COMPOSER = "#stage#";
+
+  /** Id of the wild card user */
+  public static final String ANY_USER = "#any#";
 
   /** The site */
   protected Site site = null;
@@ -146,6 +150,9 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The publisher */
   protected User publisher = null;
+
+  /** The lock owner */
+  protected User lockOwner = null;
 
   /** The path prefix */
   protected String pathPrefix = null;
@@ -875,6 +882,37 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public boolean getWithoutPublication() {
     return withoutPublication;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withLockOwner()
+   */
+  public SearchQuery withLockOwner() {
+    clearExpectations();
+    this.lockOwner = new UserImpl(ANY_USER);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withLockOwner(ch.entwine.weblounge.common.security.User)
+   */
+  public SearchQuery withLockOwner(User lockOwner) {
+    clearExpectations();
+    this.lockOwner = lockOwner;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getLockOwner()
+   */
+  public User getLockOwner() {
+    return lockOwner;
   }
 
   /**
