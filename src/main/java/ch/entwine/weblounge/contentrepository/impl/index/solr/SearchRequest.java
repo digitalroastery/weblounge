@@ -248,7 +248,7 @@ public class SearchRequest {
 
       // Are we looking for the pagelet in a certain composer or position?
       PageletURI uri = pagelet.getURI();
-      if (StringUtils.isNotBlank(uri.getComposer()) || uri.getPosition() >= 0) {
+      if (uri != null && (StringUtils.isNotBlank(uri.getComposer()) || uri.getPosition() >= 0)) {
         if (StringUtils.isNotBlank(uri.getComposer())) {
           String field = MessageFormat.format(PAGELET_TYPE_COMPOSER, uri.getComposer());
           and(solrQuery, field, searchTerm.toString(), true, true);
