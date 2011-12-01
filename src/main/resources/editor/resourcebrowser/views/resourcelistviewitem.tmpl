@@ -16,9 +16,16 @@
 		<td>-</td>
 	{{/if}}
 	<td class="wbl-action">
-		<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_settings.png" class="wbl-settings" alt="settings">
-		<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_trash.png" class="wbl-itemDelete" alt="trash">
+		<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_read_list.png" class="wbl-listitem-read" alt="Preview">
+		<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_settings_list.png" class="wbl-listitem-settings" alt="Settings">
+		<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_trash_list.png" class="wbl-listitem-delete" alt="Trash">
 		<!-- <img src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_favorite.png" class="wbl-itemFavorize" alt="favorize"> -->
+		<div class="wbl-previewOverlay">
+			<img class="wbl-overlayPreviewImage" src="" />
+			<video preload="preload" controls="controls"></video>
+			<div class="wbl-overlayPreviewContent"></div>
+			<iframe src="" sandbox="" seamless></iframe>
+		</div>
 	</td>
 </tr>
 

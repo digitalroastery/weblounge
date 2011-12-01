@@ -134,19 +134,33 @@
 }
 
 .editor_resourcebrowser .wbl-action {
-	width: 50px;
+	width: 70px;
 }
 
-.editor_resourcebrowser .wbl-itemDelete {
+.editor_resourcebrowser .wbl-listitem-read {
+	margin-left: 2px;
+	margin-right: 2px;
+	cursor: pointer;
+}
+
+.editor_resourcebrowser .wbl-listitem-delete {
 	display: none;
+	margin-left: 2px;
+	margin-right: 2px;
+	cursor: pointer;
+}
+
+.editor_resourcebrowser .wbl-listitem-settings {
+	display: none;
+	margin-left: 2px;
+	margin-right: 2px;
 	cursor: pointer;
 }
 
 .editor_resourcebrowser .wbl-itemFavorize {
 	display: none;
-	cursor: pointer;
-}
-.editor_resourcebrowser .wbl-settings {
+	margin-left: 2px;
+	margin-right: 2px;
 	cursor: pointer;
 }
 
@@ -420,9 +434,22 @@ div.wbl-overlayPreviewContent {
 	-o-transform: rotate(-45deg);
 	-moz-transform: rotate(-45deg);
 	-webkit-transform: rotate(-45deg);
-	background-color: #9a0000;
-	background: -webkit-gradient(linear, left bottom, left top, from(#9a0000), to(#a90000));
 	text-align: center;
 	color: #fff;
 	line-height: 1.5em;
+}
+
+.ribbon-work {
+	background-color: #ff9933;
+	background: -webkit-gradient(linear, left bottom, left top, from(#ff9933), to(#ff9933));
+}
+
+.ribbon-locked-by-me {
+	background-color: #ff9933;
+	background: -webkit-gradient(linear, left bottom, left top, from(#ff9933), to(#ff9933));
+}
+
+.ribbon-locked-by-others {
+	background-color: #9a0000;
+	background: -webkit-gradient(linear, left bottom, left top, from(#9a0000), to(#a90000));
 }

@@ -13,10 +13,10 @@ steal.plugins('jquery/controller',
 				this.element.find('img.wbl-settings').show();
 				this.element.find('td.wbl-action').hover(
 						function () {
-							$(this).find('img').show();
+							$(this).find('img').not('.wbl-overlayPreviewImage').show();
 						},
 						function () {
-							$(this).find('img').not('.wbl-settings').hide();
+							$(this).find('img').not('.wbl-listitem-read,.wbl-overlayPreviewImage').hide();
 						}
 				);
 			}
@@ -40,12 +40,17 @@ steal.plugins('jquery/controller',
 			}
 		},
 		
-		"img.wbl-settings click": function(el, ev) {
+		"img.wbl-listitem-read click": function(el, ev) {
+			ev.stopPropagation();
+			this._showResource(el.parents('tr.wbl-pageEntry'));
+		},
+
+		"img.wbl-listitem-settings click": function(el, ev) {
 			ev.stopPropagation();
 			this._openSettings(el.parents('tr.wbl-pageEntry'));
 		},
 		
-		"img.wbl-itemDelete click": function(el, ev) {
+		"img.wbl-listitem-delete click": function(el, ev) {
 			ev.stopPropagation();
 			el.trigger('deleteResource', el.parent().parent());
 		}
