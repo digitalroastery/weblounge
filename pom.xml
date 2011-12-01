@@ -479,12 +479,13 @@
               OSGI-INF/security-service.xml,
               OSGI-INF/shared-httpcontext.xml,
               OSGI-INF/shared-resources.xml,
+              OSGI-INF/site-admin-directory-provider.xml,
               OSGI-INF/site-command.xml,
               OSGI-INF/site-dispatcher-service.xml,
               OSGI-INF/site-manager-service.xml,
               OSGI-INF/site-rest-service.xml,
               OSGI-INF/site-runtime-information.xml,
-              OSGI-INF/systemdirectory-provider.xml,
+              OSGI-INF/system-admin-directory-provider.xml,
               OSGI-INF/test-command.xml
             </Service-Component>
           </instructions>

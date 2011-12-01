@@ -45,10 +45,10 @@ import java.util.Map;
  * An in-memory user directory containing the users and roles used by the
  * system.
  */
-public class SystemDirectoryProvider implements DirectoryProvider, ManagedService {
+public class SystemAdminDirectoryProvider implements DirectoryProvider, ManagedService {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(SystemDirectoryProvider.class);
+  private static final Logger logger = LoggerFactory.getLogger(SystemAdminDirectoryProvider.class);
 
   /** Service pid, used to look up the service configuration */
   public static final String SERVICE_PID = "ch.entwine.weblounge.systemdirectory";
