@@ -46,8 +46,6 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 				placeholder: rootPath + "/editor/resourcebrowser/images/empty_thumbnail.png",
 				event: "scroll",
 				container: this.element.find("div.scrollWrapper")
-			}).one("error", function() {
-				$(this).hide().attr('src', rootPath + '/editor/resourcebrowser/images/empty_thumbnail.png').show();
 			});
 		},
 		
