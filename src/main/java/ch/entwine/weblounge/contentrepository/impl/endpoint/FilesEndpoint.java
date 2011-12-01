@@ -44,6 +44,7 @@ import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
@@ -77,6 +78,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.UUID;
@@ -190,9 +192,84 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     if (StringUtils.isNotBlank(searchterms))
       q.withText(searchterms, true);
 
+    Calendar today = Calendar.getInstance();
+    today.set(Calendar.HOUR_OF_DAY, 0);
+    today.set(Calendar.MINUTE, 0);
+    today.set(Calendar.SECOND, 0);
+    today.set(Calendar.MILLISECOND, 0);
+    Calendar yesterday = Calendar.getInstance();
+    yesterday.add(Calendar.DATE, -1);
+    yesterday.set(Calendar.HOUR_OF_DAY, 0);
+    yesterday.set(Calendar.MINUTE, 0);
+    yesterday.set(Calendar.SECOND, 0);
+    yesterday.set(Calendar.MILLISECOND, 0);
+    Calendar tomorrow = Calendar.getInstance();
+    tomorrow.add(Calendar.DATE, 1);
+    tomorrow.set(Calendar.HOUR_OF_DAY, 0);
+    tomorrow.set(Calendar.MINUTE, 0);
+    tomorrow.set(Calendar.SECOND, 0);
+    tomorrow.set(Calendar.MILLISECOND, 0);
+
     // Filter query
-    if (StringUtils.isNotBlank(filter))
-      q.withFilter(filter);
+    if (StringUtils.isNotBlank(filter)) {
+      if ("/".equals(filter)) {
+        q.withPath("/");
+      }
+
+      // by user
+      else if (filter.startsWith("creator:") && filter.length() > "creator:".length()) {
+        String creator = StringUtils.trim(filter.substring("creator:".length()));
+        if ("me".equals(creator))
+          q.withCreator(securityService.getUser());
+        else
+          q.withCreator(new UserImpl(creator));
+      } else if (filter.startsWith("modifier:") && filter.length() > "modifier:".length()) {
+        String modifier = StringUtils.trim(filter.substring("modifier:".length()));
+        if ("me".equals(modifier))
+          q.withModifier(securityService.getUser());
+        else
+          q.withModifier(new UserImpl(modifier));
+      } else if (filter.startsWith("publisher:") && filter.length() > "publisher:".length()) {
+        String publisher = StringUtils.trim(filter.substring("publisher:".length()));
+        if ("me".equals(publisher))
+          q.withPublisher(securityService.getUser());
+        else
+          q.withPublisher(new UserImpl(publisher));
+      }
+
+      // by date
+
+      else if (filter.startsWith("created:") && filter.length() > "created:".length()) {
+        String created = StringUtils.trim(filter.substring("created:".length()));
+        if ("today".equals(created))
+          q.withCreationDateBetween(today.getTime()).and(tomorrow.getTime());
+        else if ("yesterday".equals(created))
+          q.withCreationDateBetween(yesterday.getTime()).and(today.getTime());
+        else
+          q.withCreationDate(tomorrow.getTime());
+      } else if (filter.startsWith("modified:") && filter.length() > "modified:".length()) {
+        String modified = StringUtils.trim(filter.substring("modified:".length()));
+        if ("today".equals(modified))
+          q.withModificationDateBetween(today.getTime()).and(tomorrow.getTime());
+        else if ("yesterday".equals(modified))
+          q.withModificationDateBetween(yesterday.getTime()).and(today.getTime());
+        else
+          q.withCreationDate(tomorrow.getTime());
+      } else if (filter.startsWith("publisher:") && filter.length() > "publisher:".length()) {
+        String published = StringUtils.trim(filter.substring("published:".length()));
+        if ("today".equals(published))
+          q.withPublishingDateBetween(today.getTime()).and(tomorrow.getTime());
+        else if ("yesterday".equals(published))
+          q.withPublishingDateBetween(yesterday.getTime()).and(today.getTime());
+        else
+          q.withCreationDate(tomorrow.getTime());
+      }
+
+      // simple filter
+      else {
+        q.withFilter(filter);
+      }
+    }
 
     // Limit and Offset
     q.withLimit(limit);

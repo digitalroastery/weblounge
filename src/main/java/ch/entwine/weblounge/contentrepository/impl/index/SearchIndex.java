@@ -94,7 +94,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   private Solr solrServer = null;
 
   /** Solr query execution */
-  private SearchRequest solrRequester = null;
+  private SearchRequest searchRequest = null;
 
   /** True if this is a readonly index */
   protected boolean isReadOnly = false;
@@ -163,7 +163,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       throws ContentRepositoryException {
     logger.debug("Searching index using query '{}'", query);
     try {
-      return solrRequester.getByQuery(query);
+      return searchRequest.getByQuery(query);
     } catch (Throwable t) {
       throw new ContentRepositoryException("Error querying solr index", t);
     }
@@ -530,7 +530,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     }
 
     solrServer = new Solr(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
-    solrRequester = new SearchRequest(solrServer);
+    searchRequest = new SearchRequest(solrServer);
 
     // Determine the index version
     if (configExists && dataExists) {

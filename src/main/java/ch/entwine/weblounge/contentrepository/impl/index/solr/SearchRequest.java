@@ -59,7 +59,9 @@ import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
@@ -76,7 +78,6 @@ import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -90,7 +91,7 @@ public class SearchRequest {
   private static Logger logger = LoggerFactory.getLogger(SearchRequest.class);
 
   /** The connection to the solr database */
-  private Solr solrConnection = null;
+  private Solr solr = null;
 
   /**
    * Creates a new requester for solr that will be using the given connection
@@ -102,7 +103,7 @@ public class SearchRequest {
   public SearchRequest(Solr connection) {
     if (connection == null)
       throw new IllegalStateException("Unable to run queries on null connection");
-    this.solrConnection = connection;
+    this.solr = connection;
   }
 
   /**
@@ -121,9 +122,6 @@ public class SearchRequest {
 
     // Build the solr query string
     StringBuilder solrQuery = new StringBuilder();
-
-    // Hide the root entry
-    andNot(solrQuery, ID, Long.toString(SearchIndex.ROOT_ID), true, true);
 
     // Resource id
     if (query.getIdentifier().length > 0) {
@@ -190,7 +188,10 @@ public class SearchRequest {
 
     // Creation date
     if (query.getCreationDate() != null) {
-      and(solrQuery, CREATED, SolrUtils.serializeDateRange(query.getCreationDate(), new Date()), false, false);
+      if (query.getCreationDateEnd() != null)
+        and(solrQuery, CREATED, SolrUtils.serializeDateRange(query.getCreationDate(), query.getCreationDateEnd()), false, false);
+      else
+        and(solrQuery, CREATED, SolrUtils.selectDay(query.getCreationDate()), false, false);
     }
 
     // Modifier
@@ -200,7 +201,10 @@ public class SearchRequest {
 
     // Modification date
     if (query.getModificationDate() != null) {
-      and(solrQuery, MODIFIED, SolrUtils.selectDay(query.getModificationDate()), false, false);
+      if (query.getCreationDateEnd() != null)
+        and(solrQuery, MODIFIED, SolrUtils.serializeDateRange(query.getModificationDate(), query.getModificationDateEnd()), false, false);
+      else
+        and(solrQuery, MODIFIED, SolrUtils.selectDay(query.getModificationDate()), false, false);
     }
 
     // Without Modification
@@ -215,12 +219,24 @@ public class SearchRequest {
 
     // Publication date
     if (query.getPublishingDate() != null) {
-      and(solrQuery, PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, false);
+      if (query.getCreationDateEnd() != null)
+        and(solrQuery, PUBLISHED_FROM, SolrUtils.serializeDateRange(query.getPublishingDate(), query.getPublishingDateEnd()), false, false);
+      else
+        and(solrQuery, PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, false);
     }
 
     // Without Publication
     if (query.getWithoutPublication()) {
       andEmpty(solrQuery, PUBLISHED_FROM);
+    }
+
+    // Lock owner
+    if (query.getLockOwner() != null) {
+      User user = query.getLockOwner();
+      if (SearchQueryImpl.ANY_USER.equals(user.getLogin()))
+        andNotEmpty(solrQuery, SolrSchema.LOCKED_BY);
+      else
+        and(solrQuery, SolrSchema.LOCKED_BY, SolrUtils.serializeUserId(user), true, true);
     }
 
     // Pagelet elements
@@ -299,6 +315,9 @@ public class SearchRequest {
     if (solrQuery.length() == 0)
       solrQuery.append("*:*");
 
+    // Hide the root entry
+    andNot(solrQuery, ID, Long.toString(SearchIndex.ROOT_ID), true, true);
+
     logger.debug("Solr query is {}", solrQuery.toString());
 
     // Prepare the solr query
@@ -308,7 +327,7 @@ public class SearchRequest {
 
     // Filter query
     if (query.getFilter() != null) {
-      q.addFilterQuery("*" + clean(query.getFilter().toLowerCase()) + "*");
+      q.addFilterQuery(clean(query.getFilter().toLowerCase()));
     }
 
     // Define the fields that should be returned by the query
@@ -373,7 +392,7 @@ public class SearchRequest {
     // Execute the query and try to get hold of a query response
     QueryResponse solrResponse = null;
     try {
-      solrResponse = solrConnection.request(q);
+      solrResponse = solr.request(q);
     } catch (Throwable t) {
       throw new SolrServerException(t);
     }
@@ -577,7 +596,7 @@ public class SearchRequest {
 
   /**
    * Encodes the field name as part of the AND clause of a solr query:
-   * <tt>AND -fieldName : ["" TO *]</tt>.
+   * <tt>AND -fieldName : [* TO *]</tt>.
    * 
    * @param buf
    *          the <code>StringBuilder</code> to append to
@@ -587,8 +606,26 @@ public class SearchRequest {
    */
   private StringBuilder andEmpty(StringBuilder buf, String fieldName) {
     if (buf.length() > 0)
-      buf.append(" AND "); // notice the minus sign
+      buf.append(" AND ");
     buf.append("-"); // notice the minus sign
+    buf.append(StringUtils.trim(fieldName));
+    buf.append(":[* TO *]");
+    return buf;
+  }
+
+  /**
+   * Encodes the field name as part of the AND clause of a solr query:
+   * <tt>AND fieldName : ["" TO *]</tt>.
+   * 
+   * @param buf
+   *          the <code>StringBuilder</code> to append to
+   * @param fieldName
+   *          the field name
+   * @return the encoded query part
+   */
+  private StringBuilder andNotEmpty(StringBuilder buf, String fieldName) {
+    if (buf.length() > 0)
+      buf.append(" AND "); // notice the minus sign
     buf.append(StringUtils.trim(fieldName));
     buf.append(":[* TO *]");
     return buf;
