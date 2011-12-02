@@ -40,6 +40,7 @@ import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
+import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.security.User;
@@ -269,22 +270,34 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         return true;
       }
 
-      // Create the set of tags that identify the page
-      CacheTagSet cacheTags = createPrimaryCacheTags(request);
+      // Check for explicit no cache instructions
+      boolean noCache = request.getParameter(ResponseCache.NOCACHE_PARAM) != null;
 
       // Check if the page is already part of the cache. If so, our task is
       // already done!
-      if (request.getVersion() == Resource.LIVE && !isEditing && action == null) {
-        long validTime = Renderer.DEFAULT_VALID_TIME;
-        long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+      if (!noCache && request.getVersion() == Resource.LIVE && !isEditing) {
 
-        // Check if the page is already part of the cache
-        if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
-          logger.debug("Page handler answered request for {} from cache", request.getUrl());
-          return true;
+        // Create the set of tags that identify the page
+        CacheTagSet cacheTags = createPrimaryCacheTags(request);
+
+        if (action == null) {
+          long validTime = Renderer.DEFAULT_VALID_TIME;
+          long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+
+          // Check if the page is already part of the cache
+          if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
+            logger.debug("Page handler answered request for {} from cache", request.getUrl());
+            return true;
+          }
+          processingMode = Mode.Cached;
+        } else {
+          // Add the cache tags (in addition to what the action handler might
+          // have
+          // set already)
+          cacheTags.add(CacheTag.Resource, page.getURI().getIdentifier());
+          response.addTags(cacheTags);
         }
 
-        processingMode = Mode.Cached;
       } else if (Http11Constants.METHOD_HEAD.equals(requestMethod)) {
         // handle HEAD requests
         Http11Utils.startHeadResponse(response);
@@ -292,11 +305,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       } else if (request.getVersion() == Resource.WORK) {
         response.setMaximumValidTime(0);
       }
-
-      // Add the cache tags (in addition to what the action handler might have
-      // set already)
-      cacheTags.add(CacheTag.Resource, page.getURI().getIdentifier());
-      response.addTags(cacheTags);
 
       // Set the default maximum render and valid times for pages
       response.setMaximumRecheckTime(Renderer.DEFAULT_RECHECK_TIME);
@@ -481,7 +489,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     cacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
     cacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
     cacheTags.add(CacheTag.User, request.getUser().getLogin());
-    cacheTags.add(CacheTag.Site, request.getSite().getIdentifier());
     Enumeration<?> pe = request.getParameterNames();
     int parameterCount = 0;
     while (pe.hasMoreElements()) {

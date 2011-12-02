@@ -38,6 +38,7 @@ import ch.entwine.weblounge.common.impl.url.UrlMatcherImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
+import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.Action;
@@ -203,9 +204,12 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         return true;
       }
 
+      // Check for explicit no cache instructions
+      boolean noCache = request.getParameter(ResponseCache.NOCACHE_PARAM) != null;
+
       // Check if the page is already part of the cache. If so, our task is
       // already done!
-      if (request.getVersion() == Resource.LIVE) {
+      if (!noCache && request.getVersion() == Resource.LIVE) {
         long validTime = Renderer.DEFAULT_VALID_TIME;
         long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
 
@@ -259,6 +263,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           }
       }
 
+    } finally {
+
       // Finish cache handling
       switch (processingMode) {
         case Cached:
@@ -271,8 +277,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           break;
       }
 
-      // Return the action
-    } finally {
+      // Return the action handler to the pool
       try {
         pool.returnObject(action);
       } catch (Throwable t) {
@@ -470,7 +475,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     cacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
     cacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
     cacheTags.add(CacheTag.User, request.getUser().getLogin());
-    cacheTags.add(CacheTag.Site, request.getSite().getIdentifier());
     cacheTags.add(CacheTag.Module, action.getModule().getIdentifier());
     cacheTags.add(CacheTag.Action, action.getIdentifier());
     Enumeration<?> pe = request.getParameterNames();

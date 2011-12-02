@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import ch.entwine.weblounge.common.content.PageSearchResultItem;
+import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Renderer.RendererType;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
@@ -35,9 +36,12 @@ import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
+import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.Environment;
@@ -77,6 +81,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,6 +177,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     Site site = request.getSite();
     String path = request.getRequestURI();
     String feedType = null;
+    String feedVersion = null;
 
     // Currently, we only support feeds mapped to our well-known uri
     if (!path.startsWith(URI_PREFIX) || !(path.length() > URI_PREFIX.length()))
@@ -184,15 +190,6 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       return false;
     }
 
-    // Get hold of the content repository
-    ContentRepository contentRepository = site.getContentRepository();
-    if (contentRepository == null) {
-      logger.warn("No content repository found for site '{}'", site);
-      return false;
-    }
-
-    // TODO: Add check for if-modified-since
-
     // Check for feed type and version
     String feedURI = path.substring(URI_PREFIX.length());
     String[] feedURIParts = feedURI.split("/");
@@ -204,6 +201,93 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       return false;
     }
 
+    feedType = feedURIParts[0];
+    feedVersion = feedURIParts[1];
+
+    // Check for explicit no cache instructions
+    boolean noCache = request.getParameter(ResponseCache.NOCACHE_PARAM) != null;
+
+    // Check if the page is already part of the cache. If so, our task is
+    // already done!
+    if (!noCache) {
+      long validTime = Renderer.DEFAULT_VALID_TIME;
+      long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+
+      // Create the set of tags that identify the request output
+      CacheTagSet cacheTags = createPrimaryCacheTags(request);
+
+      // Check if the page is already part of the cache
+      if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
+        logger.debug("Feed handler answered request for {} from cache", request.getUrl());
+        return true;
+      }
+    }
+
+    try {
+
+      // Compile the feed
+      SyndFeed feed = createFeed(feedType, feedVersion, site, request, response);
+      if (feed == null)
+        return true;
+
+      // Set the response type
+      String characterEncoding = "utf-8";
+      if (feedType.startsWith("atom"))
+        response.setContentType("application/atom+xml; charset=" + characterEncoding);
+      else if (feedType.startsWith("rss"))
+        response.setContentType("application/rss+xml; charset=" + characterEncoding);
+
+      // Set the character encoding
+      feed.setEncoding(response.getCharacterEncoding());
+
+      // Write the feed back to the response
+
+      SyndFeedOutput output = new SyndFeedOutput();
+      Writer responseWriter = new OutputStreamWriter(response.getOutputStream(), characterEncoding);
+      output.output(feed, responseWriter);
+      response.getOutputStream().flush();
+      return true;
+
+    } catch (ContentRepositoryException e) {
+      logger.error("Error loading articles for feeds from {}: {}", site.getIdentifier(), e.getMessage());
+      DispatchUtils.sendInternalError(request, response);
+      return true;
+    } catch (FeedException e) {
+      logger.error("Error creating {} feed: {}", feedType, e.getMessage());
+      DispatchUtils.sendInternalError(request, response);
+      return true;
+    } catch (EOFException e) {
+      logger.debug("Error writing feed '{}' back to client: connection closed by client", feedType);
+      return true;
+    } catch (IOException e) {
+      logger.error("Error sending {} feed to the client: {}", feedType, e.getMessage());
+      DispatchUtils.sendInternalError(request, response);
+      return true;
+    } finally {
+      response.endResponse();
+    }
+  }
+
+  /**
+   * Compiles the feed based on feed type, version and request parameters.
+   * 
+   * @param feedType
+   *          feed type
+   * @param feedVersion
+   *          feed version
+   * @param site
+   *          the site
+   * @param request
+   *          the request
+   * @param response
+   *          the response
+   * @return the feed object
+   * @throws ContentRepositoryException
+   *           if the content repository can't be accessed
+   */
+  private SyndFeed createFeed(String feedType, String feedVersion, Site site,
+      WebloungeRequest request, WebloungeResponse response)
+      throws ContentRepositoryException {
     // Extract the subjects. The parameter may be specified multiple times
     // and add more than one subject by separating them using a comma.
     String[] subjectParameter = request.getParameterValues(PARAM_SUBJECT);
@@ -229,12 +313,19 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       }
     }
 
+    // Get hold of the content repository
+    ContentRepository contentRepository = site.getContentRepository();
+    if (contentRepository == null) {
+      logger.warn("No content repository found for site '{}'", site);
+      return null;
+    }
+
     // User and language
     Language language = request.getLanguage();
     // User user = request.getUser();
 
     // Determine the feed type
-    feedType = feedURIParts[0].toLowerCase() + "_" + feedURIParts[1];
+    feedType = feedType.toLowerCase() + "_" + feedVersion;
     SyndFeed feed = new SyndFeedImpl();
     feed.setFeedType(feedType);
     feed.setLink(request.getRequestURL().toString());
@@ -244,132 +335,97 @@ public class FeedRequestHandlerImpl implements RequestHandler {
 
     // TODO: Add more feed metadata, ask site
 
-    // Find the pages that will form the feed
-    try {
-      SearchQuery query = new SearchQueryImpl(site);
-      query.withVersion(Resource.LIVE);
-      query.withTypes(Page.TYPE);
-      query.withLimit(limit);
-      query.sortByModificationDate(Order.Descending);
-      for (String subject : subjects) {
-        query.withSubject(subject);
+    SearchQuery query = new SearchQueryImpl(site);
+    query.withVersion(Resource.LIVE);
+    query.withTypes(Page.TYPE);
+    query.withLimit(limit);
+    query.sortByModificationDate(Order.Descending);
+    for (String subject : subjects) {
+      query.withSubject(subject);
+    }
+
+    // Load the result and add feed entries
+    SearchResult result = contentRepository.find(query);
+    List<SyndEntry> entries = new ArrayList<SyndEntry>();
+    limit = result.getItems().length;
+
+    while (limit > 0) {
+      SearchResultItem item = result.getItems()[limit - 1];
+      limit--;
+
+      // Get the page
+      PageSearchResultItem pageItem = (PageSearchResultItem) item;
+      Page page = pageItem.getPage();
+      page.switchTo(language);
+
+      // Tag the cache entry
+      response.addTag(CacheTag.Resource, page.getIdentifier());
+
+      // Create the entry
+      SyndEntry entry = new SyndEntryImpl();
+      entry.setPublishedDate(page.getPublishFrom());
+      entry.setLink(site.getConnector(request.getEnvironment()).toExternalForm() + item.getUrl().getLink());
+      entry.setAuthor(page.getCreator().getName());
+      entry.setTitle(page.getTitle());
+
+      // Categories
+      if (page.getSubjects().length > 0) {
+        List<SyndCategory> categories = new ArrayList<SyndCategory>();
+        for (String subject : page.getSubjects()) {
+          SyndCategory category = new SyndCategoryImpl();
+          category.setName(subject);
+          categories.add(category);
+        }
+        entry.setCategories(categories);
       }
 
-      // Load the result and add feed entries
-      SearchResult result = contentRepository.find(query);
-      List<SyndEntry> entries = new ArrayList<SyndEntry>();
-      for (SearchResultItem item : result.getItems()) {
-        if (limit == 0)
-          break;
+      // TODO: Can the page be accessed?
 
-        // Get the page
-        PageSearchResultItem pageItem = (PageSearchResultItem) item;
-        Page page = pageItem.getPage();
-        page.switchTo(language);
+      // Try to render the preview pagelets and write them to the feed
+      List<SyndContent> entryContent = new ArrayList<SyndContent>();
+      Composer composer = new ComposerImpl("preview", page.getPreview());
 
-        // Create the entry
-        SyndEntry entry = new SyndEntryImpl();
-        entry.setPublishedDate(page.getPublishFrom());
-        entry.setLink(site.getConnector(request.getEnvironment()).toExternalForm() + item.getUrl().getLink());
-        entry.setAuthor(page.getCreator().getName());
-        entry.setTitle(page.getTitle());
-
-        // Categories
-        if (page.getSubjects().length > 0) {
-          List<SyndCategory> categories = new ArrayList<SyndCategory>();
-          for (String subject : page.getSubjects()) {
-            SyndCategory category = new SyndCategoryImpl();
-            category.setName(subject);
-            categories.add(category);
-          }
-          entry.setCategories(categories);
+      for (Pagelet pagelet : composer.getPagelets()) {
+        Module module = site.getModule(pagelet.getModule());
+        PageletRenderer renderer = null;
+        if (module == null) {
+          logger.warn("Skipping pagelet {} in feed due to missing module '{}'", pagelet, pagelet.getModule());
+          continue;
         }
 
-        // TODO: Can the page be accessed?
-
-        // Try to render the preview pagelets and write them to the feed
-        List<SyndContent> entryContent = new ArrayList<SyndContent>();
-        Composer composer = new ComposerImpl("preview", page.getPreview());
-        for (Pagelet pagelet : composer.getPagelets()) {
-          Module module = site.getModule(pagelet.getModule());
-          PageletRenderer renderer = null;
-          if (module == null) {
-            logger.warn("Skipping pagelet {} in feed due to missing module '{}'", pagelet, pagelet.getModule());
-            continue;
+        renderer = module.getRenderer(pagelet.getIdentifier());
+        URL rendererURL = renderer.getRenderer(RendererType.Feed.toString());
+        Environment environment = request.getEnvironment();
+        if (rendererURL == null)
+          rendererURL = renderer.getRenderer();
+        if (rendererURL != null) {
+          String rendererContent = null;
+          try {
+            pagelet.switchTo(language);
+            rendererContent = loadContents(rendererURL, site, page, composer, pagelet, environment);
+          } catch (ServletException e) {
+            logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
+          } catch (IOException e) {
+            logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
           }
-
-          renderer = module.getRenderer(pagelet.getIdentifier());
-          URL rendererURL = renderer.getRenderer(RendererType.Feed.toString());
-          Environment environment = request.getEnvironment();
-          if (rendererURL == null)
-            rendererURL = renderer.getRenderer();
-          if (rendererURL != null) {
-            String rendererContent = null;
-            try {
-              pagelet.switchTo(language);
-              rendererContent = loadContents(rendererURL, site, page, composer, pagelet, environment);
-            } catch (ServletException e) {
-              logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
-            } catch (IOException e) {
-              logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
-            }
-            SyndContent content = new SyndContentImpl();
-            content.setType("text/html");
-            content.setMode("escaped");
-            content.setValue(rendererContent);
-            entryContent.add(content);
-          }
+          SyndContent content = new SyndContentImpl();
+          content.setType("text/html");
+          content.setMode("escaped");
+          content.setValue(rendererContent);
+          entryContent.add(content);
         }
-        if (entryContent.size() > 0) {
-          entry.setContents(entryContent);
-        }
-
-        entries.add(entry);
-        limit--;
       }
 
-      feed.setEntries(entries);
-    } catch (ContentRepositoryException e) {
-      logger.error("Error loading articles for feeds from {}: {}", contentRepository, e.getMessage());
-      DispatchUtils.sendInternalError(request, response);
-      return true;
+      if (entryContent.size() > 0) {
+        entry.setContents(entryContent);
+      }
+
+      entries.add(entry);
     }
 
-    // Set the response type
-    String characterEncoding = response.getCharacterEncoding();
-    if (StringUtils.isNotBlank(requestMethod)) {
-      characterEncoding = "; charset=" + characterEncoding.toLowerCase();
-    } else {
-      characterEncoding = "";
-    }
-    if (feedType.startsWith("atom"))
-      response.setContentType("application/atom+xml" + characterEncoding);
-    else if (feedType.startsWith("rss"))
-      response.setContentType("application/rss+xml" + characterEncoding);
+    feed.setEntries(entries);
 
-    // Set the character encoding
-    feed.setEncoding(response.getCharacterEncoding());
-
-    // Write the feed back to the response
-    try {
-
-      SyndFeedOutput output = new SyndFeedOutput();
-      Writer responseWriter = new OutputStreamWriter(response.getOutputStream());
-      output.output(feed, responseWriter);
-      response.getOutputStream().flush();
-      return true;
-    } catch (FeedException e) {
-      logger.error("Error creating {} feed: {}", feedType, e.getMessage());
-      DispatchUtils.sendInternalError(request, response);
-      return true;
-    } catch (EOFException e) {
-      logger.debug("Error writing feed '{}' back to client: connection closed by client", feedType);
-      return true;
-    } catch (IOException e) {
-      logger.error("Error sending {} feed to the client: {}", feedType, e.getMessage());
-      DispatchUtils.sendInternalError(request, response);
-      return true;
-    }
+    return feed;
   }
 
   /**
@@ -453,6 +509,32 @@ public class FeedRequestHandlerImpl implements RequestHandler {
         IOUtils.closeQuietly(is);
       }
     }
+  }
+
+  /**
+   * Returns the primary set of cache tags for the given request.
+   * 
+   * @param request
+   *          the request
+   * @return the cache tags
+   */
+  protected CacheTagSet createPrimaryCacheTags(WebloungeRequest request) {
+    CacheTagSet cacheTags = new CacheTagSet();
+    cacheTags.add(CacheTag.Url, request.getUrl().getPath());
+    cacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
+    cacheTags.add(CacheTag.User, request.getUser().getLogin());
+    Enumeration<?> pe = request.getParameterNames();
+    int parameterCount = 0;
+    while (pe.hasMoreElements()) {
+      parameterCount++;
+      String key = pe.nextElement().toString();
+      String[] values = request.getParameterValues(key);
+      for (String value : values) {
+        cacheTags.add(key, value);
+      }
+    }
+    cacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
+    return cacheTags;
   }
 
   /**
