@@ -22,6 +22,7 @@ package ch.entwine.weblounge.taglib.content;
 
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.editor.EditingState;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
@@ -72,14 +73,29 @@ public class WorkbenchTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
+    boolean isMockRequest = RequestUtils.isMockRequest(request);
+
     // If the user does not have editing rights, make sure the
     // cookie is deleted. This is likely to be the case after the user
     // has hit the logout button or after the session has expired.
-    if (!SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR)) {
-      Cookie cookie = new Cookie(EditingState.STATE_COOKIE, null);
-      cookie.setMaxAge(0);
-      cookie.setPath("/");
-      response.addCookie(cookie);
+
+    boolean isEditor = SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR);
+
+    if (!isEditor && !isMockRequest) {
+
+      // Make sure the cookie is removed on the client side
+      Cookie[] cookies = request.getCookies();
+      if (cookies != null) {
+        for (Cookie c : cookies) {
+          if (EditingState.STATE_COOKIE.equals(c.getName())) {
+            Cookie cookie = new Cookie(EditingState.STATE_COOKIE, null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+          }
+        }
+      }
+
       return super.doEndTag();
     }
 
@@ -88,7 +104,8 @@ public class WorkbenchTag extends WebloungeTag {
     }
 
     // Is the ?edit parameter in place?
-    if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
+    boolean enterWorkbench = request.getParameter(EditingState.WORKBENCH_PARAM) != null;
+    if (enterWorkbench && !isMockRequest) {
       Cookie cookie = new Cookie(EditingState.STATE_COOKIE, "true");
       cookie.setPath("/");
       response.addCookie(cookie);
@@ -99,6 +116,7 @@ public class WorkbenchTag extends WebloungeTag {
     // If not, do we have the cookie instead?
     if (request.getCookies() == null)
       return super.doEndTag();
+
     for (Cookie cookie : request.getCookies()) {
       if (cookie.getName().equals(EditingState.STATE_COOKIE) && "true".equals(cookie.getValue())) {
         writeWorkbenchScript(getRequest(), getResponse());
