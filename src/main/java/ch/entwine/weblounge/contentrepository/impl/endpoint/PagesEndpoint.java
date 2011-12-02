@@ -34,6 +34,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
@@ -671,7 +672,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Make sure the page doesn't exist
     try {
-      if (contentRepository.existsInAnyVersion(pageURI)) {
+      if (contentRepository.existsInAnyVersion(new GeneralResourceURIImpl(site, pageURI.getPath()))) {
         logger.warn("Tried to create already existing page {} in site '{}'", pageURI, site);
         throw new WebApplicationException(Status.CONFLICT);
       }
