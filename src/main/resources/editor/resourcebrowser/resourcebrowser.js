@@ -82,24 +82,30 @@ steal.plugins(
 				this.resourceMode = resourceMode;
 			}
 			
+			this.lastParams = {preferredversion: 1};
+			this.lastParams.filter = '';
+			$.each(preSelection, $.proxy(function(i, id) {
+				if(id == '') return;
+				this.lastParams.filter += 'id:' + id + ' ';
+			}, this));
+			
 			this.lastQuery = {page: $.proxy(function(params) {
 				Page.findAll(params, $.proxy(function(pages) {
 					this.options.resources = pages;
 					this.searchFlag = false;
-					this._updateEditorSelectionMode(isMultiSelect, preSelection);
+					this._updateEditorSelectionMode(isMultiSelect, preSelection, this.lastParams.filter);
 				}, this));
 			}, this), media: $.proxy(function(params) {
 				Editor.File.findAll(params, $.proxy(function(media) {
 					this.options.resources = media;
 					this.searchFlag = false;
-					this._updateEditorSelectionMode(isMultiSelect, preSelection);
+					this._updateEditorSelectionMode(isMultiSelect, preSelection, this.lastParams.filter);
 				}, this));
 			}, this)};
-			this.lastParams = {preferredversion: 1};
 			this._loadResources(this.lastParams, this.lastQuery);
 		},
 		
-		_updateEditorSelectionMode: function(isMultiSelect, preSelection) {
+		_updateEditorSelectionMode: function(isMultiSelect, preSelection, filter) {
 			this.activeElement.show();
 			this.searchBox.hide();
 			this.element.find('div.wbl-view').show();
@@ -124,6 +130,8 @@ steal.plugins(
 			});
 			
 			this.element.find('nav.wbl-icons button').hide();
+			if(filter != '')
+				this.element.find('nav.wbl-icons input#wbl-filter').val(filter);
 			
 			if(this.activeElement.is(this.scrollView)) {
 				this.scrollView.editor_resourcescrollview('_selectResources', preSelection);

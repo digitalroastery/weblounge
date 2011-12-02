@@ -50,8 +50,10 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 		},
 		
 		_initViewItems: function() {
+			var scrollViewItem = this.element.find('div.scrollableArea').hide();
 			$.each(this.options.resources, $.proxy(function (i, res) {
-				var scrollViewItem = this.element.find('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {
+				if(i == 49) return false;
+				scrollViewItem.append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {
 					page: res, 
 					language: this.options.language,
 					runtime: this.options.runtime,
@@ -65,6 +67,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/widget')
 					mode: this.options.mode
 				});
 			}, this));
+			scrollViewItem.show();
 		},
 		
 		_selectResources: function(selection) {
