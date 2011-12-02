@@ -84,10 +84,12 @@ steal.plugins(
 			
 			this.lastParams = {preferredversion: 1};
 			this.lastParams.filter = '';
-			$.each(preSelection, $.proxy(function(i, id) {
-				if(id == '') return;
-				this.lastParams.filter += 'id:' + id + ' ';
-			}, this));
+			if (preSelection) {
+				$.each(preSelection, $.proxy(function(i, id) {
+					if(id == '') return;
+					this.lastParams.filter += 'id:' + id + ' ';
+				}, this));
+			}
 			
 			this.lastQuery = {page: $.proxy(function(params) {
 				Page.findAll(params, $.proxy(function(pages) {
