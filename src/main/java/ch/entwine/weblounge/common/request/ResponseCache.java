@@ -51,6 +51,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface ResponseCache {
 
+  /** The no cache parameter */
+  String NOCACHE_PARAM = "_";
+
   /**
    * Wraps the given response into a cacheable http servlet response.
    * 

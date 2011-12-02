@@ -37,7 +37,7 @@ public interface CacheTag extends Tag {
   String User = "user";
   String Module = "module";
   String Action = "action";
-  String Site = "site";
+  String Site = "site"; // TODO: Remove, cache is per site anyway
   String Parameters = "parameters";
   String Composer = "composer";
   String Position = "position";
