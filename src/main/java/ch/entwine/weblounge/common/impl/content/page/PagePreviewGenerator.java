@@ -40,6 +40,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
@@ -109,6 +111,9 @@ public class PagePreviewGenerator implements PreviewGenerator {
   /** The user agents per site */
   private static Map<String, WebloungeUserAgent> userAgents = new HashMap<String, WebloungeUserAgent>();
 
+  /** Warning flags */
+  private boolean isRenderingEnvironmentSane = true;
+
   /** The cache service tracker */
   private ServiceTracker siteServletTracker = null;
 
@@ -162,6 +167,11 @@ public class PagePreviewGenerator implements PreviewGenerator {
   public void createPreview(Resource<?> resource, Environment environment,
       Language language, ImageStyle style, InputStream is, OutputStream os)
       throws IOException {
+
+    if (!isRenderingEnvironmentSane) {
+      logger.debug("Skipping page preview rendering as environment is not sane");
+      return;
+    }
 
     ResourceURI uri = resource.getURI();
     Site site = uri.getSite();
@@ -219,8 +229,18 @@ public class PagePreviewGenerator implements PreviewGenerator {
       // Create the renderer. Due to a synchronization bug in the software,
       // this needs to be synchronized
       Java2DRenderer renderer = null;
-      synchronized (this) {
-        renderer = new Java2DRenderer(xhtmlFile, screenshotWidth, screenshotHeight);
+      try {
+        synchronized (this) {
+          renderer = new Java2DRenderer(xhtmlFile, screenshotWidth, screenshotHeight);
+        }
+      } catch (Throwable t) {
+        if (isRenderingEnvironmentSane) {
+          logger.warn("Error creating Java 2D renderer for previews: {}" + t.getMessage());
+          logger.warn("Page preview rendering will be switched off");
+          isRenderingEnvironmentSane = false;
+        }
+        logger.debug("Error creating Java 2D renderer for preview of page {}: {}" + uri.getPath(), t.getMessage());
+        return;
       }
 
       // Configure the renderer
@@ -249,7 +269,9 @@ public class PagePreviewGenerator implements PreviewGenerator {
       logger.warn("Error rendering page content at " + uri + ": " + e.getMessage());
       throw e;
     } catch (HeadlessException e) {
-      logger.warn("Headless error rendering page content at " + uri + ": " + e.getMessage());
+      logger.warn("Headless error while trying to render page preview: " + e.getMessage());
+      logger.warn("Page preview rendering will be switched off");
+      isRenderingEnvironmentSane = false;
       throw e;
     } catch (Throwable t) {
       logger.warn("Error rendering page content at " + uri + ": " + t.getMessage(), t);
@@ -325,6 +347,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
       return response.getContentAsString();
     } else {
       HttpClient httpClient = new DefaultHttpClient();
+      httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BEST_MATCH);
       try {
         if (version == Resource.WORK) {
           rendererURL = new URL(UrlUtils.concat(rendererURL.toExternalForm(), "work_" + language.getIdentifier() + ".html"));
