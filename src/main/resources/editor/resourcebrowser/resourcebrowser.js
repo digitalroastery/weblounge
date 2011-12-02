@@ -417,7 +417,7 @@ steal.plugins(
                 			}
                 		}, this));
                 	} else {
-                		this._showErrorMessage("Can't delete " + page.getPath() + ": Page is locked!");
+                		this._showErrorMessage("Can't delete " + page.getPath() + ": Page is locked by " + page.getLockOwner() + "!");
                 	}
         		}, this))
         		break;
