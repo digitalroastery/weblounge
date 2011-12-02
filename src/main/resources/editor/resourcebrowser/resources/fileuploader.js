@@ -627,7 +627,7 @@ qq.extend(qq.FileUploader.prototype, {
         qq.remove(this._find(item, 'progressContainer'));
         
         if (result.success){
-            qq.addClass(item, this._classes.success);    
+            qq.addClass(item, this._classes.success);
         } else {
             qq.addClass(item, this._classes.fail);
         }         
@@ -635,12 +635,13 @@ qq.extend(qq.FileUploader.prototype, {
     _addToList: function(id, fileName){
         var item = qq.toElement(this._options.fileTemplate);                
         item.qqFileId = id;
+        $(item).attr('id', id);
 
         var fileElement = this._find(item, 'file');        
         qq.setText(fileElement, this._formatFileName(fileName));
         this._find(item, 'size').style.display = 'none';        
 
-        this._listElement.appendChild(item);
+        $(item).prependTo(this._listElement);
     },
     _getItemByFileId: function(id){
         var item = this._listElement.firstChild;        

@@ -38,7 +38,11 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller', 'jque
 						var count = parseInt(pendingCircle.html());
 						if(isNaN(count)) count = 0;
 						pendingCircle.html(++count).fadeIn();
-						$(this.element.find('ul.qq-upload-list li')[id]).effect("transfer", { to: this.element.parent().parent().find("div#wbl-pendingCircle") }, 1000);
+						var listItem = $(this.element.find('ul.qq-upload-list li#' + id));
+						listItem.effect("transfer", { to: this.element.parent().parent().find("div#wbl-pendingCircle") }, 1000);
+						listItem.delay(5000).fadeOut(400, function() {
+						    $(this).remove();
+						});
 				    }, this),
 				    // path to server-side upload script
 				    action: '/system/weblounge/files/uploads'
