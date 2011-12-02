@@ -255,6 +255,16 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
           q.withCreationDate(tomorrow.getTime());
       }
 
+      // by id
+      else if (filter.contains("id:")) {
+        String[] searchTerms = StringUtils.split(filter);
+        for (String searchTerm : searchTerms) {
+          if (searchTerm.startsWith("id:") && filter.length() > "id:".length()) {
+            q.withIdentifier(StringUtils.trim(searchTerm.substring("id:".length())));
+          }
+        }
+      }
+
       // simple filter
       else {
         q.withFilter(filter);
