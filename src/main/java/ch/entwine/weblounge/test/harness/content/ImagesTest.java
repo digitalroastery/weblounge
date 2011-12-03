@@ -406,7 +406,7 @@ public class ImagesTest extends IntegrationTestBase {
       assertEquals("inline; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
 
       // Test ETag header
-      Header eTagHeader = response.getFirstHeader("Etag");
+      Header eTagHeader = response.getFirstHeader("ETag");
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
@@ -453,7 +453,7 @@ public class ImagesTest extends IntegrationTestBase {
       assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
 
       // Test ETag header
-      Header eTagHeader = response.getFirstHeader("Etag");
+      Header eTagHeader = response.getFirstHeader("ETag");
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
@@ -531,7 +531,7 @@ public class ImagesTest extends IntegrationTestBase {
       assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
 
       // Test ETag header
-      Header eTagHeader = response.getFirstHeader("Etag");
+      Header eTagHeader = response.getFirstHeader("ETag");
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
@@ -614,7 +614,7 @@ public class ImagesTest extends IntegrationTestBase {
       assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
 
       // Test ETag header
-      Header eTagHeader = response.getFirstHeader("Etag");
+      Header eTagHeader = response.getFirstHeader("ETag");
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();

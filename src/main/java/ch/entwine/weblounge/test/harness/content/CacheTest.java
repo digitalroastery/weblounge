@@ -144,10 +144,10 @@ public class CacheTest extends IntegrationTestBase {
       boolean okOrNotModified = statusCode == HttpServletResponse.SC_OK || statusCode == HttpServletResponse.SC_NOT_MODIFIED;
       assertTrue(okOrNotModified);
 
-      // Get the Etag header
-      assertNotNull(response.getHeaders("Etag"));
-      assertEquals(1, response.getHeaders("Etag").length);
-      String eTag = response.getHeaders("Etag")[0].getValue();
+      // Get the ETag header
+      assertNotNull(response.getHeaders("ETag"));
+      assertEquals(1, response.getHeaders("ETag").length);
+      String eTag = response.getHeaders("ETag")[0].getValue();
 
       // Get the Expires header
       assertNotNull(response.getHeaders("Expires"));
@@ -176,10 +176,10 @@ public class CacheTest extends IntegrationTestBase {
       // received
       // value, since on first request, that value is not yet correct
 
-      // Get the Etag header
-      assertNotNull(response.getHeaders("Etag"));
-      assertEquals(1, response.getHeaders("Etag").length);
-      assertEquals(eTag, response.getHeaders("Etag")[0].getValue());
+      // Get the ETag header
+      assertNotNull(response.getHeaders("ETag"));
+      assertEquals(1, response.getHeaders("ETag").length);
+      assertEquals(eTag, response.getHeaders("ETag")[0].getValue());
 
       // Test the Cache header
       assertNotNull(response.getHeaders("X-Cache-Key"));

@@ -259,7 +259,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
 
       // Test ETag header
-      Header eTagHeader = response.getFirstHeader("Etag");
+      Header eTagHeader = response.getFirstHeader("ETag");
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
@@ -306,7 +306,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
         assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
 
         // Test ETag header
-        Header eTagHeader = response.getFirstHeader("Etag");
+        Header eTagHeader = response.getFirstHeader("ETag");
         assertNotNull(eTagHeader);
         assertNotNull(eTagHeader.getValue());
         eTagValue = eTagHeader.getValue();

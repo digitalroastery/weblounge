@@ -140,7 +140,7 @@ public class FilesEndpointTest extends IntegrationTestBase {
       assertEquals(id, XPathHelper.valueOf(fileXml, "/file/@id"));
 
       // Test ETag header
-      Header eTagHeader = response.getFirstHeader("Etag");
+      Header eTagHeader = response.getFirstHeader("ETag");
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();

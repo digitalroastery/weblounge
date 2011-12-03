@@ -83,7 +83,7 @@ public class StaticResourcesTest extends IntegrationTestBase {
     
     String requestUrl = UrlUtils.concat(serverUrl, IMAGE_PATH);
     
-    // Value of the Etag header from the first response */
+    // Value of the ETag header from the first response */
     String eTagValue = null; 
 
     // Send and the request and examine the response
@@ -100,8 +100,8 @@ public class StaticResourcesTest extends IntegrationTestBase {
       // Read the content
       response.getEntity().consumeContent();
       
-      // Read and store Etag
-      Header eTagHeader = response.getFirstHeader("Etag");
+      // Read and store ETag
+      Header eTagHeader = response.getFirstHeader("ETag");
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();

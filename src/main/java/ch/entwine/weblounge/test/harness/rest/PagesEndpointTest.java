@@ -208,7 +208,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
       assertEquals(id, XPathHelper.valueOf(pageXml, "/page/@id"));
 
       // Test ETag header
-      Header eTagHeader = response.getFirstHeader("Etag");
+      Header eTagHeader = response.getFirstHeader("ETag");
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();

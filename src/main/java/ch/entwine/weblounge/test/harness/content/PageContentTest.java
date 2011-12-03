@@ -197,7 +197,7 @@ public class PageContentTest extends IntegrationTestBase {
         assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${site.root}')]"));
 
         // Test ETag header
-        Header eTagHeader = response.getFirstHeader("Etag");
+        Header eTagHeader = response.getFirstHeader("ETag");
         assertNotNull(eTagHeader);
         assertNotNull(eTagHeader.getValue());
         eTagValue = eTagHeader.getValue();
