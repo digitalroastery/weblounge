@@ -674,7 +674,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // This header must be set, otherwise it defaults to
     // "Thu, 01-Jan-1970 00:00:00 GMT"
     response.setDateHeader("Expires", element.getExpirationTime());
-    response.setHeader("Etag", entry.getETag());
+    response.setHeader("ETag", entry.getETag());
 
     // Add the X-Cache-Key header
     if (debug) {

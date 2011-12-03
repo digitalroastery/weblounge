@@ -159,7 +159,7 @@ public class CacheEntryTest {
    * Test method for {@link ch.entwine.weblounge.cache.impl.CacheEntry#setHeaders(CacheableHttpServletResponseHeaders)}.
    */
   @Test
-  public void testPassEtag() {
+  public void testPassETag() {
     String eTag = "\"0123456789\""; 
     CacheableHttpServletResponseHeaders h = entry.getHeaders();
     h.addHeader("ETag", eTag);
