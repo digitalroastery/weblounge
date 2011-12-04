@@ -289,14 +289,11 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
             logger.debug("Page handler answered request for {} from cache", request.getUrl());
             return true;
           }
-          processingMode = Mode.Cached;
-        } else {
-          // Add the cache tags (in addition to what the action handler might
-          // have
-          // set already)
-          cacheTags.add(CacheTag.Resource, page.getURI().getIdentifier());
-          response.addTags(cacheTags);
         }
+
+        processingMode = Mode.Cached;
+        cacheTags.add(CacheTag.Resource, page.getURI().getIdentifier());
+        response.addTags(cacheTags);
 
       } else if (Http11Constants.METHOD_HEAD.equals(requestMethod)) {
         // handle HEAD requests

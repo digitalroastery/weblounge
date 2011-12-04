@@ -20,7 +20,6 @@
 
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
-import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Composer;
@@ -210,8 +209,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       // Check if the page is already part of the cache. If so, our task is
       // already done!
       if (!noCache && request.getVersion() == Resource.LIVE) {
-        long validTime = Renderer.DEFAULT_VALID_TIME;
-        long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+        long validTime = action.getValidTime();
+        long recheckTime = action.getRecheckTime();
 
         // Create the set of tags that identify the request output
         CacheTagSet cacheTags = createCacheTags(request, action);
