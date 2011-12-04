@@ -1224,7 +1224,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     try {
       for (Pagelet pagelet : page.getPagelets()) {
         String resourceId = pagelet.getProperty("resourceid");
-        if (resourceId == null)
+        if (StringUtils.isEmpty(resourceId))
           continue;
         ResourceURI resourceURI = contentRepository.getResourceURI(resourceId);
         if (resourceURI == null) {
