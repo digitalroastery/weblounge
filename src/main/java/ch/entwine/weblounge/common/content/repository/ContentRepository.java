@@ -62,6 +62,14 @@ public interface ContentRepository {
   boolean isReadOnly();
 
   /**
+   * Returns <code>true</code> if the content repository is currently indexing
+   * the contents.
+   * 
+   * @return <code>true</code> if the repository content is being index
+   */
+  boolean isIndexing();
+
+  /**
    * Opens the repository. Depending on the type of the repository
    * implementation, this might involve mounting network volumes, opening
    * database connections etc.

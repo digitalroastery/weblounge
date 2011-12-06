@@ -28,6 +28,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
@@ -43,6 +48,7 @@
             <Bundle-SymbolicName>${project.groupId}.common-api</Bundle-SymbolicName>
             <Import-Package>
               org.apache.commons.lang;version="2.6",
+              org.slf4j;version="[1.5.0,1.6.0)",
               javax.security.auth.login,
               javax.security.auth.spi,
               javax.servlet.http;version="2.5",

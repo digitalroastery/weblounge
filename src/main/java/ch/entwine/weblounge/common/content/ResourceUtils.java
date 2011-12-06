@@ -24,6 +24,8 @@ import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -37,6 +39,9 @@ import javax.servlet.http.HttpServletRequest;
  * resource versions and names.
  */
 public final class ResourceUtils {
+
+  /** Logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(ResourceUtils.class);
 
   /** File size units */
   private static final String[] SIZE_UNITS = { "B", "kB", "MB", "GB", "TB" };
@@ -138,9 +143,13 @@ public final class ResourceUtils {
   public static boolean isModified(HttpServletRequest request,
       Resource<?> resource) throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
-      long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-      long resourceModificationDate = getModificationDate(resource, null).getTime();
-      return cachedModificationDate < resourceModificationDate;
+      try {
+        long cachedModificationDate = request.getDateHeader("If-Modified-Since");
+        long resourceModificationDate = getModificationDate(resource, null).getTime();
+        return cachedModificationDate < resourceModificationDate;
+      } catch (IllegalArgumentException e) {
+        logger.debug("Client sent malformed 'If-Modified-Since' header: {}");
+      }
     }
     return true;
   }
@@ -165,9 +174,13 @@ public final class ResourceUtils {
   public static boolean isModified(HttpServletRequest request,
       Resource<?> resource, Language language) throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
-      long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-      long resourceModificationDate = getModificationDate(resource, language).getTime();
-      return cachedModificationDate < resourceModificationDate;
+      try {
+        long cachedModificationDate = request.getDateHeader("If-Modified-Since");
+        long resourceModificationDate = getModificationDate(resource, language).getTime();
+        return cachedModificationDate < resourceModificationDate;
+      } catch (IllegalArgumentException e) {
+        logger.debug("Client sent malformed 'If-Modified-Since' header: {}");
+      }
     }
     return true;
   }
