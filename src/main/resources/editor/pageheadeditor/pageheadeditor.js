@@ -36,7 +36,7 @@ steal.plugins('jquery',
 			
 			Page.findReferrer({id: this.options.page.value.id}, $.proxy(function(referrer) {
 				if(referrer == undefined) {
-					this.element.find('div.wbl-referrerPageSettings').html('Keine Verweise');
+					this.element.find('div.wbl-referrerPageSettings').html('No references');
 					return;
 				}
 				$.each(referrer, $.proxy(function(index, ref) {
@@ -76,7 +76,7 @@ steal.plugins('jquery',
 			// Dialog
 			this.element.dialog({
 				modal: true,
-				title: 'Seite bearbeiten',
+				title: 'Page Properties',
 				autoOpen: true,
 				resizable: true,
 				draggable: true,
