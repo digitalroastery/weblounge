@@ -1,16 +1,31 @@
 steal.plugins('jquery/controller', 
 		'jquery/controller/view', 
 		'jquery/event/hover')
+.views('//editor/resourcebrowser/views/resourcelistviewitem.tmpl')
 .then('resourceviewitem')
 .then(function($) {
 
   Editor.Resourceviewitem.extend('Editor.Resourcelistviewitem',
 	{
 		init: function(el) {
-			if(this.options.mode == 'editorSelection' || this.options.mode == 'editorMultiSelection') {
-				this.element.find('img.wbl-settings').hide();
-			} else {
-				this.element.find('img.wbl-settings').show();
+			this._initImages();
+		},
+		
+		_updateView: function(resource) {
+			this.options.page = resource;
+			this.element.html('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {
+				page: this.options.page, 
+				language: this.options.language,
+				runtime: this.options.runtime,
+				resourceType: this.options.resourceType
+			});
+			$(this.element.find('td:first')).unwrap();
+			this._initImages();
+			this.element.trigger('updateResource', resource);
+		},
+		
+		_initImages: function() {
+			if(this.options.mode == 'normal') {
 				this.element.find('td.wbl-action').hover(
 						function () {
 							$(this).find('img').not('.wbl-overlayPreviewImage').show();
@@ -20,7 +35,6 @@ steal.plugins('jquery/controller',
 						}
 				);
 			}
-			
 		},
 		
 		'input[type="checkbox"] click': function(el, ev) {

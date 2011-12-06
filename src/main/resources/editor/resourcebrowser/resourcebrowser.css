@@ -133,6 +133,10 @@
 	background-color: #efefef;
 }
 
+.editor_resourcebrowser tr.wbl-pageEntry td {
+	white-space: nowrap;
+}
+
 .editor_resourcebrowser .wbl-action {
 	width: 70px;
 }

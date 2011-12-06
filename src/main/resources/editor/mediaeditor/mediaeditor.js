@@ -48,7 +48,7 @@ steal.plugins('jquery',
 				title: 'Metadaten eingeben: Datei 1 / ' + this.options.map.length,
 				autoOpen: true,
 				resizable: true,
-				buttons: this.options.buttons,
+				draggable: true,
 				width: 700,
 				height: 650,
 				buttons: {

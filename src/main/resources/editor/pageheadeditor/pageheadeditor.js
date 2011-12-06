@@ -2,7 +2,11 @@ steal.plugins('jquery',
 		'jquery/controller/view',
 		'jquery/view',
 		'jquery/view/tmpl',
-		'jqueryui/widget')
+		'jqueryui/autocomplete',
+		'jqueryui/dialog',
+		'jqueryui/draggable',
+		'jqueryui/resizable',
+		'jqueryui/mouse')
 .models('../../models/workbench')
 .views('//editor/pageheadeditor/views/init.tmpl')
 .css('pageheadeditor')
@@ -80,7 +84,6 @@ steal.plugins('jquery',
 				height: 650,
 				buttons: {
 					Abbrechen: $.proxy(function() {
-						$("body").css({ overflow: 'visible' });
 						this.element.dialog('close');
 					}, this),
 					Speichern: $.proxy(function() {
@@ -93,23 +96,18 @@ steal.plugins('jquery',
 						
 						// update pageData
 						this.options.page.saveMetadata(pageData, this.options.language, $.proxy(function() {
-							location.href = this.options.page.getPath() + this.options.language + "?edit&_=" + new Date().getTime();
+							if($.isFunction(this.options.success))
+								this.options.success();
 						}, this));
 						
-						$("body").css({ overflow: 'visible' });
-						this.element.trigger('closeeditor');
 						this.element.dialog('destroy');
 						this.destroy();
 					}, this)
 				},
 				close: $.proxy(function () {
-					this.element.trigger('closeeditor');
 					this.element.dialog('destroy');
 					this.destroy();
-				},this),
-				create: function(event, ui) {
-					$("body").css({ overflow: 'hidden' });
-				}
+				},this)
 			});
 			
 			this.element.find("form#wbl-validatePageSettings").validate();

@@ -106,6 +106,19 @@ steal.plugins('jquery/controller',
 		"img deleteResource": function(el, ev, resource) {
 			this.options.selectedResources = resource;
 			this.deleteDialog.dialog('open');
+		},
+		
+		"div,tr updateResource": function(el, ev, resource) {
+			ev.stopPropagation();
+			var index = -1;
+			$.each(this.options.resources, function(i, elem) {
+				if($(this).attr('id') == resource.id) {
+					index = i;
+					return false;
+				}
+			})
+			if(index == -1) return;
+			this.options.resources.splice(index, 1, resource)
 		}
 		
 	});

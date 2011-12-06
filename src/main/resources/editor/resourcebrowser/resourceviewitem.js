@@ -145,18 +145,31 @@ steal.plugins().then(function($) {
     			var locked = page.isLocked();
             	var userLocked = page.isLockedUser(this.options.runtime.getUserLogin());
             	if(locked && !userLocked) {
-            		this.element.trigger('showErrorMessage', "Can't edite page settings " + page.getPath() + ": Page is locked!");
+            		this.element.trigger('showErrorMessage', "Can't edite page settings " + page.getPath() + ": Page is locked by " + page.getLockOwner() + "!");
             		return;
             	} else if(locked && userLocked) {
-            		$('#wbl-pageheadeditor').editor_pageheadeditor({page: page, language: this.options.language, runtime: this.options.runtime});
+            		$('#wbl-pageheadeditor').editor_pageheadeditor({
+            			page: page,
+            			language: this.options.language,
+            			runtime: this.options.runtime,
+            			success: $.proxy(function() {
+            				this._update();
+            			}, this)
+            		});
             	} else {
 		    		page.lock(this.options.runtime.getUserLogin(), $.proxy(function() {
-		    			var editor = $('#wbl-pageheadeditor').editor_pageheadeditor({page: page, language: this.options.language, runtime: this.options.runtime});
-		    			editor.one("closeeditor", $.proxy(function(event, ui) {
-							page.unlock(function(){}, $.proxy(function() {
-								this.element.trigger('showErrorMessage', "Can't unlock page " + page.getPath() + "!");
-							}, this));
-	    				}, this));
+		    			$('#wbl-pageheadeditor').editor_pageheadeditor({
+		    				page: page, 
+		    				language: this.options.language, 
+		    				runtime: this.options.runtime,
+		    				success: $.proxy(function() {
+		    					page.unlock($.proxy(function(){
+		    						this._update();
+		    					}, this), $.proxy(function() {
+		    						this.element.trigger('showErrorMessage', "Can't unlock page " + page.getPath() + "!");
+		    					}, this));
+		    				}, this)
+		    			});
 		    		}, this), $.proxy(function() {
 		    			this.element.trigger('showErrorMessage', "Can't lock page " + page.getPath() + "!");
 		    		}, this));
@@ -169,11 +182,27 @@ steal.plugins().then(function($) {
 				map: map, 
 				language: this.options.language,
 				runtime: this.options.runtime,
-				success: function() {
-					resourceItem.parents('#wbl-mainContainer').trigger('updateLastMedia');
-				}
+				success: $.proxy(function() {
+					this._update();
+				}, this)
 			});
 			break;
+		}
+	},
+	
+	_update: function() {
+		switch(this.options.resourceType) {
+			case 'pages':
+				Page.findOne({id: this.element.attr('id')}, $.proxy(function(page) {
+					this._updateView(page.value);
+				}, this));
+				break;
+			case 'media':
+				Editor.File.findOne({id: this.element.attr('id')}, $.proxy(function(file) {
+					file.value.type = file.name.key;
+					this._updateView(file.value);
+				}, this));
+				break;
 		}
 	}
 

@@ -1,4 +1,5 @@
 steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view')
+.views('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl')
 .then('resourceviewitem')
 .then(function($) {
 
@@ -9,6 +10,27 @@ steal.plugins('jquery/controller', 'jquery/event/hover', 'jquery/controller/view
 			this.element.find('img.wbl-trashPage').hide();
 			this.element.find('img.wbl-editPage').hide();
 			this.element.find('img.wbl-pagePreview').hide();
+		},
+		
+		_updateView: function(resource) {
+			this.options.page = resource;
+			this.element.html('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {
+				page: this.options.page, 
+				language: this.options.language,
+				runtime: this.options.runtime,
+				resourceType: this.options.resourceType
+			});
+			$(this.element.find('div.wbl-imageContainer')).unwrap();
+			var pageThumbnail = this.element.find('img.wbl-pageThumbnail');
+			var defaultImage = pageThumbnail.attr("src");
+			pageThumbnail.attr("src", $(pageThumbnail).attr("original"));
+			pageThumbnail.one("error", function() {
+				$(this).attr('src', defaultImage);
+			});
+			this.element.find('img.wbl-trashPage').hide();
+			this.element.find('img.wbl-editPage').hide();
+			this.element.find('img.wbl-pagePreview').hide();
+			this.element.trigger('updateResource', resource);
 		},
 		
 		"click": function(el, ev) {

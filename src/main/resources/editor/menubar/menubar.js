@@ -309,7 +309,14 @@ steal.plugins(
 		
 		"img.wbl-pageSettings click": function(el, ev) {
 			$('.wbl-menu').hide();
-			$('#wbl-pageheadeditor').editor_pageheadeditor({page: this.options.page, language: this.options.language, runtime: this.options.runtime});
+			$('#wbl-pageheadeditor').editor_pageheadeditor({
+				page: this.options.page,
+				language: this.options.language,
+				runtime: this.options.runtime,
+     			success: $.proxy(function() {
+     				location.href = this.options.page.getPath() + this.options.language + "?edit&_=" + new Date().getTime();
+    			}, this)
+			});
 		},
 		
 		"li.wbl-news click": function(el, ev) {

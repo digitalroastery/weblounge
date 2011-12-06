@@ -23,9 +23,10 @@ steal.plugins('jquery',
 			this.enabled = true;
 			this._hide();
 			this.options.runtime.getSiteModules(this.callback('_initViews', el));
+			var designerTab = $('div#weblounge-editor a.wbl-tab.wbl-designer');
 			
 			$(window).resize($.proxy(function() {
-				if(!this.element.is(":visible")) return;
+				if(!this.element.is(":visible") || !designerTab.hasClass('wbl-active')) return;
 				this._calculateHeight();
 			}, this));
 
