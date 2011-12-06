@@ -553,6 +553,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
       currentPage = (Page) contentRepository.get(workURI);
+      workURI.setPath(currentPage.getURI().getPath());
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -777,8 +778,10 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     try {
       if (contentRepository.exists(livePageURI)) {
         page = (Page) contentRepository.get(livePageURI);
+        livePageURI.setPath(page.getURI().getPath());
       } else {
         page = (Page) contentRepository.get(workPageURI);
+        workPageURI.setPath(page.getURI().getPath());
       }
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", livePageURI, e.getMessage());
@@ -982,10 +985,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       if (!contentRepository.exists(workURI)) {
         logger.debug("Creating work version of {}", liveURI);
         page = (Page) contentRepository.get(liveURI);
+        liveURI.setPath(page.getURI().getPath());
         page.setVersion(Resource.WORK);
         contentRepository.put(page);
       } else {
         page = (Page) contentRepository.get(workURI);
+        workURI.setPath(page.getURI().getPath());
       }
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", workURI, e.getMessage());
@@ -1086,6 +1091,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       if (!contentRepository.existsInAnyVersion(pageURI))
         throw new WebApplicationException(Status.NOT_FOUND);
       page = (Page) contentRepository.get(contentRepository.getVersions(pageURI)[0]);
+      pageURI.setPath(page.getURI().getPath());
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1192,6 +1198,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       if (!contentRepository.exists(workURI))
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       page = (Page) contentRepository.get(workURI);
+      workURI.setPath(page.getURI().getPath());
     } catch (ContentRepositoryException e) {
       logger.warn("Error looking up page {} from repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1351,6 +1358,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       page = (Page) contentRepository.get(liveURI);
       if (page == null)
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      liveURI.setPath(page.getURI().getPath());
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
