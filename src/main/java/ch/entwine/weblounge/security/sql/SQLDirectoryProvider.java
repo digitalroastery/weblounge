@@ -140,6 +140,8 @@ public class SQLDirectoryProvider implements DirectoryProvider, ManagedService {
       return;
     }
 
+    logger.info("Configuring database provider");
+
     // Store url and properties
     connectionProperties = new Properties();
     connectionProperties.put(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS, driver);
