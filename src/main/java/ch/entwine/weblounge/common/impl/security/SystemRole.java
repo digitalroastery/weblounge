@@ -133,6 +133,8 @@ public final class SystemRole extends RoleImpl {
       return PUBLISHER;
     else if (roleId.equalsIgnoreCase(SITEADMIN.getIdentifier()))
       return SITEADMIN;
+    else if (roleId.equalsIgnoreCase(SYSTEMADMIN.getIdentifier()))
+      return SYSTEMADMIN;
     else
       return null;
   }
