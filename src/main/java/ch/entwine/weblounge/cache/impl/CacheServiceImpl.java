@@ -780,7 +780,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         if (!response.isCommitted())
           response.flushBuffer();
       } catch (IOException e) {
-        logger.warn("Error flusing response: " + e.getMessage());
+        String message = e.getMessage();
+        // This is debug, as the client may have closed the connection
+        logger.debug("Error flushing response: {}", message);
       }
     }
   }
