@@ -292,10 +292,11 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
 
     // Load the resource
-    if (uri.getVersion() == Resource.LIVE) {
-      SearchQuery q = new SearchQueryImpl(site).withVersion(Resource.LIVE).withIdentifier(uri.getIdentifier());
-      ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) index.find(q).getItems()[0];
+    SearchQuery q = new SearchQueryImpl(site).withVersion(uri.getVersion()).withIdentifier(uri.getIdentifier());
+    SearchResult result = index.find(q);
 
+    if (result.getDocumentCount() > 0) {
+      ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
       InputStream is = null;
       try {
         ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
@@ -314,7 +315,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
       }
     } else {
       try {
-        return loadResource(uri);
+        Resource<?> resource = loadResource(uri);
+        if (resource == null) {
+          logger.warn("Index inconsistency detected: version '{}' of {} does not exist on disk", uri, ResourceUtils.getVersionString(uri.getVersion()));
+          return null;
+        }
+        return resource;
       } catch (IOException e) {
         logger.error("Error loading {}: {}", uri, e.getMessage());
         throw new ContentRepositoryException(e);
@@ -574,7 +580,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
   protected Resource<?> loadResource(ResourceURI uri) throws IOException {
     InputStream is = null;
     try {
-      is = new BufferedInputStream(openStreamToResource(uri));
+      InputStream resourceStream = openStreamToResource(uri);
+      if (resourceStream == null)
+        return null;
+      is = new BufferedInputStream(resourceStream);
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
