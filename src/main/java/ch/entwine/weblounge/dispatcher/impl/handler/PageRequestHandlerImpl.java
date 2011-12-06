@@ -147,6 +147,10 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         if (contentRepository == null) {
           logger.debug("No content repository found for site '{}'", site);
           return false;
+        } else if (contentRepository.isIndexing()) {
+          logger.debug("Content repository of site '{}' is currently being indexed", site);
+          DispatchUtils.sendServiceUnavailable(request, response);
+          return true;
         }
 
         ResourceURI requestURI = null;

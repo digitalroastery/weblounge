@@ -318,6 +318,10 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     if (contentRepository == null) {
       logger.warn("No content repository found for site '{}'", site);
       return null;
+    } else if (contentRepository.isIndexing()) {
+      logger.debug("Content repository of site '{}' is currently being indexed", site);
+      DispatchUtils.sendServiceUnavailable(request, response);
+      return null;
     }
 
     // User and language

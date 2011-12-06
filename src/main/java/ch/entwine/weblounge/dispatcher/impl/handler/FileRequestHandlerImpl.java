@@ -100,6 +100,10 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     if (contentRepository == null) {
       logger.warn("No content repository found for site '{}'", site);
       return false;
+    } else if (contentRepository.isIndexing()) {
+      logger.debug("Content repository of site '{}' is currently being indexed", site);
+      DispatchUtils.sendServiceUnavailable(request, response);
+      return true;
     }
 
     // Check if the request uri matches the special uri for files. If so, try
