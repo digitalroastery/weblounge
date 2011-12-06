@@ -406,6 +406,7 @@
               OSGI-INF/file-serializer.xml,
               OSGI-INF/files-rest-service.xml,
               OSGI-INF/image-serializer.xml,
+              OSGI-INF/index-rest-service.xml,
               OSGI-INF/movie-serializer.xml,
               OSGI-INF/pages-rest-service.xml,
               OSGI-INF/page-serializer.xml,

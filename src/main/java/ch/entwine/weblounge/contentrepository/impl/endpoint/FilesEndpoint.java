@@ -654,12 +654,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         IOUtils.closeQuietly(is);
       }
 
-      // Make sure the content repository is writable
-      if (site.getContentRepository().isReadOnly()) {
-        logger.warn("Attempt to write to read-only content repository {}", site);
-        throw new WebApplicationException(Status.PRECONDITION_FAILED);
-      }
-
       URI uri = null;
       WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
       try {
@@ -737,12 +731,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     ResourceURI uri = resource.getURI();
     Site site = getSite(request);
-
-    // Make sure the content repository is writable
-    if (site.getContentRepository().isReadOnly()) {
-      logger.warn("Attempt to write to read-only content repository {}", site);
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    }
 
     // Get the current user
     User user = securityService.getUser();
@@ -913,12 +901,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       @FormParam("path") String path) {
 
     Site site = getSite(request);
-
-    // Make sure the content repository is writable
-    if (site.getContentRepository().isReadOnly()) {
-      logger.warn("Attempt to write to read-only content repository {}", site);
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    }
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Get the current user
     User user = securityService.getUser();
@@ -928,8 +911,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Make sure the user has editing rights
     if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
       throw new WebApplicationException(Status.UNAUTHORIZED);
-
-    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Create the resource uri
     ResourceURIImpl resourceURI = null;
@@ -1006,12 +987,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     Site site = getSite(request);
-
-    // Make sure the content repository is writable
-    if (site.getContentRepository().isReadOnly()) {
-      logger.warn("Attempt to write to read-only content repository {}", site);
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    }
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Get the current user
     User user = securityService.getUser();
@@ -1022,7 +998,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
       throw new WebApplicationException(Status.UNAUTHORIZED);
 
-    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     ResourceURI resourceURI = null;
 
     // Make sure the resource exists

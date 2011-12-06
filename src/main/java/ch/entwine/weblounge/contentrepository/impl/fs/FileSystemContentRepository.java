@@ -58,6 +58,7 @@ import java.io.OutputStream;
 import java.util.Dictionary;
 import java.util.Set;
 import java.util.Stack;
+import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
@@ -96,6 +97,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
   /** The root directory for the temporary bundle index */
   protected File idxRootDir = null;
+
+  /** Flag to indicate off-site indexing */
+  protected boolean indexingOffsite = false;
 
   /** The document builder factory */
   protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -170,28 +174,110 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index()
    */
   public void index() throws ContentRepositoryException {
-    try {
-      index.clear();
-    } catch (IOException e) {
-      throw new ContentRepositoryException("Error clearing index " + site.getIdentifier(), e);
+
+    if (indexing || indexingOffsite) {
+      logger.warn("Ignoring additional index request for {}", this);
+      return;
     }
 
-    rebuildIndex();
+    readOnly = true;
+    logger.info("Switching site '{}' to read only mode", site);
+
+    String newIdxRootDirName = idxRootDir.getName() + "-new-" + UUID.randomUUID().toString();
+    File newIdxRootDir = new File(idxRootDir.getParentFile(), newIdxRootDirName);
+    FileSystemContentRepositoryIndex newIndex = null;
+
+    // Create the new index
+    try {
+      logger.info("Creating new index at {}", newIdxRootDir);
+      FileUtils.forceMkdir(newIdxRootDir);
+      newIndex = new FileSystemContentRepositoryIndex(newIdxRootDir);
+      indexingOffsite = true;
+      rebuildIndex(newIndex);
+    } catch (IOException e) {
+      indexingOffsite = false;
+      try {
+        FileUtils.forceDelete(newIdxRootDir);
+      } catch (IOException e1) {
+        logger.error("Error removing incomplete new index at {}: {}", newIdxRootDir, e.getMessage());
+      }
+      throw new ContentRepositoryException("Error creating index " + site.getIdentifier(), e);
+    } finally {
+      try {
+        if (newIndex != null)
+          newIndex.close();
+      } catch (IOException e) {
+        throw new ContentRepositoryException("Error closing new index " + site.getIdentifier(), e);
+      }
+    }
+
+    String oldIdxRootDirName = idxRootDir.getName() + "-old-" + UUID.randomUUID().toString();
+    File oldIdxRootDir = new File(idxRootDir.getParentFile(), oldIdxRootDirName);
+
+    try {
+      indexing = true;
+      index.close();
+      logger.info("Moving new index to place {}", idxRootDir);
+      FileUtils.moveDirectory(idxRootDir, oldIdxRootDir);
+      FileUtils.moveDirectory(newIdxRootDir, idxRootDir);
+      index = new FileSystemContentRepositoryIndex(idxRootDir);
+      logger.info("Removing old index at {}", oldIdxRootDir);
+      FileUtils.forceDelete(oldIdxRootDir);
+    } catch (IOException e) {
+      throw new ContentRepositoryException("Error clearing index " + site.getIdentifier(), e);
+    } finally {
+      indexing = false;
+      indexingOffsite = false;
+      logger.info("Switching site '{}' back to write mode", site);
+      readOnly = false;
+    }
+
   }
 
   /**
-   * {@inheritDoc}
+   * Creates a new content repository index at the given location as specified
+   * by <code>idx</code>.
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index()
+   * @param idx
+   *          the index
+   * @throws ContentRepositoryException
+   *           if indexing fails
    */
-  private void rebuildIndex() throws ContentRepositoryException {
+  private void buildIndex(ContentRepositoryIndex idx)
+      throws ContentRepositoryException {
+    boolean oldReadOnly = readOnly;
+    readOnly = true;
+    indexing = true;
+
+    if (!oldReadOnly)
+      logger.info("Switching site '{}' to read only mode", site);
+
+    rebuildIndex(idx);
+
+    indexing = false;
+    if (!oldReadOnly)
+      logger.info("Switching site '{}' back to write mode", site);
+    readOnly = oldReadOnly;
+  }
+
+  /**
+   * Creates a new content repository index at the given location as specified
+   * by <code>idx</code>.
+   * 
+   * @param idx
+   *          the index
+   * @throws ContentRepositoryException
+   *           if indexing fails
+   */
+  private void rebuildIndex(ContentRepositoryIndex idx)
+      throws ContentRepositoryException {
     boolean success = true;
 
     try {
       // Clear the current index, which might be null if the site has not been
       // started yet.
-      if (index == null)
-        index = loadIndex();
+      if (idx == null)
+        idx = loadIndex(idxRootDir);
 
       logger.info("Creating site index '{}'...", site);
       long time = System.currentTimeMillis();
@@ -204,7 +290,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
         return;
       }
       for (ResourceSerializer<?, ?> serializer : serializers) {
-        long added = index(serializer.getType());
+        long added = index(idx, serializer.getType());
         if (added > 0)
           logger.info("Added {} {}s to index", added, serializer.getType().toLowerCase());
         resourceCount += added;
@@ -224,7 +310,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     } finally {
       if (!success) {
         try {
-          index.clear();
+          idx.clear();
         } catch (IOException e) {
           logger.error("Error while trying to cleanup after failed indexing operation", e);
         }
@@ -237,13 +323,16 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * to be located in a subdirectory of the site directory named
    * <tt>&lt;resourceType&gt;s<tt>.
    * 
+   * @param idx
+   *          the content repository index
    * @param resourceType
    *          the resource type
    * @return the number of resources that were indexed
    * @throws IOException
    *           if accessing a file fails
    */
-  protected long index(String resourceType) throws IOException {
+  protected long index(ContentRepositoryIndex idx, String resourceType)
+      throws IOException {
     // Temporary path for rebuilt site
     String resourceDirectory = resourceType + "s";
     String homePath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), resourceDirectory);
@@ -313,7 +402,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                 IOUtils.closeQuietly(is);
               }
 
-              index.add(resource);
+              idx.add(resource);
               resourceVersionCount++;
 
               // Make sure the resource is in the correct place
@@ -703,43 +792,62 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   @Override
   protected ContentRepositoryIndex loadIndex() throws IOException,
       ContentRepositoryException {
-
     logger.debug("Trying to load site index from {}", idxRootDir);
+    return loadIndex(idxRootDir);
+  }
+
+  /**
+   * Loads the index from a given directory on the filesystem.
+   * 
+   * @param idxRoot
+   *          the root directory
+   * @return the content repository
+   * @throws IOException
+   *           if reading from the filesystem fails
+   * @throws ContentRepositoryException
+   *           if creating the content repository index fails
+   */
+  protected ContentRepositoryIndex loadIndex(File idxRoot) throws IOException,
+      ContentRepositoryException {
+
+    ContentRepositoryIndex idx = null;
+
+    logger.debug("Trying to load site index from {}", idxRoot);
 
     // Is this a new index?
-    boolean created = !idxRootDir.exists() || idxRootDir.list().length == 0;
-    FileUtils.forceMkdir(idxRootDir);
+    boolean created = !idxRoot.exists() || idxRoot.list().length == 0;
+    FileUtils.forceMkdir(idxRoot);
 
     // Add content if there is any
-    index = new FileSystemContentRepositoryIndex(idxRootDir);
+    idx = new FileSystemContentRepositoryIndex(idxRoot);
 
-    // Create the index if there is nothing in place so far
-    if (index.getResourceCount() <= 0) {
-      rebuildIndex();
+    // Create the idx if there is nothing in place so far
+    if (idx.getResourceCount() <= 0) {
+      buildIndex(idx);
     }
 
     // Make sure the version matches the implementation
-    else if (index.getIndexVersion() < VersionedContentRepositoryIndex.INDEX_VERSION) {
+    else if (idx.getIndexVersion() < VersionedContentRepositoryIndex.INDEX_VERSION) {
       logger.info("Index needs to be updated, triggering reindex");
-      rebuildIndex();
-    } else if (index.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
+      buildIndex(idx);
+    } else if (idx.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
       logger.warn("Index needs to be downgraded, triggering reindex");
-      rebuildIndex();
+      buildIndex(idx);
     }
 
-    // Is there an existing index?
+    // Is there an existing idx?
     if (created) {
-      logger.info("Created site index at {}", idxRootDir);
+      logger.info("Created site idx at {}", idxRoot);
     } else {
-      long resourceCount = index.getResourceCount();
-      long resourceVersionCount = index.getRevisionCount();
-      logger.info("Loaded site index with {} resources and {} revisions from {}", new Object[] {
+      long resourceCount = idx.getResourceCount();
+      long resourceVersionCount = idx.getRevisionCount();
+      logger.info("Loaded site idx with {} resources and {} revisions from {}", new Object[] {
           resourceCount,
           resourceVersionCount - resourceCount,
-          idxRootDir });
+          idxRoot });
     }
 
-    return index;
+    return idx;
   }
 
 }

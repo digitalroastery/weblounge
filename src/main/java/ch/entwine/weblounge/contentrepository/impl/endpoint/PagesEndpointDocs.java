@@ -82,8 +82,8 @@ public final class PagesEndpointDocs {
     getAllPagesEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("version", Parameter.Type.String, "The version", "0", versions));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("preferredversion", Parameter.Type.String, "The preferred version", "1", versions));
-    getAllPagesEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
-    getAllPagesEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Number of result items to include", "10"));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Offset within the result set", "0"));
     getAllPagesEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "true"));
     getAllPagesEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getAllPagesEndpoint);
@@ -109,8 +109,8 @@ public final class PagesEndpointDocs {
     getPending.addStatus(serviceUnavailable("The site or its content repository is temporarily offline"));
     getPending.addOptionalParameter(new Parameter("filter", Parameter.Type.String, "Filter for the current result set"));
     getPending.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
-    getPending.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
-    getPending.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
+    getPending.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Number of result items to include", "10"));
+    getPending.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Offset within the result set", "0"));
     getPending.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getPending);
 

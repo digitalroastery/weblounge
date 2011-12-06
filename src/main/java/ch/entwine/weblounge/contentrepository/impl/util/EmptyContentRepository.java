@@ -79,6 +79,15 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#isIndexing()
+   */
+  public boolean isIndexing() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public boolean exists(ResourceURI uri) throws ContentRepositoryException {
@@ -151,16 +160,6 @@ public class EmptyContentRepository implements ContentRepository {
    * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public ResourceURI[] getVersions(ResourceURI uri)
-      throws ContentRepositoryException {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getLanguages(ch.entwine.weblounge.common.content.ResourceURI)
-   */
-  public Language[] getLanguages(ResourceURI uri)
       throws ContentRepositoryException {
     return null;
   }

@@ -644,13 +644,6 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       @FormParam("content") String pageXml, @FormParam("path") String path) {
 
     Site site = getSite(request);
-
-    // Make sure the content repository is writable
-    if (site.getContentRepository().isReadOnly()) {
-      logger.warn("Attempt to write to read-only content repository {}", site);
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    }
-
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Create the page uri
@@ -765,16 +758,10 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     Site site = getSite(request);
-
-    // Make sure the content repository is writable
-    if (site.getContentRepository().isReadOnly()) {
-      logger.warn("Attempt to write to read-only content repository {}", site);
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    }
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     ResourceURI livePageURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
     ResourceURI workPageURI = new PageURIImpl(site, null, pageId, Resource.WORK);
-    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     try {
       if (!contentRepository.existsInAnyVersion(livePageURI)) {

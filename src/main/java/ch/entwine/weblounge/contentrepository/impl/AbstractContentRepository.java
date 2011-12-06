@@ -89,6 +89,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /** Flag indicating the initializing state */
   protected boolean initializing = false;
 
+  /** Flag indicating the write access */
+  protected boolean readOnly = false;
+
+  /** Flag indicating the indexing state */
+  protected boolean indexing = false;
+
   /** The document builder factory */
   protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
@@ -126,7 +132,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#isReadOnly()
    */
   public boolean isReadOnly() {
-    return !(this instanceof WritableContentRepository);
+    return readOnly || !(this instanceof WritableContentRepository);
   }
 
   /**
@@ -164,6 +170,15 @@ public abstract class AbstractContentRepository implements ContentRepository {
     } catch (IOException e) {
       throw new ContentRepositoryException("Error closing repository index", e);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#isIndexing()
+   */
+  public boolean isIndexing() {
+    return indexing;
   }
 
   /**

@@ -300,19 +300,31 @@ public class ContentRepositoryEndpoint {
   protected ContentRepository getContentRepository(Site site, boolean writable) {
     try {
       ContentRepository contentRepository = site.getContentRepository();
+
+      // Make sure the content repository is ready to use
       if (contentRepository == null) {
-        logger.warn("No content repository found for site '{}'", site);
+        logger.debug("No content repository found for site '{}'", site);
+        throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+      } else if (contentRepository.isIndexing()) {
+        logger.debug("Content repository is being indexed '{}'", site);
         throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
       }
+
+      // Is the client asking for a writable repository?
       if (writable) {
+        if (contentRepository.isReadOnly()) {
+          logger.warn("Content repository '{}' is not writable", site);
+          throw new WebApplicationException(Status.PRECONDITION_FAILED);
+        }
         WritableContentRepository wcr = (WritableContentRepository) contentRepository;
         return wcr;
       } else {
         return contentRepository;
       }
+
     } catch (ClassCastException e) {
       logger.warn("Content repository '{}' is not writable", site);
-      throw new WebApplicationException(Status.NOT_ACCEPTABLE);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
   }
 
