@@ -26,9 +26,14 @@ import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.impl.content.page.LinkImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
+import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Environment;
+import ch.entwine.weblounge.common.site.Module;
+import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -91,6 +96,15 @@ public class PageletRendererImplTest {
   /** Cascading stylesheet include */
   protected Link css = new LinkImpl("http://localhost/css.css");
 
+  /** The module */
+  protected Module module = null;
+
+  /** The site */
+  protected Site site = null;
+
+  /** The default site url */
+  protected SiteURL hostname = null;
+
   /**
    * @throws java.lang.Exception
    */
@@ -98,7 +112,6 @@ public class PageletRendererImplTest {
   public void setUp() throws Exception {
     setUpPreliminaries();
     renderer = new PageletRendererImpl();
-    renderer.setEnvironment(Environment.Production);
     renderer.setIdentifier(identifier);
     renderer.setRenderer(rendererUrl);
     renderer.addRenderer(feedRendererUrl, feedRendererType);
@@ -109,6 +122,8 @@ public class PageletRendererImplTest {
     renderer.setPreviewMode(previewMode);
     renderer.setName(name);
     renderer.addHTMLHeader(css);
+    renderer.setModule(module);
+    renderer.setEnvironment(Environment.Production);
   }
 
   /**
@@ -118,6 +133,18 @@ public class PageletRendererImplTest {
    *           if setup fails
    */
   protected void setUpPreliminaries() throws Exception {
+    hostname = new SiteURLImpl(new URL("http://localhost"));
+
+    site = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(site.getIdentifier()).andReturn("testsite").anyTimes();
+    EasyMock.expect(site.getHostname((Environment) EasyMock.anyObject())).andReturn(hostname).anyTimes();
+    EasyMock.replay(site);
+
+    module = EasyMock.createMock(Module.class);
+    EasyMock.expect(module.getIdentifier()).andReturn("testmodule").anyTimes();
+    EasyMock.expect(module.getSite()).andReturn(site).anyTimes();
+    EasyMock.replay(module);
+
     rendererUrl = new URL(rendererPath);
     feedRendererUrl = new URL(feedRendererPath);
     editorUrl = new URL(editorPath);

@@ -135,6 +135,9 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   public void setModule(Module module) {
     this.module = module;
+    for (HTMLHeadElement headElement : headers) {
+      headElement.setModule(module);
+    }
   }
 
   /**
@@ -154,6 +157,9 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   public void setSite(Site site) {
     this.site = site;
+    for (HTMLHeadElement headElement : headers) {
+      headElement.setSite(site);
+    }
   }
 
   /**
@@ -163,6 +169,41 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   public Site getSite() {
     return site;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.impl.content.GeneralComposeable#setEnvironment(ch.entwine.weblounge.common.site.Environment)
+   */
+  @Override
+  public void setEnvironment(Environment environment) {
+    processURLTemplates(environment);
+    super.setEnvironment(environment);
+  }
+
+  /**
+   * Processes both renderer and editor url by replacing templates in their
+   * paths with real values from the actual module.
+   * 
+   * @param environment
+   *          the environment
+   * 
+   * @return <code>false</code> if the paths don't end up being real urls,
+   *         <code>true</code> otherwise
+   */
+  private boolean processURLTemplates(Environment environment) {
+    if (site == null)
+      throw new IllegalStateException("Site cannot be null");
+    if (module == null)
+      throw new IllegalStateException("Module cannot be null");
+
+    // Process the head elements (scripts and stylesheet includes)
+    for (HTMLHeadElement headElement : headers) {
+      headElement.setEnvironment(environment);
+    }
+
+    return true;
   }
 
   /**
@@ -180,7 +221,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @see ch.entwine.weblounge.common.site.Action#getUrl(ch.entwine.weblounge.common.site.Environment)
    */
   public WebUrl getUrl(Environment environment) {
-    SiteURL siteURL = site.getConnector(environment);
+    SiteURL siteURL = site.getHostname(environment);
     return new WebUrlImpl(site, UrlUtils.concat(siteURL.toExternalForm(), mountpoint));
   }
 
@@ -775,7 +816,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
 
     // Includes
-    if (headers != null && headers.size() > 0) {
+    if (headers.size() > 0) {
       b.append("<includes>");
       for (HTMLHeadElement header : getHTMLHeaders()) {
         if (header instanceof Link)

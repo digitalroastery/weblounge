@@ -96,7 +96,7 @@ public class HTMLActionSupportTest extends ActionSupportTest {
     // site
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getTemplate(template)).andReturn(pageTemplate);
-    EasyMock.expect(site.getConnector((Environment) EasyMock.anyObject())).andReturn(new SiteURLImpl(new URL(siteUrl)));
+    EasyMock.expect(site.getHostname((Environment) EasyMock.anyObject())).andReturn(new SiteURLImpl(new URL(siteUrl)));
     EasyMock.replay(site);
 
     // Renderer

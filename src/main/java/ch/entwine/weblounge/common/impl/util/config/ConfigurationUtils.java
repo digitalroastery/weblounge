@@ -606,7 +606,7 @@ public final class ConfigurationUtils {
 
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = request.getSite();
-    SiteURL siteURL = site.getConnector(request.getEnvironment());
+    SiteURL siteURL = site.getHostname(request.getEnvironment());
 
     StringBuffer siteRootReplacement = new StringBuffer();
     siteRootReplacement.append(siteURL.getURL().toExternalForm());
@@ -646,7 +646,7 @@ public final class ConfigurationUtils {
     Site site = module.getSite();
 
     StringBuffer siteRootReplacement = new StringBuffer();
-    siteRootReplacement.append(site.getConnector(environment).toExternalForm());
+    siteRootReplacement.append(site.getHostname(environment).toExternalForm());
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
     replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
 
@@ -684,7 +684,7 @@ public final class ConfigurationUtils {
     Map<String, String> replacements = new HashMap<String, String>();
 
     StringBuffer siteRootReplacement = new StringBuffer();
-    siteRootReplacement.append(site.getConnector(environment).toExternalForm());
+    siteRootReplacement.append(site.getHostname(environment).toExternalForm());
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
     replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
 

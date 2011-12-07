@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
+import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -62,11 +63,11 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /** The defining module */
   protected Module module = null;
 
+  /** The site */
+  protected Site site = null;
+
   /** The preview mode */
   protected PagePreviewMode previewMode = PagePreviewMode.None;
-
-  /** Flag to indicate whether template processing in the urls has happened */
-  private boolean urlTemplatesProcessed = false;
 
   /**
    * Creates a new page template.
@@ -106,6 +107,11 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void setModule(Module module) {
     this.module = module;
+    this.site = module.getSite();
+    for (HTMLHeadElement htmlHead : headers) {
+      htmlHead.setSite(site);
+      htmlHead.setModule(module);
+    }
   }
 
   /**
@@ -115,8 +121,15 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   @Override
   public void setEnvironment(Environment environment) {
-    if (urlTemplatesProcessed && !environment.equals(this.environment))
-      urlTemplatesProcessed = false;
+    if (environment == null)
+      throw new IllegalArgumentException("Environment cannot be null");
+
+    // Is there anything we need to be doing?
+    if (!environment.equals(this.environment)) {
+      logger.debug("Processing url templates of {} with environment {}", this, environment);
+      processURLTemplates(environment);
+    }
+
     super.setEnvironment(environment);
   }
 
@@ -124,22 +137,17 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * Processes both renderer and editor url by replacing templates in their
    * paths with real values from the actual module.
    * 
-   * @param module
-   *          the module
    * @param environment
    *          the environment
+   * 
    * @return <code>false</code> if the paths don't end up being real urls,
    *         <code>true</code> otherwise
    */
-  private boolean processURLTemplates(Module module, Environment environment) {
-    if (module == null || module.getSite() == null)
-      return false;
-
-    if (environment == null)
-      throw new IllegalStateException("Environment has not been set");
-
-    this.urlTemplatesProcessed = true;
-    this.environment = environment;
+  private boolean processURLTemplates(Environment environment) {
+    if (module == null)
+      throw new IllegalStateException("Module is null");
+    if (module.getSite() == null)
+      throw new IllegalArgumentException("Site is null");
 
     // Process the renderer URL
     for (Map.Entry<String, URL> entry : renderers.entrySet()) {
@@ -149,7 +157,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
         renderer = new URL(rendererURL);
         renderers.put(entry.getKey(), renderer);
       } catch (MalformedURLException e) {
-        logger.error("Renderer url {} of pagelet {} is malformed", rendererURL, this);
+        logger.warn("Renderer url {} of pagelet {} is malformed", rendererURL, this);
         return false;
       }
     }
@@ -160,9 +168,14 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       try {
         editor = new URL(editorURL);
       } catch (MalformedURLException e) {
-        logger.error("Editor url {} of pagelet {} is malformed", editorURL, this);
+        logger.warn("Editor url {} of pagelet {} is malformed", editorURL, this);
         return false;
       }
+    }
+
+    // Process the head elements (scripts and stylesheet includes)
+    for (HTMLHeadElement headElement : headers) {
+      headElement.setEnvironment(environment);
     }
 
     return true;
@@ -203,7 +216,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   @Override
   public void setRenderer(URL renderer) {
     super.setRenderer(renderer);
-    urlTemplatesProcessed = false;
+    if (environment != null)
+      processURLTemplates(environment);
   }
 
   /**
@@ -223,8 +237,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   @Override
   public URL getRenderer(String type) {
-    if (!urlTemplatesProcessed)
-      processURLTemplates(module, environment);
     return super.getRenderer(type);
   }
 
@@ -235,7 +247,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void setEditor(URL editor) {
     this.editor = editor;
-    urlTemplatesProcessed = false;
+    if (environment != null)
+      processURLTemplates(environment);
   }
 
   /**
@@ -244,8 +257,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * @see ch.entwine.weblounge.common.content.page.PageletRenderer#getEditor()
    */
   public URL getEditor() {
-    if (!urlTemplatesProcessed)
-      processURLTemplates(module, environment);
     return editor;
   }
 
@@ -257,8 +268,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException {
-    if (!urlTemplatesProcessed)
-      processURLTemplates(module, request.getEnvironment());
     URL renderer = renderers.get(RendererType.Page.toString().toLowerCase());
     includeJSP(request, response, renderer);
   }
@@ -271,8 +280,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void renderAsEditor(WebloungeRequest request,
       WebloungeResponse response) throws RenderException {
-    if (!urlTemplatesProcessed)
-      processURLTemplates(module, request.getEnvironment());
     includeJSP(request, response, editor);
   }
 

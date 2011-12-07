@@ -110,6 +110,9 @@ public class ModuleImpl implements Module {
   /** List of module listeners */
   protected List<ModuleListener> moduleListeners = null;
 
+  /** The environment */
+  protected Environment environment = null;
+
   /**
    * Creates a new module.
    */
@@ -119,6 +122,26 @@ public class ModuleImpl implements Module {
     imagestyles = new HashMap<String, ImageStyle>();
     jobs = new HashMap<String, Job>();
     options = new OptionsHelper();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Module#initialize(ch.entwine.weblounge.common.site.Environment)
+   */
+  public void initialize(Environment environment) {
+    this.environment = environment;
+
+    // Tell the renderers about the environment
+    for (PageletRenderer renderer : renderers.values()) {
+      renderer.setEnvironment(environment);
+    }
+
+    // Tell the actions about the environment
+    for (Action action : actions.values()) {
+      action.setEnvironment(environment);
+    }
+
   }
 
   /**
@@ -162,7 +185,7 @@ public class ModuleImpl implements Module {
       return url;
     if (site == null)
       throw new IllegalStateException("Site has not yet been set");
-    SiteURL siteURL = site.getConnector(environment);
+    SiteURL siteURL = site.getHostname(environment);
     url = new WebUrlImpl(site, UrlUtils.concat(siteURL.toExternalForm(), "module", identifier));
     return url;
   }
@@ -200,8 +223,15 @@ public class ModuleImpl implements Module {
    */
   public void setSite(Site site) throws ModuleException {
     this.site = site;
+
+    // Initialize actions
     for (Action action : actions.values()) {
       action.setSite(site);
+    }
+
+    // Initialize renderers
+    for (PageletRenderer renderer : renderers.values()) {
+      renderer.setModule(this);
     }
   }
 
@@ -222,7 +252,8 @@ public class ModuleImpl implements Module {
   public void addAction(Action action) {
     actions.put(action.getIdentifier(), action);
     action.setModule(this);
-    action.setSite(site);
+    if (site != null)
+      action.setSite(site);
   }
 
   /**
@@ -297,7 +328,9 @@ public class ModuleImpl implements Module {
    */
   public void addRenderer(PageletRenderer renderer) {
     renderers.put(renderer.getIdentifier(), renderer);
-    renderer.setModule(this);
+    if (site != null) {
+      renderer.setModule(this);
+    }
   }
 
   /**

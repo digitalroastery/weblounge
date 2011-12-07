@@ -196,6 +196,9 @@ public class SiteImpl implements Site {
   /** The site's bundle context */
   protected BundleContext bundleContext = null;
 
+  /** The current system environment */
+  protected Environment environment = null;
+
   /**
    * Creates a new site that is initially disabled. Use {@link #setEnabled()} to
    * enable the site.
@@ -211,6 +214,26 @@ public class SiteImpl implements Site {
     localRoles = new HashMap<String, String>();
     i18n = new I18nDictionaryImpl();
     options = new OptionsHelper();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#initialize(ch.entwine.weblounge.common.site.Environment)
+   */
+  public void initialize(Environment environment) {
+    this.environment = environment;
+
+    // Pass the initialization on to the templates
+    for (PageTemplate template : templates.values()) {
+      template.setEnvironment(environment);
+    }
+
+    // Initialize modules as well
+    for (Module module : modules.values()) {
+      module.initialize(environment);
+    }
+
   }
 
   /**
@@ -310,6 +333,7 @@ public class SiteImpl implements Site {
    * @see ch.entwine.weblounge.common.site.Site#addTemplate(ch.entwine.weblounge.common.content.page.PageTemplate)
    */
   public void addTemplate(PageTemplate template) {
+    template.setSite(this);
     templates.put(template.getIdentifier(), template);
   }
 
@@ -354,6 +378,7 @@ public class SiteImpl implements Site {
    */
   public void setDefaultTemplate(PageTemplate template) {
     if (template != null) {
+      template.setSite(this);
       templates.put(template.getIdentifier(), template);
       logger.debug("Default page template is '{}'", template.getIdentifier());
     } else
@@ -482,20 +507,20 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#setDefaultURL(URL)
+   * @see ch.entwine.weblounge.common.site.Site#setDefaultHostname(URL)
    */
-  public void setDefaultURL(SiteURL url) {
+  public void setDefaultHostname(SiteURL url) {
     defaultURL = url;
     if (url != null)
-      addConnector(url);
+      addHostname(url);
   }
   
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.common.site.Site#setDefaultURL(ch.entwine.weblounge.common.site.SiteURL, ch.entwine.weblounge.common.site.Environment)
+   * @see ch.entwine.weblounge.common.site.Site#setDefaultHostname(ch.entwine.weblounge.common.site.SiteURL, ch.entwine.weblounge.common.site.Environment)
    */
-  public void setDefaultURL(SiteURL url, Environment environment) {
+  public void setDefaultHostname(SiteURL url, Environment environment) {
     if (url == null)
       throw new IllegalArgumentException("Url must not be null");
     if (environment == null)
@@ -505,9 +530,9 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#addConnector(URL)
+   * @see ch.entwine.weblounge.common.site.Site#addHostname(URL)
    */
-  public void addConnector(SiteURL url) {
+  public void addHostname(SiteURL url) {
     if (url == null)
       throw new IllegalArgumentException("Url must not be null");
     urls.add(url);
@@ -530,9 +555,9 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#removeConnector(URL)
+   * @see ch.entwine.weblounge.common.site.Site#removeHostname(URL)
    */
-  public boolean removeConnector(SiteURL url) {
+  public boolean removeHostname(SiteURL url) {
     if (url == null)
       throw new IllegalArgumentException("Hostname must not be null");
     if (url.equals(defaultURL))
@@ -543,27 +568,27 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#getConnectors()
+   * @see ch.entwine.weblounge.common.site.Site#getHostnames()
    */
-  public SiteURL[] getConnectors() {
+  public SiteURL[] getHostnames() {
     return urls.toArray(new SiteURL[urls.size()]);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#getConnector()
+   * @see ch.entwine.weblounge.common.site.Site#getHostname()
    */
-  public SiteURL getConnector() {
+  public SiteURL getHostname() {
     return defaultURL;
   }
   
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.common.site.Site#getConnector(ch.entwine.weblounge.common.site.Environment)
+   * @see ch.entwine.weblounge.common.site.Site#getHostname(ch.entwine.weblounge.common.site.Environment)
    */
-  public SiteURL getConnector(Environment environment) {
+  public SiteURL getHostname(Environment environment) {
     SiteURL url = defaultURLByEnvironment.get(environment);
     if (url != null)
       return url;
@@ -1437,7 +1462,7 @@ public class SiteImpl implements Site {
         siteURL.setDefault(defaultUrl);
         siteURL.setEnvironment(environment);
         
-        site.addConnector(siteURL);
+        site.addHostname(siteURL);
       }
     } catch (MalformedURLException e) {
       throw new IllegalStateException("Site '" + identifier + "' defines malformed url: " + url);

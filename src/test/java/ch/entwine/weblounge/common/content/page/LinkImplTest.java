@@ -94,7 +94,7 @@ public class LinkImplTest {
   @Ignore
   public void testSetModule() {
     assertEquals(href, link.getHref());
-    link.configure(null, null, module);
+    link.setModule(module);
     assertEquals(absoluteHref, link.getHref());
   }
 

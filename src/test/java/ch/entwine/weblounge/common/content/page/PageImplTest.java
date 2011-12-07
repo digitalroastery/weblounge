@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
@@ -178,10 +179,14 @@ public class PageImplTest {
    * Preliminary setup work.
    */
   protected void setupPrerequisites() {
+    PageTemplate homeTemplate = new PageTemplateImpl();
+
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getDefaultLanguage()).andReturn(german);    
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin"));    
-    EasyMock.expect(site.getDefaultLanguage()).andReturn(german);    
+    EasyMock.expect(site.getDefaultLanguage()).andReturn(german);
+    EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(homeTemplate).anyTimes();
+    EasyMock.expect(site.getDefaultTemplate()).andReturn(homeTemplate).anyTimes();
     EasyMock.replay(site);
     pageURI = new PageURIImpl(site, "/service/test", "4bb19980-8f98-4873-a813-71b6dfab22as", Resource.LIVE);
   }

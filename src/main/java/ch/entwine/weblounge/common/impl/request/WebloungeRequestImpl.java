@@ -134,7 +134,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     environment = Environment.Production;
 
     // Find the environment by looking at the url
-    for (SiteURL connector : site.getConnectors()) {
+    for (SiteURL connector : site.getHostnames()) {
       if (super.getRequestURL().toString().startsWith(connector.toExternalForm())) {
         environment = connector.getEnvironment();
         break;

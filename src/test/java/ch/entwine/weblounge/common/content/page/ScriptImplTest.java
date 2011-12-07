@@ -131,7 +131,7 @@ public class ScriptImplTest {
   @Ignore
   public void testSetModule() {
     assertEquals(href, script.getHref());
-    script.configure(null, null, module);
+    script.setModule(module);
     assertEquals(absoluteHref, script.getHref());
   }
 

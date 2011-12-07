@@ -117,7 +117,7 @@ public class ActionSupportTest {
   protected void setUpPreliminaries() throws Exception {
     // site
     site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getConnector((Environment)EasyMock.anyObject())).andReturn(new SiteURLImpl(new URL(siteUrl)));
+    EasyMock.expect(site.getHostname((Environment)EasyMock.anyObject())).andReturn(new SiteURLImpl(new URL(siteUrl)));
     EasyMock.replay(site);
 
     // module

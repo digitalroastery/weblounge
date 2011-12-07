@@ -49,7 +49,7 @@ public class GeneralComposeable implements Composeable {
   protected String name = null;
 
   /** The execution environment */
-  protected Environment environment = Environment.Production;
+  protected Environment environment = null;
 
   /** HTML head elements */
   protected List<HTMLHeadElement> headers = null;
@@ -108,6 +108,7 @@ public class GeneralComposeable implements Composeable {
     this.recheckTime = recheckTime;
     this.validTime = validTime;
     this.identifier = identifier;
+    this.headers = new ArrayList<HTMLHeadElement>();
   }
 
   /**
@@ -212,8 +213,6 @@ public class GeneralComposeable implements Composeable {
    * @see ch.entwine.weblounge.common.content.Composeable#addHTMLHeader(HTMLHeadElement)
    */
   public void addHTMLHeader(HTMLHeadElement header) {
-    if (headers == null)
-      headers = new ArrayList<HTMLHeadElement>();
     if (!headers.contains(header))
       headers.add(header);
   }
@@ -224,8 +223,6 @@ public class GeneralComposeable implements Composeable {
    * @see ch.entwine.weblounge.common.content.Composeable#removeHTMLHeader(HTMLHeadElement)
    */
   public void removeHTMLHeader(HTMLHeadElement header) {
-    if (headers == null)
-      return;
     headers.remove(header);
   }
 
@@ -235,10 +232,7 @@ public class GeneralComposeable implements Composeable {
    * @see ch.entwine.weblounge.common.content.Composeable#getHTMLHeaders()
    */
   public HTMLHeadElement[] getHTMLHeaders() {
-    if (headers != null) {
-      return headers.toArray(new HTMLHeadElement[headers.size()]);
-    }
-    return new HTMLHeadElement[] {};
+    return headers.toArray(new HTMLHeadElement[headers.size()]);
   }
 
   /**

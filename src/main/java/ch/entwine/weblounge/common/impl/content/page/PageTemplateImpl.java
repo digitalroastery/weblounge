@@ -67,8 +67,8 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   /** Is this the default template? */
   protected boolean isDefault = false;
 
-  /** Flag to indicate whether template processing in the urls has happened */
-  private boolean urlTemplatesProcessed = false;
+  /** The site */
+  protected Site site = null;
 
   /**
    * Creates a new page template.
@@ -89,6 +89,18 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   public PageTemplateImpl(String identifier, URL url) {
     super(identifier, url);
     addFlavor(RequestFlavor.HTML);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.PageTemplate#setSite(ch.entwine.weblounge.common.site.Site)
+   */
+  public void setSite(Site site) {
+    this.site = site;
+    for (HTMLHeadElement htmlHead : headers) {
+      htmlHead.setSite(site);
+    }
   }
 
   /**
@@ -153,8 +165,6 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    */
   public void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException {
-    if (!urlTemplatesProcessed)
-      processURLTemplates(request.getSite(), request.getEnvironment());
     URL renderer = renderers.get(RendererType.Page.toString().toLowerCase());
     includeJSP(request, response, renderer);
   }
@@ -410,19 +420,15 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    * Processes both renderer and editor url by replacing templates in their
    * paths with real values from the actual module.
    * 
-   * @param site
-   *          the site
    * @param environment
    *          the environment
+   * 
    * @return <code>false</code> if the paths don't end up being real urls,
    *         <code>true</code> otherwise
    */
-  private boolean processURLTemplates(Site site, Environment environment) {
+  private boolean processURLTemplates(Environment environment) {
     if (site == null)
-      return false;
-
-    urlTemplatesProcessed = true;
-    this.environment = environment;
+      throw new IllegalStateException("Site cannot be null");
 
     // Process the renderer URL
     for (Map.Entry<String, URL> entry : renderers.entrySet()) {
@@ -433,8 +439,12 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
         renderers.put(entry.getKey(), renderer);
       } catch (MalformedURLException e) {
         logger.error("Renderer url {} of pagelet {} is malformed", rendererURL, this);
-        return false;
       }
+    }
+
+    // Process the head elements (scripts and stylesheet includes)
+    for (HTMLHeadElement headElement : headers) {
+      headElement.setEnvironment(environment);
     }
 
     return true;
@@ -447,8 +457,15 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    */
   @Override
   public void setEnvironment(Environment environment) {
-    if (urlTemplatesProcessed && !environment.equals(this.environment))
-      urlTemplatesProcessed = false;
+    if (environment == null)
+      throw new IllegalArgumentException("Environment cannot be null");
+
+    // Is there anything we need to be doing?
+    if (!environment.equals(this.environment)) {
+      logger.debug("Processing url templates of {} with environment {}", this, environment);
+      processURLTemplates(environment);
+    }
+
     super.setEnvironment(environment);
   }
 

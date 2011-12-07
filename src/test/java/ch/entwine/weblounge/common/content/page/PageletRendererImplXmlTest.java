@@ -60,6 +60,7 @@ public class PageletRendererImplXmlTest extends PageletRendererImplTest {
     XPath xpath = XPathFactory.newInstance().newXPath();
     xpath.setNamespaceContext(new XPathNamespaceContext(true));
     renderer = PageletRendererImpl.fromXml(doc.getFirstChild(), xpath);
+    renderer.setModule(module);
   }
 
   /**

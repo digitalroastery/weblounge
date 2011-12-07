@@ -138,7 +138,7 @@ public class UrlMatcherImpl implements UrlMatcher {
    */
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer(site.getConnector().getURL().getHost());
+    StringBuffer buf = new StringBuffer(site.getHostname().getURL().getHost());
     buf.append("/").append(path);
     if (extension != null)
       buf.append(extension);

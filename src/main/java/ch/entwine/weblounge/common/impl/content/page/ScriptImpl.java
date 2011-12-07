@@ -21,11 +21,10 @@
 package ch.entwine.weblounge.common.impl.content.page;
 
 import ch.entwine.weblounge.common.ConfigurationException;
-import ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.Script;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
-import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -40,7 +39,7 @@ import javax.xml.xpath.XPathFactory;
  * &lt;head&gt; section of an <code>HTML</code> page. Relative paths are
  * interpreted to be relative to the weblounge folder <code>shared</code>.
  */
-public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
+public class ScriptImpl implements Script {
 
   /** Default character set */
   public static final String DEFAULT_CHARSET = "iso-8859-1";
@@ -62,6 +61,12 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
 
   /** The jquery version to use in for the script */
   protected String jquery = null;
+
+  /** The site */
+  protected Site site = null;
+
+  /** The module */
+  protected Module module = null;
 
   /**
    * Creates a new <code>Script</code> object with the script's path and
@@ -125,19 +130,42 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement#configure(ch.entwine.weblounge.common.request.WebloungeRequest,
-   *      ch.entwine.weblounge.common.site.Site,
-   *      ch.entwine.weblounge.common.site.Module)
+   * @see ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement#setSite(ch.entwine.weblounge.common.site.Site)
    */
-  public void configure(WebloungeRequest request, Site site, Module module)
-      throws IllegalStateException {
+  public void setSite(Site site) {
+    if (site == null)
+      throw new IllegalArgumentException("Site must not be null");
+    this.site = site;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement#setModule(ch.entwine.weblounge.common.site.Module)
+   */
+  public void setModule(Module module) {
+    if (module == null)
+      throw new IllegalArgumentException("Module must not be null");
+    this.module = module;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#setEnvironment(ch.entwine.weblounge.common.site.Environment)
+   */
+  public void setEnvironment(Environment environment) {
     if (href == null || !href.matches(".*\\$\\{.*\\}.*"))
       return;
 
+    // The module may be null, but the site must not
+    if (site == null)
+      throw new IllegalStateException("Site must not be null");
+
     if (module != null) {
-      href = ConfigurationUtils.processTemplate(href, module, request.getEnvironment());
+      href = ConfigurationUtils.processTemplate(href, module, environment);
     } else {
-      href = ConfigurationUtils.processTemplate(href, site, request.getEnvironment());
+      href = ConfigurationUtils.processTemplate(href, site, environment);
     }
   }
 

@@ -175,9 +175,9 @@ public class SiteImplTest {
     site.addTemplate(mobileTemplate);
     site.setDefaultLanguage(GERMAN);
     site.addLanguage(ENGLISH);
-    site.addConnector(defaultURL);
-    site.addConnector(fallbackURL);
-    site.addConnector(localhost);
+    site.addHostname(defaultURL);
+    site.addHostname(fallbackURL);
+    site.addHostname(localhost);
     site.addLocalRole(Security.SITE_ADMIN_ROLE, adminRole);
     site.addLocalRole(Security.PUBLISHER_ROLE, publisherRole);
     site.addLocalRole(Security.EDITOR_ROLE, editorRole);
@@ -431,25 +431,25 @@ public class SiteImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#removeConnector(URL)}
+   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#removeHostname(URL)}
    * .
    */
   @Test
   public void testRemoveURL() throws Exception {
-    site.removeConnector(new SiteURLImpl(new URL("http://test")));
-    assertEquals(3, site.getConnectors().length);
-    site.removeConnector(defaultURL);
-    assertEquals(2, site.getConnectors().length);
+    site.removeHostname(new SiteURLImpl(new URL("http://test")));
+    assertEquals(3, site.getHostnames().length);
+    site.removeHostname(defaultURL);
+    assertEquals(2, site.getHostnames().length);
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getConnectors()}.
+   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getHostnames()}.
    */
   @Test
   public void testGetURLs() {
-    assertEquals(3, site.getConnectors().length);
-    List<SiteURL> connectors = Arrays.asList(site.getConnectors());
+    assertEquals(3, site.getHostnames().length);
+    List<SiteURL> connectors = Arrays.asList(site.getHostnames());
     assertTrue(connectors.contains(defaultURL));
     assertTrue(connectors.contains(fallbackURL));
     assertTrue(connectors.contains(localhost));
@@ -457,14 +457,14 @@ public class SiteImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getConnector()}.
+   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getHostname()}.
    */
   @Test
   public void testGetURL() {
-    assertEquals(defaultURL, site.getConnector());
-    site.removeConnector(defaultURL);
-    assertEquals(2, site.getConnectors().length);
-    assertTrue(site.getConnector() == null);
+    assertEquals(defaultURL, site.getHostname());
+    site.removeHostname(defaultURL);
+    assertEquals(2, site.getHostnames().length);
+    assertTrue(site.getHostname() == null);
   }
 
   /**
@@ -473,11 +473,11 @@ public class SiteImplTest {
    */
   @Test
   public void testGetUrl() {
-    assertEquals(defaultURL, site.getConnector());
-    site.removeConnector(defaultURL);
-    site.removeConnector(fallbackURL);
-    site.removeConnector(localhost);
-    assertNull(site.getConnector());
+    assertEquals(defaultURL, site.getHostname());
+    site.removeHostname(defaultURL);
+    site.removeHostname(fallbackURL);
+    site.removeHostname(localhost);
+    assertNull(site.getHostname());
   }
 
   /**

@@ -21,11 +21,10 @@
 package ch.entwine.weblounge.common.impl.content.page;
 
 import ch.entwine.weblounge.common.ConfigurationException;
-import ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.Link;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
-import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -39,28 +38,34 @@ import javax.xml.xpath.XPathFactory;
  * This class encapsulates the information to include a link element within the
  * &lt;head&gt; section of an <code>HTML</code> page.
  */
-public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
+public class LinkImpl implements Link {
 
   /** Source */
   protected String href = null;
 
   /** The kind of device that this link is displayed on */
   protected String media = null;
-  
+
   /** Relationship between this document and the linked one */
   protected String relation = null;
 
   /** Relationship between the linked document and the current one */
   protected String reverseRelation = null;
-  
+
   /** The mime type */
   protected String type = null;
-  
+
   /** The character set */
   protected String charset = null;
 
   /** Element usage scenario */
   protected Use use = null;
+
+  /** The site */
+  protected Site site = null;
+
+  /** The module */
+  protected Module module = null;
 
   /**
    * Creates a new link of type <code>text/css</code>, media <code>all</code>
@@ -128,20 +133,46 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement#configure(ch.entwine.weblounge.common.request.WebloungeRequest, ch.entwine.weblounge.common.site.Site, ch.entwine.weblounge.common.site.Module)
+   * 
+   * @see ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement#setSite(ch.entwine.weblounge.common.site.Site)
    */
-  public void configure(WebloungeRequest request, Site site, Module module)
-      throws IllegalStateException {
-    if (href == null || !href.matches(".*\\$\\{.*\\}.*")) return;
-    
+  public void setSite(Site site) {
+    if (site == null)
+      throw new IllegalArgumentException("Site must not be null");
+    this.site = site;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement#setModule(ch.entwine.weblounge.common.site.Module)
+   */
+  public void setModule(Module module) {
+    if (module == null)
+      throw new IllegalArgumentException("Module must not be null");
+    this.module = module;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#setEnvironment(ch.entwine.weblounge.common.site.Environment)
+   */
+  public void setEnvironment(Environment environment) {
+    if (href == null || !href.matches(".*\\$\\{.*\\}.*"))
+      return;
+
+    // The module may be null, but the site must not
+    if (site == null)
+      throw new IllegalStateException("Site must not be null");
+
     if (module != null) {
-      href = ConfigurationUtils.processTemplate(href, module, request.getEnvironment());
+      href = ConfigurationUtils.processTemplate(href, module, environment);
     } else {
-      href = ConfigurationUtils.processTemplate(href, site, request.getEnvironment());
+      href = ConfigurationUtils.processTemplate(href, site, environment);
     }
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -171,7 +202,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Link#setCharset(java.lang.String)
    */
   public void setCharset(String charset) {
@@ -180,7 +211,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Link#getCharset()
    */
   public String getCharset() {
@@ -189,7 +220,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Link#setMedia(java.lang.String)
    */
   public void setMedia(String media) {
@@ -198,7 +229,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Link#getMedia()
    */
   public String getMedia() {
@@ -207,7 +238,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Link#setRelation(java.lang.String)
    */
   public void setRelation(String relation) {
@@ -216,7 +247,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Link#getRelation()
    */
   public String getRelation() {
@@ -225,7 +256,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Link#setReverseRelation(java.lang.String)
    */
   public void setReverseRelation(String relation) {
@@ -234,7 +265,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Link#getReverseRelation()
    */
   public String getReverseRelation() {
@@ -243,7 +274,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Link#setType(java.lang.String)
    */
   public void setType(String type) {
@@ -252,7 +283,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.Link#getType()
    */
   public String getType() {
@@ -315,7 +346,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#toXml()
    */
   public String toXml() {

@@ -140,7 +140,7 @@ public class WebUrlImplTest {
     siteMock = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(siteMock.getLanguage("de")).andReturn(german).anyTimes();
     EasyMock.expect(siteMock.getDefaultLanguage()).andReturn(english);
-    EasyMock.expect(siteMock.getConnector()).andReturn(siteUrl).anyTimes();
+    EasyMock.expect(siteMock.getHostname()).andReturn(siteUrl).anyTimes();
     EasyMock.replay(siteMock);
     otherSiteMock = EasyMock.createNiceMock(Site.class);
 

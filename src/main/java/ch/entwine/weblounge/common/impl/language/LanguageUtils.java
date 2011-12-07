@@ -79,17 +79,38 @@ public final class LanguageUtils {
   public static Language getLanguage(Locale locale)
       throws UnknownLanguageException {
 
+    // Do we know this language already?
+    Language language = systemLanguages.get(locale.getLanguage());
+    if (language != null)
+      return language;
+
+    // Makes sure we get the locale in the right format (might be hand crafted)
     Matcher matcher = ACCEPT_LANGUAGE_HEADER.matcher(locale.getLanguage());
     if (matcher.matches()) {
       locale = new Locale(matcher.group(2), matcher.group(1));
     }
 
-    Language language = systemLanguages.get(locale.getLanguage());
-    if (language == null) {
+    // Check the system locales for a match
+    Locale systemLocale = null;
+    for (Locale l : Locale.getAvailableLocales()) {
+      if (l.getISO3Language().equals(locale.getISO3Language())) {
+        systemLocale = l;
+        break;
+      } else if (l.getLanguage().equals(l.getLanguage())) {
+        systemLocale = l;
+        break;
+      }
+    }
+
+    // Is there a matching system locale?
+    if (systemLocale != null) {
       language = new LanguageImpl(locale);
       systemLanguages.put(locale.getLanguage(), language);
+      return language;
     }
-    return language;
+
+    // Apparently not...
+    throw new UnknownLanguageException(locale.getLanguage());
   }
 
   /**
@@ -387,9 +408,14 @@ public final class LanguageUtils {
     if (request.getHeader("Accept-Language") != null) {
       Enumeration<?> locales = request.getLocales();
       while (locales.hasMoreElements()) {
-        Language l = getLanguage((Locale) locales.nextElement());
-        if (choices.contains(l))
-          return l;
+        try {
+          Language l = getLanguage((Locale) locales.nextElement());
+          if (choices.contains(l))
+            return l;
+        } catch (UnknownLanguageException e) {
+          // never mind, some clients will send stuff like "*" as the locale
+        }
+
       }
     }
     return null;
@@ -433,12 +459,16 @@ public final class LanguageUtils {
     if (request.getHeader("Accept-Language") != null) {
       Enumeration<?> locales = request.getLocales();
       while (locales.hasMoreElements()) {
-        Language l = getLanguage((Locale) locales.nextElement());
-        if (localizable != null && !localizable.supportsLanguage(l))
-          continue;
-        if (!site.supportsLanguage(l))
-          continue;
-        return l;
+        try {
+          Language l = getLanguage((Locale) locales.nextElement());
+          if (localizable != null && !localizable.supportsLanguage(l))
+            continue;
+          if (!site.supportsLanguage(l))
+            continue;
+          return l;
+        } catch (UnknownLanguageException e) {
+          // never mind, some clients will send stuff like "*" as the locale
+        }
       }
     }
 
@@ -510,12 +540,18 @@ public final class LanguageUtils {
     if (request.getHeader("Accept-Language") != null) {
       Enumeration<?> locales = request.getLocales();
       while (locales.hasMoreElements()) {
-        Language l = getLanguage((Locale) locales.nextElement());
-        if (!resource.supportsContentLanguage(l))
-          continue;
-        if (!site.supportsLanguage(l))
-          continue;
-        return l;
+        try {
+          Language l = getLanguage((Locale) locales.nextElement());
+          if (l == null)
+            continue;
+          if (!resource.supportsContentLanguage(l))
+            continue;
+          if (!site.supportsLanguage(l))
+            continue;
+          return l;
+        } catch (UnknownLanguageException e) {
+          // never mind, some clients will send stuff like "*" as the locale
+        }
       }
     }
 
@@ -564,9 +600,13 @@ public final class LanguageUtils {
     if (request.getHeader("Accept-Language") != null) {
       Enumeration<?> locales = request.getLocales();
       while (locales.hasMoreElements()) {
-        Language l = getLanguage((Locale) locales.nextElement());
-        if (site.supportsLanguage(l))
-          return l;
+        try {
+          Language l = getLanguage((Locale) locales.nextElement());
+          if (site.supportsLanguage(l))
+            return l;
+        } catch (UnknownLanguageException e) {
+          // never mind, some clients will send stuff like "*" as the locale
+        }
       }
     }
 

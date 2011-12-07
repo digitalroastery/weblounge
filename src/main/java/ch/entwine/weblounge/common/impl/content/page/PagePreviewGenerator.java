@@ -177,7 +177,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
     Site site = uri.getSite();
     String html = null;
     try {
-      URL pageURL = new URL(UrlUtils.concat(site.getConnector(environment).toExternalForm(), PAGE_HANDLER_PREFIX, uri.getIdentifier()));
+      URL pageURL = new URL(UrlUtils.concat(site.getHostname(environment).toExternalForm(), PAGE_HANDLER_PREFIX, uri.getIdentifier()));
       html = render(pageURL, site, environment, language, resource.getVersion());
       if (StringUtils.isBlank(html)) {
         logger.warn("Error rendering preview of page " + uri.getPath());
@@ -244,14 +244,14 @@ public class PagePreviewGenerator implements PreviewGenerator {
       }
 
       // Configure the renderer
-      renderer.getSharedContext().setBaseURL(site.getConnector().toExternalForm());
+      renderer.getSharedContext().setBaseURL(site.getHostname().toExternalForm());
       renderer.getSharedContext().setInteractive(false);
 
       // Make sure the renderer is using a user agent that will correctly
       // resolve urls
       WebloungeUserAgent agent = userAgents.get(site.getIdentifier());
       if (agent == null) {
-        agent = new WebloungeUserAgent(site.getConnector().getURL());
+        agent = new WebloungeUserAgent(site.getHostname().getURL());
         userAgents.put(site.getIdentifier(), agent);
       }
       renderer.getSharedContext().setUserAgentCallback(agent);
@@ -335,9 +335,9 @@ public class PagePreviewGenerator implements PreviewGenerator {
 
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setServerName(site.getConnector(environment).getURL().getHost());
-      request.setServerPort(site.getConnector(environment).getURL().getPort());
-      request.setMethod(site.getConnector(environment).getURL().getProtocol());
+      request.setServerName(site.getHostname(environment).getURL().getHost());
+      request.setServerPort(site.getHostname(environment).getURL().getPort());
+      request.setMethod(site.getHostname(environment).getURL().getProtocol());
       request.setAttribute(WebloungeRequest.LANGUAGE, language);
       request.setPathInfo(pathInfo);
       request.setRequestURI(UrlUtils.concat(httpContextURI, pathInfo));

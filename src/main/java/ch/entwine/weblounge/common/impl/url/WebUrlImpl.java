@@ -355,7 +355,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
 
     // Site
     if (includeHost)
-      buf.append(site.getConnector());
+      buf.append(site.getHostname());
 
     // Path
     buf.append(pathElementSeparatorChar).append(path);
