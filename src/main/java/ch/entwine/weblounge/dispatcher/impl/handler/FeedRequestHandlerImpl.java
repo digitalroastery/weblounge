@@ -368,7 +368,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       // Create the entry
       SyndEntry entry = new SyndEntryImpl();
       entry.setPublishedDate(page.getPublishFrom());
-      entry.setLink(site.getConnector(request.getEnvironment()).toExternalForm() + item.getUrl().getLink());
+      entry.setLink(site.getHostname(request.getEnvironment()).toExternalForm() + item.getUrl().getLink());
       entry.setAuthor(page.getCreator().getName());
       entry.setTitle(page.getTitle());
 
@@ -492,9 +492,9 @@ public class FeedRequestHandlerImpl implements RequestHandler {
 
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setServerName(site.getConnector(environment).getURL().getHost());
-      request.setServerPort(site.getConnector(environment).getURL().getPort());
-      request.setMethod(site.getConnector(environment).getURL().getProtocol());
+      request.setServerName(site.getHostname(environment).getURL().getHost());
+      request.setServerPort(site.getHostname(environment).getURL().getPort());
+      request.setMethod(site.getHostname(environment).getURL().getProtocol());
       request.setAttribute(WebloungeRequest.PAGE, page);
       request.setAttribute(WebloungeRequest.COMPOSER, composer);
       request.setAttribute(WebloungeRequest.PAGELET, pagelet);
