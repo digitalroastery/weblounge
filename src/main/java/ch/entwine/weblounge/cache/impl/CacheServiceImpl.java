@@ -122,7 +122,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   public static final String OPT_OVERFLOW_TO_DISK = OPT_PREFIX + ".overflowToDisk";
 
   /** The default value for "overflow to disk" configuration property */
-  private static final boolean DEFAULT_OVERFLOW_TO_DISK = true;
+  private static final boolean DEFAULT_OVERFLOW_TO_DISK = false;
 
   /** Configuration key for the statistics setting */
   public static final String OPT_ENABLE_STATISTICS = OPT_PREFIX + ".statistics";
@@ -429,8 +429,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       config.setOverflowToDisk(overflowToDisk && diskStoreEnabled);
       if (overflowToDisk && diskStoreEnabled) {
         config.setMaxElementsOnDisk(maxElementsOnDisk);
-        config.setDiskPersistent(diskPersistent);
       }
+      config.setDiskPersistent(diskPersistent && diskStoreEnabled);
       config.setStatistics(statisticsEnabled);
       config.setMaxElementsInMemory(maxElementsInMemory);
       config.setTimeToIdleSeconds(timeToIdle);
