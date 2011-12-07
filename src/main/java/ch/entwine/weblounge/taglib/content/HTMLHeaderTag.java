@@ -20,7 +20,6 @@
 
 package ch.entwine.weblounge.taglib.content;
 
-import ch.entwine.weblounge.common.content.page.DeclarativeHTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
@@ -179,8 +178,6 @@ public class HTMLHeaderTag extends WebloungeTag {
    */
   private void addHeadElement(HTMLHeadElement headElement, Site site,
       Module module) {
-    if (headElement instanceof DeclarativeHTMLHeadElement)
-      ((DeclarativeHTMLHeadElement) headElement).configure(request, site, module);
     if (headElement.getUse().equals(HTMLInclude.Use.Editor))
       return;
     if (headElement instanceof Script)
