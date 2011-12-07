@@ -87,7 +87,7 @@ public class WorkbenchEndpoint {
 
     // What is the current environment?
     Environment environment = Environment.Production;
-    for (SiteURL url : site.getConnectors()) {
+    for (SiteURL url : site.getHostnames()) {
       if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
         environment = url.getEnvironment();
         break;
@@ -123,7 +123,7 @@ public class WorkbenchEndpoint {
     
     // What is the current environment?
     Environment environment = Environment.Production;
-    for (SiteURL url : site.getConnectors()) {
+    for (SiteURL url : site.getHostnames()) {
       if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
         environment = url.getEnvironment();
         break;

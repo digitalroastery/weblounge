@@ -345,9 +345,9 @@ public class WorkbenchService {
 
       // Prepare the mock request
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-      request.setServerName(site.getConnector(environment).getURL().getHost());
-      request.setServerPort(site.getConnector(environment).getURL().getPort());
-      request.setMethod(site.getConnector(environment).getURL().getProtocol());
+      request.setServerName(site.getHostname(environment).getURL().getHost());
+      request.setServerPort(site.getHostname(environment).getURL().getPort());
+      request.setMethod(site.getHostname(environment).getURL().getProtocol());
       if (language != null)
         request.addPreferredLocale(new Locale(language));
       request.setAttribute(WebloungeRequest.PAGE, page);
