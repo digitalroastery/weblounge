@@ -195,8 +195,8 @@ public class SiteCommand {
     pad("running", (site.isOnline() ? "yes" : "no"));
 
     // Hostnames
-    if (site.getConnectors().length > 0)
-      pad("hosts", site.getConnectors());
+    if (site.getHostnames().length > 0)
+      pad("hosts", site.getHostnames());
 
     // Languages
     if (site.getLanguages().length > 0) {

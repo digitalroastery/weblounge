@@ -8,7 +8,8 @@
   <service>
     <provide interface="ch.entwine.weblounge.kernel.site.SiteManager" />
   </service>
-  
+
   <reference name="configurationadmin" interface="org.osgi.service.cm.ConfigurationAdmin" cardinality="1..1" policy="static" bind="setConfigurationAdmin" />
+  <reference name="environment" interface="ch.entwine.weblounge.common.site.Environment" cardinality="1..1" policy="dynamic" bind="setEnvironment" unbind="removeEnvironment" />
 
 </scr:component>

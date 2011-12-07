@@ -160,7 +160,7 @@ public class SiteContextFilter implements Filter {
    *          the new site
    */
   void addSite(Site site) {
-    for (SiteURL connector : site.getConnectors()) {
+    for (SiteURL connector : site.getHostnames()) {
       String hostName = connector.getURL().getHost();
       Site registeredFirst = sitesByServerName.get(hostName);
       if (registeredFirst != null && !site.equals(registeredFirst)) {

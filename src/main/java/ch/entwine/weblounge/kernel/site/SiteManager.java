@@ -22,6 +22,7 @@ package ch.entwine.weblounge.kernel.site;
 
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteException;
 import ch.entwine.weblounge.common.site.SiteURL;
@@ -74,6 +75,9 @@ public class SiteManager {
 
   /** Maps sites to osgi bundles */
   private Map<Site, Bundle> siteBundles = new HashMap<Site, Bundle>();
+
+  /** The environment */
+  private Environment environment = null;
 
   /** Maps content repositories to site identifier */
   private Map<String, ContentRepository> repositoriesBySite = new HashMap<String, ContentRepository>();
@@ -242,11 +246,23 @@ public class SiteManager {
   synchronized void addSite(Site site, ServiceReference reference) {
     sites.add(site);
     siteBundles.put(site, reference.getBundle());
-    for (SiteURL connector : site.getConnectors()) {
-      String hostName = connector.getURL().getHost();
+
+    // Make sure we have an environment
+    Environment env = environment;
+    if (env == null) {
+      logger.warn("No environment has been defined. Falling back to {}", Environment.Production);
+      env = environment;
+    }
+
+    // Register the site urls and make sure we don't double book
+    site.initialize(env);
+    for (SiteURL url : site.getHostnames()) {
+      if (!env.equals(url.getEnvironment()))
+        continue;
+      String hostName = url.getURL().getHost();
       Site registeredFirst = sitesByServerName.get(hostName);
       if (registeredFirst != null && !site.equals(registeredFirst)) {
-        logger.warn("Another site is already registered to " + connector);
+        logger.error("Another site is already registered to {}. Site is not registered", url);
         continue;
       }
       sitesByServerName.put(hostName, site);
@@ -439,6 +455,32 @@ public class SiteManager {
    */
   void setConfigurationAdmin(ConfigurationAdmin configurationAdmin) {
     this.configurationAdmin = configurationAdmin;
+  }
+
+  /**
+   * OSGi callback that passes in the environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
+  }
+
+  /**
+   * OSGi callback that removes the environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void removeEnvironment(Environment environment) {
+    if (Environment.Production.equals(this.environment)) {
+      logger.info("Changing site environments to {}", Environment.Production);
+      for (Site site : sites) {
+        site.initialize(Environment.Production);
+      }
+    }
+    this.environment = null;
   }
 
   /**
