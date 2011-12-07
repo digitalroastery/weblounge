@@ -37,6 +37,14 @@ public interface Module extends Customizable {
   String CONFIG_FILE = "module.xml";
 
   /**
+   * Initializes the module with the system environment.
+   * 
+   * @param environment
+   *          the system environment
+   */
+  void initialize(Environment environment);
+
+  /**
    * Sets the module identifier.
    * <p>
    * <b>Note:</b> the identifier may be used in file paths, database table names

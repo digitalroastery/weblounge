@@ -49,6 +49,14 @@ public interface Site extends Customizable, RequestListener, Serializable {
   String BUNDLE_PATH = "/site";
 
   /**
+   * Initializes the site with the system environment.
+   * 
+   * @param environment
+   *          the system environment
+   */
+  void initialize(Environment environment);
+
+  /**
    * Sets the site identifier.
    * <p>
    * <b>Note:</b> the identifier may be used in file paths, database table names
@@ -288,7 +296,7 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * @param url
    *          the url to add
    */
-  void addConnector(SiteURL url);
+  void addHostname(SiteURL url);
 
   /**
    * Returns the primary url used to reach this site. This method will return
@@ -297,7 +305,7 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * 
    * @return the site's primary url
    */
-  SiteURL getConnector();
+  SiteURL getHostname();
 
   /**
    * Returns the primary url used to reach this site in the given environment.
@@ -306,14 +314,14 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * 
    * @return the site's primary url for the given environment
    */
-  SiteURL getConnector(Environment environment);
+  SiteURL getHostname(Environment environment);
 
   /**
    * Returns the urls that will lead to this site.
    * 
    * @return the registered site urls
    */
-  SiteURL[] getConnectors();
+  SiteURL[] getHostnames();
 
   /**
    * Removes <code>hostname</code> from the list of hostnames. The method
@@ -324,7 +332,7 @@ public interface Site extends Customizable, RequestListener, Serializable {
    *          the hostname to remove
    * @return <code>true</code> if the hostname was removed
    */
-  boolean removeConnector(SiteURL url);
+  boolean removeHostname(SiteURL url);
 
   /**
    * Adds <code>language</code> to the site languages.

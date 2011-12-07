@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.content.page;
 
 import ch.entwine.weblounge.common.content.Renderer;
+import ch.entwine.weblounge.common.site.Site;
 
 /**
  * A <code>PageTemplate</code> is a renderer that is used to render a whole
@@ -30,6 +31,14 @@ public interface PageTemplate extends Renderer {
 
   /** Default name of the main composer */
   String DEFAULT_STAGE = "main";
+
+  /**
+   * Sets the associated site.
+   * 
+   * @param site
+   *          the site
+   */
+  void setSite(Site site);
 
   /**
    * Defines the main composer for this template, which will be used when

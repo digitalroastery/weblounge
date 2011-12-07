@@ -108,7 +108,7 @@ public interface WebUrl extends Path {
    * <ul>
    * <li>It does not contain a protocol</li>
    * <li>It starts with the site's main hostname as returned by
-   * {@link ch.entwine.weblounge.common.site.Site#getConnector()}</li>
+   * {@link ch.entwine.weblounge.common.site.Site#getHostname()}</li>
    * <li>It contains the requested version as a url extension</li>
    * <li>It contains the request flavor as a url extension</li>
    * </ul>

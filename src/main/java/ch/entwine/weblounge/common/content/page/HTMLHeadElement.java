@@ -21,6 +21,9 @@
 package ch.entwine.weblounge.common.content.page;
 
 import ch.entwine.weblounge.common.content.page.HTMLInclude.Use;
+import ch.entwine.weblounge.common.site.Environment;
+import ch.entwine.weblounge.common.site.Module;
+import ch.entwine.weblounge.common.site.Site;
 
 /**
  * This interface describes elements that are included in the &lt;head&gt;
@@ -42,6 +45,30 @@ public interface HTMLHeadElement {
    *          the element use
    */
   void setUse(Use use);
+
+  /**
+   * Sets the associated site.
+   * 
+   * @param site
+   *          the site
+   */
+  void setSite(Site site);
+
+  /**
+   * Sets the associated module.
+   * 
+   * @param module
+   *          the module
+   */
+  void setModule(Module module);
+
+  /**
+   * Sets the system environment.
+   * 
+   * @param environment
+   *          the system environment
+   */
+  void setEnvironment(Environment environment);
 
   /**
    * Returns the xml representation of this script.
