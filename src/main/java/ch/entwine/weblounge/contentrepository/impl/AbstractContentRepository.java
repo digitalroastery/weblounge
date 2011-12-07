@@ -317,7 +317,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       try {
         Resource<?> resource = loadResource(uri);
         if (resource == null) {
-          logger.warn("Index inconsistency detected: version '{}' of {} does not exist on disk", uri, ResourceUtils.getVersionString(uri.getVersion()));
+          logger.error("Index inconsistency detected: version '{}' of {} does not exist on disk", ResourceUtils.getVersionString(uri.getVersion()), uri);
           return null;
         }
         return resource;
