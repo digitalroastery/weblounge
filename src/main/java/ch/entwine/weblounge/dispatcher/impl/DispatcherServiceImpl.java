@@ -154,7 +154,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    *          the request handler
    */
   void addRequestHandler(RequestHandler handler) {
-    logger.info("Registering {}", handler);
+    logger.debug("Registering {}", handler);
     dispatcher.addRequestHandler(handler);
   }
 
@@ -165,7 +165,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    *          the request handler
    */
   void removeRequestHandler(RequestHandler handler) {
-    logger.info("Unregistering {}", handler);
+    logger.debug("Unregistering {}", handler);
     dispatcher.removeRequestHandler(handler);
   }
 
