@@ -69,7 +69,7 @@ public final class ActionPool extends GenericObjectPool {
 
     if (getNumActive() > reportedLimit + 10) {
       reportedLimit += 10;
-      logger.info("Action pool '{}' grew above {}", new Object[] {
+      logger.debug("Action pool '{}' grew above {}", new Object[] {
           action,
           reportedLimit }
       );
@@ -98,7 +98,7 @@ public final class ActionPool extends GenericObjectPool {
         this.getNumIdle() });
     if (getNumActive() < reportedLimit - 10) {
       reportedLimit -= 10;
-      logger.info("Action pool '{}' dropped below {}", new Object[] {
+      logger.debug("Action pool '{}' dropped below {}", new Object[] {
           action,
           reportedLimit }
       );
