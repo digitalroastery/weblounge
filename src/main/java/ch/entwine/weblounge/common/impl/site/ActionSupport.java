@@ -463,8 +463,8 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       request.setAttribute(WebloungeRequest.PAGELET, pagelet);
 
     // Adjust the maximum valid and recheck time and add cache tags
-    response.setMaximumValidTime(renderer.getValidTime());
-    response.setMaximumRecheckTime(renderer.getRecheckTime());
+    response.setCacheExpirationTime(renderer.getValidTime());
+    response.setClientRevalidationTime(renderer.getRecheckTime());
     if (renderer.getModule() != null)
       response.addTag(CacheTag.Module, renderer.getModule().getIdentifier());
     response.addTag(CacheTag.Renderer, renderer.getIdentifier());
@@ -674,26 +674,26 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * 
    * @param config
    *          the action node
-   * @param xpathProcessor
+   * @param xpath
    *          xpath processor to use
    * @throws IllegalStateException
    *           if the configuration cannot be parsed
    * @see #toXml()
    */
   @SuppressWarnings("unchecked")
-  public static Action fromXml(Node config, XPath xpathProcessor)
+  public static Action fromXml(Node config, XPath xpath)
       throws IllegalStateException {
 
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     // identifier
-    String identifier = XPathHelper.valueOf(config, "@id", xpathProcessor);
+    String identifier = XPathHelper.valueOf(config, "@id", xpath);
     if (identifier == null)
       throw new IllegalStateException("Unable to create actions without identifier");
 
     // class
     Action action = null;
-    String className = XPathHelper.valueOf(config, "m:class", xpathProcessor);
+    String className = XPathHelper.valueOf(config, "m:class", xpath);
     if (className != null) {
       try {
         Class<? extends Action> c = (Class<? extends Action>) classLoader.loadClass(className);
@@ -708,14 +708,14 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
 
     // mountpoint
-    String mountpoint = XPathHelper.valueOf(config, "m:mountpoint", xpathProcessor);
+    String mountpoint = XPathHelper.valueOf(config, "m:mountpoint", xpath);
     if (mountpoint == null)
       throw new IllegalStateException("Action '" + identifier + " has no mountpoint");
     action.setPath(mountpoint);
     // TODO: handle /, /*
 
     // content url
-    String targetUrl = XPathHelper.valueOf(config, "m:page", xpathProcessor);
+    String targetUrl = XPathHelper.valueOf(config, "m:page", xpath);
     if (StringUtils.isNotBlank(targetUrl)) {
       if (!(action instanceof HTMLActionSupport))
         throw new IllegalStateException("Target page configuration for '" + action.getIdentifier() + "' requires subclassing HTMLActionSupport");
@@ -723,56 +723,56 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
 
     // template
-    String targetTemplate = XPathHelper.valueOf(config, "m:template", xpathProcessor);
+    String targetTemplate = XPathHelper.valueOf(config, "m:template", xpath);
     if (StringUtils.isNotBlank(targetTemplate)) {
       if (!(action instanceof HTMLActionSupport))
         throw new IllegalStateException("Target template configuration for '" + action.getIdentifier() + "' requires subclassing HTMLActionSupport");
       ((HTMLActionSupport) action).setDefaultTemplate(targetTemplate);
     }
 
-    // recheck time
-    String recheck = XPathHelper.valueOf(config, "m:recheck", xpathProcessor);
+    // client revalidation time
+    String recheck = XPathHelper.valueOf(config, "m:recheck", xpath);
     if (recheck != null) {
       try {
-        action.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
+        action.setClientRevalidationTime(ConfigurationUtils.parseDuration(recheck));
       } catch (NumberFormatException e) {
-        throw new IllegalStateException("The action recheck time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The action revalidation time is malformed: '" + recheck + "'");
       } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("The action recheck time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The action revalidation time is malformed: '" + recheck + "'");
       }
     }
 
-    // valid time
-    String valid = XPathHelper.valueOf(config, "m:valid", xpathProcessor);
+    // cache expiration time
+    String valid = XPathHelper.valueOf(config, "m:valid", xpath);
     if (valid != null) {
       try {
-        action.setValidTime(ConfigurationUtils.parseDuration(valid));
+        action.setCacheExpirationTime(ConfigurationUtils.parseDuration(valid));
       } catch (NumberFormatException e) {
-        throw new IllegalStateException("The action valid time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The action valid time is malformed: '" + valid + "'", e);
       } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("The action valid time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The action valid time is malformed: '" + valid + "'", e);
       }
     }
 
     // scripts
-    NodeList scripts = XPathHelper.selectList(config, "m:includes/m:script", xpathProcessor);
+    NodeList scripts = XPathHelper.selectList(config, "m:includes/m:script", xpath);
     for (int i = 0; i < scripts.getLength(); i++) {
       action.addHTMLHeader(ScriptImpl.fromXml(scripts.item(i)));
     }
 
     // links
-    NodeList includes = XPathHelper.selectList(config, "m:includes/m:link", xpathProcessor);
+    NodeList includes = XPathHelper.selectList(config, "m:includes/m:link", xpath);
     for (int i = 0; i < includes.getLength(); i++) {
       action.addHTMLHeader(LinkImpl.fromXml(includes.item(i)));
     }
 
     // name
-    String name = XPathHelper.valueOf(config, "m:name", xpathProcessor);
+    String name = XPathHelper.valueOf(config, "m:name", xpath);
     action.setName(name);
 
     // options
-    Node optionsNode = XPathHelper.select(config, "m:options", xpathProcessor);
-    OptionsHelper.fromXml(optionsNode, action, xpathProcessor);
+    Node optionsNode = XPathHelper.select(config, "m:options", xpath);
+    OptionsHelper.fromXml(optionsNode, action, xpath);
 
     return action;
   }

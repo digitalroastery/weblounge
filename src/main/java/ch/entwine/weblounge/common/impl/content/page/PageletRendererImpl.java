@@ -406,27 +406,27 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       throw new IllegalStateException("Malformed editor url in page template definition: " + editorUrlNode);
     }
 
-    // recheck time
+    // client revalidation time
     String recheck = XPathHelper.valueOf(node, "m:recheck", xpath);
     if (recheck != null) {
       try {
-        renderer.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
+        renderer.setClientRevalidationTime(ConfigurationUtils.parseDuration(recheck));
       } catch (NumberFormatException e) {
-        throw new IllegalStateException("The pagelet renderer valid time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The pagelet renderer revalidation time is malformed: '" + recheck + "'");
       } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("The pagelet renderer valid time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The pagelet renderer revalidation time is malformed: '" + recheck + "'");
       }
     }
 
-    // valid time
+    // cache expiration time
     String valid = XPathHelper.valueOf(node, "m:valid", xpath);
     if (valid != null) {
       try {
-        renderer.setValidTime(ConfigurationUtils.parseDuration(valid));
+        renderer.setCacheExpirationTime(ConfigurationUtils.parseDuration(valid));
       } catch (NumberFormatException e) {
-        throw new IllegalStateException("The pagelet renderer valid time '" + valid + "' is malformed", e);
+        throw new IllegalStateException("The pagelet renderer valid time is malformed: '" + valid + "'", e);
       } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("The pagelet renderer valid time '" + valid + "' is malformed", e);
+        throw new IllegalStateException("The pagelet renderer valid time is malformed: '" + valid + "'", e);
       }
     }
 

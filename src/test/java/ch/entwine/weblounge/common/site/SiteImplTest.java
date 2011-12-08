@@ -202,8 +202,8 @@ public class SiteImplTest {
     administrator.addPrivateCredentials(new PasswordImpl(administratorPassword, DigestType.plain));
     // Default template
     defaultTemplate = new PageTemplateImpl(defaultTemplateId, new URL(defaultTemplateUrl));
-    defaultTemplate.setRecheckTime(defaultTemplateRecheckTime);
-    defaultTemplate.setValidTime(defaultTemplateValidTime);
+    defaultTemplate.setClientRevalidationTime(defaultTemplateRecheckTime);
+    defaultTemplate.setCacheExpirationTime(defaultTemplateValidTime);
     defaultTemplate.setComposeable(true);
     defaultTemplate.setStage(defaultTemplateStage);
     defaultTemplate.setName(defaultTemplateName);

@@ -101,8 +101,8 @@ public class ActionSupportTest {
     action.addFlavor(RequestFlavor.HTML);
     action.addHTMLHeader(script);
     action.setPath(mountpoint);
-    action.setRecheckTime(recheckTime);
-    action.setValidTime(validTime);
+    action.setClientRevalidationTime(recheckTime);
+    action.setCacheExpirationTime(validTime);
     action.setOption(optionKey, optionValue);
     action.setSite(site);
     action.setModule(module);

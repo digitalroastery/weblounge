@@ -299,27 +299,27 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     if (layout != null)
       template.setDefaultLayout(layout);
 
-    // recheck time
+    // client revalidation time
     String recheck = XPathHelper.valueOf(node, "ns:recheck", xpath);
     if (recheck != null) {
       try {
-        template.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
+        template.setClientRevalidationTime(ConfigurationUtils.parseDuration(recheck));
       } catch (NumberFormatException e) {
-        throw new IllegalStateException("The page template valid time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The page template revalidation time is malformed: '" + recheck + "'");
       } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("The page template valid time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The page template revalidation time is malformed: '" + recheck + "'");
       }
     }
 
-    // valid time
+    // cache expiration time
     String valid = XPathHelper.valueOf(node, "ns:valid", xpath);
     if (valid != null) {
       try {
-        template.setValidTime(ConfigurationUtils.parseDuration(valid));
+        template.setCacheExpirationTime(ConfigurationUtils.parseDuration(valid));
       } catch (NumberFormatException e) {
-        throw new IllegalStateException("The page template valid time '" + valid + "' is malformed", e);
+        throw new IllegalStateException("The page template valid time is malformed: '" + valid + "'", e);
       } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("The page template valid time '" + valid + "' is malformed", e);
+        throw new IllegalStateException("The page template valid time is malformed: '" + valid + "'", e);
       }
     }
 

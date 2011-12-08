@@ -116,8 +116,8 @@ public class PageletRendererImplTest {
     renderer.setRenderer(rendererUrl);
     renderer.addRenderer(feedRendererUrl, feedRendererType);
     renderer.setEditor(editorUrl);
-    renderer.setRecheckTime(recheckTime);
-    renderer.setValidTime(validTime);
+    renderer.setClientRevalidationTime(recheckTime);
+    renderer.setCacheExpirationTime(validTime);
     renderer.setComposeable(composeable);
     renderer.setPreviewMode(previewMode);
     renderer.setName(name);

@@ -368,60 +368,60 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.request.WebloungeResponse#setMaximumRecheckTime(long)
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#setClientRevalidationTime(long)
    */
-  public void setMaximumRecheckTime(long recheckTime) {
+  public void setClientRevalidationTime(long recheckTime) {
     if (cacheHandle == null)
       return;
     CacheHandle hdl = cacheHandle.get();
     if (hdl == null)
       return;
-    hdl.setRecheckTime(Math.min(recheckTime, hdl.getRecheckTime()));
+    hdl.setClientRevalidationTime(Math.min(recheckTime, hdl.getClientRevalidationTime()));
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.request.WebloungeResponse#getMaxiumRecheckTime()
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#getClientRevalidationTime()
    */
-  public long getMaxiumRecheckTime() {
+  public long getClientRevalidationTime() {
     if (cacheHandle == null)
       return 0;
     CacheHandle hdl = cacheHandle.get();
     if (hdl == null)
       return 0;
-    return hdl.getRecheckTime();
+    return hdl.getClientRevalidationTime();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.request.WebloungeResponse#setMaximumValidTime(long)
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#setCacheExpirationTime(long)
    */
-  public void setMaximumValidTime(long validTime) {
+  public void setCacheExpirationTime(long validTime) {
     if (cacheHandle == null)
       return;
     CacheHandle hdl = cacheHandle.get();
     if (hdl == null)
       return;
-    hdl.setExpireTime(Math.min(validTime, hdl.getExpireTime()));
+    hdl.setCacheExpirationTime(Math.min(validTime, hdl.getCacheExpirationTime()));
 
     // The recheck time can't be longer than the valid time
-    setMaximumRecheckTime(validTime);
+    setClientRevalidationTime(validTime);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.request.WebloungeResponse#getMaxiumValidTime()
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#getCacheExpirationTime()
    */
-  public long getMaxiumValidTime() {
+  public long getCacheExpirationTime() {
     if (cacheHandle == null)
       return 0;
     CacheHandle hdl = cacheHandle.get();
     if (hdl == null)
       return 0;
-    return hdl.getExpireTime();
+    return hdl.getCacheExpirationTime();
   }
 
   /**

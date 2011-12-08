@@ -91,10 +91,10 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
     }
     
     // Recheck time
-    action.setRecheckTime(blueprint.getRecheckTime());
+    action.setClientRevalidationTime(blueprint.getRecheckTime());
 
     // Valid time
-    action.setValidTime(blueprint.getValidTime());
+    action.setCacheExpirationTime(blueprint.getValidTime());
 
     // Are we looking at an html action?
     if (blueprint instanceof HTMLAction) {

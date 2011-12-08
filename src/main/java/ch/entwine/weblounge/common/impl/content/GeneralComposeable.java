@@ -170,9 +170,9 @@ public class GeneralComposeable implements Composeable {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Composeable#setRecheckTime(long)
+   * @see ch.entwine.weblounge.common.content.Composeable#setClientRevalidationTime(long)
    */
-  public void setRecheckTime(long time) {
+  public void setClientRevalidationTime(long time) {
     if (time < 0)
       throw new IllegalArgumentException("Recheck time must be greater than or equal to zero");
     this.recheckTime = time;
@@ -190,9 +190,9 @@ public class GeneralComposeable implements Composeable {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Composeable#setValidTime(long)
+   * @see ch.entwine.weblounge.common.content.Composeable#setCacheExpirationTime(long)
    */
-  public void setValidTime(long time) {
+  public void setCacheExpirationTime(long time) {
     if (time < 0)
       throw new IllegalArgumentException("Valid time must be greater than or equal to zero");
     this.validTime = time;

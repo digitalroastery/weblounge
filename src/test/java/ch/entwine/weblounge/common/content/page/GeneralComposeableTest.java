@@ -104,8 +104,8 @@ public class GeneralComposeableTest {
    */
   protected void setUpComposeable() throws Exception {
     composeable.setName(name);
-    composeable.setRecheckTime(recheckTime);
-    composeable.setValidTime(validTime);
+    composeable.setClientRevalidationTime(recheckTime);
+    composeable.setCacheExpirationTime(validTime);
     composeable.setComposeable(isComposeable);
     composeable.addHTMLHeader(css);
     composeable.addHTMLHeader(javascript);
