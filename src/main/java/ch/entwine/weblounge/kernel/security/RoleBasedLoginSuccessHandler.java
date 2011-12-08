@@ -82,7 +82,7 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
     User user = ((SpringSecurityUser) principal).getUser();
     boolean isEditor = SecurityUtils.userHasRole(user, SystemRole.EDITOR);
 
-    logger.info("User '{}' logged in", user.getLogin());
+    logger.info("{} logged in", user);
 
     // Try to redirect the user to the initial url
     HttpSession session = request.getSession(false);

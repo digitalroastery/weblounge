@@ -1,5 +1,6 @@
 package ch.entwine.weblounge.kernel.security;
 
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.url.PathUtils;
 
 import org.slf4j.Logger;
@@ -41,9 +42,15 @@ public class WebloungeLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler
 
     // Authentication can be null, e. g. if a user presses "logout" even though
     // his session has already been expired
-    if (authentication != null)
-      logger.info("User '{}' logged out", authentication.getName());
-
+    if (authentication != null) {
+      Object principal = authentication.getPrincipal();
+      if (!(principal instanceof SpringSecurityUser)) {
+        User user = ((SpringSecurityUser) principal).getUser();
+        logger.info("{} logged out", user);
+      } else {
+        logger.info("{} logged out", authentication.getName());
+      }
+    }
     setDefaultTargetUrl(addTimeStamp(targetUrl));
     super.onLogoutSuccess(request, response, authentication);
   }
