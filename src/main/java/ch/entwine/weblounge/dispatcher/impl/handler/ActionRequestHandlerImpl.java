@@ -227,7 +227,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         Http11Utils.startHeadResponse(response);
         processingMode = Mode.Head;
       } else if (request.getVersion() == Resource.WORK) {
-        response.setMaximumValidTime(0);
+        response.setCacheExpirationTime(0);
       }
 
       logger.debug("Action {} will handle {}", action, url);

@@ -304,12 +304,12 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         Http11Utils.startHeadResponse(response);
         processingMode = Mode.Head;
       } else if (request.getVersion() == Resource.WORK) {
-        response.setMaximumValidTime(0);
+        response.setCacheExpirationTime(0);
       }
 
       // Set the default maximum render and valid times for pages
-      response.setMaximumRecheckTime(Renderer.DEFAULT_RECHECK_TIME);
-      response.setMaximumValidTime(Renderer.DEFAULT_VALID_TIME);
+      response.setClientRevalidationTime(Renderer.DEFAULT_RECHECK_TIME);
+      response.setCacheExpirationTime(Renderer.DEFAULT_VALID_TIME);
 
       // Store the page in the request
       request.setAttribute(WebloungeRequest.PAGE, page);
@@ -349,11 +349,11 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       response.addTag(CacheTag.Renderer, template.getIdentifier());
 
       // Configure valid and recheck time according to the template
-      response.setMaximumRecheckTime(template.getRecheckTime());
-      response.setMaximumValidTime(template.getValidTime());
+      response.setClientRevalidationTime(template.getRecheckTime());
+      response.setCacheExpirationTime(template.getValidTime());
 
       // Set the Expires header
-      long expires = response.getMaxiumValidTime();
+      long expires = response.getCacheExpirationTime();
       if (expires > 0) {
         expires = System.currentTimeMillis() + expires;
       } else {
