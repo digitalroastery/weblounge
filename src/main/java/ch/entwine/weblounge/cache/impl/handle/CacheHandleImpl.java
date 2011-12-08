@@ -52,7 +52,7 @@ public class CacheHandleImpl implements CacheHandle {
   protected long expires;
 
   /** The recheck time of the cached object */
-  protected long recheck;
+  protected long revalidate;
 
   /** the set of cache tags */
   protected CacheTagSet tags = new CacheTagSet();
@@ -84,8 +84,8 @@ public class CacheHandleImpl implements CacheHandle {
    *          the time the cached element has to be checked for modifications.
    */
   protected CacheHandleImpl(long expires, long recheck) {
-    setRecheckTime(recheck);
-    setExpireTime(expires);
+    setClientRevalidationTime(recheck);
+    setCacheExpirationTime(expires);
   }
 
   /**
@@ -121,17 +121,17 @@ public class CacheHandleImpl implements CacheHandle {
    * 
    * @return the expiration time
    */
-  public final long getExpireTime() {
+  public final long getCacheExpirationTime() {
     return expires;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.request.CacheHandle#setExpireTime(long)
+   * @see ch.entwine.weblounge.common.request.CacheHandle#setCacheExpirationTime(long)
    */
-  public final void setExpireTime(long expires) {
-    this.expires = (expires > Times.MS_PER_SECOND) ? expires : Times.MS_PER_SECOND;
+  public final void setCacheExpirationTime(long expires) {
+    this.expires = Math.max(expires, Times.MS_PER_SECOND);
   }
 
   /**
@@ -139,17 +139,17 @@ public class CacheHandleImpl implements CacheHandle {
    * 
    * @return the recheck time
    */
-  public final long getRecheckTime() {
-    return recheck;
+  public final long getClientRevalidationTime() {
+    return revalidate;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.request.CacheHandle#setRecheckTime(long)
+   * @see ch.entwine.weblounge.common.request.CacheHandle#setClientRevalidationTime(long)
    */
-  public final void setRecheckTime(long recheck) {
-    this.recheck = (recheck > Times.MS_PER_SECOND) ? recheck : Times.MS_PER_SECOND;
+  public final void setClientRevalidationTime(long recheck) {
+    this.revalidate = Math.max(recheck, Times.MS_PER_SECOND);
   }
 
   /**

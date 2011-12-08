@@ -104,44 +104,44 @@ public class CacheHandleImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.cache.impl.handle.CacheHandleImpl#getExpireTime()}.
+   * {@link ch.entwine.weblounge.cache.impl.handle.CacheHandleImpl#getCacheExpirationTime()}.
    */
   @Test
   public void testGetExpires() {
-    assertEquals(expirationTime, handle.getExpireTime());
+    assertEquals(expirationTime, handle.getCacheExpirationTime());
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.cache.impl.handle.CacheHandleImpl#setExpireTime(long)}
+   * {@link ch.entwine.weblounge.cache.impl.handle.CacheHandleImpl#setCacheExpirationTime(long)}
    * .
    */
   @Test
   public void testSetExpires() {
     long t = System.currentTimeMillis();
-    handle.setExpireTime(t);
-    assertEquals(t, handle.getExpireTime());
+    handle.setCacheExpirationTime(t);
+    assertEquals(t, handle.getCacheExpirationTime());
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.cache.impl.handle.CacheHandleImpl#getRecheckTime()}.
+   * {@link ch.entwine.weblounge.cache.impl.handle.CacheHandleImpl#getClientRevalidationTime()}.
    */
   @Test
   public void testGetRecheck() {
-    assertEquals(recheckTime, handle.getRecheckTime());
+    assertEquals(recheckTime, handle.getClientRevalidationTime());
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.cache.impl.handle.CacheHandleImpl#setRecheckTime(long)}
+   * {@link ch.entwine.weblounge.cache.impl.handle.CacheHandleImpl#setClientRevalidationTime(long)}
    * .
    */
   @Test
   public void testSetRecheck() {
     long t = System.currentTimeMillis();
-    handle.setRecheckTime(t);
-    assertEquals(t, handle.getRecheckTime());
+    handle.setClientRevalidationTime(t);
+    assertEquals(t, handle.getClientRevalidationTime());
   }
 
   /**

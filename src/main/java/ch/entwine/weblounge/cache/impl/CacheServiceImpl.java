@@ -749,9 +749,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         String encoding = cacheableResponse.getCharacterEncoding();
         CacheEntry entry = new CacheEntry(cacheHdl, tx.getContent(), encoding, tx.getHeaders());
         Element element = new Element(new CacheEntryKey(cacheHdl), entry);
-        element.setTimeToLive((int) (cacheHdl.getExpireTime() / 1000));
+        element.setTimeToLive((int) (cacheHdl.getCacheExpirationTime() / 1000));
         cache.put(element);
-        response.setDateHeader("Expires", System.currentTimeMillis() + cacheHdl.getExpireTime());
+        response.setDateHeader("Expires", System.currentTimeMillis() + cacheHdl.getCacheExpirationTime());
 
         // Inform listeners
         for (CacheListener listener : cacheListeners) {
@@ -759,7 +759,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         }
       } else if (tx.isValid() && response.isValid()) {
         logger.trace("Skip caching of response for {} to the cache: {}", response, response.getStatus());
-        response.setDateHeader("Expires", System.currentTimeMillis() + tx.getHandle().getExpireTime());
+        response.setDateHeader("Expires", System.currentTimeMillis() + tx.getHandle().getCacheExpirationTime());
       } else {
         logger.debug("Response to {} was invalid and is not being cached", response);
       }
