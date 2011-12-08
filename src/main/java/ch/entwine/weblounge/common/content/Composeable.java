@@ -94,7 +94,7 @@ public interface Composeable {
    * @param time
    *          the valid time
    */
-  void setValidTime(long time);
+  void setCacheExpirationTime(long time);
 
   /**
    * Returns the amount of time in milliseconds that output using this
@@ -114,7 +114,7 @@ public interface Composeable {
    * @param time
    *          the recheck time
    */
-  void setRecheckTime(long time);
+  void setClientRevalidationTime(long time);
 
   /**
    * Returns the amount of time in milliseconds that output using this
