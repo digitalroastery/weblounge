@@ -59,6 +59,9 @@ public final class CacheEntry implements Serializable {
   /** Date where the entry was added to the cache */
   private long lastModified = 0L;
 
+  /** Time in ms for the client to revalidate */
+  private long clientRevalidationTime = 0L;
+
   /** The etag */
   private String eTag = null;
 
@@ -91,6 +94,7 @@ public final class CacheEntry implements Serializable {
     this.encoding = encoding;
     this.content = content;
     this.lastModified = handle.getCreationDate();
+    this.clientRevalidationTime = handle.getClientRevalidationTime();
     this.eTag = createETag(lastModified);
     setHeaders(headers);
   }
@@ -129,6 +133,15 @@ public final class CacheEntry implements Serializable {
    */
   public long getLastModified() {
     return lastModified;
+  }
+
+  /**
+   * Returns the time in ms until the client needs to revalidate the response.
+   * 
+   * @return the client revalidation time
+   */
+  public long getClientRevalidationTime() {
+    return clientRevalidationTime;
   }
 
   /**
