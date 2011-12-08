@@ -37,6 +37,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,14 +93,18 @@ public final class LanguageUtils {
 
     // Check the system locales for a match
     Locale systemLocale = null;
-    for (Locale l : Locale.getAvailableLocales()) {
-      if (l.getISO3Language().equals(locale.getISO3Language())) {
-        systemLocale = l;
-        break;
-      } else if (l.getLanguage().equals(l.getLanguage())) {
-        systemLocale = l;
-        break;
+    try {
+      for (Locale l : Locale.getAvailableLocales()) {
+        if (l.getISO3Language().equals(locale.getISO3Language())) {
+          systemLocale = l;
+          break;
+        } else if (l.getLanguage().equals(l.getLanguage())) {
+          systemLocale = l;
+          break;
+        }
       }
+    } catch (MissingResourceException e) {
+      logger.debug("No 3 found for '{}': {}", locale, e.getMessage());
     }
 
     // Is there a matching system locale?
