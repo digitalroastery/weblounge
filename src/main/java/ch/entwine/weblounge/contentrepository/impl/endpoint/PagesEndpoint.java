@@ -1030,7 +1030,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Finally, perform the lock operation (on all resource versions)
     try {
       contentRepository.lock(workURI, user);
-      logger.info("Page {} has been locked by '{}'", workURI, user);
+      logger.info("Page {} has been locked by {}", workURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to lock page {} of site '{}' without permission", workURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
@@ -1124,7 +1124,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Finally, perform the lock operation (on all resource versions)
     try {
       contentRepository.unlock(pageURI, user);
-      logger.info("Page {} has been unlocked by '{}'", pageURI, user);
+      logger.info("Page {} has been unlocked by {}", pageURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
