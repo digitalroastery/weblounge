@@ -228,12 +228,12 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:if test="property[@id='partition'] and property[@id='path']">
-              <property id="pageid">
+              <property id="resourceid">
                 <xsl:value-of select="importer:getUUID(property[@id='partition'], property[@id='path'])" />
               </property>
             </xsl:if>
             <xsl:if test="properties/property[@id='partition'] and properties/property[@id='path']">
-              <property id="pageid">
+              <property id="resourceid">
                 <xsl:value-of select="importer:getUUID(properties/property[@id='partition'], properties/property[@id='path'])" />
               </property>
             </xsl:if>
