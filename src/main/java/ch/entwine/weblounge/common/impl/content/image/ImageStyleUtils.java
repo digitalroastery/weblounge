@@ -52,6 +52,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
@@ -612,6 +614,38 @@ public final class ImageStyleUtils {
         return style;
     }
     return null;
+  }
+
+  /**
+   * Searches all modules of the given site for the image styles whose
+   * identifier matches <code>regex</code>. If no such style was found, an empty
+   * array is returned.
+   * 
+   * @param regex
+   *          the image style identifier
+   * @param composeableOnly
+   *          if <code>true</code>, return composeable styles only
+   * @param site
+   *          the site
+   * @return the image styles
+   */
+  public static ImageStyle[] findStyles(String regex, boolean composeableOnly,
+      Site site) {
+    if (regex == null)
+      throw new IllegalArgumentException("Regular expression cannot be null");
+    if (site == null)
+      throw new IllegalArgumentException("Site cannot be null");
+    List<ImageStyle> styles = new ArrayList<ImageStyle>();
+    for (Module m : site.getModules()) {
+      for (ImageStyle style : m.getImageStyles()) {
+        if (composeableOnly && !style.isComposeable())
+          continue;
+        if (!style.getIdentifier().matches(regex))
+          continue;
+        styles.add(style);
+      }
+    }
+    return styles.toArray(new ImageStyle[styles.size()]);
   }
 
   /**
