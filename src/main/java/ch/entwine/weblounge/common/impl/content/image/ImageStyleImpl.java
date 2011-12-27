@@ -29,6 +29,7 @@ import static ch.entwine.weblounge.common.site.ImageScalingMode.Width;
 
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.content.GeneralComposeable;
+import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 
@@ -308,7 +309,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     }
 
     // Composeable
-    boolean composeable = "true".equals(XPathHelper.valueOf(node, "@composeable", xpath));
+    boolean composeable = ConfigurationUtils.isTrue(XPathHelper.valueOf(node, "@composeable", xpath), true);
 
     // Scaling mode
     String mode = XPathHelper.valueOf(node, "m:scalingmode", xpath);
