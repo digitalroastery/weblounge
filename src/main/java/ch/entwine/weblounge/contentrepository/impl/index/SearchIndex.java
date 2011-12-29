@@ -542,7 +542,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
           indexVersion = -1;
         } else {
           indexVersion = Integer.parseInt(r.getResults().get(0).getFieldValue(VERSION).toString());
-          logger.info("Search index version is {}", indexVersion);
+          logger.debug("Search index version is {}", indexVersion);
         }
       } catch (Throwable e) {
         logger.warn("Index version information cannot be determined ({}), triggering reindex", e.getMessage());

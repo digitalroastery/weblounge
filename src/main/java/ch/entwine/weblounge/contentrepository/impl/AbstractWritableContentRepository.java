@@ -135,11 +135,27 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   @Override
   public void disconnect() throws ContentRepositoryException {
     super.disconnect();
+
+    // Make sure the bundle is still active. If not, unregistering the trackers
+    // below will throw an IllegalStateException
+    Bundle bundle = loadBundle(site);
+    if (bundle == null || bundle.getState() != Bundle.ACTIVE)
+      return;
+
+    // Close the image style tracker
     if (imageStyleTracker != null) {
       imageStyleTracker.close();
       imageStyleTracker = null;
+    }
+
+    // Close the cache tracker
+    if (responseCacheTracker != null) {
       responseCacheTracker.close();
       responseCacheTracker = null;
+    }
+
+    // Close the environment tracker
+    if (environmentTracker != null) {
       environmentTracker.close();
       environmentTracker = null;
     }
@@ -380,7 +396,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
         // Load the resource, adjust the path and store it again
         Resource<?> r = get(candidateURI);
-        
+
         // Store the updated resource
         r.getURI().setPath(newPath);
         storeResource(r);

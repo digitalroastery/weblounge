@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.contentrepository.impl;
 
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 
@@ -215,6 +216,12 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
    */
   public void deleted(String pid) {
     ServiceRegistration registration = services.remove(pid);
+    ContentRepository repository = (ContentRepository) bundleCtx.getService(registration.getReference());
+    try {
+      repository.disconnect();
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error disconnecting repository {}: {}", repository, e.getMessage());
+    }
     registration.unregister();
   }
 
