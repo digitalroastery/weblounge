@@ -113,7 +113,7 @@ public class Precompiler {
    * Stops the current precompilation work.
    */
   public void stop() {
-    logger.info("Asking precompiler for '{}' to stop", servlet.getSite());
+    logger.debug("Asking precompiler for '{}' to stop", servlet.getSite());
     keepGoing = false;
   }
 

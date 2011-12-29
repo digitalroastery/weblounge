@@ -431,18 +431,18 @@ public class SiteManager {
 
     // Tell the site to no longer use it
     if (siteIdentifier != null) {
-      repositoriesBySite.remove(siteIdentifier);
       Site site = findSiteByIdentifier(siteIdentifier);
-      if (site != null) {
-        site.setContentRepository(null);
-      }
-    }
+      repositoriesBySite.remove(siteIdentifier);
 
-    // Tell the repository to clean up
-    try {
-      repository.disconnect();
-    } catch (ContentRepositoryException e) {
-      logger.warn("Error disconnecting content repository " + repository, e);
+      // Tell the repository to clean up
+      if (site != null && site.getContentRepository() != null) {
+        try {
+          site.setContentRepository(null);
+          repository.disconnect();
+        } catch (ContentRepositoryException e) {
+          logger.warn("Error disconnecting content repository " + repository, e);
+        }
+      }
     }
 
   }

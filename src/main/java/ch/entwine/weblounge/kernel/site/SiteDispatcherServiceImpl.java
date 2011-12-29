@@ -437,6 +437,11 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     // We are no longer interested in site events
     site.removeSiteListener(this);
 
+    // Stop the site's precompiler
+    Precompiler precompiler = precompilers.get(site);
+    if (precompiler != null)
+      precompiler.stop();
+
     siteServlets.remove(site);
 
     // TODO: unregister site dispatcher
