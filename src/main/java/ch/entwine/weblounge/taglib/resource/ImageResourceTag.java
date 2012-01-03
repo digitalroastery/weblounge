@@ -199,7 +199,7 @@ public class ImageResourceTag extends WebloungeTag {
     if (uri == null && RequestUtils.isMockRequest(request))
       return SKIP_BODY;
     if (uri == null)
-      throw new JspException("Neither image id nor image path were specified");
+      throw new JspException("None of the several possibilities returned a valid image");
 
     // Try to load the image from the content repository
     try {
