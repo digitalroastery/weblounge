@@ -36,15 +36,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.ServletResponseWrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyTagSupport;
+import javax.servlet.jsp.tagext.TryCatchFinally;
 
 /**
  * Base class for weblounge tags which implements most of the standard
  * <code>HTML 4</code> tag attributes.
  */
-public class WebloungeTag extends BodyTagSupport {
+public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
 
   /** Serial version id */
   private static final long serialVersionUID = 1754816467985401658L;
@@ -104,7 +104,10 @@ public class WebloungeTag extends BodyTagSupport {
   protected WebloungeResponse response = null;
 
   /**
-   * Resets the properties of this tag to default values.
+   * Resets the properties of this tag to default values. This method is called
+   * between <strong>every</strong> request.
+   * <p>
+   * If you override this method make sure you call <code>super.reset()</code>
    */
   protected void reset() {
     css = null;
@@ -123,6 +126,8 @@ public class WebloungeTag extends BodyTagSupport {
     onkeydown = null;
     onkeypress = null;
     onkeyup = null;
+    request = null;
+    response = null;
   }
 
   /**
@@ -588,12 +593,20 @@ public class WebloungeTag extends BodyTagSupport {
   /**
    * {@inheritDoc}
    * 
-   * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
+   * @see javax.servlet.jsp.tagext.TryCatchFinally#doCatch(java.lang.Throwable)
    */
-  @Override
-  public int doEndTag() throws JspException {
+  public void doCatch(Throwable t) throws Throwable {
+    // Nothing to do here...
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.TryCatchFinally#doFinally()
+   */
+  public void doFinally() {
+    // Make sure the state of the tag is reset between every use
     reset();
-    return super.doEndTag();
   }
 
 }
