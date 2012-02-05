@@ -268,7 +268,8 @@ public class PageListTag extends WebloungeTag {
       // Add the pagelets required on state
       for (String headline : requiredPagelets) {
         String[] parts = headline.split("/");
-        query.withPagelet(parts[0], parts[1]).inStage();
+        if (parts.length > 1)
+          query.withPagelet(parts[0], parts[1]).inStage();
       }
 
       // Order by date and limit the result set
