@@ -83,44 +83,46 @@
           <xsl:text>set:</xsl:text>
           <xsl:value-of select="//collection/@id" />
         </subject>
-        <xsl:if test="string-length(/collection/@id) > 0">
-          <xsl:analyze-string select="/collection/@id" regex="^/portrait/spieler/(damen|herren)/[A-Za-z]/(\d+)/(club|nati)/$" flags="i">
+        <xsl:if test="string-length($entry/@id) > 0">
+          <!-- Player Portrait -->
+          <xsl:analyze-string select="$entry/@id" regex="^/portrait/spieler/(damen|herren)/[A-Za-z]/(\d+)/(club|nati)/portrait\.jpg$" flags="i">
             <xsl:matching-substring>
+              <subject>player</subject>
               <subject>
-                <xsl:text>player:</xsl:text>
                 <xsl:value-of select="regex-group(2)" />
               </subject>
               <subject>
                 <xsl:if test="regex-group(3) = 'nati'">
                   <xsl:text>natiportrait</xsl:text>
                 </xsl:if>
-                <xsl:if test="regex-group(3) = 'nati'">
+                <xsl:if test="regex-group(3) != 'nati'">
                   <xsl:text>portrait</xsl:text>
                 </xsl:if>
               </subject>
             </xsl:matching-substring>
           </xsl:analyze-string>
-        </xsl:if>
-        <xsl:if test="string-length($entry/@id) > 0">
-          <xsl:analyze-string select="$entry/@id" regex="^/portrait/teams/(damen|herren)/[A-Za-z]/(\d+)/\d+\.\w+$" flags="i">
+          <!-- Club Logo (Tags: club, logo, <Club-ID>)-->
+          <xsl:analyze-string select="$entry/@id" regex="^/portrait/teams/(damen|herren)/[A-Za-z]/(\d+)/\d+\.(gif|png)$" flags="i">
             <xsl:matching-substring>
+              <subject>club</subject>
+              <subject>logo</subject>
               <subject>
-                <xsl:text>clublogo:</xsl:text>
                 <xsl:value-of select="regex-group(2)" />
               </subject>
             </xsl:matching-substring>
           </xsl:analyze-string>
-          <xsl:analyze-string select="$entry/@id" regex="^/portrait/teams/(damen|herren)/[A-Za-z]/(\d+)/\d+_(\d+)\.\w+$" flags="i">
+          <!-- Team Portrait (Tags: teamportrait, club, <Club-ID>, leaguecode:<leaguecode>)-->
+          <xsl:analyze-string select="$entry/@id" regex="^/portrait/teams/(damen|herren)/[A-Za-z]/(\d+)/\d+_(\d+)\.jpg$" flags="i">
             <xsl:matching-substring>
+              <subject>teamportrait</subject>
+              <subject>club</subject>
               <subject>
-                <xsl:text>club:</xsl:text>
                 <xsl:value-of select="regex-group(2)" />
               </subject>
               <subject>
                 <xsl:text>leaguecode:</xsl:text>
                 <xsl:value-of select="regex-group(3)" />
               </subject>
-              <subject>portrait:team</subject>
             </xsl:matching-substring>
           </xsl:analyze-string>
         </xsl:if>
