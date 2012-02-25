@@ -89,7 +89,9 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         },
         
         _loadValidateLanguage: function() {
-        	$.getScript(this.runtime.getRootPath() + '/editor/resources/localization/messages_' + this.options.language + '.js');
+        	if (this.options.language !== 'en') {
+        		$.getScript(this.runtime.getRootPath() + '/editor/resources/localization/messages_' + this.options.language + '.js');
+        	}
         },
         
         _supportsLocalStorage: function() {
