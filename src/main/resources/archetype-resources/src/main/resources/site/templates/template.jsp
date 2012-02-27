@@ -1,5 +1,5 @@
-<%@ taglib uri="/WEB-INF/taglibrary.tld" prefix="custom" %>
-<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib uri="http://www.myorganization.org/taglibrary" prefix="custom" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
 <html>
 	<head>
 		<title>Welcome to ${groupId}</title>
