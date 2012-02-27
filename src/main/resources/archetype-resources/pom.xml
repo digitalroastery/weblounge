@@ -22,19 +22,19 @@
     <dependency>
       <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-common-api</artifactId>
-      <version>3.1.0-SNAPSHOT<version>
+      <version>3.1.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-common</artifactId>
-      <version>3.1.0-SNAPSHOT<version>
+      <version>3.1.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-taglib</artifactId>
-      <version>3.1.0-SNAPSHOT<version>
+      <version>3.1.0-SNAPSHOT</version>
     </dependency>
 
     <!-- thirdparty -->
