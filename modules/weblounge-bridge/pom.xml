@@ -1,0 +1,221 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ch.entwine.weblounge</groupId>
+  <artifactId>weblounge-bridge</artifactId>
+  <packaging>bundle</packaging>
+  <name>Weblounge Bridge</name>
+  <parent>
+    <groupId>ch.entwine.weblounge</groupId>
+    <artifactId>weblounge-base</artifactId>
+    <version>3.1.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  
+  <properties>
+    <weblounge.deploymentdir>lib</weblounge.deploymentdir>
+  </properties>
+  
+  <dependencies>
+	
+    <!-- weblounge -->
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-common-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- osgi support -->
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common</artifactId>
+      <version>1.3-rc2</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>org.springframework.core</artifactId>
+    </dependency>
+    
+    <!-- thirdparty -->
+
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>javax.persistence</artifactId>
+    </dependency>
+
+    <!-- testing -->
+    
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-contentrepository</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+      <version>2.5.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.jpa</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.asm</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.antlr</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.3.149</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>c3p0</groupId>
+      <artifactId>c3p0</artifactId>
+      <version>0.9.1.2</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+	  <groupId>joda-time</groupId>
+	  <artifactId>joda-time</artifactId>
+	  <version>1.6</version>
+	  <scope>test</scope>
+	</dependency>
+    
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.bridge</Bundle-SymbolicName>
+            <Import-Package>
+              ch.entwine.weblounge.common.content;version=${project.version},
+              ch.entwine.weblounge.common.content.image;version=${project.version},
+              ch.entwine.weblounge.common.content.page;version=${project.version},
+              ch.entwine.weblounge.common.content.repository;version=${project.version},
+              ch.entwine.weblounge.common.language;version=${project.version},
+              ch.entwine.weblounge.common.scheduler;version=${project.version},
+              ch.entwine.weblounge.common.site;version=${project.version},
+              org.apache.commons.io;version="2.0",
+              org.apache.commons.lang;version="2.6",
+              org.slf4j;version="[1.5.0,1.6.0)",
+              *;resolution:=optional
+            </Import-Package>
+            <Export-Package>
+              ch.entwine.weblounge.bridge.mail;version=${project.version},
+              ch.entwine.weblounge.bridge.oaipmh;version=${project.version},
+              ch.entwine.weblounge.bridge.oaipmh.harvester;version=${project.version},
+              ch.entwine.weblounge.bridge.oaipmh.util;version=${project.version}
+            </Export-Package>
+            <Embed-Dependency>
+              matterhorn-common;inline=true,
+            </Embed-Dependency>
+            <Private-Package>
+              org.opencastproject.*
+            </Private-Package>
+            <JPA-PersistenceUnits>ch.entwine.weblounge.bridge.oaipmh.harvester</JPA-PersistenceUnits>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
