@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.kernel.site;
 
+import ch.entwine.weblounge.common.content.Renderer.RendererType;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -37,12 +38,13 @@ import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
-import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This precompiler searches an OSGi bundle for Java Server Pages (JSP) and
@@ -137,11 +139,9 @@ public class Precompiler {
      * 
      * @see java.lang.Runnable#run()
      */
-    @SuppressWarnings("unchecked")
     public void run() {
 
       Site site = servlet.getSite();
-      Bundle bundle = servlet.getBundle();
 
       // Prepare the mock request and response objects
       MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
@@ -163,9 +163,28 @@ public class Precompiler {
         }
       }
 
-      // Collect all jsp files and ask for precompilation
-      Enumeration<URL> jspEntries = bundle.findEntries(Site.BUNDLE_PATH, "*.jsp", true);
-      if (jspEntries == null) {
+      // Collect all renderers (from modules and templates) and ask for precompilation
+      List<URL> rendererUrls = new ArrayList<URL>();
+      for (Module m: site.getModules()) {
+        if (!m.isEnabled())
+          break;
+        for (PageletRenderer p : m.getRenderers()) {
+          if (p.getRenderer() != null)
+            rendererUrls.add(p.getRenderer());
+          if (p.getRenderer(RendererType.Feed.name()) != null)
+            rendererUrls.add(p.getRenderer(RendererType.Feed.name()));
+          if (p.getRenderer(RendererType.Search.name()) != null)
+            rendererUrls.add(p.getRenderer(RendererType.Search.name()));
+          if (p.getEditor() != null)
+            rendererUrls.add(p.getEditor());
+        }
+      }
+      for (PageTemplate t : site.getTemplates()) {
+        if (t.getRenderer() != null)
+          rendererUrls.add(t.getRenderer());
+      }
+      
+      if (rendererUrls.size() < 1) {
         logger.debug("No java server pages found to precompile for {}", site);
         return;
       }
@@ -176,10 +195,11 @@ public class Precompiler {
 
       logger.info("Precompiling java server pages for '{}'", site);
       int errorCount = 0;
-      while (keepGoing && jspEntries.hasMoreElements()) {
-        URL entry = jspEntries.nextElement();
+      Iterator<URL> rendererIterator = rendererUrls.iterator();
+      while (keepGoing && rendererIterator.hasNext()) {
+        URL entry = rendererIterator.next();
         String path = entry.getPath();
-        String pathInfo = path.substring(path.indexOf(Site.BUNDLE_PATH) + Site.BUNDLE_PATH.length());
+        String pathInfo = path.substring(path.indexOf(site.getIdentifier()) + site.getIdentifier().length());
         request.setPathInfo(pathInfo);
         request.setRequestURI(pathInfo);
 
