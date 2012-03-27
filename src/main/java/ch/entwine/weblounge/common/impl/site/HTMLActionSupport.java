@@ -176,7 +176,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
     if (StringUtils.isNotBlank(stageRendererId)) {
       this.stageRenderer = getModule().getRenderer(stageRendererId);
       if (this.stageRenderer == null) {
-        logger.warn("Stage renderer '{}' for action {} not found", stageRenderer, this);
+        logger.warn("Stage renderer '{}' for action {} not found", stageRendererId, this);
       }
     }
   }
