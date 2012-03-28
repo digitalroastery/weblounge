@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  activate="activate"
+  immediate="true"
+  name="Weblounge Cache Commands">
+
+  <implementation class="ch.entwine.weblounge.cache.impl.command.CacheCommand" />
+  <property name="service.description" value="Weblounge Cache Command" />
+  <reference name="cacheconfigfactory" interface="ch.entwine.weblounge.cache.impl.CacheConfigurationFactory" cardinality="0..1" policy="dynamic" bind="setCacheConfigurationFactory" unbind="removeCacheConfigurationFactory" />
+
+</scr:component>

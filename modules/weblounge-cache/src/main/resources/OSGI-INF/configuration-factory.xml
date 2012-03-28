@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge Cache Configuration Factory">
+
+  <implementation class="ch.entwine.weblounge.cache.impl.CacheConfigurationFactory" />
+  <property name="service.description" value="Weblounge Cache Configuration Factory" />
+  <property name="service.pid" value="ch.entwine.weblounge.cache"/>
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
+    <provide interface="ch.entwine.weblounge.cache.impl.CacheConfigurationFactory" />
+  </service>
+  <reference name="site" interface="ch.entwine.weblounge.common.site.Site" cardinality="0..n" policy="dynamic" bind="addSite" unbind="removeSite" />
+  <reference name="configadmin" interface="org.osgi.service.cm.ConfigurationAdmin" cardinality="1..1" policy="static" bind="setConfigurationAdmin" />
+
+</scr:component>

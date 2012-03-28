@@ -1,0 +1,190 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <packaging>bundle</packaging>
+  <groupId>ch.entwine.weblounge</groupId>
+  <artifactId>weblounge-cache</artifactId>
+  <name>Weblounge Cache</name>
+  <parent>
+    <groupId>ch.entwine.weblounge</groupId>
+    <artifactId>weblounge-base</artifactId>
+    <version>3.1.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  
+  <properties>
+    <weblounge.basedir>${project.basedir}/../..</weblounge.basedir>
+    <weblounge.deploymentdir>lib</weblounge.deploymentdir>
+    <checkstyle.skip>false</checkstyle.skip>
+  </properties>
+  
+  <dependencies>
+
+    <!-- weblounge -->
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-cache-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-common-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- osgi support -->
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+
+    <!-- thirdparty -->
+
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <version>2.3.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>jtidy</groupId>
+      <artifactId>jtidy</artifactId>
+      <version>4aug2000r7-dev</version>
+    </dependency>
+    
+    <!-- testing -->
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.cache</Bundle-SymbolicName>
+            <Import-Package>
+              ch.entwine.weblounge.cache;version=${project.version},
+              ch.entwine.weblounge.common;version=${project.version},
+              ch.entwine.weblounge.common.content;version=${project.version},
+              ch.entwine.weblounge.common.impl.request;version=${project.version},
+              ch.entwine.weblounge.common.impl.url;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.config;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.datatype;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.doc;version=${project.version}, 
+              ch.entwine.weblounge.common.language;version=${project.version},
+              ch.entwine.weblounge.common.request;version=${project.version},
+              ch.entwine.weblounge.common.security;version=${project.version},
+              ch.entwine.weblounge.common.site;version=${project.version},
+              ch.entwine.weblounge.common.url;version=${project.version},
+              ch.entwine.weblounge.kernel;version=${project.version},
+              ch.entwine.weblounge.kernel.site;version=${project.version},
+              org.apache.commons.io;version="2.0",
+              org.apache.commons.io.output;version="2.0",
+              org.apache.commons.lang;version="2.6",
+              org.slf4j;version="[1.5.0,1.6.0)",
+              javax.servlet;version="2.5",
+              javax.servlet.http;version="2.5",
+              net.sf.ehcache;version="2.3.0",
+              net.sf.ehcache.config;version="2.3.0",
+              javax.management,
+              javax.management.openmbean,
+              javax.naming,
+              javax.transaction;resolution:=optional,
+              javax.transaction.xa;resolution:=optional, 
+              javax.ws.rs;version="1.0",
+              javax.ws.rs.core;version="1.0",
+              javax.xml.parsers,
+              org.xml.sax.helpers,
+              org.osgi.framework,
+              org.osgi.service.cm;version="1.3.0",
+              org.osgi.service.component;version="1.1.0"
+            </Import-Package>
+            <Export-Package>
+              ch.entwine.weblounge.cache.impl;version=${project.version},
+              ch.entwine.weblounge.cache.impl.command;version=${project.version},
+              ch.entwine.weblounge.cache.impl.endpoint;version=${project.version}
+            </Export-Package>
+            <Private-Package>
+              ch.entwine.weblounge.cache.impl.filter,
+              ch.entwine.weblounge.cache.impl.handle
+            </Private-Package>
+            <Service-Component>
+              OSGI-INF/cache-command.xml,
+              OSGI-INF/cache-rest-service.xml,
+              OSGI-INF/configuration-factory.xml,
+              OSGI-INF/service-factory.xml
+            </Service-Component>
+            <Embed-Dependency>
+              jtidy
+            </Embed-Dependency>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
