@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<image xmlns="http://www.entwinemedia.com/weblounge/3.0/image"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/image http://www.entwinemedia.com/xsd/weblounge/3.0/image.xsd"
+       id="123456789"
+       path="/portrait/spieler/damen/b/1009/club/"
+       version="live">
+   <head>
+      <promote>true</promote>
+      <index>true</index>
+      <metadata>
+         <title language="de"><![CDATA[Barbara Buff]]></title>
+         <subject><![CDATA[player:1009]]></subject>
+         <subject><![CDATA[portrait:club]]></subject>
+      </metadata>
+      <security>
+         <owner>
+            <user id="evelyne.balsiger" realm="weblounge">Evelyne Balsiger</user>
+         </owner>
+      </security>
+      <created>
+         <date>2007-12-13T12:56:10+01:00</date>
+         <user id="evelyne.balsiger" realm="weblounge">Evelyne Balsiger</user>
+      </created>
+      <modified>
+         <date>2007-12-13T12:56:10+01:00</date>
+         <user id="evelyne.balsiger" realm="weblounge">Evelyne Balsiger</user>
+      </modified>
+      <published>
+         <from>2006-08-25T21:32:02+01:00</from>
+         <to>292278994-08-17T07:12:55+01:00</to>
+         <user id="evelyne.balsiger" realm="weblounge">Evelyne Balsiger</user>
+      </published>
+   </head>
+   <body>
+      <content language="de" original="true">
+         <created>
+            <date>2007-12-13T12:56:10+01:00</date>
+            <user id="evelyne.balsiger" realm="weblounge">Evelyne Balsiger</user>
+         </created>
+         <filename><![CDATA[portrait.jpg]]></filename>
+         <mimetype>image/jpeg</mimetype>
+         <size>39249</size>
+         <width>100</width>
+         <height>150</height>
+      </content>
+   </body>
+</image>

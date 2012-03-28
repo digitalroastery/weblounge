@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module id="league" xmlns="http://www.entwinemedia.com/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
+
+  <enable>true</enable>
+
+  <name>League</name>
+
+  <pagelets>
+    <pagelet id="errors" composeable="false">
+      <name>Shows error messages</name>
+      <renderer>file://${module.root}/jsp/error/errors.jsp</renderer>
+    </pagelet>
+    <pagelet id="missingparameter" composeable="false">
+      <name>Missing Parameter</name>
+      <renderer>file://${module.root}/jsp/error/parameter.jsp</renderer>
+    </pagelet>
+    <pagelet id="league_playoff_quicklinks" composeable="true">
+      <name>Link to playoff series</name>
+      <renderer>file://${module.root}/jsp/quicklinks/playoff.jsp</renderer>
+      <recheck>1d</recheck>
+      <valid>1d</valid>
+    </pagelet>
+    <pagelet id="league_link" composeable="true">
+      <name>Link to league action</name>
+      <renderer>file://${module.root}/jsp/quicklinks/link.jsp</renderer>
+      <editor>file://${module.root}/jsp/quicklinks/link_editor.jsp</editor>
+      <recheck>1d</recheck>
+      <valid>1d</valid>
+    </pagelet>
+    <pagelet id="liveticker_quicklinks" composeable="true">
+      <name>Liveticker Quicklinks</name>
+      <renderer>file://${module.root}/jsp/quicklinks/liveticker.jsp</renderer>
+      <editor>file://${module.root}/jsp/table/league_editor.jsp</editor>
+      <recheck>5M</recheck>
+      <valid>20M</valid>
+    </pagelet>
+    <pagelet id="table_small" composeable="true">
+      <name>Standings small</name>
+      <renderer>file://${module.root}/jsp/table/table_small.jsp</renderer>
+      <editor>file://${module.root}/jsp/results/nl_editor.jsp</editor>
+      <recheck>1H</recheck>
+      <valid>1H</valid>
+    </pagelet>
+    <pagelet id="table_topleagues" composeable="true">
+      <name>Standings top leagues</name>
+      <renderer>file://${module.root}/jsp/table/table_topleagues.jsp</renderer>
+      <editor>file://${module.root}/jsp/table/table_topleagues_editor.jsp</editor>
+      <recheck>10M</recheck>
+      <valid>1H</valid>
+    </pagelet>
+    <pagelet id="results" composeable="false">
+      <name>Results</name>
+      <renderer>file://${module.root}/jsp/results/results.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid>
+    </pagelet>
+    <pagelet id="cupresults" composeable="true">
+      <name>Cup results</name>
+      <renderer>file://${module.root}/jsp/results/cup.jsp</renderer>
+      <editor>file://${module.root}/jsp/results/cup_editor.jsp</editor>
+      <recheck>1H</recheck>
+      <valid>1H</valid>
+    </pagelet>
+    <pagelet id="overview_cup" composeable="true">
+      <name>Cup overview</name>
+      <renderer>file://${module.root}/jsp/overview/overview_cup.jsp</renderer>
+      <editor>file://${module.root}/jsp/results/cup_editor.jsp</editor>
+      <recheck>1H</recheck>
+      <valid>1H</valid>
+    </pagelet>
+    <pagelet id="games" composeable="false">
+      <name>Game Schedule</name>
+      <renderer>file://${module.root}/jsp/game/games.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid>
+    </pagelet>
+    <pagelet id="table" composeable="false">
+      <name>Standings</name>
+      <renderer>file://${module.root}/jsp/table/table.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid>
+    </pagelet>
+    <pagelet id="overview" composeable="false">
+      <name>Overview</name>
+      <renderer>file://${module.root}/jsp/overview/overview.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid>
+    </pagelet>
+    <pagelet id="overview_nl" composeable="true">
+      <name>Overview NL</name>
+      <renderer>file://${module.root}/jsp/overview/overview_nl.jsp</renderer>
+      <editor>file://${module.root}/jsp/results/nl_editor.jsp</editor>
+      <recheck>10M</recheck>
+      <valid>1H</valid>
+    </pagelet>
+    <pagelet id="round_preview" composeable="true">
+      <name>Round preview NL</name>
+      <renderer>file://${module.root}/jsp/overview/round_preview.jsp</renderer>
+      <editor>file://${module.root}/jsp/overview/round_preview_editor.jsp</editor>
+      <recheck>1w</recheck>
+      <valid>1w</valid> <!-- 1 week -->
+    </pagelet>
+    <pagelet id="club" composeable="false">
+      <name>Club</name>
+      <renderer>file://${module.root}/jsp/club/club.jsp</renderer>
+      <recheck>10M</recheck>
+      <valid>10M</valid>  <!-- 10' -->
+    </pagelet>
+    <pagelet id="club_season" composeable="false">
+      <name>Club: season chooser</name>
+      <renderer>file://${module.root}/jsp/club/club_season.jsp</renderer>
+      <recheck>120M</recheck>
+      <valid>120M</valid> <!-- 120' -->
+    </pagelet>
+    <pagelet id="portrait_team" composeable="false">
+      <name>Team's portrait</name>
+      <renderer>file://${module.root}/jsp/portrait/portrait_team.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid> <!-- 1 week -->
+    </pagelet>
+    <pagelet id="portrait_team_col2" composeable="false">
+      <name>Team's portrait part 2</name>
+      <renderer>file://${module.root}/jsp/portrait/portrait_team_col2.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid> <!-- 1 week -->
+    </pagelet>
+    <pagelet id="portrait_player" composeable="false">
+      <name>Player's portrait</name>
+      <renderer>file://${module.root}/jsp/portrait/portrait_player.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid> <!-- 1 week -->
+    </pagelet>
+    <pagelet id="scorer" composeable="false">
+      <name>Scorerliste</name>
+      <renderer>file://${module.root}/jsp/results/scorer.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid> <!-- 1 week -->
+    </pagelet>
+    <pagelet id="scorer_small" composeable="true">
+      <name>Scorer list small</name>
+      <renderer>file://${module.root}/jsp/results/scorer_small.jsp</renderer>
+      <editor>file://${module.root}/jsp/table/league_editor.jsp</editor>
+      <recheck>1d</recheck>
+      <valid>1d</valid> <!-- 1 day -->
+    </pagelet>
+    <pagelet id="spectators_league" composeable="true">
+      <name>Zuschauerzahlen</name>
+      <renderer>file://${module.root}/jsp/results/spectators_league.jsp</renderer>
+      <editor>file://${module.root}/jsp/results/spectators_editor.jsp</editor>
+      <recheck>1w</recheck>
+      <valid>1w</valid> <!-- 1 week -->
+    </pagelet>
+    <pagelet id="spectators_club" composeable="false">
+      <name>Zuschauerzahlen pro Team</name>
+      <renderer>file://${module.root}/jsp/results/spectators_club.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid> <!-- 1 week -->
+    </pagelet>
+    <pagelet id="playoffs" composeable="false">
+      <name>Playoffs</name>
+      <renderer>file://${module.root}/jsp/game/playoffs.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid> <!-- 1 week -->
+    </pagelet>
+    <pagelet id="playoffs_small" composeable="true">
+      <name>Playoffs small</name>
+      <renderer>file://${module.root}/jsp/game/playoffs_small.jsp</renderer>
+      <editor>file://${module.root}/jsp/results/nl_editor.jsp</editor>
+      <recheck>20M</recheck>
+      <valid>20M</valid>  <!-- 20' -->
+    </pagelet>
+    <pagelet id="playoffs_nl" composeable="true">
+      <name>Playoffs NL</name>
+      <renderer>file://${module.root}/jsp/game/playoffs_nl.jsp</renderer>
+      <editor>file://${module.root}/jsp/results/nl_editor.jsp</editor>
+      <recheck>20M</recheck>
+      <valid>20M</valid>  <!-- 20' -->
+    </pagelet>
+    <pagelet id="liveticker" composeable="false">
+      <name>Live ticker</name>
+      <renderer>file://${module.root}/jsp/liveticker/liveticker.jsp</renderer>
+      <recheck>1w</recheck>
+      <valid>1w</valid> <!-- 1 week -->
+    </pagelet>
+    <pagelet id="telegram_compact" composeable="true">
+      <name>Match telegram small</name>
+      <renderer>file://${module.root}/jsp/results/telegram_compact.jsp</renderer>
+      <editor>file://${module.root}/jsp/table/league_editor.jsp</editor>
+      <recheck>30M</recheck>
+      <valid>30M</valid>  <!-- 30' -->
+    </pagelet>
+    <pagelet id="results_check_chooser" composeable="true">
+      <name>Results check (box)</name>
+      <renderer>file://${module.root}/jsp/transmission/resultscheck_chooser.jsp</renderer>
+    </pagelet>
+    <pagelet id="results_check" composeable="false">
+      <name>Results check</name>
+      <renderer>file://${module.root}/jsp/transmission/resultscheck.jsp</renderer>
+    </pagelet>
+    <!-- move to portal: -->
+    <pagelet id="mailtelegram_chooser" composeable="false">
+      <name>Mail Telegram (box)</name>
+      <renderer>file://${module.root}/jsp/transmission/mailtelegram_chooser.jsp</renderer>
+    </pagelet>
+    <pagelet id="mailtelegram" composeable="false">
+      <name>Mail Telegram</name>
+      <renderer>file://${module.root}/jsp/transmission/mailtelegram.jsp</renderer>
+    </pagelet>
+    <pagelet id="regform" composeable="false">
+      <name>Registration</name>
+      <renderer>file://${module.root}/jsp/registration/form.jsp</renderer>
+    </pagelet>
+    <pagelet id="regalready" composeable="false">
+      <name>Registration</name>
+      <renderer>file://${module.root}/jsp/registration/already.jsp</renderer>
+    </pagelet>
+    <pagelet id="regmissing" composeable="false">
+      <name>Registration</name>
+      <renderer>file://${module.root}/jsp/registration/missing.jsp</renderer>
+    </pagelet>
+    <pagelet id="regsuccess" composeable="false">
+      <name>Registration</name>
+      <renderer>file://${module.root}/jsp/registration/success.jsp</renderer>
+    </pagelet>
+    <pagelet id="regerror" composeable="false">
+      <name>Registration</name>
+      <renderer>file://${module.root}/jsp/registration/error.jsp</renderer>
+    </pagelet>
+    <pagelet id="regheader" composeable="false">
+      <name>Registration</name>
+      <renderer>file://${module.root}/jsp/registration/header.jsp</renderer>
+    </pagelet>
+    <pagelet id="parameterassistant" composeable="true">
+      <name>Parameter assistant</name>
+      <renderer>file://${module.root}/jsp/club/parameterAssistant.jsp</renderer>
+      <recheck>1d</recheck>
+      <valid>1d</valid> <!-- 1 day -->
+    </pagelet>
+    <!-- move to leagueadmin: -->
+    <pagelet id="mailjobregistration" composeable="false">
+      <name>Mail job registration</name>
+      <renderer>file://${module.root}/jsp/transmission/mailjobinput.jsp</renderer>
+      <recheck>1d</recheck>
+      <valid>1d</valid> <!-- 1 day -->
+    </pagelet>
+    <pagelet id="mailjoboutput" composeable="false">
+      <name>Mail job feedback</name>
+      <renderer>file://${module.root}/jsp/transmission/mailjoboutput.jsp</renderer>
+    </pagelet>
+    <pagelet id="gamepreview" composeable="false">
+      <name>game preview (in detail)</name>
+      <renderer>file://${module.root}/jsp/game/gamepreview.jsp</renderer>
+      <recheck>1d</recheck>
+      <valid>1d</valid> <!-- 1 day -->
+    </pagelet>
+    <pagelet id="spielservice_chooser" composeable="true">
+      <name>Spielservice Chooser</name>
+      <renderer>file://${module.root}/jsp/quicklinks/spielservice_chooser.jsp</renderer>
+      <editor>file://${module.root}/jsp/quicklinks/spielservice_chooser_editor.jsp</editor>
+      <recheck>1d</recheck>
+      <valid>1d</valid> <!-- 1 day -->
+    </pagelet>
+    <pagelet id="gamedetails.main" composeable="false">
+      <name>Game details</name>
+      <renderer>file://${module.root}/jsp/gamedetails/main.jsp</renderer>
+    </pagelet>
+    <pagelet id="advertising" composeable="false">
+      <name>Advertising (league)</name>
+      <renderer>file://${module.root}/jsp/overview/advertising.jsp</renderer>
+    </pagelet>
+    <pagelet id="liveticker.ajax.quicklinks" composeable="false">
+      <name>Liveticker Ajax Quicklinks</name>
+      <renderer>file://${module.root}/jsp/liveticker/ajax/quicklinks.jsp</renderer>
+    </pagelet>
+    <pagelet id="liveticker.ajax.result" composeable="false">
+      <name>Liveticker Ajax Result</name>
+      <renderer>file://${module.root}/jsp/liveticker/ajax/result.jsp</renderer>
+    </pagelet>
+    <pagelet id="gamereport" composeable="true">
+      <name>Game report</name>
+      <renderer>file://${module.root}/jsp/game/gamereport.jsp</renderer>
+      <editor>file://${module.root}/jsp/game/gamereport_editor.jsp</editor>
+      <recheck>1d</recheck>
+      <valid>1d</valid> <!-- 1 day -->
+    </pagelet>
+  </pagelets>
+
+  <!--
+    Actions represent urls that are mounted into the defining site. An action may take requests and process them in various
+    ways by either writing back a response or forwarding the
+    request to another site url.
+  -->
+
+  <actions>
+    <action id="league.games">
+      <name>Meisterschaft</name>
+      <class>ch.swissunihockey.weblounge.module.league.result.GamesAction</class>
+      <mountpoint>/spielbetrieb/spiel</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.tables">
+      <name>Standings</name>
+      <class>ch.swissunihockey.weblounge.module.league.result.TableAction</class>
+      <mountpoint>/spielbetrieb/tabelle</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.overview">
+      <name>Meisterschaft</name>
+      <class>ch.swissunihockey.weblounge.module.league.result.OverviewAction</class>
+      <mountpoint>/spielbetrieb/resultatservice</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.playoffs">
+      <name>Playoff Resuls</name>
+      <class>ch.swissunihockey.weblounge.module.league.result.PlayoffResultsAction</class>
+      <mountpoint>/spielbetrieb/playoff</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.results">
+      <name>Results</name>
+      <class>ch.swissunihockey.weblounge.module.league.result.ResultsAction</class>
+      <mountpoint>/spielbetrieb/resultat</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.results.cup">
+      <name>Cup results</name>
+      <class>ch.swissunihockey.weblounge.module.league.result.CupAction</class>
+      <mountpoint>/spielbetrieb/resultat/cup</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.liveticker">
+      <name>Liveticker</name>
+      <class>ch.swissunihockey.weblounge.module.league.result.LivetickerAction</class>
+      <mountpoint>/spielbetrieb/liveticker</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.groups">
+      <name>Gruppeneinteilung</name>
+      <class>ch.swissunihockey.weblounge.module.league.result.GroupsAction</class>
+      <mountpoint>/spielbetrieb/gruppe</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.club">
+      <name>Club overview</name>
+      <class>ch.swissunihockey.weblounge.module.league.club.ClubAction</class>
+      <mountpoint>/spielbetrieb/verein</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.parameter">
+      <name>Parameter assistant</name>
+      <class>ch.swissunihockey.weblounge.module.league.club.ParameterAssistantAction</class>
+      <mountpoint>/spielbetrieb/verein/parameterassistant</mountpoint>
+      <page>/spielbetrieb/parameterassistant</page>
+    </action>
+
+    <action id="league.portrait.team">
+      <name>Club portrait</name>
+      <class>ch.swissunihockey.weblounge.module.league.portrait.TeamPortraitAction</class>
+      <mountpoint>/spielbetrieb/portrait/team</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.portrait.player">
+      <name>Player portrait</name>
+      <class>ch.swissunihockey.weblounge.module.league.portrait.PlayerPortraitAction</class>
+      <mountpoint>/spielbetrieb/portrait/spieler</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.scorer">
+      <name>Scorer</name>
+      <class>ch.swissunihockey.weblounge.module.league.league.ScorerAction</class>
+      <mountpoint>/spielbetrieb/skorer</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.spectators.league">
+      <name>Spectators</name>
+      <class>ch.swissunihockey.weblounge.module.league.league.SpectatorLeagueAction</class>
+      <mountpoint>/spielbetrieb/zuschauer/liga</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.spectators.club">
+      <name>Spectators</name>
+      <class>ch.swissunihockey.weblounge.module.league.league.SpectatorClubAction</class>
+      <mountpoint>/spielbetrieb/zuschauer/club</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="league.gamedetails">
+      <name>Game details</name>
+      <class>ch.swissunihockey.weblounge.module.league.result.GamedetailsAction</class>
+      <mountpoint>/spielbetrieb/spieldetails</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="legueServiceRegistration">
+      <name>Webservice Registration</name>
+      <class>ch.swissunihockey.weblounge.module.league.webservice.WebserviceRegistrationAction</class>
+      <mountpoint>/webservices/register</mountpoint>
+      <page>/service</page>
+      <valid>0</valid>
+    </action>
+
+    <action id="JSONAction">
+      <name>JSONAction</name>
+      <class>ch.swissunihockey.weblounge.module.league.LeagueJSONAction</class>
+      <mountpoint>/spielbetrieb/json</mountpoint>
+      <valid>0</valid>
+    </action>
+
+    <action id="LivetickerJSONAction">
+      <name>Liveticker JSON Action</name>
+      <class>ch.swissunihockey.weblounge.module.league.LivetickerJSONAction</class>
+      <mountpoint>/spielbetrieb/liveticker/json</mountpoint>
+      <valid>60000</valid>  <!-- 1min -->
+    </action>
+
+    <action id="LivetickerAjaxAction">
+      <name>LivetickerAjaxAction</name>
+      <class>ch.swissunihockey.weblounge.module.league.result.LivetickerAjaxAction</class>
+      <mountpoint>/spielbetrieb/liveticker/ajax</mountpoint>
+      <valid>0</valid>
+    </action>
+
+    <action id="league.portrait.image">
+      <name>Player portrait</name>
+      <class>ch.swissunihockey.weblounge.module.league.portrait.ImageAction</class>
+      <mountpoint>/portrait/image</mountpoint>
+      <page>/spielbetrieb</page>
+    </action>
+
+    <action id="ICalendarAction">
+      <name>iCalendar Action</name>
+      <class>ch.swissunihockey.weblounge.module.league.ICalendarAction</class>
+      <mountpoint>/spielbetrieb/icalendar</mountpoint>
+      <valid>0</valid>
+    </action>
+
+  </actions>
+
+</module>

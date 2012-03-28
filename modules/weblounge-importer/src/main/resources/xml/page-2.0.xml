@@ -1,0 +1,4075 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page partition="verband" path="/ausbildung/" version="live">
+  <header>
+    <renderer>default</renderer>
+    <layout>default</layout>
+    <type>default</type>
+    <publish>
+      <from>2006/04/26 18:36:46 GMT</from>
+      <to>292278994/08/17 07:12:55 GMT</to>
+    </publish>
+    <security>
+      <owner>www</owner>
+      <permission id="system:translate" type="role">system:translator</permission>
+      <permission id="system:manage" type="role">system:editor</permission>
+      <permission id="system:write" type="role">system:editor</permission>
+      <permission id="system:publish" type="role">system:publisher</permission>
+      <permission id="system:read" type="role">system:guest</permission>
+    </security>
+    <keywords />
+    <title language="de">Ausbildung</title>
+    <title language="fr">Education</title>
+    <title language="it">Educazione</title>
+    <modified>
+      <date>2010/03/12 15:20:47 GMT</date>
+      <user>stefan.buerki</user>
+    </modified>
+  </header>
+  <body>
+    <composer id="main">
+      <pagelet id="title" module="text">
+        <publish>
+          <from>2005/03/20 14:15:55 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/02/19 20:31:26 GMT</date>
+            <user>simon.betschmann</user>
+          </modified>
+          <text id="title">Ausbildungskommission</text>
+          <text id="keyword">Verband</text>
+          <text id="lead" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:31:15 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Commission Formation</text>
+          <text id="keyword">Association</text>
+          <text id="lead" />
+        </content>
+        <properties>
+          <property id="author">false</property>
+          <property id="date">false</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2009/06/12 14:40:02 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/06/12 14:41:04 GMT</date>
+            <user>stefan.buerki</user>
+          </modified>
+          <text id="title">swiss unihockey Grundkurs </text>
+          <text id="paragraph">Wie in früheren Jahren bereits, führt swiss unihockey auch im diesem Jahr wieder einen Grundkurs für angehende und bestehende Trainer, Coaches und Betreuer durch. Angesprochen ist, wer ein Team trainiert, coacht oder dies eventuell bald im Sinn hat und sich weiterbilden möchte.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:42:56 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">swiss unihockey - cours de base</text>
+          <text id="paragraph">Comme les autres années, swiss unihockey organise un cours de base pour les futurs entraîneurs, coaches et ceux qui sont déjà en fonction. Tout unihockeyeur qui se sent attiré par une de ces fonctions ou aimerait suivre un cours de perfectionnement peut s ' inscrire. </text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/06/15 07:20:31 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/06/15 07:26:44 GMT</date>
+            <user>stefan.buerki</user>
+          </modified>
+          <text id="title">Einsteigerkurse</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:33:55 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Cours pour débutants</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link">http://www.swissunihockey.ch/weblounge/manage/login/index.wbl</property>
+          <property id="path">/ausbildung/aufbaukurs/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/06/15 07:26:57 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/06/15 07:27:44 GMT</date>
+            <user>stefan.buerki</user>
+          </modified>
+          <text id="title">Grundkurs</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:34:10 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Cours de base</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/ausbildung/grundkurs/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/06/12 14:44:46 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/06/12 14:49:37 GMT</date>
+            <user>stefan.buerki</user>
+          </modified>
+          <text id="title">Link zur Kursanmeldung</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:34:28 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Lien pour inscription</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/kursanmeldung/</property>
+          <property id="typ">internal</property>
+          <property id="anchor">anmeldung</property>
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2009/06/12 14:43:17 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>stefan.buerki</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/06/12 14:43:17 GMT</date>
+            <user>stefan.buerki</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/04/17 13:39:48 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/08/12 07:56:40 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Kursvorbereitung für zukünftige J+S-Leiter</text>
+          <text id="paragraph">Alle Teilnehmer von J+S-Leiterkursen müssen eine kleine Vorarbeit leisten und sich das "Unihockey manual - Ausbildungskonzept für Unihockeyvereine" besorgen.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:27:13 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Préparation des futurs coaches J+S</text>
+          <text id="paragraph">Tous les participants aux cours de coaches J+S doivent faire un petit travail préparatoire et acquérir à cet effet le "Manuel Unihockey - concept de formation pour clubs unihohckey". (Unihockey manual - Ausbildungskonzept für Unihockeyvereine" )</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2008/04/17 13:42:25 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/03 21:57:59 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Weitere Informationen</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:25:19 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Autres informations</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/downloads/trainer/Vorbereitung/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2008/04/17 13:43:01 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/17 13:43:01 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/08/15 06:11:08 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/03 22:03:37 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Unihockey online - neue Übungen verfügbar!</text>
+          <text id="paragraph">Mit viel Verspätung, sind nun endlich die neuen Updates für das Unihockey manual verfügbar.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:29:36 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Unihockey online -nouveaux exercices!</text>
+          <text id="paragraph">Les mises à jour du manuel unihockey sont enfin disponibles.</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/09/03 22:03:50 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2010/03/12 15:20:24 GMT</date>
+            <user>stefan.buerki</user>
+          </modified>
+          <text id="title" />
+          <text id="paragraph">Spitalfangis, Farbiger Mann, Komplexübung... vom Kinderunihockey bis zum ambitionierten U21 Team hat es für alle etwas dabei.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:33:03 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title" />
+          <text id="paragraph">Duel, jeu dans la jungle, filet de pêcheurs, multicours, saisie de la balle, 4 champ.. du unihockey enfants au M21.</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2008/08/15 06:11:45 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/08/15 06:13:35 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Unihockey online</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/trainer/projekt_trainer_ecke/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2008/06/06 08:06:32 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/06/06 08:06:32 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/07/15 14:52:52 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/07/15 14:53:29 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">René Berliat im grosse Trainerinterview</text>
+          <text id="paragraph">Der Trainer des Vize-Meisters Floorball Köniz und Assistenztrainer der Schweizer Nationalmannschaft René Berliat stellt im grossen Interview seine Trainerphilosophie vor.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:44:43 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Interview avec René Berliat, entraîneur</text>
+          <text id="paragraph">René Berliat, entraîneur du vice-champion Floorball Köniz et entraîneur assistant Equipe nationale expose sa philosophie d entraîneur au cours de cette interview.</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2008/07/15 14:53:38 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/07/15 14:55:37 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Zum Interview</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:41:32 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Interview</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/Trainerpersoenlichkeit/1214463413060/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2008/07/15 14:55:55 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/07/15 14:55:55 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/09/15 17:40:59 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/15 17:41:22 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Ethik-Charta im Sport - gemeinsam für einen gesunden, respektvollen und fairen Sport!</text>
+          <text id="paragraph">Prinzipien der Ethik-Charta:
+            1. Gleichbehandlung für alle!
+            2. Sport und soziales Umfeld im Einklang!
+            3. Förderung der Selbst- und Mitverantwortung!
+            4. Respektvolle Förderung statt Überforderung!
+            5. Erziehung zu Fairness und Umweltverantwortung!
+            6. Gegen Gewalt, Ausbeutung und sexuelle Übergriffe!
+            7. Absage an Doping und Suchtmittel!
+
+            Weiter Informationen:</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:39:53 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Charte d'éthique du sport - ensemble en faveur d'un sport sains, respectueux et correct</text>
+          <text id="paragraph">Principes de la Charte d'éthique
+            1. Traiter toutes les personnes de manière égale !
+            2. Promouvoir lharmonie du sport avec lenvironnement social !
+            3. Favoriser le partage des responsabilités !
+            4. Respecter pleinement les sportifs et les sportives au lieu de les surmener
+            5. Eduquer à une attitude sociale juste
+            et à un comportement responsable envers lenvironnement !
+            6. Sopposer à la violence, à lexploitation et au harcèlement sexuel !
+            7. Sopposer au dopage et aux toxicodépendances !
+
+
+            Autres informations:</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2008/05/07 05:15:59 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/05/07 05:16:45 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Die Ethik-Charta im Sport</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:40:37 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">La Charte d'éthique du sport</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="link">http://www.spiritofsport.ch/desktopdefault.aspx/tabid-2501/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2008/05/07 05:17:08 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/05/07 05:17:37 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Interview mit Simone Berner</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/interview berner.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:40:59 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Interview avec Simone Berner</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/interview berner.pdf</text>
+        </content>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2008/04/25 11:02:59 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/25 11:02:59 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/09/03 21:33:55 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/03 21:34:17 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Jugendurlaub für die Trainerausbildung</text>
+          <text id="paragraph">Lernende sowie Arbeitnehmerinnen und Arbeitnehmer bis 30 Jahre, die ehrenamtlich in einer kulturellen oder sozialen Institution in der Jugendarbeit tätig sind, können gemäss Obligationenrecht (OR Art 329e) Jugendurlaub beziehen.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:48:42 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Congé pour les activités de jeunesse extra-scolaire pour la formation entraîneur</text>
+          <text id="paragraph">Lemployeur accorde au travailleur jusquà lâge de 30 ans révolus un congé-jeunesse représentant au plus et en tout une semaine de travail, lorsque ce dernier se livre bénévolement à des activités de jeunesse extra-scolaires (CO art. 329e).</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2008/04/07 18:35:56 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/07 18:36:24 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">weiter...</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:46:38 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">suite...</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="link">http://www.jugendundsport.ch/internet/baspo/de/home/informationen/js_zukuenftigeleiter/jugendurlaub.html</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2008/04/07 18:41:58 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/07 18:41:58 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/04/10 06:16:13 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/10/16 12:13:21 GMT</date>
+            <user>daniel.bitterli</user>
+          </modified>
+          <text id="title">DVDs von Unihockeyspielen</text>
+          <text id="paragraph">swiss unihockey hat diese Saison in Zusammenarbeit mit dem Leadingsponsor Mobiliar mehrere Unihockeyspiele in Fernsehqualität produziert.
+            Die DVDs können zu einem Stückpreis von SFr. 20.-/ 30.- (exkl. Versandspesen) bei swiss unihockey bezogen werden.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:52:11 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">DVD - matches de unihockey</text>
+          <text id="paragraph">swiss unihockey a produit un dvd en collaboration avec son sponsor La Mobilière un dvd de plusieurs matches de unihockey - qualité télévision.
+            Le dvd coûte 20 francs (+ frais d'envoi) et peut être commandé auprès de swiss unihockey.</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2009/05/28 14:28:04 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/05/28 14:36:04 GMT</date>
+            <user>daniel.bitterli</user>
+          </modified>
+          <text id="title">Bestelltalon für DVDs (Saison 2008/09)</text>
+          <text id="description" />
+          <text id="path">/Verband/shop/Bestellung 2 Shop DVD 28.05.09_v2.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:39:56 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Bon de commande pour le DVD (Saison 2008/09)</text>
+          <text id="description" />
+          <text id="path">/Verband/shop/Bestellung 2 Shop DVD 28.05.09_v2.pdf</text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2008/04/09 14:47:08 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/05/28 14:27:57 GMT</date>
+            <user>daniel.bitterli</user>
+          </modified>
+          <text id="title">Bestelltalon für DVDs (Saison 2007/08)</text>
+          <text id="description" />
+          <text id="path">/Verband/shop/Bestellung Shop DVD 16.10.08.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:49:28 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Bon de commande</text>
+          <text id="description" />
+          <text id="path">/Verband/shop/BESTELLUNG Shop_DVD_v3.pdf</text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2008/04/04 04:29:50 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/04 04:30:37 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Zum Shop (Übersicht der Spiele)</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:49:56 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Shop</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">home</property>
+          <property id="path">shop/DVD/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2008/04/04 04:27:42 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/04 04:27:42 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="image" module="repository">
+        <publish>
+          <from>2008/04/01 12:13:57 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/11 08:10:26 GMT</date>
+            <user>simon.betschmann</user>
+          </modified>
+          <text id="description" />
+          <text id="alt" />
+        </content>
+        <properties>
+          <property id="description_preview">false</property>
+          <property id="alignment">left_floated</property>
+          <property id="enlarge">true</property>
+          <property id="style">normal</property>
+          <property id="link" />
+          <property id="photographer" />
+          <property id="path">/trainerausbildung/Bilder/TH sind anders.jpg</property>
+          <property id="border">false</property>
+          <property id="group">false</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/04/01 11:48:04 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/01 12:18:27 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">"Torhüter sind anders" - gratis zum downloaden!</text>
+          <text id="paragraph">Das swiss unihockey-Lehrmittel "Torhüter sind anders - Anforderungen und Training des Unihockeytorhüters" ist schon seit einige Zeit vergriffen und wird auch nicht mehr produziert.
+            Hier kann es gratis heruntergeladen werden:</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:54:20 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">"Les gardiens - un monde pour soi - à télécharger gratuitement</text>
+          <text id="paragraph">Le manuel de swiss unihockey "Torhüter sind anders - Anforderungen und Training des Unihockeytorhüters" est épuisé et ne sera plus publié, mais il peut être téléchargé gratuitement.</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="clear" module="league_special">
+        <publish>
+          <from>2008/09/03 21:41:08 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/03 21:41:08 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">league_special</property>
+          <property id="count">1</property>
+          <property id="renderer">clear</property>
+        </properties>
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2008/04/01 11:50:56 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/01 11:51:26 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Torhüter sind anders (1/4)</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Arbeiten/TH 1.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:38:15 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Gardiens sont différents (1/4)</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Arbeiten/TH 1.pdf</text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2008/04/01 12:06:12 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/01 12:06:34 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Torhüter sind anders (2/4)</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Arbeiten/TH_2.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:38:43 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Gardiens sont différents (2/4)</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Arbeiten/TH_2.pdf</text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2008/04/01 12:06:43 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/08/20 13:48:44 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Torhüter sind anders (3/4)</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/TH 3_neu.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:38:58 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Gardiens sont différents (3/4)</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/TH 3_neu.pdf</text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2008/04/01 12:07:12 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/01 12:07:42 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Torhüter sind anders (4/4)</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Arbeiten/TH_4.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:39:18 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Gardiens sont différents (4/4)</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Arbeiten/TH_4.pdf</text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2008/04/01 11:47:50 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/01 11:47:50 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/04/01 11:36:47 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/12/07 09:01:24 GMT</date>
+            <user>stefan.buerki</user>
+          </modified>
+          <text id="title">Powerplay-Abo-Aktion</text>
+          <text id="paragraph">Das Powerplay (offizielles Schweizer Unihockeymagazin) ist in den Lizenzgebüren inbegriffen und wird allen lizenzierten Spielern per Post zu gestellt. Da Trainer über keine Lizenz verfügen und dadurch beim Verband auch nicht registriert sind, können sie ein Powerplay-Abo zum Aktionspreis von SFr. 20.- abonnieren. Darin inbegriffen sind 6 Ausgaben, wovon die Erste der Guide zum Saisonanfang ist.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:58:15 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Powerplay-Abo</text>
+          <text id="paragraph">Powerplay (magazine officiel de swiss unihockey) est compris dans les taxes de licence et envoyé par la poste. Comme les entraîneurs n ' ont pas de licence et sont donc pas enregistrés, ils prendre un abonnement au prix de 20 francs (6 numéros par an avec le guide de la saison).</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="email" module="text">
+        <publish>
+          <from>2008/04/01 11:38:36 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/12/07 09:02:06 GMT</date>
+            <user>stefan.buerki</user>
+          </modified>
+          <text id="title">Bestelladresse</text>
+          <text id="description">Bitte mit:
+            Namen/Vornamen
+            Geburtsdatum
+            Strasse
+            PLZ/Ort</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 09:59:00 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">à commander auprès de</text>
+          <text id="description">Bitte mit:
+            Namen/Vornamen
+            Strasse
+            PLZ/Ort</text>
+        </content>
+        <properties>
+          <property id="email">buerki@swissunihockey.ch</property>
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2008/04/01 11:23:09 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/01 11:23:09 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/09/15 17:50:01 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/15 17:50:27 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Augenverletzungen im Unihockey</text>
+          <text id="paragraph">Das Verletzungsrisiko im Augenbereich ist ein aktuelles Thema im Unihockeysport. Luca Meffioletti hat dazu im Rahmen seiner Diplomarbeit an der ETH Zürich eine interessante Untersuchung gemacht.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2008/09/28 10:01:39 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Se blesser aux yeux en faisant du unihockey</text>
+          <text id="paragraph">Le risque de se blesser aux yeux est un sujet brûlant dans le unihockey. Luca Meffoletti a écrit un mémoire à ce sujet pour l'EPFZ.</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2007/05/14 16:33:07 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/05/14 16:33:31 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Diplomarbeit</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2007/07/01 10:16:32 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Mémoire</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/downloads/uebungssammlung/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2007/05/14 16:34:08 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/05/14 16:34:32 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Zusammenfassung (Powerplay-Artikel)</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Arbeiten/5_07_augenverletzungen.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2007/07/01 10:18:34 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Abrégé (Powerplay) - en allemand</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Arbeiten/5_07_augenverletzungen.pdf</text>
+        </content>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2006/12/19 06:58:34 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/19 06:58:34 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2006/12/19 06:59:02 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/03 21:55:22 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Wettkampfanalyse im Unihockey</text>
+          <text id="paragraph">Für die Ermittleung der physiologischen Kenngrössen hat Daniel Meienberg das NLA-Spiel zwischen Floorball Köniz und Tigers Langnau analysiert.
+            Für die hervorragende Diplomarbeit zur Erlangung des Diploms Sportlehrer FH in Magglingen wurde Daniel von der Studiumsleitung mit einem Preis ausgezeichnet.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2007/01/17 20:25:26 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Analyse de la compétition en Unihockey</text>
+          <text id="paragraph">Daniel Meienberg a analysé le match LNA entre Floorball Köniz et Tigers Langnau pour transmettre les connaissances physiologiques.
+
+            Daniel Meienberg a reçu un prix pour ce mémoire de diplôme excellent dans le cadre de ses étudese comme prof. de sport.</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/12/19 07:03:19 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/19 07:04:28 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title" />
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:41:11 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Recueil d 'exercices, mémoires de diplôme</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/downloads/uebungssammlung/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2006/12/19 07:02:33 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/19 07:02:57 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Zusammenfassung</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Arbeiten/Poster_Unihockey_THT_06.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/12/20 21:25:43 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Récapitulation</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Arbeiten/Poster_Unihockey_THT_06.pdf</text>
+        </content>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2006/12/16 10:43:21 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/16 10:43:21 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="image" module="repository">
+        <publish>
+          <from>2006/12/16 11:09:01 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/16 11:09:17 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="description" />
+          <text id="alt" />
+        </content>
+        <properties>
+          <property id="alignment">left_floated</property>
+          <property id="style">preview</property>
+          <property id="link" />
+          <property id="photographer" />
+          <property id="path">/trainerausbildung/cover_mentaltraining.jpeg</property>
+          <property id="border">false</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2006/12/16 11:00:56 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/19 09:15:51 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Mentale Trainingsformen im Leistungssport</text>
+          <text id="paragraph">Mentale Trainingsformen unterstützen AthletInnen in ihrem Trainingsalltag und während Wettkämpfen. Sie helfen, persönliche Spitzenleistungen auch unter erschwerten Bedingungen zu erbringen. Ziel dieser DVD ist es, praktische Beispiele aus sportpsychologischen Bereichen vorzustellen, in denen sich AthletInnen verbessern wollen.
+            Die DVD richtet sich an jugendliche und erwachsene SportlerInnen, die sich über mentale Trainingsformen im Leistungssport informieren wollen sowie an TrainerInnen zur Unterstützung ihrer Arbeit mit SportlerInnen.
+            Mentale Trainingsformen im Leistungssport. Eine DVD-Produktion des BASPO in Zusammenarbeit mit der Schweizerischen Arbeitsgemeinschaft für Sportpsychologie (SASP) und verschiedenen SpitzensportlerInnen, TrainerInnen und Sportpsychologen.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/12/20 21:31:10 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Entraînement mental dans le sport de performance</text>
+          <text id="paragraph">Les formes en entraînement mental sont utiles aux sportifs en entraînement comme en compétition. Elles les aident à réaliser des performances personnelles de haut niveau même dans des conditions difficiles.
+            Ce DVD a pour objectif de présenter des exemples pratiques reprenant différents domaines de la psychologie du sport dans lesquels ils souhaitent être meilleurs. Il convient aux sportifs, jeunes et adultes, désirant se familiariser avec les formes en entraînement mental dans le sport de performance et aux entraîneurs souhaitant appliquer ces formes dans leur travail avec les sportifs.
+
+            Un DVD produit par OFSPO et Association suisse de psychologie du sport (ASPS) ainsi que différents sportifs élite, entraîneurs et psychologues du sport.</text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2006/12/16 11:03:20 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/29 09:27:21 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Bestellung</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/12/19 09:20:48 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Commande</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="link">http://www.basposhop.ch/de/shop/artikeldetail.aspx?art=282</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2006/12/16 11:05:16 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/16 11:05:16 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2006/11/08 14:15:58 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/05/14 16:26:48 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Broschüre "Unihockey für Jugendliche"</text>
+          <text id="paragraph">Der internationale Unihockeyverband IFF hat ein Handbuch für Unihockeytrainer erstellt, welches gratis zum downloaden freigegeben ist.
+            Das einfache "Starter-Kit" ist auf der Homepage des IFF in 6 Sprachen (Deutsch, Englisch, Französisch, Italienisch, Portugisisch und Spanisch) erhältlich.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2007/01/17 20:26:24 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Brochure "Kit de démarrage pour jeunes"</text>
+          <text id="paragraph">Un manuel pour entraîneurs unihockey a été publié par la fédération internationale IFF et peut être téléchargé gratuitement.
+            Le kit de démarrage est sur le site IFF en 5 langues (français, allemand, anglais, italien et espagnol).</text>
+        </content>
+        <properties>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2006/11/08 14:19:57 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/03 22:01:34 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Unihockey für Jugendliche</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/Unterlagen/Starter Kit d.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/11/30 08:56:37 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Unihockey pour les jeunes</text>
+          <text id="description">Un manuel pour entraîneurs unihockey</text>
+          <text id="path">/trainerausbildung/Unterlagen/Starter Kit d.pdf</text>
+        </content>
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2006/11/08 14:21:37 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/11/08 14:22:17 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">International Floorball Federation (IFF)</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="link">http://www.floorball.org/materials.asp</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2006/11/08 14:00:29 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/11/08 14:00:29 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="image" module="repository">
+        <publish>
+          <from>2006/07/19 08:31:35 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/10/18 21:10:25 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="description" />
+          <text id="alt" />
+        </content>
+        <properties>
+          <property id="alignment">left_floated</property>
+          <property id="style">preview</property>
+          <property id="description" />
+          <property id="link" />
+          <property id="photographer" />
+          <property id="path">/trainerausbildung/Unterlagen/20101.jpeg</property>
+          <property id="border">false</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2006/07/19 08:19:28 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/13 21:37:42 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Training - fundiert erklärt</text>
+          <text id="paragraph">Büchertipp: «Training  fundiert erklärt» von Jost Hegner vermittelt das Basiswissen, um das Training im Kinder- und Jugendalter, im Gesundheits- und Fitnesssport sowie im Leistungs- und Hochleistungssport richtig planen, durchführen und auswerten zu können.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:33:43 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Coaching expliqué à fond</text>
+          <text id="paragraph">Ce manuel pédagogique de Jost Hegner communique les bases d´enseignement, la planification, lapplication et l´évaluation de l´entraînement avec des enfants et des adolescents aussi bien sous forme de sport de fitness que de sport d´élite.
+
+            Cet excellent manuel pédagogique peut être commandé auprès de lOFSPO (en allemand uniquement):</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/09/03 22:02:57 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/03 22:03:05 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title" />
+          <text id="paragraph">Das hervorragende Lehrmittel ist direkt zum Preis von 56.- am Baspo erhältlich:</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2006/07/19 08:20:18 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/07/19 08:24:11 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Link zur Bestellung</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:34:01 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Lien pour commande </text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="link">http://www.baspo.admin.ch/internet/baspo/de/home.html</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="clear" module="league_special">
+        <publish>
+          <from>2006/10/18 21:13:45 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/10/18 21:13:45 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">league_special</property>
+          <property id="count">1</property>
+          <property id="renderer">clear</property>
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from>2006/07/19 08:24:18 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/07/19 08:24:18 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">divider</property>
+        </properties>
+      </pagelet>
+      <pagelet id="image" module="repository">
+        <publish>
+          <from>2006/07/19 08:58:06 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/10/18 21:11:26 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="description" />
+          <text id="alt" />
+        </content>
+        <properties>
+          <property id="alignment">left_floated</property>
+          <property id="style">preview</property>
+          <property id="description" />
+          <property id="link" />
+          <property id="photographer" />
+          <property id="path">/trainerausbildung/Unterlagen/unihockey_dvd_bild.jpeg</property>
+          <property id="border">false</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2006/04/26 18:35:02 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/04/26 18:36:40 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Neue DVD: Unihockey technics</text>
+          <text id="paragraph">Die neue Ausbildungs DVD "Unihockey technics" ist ab sofort für CHF 42.00 erhältlich.
+
+</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:36:09 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Nouveau DVD: Unihockey technics</text>
+          <text id="paragraph">Le nouveau dvd "Unihockey technics" peut être commandé auprès de lOFSPO; il coûte 42 francs.  </text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/10/14 07:37:13 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/03/21 08:56:09 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Weitere Infos</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/10/14 07:37:55 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Autres informations</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">home</property>
+          <property id="path">shop/Technik_DVD/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/12/16 10:28:27 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/16 10:28:48 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">English</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/technics/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2007/01/25 09:51:09 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/25 09:51:09 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from />
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/02/27 08:03:34 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="renderer">divider</property>
+          <property id="count">1</property>
+          <property id="module">text</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2006/01/26 06:58:25 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/08/05 20:40:16 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">News-Letter für die Ausbildung</text>
+          <text id="paragraph">Newsletter für die Trainerausbildung von Swiss Unihockey und Jugend + Sport. Sie erhalten laufend Informationen zum Aus- und Weiterbildungsangebot, Internetservice (Übungssammlungen, Trainertipp, Bibliothek...) und den neusten Lehrmitteln.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:37:40 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">News-Letter pour la formation </text>
+          <text id="paragraph">Newsletter pour la formation des coaches de Swiss Unihockey et Jeunesse + Sport. Vous êtes constamment au courant des offres de formation de base et continue, des services Internet (exercices, tuyau dcoach, biliothèque,..) et des nouveaux manuels pédagogiques. </text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2006/08/05 20:38:34 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="fr" original="true">
+          <modified>
+            <date>2006/08/05 20:38:36 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title" />
+          <text id="paragraph">Tous les responsables J+S Unihockey avec adresse e-mail sont mémorisés dans la banque de données nationale. </text>
+        </content>
+        <content language="de">
+          <modified>
+            <date>2006/08/05 20:40:29 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title" />
+          <text id="paragraph">Sämtliche J+S-Leiter Unihockey mit einer e-mail-Adresse in der Nationalen Datenbank (NDBJS) wurden mit einem Mail direkt angeschrieben. </text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/01/24 22:13:41 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">News-Letter anmelden</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:38:56 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Inscription à la Newsletter</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="link">http://lists.swissunihockey.ch/mailman/listinfo/trainerausbildung</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from />
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/01/20 15:22:29 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="renderer">divider</property>
+          <property id="count">1</property>
+          <property id="module">text</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2006/01/20 17:30:20 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/01/20 17:30:49 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Intressiert an der Ausbildung zum Unihockeytrainer?</text>
+          <text id="paragraph">Das folgende Dokument informiert über die verlangten Anforderungen für die Teilnahme an einem J+S-Leiterkurs Unihockey.
+</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:52:16 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Suivre la formation de coach dunihockey?</text>
+          <text id="paragraph">Toutes les informations concernant ce qui est demandé pour participe au cours J+S sont dans ce document.</text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="download" module="repository">
+        <publish>
+          <from>2006/10/14 07:37:13 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/01/20 15:08:19 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Anforderungsprofil für die Teilnahme am J+S-Leiterkurs Unihockey</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/anmeldung/Anforderungsprofil LK.pdf</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/10/14 07:39:45 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Profil exigé pour participer au cours de responsables J+S Unihockey</text>
+          <text id="description" />
+          <text id="path">/trainerausbildung/anmeldung/Anforderungsprofil LK.pdf</text>
+        </content>
+      </pagelet>
+      <pagelet id="divider" module="text">
+        <publish>
+          <from />
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/01/20 15:08:52 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="renderer">divider</property>
+          <property id="count">1</property>
+          <property id="module">text</property>
+        </properties>
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:42:23 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/29 05:45:18 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Adressen der J+S-Ämter</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:57:33 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Adresses des services cantonaux </text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="link">http://www.baspo.admin.ch/internet/baspo/de/home/sport00/sport00a/sport00a10.Par.0002.DownloadFile.tmp/JS-Aemter.pdf</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2006/08/05 20:42:23 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/29 05:46:06 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="paragraph">Der Fachleiter kann nur über SUHV-Kurse informieren.</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:57:55 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title" />
+          <text id="paragraph">Le responsable des cours ne peut donner des informations que sur les cours organisés par Swiss Unihockey. </text>
+        </content>
+        <properties />
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2008/09/03 21:18:25 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/03 21:18:25 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="author" module="text">
+        <publish>
+          <from>2005/04/21 13:42:00 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/21 17:10:35 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="position">Fachleiter J+S / Ausbildungsverantwortlicher </text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:58:56 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="position">Responsable J+S / Responsable de la formation</text>
+        </content>
+        <properties>
+          <property id="email">mark.wolf@swissunihockey.ch</property>
+          <property id="name">Mark Wolf</property>
+          <property id="login">evelyne.balsiger</property>
+          <property id="year">2005</property>
+        </properties>
+      </pagelet>
+    </composer>
+    <composer id="navigation">
+      <pagelet id="subtitle" module="text">
+        <publish>
+          <from>2008/09/14 21:16:52 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/14 21:17:08 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="subtitle">Ausbildung</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:43:37 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="subtitle">Formation</text>
+        </content>
+        <properties>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2005/04/29 20:57:05 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/23 08:34:37 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Ausbildungsübersicht</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:22:53 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">News Formation</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/06/26 08:27:28 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/06/26 08:28:05 GMT</date>
+            <user>edith.bussard</user>
+          </modified>
+          <text id="title">Nachwuchslabel</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:44:22 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Label des espoirs</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/Label/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/06/04 19:42:47 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/06/04 19:43:08 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Newsübersicht</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:23:17 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">News</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/news/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="subtitle" module="text">
+        <publish>
+          <from>2005/04/24 17:38:14 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/24 17:38:34 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="subtitle">Aus- und Fortbildung</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:23:31 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="subtitle">Formation de base et continue</text>
+        </content>
+        <properties>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/02/14 16:38:35 GMT</date>
+            <user>simon.betschmann</user>
+          </modified>
+          <text id="title">Ausbildungsstruktur</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:24:03 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Structure de la formation</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildungsstruktur/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/03/15 21:59:07 GMT</date>
+            <user>simon.betschmann</user>
+          </modified>
+          <text id="title">Kursübersicht</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:24:34 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Cours de formation</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/kursuebericht/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/02/14 16:55:06 GMT</date>
+            <user>simon.betschmann</user>
+          </modified>
+          <text id="title">Kursanmeldung</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:24:44 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Inscription aux cours </text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/kursanmeldung/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="subtitle" module="text">
+        <publish>
+          <from>2009/09/16 21:51:24 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/09/16 21:51:33 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="subtitle">E-Junioren Meisterschaft</text>
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:44:50 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="subtitle">Championnats Juniors E</text>
+        </content>
+        <properties>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/09/16 21:51:46 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/09/16 21:52:52 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Übersicht</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:45:09 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Infos générales</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/ausbildung/E_Juniorenmeisterschaft/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/09/16 21:57:00 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/09/16 21:57:32 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">J+S Kids</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/ausbildung/E_Juniorenmeisterschaft/J_S_Kids/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/09/16 21:53:17 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/09/16 21:53:48 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Organisation</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/ausbildung/E_Juniorenmeisterschaft/Organisation/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/09/16 21:53:48 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/09/16 21:54:25 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Spielregeln</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:45:39 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Règles de jeu</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/ausbildung/E_Juniorenmeisterschaft/Spielregeln/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/09/16 21:54:25 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/09/16 21:55:17 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Wettkampfsystem</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2010/01/04 06:46:07 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Système de compétition</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/ausbildung/E_Juniorenmeisterschaft/Wettkampfsystem/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/09/16 21:56:30 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/09/16 21:57:00 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Wichtige Info für die Eltern</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/ausbildung/E_Juniorenmeisterschaft/Eltern/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/09/16 21:55:17 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/09/16 21:55:38 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">FAQ</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/ausbildung/E_Juniorenmeisterschaft/FAQ/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/09/16 21:55:38 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/09/16 21:56:07 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Hilfsmittel</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/ausbildung/E_Juniorenmeisterschaft/Hilfsmittel/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="link" module="navigation">
+        <publish>
+          <from>2009/09/16 22:04:05 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2009/09/16 22:04:46 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Downloads</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="link" />
+          <property id="path">/ausbildung/E_Juniorenmeisterschaft/downloads/</property>
+          <property id="typ">internal</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="subtitle" module="text">
+        <publish>
+          <from />
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/29 09:25:51 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="subtitle">Trainer Academy</text>
+        </content>
+        <properties>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2007/01/23 08:46:16 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/23 08:46:47 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Übersicht</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2007/10/25 07:53:42 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Vue d ' ensemble</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/TrainerAcademy/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2005/04/29 11:08:13 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/29 21:27:38 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Bibliothek</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:25:18 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Bibliothèque</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/trainer/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/29 21:28:04 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Trainertipp</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:25:38 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Tuyaux pour coaches</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/Trainertipp/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/05/07 14:11:29 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Powerplay Artikel</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:26:45 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Articles de la revue Powerplay</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/downloads/artikel/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2007/02/19 18:12:32 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/03/02 01:34:17 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Unihockey online</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/trainer/projekt_trainer_ecke/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2007/10/17 14:03:10 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/10/17 14:03:43 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Trainerpersönlichkeiten</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/Trainerpersoenlichkeit/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/25 09:22:30 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Bücher / Videos (Shop)</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2007/10/25 07:54:10 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Livres  vidéos (swiss unihockey) </text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">home</property>
+          <property id="path">shop/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/05/07 14:18:47 GMT</date>
+            <user>philippe.pfeiffer</user>
+          </modified>
+          <text id="title">Literaturverzeichnis</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:27:27 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Bibliographie</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/Literaturverzeichnis/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="subtitle" module="text">
+        <publish>
+          <from>2005/04/29 09:24:56 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/29 09:25:14 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="subtitle">Toolbox</text>
+        </content>
+        <properties>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2005/03/03 15:23:51 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/22 03:44:41 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Übersicht</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:28:14 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Vue densemble</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/downloads/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2005/04/24 17:54:28 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/24 17:58:38 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Trainer / J+S-Leiter</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:28:47 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Coaches / Responsables J+S</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/downloads/trainer/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/03/13 21:11:36 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">J+S Coach</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:29:28 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Coach J+S  </text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/downloads/coach/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/03/13 21:12:06 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">J+S Experten</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:29:38 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Experts J+S</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/downloads/experten/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/08/05 20:21:44 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/29 10:08:03 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Lehrer</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/08/05 20:30:42 GMT</date>
+            <user>evelyne.balsiger</user>
+          </modified>
+          <text id="title">Educateur</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/downloads/Schule/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2008/10/14 06:43:54 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/10/14 06:44:32 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Kurskader</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/Kurskader/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="subtitle" module="text">
+        <publish>
+          <from>2007/01/23 08:53:27 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/23 08:53:32 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="subtitle">Service</text>
+        </content>
+        <properties>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2007/01/23 08:54:44 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/23 08:55:02 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Newsletter</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="link">http://lists.swissunihockey.ch/mailman/listinfo/trainerausbildung</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2007/01/23 08:56:22 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/03 07:50:00 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">J+S-Homepage</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2007/10/25 07:54:38 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">J+S - page accueil </text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="link">http://www.jugendundsport.ch/internet/baspo/de/home/sportarten/unihockey/0.html</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2007/01/23 17:14:53 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/23 17:15:27 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">cool and clean</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/coolandclean/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2008/04/25 10:04:14 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/25 10:04:34 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Ethik-Charta im Sport</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="link">http://www.spiritofsport.ch/desktopdefault.aspx/tabid-2501/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+    </composer>
+    <composer id="boxes">
+      <pagelet id="image" module="repository">
+        <publish>
+          <from>2008/04/08 18:31:43 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>simon.betschmann</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/08 18:32:23 GMT</date>
+            <user>simon.betschmann</user>
+          </modified>
+          <text id="description" />
+          <text id="alt" />
+        </content>
+        <properties>
+          <property id="description_preview">false</property>
+          <property id="alignment">center</property>
+          <property id="enlarge">false</property>
+          <property id="style">original</property>
+          <property id="link" />
+          <property id="photographer" />
+          <property id="path">/Verband/logos/logo_ausbildung_mittel.jpg</property>
+          <property id="border">false</property>
+          <property id="group">false</property>
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2008/04/08 18:33:16 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>simon.betschmann</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/04/08 18:33:16 GMT</date>
+            <user>simon.betschmann</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="image" module="repository">
+        <publish>
+          <from>2007/10/12 07:44:54 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/13 21:08:12 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="description_preview">false</property>
+          <property id="alignment">center</property>
+          <property id="enlarge">false</property>
+          <property id="style">preview</property>
+          <property id="link" />
+          <property id="photographer" />
+          <property id="path">/trainerausbildung/Bilder/JS.jpg</property>
+          <property id="border">false</property>
+          <property id="group">false</property>
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from />
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2005/04/24 17:56:08 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="renderer">spacer</property>
+          <property id="count">1</property>
+          <property id="module">text</property>
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2007/10/12 07:45:32 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/10/12 07:45:32 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2007/10/12 07:41:34 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/10/12 07:41:34 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="image" module="repository">
+        <publish>
+          <from>2006/12/16 10:31:52 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/16 10:32:40 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="description" />
+          <text id="alt" />
+        </content>
+        <properties>
+          <property id="alignment">left</property>
+          <property id="style">normal</property>
+          <property id="link" />
+          <property id="photographer" />
+          <property id="path">/Verband/shop/Plakat_unihockey.jpg</property>
+          <property id="border">false</property>
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/12/16 10:33:02 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/16 10:34:34 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Information + Bestellung</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2007/10/25 07:50:36 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Informations + commande</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">home</property>
+          <property id="path">shop/Technik_DVD/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2006/12/16 10:34:50 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/16 10:35:24 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Information + Order (english)</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">verband</property>
+          <property id="path">/ausbildung/technics/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2007/10/12 07:45:47 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/10/12 07:45:47 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2006/12/16 10:35:39 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/12/16 10:35:39 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="image" module="repository">
+        <publish>
+          <from>2007/01/25 09:42:18 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/25 09:42:54 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="description" />
+          <text id="alt" />
+        </content>
+        <properties>
+          <property id="alignment">left</property>
+          <property id="style">normal</property>
+          <property id="link" />
+          <property id="photographer" />
+          <property id="path">/trainerausbildung/Unterlagen/Basics.jpg</property>
+          <property id="border">false</property>
+        </properties>
+      </pagelet>
+      <pagelet id="linkinternal" module="navigation">
+        <publish>
+          <from>2007/01/25 09:43:10 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/25 09:43:35 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+          <text id="title">Information + Bestellung</text>
+          <text id="description" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2007/10/25 07:51:08 GMT</date>
+            <user>elisabeth.kleiner</user>
+          </modified>
+          <text id="title">Informations + commande</text>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="partition">home</property>
+          <property id="path">shop/basics/</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2007/01/25 09:43:55 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/25 09:43:55 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2007/01/25 09:44:07 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/25 09:44:07 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2007/01/25 09:48:00 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/25 09:48:00 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2007/01/25 09:51:50 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/25 09:51:50 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2007/01/25 09:52:11 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/25 09:52:11 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="spacer" module="text">
+        <publish>
+          <from>2007/01/25 09:52:01 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>mark.wolf</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2007/01/25 09:52:01 GMT</date>
+            <user>mark.wolf</user>
+          </modified>
+        </content>
+        <properties>
+          <property id="module">text</property>
+          <property id="count">1</property>
+          <property id="renderer">spacer</property>
+        </properties>
+      </pagelet>
+      <pagelet id="image" module="repository">
+        <publish>
+          <from>2006/02/19 20:29:43 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>www</owner>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/02/19 20:30:54 GMT</date>
+            <user>simon.betschmann</user>
+          </modified>
+          <text id="alt" />
+        </content>
+        <properties>
+          <property id="showartist">false</property>
+          <property id="alignment">left</property>
+          <property id="style">normal</property>
+          <property id="link" />
+          <property id="border">false</property>
+          <property id="path">/trainerausbildung/Bilder/Trainer_Anweisung.JPG</property>
+          <property id="flow">false</property>
+        </properties>
+      </pagelet>
+    </composer>
+    <composer id="main-left" />
+    <composer id="main-right" />
+    <composer id="Navigation-Specials">
+      <pagelet id="image" module="repository">
+        <publish>
+          <from>2008/09/13 21:25:06 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/13 21:25:47 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="description" />
+        </content>
+        <properties>
+          <property id="description_preview">false</property>
+          <property id="alignment">center</property>
+          <property id="enlarge">false</property>
+          <property id="style">normal</property>
+          <property id="link">http://www.swissunihockey.ch/weblounge/verband/ausbildung/news/1173211587010/</property>
+          <property id="photographer" />
+          <property id="path">/trainerausbildung/Unterlagen/Foto manual 1.jpg</property>
+          <property id="border">false</property>
+          <property id="group">false</property>
+        </properties>
+      </pagelet>
+      <pagelet id="paragraph" module="text">
+        <publish>
+          <from>2008/09/13 21:23:11 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/13 21:29:33 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title" />
+          <text id="paragraph">Das Ausbildungslehrmittel "Unihockey manual - Ausbildungskonzept für Unihockeyvereine" ist im Swiss Unihockey-Shop erhältlich!
+            Der Internet-Service "Unihockey online" liefert regelmässig stufengerechte Trainingsinputs.</text>
+        </content>
+        <properties>
+          <property id="quote">false</property>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+      <pagelet id="linkexternal" module="navigation">
+        <publish>
+          <from>2008/09/13 21:27:01 GMT</from>
+          <to />
+        </publish>
+        <security>
+          <owner>markus.jauss</owner>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2008/09/13 21:27:12 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">Weitere Informationen</text>
+          <text id="description" />
+          <text id="link">http://www.swissunihockey.ch/weblounge/verband/ausbildung/news/1173211587010/</text>
+        </content>
+        <properties>
+          <property id="anchor" />
+        </properties>
+      </pagelet>
+    </composer>
+  </body>
+  verband/ausbildung/live
+</page>
