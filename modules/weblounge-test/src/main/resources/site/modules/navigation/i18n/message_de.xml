@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- topstories -->
+	<string name="module.navigation.topstories.tab.default">
+		Standard
+	</string>
+	<string name="module.navigation.topstories.tab.extended">
+		Erweitert
+	</string>
+	<string name="module.navigation.topstories.sitetyp">
+		Seitentyp
+	</string>
+	<string name="module.navigation.topstories.keyword">
+		Schlüsselwörter
+	</string>
+	<string name="module.navigation.topstories.keyword.sample">
+		top,sk
+	</string>
+	<string name="module.navigation.topstories.size">
+		Anzahl
+	</string>
+	<string name="module.navigation.topstories.auto">
+		Zeit zwischen den Wechseln
+	</string>
+	<string name="module.navigation.topstories.speed">
+		Dauer des Wechsels
+	</string>
+	<string name="module.navigation.topstories.circular">
+		Nach der letzten Meldung wiederholen
+	</string>
+	<string name="module.navigation.topstories.circular.true">
+		Ja
+	</string>
+	<string name="module.navigation.topstories.circular.false">
+		Nein
+	</string>	
+		
+			
+	<!-- anchorlist -->
+	<string name="module.navigation.anchorlist.choose">
+		Bitte wählen...
+	</string>
+
+	<!-- backlink -->
+	<string name="module.navigation.backlink">
+		Zur&#252;ck
+	</string>
+	
+	<!-- anchor -->
+	<string name="module.navigation.anchor">
+		Anker
+	</string>
+	<string name="module.navigation.anchor.sample">
+		top
+	</string>
+
+	<!-- linkanchor -->
+	<string name="module.navigation.linkanchor.title">
+		Titel
+	</string>
+	<string name="module.navigation.linkanchor.title.sample">
+		International
+	</string>
+	<string name="module.navigation.linkanchor.description">
+		Beschreibung
+	</string>
+	<string name="module.navigation.linkanchor.description.sample">
+		Internationaler Einsatz f&#252;r die Schiedsrichter...
+	</string>
+	<string name="module.navigation.linkanchor.anchor">
+		Anker
+	</string>
+	<string name="module.navigation.linkanchor.anchor.sample">
+		bottom
+	</string>
+	
+	<string name="module.navigation.link.type">Typ</string>
+	<string name="module.navigation.link.type.internal.name">interne Seite</string>
+	<string name="module.navigation.link.type.external.name">externe URL</string>
+	<string name="module.navigation.link.external.url">URL</string>
+	<string name="module.navigation.link.external.window">In neuem Fenster</string>
+	<string name="module.navigation.link.external.window.yes">Ja</string>
+	<string name="module.navigation.link.external.window.no">Nein</string>
+	<string name="module.navigation.link.internal.button">Seite auswählen</string>
+
+	<!-- linkexternal -->
+	<string name="module.navigation.linkexternal.title">
+		Titel
+	</string>
+	<string name="module.navigation.linkexternal.title.sample">
+		International Floorball Federation (IFF)
+	</string>
+	<string name="module.navigation.linkexternal.description">
+		Beschreibung
+	</string>
+	<string name="module.navigation.linkexternal.description.sample">
+		Der IFF ist die internationale Dachorganisation der Sportart Unihockey
+	</string>
+	<string name="module.navigation.linkexternal.anchor">
+		Anker
+	</string>
+	<string name="module.navigation.linkexternal.anchor.sample">
+		bottom
+	</string>
+	<string name="module.navigation.linkexternal.link">
+		Link (inkl. http://)
+	</string>
+	<string name="module.navigation.linkexternal.link.sample">
+		http://www.floorball.com
+	</string>
+
+	<!-- linkinternal -->
+	<string name="module.navigation.linkinternal.title">
+		Titel
+	</string>
+	<string name="module.navigation.linkinternal.title.sample">
+		Bericht Mai 05
+	</string>
+	<string name="module.navigation.linkinternal.description">
+		Beschreibung
+	</string>
+	<string name="module.navigation.linkinternal.description.sample">
+		Monatsbericht vom Mai 2005
+	</string>
+	<string name="module.navigation.linkinternal.anchor">
+		Anker
+	</string>
+	<string name="module.navigation.linkinternal.anchor.sample">
+		bottom
+	</string>
+
+	<!-- linklist -->
+	<string name="module.navigation.linklist.extended">
+		Erweiterte Liste
+	</string>
+	<string name="module.navigation.linklist.title">
+		Titel
+	</string>
+	<string name="module.navigation.linklist.tab.default">
+		Standard
+	</string>
+	<string name="module.navigation.linklist.sitetyp.default">
+		Standard
+	</string>
+	<string name="module.navigation.linklist.sitetyp.news">
+		News
+	</string>
+	<string name="module.navigation.linklist.sitetyp.feature">
+		Bericht
+	</string>
+	<string name="module.navigation.linklist.sitetyp.interview">
+		Interview
+	</string>
+	<string name="module.navigation.linklist.sitetyp.editorial">
+		Kolummne
+	</string>	
+	<string name="module.navigation.linklist.sitetyp">
+		Seitentyp
+	</string>
+	<string name="module.navigation.linklist.keyword">
+		Schlüsselwörter
+	</string>
+	<string name="module.navigation.linklist.keyword.sample">
+		top,sk
+	</string>
+	<string name="module.navigation.linklist.size">
+		Anzahl
+	</string>
+	<string name="module.navigation.linklist.showlead">
+		Anreisser anzeigen
+	</string>
+	<string name="module.navigation.linklist.showkeyword">
+		Keyword anzeigen
+	</string>
+	<string name="module.navigation.linklist.showrss">
+		RSS-Feed anzeigen
+	</string>
+	<string name="module.navigation.linklist.rss">
+		RSS-Feed
+	</string>
+
+	<!-- linkmore -->
+	<string name="module.navigation.linkmore">
+		Mehr
+	</string>
+	
+	<!-- linktop -->
+	<string name="module.navigation.linktop">
+		Seitenanfang
+	</string>
+
+	<!-- local navigation -->
+	<string name="module.navigation.localnavigation.showroots">
+		Seiten auf gleicher Ebene anzeigen
+	</string>
+	<string name="module.navigation.localnavigation.showchildren">
+		Seiten auf nächster Ebene anzeigen
+	</string>
+
+	<!-- preview -->
+	<string name="module.navigation.pagepreview.tab.default">
+		Standard
+	</string>
+	<string name="module.navigation.pagepreview.tab.extended">
+		Erweitert
+	</string>		
+	<string name="module.navigation.preview.start">
+		Vorschau Anfang
+	</string>
+	<string name="module.navigation.preview.start.top">
+		Alles anzeigen
+	</string>
+	<string name="module.navigation.preview.start.lead">
+		Nach Titel und Anreisser
+	</string>
+	<string name="module.navigation.preview.start.marker">
+		Nach Start-Markierung
+	</string>
+		<string name="module.navigation.preview.stop">
+		Vorschau Beenden
+	</string>
+	<string name="module.navigation.preview.stop.never">
+		Nie (Alles anzeigen)
+	</string>
+	<string name="module.navigation.preview.stop.lead">
+		Nach Titel und Anreisser
+	</string>
+	<string name="module.navigation.preview.stop.marker">
+		Nach Preview-Markierung
+	</string>
+	<string name="module.navigation.pagepreview.nomorelink">
+		[mehr]-Link ausblenden
+	</string>
+	<string name="module.navigation.pagepreview.boxed">
+		In Box anzeigen
+	</string>
+	<string name="module.navigation.pagepreview.box.title">
+		Box Titel
+	</string>
+</resources>

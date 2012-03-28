@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- address-->
+	<string name="module.text.adress.tab.personalia">
+		Identité
+	</string>
+	<string name="module.text.adress.tab.adress">
+		Adresse
+	</string>	
+	<string name="module.text.adress.salutation">
+		Titre
+	</string>
+	<string name="module.text.adress.Herr">
+		Monsieur
+	</string>
+	<string name="module.text.adress.Frau">
+		Madame
+	</string>
+	<string name="module.text.adress.name">
+		Nom
+	</string>
+	<string name="module.text.adress.position">
+		Position
+	</string>
+	<string name="module.text.adress.email">
+		E-Mail
+	</string>
+	<string name="module.text.adress.phone">
+		Téléphone
+	</string>
+	<string name="module.text.adress.celular">
+		Mobile
+	</string>
+	<string name="module.text.adress.adress">
+		Adresse
+	</string>
+	<string name="module.text.adress.pob">
+		Case postale
+	</string>		
+	<string name="module.text.adress.zip">
+		NP
+	</string>
+	<string name="module.text.adress.city">
+		Lieu
+	</string>
+	<string name="module.text.adress.country">
+		Pays
+	</string>
+	<string name="module.text.adress.country.CH">
+		Suisse
+	</string>
+	<string name="module.text.adress.country.DE">
+		Allemagne
+	</string>
+	<string name="module.text.adress.country.AT">
+		Autriche
+	</string>
+	<string name="module.text.adress.country.AU">
+		Australie
+	</string>
+	<string name="module.text.adress.country.BE">
+		Belgique
+	</string>
+	<string name="module.text.adress.country.CA">
+		Canada
+	</string>
+	<string name="module.text.adress.country.CZ">
+		République tchèque
+	</string>
+	<string name="module.text.adress.country.DK">
+		Danemark
+	</string>
+	<string name="module.text.adress.country.EE">
+		Estonie
+	</string>
+	<string name="module.text.adress.country.FI">
+		Finlande
+	</string>
+	<string name="module.text.adress.country.FR">
+		France
+	</string>
+	<string name="module.text.adress.country.GE">
+		Géorgie
+	</string>
+	<string name="module.text.adress.country.GB">
+		Royaume-Uni
+	</string>
+	<string name="module.text.adress.country.HU">
+		Hongrie
+	</string>
+	<string name="module.text.adress.country.IT">
+		Italie
+	</string>
+	<string name="module.text.adress.country.IS">
+		Islande
+	</string>
+	<string name="module.text.adress.country.JP">
+		Japon
+	</string>
+	<string name="module.text.adress.country.KR">
+		Corée du Sud
+	</string>
+	<string name="module.text.adress.country.LV">
+		Lettonie
+	</string>
+	<string name="module.text.adress.country.LI">
+		Liechtenstein
+	</string>
+	<string name="module.text.adress.country.MY">
+		Malaisie
+	</string>
+	<string name="module.text.adress.country.NL">
+		Pays-Bas
+	</string>
+	<string name="module.text.adress.country.NO">
+		Norvège
+	</string>
+	<string name="module.text.adress.country.PK">
+		Pakistan
+	</string>
+	<string name="module.text.adress.country.PL">
+		Pologne
+	</string>
+	<string name="module.text.adress.country.RU">
+		Russie
+	</string>
+	<string name="module.text.adress.country.SG">
+		Singapour
+	</string>
+	<string name="module.text.adress.country.SK">
+		Slovaquie
+	</string>
+	<string name="module.text.adress.country.SI">
+		Slovénie
+	</string>
+	<string name="module.text.adress.country.ES">
+		Espagne
+	</string>
+	<string name="module.text.adress.country.SE">
+		Suède
+	</string>
+	<string name="module.text.adress.country.US">
+		États-Unis
+	</string>
+
+	<!-- title -->
+	<string name="module.text.title.keyword">
+		Schl&#252;sselwort
+	</string>
+	<string name="module.text.title.keyword.sample">
+		International
+	</string>
+	<string name="module.text.title.title">
+		Titre
+	</string>
+	<string name="module.text.title.title.sample">
+		Internationaler Einsatz pour...
+	</string>
+	<string name="module.text.title.lead">
+		Anreisser
+	</string>
+	<string name="module.text.title.lead.sample">
+		Die Schiedsrichterkommission nominiert die beiden Schiedsrichter...
+	</string>
+	<string name="module.text.title.showdate">
+		Datum anzeigen
+	</string>
+	<string name="module.text.title.showauthor">
+		Autor / &#220;bersetzer anzeigen
+	</string>
+	
+	<!-- subtitle -->
+	<string name="module.text.subtitle.title">
+		Titre
+	</string>
+	<string name="module.text.subtitle.title.sample">
+		Internationaler Einsatz f&#252;r...
+	</string>
+	<string name="module.text.subtitle.anchor">
+		Anker
+	</string>
+	<string name="module.text.subtitle.anchor.sample">
+		international
+	</string>
+	
+	<!-- faq -->
+	<string name="module.text.faq.question">
+		Question
+	</string>
+	<string name="module.text.faq.question.sample">
+		Qu'est-ce que vous pensez...?
+	</string>
+	<string name="module.text.faq.answer">
+		R&#233;ponse
+	</string>
+	<string name="module.text.faq.answer.sample">
+		Je pense, que...
+	</string>
+	
+	<!-- author -->
+	<string name="module.text.author.source">
+		Source
+	</string>
+	<string name="module.text.author.source.sample">
+		Grasshopper-Club Z&#252;rich
+	</string>
+	<string name="module.text.author.author">
+		Auteur
+	</string>
+	<string name="module.text.author.author.sample">
+		Tobias Wunden
+	</string>
+	<string name="module.text.author.email">
+		E-Mail
+	</string>
+	<string name="module.text.author.email.sample">
+		tobias.wunden&#064;o2it.ch
+	</string>
+	<string name="module.text.author.position">
+		Position
+	</string>
+	<string name="module.text.author.position.sample">
+		Entwicklungsleiter
+	</string>
+	<string name="module.text.author.copyrightholder">
+		Possesseur du droit d'auteur
+	</string>
+	<string name="module.text.author.copyrightholder.sample">
+		swiss unihockey
+	</string>
+	
+	<!-- paragraph -->
+	<string name="module.text.paragraph.tab.default">
+		Standard
+	</string>
+	<string name="module.text.paragraph.tab.extended">
+		Élargi
+	</string>	
+	<string name="module.text.paragraph.title">
+		Titre
+	</string>
+	<string name="module.text.paragraph.title.sample">
+		.
+	</string>
+	<string name="module.text.paragraph.paragraph">
+		Alinéa
+	</string>
+	<string name="module.text.paragraph.paragraph.sample">
+		.
+	</string>
+	
+	<!-- enumeration -->
+	<string name="module.text.enumeration.type">
+		Aufz&#228;hlungstyp
+	</string>
+	<string name="module.text.enumeration.enumeration">
+		Aufz&#228;hlung
+	</string>
+	<string name="module.text.enumeration.numbered">
+		Nummeriert
+	</string>
+	<string name="module.text.enumeration.unnumbered">
+		Ohne Nummerierung
+	</string>
+	<string name="module.text.enumeration.add">
+		Hinzuf&#252;gen
+	</string>
+	<string name="module.text.enumeration.remove">
+		Entfernen
+	</string>
+
+	<!-- categorie -->
+	<string name="module.text.categorie.title">
+		Boxentitel
+	</string>
+	<string name="module.text.categorie.title.sample">
+		Schiedsrichter-Adressbuch
+	</string>
+
+	<!-- code -->
+	<string name="module.text.code.type">
+		Sprache
+	</string>
+	<string name="module.text.code.code">
+		Code
+	</string>
+	<string name="module.text.code.code.sample">
+		public void helloWorld() { System.out.println("Hello World"); } 
+	</string>
+	
+
+	<!-- email -->
+	<string name="module.text.email">
+		Name
+	</string>
+	<string name="module.text.email.sample">
+		Gerhard Zingg
+	</string>
+	<string name="module.text.email.description">
+		Beschreibung
+	</string>
+	<string name="module.text.email.description.sample">
+		Zentralpr&#228;sident
+	</string>
+	<string name="module.text.email.link">
+		E-Mailadresse
+	</string>
+	<string name="module.text.email.link.sample">
+		gerhard.zingg@swissunihockey.ch
+	</string>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<taglib 
+  xmlns="http://java.sun.com/xml/ns/j2ee" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" 
+  version="2.0">
+
+  <tlib-version>1.0</tlib-version>
+  <short-name>weblounge-test</short-name>
+ 
+  <display-name>Weblounge Test Tag Library</display-name>
+  <description>Tag library for the Weblounge test site</description>
+  
+  <tag>
+    <name>greeting</name>
+    <tag-class>ch.entwine.weblounge.test.site.GreeterTag</tag-class>
+    <body-content>empty</body-content>
+    <display-name>Weblounge Greeter Tag</display-name>
+    <description>Issues a greeting in a (random) language</description>
+    <attribute><name>language</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+  </tag>
+
+</taglib>

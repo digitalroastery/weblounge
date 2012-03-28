@@ -1,0 +1,22 @@
+div#mainTabContainerEnumeration {
+	width: 100%;
+	height: 400px;
+}
+
+table#enumeration textarea {
+	width: 360px;
+}
+
+table#enumeration img {
+	cursor: pointer;
+}
+
+td.dragHandle {
+}
+
+td.showDragHandle {
+    background-image: url("dragHandle.gif");
+    background-position: center center;
+    background-repeat: no-repeat;
+    cursor: move;
+}

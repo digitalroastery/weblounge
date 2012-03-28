@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module id="text" xmlns="http://www.entwinemedia.com/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
+
+  <enable>true</enable>
+
+  <name>Text</name>
+
+  <pagelets>
+
+    <pagelet id="box" composeable="true">
+      <name>Box</name>
+      <renderer>file://${module.root}/jsp/box/box.jsp</renderer>
+      <editor>file://${module.root}/jsp/box/box_editor.jsp</editor>
+    </pagelet>
+
+    <pagelet id="title" composeable="true">
+      <name>Title</name>
+      <renderer>file://${module.root}/jsp/title/title.jsp</renderer>
+      <renderer type="feed">file://${module.root}/jsp/title/title-feed.jsp</renderer>
+      <editor>file://${module.root}/jsp/title/title_editor.jsp</editor>
+      <preview>first</preview>
+    </pagelet>
+
+    <pagelet id="subtitle" composeable="true">
+      <name>Subtitle</name>
+      <renderer>file://${module.root}/jsp/subtitle/subtitle.jsp</renderer>
+      <editor>file://${module.root}/jsp/subtitle/subtitle_editor.jsp</editor>
+    </pagelet>
+
+    <pagelet id="categorie" composeable="true">
+      <name>Categorie</name>
+      <renderer>file://${module.root}/jsp/categorie/categorie.jsp</renderer>
+      <editor>file://${module.root}/jsp/categorie/categorie_editor.jsp</editor>
+    </pagelet>
+
+    <pagelet id="paragraph" composeable="true">
+      <name>Paragraph</name>
+      <renderer>file://${module.root}/jsp/paragraph/paragraph.jsp</renderer>
+      <renderer type="feed">file://${module.root}/jsp/paragraph/paragraph-feed.jsp</renderer>
+      <editor>file://${module.root}/jsp/paragraph/paragraph_editor.jsp</editor>
+    </pagelet>
+
+    <pagelet id="enumeration" composeable="true">
+      <name>Enumeration</name>
+      <renderer>file://${module.root}/jsp/enumeration/enumeration.jsp</renderer>
+      <editor>file://${module.root}/jsp/enumeration/enumeration_editor.jsp</editor>
+      <includes>
+        <link use="editor" href="file://${module.root}/jsp/enumeration/enumeration.css" rel="stylesheet" type="text/css"></link>
+        <script use="editor" src="file://${module.root}/jsp/enumeration/jquery.tablednd_0_5.js" type="text/javascript"></script>
+        <script use="editor" src="file://${module.root}/jsp/enumeration/enumeration.js" type="text/javascript"></script>
+      </includes>
+    </pagelet>
+
+    <pagelet id="author" composeable="true">
+      <name>Author</name>
+      <renderer>file://${module.root}/jsp/author/author.jsp</renderer>
+      <editor>file://${module.root}/jsp/author/author_editor.jsp</editor>
+      <includes>
+        <script use="editor" src="file://${module.root}/jsp/author/author.js" type="text/javascript"></script>
+      </includes>
+    </pagelet>
+
+    <pagelet id="address" composeable="true">
+      <name>Contact</name>
+      <renderer>file://${module.root}/jsp/address/address.jsp</renderer>
+      <editor>file://${module.root}/jsp/address/address_editor.jsp</editor>
+    </pagelet>
+
+    <pagelet id="faq" composeable="true">
+      <name>Question and Answer</name>
+      <renderer>file://${module.root}/jsp/faq/faq.jsp</renderer>
+      <editor>file://${module.root}/jsp/faq/faq_editor.jsp</editor>
+    </pagelet>
+
+    <pagelet id="spacer" composeable="true">
+      <name>Spacer</name>
+      <renderer>file://${module.root}/jsp/spacer/spacer.jsp</renderer>
+    </pagelet>
+
+    <pagelet id="divider" composeable="true">
+      <name>Divider</name>
+      <renderer>file://${module.root}/jsp/divider/divider.jsp</renderer>
+    </pagelet>
+
+    <pagelet id="email" composeable="true">
+      <name>Email</name>
+      <renderer>file://${module.root}/jsp/email/email.jsp</renderer>
+      <editor>file://${module.root}/jsp/email/email_editor.jsp</editor>
+    </pagelet>
+
+  </pagelets>
+
+</module>

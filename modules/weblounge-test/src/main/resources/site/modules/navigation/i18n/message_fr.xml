@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- backlink -->
+	<string name="module.navigation.backlink">
+		Retour
+	</string>
+	
+	<!-- anchor -->
+	<string name="module.navigation.anchor">
+		Ancre
+	</string>
+	<string name="module.navigation.anchor.sample">
+		top
+	</string>
+
+	<!-- linkanchor -->
+	<string name="module.navigation.linkanchor.title">
+		Titre
+	</string>
+	<string name="module.navigation.linkanchor.title.sample">
+		International
+	</string>
+	<string name="module.navigation.linkanchor.description">
+		Description
+	</string>
+	<string name="module.navigation.linkanchor.description.sample">
+		International missions for our two refrees...
+	</string>
+	<string name="module.navigation.linkanchor.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkanchor.anchor.sample">
+		bottom
+	</string>
+
+	<!-- linkexternal -->
+	<string name="module.navigation.linkexternal.title">
+		Title
+	</string>
+	<string name="module.navigation.linkexternal.title.sample">
+		International Floorball Federation (IFF)
+	</string>
+	<string name="module.navigation.linkexternal.description">
+		Description
+	</string>
+	<string name="module.navigation.linkexternal.description.sample">
+		The IFF is the international floorball federation.
+	</string>
+	<string name="module.navigation.linkexternal.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkexternal.anchor.sample">
+		bottom
+	</string>
+	<string name="module.navigation.linkexternal.link">
+		Link (incl. http://)
+	</string>
+	<string name="module.navigation.linkexternal.link.sample">
+		http://www.floorball.com
+	</string>
+
+	<!-- linkinternal -->
+	<string name="module.navigation.linkinternal.title">
+		Titre
+	</string>
+	<string name="module.navigation.linkinternal.title.sample">
+		Rapport mai 05
+	</string>
+	<string name="module.navigation.linkinternal.description">
+		Description
+	</string>
+	<string name="module.navigation.linkinternal.description.sample">
+		Rapport mensuel du mai 2005
+	</string>
+	<string name="module.navigation.linkinternal.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkinternal.anchor.sample">
+		bottom
+	</string>
+
+	<!-- linklist -->
+	<string name="module.navigation.linklist.sitetyp">
+		Seitentyp
+	</string>
+	<string name="module.navigation.linklist.sitetyp.sample">
+		news, interwiev
+	</string>
+	<string name="module.navigation.linklist.keyword">
+		Keyword
+	</string>
+	<string name="module.navigation.linklist.keyword.sample">
+		top, sk
+	</string>
+	<string name="module.navigation.linklist.size">
+		Anzahl
+	</string>
+	<string name="module.navigation.linklist.showlead">
+		Anreisser anzeigen
+	</string>
+
+	<!-- linkmore -->
+	<string name="module.navigation.linkmore">
+		Plus
+	</string>
+	
+	<!-- linktop -->
+	<string name="module.navigation.linktop">
+		Top
+	</string>
+
+	<!-- preview -->
+	<string name="module.navigation.preview.stop">
+		Vorschau Beenden
+	</string>
+	<string name="module.navigation.preview.stop.never">
+		Nie (Alles anzeigen)
+	</string>
+	<string name="module.navigation.preview.stop.lead">
+		Nach Titel und Anreisser
+	</string>
+	<string name="module.navigation.preview.stop.marker">
+		Nach Preview-Markierung
+	</string>
+</resources>

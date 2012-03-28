@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- download -->
+	<string name="module.repository.download.download">
+		Download
+	</string>
+	<string name="module.repository.download.title">
+		Titre
+	</string>
+	<string name="module.repository.download.title.sample">
+		Rapport annuel
+	</string>
+	<string name="module.repository.download.description">
+		Description
+	</string>
+	<string name="module.repository.download.description.sample">
+		Rapport annuel de notre division
+	</string>
+	
+	<!-- image -->
+	<string name="module.repository.image.image">
+		Image
+	</string>
+	<string name="module.repository.image.border">
+		Bordure
+	</string>
+	<string name="module.repository.image.enlarge">
+		agrandir
+	</string>
+	<string name="module.repository.image.description_preview">
+		Ne pas afficher l&#233;gende sous l&#39;aper&#231;u
+	</string>
+	<string name="module.repository.image.style">
+		Style
+	</string>
+	<string name="module.repository.image.alignment">
+		Alignement
+	</string>
+	<string name="module.repository.image.alt">
+		Description alternative
+	</string>
+	<string name="module.repository.image.alt.sample">
+		Logo
+	</string>
+	<string name="module.repository.image.link">
+		Lien arri&#232;re l&#39;image
+	</string>
+	<string name="module.repository.image.link.sample">
+		http://weblounge.o2it.ch
+	</string>
+		<string name="module.repository.image.photographer">
+		Photographe
+	</string>
+	<string name="module.repository.image.photographer.sample">
+		Markus Jauss
+	</string>
+	<string name="module.repository.image.description">
+		Description de l&#39;image
+	</string>
+	<string name="module.repository.image.description.sample">
+		Matthias Hofbauer
+	</string>
+	<string name="module.repository.image.center">
+		centr&#233;
+	</string>
+	<string name="module.repository.image.left">
+		&#192; gauche
+	</string>
+	<string name="module.repository.image.right">
+		&#192; droite
+	</string>
+	<string name="module.repository.image.left_floated">
+		&#192; gauche, avec texte
+	</string>
+	<string name="module.repository.image.right_floated">
+		&#192; droite, avec texte
+	</string>
+
+
+	<!-- gallery -->
+	<string name="module.repository.gallery.frontimage">
+		Gallery / Titelbild
+	</string>
+	<string name="module.repository.gallery.preview">
+		Vorschau
+	</string>
+	<string name="module.repository.gallery.layout">
+		Layout
+	</string>
+	<string name="module.repository.gallery.layout.3x3">
+		3 x 3 Bilder
+	</string>
+	<string name="module.repository.gallery.layout.1x1">
+		Einzelbilder
+	</string>
+	<string name="module.repository.gallery.title">
+		Titel
+	</string>
+	<string name="module.repository.gallery.title.sample">
+		Ferienbilder
+	</string>
+	<string name="module.repository.gallery.description">
+		Beschreibung
+	</string>
+	<string name="module.repository.gallery.description.sample">
+		Impressionen aus den Ferien
+	</string>
+</resources>

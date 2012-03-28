@@ -1,0 +1,18 @@
+div#wbl-imageEditor label {
+    display: inline-block;
+    width: 160px
+}
+
+p.editor-left {
+	float: left;
+	width: 50%;
+}
+
+p.editor-right {
+	float: right;
+	width: 50%;
+}
+
+div#wbl-imageEditor img {
+	display: none;
+}

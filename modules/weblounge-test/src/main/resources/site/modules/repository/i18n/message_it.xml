@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- download -->
+	<string name="module.repository.download.download">
+		stringDownload
+	</string>
+	<string name="module.repository.download.title">
+		stringTitolo
+	</string>
+	<string name="module.repository.download.title.sample">
+		stringProtocollo riunione di comitato
+	</string>
+	<string name="module.repository.download.description">
+		stringDescrizione
+	</string>
+	<string name="module.repository.download.description.sample">
+		stringProtocollo della riunione di comitato del 1. luglio...
+	</string>
+	
+	<!-- image -->
+	<string name="module.repository.image.image">
+		stringImmagine
+	</string>
+	<string name="module.repository.image.border">
+		stringBordi
+	</string>
+	<string name="module.repository.image.enlarge">
+		stringingrandire
+	</string>
+	<string name="module.repository.image.description_preview">
+		stringNon mostra descrizione nell&#39;anteprima
+	</string>
+	<string name="module.repository.image.style">
+		stringStile
+	</string>
+	<string name="module.repository.image.alignment">
+		stringAllineamento
+	</string>
+	<string name="module.repository.image.alt">
+		stringDescrizione alternativa
+	</string>
+	<string name="module.repository.image.alt.sample">
+		stringIl nostro logo
+	</string>
+	<string name="module.repository.image.link">
+		stringA sinistra sotto l&#39;immagine
+	</string>
+	<string name="module.repository.image.link.sample">
+		stringhttp://weblounge.o2it.ch
+	</string>
+	<string name="module.repository.image.photographer">
+		stringfotografo
+	</string>
+	<string name="module.repository.image.photographer.sample">
+		stringMarkus Jauss
+	</string>
+	<string name="module.repository.image.description">
+		stringDescrizione
+	</string>
+	<string name="module.repository.image.description.sample">
+		stringMatthias Hofbauer
+	</string>
+	<string name="module.repository.image.center">
+		stringcentrato
+	</string>
+	<string name="module.repository.image.left">
+		stringa sinistra
+	</string>
+	<string name="module.repository.image.right">
+		stringa destra
+	</string>
+	<string name="module.repository.image.left_floated">
+		stringa sinistra del testo
+	</string>
+	<string name="module.repository.image.right_floated">
+		stringa destra del testo
+	</string>
+
+
+	<!-- gallery -->
+	<string name="module.repository.gallery.frontimage">
+		stringGalleria / titolo dell&#39;immagine
+	</string>
+	<string name="module.repository.gallery.preview">
+		stringAnteprima
+	</string>
+	<string name="module.repository.gallery.layout">
+		stringLayout
+	</string>
+	<string name="module.repository.gallery.layout.3x3">
+		stringImmagine 3 x 3
+	</string>
+	<string name="module.repository.gallery.layout.1x1">
+		stringImmagine singola
+	</string>
+	<string name="module.repository.gallery.title">
+		stringTitolo
+	</string>
+	<string name="module.repository.gallery.title.sample">
+		stringImmagini delle vacanze
+	</string>
+	<string name="module.repository.gallery.description">
+		stringDescrizione
+	</string>
+	<string name="module.repository.gallery.description.sample">
+		stringImpressione sulle vacanze
+	</string>
+</resources>

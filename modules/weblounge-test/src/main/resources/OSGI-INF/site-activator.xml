@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  activate="activate"
+  deactivate="deactivate"
+  immediate="true"
+  name="Weblounge Test Site">
+
+  <implementation class="ch.entwine.weblounge.common.impl.site.SiteActivator" />
+  <property name="service.description" value="Weblounge Test Site" />
+  <property name="contentrepository.type" value="ch.entwine.weblounge.contentrepository.impl.bundle.WritableBundleContentRepository" />
+  <property name="tests" value="true" />
+
+</scr:component>

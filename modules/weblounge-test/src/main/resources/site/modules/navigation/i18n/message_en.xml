@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- anchorlist -->
+	<string name="module.navigation.anchorlist.choose">
+		Please choose...
+	</string>
+
+	<!-- backlink -->
+	<string name="module.navigation.backlink">
+		back
+	</string>
+	
+	<!-- anchor -->
+	<string name="module.navigation.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.anchor.sample">
+		top
+	</string>
+
+	<!-- linkanchor -->
+	<string name="module.navigation.linkanchor.title">
+		Title
+	</string>
+	<string name="module.navigation.linkanchor.title.sample">
+		International
+	</string>
+	<string name="module.navigation.linkanchor.description">
+		Description
+	</string>
+	<string name="module.navigation.linkanchor.description.sample">
+		Internationaler challange for...
+	</string>
+	<string name="module.navigation.linkanchor.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkanchor.anchor.sample">
+		bottom
+	</string>
+	
+	<string name="module.navigation.link.type">Type</string>
+	<string name="module.navigation.link.type.internal.name">internal Page</string>
+	<string name="module.navigation.link.type.external.name">external URL</string>
+	<string name="module.navigation.link.external.url">URL</string>
+	<string name="module.navigation.link.external.window">Open in new window</string>
+	<string name="module.navigation.link.external.window.yes">Yes</string>
+	<string name="module.navigation.link.external.window.no">No</string>
+	<string name="module.navigation.link.internal.button">Select Page</string>
+
+	<!-- linkexternal -->
+	<string name="module.navigation.linkexternal.title">
+		Title
+	</string>
+	<string name="module.navigation.linkexternal.title.sample">
+		International Floorball Federation (IFF)
+	</string>
+	<string name="module.navigation.linkexternal.description">
+		Description
+	</string>
+	<string name="module.navigation.linkexternal.description.sample">
+		The IFF is umbrella group of floorball.
+	</string>
+	<string name="module.navigation.linkexternal.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkexternal.anchor.sample">
+		bottom
+	</string>
+	<string name="module.navigation.linkexternal.link">
+		Link (incl. http://)
+	</string>
+	<string name="module.navigation.linkexternal.link.sample">
+		http://www.floorball.com
+	</string>
+
+	<!-- linkinternal -->
+	<string name="module.navigation.linkinternal.title">
+		Title
+	</string>
+	<string name="module.navigation.linkinternal.title.sample">
+		Repport May 2005
+	</string>
+	<string name="module.navigation.linkinternal.description">
+		Description
+	</string>
+	<string name="module.navigation.linkinternal.description.sample">
+		Monthly report from May 2005
+	</string>
+	<string name="module.navigation.linkinternal.anchor">
+		Anchor
+	</string>
+	<string name="module.navigation.linkinternal.anchor.sample">
+		bottom
+	</string>
+
+	<!-- linklist -->
+	<string name="module.navigation.linklist.sitetyp">
+		Sitetyp
+	</string>
+	<string name="module.navigation.linklist.sitetyp.sample">
+		news, interwiev
+	</string>
+	<string name="module.navigation.linklist.keyword">
+		Keywords
+	</string>
+	<string name="module.navigation.linklist.keyword.sample">
+		top, sk
+	</string>
+	<string name="module.navigation.linklist.size">
+		Size
+	</string>
+	<string name="module.navigation.linklist.showlead">
+		Show lead
+	</string>
+	<string name="module.navigation.linklist.showkeyword">
+		Show keyword
+	</string>
+	<string name="module.navigation.linklist.showrss">
+		Show RSS feed
+	</string>
+	<string name="module.navigation.linklist.rss">
+		RSS-Feed
+	</string>
+
+	<!-- linkmore -->
+	<string name="module.navigation.linkmore">
+		more
+	</string>
+	
+	<!-- linktop -->
+	<string name="module.navigation.linktop">
+		top
+	</string>
+
+	<!-- local navigation -->
+	<string name="module.navigation.localnavigation.showroots">
+		Show pages on same level
+	</string>
+	<string name="module.navigation.localnavigation.showchildren">
+		Show child pages
+	</string>
+
+	<!-- preview -->
+	<string name="module.navigation.preview.stop">
+		End Preview
+	</string>
+	<string name="module.navigation.preview.stop.never">
+		Nenver (Show all)
+	</string>
+	<string name="module.navigation.preview.stop.lead">
+		After Title and Lead
+	</string>
+	<string name="module.navigation.preview.stop.marker">
+		After Preview Marker
+	</string>
+
+	<string name="module.navigation.pagepreview.boxed">
+		Embed in box
+	</string>
+	<string name="module.navigation.pagepreview.box.title">
+		Box title
+	</string>
+</resources>

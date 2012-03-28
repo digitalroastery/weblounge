@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- audio -->
+	<string name="module.repository.audio.tab.default">
+		Standard
+	</string>
+	<string name="module.repository.audio.audio">
+		Audio-Datei
+	</string>
+	<string name="module.repository.audio">
+		Bitte wählen Sie die gewünschte Audio-Datei aus, für welche ein Mini-Player eingefügt werden soll.
+	</string>
+	<string name="module.repository.audio.description">
+		Beschreibung
+	</string>
+	<string name="module.repository.audio.description.sample">
+		Interview mit Matthias Hofbauer nach dem Sieg gegen Schweden.
+	</string>
+	<string name="module.repository.audio.producer">
+		Autor
+	</string>
+	<string name="module.repository.audio.producer.sample">
+		Giovanni Marti
+	</string>		
+
+	<!-- download -->
+	<string name="module.repository.download.download">
+		Download
+	</string>
+	<string name="module.repository.download.title">
+		Titel
+	</string>
+	<string name="module.repository.download.title.sample">
+		Protokoll Vorstandsitzung
+	</string>
+	<string name="module.repository.download.description">
+		Beschreibung
+	</string>
+	<string name="module.repository.download.description.sample">
+		Protokoll der Vorstandsitzung vom 1. Juli
+	</string>
+	<string name="module.repository.download.button">Datei auswählen</string>
+	
+	<!-- image -->
+	<string name="module.repository.image.title">Titel</string>
+	<string name="module.repository.image.button">Bild auswählen</string>
+	<string name="module.repository.image.image">
+		Bild
+	</string>
+	<string name="module.repository.image.border">
+		Rahmen
+	</string>
+	<string name="module.repository.image.enlarge">
+		Vergr&#246;ssern
+	</string>
+	<string name="module.repository.image.description_preview">
+		Beschreibung beim Vorschaubild nicht anzeigen
+	</string>
+	<string name="module.repository.image.slideshow">
+		Bild in Gruppe anzeigen
+	</string>
+	<string name="module.repository.image.style">
+		Gr&#246;sse
+	</string>
+	<string name="module.repository.image.alignment">
+		Ausrichtung
+	</string>
+	<string name="module.repository.image.alt">
+		Alternative Beschreibung
+	</string>
+	<string name="module.repository.image.alt.sample">
+		Portait: Peter Muster
+	</string>
+	<string name="module.repository.image.link">
+		Link hinter dem Bild
+	</string>
+	<string name="module.repository.image.link.sample">
+		http://weblounge.o2it.ch
+	</string>
+	<string name="module.repository.image.photographer">
+		Fotograf
+	</string>
+	<string name="module.repository.image.photographer.sample">
+		Markus Jauss
+	</string>
+	<string name="module.repository.image.description">
+		Bild-Beschreibung
+	</string>
+	<string name="module.repository.image.description.sample">
+		Matthias Hofbauer beim 1:0
+	</string>
+	<string name="module.repository.image.center">
+		zentriert
+	</string>
+	<string name="module.repository.image.left">
+		links
+	</string>
+	<string name="module.repository.image.right">
+		rechts
+	</string>
+	<string name="module.repository.image.left_floated">
+		links mit Textumfluss
+	</string>
+	<string name="module.repository.image.right_floated">
+		rechts mit Textumfluss
+	</string>
+
+	<!-- movie -->
+	<string name="module.repository.movie.tab.default">
+		Standard
+	</string>
+	<string name="module.repository.movie.tab.extended">
+		Erweitert
+	</string>		
+	<string name="module.repository.movie.movie">
+		Film
+	</string>
+	<string name="module.repository.movie.width.sample">
+		225
+	</string>
+	<string name="module.repository.movie.height.sample">
+		175
+	</string>
+	<string name="module.repository.movie.producer">
+		Quelle
+	</string>
+	<string name="module.repository.movie.producer.sample">
+		Steven Spielberg
+	</string>
+	<string name="module.repository.movie.description">
+		Film-Beschreibung
+	</string>
+	<string name="module.repository.movie.description.sample">
+		Matthias Hofbauer beim 1-0
+	</string>
+	<string name="module.repository.movie.type">
+		Typ
+	</string>
+	<string name="module.repository.movie.size">
+		Grösse
+	</string>
+	<string name="module.repository.movie.external">
+		In externem Player abspielen
+	</string>
+	<string name="module.repository.movie.width">
+		Breite
+	</string>
+	<string name="module.repository.movie.height">
+		H&#246;he
+	</string>
+	<string name="module.repository.movie.display.movie">
+		Film und Link anzeigen
+	</string>
+	<string name="module.repository.movie.display.link">
+		Nur Link anzeigen
+	</string>
+	<string name="module.repository.movie.cover">
+		Cover
+	</string>	
+	
+	<!-- gallery -->
+	<string name="module.repository.gallery">
+		Gallery
+	</string>	
+	<string name="module.repository.gallery.frontimage">
+		Gallery und Titelbild
+	</string>
+	<string name="module.repository.gallery.preview">
+		Gr&#246;sse Vorschaubild
+	</string>
+	<string name="module.repository.gallery.layout">
+		Gallery-Layout
+	</string>
+	<string name="module.repository.gallery.layout.3x3">
+		3 x 3 Bilder
+	</string>
+	<string name="module.repository.gallery.layout.1x1">
+		Einzelbilder
+	</string>
+	<string name="module.repository.gallery.title">
+		Titel
+	</string>
+	<string name="module.repository.gallery.title.sample">
+		Ferienbilder
+	</string>
+	<string name="module.repository.gallery.description">
+		Beschreibung
+	</string>
+	<string name="module.repository.gallery.description.sample">
+		Impressionen aus den Ferien
+	</string>
+	<string name="module.repository.gallery.resize">
+		Hochskallieren
+	</string>
+	<string name="module.repository.gallery.description_alignment">
+		Beschreibung
+	</string>	
+	<string name="module.repository.gallery.left">
+		Links neben dem Vorschaubild
+	</string>	
+	<string name="module.repository.gallery.bottom">
+		Unter dem Vorschaubild
+	</string>
+	<string name="module.repository.gallery.right">
+		Rechts neben dem Vorschaubild
+	</string>
+	<string name="module.repository.gallery.prev">
+		Zur&#252;ck
+	</string>
+	<string name="module.repository.gallery.next">
+		Weiter
+	</string>
+	<string name="module.repository.gallery.button">Bilder auswählen</string>
+</resources>

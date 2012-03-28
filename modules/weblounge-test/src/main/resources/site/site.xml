@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<site id="weblounge-test" xmlns="http://www.entwinemedia.com/weblounge/3.0/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/site http://www.entwinemedia.com/xsd/weblounge/3.0/site.xsd">
+  <autostart>true</autostart>
+  <class>ch.entwine.weblounge.test.site.TestSite</class>
+  <name>Weblounge Test Site</name>
+  <languages>
+    <language default="true">de</language>
+    <language>fr</language>
+    <language>en</language>
+  </languages>
+  <domains>
+    <url environment="production">http://weblounge.entwinemedia.com</url>
+    <url environment="development" default="true">http://localhost:8080</url>
+    <url environment="development">http://127.0.0.1:8080</url>
+    <url environment="development">http://test:8080</url>
+  </domains>
+  <security>
+    <administrator>
+      <login>testadmin</login>
+      <password type="plain">secret</password>
+      <name>Web Office</name>
+      <email>weboffice@nowhere.com</email>
+    </administrator>
+  </security>
+  <templates>
+    <template id="default" composeable="true" default="true">
+      <name>Default template</name>
+      <renderer>file://${site.root}/templates/default.jsp</renderer>
+      <stage>main</stage>
+      <recheck>1d10M</recheck>
+      <valid>1w1d1H1M</valid>
+    </template>
+    <template id="alternate" composeable="true">
+      <name>Default template</name>
+      <renderer>file://${site.root}/templates/alternate.jsp</renderer>
+      <stage>main</stage>
+    </template>
+    <template id="welcome" composeable="false">
+      <name>Welcome page</name>
+      <renderer>file://${site.root}/templates/welcome.jsp</renderer>
+      <stage>main</stage>
+      <recheck>1d10M</recheck>
+      <valid>1w1d1H1M</valid>
+    </template>
+  </templates>
+  <options>
+  	<option>
+  		<name>contentrepository.type</name>
+  		<value>ch.entwine.weblounge.contentrepository.impl.bundle.WritableBundleContentRepository</value>
+  	</option>
+  </options>
+</site>

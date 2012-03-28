@@ -1,0 +1,8 @@
+div#wbl-linkEditor label {
+    display: inline-block;
+    width: 160px
+}
+
+div.wbl-linkInternal img {
+	display: none;
+}

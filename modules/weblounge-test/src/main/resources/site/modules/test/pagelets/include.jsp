@@ -1,0 +1,1 @@
+<div class="greeting">Hi, I am an included pagelet</div>

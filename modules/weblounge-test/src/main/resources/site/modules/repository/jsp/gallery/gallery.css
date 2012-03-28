@@ -1,0 +1,8 @@
+div#wbl-galleryEditor label {
+    display: inline-block;
+    width: 160px
+}
+
+div#wbl-galleryEditor img {
+	display: none;
+}

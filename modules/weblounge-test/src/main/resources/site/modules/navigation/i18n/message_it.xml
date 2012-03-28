@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- backlink -->
+	<string name="module.navigation.backlink">
+		Indietro
+	</string>
+	
+	<!-- anchor -->
+	<string name="module.navigation.anchor">
+		Ancora
+	</string>
+	<string name="module.navigation.anchor.sample">
+		top
+	</string>
+
+	<!-- linkanchor -->
+	<string name="module.navigation.linkanchor.title">
+		Titolo
+	</string>
+	<string name="module.navigation.linkanchor.title.sample">
+		Intenazionale
+	</string>
+	<string name="module.navigation.linkanchor.description">
+		Descrizione
+	</string>
+	<string name="module.navigation.linkanchor.description.sample">
+		Impiego internazionale per gli arbitri...
+	</string>
+	<string name="module.navigation.linkanchor.anchor">
+		Ancora
+	</string>
+	<string name="module.navigation.linkanchor.anchor.sample">
+		bottom
+	</string>
+
+	<!-- linkexternal -->
+	<string name="module.navigation.linkexternal.title">
+		Titolo
+	</string>
+	<string name="module.navigation.linkexternal.title.sample">
+		International Floorball Federation (IFF)
+	</string>
+	<string name="module.navigation.linkexternal.description">
+		Descrizione
+	</string>
+	<string name="module.navigation.linkexternal.description.sample">
+		La IFF &#232; l'organo internazionale di riferimento dello sport dell&#39;unihockey
+	</string>
+	<string name="module.navigation.linkexternal.anchor">
+		Ancora
+	</string>
+	<string name="module.navigation.linkexternal.anchor.sample">
+		bottom
+	</string>
+	<string name="module.navigation.linkexternal.link">
+		Link (incl. http://)
+	</string>
+	<string name="module.navigation.linkexternal.link.sample">
+		http://www.floorball.com
+	</string>
+
+	<!-- linkinternal -->
+	<string name="module.navigation.linkinternal.title">
+		Titolo
+	</string>
+	<string name="module.navigation.linkinternal.title.sample">
+		Rapporto maggio 05
+	</string>
+	<string name="module.navigation.linkinternal.description">
+		Descrizione
+	</string>
+	<string name="module.navigation.linkinternal.description.sample">
+		Rapporto mensile del mese di maggio 2005
+	</string>
+	<string name="module.navigation.linkinternal.anchor">
+		Ancora
+	</string>
+	<string name="module.navigation.linkinternal.anchor.sample">
+		bottom
+	</string>
+
+	<!-- linklist -->
+	<string name="module.navigation.linklist.sitetyp">
+		Tipo di pagina
+	</string>
+	<string name="module.navigation.linklist.sitetyp.sample">
+		news, interviste
+	</string>
+	<string name="module.navigation.linklist.keyword">
+		Parola chiave
+	</string>
+	<string name="module.navigation.linklist.keyword.sample">
+		top, sk
+	</string>
+	<string name="module.navigation.linklist.size">
+		Numero
+	</string>
+	<string name="module.navigation.linklist.showlead">
+		Mostra il tracciante
+	</string>
+
+	<!-- linkmore -->
+	<string name="module.navigation.linkmore">
+		More
+	</string>
+	
+	<!-- linktop -->
+	<string name="module.navigation.linktop">
+		Top
+	</string>
+
+	<!-- preview -->
+	<string name="module.navigation.preview.stop">
+		Vorschau Beenden
+	</string>
+	<string name="module.navigation.preview.stop.never">
+		Nie (Alles anzeigen)
+	</string>
+	<string name="module.navigation.preview.stop.lead">
+		Nach Titel und Anreisser
+	</string>
+	<string name="module.navigation.preview.stop.marker">
+		Nach Preview-Markierung
+	</string>
+</resources>
