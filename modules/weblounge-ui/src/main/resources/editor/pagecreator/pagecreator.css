@@ -1,0 +1,45 @@
+.editor_pagecreator {
+
+}
+
+/* custom button icons */
+.editor_pagecreator .wbl-iconList {background: url('../resourcebrowser/images/icon_list.png') no-repeat top left !important}
+.editor_pagecreator .wbl-iconTree {background: url('../resourcebrowser/images/icon_tree.png') no-repeat top left !important}
+.editor_pagecreator .wbl-iconThumbnails {background: url('../resourcebrowser/images/icon_thumbnails.png') no-repeat top left !important}
+
+.editor_pagecreator #wbl-makeMeScrollablePageCreator {
+    height: 330px;
+    padding-bottom: 20px;
+    position: relative;
+    width: 100%;
+}
+
+.editor_pagecreator #wbl-pagecreatorStep1 {
+	position: relative;
+}
+
+.editor_pagecreator #wbl-pagecreatorStep1 input[type="text"], .editor_pagecreator #wbl-pagecreatorStep2 input[type="text"] {
+    width: 200px;
+}
+
+.editor_pagecreator .wbl-topRight {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.editor_pagecreator .filetree span.file {
+	cursor: pointer;
+}
+
+.editor_pagecreator .wbl-active img {
+	opacity: 0.3;
+}
+
+.editor_pagecreator .wbl-active {
+	color: #CCCCCC !important;
+}
+
+.editor_pagecreator #wbl-pagecreatorStep2 {
+
+}

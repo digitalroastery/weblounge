@@ -1,0 +1,450 @@
+.editor_resourcebrowser {
+	background: url('images/bg_pattern.png') repeat; 
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 100;
+}
+
+.editor_resourcebrowser nav.weblounge {
+	position: relative;
+	top: 46px;
+	height: 30px;
+	line-height: 30px;
+	text-align: left;
+	padding: 10px 5px;
+}
+
+.editor_resourcebrowser nav.weblounge div.wbl-center {
+	width: 150px;
+	margin-left: 50%;
+	position: relative;
+	left: -75px;
+}
+.editor_resourcebrowser nav.weblounge div#wbl-pendingCircle {
+    border-radius: 999px;
+    
+    position: absolute;
+    top: 0;
+    left: 53%;
+    
+    border:1px solid red;
+    background: red;
+    
+    width: 20px;
+    height: 20px;
+    padding: 4px;
+    
+    color: #fff;
+    text-align: center;
+    font: 16px Arial, sans-serif;
+    display: none;
+}
+
+.editor_resourcebrowser nav {
+	padding: 10px 0;
+}
+
+.editor_resourcebrowser nav.weblounge ul,
+.editor_resourcebrowser nav.weblounge ul li {
+	list-style: none;
+	float: left;
+}
+
+.editor_resourcebrowser .wbl-alignLeft {
+	float: left;
+}
+
+.editor_resourcebrowser .wbl-alignCenter {
+	margin: 0 auto;
+	text-align: center;
+}
+
+.editor_resourcebrowser .wbl-alignRight {
+	float: right;
+}
+
+
+.editor_resourcebrowser nav.weblounge ul {
+	margin-left: 300px;
+}
+
+.editor_resourcebrowser #wbl-mainContainer {
+	position: relative;
+	top: 50px;
+	text-align: left;
+	width: 100%;
+	height: 100%;
+}
+
+.editor_resourcebrowser div.wbl-listView {
+	width: 80%;
+	margin: 50px auto;
+	padding:  5px;
+}
+
+.editor_resourcebrowser div.wbl-listView table {
+	width: 100%;
+	text-align: left !important;
+	background-color: #fff;
+}
+
+.editor_resourcebrowser div.wbl-treeView,
+.editor_resourcebrowser div.wbl-listView {
+	display: none;
+}
+
+.editor_resourcebrowser div.wbl-listView input[type="checkbox"] {
+	margin-right: 10px;
+}
+
+.editor_resourcebrowser .wbl-thumbnailView {
+	margin: 50px auto;
+	overflow: hidden;
+}
+
+.editor_resourcebrowser .wbl-message {
+	margin: 20px auto;
+	padding: 5px;
+	text-align: center;
+	width: 400px;
+	border: 1px solid transparent;
+	background-color: transparent;
+	height: 16px;
+	color: #fff;
+	visibility: hidden;
+}
+
+.editor_resourcebrowser .wbl-message.wbl-success {
+	border-color: #006600;
+	background-color: #669900;
+	color: #fff;
+}
+
+.editor_resourcebrowser .wbl-message.wbl-error {
+	border-color: #990000;
+	background-color: #FF6600;
+	color: #fff;
+}
+
+.editor_resourcebrowser tr.bg td {
+	background-color: #efefef;
+}
+
+.editor_resourcebrowser tr.wbl-pageEntry td {
+	white-space: nowrap;
+}
+
+.editor_resourcebrowser .wbl-action {
+	width: 70px;
+}
+
+.editor_resourcebrowser .wbl-listitem-read {
+	margin-left: 2px;
+	margin-right: 2px;
+	cursor: pointer;
+}
+
+.editor_resourcebrowser .wbl-listitem-delete {
+	display: none;
+	margin-left: 2px;
+	margin-right: 2px;
+	cursor: pointer;
+}
+
+.editor_resourcebrowser .wbl-listitem-settings {
+	display: none;
+	margin-left: 2px;
+	margin-right: 2px;
+	cursor: pointer;
+}
+
+.editor_resourcebrowser .wbl-itemFavorize {
+	display: none;
+	margin-left: 2px;
+	margin-right: 2px;
+	cursor: pointer;
+}
+
+.editor_resourcebrowser button.wbl-lock {
+	position: relative;
+	top: 50px;
+	left: 20px;
+}
+
+.wbl-page {
+  width: 400px;
+	position: relative;
+	height: 350px;
+	float: left;
+	margin: 0 10px;
+}
+
+img.wbl-pageThumbnail {
+	height: 200px;
+	width: 300px;
+}
+
+.wbl-page.wbl-marked div.wbl-imageContainer {
+	background-color: #ddccb5;
+	border-radius: 5px;
+	border: 2px solid red;
+}
+
+.wbl-page p,
+.wbl-page h2,
+.wbl-page a {
+	color: #fff;
+}
+
+/* custom button icons */
+.editor_resourcebrowser .wbl-iconList {background: url('images/icon_list.png') no-repeat top left !important}
+.editor_resourcebrowser .wbl-iconTree {background: url('images/icon_tree.png') no-repeat top left !important}
+.editor_resourcebrowser .wbl-iconThumbnails {background: url('images/icon_thumbnails.png') no-repeat top left !important}
+
+.wbl-page img.close {
+	position: relative;
+	left: -5px;
+  top: 15px;
+  z-index: 2;
+  display: none;
+}
+
+.editor_resourcebrowser .wbl-overlayIcons {
+	display: none;
+	background: url('images/bg_editing_icons.png') no-repeat top left;
+  left: 150px;
+  position: relative;
+  top: 150px;
+  width: 100px;
+  padding: 5px;
+  color: #fff;
+  z-index: 3;
+  margin-bottom: -30px; /* to set the dimensions to 0x0 */
+}
+
+.editor_resourcebrowser .wbl-overlayIcons img {
+	padding: 0 6px;
+	cursor: pointer;
+}
+
+.editor_resourcebrowser .wbl-hoverflip {
+	background: url('resources/icon_flip.png') no-repeat top left;
+}
+
+.editor_resourcebrowser ul.token-input-list-facebook input {
+	border: 0 !important;
+	padding: 0 !important;
+}
+
+.editor_resourcebrowser div.wbl-icon_bg {
+	border: 1px solid #999;
+	-moz-border-radius: 6px;
+	background-color: #efefef;
+}
+
+.editor_resourcebrowser #wbl-makeMeScrollable {
+  height: 330px;
+  position: relative;
+  width: 100%;
+  padding-bottom: 20px;
+}
+
+.editor_resourcebrowser div.wbl-searchBox {
+    height: 70%;
+}
+
+.editor_resourcebrowser div.wbl-resourceSearch {
+	position: relative;
+	float: left;
+	align: center;
+	width: 50%;
+	top: 35%;
+	text-align: center;
+}
+
+.editor_resourcebrowser div#wbl-mediaFileUploader {
+	position: relative;
+	float: left;
+  height: 400px;
+  width: 324px;
+  margin: 0 auto;
+  margin-top: 5%;
+}
+
+.editor_resourcebrowser #wbl-resourceSearch {
+	border-left: 0 none;
+  border-radius: 6px 6px 6px 6px;
+  border-top: 0 none;
+  color: #999999;
+  padding: 5px;
+  width: 300px;
+}
+
+.editor_resourcebrowser #wbl-hint-searchtabs {
+	display: block;
+  position: absolute;
+  z-index: 4;
+  background: url("images/hint_searchtabs.png") no-repeat scroll 0 0 transparent;
+  height: 67px;
+  left: 50%;
+  top: 0;
+  width: 230px;
+}
+
+.editor_resourcebrowser #wbl-hint-searchfield {
+	display: block;
+  position: absolute;
+  z-index: 4;
+  background: url("images/hint_searchfield.png") no-repeat scroll 0 0 transparent;
+  height: 77px;
+  right: 55%;
+  top: 20%;
+  width: 330px;
+}
+
+.editor_resourcebrowser #wbl-hint-createnew {
+	display: block;
+  position: absolute;
+  z-index: 4;
+  background: url("images/hint_createnew.png") no-repeat scroll 0 0 transparent;
+  height: 55px;
+  right: 10%;
+  top: 35%;
+  width: 282px;
+}
+
+.editor_resourcebrowser img.wbl-trashPage {
+	cursor: pointer;
+	display: inline-block;
+	position:absolute;
+ 	top: 30px;
+ 	left: 61px;
+	height: 30px;
+	width: 60px;
+	z-index: 1000;
+}
+
+.editor_resourcebrowser img.wbl-editPage {
+	cursor: pointer;
+	display: inline-block;
+	position:absolute;
+ 	top: 30px;
+ 	left: 122px;
+	height: 30px;
+	width: 56px;
+	z-index: 1000;
+}
+
+.editor_resourcebrowser img.wbl-pagePreview {
+	cursor: pointer;
+	display: inline-block;
+	position:absolute;
+ 	top: 30px;
+ 	left: 179px;
+	height: 30px;
+	width: 60px;
+	z-index: 1000;
+}
+
+.editor_resourcebrowser div#wbl-addPage {
+	position: relative;
+	float: left;
+  height: 400px;
+  width: 324px;
+  margin: 0 auto;
+  margin-top: 5%;
+}
+
+.editor_resourcebrowser img.wbl-addPageImg {
+	cursor: pointer;
+	position: relative;
+	top: 35%;
+	left: 150px;
+	padding: 0 30px;
+}
+
+div.wbl-previewOverlay {
+	display:none;
+	border: 10px solid #666;
+	background: rgb(82, 82, 82);
+	border: 2px solid rgb(82, 82, 82);
+	color: #fff;
+	font-size: 13px;
+	z-index: 5000;
+}
+
+/* default close button positioned on upper right corner */
+div.wbl-previewOverlay .close {
+	background-image: url(images/close.png);
+	position: absolute;
+	right: -15px; 
+	top: -15px;
+	cursor: pointer;
+	height: 35px;
+	width: 35px;
+	z-index: 5000;
+}
+
+img.wbl-overlayPreviewImage {
+	display: none;
+}
+
+div.wbl-previewOverlay iframe {
+	display: none;
+	width: 1025px;
+	height: 768px;
+	background-color: white;
+}
+
+div.wbl-previewOverlay video {
+	display: none;
+}
+
+div.wbl-overlayPreviewContent {
+	display: none;
+	max-width: 800px;
+	max-height: 600px;
+	overflow-y: auto;
+}
+
+.editor_resourcebrowser div.wbl-imageContainer {
+	width: 300px;
+	height: 200px;
+	overflow: hidden;
+	box-shadow: 2px 2px 2px #444;
+}
+
+.editor_resourcebrowser div.wbl-ribbon {
+	position: relative;
+	top: -180px;
+	left: -115px;
+	height: 20px;
+	transform: rotate(-45deg);
+	-ms-transform: rotate(-45deg);
+	-o-transform: rotate(-45deg);
+	-moz-transform: rotate(-45deg);
+	-webkit-transform: rotate(-45deg);
+	font-size: 11px;
+	font-weight: bold;
+  text-align: center;
+	color: #fff;
+	line-height: 1.8em;
+}
+
+.ribbon-work {
+	background-color: #ff9933;
+	background: -webkit-gradient(linear, left bottom, left top, from(#ff9933), to(#ff9933));
+}
+
+.ribbon-locked-by-me {
+	background-color: #9a0000;
+	background: -webkit-gradient(linear, left bottom, left top, from(#9a0000), to(#9a0000));
+}
+
+.ribbon-locked-by-others {
+	background-color: #666666;
+	background: -webkit-gradient(linear, left bottom, left top, from(#666666), to(#666666));
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<imagestyles>
+  <imagestyle id="weblounge-ui:preview" composeable="false">
+    <name><![CDATA[Resource Preview]]></name>
+    <scalingmode>fill</scalingmode>
+    <width>300</width>
+    <height>200</height>
+  </imagestyle>
+</imagestyles>

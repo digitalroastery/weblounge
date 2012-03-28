@@ -1,0 +1,47 @@
+<div class="wbl-scrollViewItem wbl-page" id="${page.id}">
+	<div class="wbl-imageContainer">
+		{{if page.version == 'work'}}
+			<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/empty_thumbnail.png" original="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview?version=1" alt="Vorschaubild" class="wbl-pageThumbnail" />
+			{{if page.head.locked }}
+		  	{{if page.head.locked.user.id == runtime.user.login }}
+					<div class="wbl-ribbon ribbon-locked-by-me">Locked</div>
+				{{else}}
+					<div class="wbl-ribbon ribbon-locked-by-others">Locked</div>
+				{{/if}}
+			{{else}}
+				<div class="wbl-ribbon ribbon-work">Work</div>
+			{{/if}}
+		{{else}}
+			<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/empty_thumbnail.png" original="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview?version=0" alt="Vorschaubild" class="wbl-pageThumbnail" />
+		{{/if}}
+	</div>
+	{{if !$.isEmptyObject(page.head.metadata.title) && !$.isEmptyObject(page.head.metadata.title[language])}}
+		<h2>${page.head.metadata.title[language]}</h2>
+	{{else}}
+		<h2>&nbsp;</h2>
+	{{/if}}
+	<p>
+	    {{if page.head.modified}}
+			Updated by ${page.head.modified.user.name}<br />
+        	Modification Date: ${page.head.modified.date.toLocaleString()}<br />
+    	{{else}}
+			Created by ${page.head.created.user.name}<br />
+    		Creation Date: ${page.head.created.date.toLocaleString()}<br />
+    	{{/if}}
+		{{if page.head.metadata.subject}}
+			Tags: {{each page.head.metadata.subject}} ${$value}{{if page.head.metadata.subject.length != ($index + 1)}}, {{/if}}{{/each}}<br/>
+		{{/if}}
+		{{if page.path}}
+			URL: <a href="${page.path}" class="wbl-pagePath" title="Gehe zu Seite">${page.path}</a>
+		{{/if}}
+	</p>
+	<img class="wbl-trashPage" src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_trash.png" />
+	<img class="wbl-editPage" src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_settings.png" />
+	<img class="wbl-pagePreview" src="${runtime.getRootPath()}/editor/resourcebrowser/images/icon_read.png" />
+	<div class="wbl-previewOverlay">
+		<img class="wbl-overlayPreviewImage" src="" />
+		<video preload="preload" controls="controls"></video>
+		<div class="wbl-overlayPreviewContent"></div>
+		<iframe src="" sandbox="" seamless></iframe>
+	</div>
+</div>

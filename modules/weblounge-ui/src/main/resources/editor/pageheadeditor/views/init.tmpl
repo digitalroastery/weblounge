@@ -1,0 +1,20 @@
+<form id="wbl-validatePageSettings" onsubmit="return false;">
+	Page title: <input type="text" name="title" value="${page.getTitle(language)}" class="required" /><br /><br />
+	{{if page.getPath() == '/'}}
+		URL: <input type="text" name="url" value="${page.getPath()}" disabled="disabled" /><br /><br />
+	{{else}}
+		URL: <input type="text" name="url" value="${page.getPath()}" class="required" /><br /><br />
+	{{/if}}
+	
+	Template: <select name="layout" >
+		{{each options}}
+			<option value="${$value.id}">${$value.id}</option>
+	    {{/each}}
+	</select><br /><br />
+	Description: <input type="text" value="${page.getDescription(language)}" name="description" /><br /><br />
+	Tags: <input type="text" value="${page.getTags()}" name="tags" />
+</form>
+
+<h2>References:</h2>
+
+<div class="wbl-referrerPageSettings"></div>

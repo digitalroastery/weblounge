@@ -1,0 +1,52 @@
+{{if file.name.localPart == 'movie'}}
+	<h2>Movie Metadaten:</h2>
+	Filename: {{if content.filename != undefined}}${content.filename}{{/if}}<br />
+	Source: {{if content.source != undefined}}${content.source}{{/if}}<br />
+	External: {{if content.external != undefined}}${content.external}{{/if}}<br />
+	Mimetype: {{if content.mimetype != undefined}}${content.mimetype}{{/if}}<br />
+	Size: {{if content.size != undefined}}${content.size}{{/if}}<br />
+	Duration: {{if duration != undefined}}${duration}{{/if}}<br /><br />
+	
+	{{if !$.isEmptyObject(content.audio) }}
+	Audio Bitdepht: {{if content.audio.bitdepth != undefined}}${content.audio.bitdepth}{{/if}}<br />
+	Audio Bitrate: {{if content.audio.bitrate != undefined}}${content.audio.bitrate}{{/if}}<br />
+	Audio Channels: {{if content.audio.channels != undefined}}${content.audio.channels}{{/if}}<br />
+	Audio Format: {{if content.audio.format != undefined}}${content.audio.format}{{/if}}<br />
+	Audio Samplingrate: {{if content.audio.samplingrate != undefined}}${content.audio.samplingrate}{{/if}}<br /><br />
+	{{/if}}
+	
+	{{if !$.isEmptyObject(content.video) }}
+	Video Bitrate: {{if content.video.bitrate != undefined}}${content.video.bitrate}{{/if}}<br />
+	Video Format: {{if content.video.format != undefined}}${content.video.format}{{/if}}<br />
+	Video Framerate: {{if content.video.framerate != undefined}}${content.video.framerate}{{/if}}<br />
+	Video Resolution: {{if content.video.resolution != undefined}}${content.video.resolution}{{/if}}<br />
+	Video Scantype: {{if content.video.scantype != undefined}}${content.video.scantype}{{/if}}<br />
+	{{/if}}
+{{else file.name.localPart == 'image'}}
+	<h2>Image Metadaten:</h2>
+	Width: {{if content.width != undefined}}${content.width}{{/if}}<br />
+	Filename: {{if content.filename != undefined}}${content.filename}{{/if}}<br />
+	Source: {{if content.source != undefined}}${content.source}{{/if}}<br />
+	External: {{if content.external != undefined}}${content.external}{{/if}}<br />
+	Mimetype: {{if content.mimetype != undefined}}${content.mimetype}{{/if}}<br />
+	Size: {{if content.size != undefined}}${content.size}{{/if}}<br />
+	Height: {{if content.height != undefined}}${content.height}{{/if}}<br />
+	Datetaken: {{if content.datetaken != undefined}}${content.datetaken}{{/if}}<br />
+	Location: {{if content.location != undefined}}${content.location}{{/if}}<br />
+	
+	{{if !$.isEmptyObject(content.gps) }}
+	GPS Latitude: {{if !$.isEmptyObject(content.gps.lat)}}${content.gps.lat}{{/if}}<br />
+	GPS Longitude: {{if !$.isEmptyObject(content.gps.lng)}}${content.gps.lng}{{/if}}<br />
+	{{/if}}
+	Filmspeed: {{if content.filmspeed != undefined}}${content.filmspeed}{{/if}}<br />
+	Fnumber: {{if content.fnumber != undefined}}${content.fnumber}{{/if}}<br />
+	Focal Width: {{if content.focalwidth != undefined}}${content.focalwidth}{{/if}}<br />
+	Exposure Time: {{if content.exposuretime != undefined}}${content.exposuretime}{{/if}}<br />
+{{else file.name.localPart == 'file'}}
+	<h2>File Metadaten:</h2>
+	Filename: {{if content.filename != undefined}}${content.filename}{{/if}}<br />
+	Source: {{if content.source != undefined}}${content.source}{{/if}}<br />
+	External: {{if content.external != undefined}}${content.external}{{/if}}<br />
+	Mimetype: {{if content.mimetype != undefined}}${content.mimetype}{{/if}}<br />
+	Size: {{if content.size != undefined}}${content.size}{{/if}}<br />
+{{/if}}

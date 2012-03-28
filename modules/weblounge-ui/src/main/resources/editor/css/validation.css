@@ -1,0 +1,13 @@
+input.error {
+    background-color: #FFFFD5;
+    border: 2px solid red;
+    color: red;
+    margin: 0;
+}
+
+label.error {
+    color: red;
+    display: block;
+    font-style: italic;
+    font-weight: normal;
+}

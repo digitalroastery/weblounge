@@ -1,0 +1,22 @@
+<div id="wbl-makeMeScrollable">
+	<div class="scrollingHotSpotLeft"></div>
+	<div class="scrollingHotSpotRight"></div>
+	<div class="scrollWrapper">
+		<div class="scrollableArea">
+			
+		</div>
+	</div>
+</div>
+
+<nav class="wbl-alignCenter wbl-icons">
+	<input type="text" name="filter" placeholder="Filtern..." id="wbl-filter" />
+	{{if resourceType == 'pages'}}
+		<!-- <button class="wbl-duplicate">Markierte Seite duplizieren</button> -->
+		<button class="wbl-delete">Markierte Seiten l&ouml;schen</button>
+		<!-- <button class="wbl-favorize">Zu Favoriten hinzufügen</button> -->
+	{{else}}
+		<!-- <button class="wbl-duplicate">Markiertes Medium duplizieren</button> -->
+		<button class="wbl-delete">Markierte Medien l&ouml;schen</button>
+		<!-- <button class="wbl-favorize">Zu Favoriten hinzufügen</button> -->
+	{{/if}}
+</nav>

@@ -1,0 +1,46 @@
+.editor_mediaeditor .wbl-taggerImage {
+}
+
+.editor_mediaeditor .wbl-taggerImage img{
+    width: 300px;
+    max-height: 270px;
+    position: relative;
+}
+
+.editor_mediaeditor .wbl-taggerImage video{
+    max-height: 270px;
+    position: relative;
+}
+
+.editor_mediaeditor .wbl-metadata {
+	width: 600px;
+	margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+}
+
+.editor_mediaeditor div.wbl-buttonLeft {
+	position: absolute;
+	left: 0;
+	width: 10%;
+	height: 90%;
+	background-image: url(../resourcebrowser/resources/images/arrow_left.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+	cursor: pointer;
+}
+
+.editor_mediaeditor div.wbl-buttonRight {
+	position: absolute;
+	right: 0;
+	width: 10%;
+	height: 90%;
+	background-image: url(../resourcebrowser/resources/images/arrow_right.png);				
+	background-repeat: no-repeat;
+	background-position: center center;
+	cursor: pointer;
+}
+
+.editor_mediaeditor img.wbl-copyMetadata {
+	cursor: pointer;
+}

@@ -1,0 +1,16 @@
+<form id="wbl-validate" onsubmit="return false;">
+<button id="wbl-pageSelectorButton" type="button">Elternseite ausw&auml;hlen</button><br /><br />
+Seitentitel: <input type="text" name="title" class="required" /><br /><br />
+URL: <span></span><input type="text" name="url" class="required" /><br /><br />
+Layout: <select name="layout" >
+	{{each runtime.getSiteLayouts()}}
+		{{if $value._default }}
+		<option selected="selected" value="${$value.id}">${$value.id}</option>
+		{{else}}
+		<option value="${$value.id}">${$value.id}</option>
+		{{/if}}
+    {{/each}}
+</select><br /><br />
+Beschreibung: <input type="text" name="description" /><br /><br />
+Tags: <input type="text" name="tags" />
+</form>

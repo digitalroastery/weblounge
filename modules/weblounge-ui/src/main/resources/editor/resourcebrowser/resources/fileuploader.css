@@ -1,0 +1,116 @@
+.qq-uploader { 
+	width: 100%;
+}
+
+.qq-upload-button {
+    display:block; /* or inline-block */
+    padding: 7px 0;
+	margin:0;
+    width: 105px; 
+	font-size:14px;
+	border: 1px solid #333333;
+	background-color: #FF9900;
+	color:#000000;
+    text-align:center;    
+}
+
+.qq-upload-button-hover {
+	background:#cc0000;
+}
+
+.qq-upload-button-focus {
+	outline:1px dotted black;
+}
+
+.qq-upload-drop-area {
+    position:relative; 
+    float: left;
+    width:300px; 
+    height:300px;
+    min-height: 70px; 
+    z-index:2;
+    border: 2px dashed #DDDDDD;
+    margin-bottom: 2em;
+    padding: 10px;
+	margin-right:auto;
+    text-align:center;
+    color: white;
+}
+
+.qq-upload-drop-area span {
+    display: block;
+    position:relative;
+    top: 50%;
+    width:100%;
+    font-size:16px;
+    margin-top:-8px;
+}
+
+.qq-upload-drop-area-active {
+	background: none repeat scroll 0 0 #FFFFA2;
+	border: 2px dashed #000000;
+}
+
+.qq-upload-list-container {
+	float: left;
+}
+.qq-upload-list {
+	margin:15px 35px;
+	padding:0;
+	list-style:disc;
+}
+
+.qq-upload-list li { 
+	margin:0; 
+	padding:0; 
+	line-height:15px; 
+	font-size:12px;
+}
+.qq-upload-file, .qq-upload-spinner, .qq-upload-size, .qq-upload-cancel, .qq-upload-failed-text {
+  margin-right: 7px;
+	color: white;
+}
+
+.qq-upload-file {
+}
+
+.qq-upload-spinner {
+	display:inline-block; 
+	background: url("images/loading.gif"); 
+	width:15px; 
+	height:15px; 
+	vertical-align:text-bottom;
+}
+.qq-upload-size,.qq-upload-cancel {
+	font-size:11px;
+}
+
+.qq-upload-failed-text {
+	display:none;
+}
+.qq-upload-fail .qq-upload-failed-text {
+	display:inline;
+}
+
+.qq-upload-progress-bar-container {
+    border: 1px solid #555555;
+    height: 10px;
+    margin-bottom: 20px;
+    width: 400px;
+}
+.qq-upload-progress-bar-container.uploaded {
+    border: medium none;
+    height: auto;
+}
+.qq-upload-progress-bar {
+    background: none repeat scroll 0 0 #6787E3;
+    font-weight: bold;
+    height: 10px;
+    width: 0;
+}
+.qq-upload-progress-bar-container.uploaded .qq-upload-progress-bar {
+    background: none repeat scroll 0 0 transparent;
+    color: #6DB508;
+    display: inline-block;
+    width: auto;
+}

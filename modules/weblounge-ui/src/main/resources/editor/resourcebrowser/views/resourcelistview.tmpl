@@ -1,0 +1,41 @@
+<table class="wbl-tablesorter">
+	<thead>
+		<tr>
+			{{if resourceType == 'pages'}}
+			<th>Seite</th>
+			<th>Seitentitel</th>
+			<th>Erstellt</th>
+			<th>Zuletzt editiert</th>
+			<th></th>
+			{{else}}
+			<th>Seite</th>
+			<th>Titel</th>
+			<th>Erstellt</th>
+			<th>Zuletzt editiert</th>
+			<th></th>
+			{{/if}}
+		</tr>	
+	</thead>	
+	<tbody id="wbl-listViewContent">
+	</tbody>
+</table>
+<div id="wbl-pager">
+	<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/first.png" class="wbl-first"/>
+	<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/prev.png" class="wbl-prev"/>
+	<input type="text" class="wbl-pageDisplay"/>
+	<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/next.png" class="wbl-next"/>
+	<img src="${runtime.getRootPath()}/editor/resourcebrowser/resources/images/blue/last.png" class="wbl-last"/>
+</div>
+
+<nav class="wbl-alignCenter wbl-icons">
+	<input type="text" name="filter" placeholder="Filtern..." id="wbl-filter" /> 
+	{{if resourceType == 'pages'}}
+		<!-- <button class="wbl-duplicate">Markierte Seite duplizieren</button> -->
+		<button class="wbl-delete">Markierte Seiten l&ouml;schen</button>
+		<!-- <button class="wbl-favorize">Zu Favoriten hinzuf&uuml;gen</button> -->
+	{{else}}
+		<!-- <button class="wbl-duplicate">Markiertes Medium duplizieren</button> -->
+		<button class="wbl-delete">Markierte Medien l&ouml;schen</button>
+		<!-- <button class="wbl-favorize">Zu Favoriten hinzuf&uuml;gen</button> -->
+	{{/if}}
+</nav>

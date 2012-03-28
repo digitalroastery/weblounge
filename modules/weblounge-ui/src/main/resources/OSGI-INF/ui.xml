@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  activate="activate"
+  deactivate="deactivate"
+  name="Weblounge UI">
+  
+  <implementation class="ch.entwine.weblounge.ui.WebloungeUI" />
+  <property name="service.description" value="Weblounge UI" />
+  <reference name="security" interface="ch.entwine.weblounge.common.security.Security" cardinality="1..1" policy="static" />
+
+</scr:component>
