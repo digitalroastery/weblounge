@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  start="activate"
+  stop="deactivate"
+  name="Weblounge Resource Publishing Service">
+  
+  <implementation class="ch.entwine.weblounge.kernel.publisher.ResourcePublishingService" />
+  <property name="service.description" value="Weblounge Resource Publishing Service" />
+  <service>
+    <provide interface="ch.entwine.weblounge.kernel.publisher.ResourcePublishingService" />
+  </service>
+
+</scr:component>

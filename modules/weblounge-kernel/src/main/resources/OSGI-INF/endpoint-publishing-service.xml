@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  start="activate"
+  stop="deactivate"
+  name="Weblounge Endpoint Publishing Service">
+  
+  <implementation class="ch.entwine.weblounge.kernel.publisher.EndpointPublishingService" />
+  <property name="service.description" value="Weblounge Endpoint Publishing Service" />
+  <property name="service.pid" value="ch.entwine.weblounge.restpublisher" />
+  <service>
+    <provide interface="ch.entwine.weblounge.kernel.publisher.EndpointPublishingService" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+
+</scr:component>

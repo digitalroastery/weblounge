@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  start="activate"
+  stop="deactivate"
+  name="Weblounge Environment Service">
+
+  <implementation class="ch.entwine.weblounge.kernel.runtime.EnvironmentService" />
+  <property name="service.description" value="Weblounge Environment Service" />
+  <property name="service.pid" value="ch.entwine.weblounge.environment" />
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+
+</scr:component>

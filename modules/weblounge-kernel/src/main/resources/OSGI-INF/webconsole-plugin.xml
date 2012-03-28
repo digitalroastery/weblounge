@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge Webconsole Plugin">
+
+  <implementation class="ch.entwine.weblounge.kernel.webconsole.WebConsolePlugin" />
+  <property name="felix.webconsole.label" value="weblounge" />
+  <service>
+    <provide interface="javax.servlet.Servlet" />
+  </service>
+  <reference name="resources" interface="ch.entwine.weblounge.kernel.shared.WebloungeSharedResources" cardinality="1..1" policy="static" bind="setSharedResources" />
+  <reference name="site" interface="ch.entwine.weblounge.common.site.Site" cardinality="0..n" policy="dynamic" bind="addSite" unbind="removeSite" />
+
+</scr:component>

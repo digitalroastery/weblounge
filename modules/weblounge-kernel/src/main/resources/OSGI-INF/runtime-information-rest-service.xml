@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge Runtime Information Service">
+  
+  <implementation class="ch.entwine.weblounge.kernel.endpoint.RuntimeInformationEndpoint" />
+  <property name="service.description" value="Weblounge Runtime Information Service" />
+  <property name="rest.path" value="runtime" />
+  <service>
+    <provide interface="ch.entwine.weblounge.kernel.endpoint.RuntimeInformationEndpoint" />
+  </service>
+  <reference name="security" interface="ch.entwine.weblounge.common.security.SecurityService" cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
+  <reference name="providers" interface="ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider" cardinality="0..n" policy="dynamic" bind="addRuntimeInformationProvider" unbind="removeRuntimeInformationProvider" />
+
+</scr:component>

@@ -1,0 +1,78 @@
+<script type="text/javascript" src="${shared-resources}/scripts/webconsole-plugin.js"></script>
+
+<script type="text/javascript">
+	// <![CDATA[
+	var showSiteDetails = false;
+	var siteServiceUri = '${site-service-uri}';
+	var pluginData = {
+			sites_count							: ${sites-count},
+			sites_active            : ${sites-active},
+			sites_inactive          : ${sites-inactive},
+			sites_data              : [${sites-data}]
+	};
+	var i18n = {
+			"Site"                   : 'Site',
+			stat_no_sites            : "No sites installed.",
+			stat_ok                  : "Sites information: {0} sites in total, {1} active, {2} inactive"
+	};
+	// ]]>
+</script>
+
+<!-- status line -->
+<p class="statline"><span id="sites-active">0</span> sites active, <span id="sites-inactive">0</span> sites inactive</p>
+
+<div id="sites">
+
+	<!-- controls top -->
+	<form method="post" enctype="multipart/form-data" action="">
+		<div class="ui-widget-header ui-corner-top buttonGroup">
+			<label>Status:</label>
+			<select class="minLevel">
+				<option value="1" selected="true">-</option>
+				<option value="2">Active</option>
+				<option value="3">Inactive</option>
+			</select>
+			<button class="reloadButton">Reload</button>
+		</div>
+	</form>
+
+	<!-- sites -->
+	<table id="plugin_table" class="tablesorter nicetable noauto">
+		<thead>
+			<tr>
+				<th class="col_Name">Name</th>
+				<th class="col_State">Status</th>
+				<th class="col_Actions">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr><!-- template -->
+				<td><!-- name -->
+					<div class="bIcon ui-icon ui-icon-triangle-1-e" style="float:left" title="Show Details">&nbsp;</div>
+				</td>
+				<td>&nbsp;</td><!-- status -->
+				<td><!-- actions -->
+					<ul class="icons ui-widget">
+						<li class="dynhover ui-helper-hidden" title="Start"><span class="ui-icon ui-icon-play">&nbsp;</span></li>
+						<li class="dynhover ui-helper-hidden" title="Stop"><span class="ui-icon ui-icon-stop">&nbsp;</span></li>
+						<li class="dynhover ui-helper-hidden" title="Index"><span class="ui-icon ui-icon-transferthick-e-w">&nbsp;</span></li>
+					</ul>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- controls bottom -->
+	<form method="post" enctype="multipart/form-data" action="">
+		<div class="ui-widget-header ui-corner-bottom buttonGroup">
+			<label>Status:</label>
+			<select class="minLevel">
+				<option value="1" selected="true">-</option>
+				<option value="2">Active</option>
+				<option value="3">Inactive</option>
+			</select>
+			<button class="reloadButton">Reload</button>
+		</div>
+	</form>
+
+</div>
