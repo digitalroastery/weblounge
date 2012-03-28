@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd" version="2.1">
+
+  <description>Tag library providing access to Weblounge resources</description>
+  <display-name>Weblounge Resource Tags</display-name>
+  <tlib-version>3.0</tlib-version>
+  <short-name>weblr</short-name>
+  <uri>http://entwinemedia.com/weblounge/3.0/resources</uri>
+
+  <tag>
+    <description>Loads a file resource</description>
+    <display-name>File Resource Tag</display-name>
+    <name>file</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.FileResourceTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.FileResourceTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>uuid</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>path</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <description>Loads images for a gallery</description>
+    <display-name>Image Gallery Tag</display-name>
+    <name>gallery</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.ImageGalleryTag</tag-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>subjects</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>normalstyle</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>bigstyle</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>thumbstyle</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <description>Load an image resource</description>
+    <display-name>Image Resource Tag</display-name>
+    <name>image</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.ImageResourceTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.ImageResourceTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>uuid</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>path</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>subjects</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>altimage</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>altimagepath</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>imagestyle</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <description>Loads a page</description>
+    <display-name>Page Tag</display-name>
+    <name>page</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.PageTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.PageTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>uuid</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>path</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <description>Loads resources by query</description>
+    <description>Resource Iterator Tag</description>
+    <name>resource-iterator</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.ResourceIteratorTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.ResourceIteratorTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>subjects</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>series</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>startdate</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>uuid</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>order</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>includetypes</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>excludetypes</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <description>Loads a resource</description>
+    <description>Resource Tag</description>
+    <name>resource</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.ResourceTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.ResourceTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>uuid</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>path</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <description>Loads a video resource</description>
+    <display-name>Video Resource Tag</display-name>
+    <name>video</name>
+    <tag-class>ch.entwine.weblounge.taglib.resource.VideoResourceTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.VideoResourceTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>uuid</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>path</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+</taglib>

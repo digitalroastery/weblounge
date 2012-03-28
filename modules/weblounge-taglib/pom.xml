@@ -1,0 +1,142 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ch.entwine.weblounge</groupId>
+  <artifactId>weblounge-taglib</artifactId>
+  <packaging>bundle</packaging>
+  <name>Weblounge Taglibrary</name>
+  <parent>
+    <groupId>ch.entwine.weblounge</groupId>
+    <artifactId>weblounge-base</artifactId>
+    <version>3.1.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  
+  <properties>
+    <weblounge.deploymentdir>lib</weblounge.deploymentdir>
+  </properties>
+  
+  <dependencies>
+
+    <!-- weblounge -->
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-common-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-contentrepository-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- thirdparty -->
+
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jsp-api</artifactId>
+    </dependency>
+
+    <!-- testing -->
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.taglib</Bundle-SymbolicName>
+            <Import-Package>
+              ch.entwine.weblounge.common;version=${project.version},
+              ch.entwine.weblounge.common.content;version=${project.version},
+              ch.entwine.weblounge.common.content.movie;version=${project.version},
+              ch.entwine.weblounge.common.content.file;version=${project.version},
+              ch.entwine.weblounge.common.content.image;version=${project.version},
+              ch.entwine.weblounge.common.content.page;version=${project.version},
+              ch.entwine.weblounge.common.content.repository;version=${project.version},
+              ch.entwine.weblounge.common.editor;version=${project.version},
+              ch.entwine.weblounge.common.impl.content;version=${project.version},
+              ch.entwine.weblounge.common.impl.content.movie;version=${project.version},
+              ch.entwine.weblounge.common.impl.content.file;version=${project.version},
+              ch.entwine.weblounge.common.impl.content.image;version=${project.version},
+              ch.entwine.weblounge.common.impl.content.page;version=${project.version},
+              ch.entwine.weblounge.common.impl.language;version=${project.version},
+              ch.entwine.weblounge.common.impl.request;version=${project.version},
+              ch.entwine.weblounge.common.impl.security;version=${project.version},
+              ch.entwine.weblounge.common.impl.url;version=${project.version},
+              ch.entwine.weblounge.common.impl.util;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.config;version=${project.version},
+              ch.entwine.weblounge.common.language;version=${project.version},
+              ch.entwine.weblounge.common.request;version=${project.version},
+              ch.entwine.weblounge.common.security;version=${project.version},
+              ch.entwine.weblounge.common.site;version=${project.version},
+              ch.entwine.weblounge.common.url;version=${project.version},
+              org.apache.commons.lang;version="2.6",
+              org.slf4j;version="[1.5.0,1.6.0)",
+              javax.servlet;version="2.5",
+              javax.servlet.http;version="2.5",
+              javax.servlet.jsp;version="2.1.0",
+              javax.servlet.jsp.tagext;version="2.1.0"
+            </Import-Package>
+            <Export-Package>
+              ch.entwine.weblounge.taglib;version=${project.version},
+              ch.entwine.weblounge.taglib.content;version=${project.version},
+              ch.entwine.weblounge.taglib.resource;version=${project.version},
+              ch.entwine.weblounge.taglib.security;version=${project.version},
+              ch.entwine.weblounge.taglib.util;version=${project.version}
+            </Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
