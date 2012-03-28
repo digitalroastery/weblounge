@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<site id="${artifactId}" xmlns="http://www.entwinemedia.com/weblounge/3.0/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/site http://www.entwinemedia.com/xsd/weblounge/3.0/site.xsd">
+  
+  <autostart>true</autostart>
+  <name>${artifactId}</name>
+  <class>${groupId}.CustomSite</class>
+  
+  <domains>
+    <url environment="production">http://www.customsite.com</url>
+    <url environment="staging">http://www-dev.customsite.com</url>
+    <url environment="development" default="true">http://localhost:8080</url>
+    <url environment="development">http://127.0.0.1:8080</url>
+  </domains>
+  
+  <security>
+    <administrator>
+      <login>admin</login>
+      <password type="plain">secret</password>
+      <name>Administrator</name>
+      <email>admin@nowhere.com</email>
+    </administrator>
+  </security>
+  
+  <languages>
+    <language default="true">en</language>
+    <language>de</language>
+  </languages>
+  
+  <templates>
+    <template id="default" composeable="true" default="true">
+      <renderer>${site.root}/templates/template.jsp</renderer>
+      <stage>main</stage>
+      <name>Default template</name>
+      <recheck>1d10M</recheck>
+      <valid>1w1d1H1M</valid>
+    </template>
+  </templates>
+  
+  <options>
+    <option>
+  	  <name>option.name</name>
+  	  <value>Simple string value.</value>
+    </option>
+  </options>
+  
+</site>
