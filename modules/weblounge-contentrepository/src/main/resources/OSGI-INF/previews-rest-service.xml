@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  deactivate="deactivate"
+  name="Weblounge Previews Endpoint">	
+  
+  <implementation class="ch.entwine.weblounge.contentrepository.impl.endpoint.PreviewsEndpoint" />
+  <property name="service.description" value="Weblounge Previews Endpoint" />
+  <property name="rest.path" value="previews" />
+  <service>
+    <provide interface="ch.entwine.weblounge.contentrepository.impl.endpoint.PreviewsEndpoint" />
+  </service>
+
+  <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" />
+  <reference name="imagestyles" interface="ch.entwine.weblounge.common.content.image.ImageStyle" cardinality="0..n" policy="dynamic" bind="addImageStyle" unbind="removeImageStyle" />
+
+</scr:component>

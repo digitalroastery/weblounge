@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true" 
+  name="Weblounge Page Endpoint">	
+  
+  <implementation class="ch.entwine.weblounge.contentrepository.impl.endpoint.PagesEndpoint" />
+  <property name="service.description" value="Weblounge Page Endpoint" />
+  <property name="rest.path" value="pages" />
+  <service>
+    <provide interface="ch.entwine.weblounge.contentrepository.impl.endpoint.PagesEndpoint" />
+  </service>
+
+  <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" />
+	<reference name="security" interface="ch.entwine.weblounge.common.security.SecurityService" cardinality="1..1" policy="static" bind="setSecurityService" />
+
+</scr:component>

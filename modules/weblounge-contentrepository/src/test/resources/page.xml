@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<page id="00000000-0000-0000-0000-000000000000" path="/path/to/page" version="live">
+  <head>
+    <template>template</template>
+    <layout>layout</layout>
+    <promote>true</promote>
+    <index>true</index>
+    <metadata>
+      <title language="de"><![CDATA[title]]></title>
+      <description language="de"><![CDATA[description]]></description>
+      <subject><![CDATA[subject]]></subject>
+      <type><![CDATA[type]]></type>
+      <coverage language="de"><![CDATA[coverage]]></coverage>
+      <rights language="de"><![CDATA[rights]]></rights>
+    </metadata>
+    <created>
+      <user id="creatorid" realm="testland">creator</user>
+      <date>2009-01-07T20:05:41Z</date>
+    </created>
+    <modified>
+      <user id="modifierid" realm="testland">modifier</user>
+      <date>2009-02-18T22:06:40Z</date>
+    </modified>
+    <published>
+      <user id="publisherid" realm="testland">publisher</user>
+      <from>2006-05-05T17:58:21Z</from>
+      <to>2010-01-01T01:00:00Z</to>
+    </published>
+    <security>
+      <owner>
+        <user id="ownerid" realm="testland">owner</user>
+      </owner>
+    </security>
+    <locked>
+      <user id="editorid" realm="testland">editor</user>
+    </locked>
+  </head>
+  <body>
+    <composer id="main">
+      <pagelet module="text" id="title">
+        <security>
+          <owner>
+            <user id="pageletownerid" realm="testland">pagelet owner</user>
+          </owner>
+        </security>
+        <created>
+          <user id="pageletcreatorid" realm="testland">pagelet creator</user>
+          <date>2009-01-07T20:05:41Z</date>
+        </created>
+        <published>
+          <user id="pageletpublisherid" realm="testland">pagelet publisher</user>
+          <from>2009-01-07T20:05:41Z</from>
+          <to>2009-02-18T22:06:40Z</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="pagletmodifierid" realm="testland">pagelet modifier</user>
+            <date>2009-01-07T20:05:41Z</date>
+          </modified>
+          <text id="textid"><![CDATA[text]]></text>
+        </locale>
+        <properties>
+          <property id="propertyid"><![CDATA[property]]></property>
+        </properties>
+      </pagelet>
+    </composer>
+  </body>
+</page>

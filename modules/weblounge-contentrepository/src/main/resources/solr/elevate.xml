@@ -1,0 +1,21 @@
+<!-- 
+
+ Queries for "AAA" would return the documents A and B first and only then the
+ regular search results.
+
+ <query text="AAA">
+  <doc id="A" />
+  <doc id="B" />
+ </query>
+
+ Queries for "ipod" would return the document A first and only then the
+ regular search results, at the same time omitting document B.
+
+ <query text="ipod">
+  <doc id="A" />
+  <doc id="B" exclude="true" />
+ </query>
+
+ -->
+
+<elevate/>
