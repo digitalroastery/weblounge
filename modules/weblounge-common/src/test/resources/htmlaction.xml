@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<action id="myaction">
+  <name><![CDATA[Test]]></name>
+  <class>ch.entwine.weblounge.common.site.TestAction</class>
+  <mountpoint>/test/</mountpoint>
+  <page>/testpage/</page>
+  <template>testtemplate</template>
+  <recheck>0</recheck>
+  <valid>1M</valid>
+  <includes>
+    <link href="http://localhost/css/stylesheet.css" type="text/css"/>
+    <script src="http://localhost/scripts/script.js" type="javascript"/>
+  </includes>
+  <options>
+    <option>
+      <name>key</name>
+      <value><![CDATA[value]]></value>
+    </option>
+  </options>
+</action>

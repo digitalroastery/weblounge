@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site id="dev" xmlns="http://www.entwinemedia.com/weblounge/3.0/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/site http://www.entwinemedia.com/xsd/weblounge/3.0/site.xsd">
+  <autostart>true</autostart>
+  <name><![CDATA[Main site]]></name>
+  <languages>
+    <language default="true">de</language>
+    <language>en</language>
+  </languages>
+  <domains>
+  	<url default="true" environment="production">http://www.weblounge.org</url>
+  	<url environment="staging">http://*.nowhere.com</url>
+    <url environment="development">http://localhost:8080</url>
+  </domains>
+  <security>
+    <administrator>
+      <login>blogadmin</login>
+      <password type="plain"><![CDATA[secret]]></password>
+      <name><![CDATA[Web Office]]></name>
+      <email>weboffice@nowhere.com</email>
+    </administrator>
+    <roles>
+	  <administrator>my-admin</administrator>
+	  <publisher>my-publisher</publisher>
+	  <editor>my-editor</editor>
+	  <guest>my-guest</guest>
+    </roles>
+  </security>
+  <templates>
+    <template id="default" composeable="true" default="true">
+      <name><![CDATA[Default template]]></name>
+      <renderer>file://template/default.jsp</renderer>
+      <stage>boxes</stage>
+      <recheck>1d10M</recheck>
+      <valid>1w1d1H1M</valid>
+    </template>
+    <template id="mobile" composeable="true">
+      <name><![CDATA[Mobile]]></name>
+      <renderer>file://template/mobile.jsp</renderer>
+      <recheck>1H</recheck>
+      <valid>1w</valid>
+    </template>
+  </templates>
+  <options>
+    <option>
+      <name>media.url</name>
+      <value><![CDATA[http://media.swissunihockey.ch/dev]]></value>
+    </option>
+  </options>
+</site>

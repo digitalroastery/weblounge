@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.entwinemedia.com/weblounge/3.0/module" xmlns="http://www.entwinemedia.com/weblounge/3.0/module"
+	elementFormDefault="qualified">
+
+  <xsd:element name="module">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="enable" type="xsd:boolean" />
+        <xsd:element name="class" type="xsd:string" minOccurs="0" />
+        <xsd:element name="name" type="xsd:string" minOccurs="0" />
+        <xsd:element ref="pagelets" minOccurs="0" />
+        <xsd:element ref="actions" minOccurs="0" />
+        <xsd:element ref="jobs" minOccurs="0" />
+        <xsd:element ref="imagestyles" minOccurs="0" />
+        <xsd:element ref="options" minOccurs="0" />
+      </xsd:sequence>
+      <xsd:attribute name="id" type="idType" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="pagelets">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="pagelet" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="pagelet">
+  	<xsd:complexType>
+  		<xsd:sequence>
+        <xsd:element name="name" type="xsd:string" minOccurs="0" />
+        <xsd:element name="class" type="xsd:string" minOccurs="0" />
+        <xsd:element ref="renderer" minOccurs="1" maxOccurs="unbounded"/>
+  			<xsd:element name="editor" type="xsd:anyURI" minOccurs="0" />
+  			<xsd:element name="recheck" type="durationType" minOccurs="0" />
+  			<xsd:element name="valid" type="durationType" minOccurs="0" />
+        <xsd:element ref="preview" minOccurs="0" />
+  			<xsd:element ref="includes" minOccurs="0" />
+  		</xsd:sequence>
+  		<xsd:attribute name="id" type="idType" use="required" />
+  		<xsd:attribute name="composeable" type="xsd:boolean" />
+  	</xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="renderer">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:anyURI">
+          <xsd:attribute name="type" type="xsd:string" />
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="preview">
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:enumeration value="none" />
+        <xsd:enumeration value="first" />
+        <xsd:enumeration value="all" />
+        <xsd:enumeration value="boundary" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+
+  <xsd:element name="actions">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="action" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="action">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="name" type="xsd:string" minOccurs="0" />
+        <xsd:element name="class" type="xsd:string" />
+        <xsd:element name="mountpoint" type="xsd:anyURI" />
+        <xsd:element name="page" type="xsd:anyURI" minOccurs="0" />
+        <xsd:element name="template" type="xsd:string" minOccurs="0" />
+        <xsd:element name="recheck" type="xsd:string" minOccurs="0" />
+        <xsd:element name="valid" type="xsd:string" minOccurs="0" />
+        <xsd:element ref="includes" minOccurs="0" />
+        <xsd:element ref="options" minOccurs="0" />
+      </xsd:sequence>
+      <xsd:attribute name="id" type="idType" use="required" />
+      <xsd:attribute name="composeable" type="xsd:boolean" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="jobs">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="job" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="job">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="name" type="xsd:string" minOccurs="0" />
+        <xsd:element name="class" type="xsd:string" />
+        <xsd:element name="schedule" type="xsd:string" />
+        <xsd:element ref="options" minOccurs="0" />
+      </xsd:sequence>
+      <xsd:attribute name="id" type="idType" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="imagestyles">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="imagestyle" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="imagestyle">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="name" type="xsd:string" minOccurs="0" />
+        <xsd:element ref="scalingmode" />
+        <xsd:element name="width" type="xsd:int" minOccurs="0" />
+        <xsd:element name="height" type="xsd:int" minOccurs="0" />
+      </xsd:sequence>
+      <xsd:attribute name="id" type="idType" use="required" />
+      <xsd:attribute name="composeable" type="xsd:boolean" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="scalingmode">
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:enumeration value="width" />
+        <xsd:enumeration value="height" />
+        <xsd:enumeration value="box" />
+        <xsd:enumeration value="fill" />
+        <xsd:enumeration value="cover" />
+        <xsd:enumeration value="none" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  
+  <xsd:element name="includes">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="link" minOccurs="0" maxOccurs="unbounded" />
+        <xsd:element ref="script" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="link">
+    <xsd:complexType>
+      <xsd:attribute name="use" type="useType" use="optional" />
+      <xsd:attribute name="href" type="xsd:anyURI" use="required" />
+      <xsd:attribute name="type" type="xsd:string" use="required" />
+      <xsd:attribute name="charset" type="xsd:string" use="optional" />
+      <xsd:attribute name="media" type="xsd:string" use="optional" />
+      <xsd:attribute name="rel" type="xsd:string" use="optional" />
+      <xsd:attribute name="rev" type="xsd:string" use="optional" />
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="script">
+    <xsd:complexType>
+      <xsd:attribute name="jquery" type="xsd:string" use="optional" />
+      <xsd:attribute name="use" type="useType" use="optional" />
+      <xsd:attribute name="src" type="xsd:anyURI" use="required" />
+      <xsd:attribute name="type" type="xsd:string" use="required" />
+      <xsd:attribute name="charset" type="xsd:string" use="optional" />
+      <xsd:attribute name="defer" type="xsd:boolean" use="optional" />
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="options">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="option" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!--
+  Options are defined by a name and either a single value or a list of values.
+  Multiple values are put into a value element each.
+  -->
+  <xsd:element name="option">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="name" type="xsd:string" />
+        <xsd:element name="value" type="xsd:string" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  
+  <!-- 
+  Type definition for identifiers. Since identifiers are used in path names
+  and potentially database table and column names as well, they are restricted
+  to contain commonly unproblematic characters only.
+   -->
+  <xsd:simpleType name="idType">
+    <xsd:restriction base="xsd:ID">
+      <xsd:pattern value="[a-zA-Z0-9]+[a-zA-Z0-9\-_.]*" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  
+  <!--
+  Durations for valid and recheck time can be specified in the following way:
+
+    y - years
+    m - months
+    w - weeks
+    d - days
+    H - hours
+    M - minutes
+    S - seconds
+
+  while each of these is optional. Therefore, an example representing 1 week,
+  3 days and 25 minutes would result in 1w3d25m.
+   -->
+  <xsd:simpleType name="durationType">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="([\d]+y)?([\d]+m)?([\d]+w)?([\d]+d)?([\d]+H)?([\d]+M)?([\d]+S)?" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  
+  <!-- 
+  Type definition for use attributes in include elements. These includes can
+  either be included for the renderer or the editor only or both.
+   -->
+  <xsd:simpleType name="useType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="renderer"/>
+      <xsd:enumeration value="editor"/>
+      <xsd:enumeration value="all"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  
+</xsd:schema>

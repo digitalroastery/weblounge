@@ -1,0 +1,10 @@
+<loginmodule>
+  <class>ch.entwine.weblounge.common.impl.security.jaas.AdminLoginModule</class>
+  <relevance>sufficient</relevance>
+  <options>
+    <option>
+      <name>key</name>
+      <value><![CDATA[value]]></value>
+    </option>
+  </options>
+</loginmodule>

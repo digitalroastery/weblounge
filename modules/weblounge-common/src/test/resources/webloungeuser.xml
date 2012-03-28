@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<user id="john" realm="testland" enabled="true">
+	<profile>
+		<firstname><![CDATA[John]]></firstname>
+		<lastname><![CDATA[Doe]]></lastname>
+		<initials><![CDATA[jd]]></initials>
+		<email>john.doe@testland.org</email>
+		<language>en</language>
+	</profile>
+	<security>
+		<password type="md5"><![CDATA[1a1dc91c907325c69271ddf0c944bc72]]></password>
+		<challenge><![CDATA[What's my last name]]></challenge>
+		<response type="plain"><![CDATA[Doe]]></response>
+		<lastlogin>
+			<date>2009-03-17T03:22:05Z</date>
+			<ip>192.168.0.1</ip>
+		</lastlogin>
+	</security>
+	<properties>
+		<property>
+			<name>ch.entwine.weblounge.lastpage</name>
+			<value><![CDATA[/test]]></value>
+		</property>
+	</properties>
+</user>

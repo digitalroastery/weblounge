@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template id="default" composeable="true">
+  <name><![CDATA[Default template]]></name>
+  <renderer>file://template/default.jsp</renderer>
+  <stage>boxes</stage>
+  <layout>unrestricted</layout>
+  <recheck>2d</recheck>
+  <valid>3w</valid>
+  <includes>
+    <link href="http://localhost/css.css"></link>
+    <script src="http://localhost/javascript.js"></script>
+  </includes>
+</template>

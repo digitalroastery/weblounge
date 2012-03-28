@@ -1,0 +1,11 @@
+<options>
+  <option>
+    <name>key</name>
+    <value><![CDATA[value]]></value>
+  </option>
+  <option>
+    <name>multikey</name>
+    <value><![CDATA[othervalue]]></value>
+    <value><![CDATA[value]]></value>
+  </option>
+</options>
