@@ -63,7 +63,7 @@ public class XMLActionSupport extends ActionSupport implements XMLAction {
   /**
    * This implementation always returns
    * {@link ch.entwine.weblounge.common.site.Action#EVAL_REQUEST} and simply sets
-   * the content type on the response to <code>text/xml;charset=utf-8</code>.
+   * the content type on the response to <code>application/xml;charset=utf-8</code>.
    * <p>
    * This means that subclasses should either overwrite this method to specify a
    * different encoding or make sure that everything that is written to the
@@ -80,9 +80,9 @@ public class XMLActionSupport extends ActionSupport implements XMLAction {
       throws ActionException {
     String characterEncoding = response.getCharacterEncoding();
     if (StringUtils.isNotBlank(characterEncoding))
-      response.setContentType("text/html;charset=" + characterEncoding.toLowerCase());
+      response.setContentType("application/xml;charset=" + characterEncoding.toLowerCase());
     else
-      response.setContentType("text/html");
+      response.setContentType("application/xml");
     return EVAL_REQUEST;
   }
 
