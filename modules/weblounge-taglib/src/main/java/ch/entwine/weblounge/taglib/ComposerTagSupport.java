@@ -633,8 +633,20 @@ public class ComposerTagSupport extends WebloungeTag {
       int beforePageletResult = beforePagelet(pagelet, position, writer);
 
       // Do we need to process this pagelet?
-      if (beforePageletResult == SKIP_PAGELET)
+      if (beforePageletResult == SKIP_PAGELET) {
+        // At least close pagelet properly before returning
+        try {
+          afterPagelet(pagelet, position, writer);
+        } catch (ContentRepositoryException e) {
+          logger.warn("Failed to close pagelet: {}", e.getMessage());
+          response.invalidate();
+        } catch (ContentRepositoryUnavailableException e) {
+          logger.warn("Failed to close pagelet due to missing content repository");
+          response.invalidate();
+        }
+
         return;
+      }
 
       renderingState = RenderingState.InsidePagelet;
       writer.flush();
