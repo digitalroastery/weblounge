@@ -74,9 +74,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:svn:https//entwine.svn.beanstalkapp.com/weblounge/products/weblounge/trunk</connection>
-    <developerConnection>scm:svn:https://entwine.svn.beanstalkapp.com/weblounge/products/weblounge/trunk</developerConnection>
-    <url>http://entwine.svn.beanstalkapp.com/weblounge</url>
+    <connection>scm:git:git://github.com/entwinemedia/weblounge.git</connection>
+    <developerConnection>scm:git:git://github.com/entwinemedia/weblounge.git</developerConnection>
+    <url>https://github.com/entwinemedia/weblounge</url>
   </scm>
 
   <issueManagement>
