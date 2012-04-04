@@ -1,3 +1,12 @@
+# Weblounge
+cache/
+ext/
+lib/
+logs/
+sites/
+sites-data/
+work/
+
 # Maven
 target
 
@@ -5,3 +14,6 @@ target
 .classpath
 .project
 .settings
+
+# Mac OS X
+.DS_Store
