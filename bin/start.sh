@@ -1,3 +1,19 @@
+#!/bin/bash
+
+##
+# Configure these variables to match your environment
+##
+
+if [ -z "$WEBLOUNGE_HOME" ]; then
+  PWD=`pwd`
+  if [ -f "$PWD/bin/felix.jar" ]; then
+	WEBLOUNGE_HOME="$PWD"
+  else
+	echo "WEBLOUNGE_HOME is not set"
+	exit 1
+  fi
+fi
+
 ##
 # Configure these variables to match your environment
 ##
@@ -26,8 +42,8 @@ DEBUG_SUSPEND="n"
 # adjust the two paths above, namely $WEBLOUNGE_HOME and $WEBLOUNGE_WORK_DIR.
 
 WEBLOUNGE_LOG_DIR="$WEBLOUNGE_WORK_DIR/logs"
-WEBLOUNGE_CACHE_DIR="$WEBLOUNGE_WORK_DIR/cache"
 WEBLOUNGE_TEMP_DIR="$WEBLOUNGE_WORK_DIR/work"
+WEBLOUNGE_CACHE_DIR="$WEBLOUNGE_TEMP_DIR/cache"
 WEBLOUNGE_SITES_DIR="$WEBLOUNGE_WORK_DIR/sites"
 WEBLOUNGE_SITESDATA_DIR="$WEBLOUNGE_WORK_DIR/sites-data"
 WEBLOUNGE_LIB_DIR="$WEBLOUNGE_HOME/lib"
