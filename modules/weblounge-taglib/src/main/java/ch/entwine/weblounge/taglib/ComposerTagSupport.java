@@ -343,14 +343,14 @@ public class ComposerTagSupport extends WebloungeTag {
             ResourceURI pageURI = new PageURIImpl(site, pageUrl);
             try {
               contentProvider = (Page) contentRepository.get(pageURI);
-              if (contentProvider == null) {
-                logger.debug("Parent page {} could not be loaded", pageUrl);
-                return;
-              }
-              content = contentProvider.getPagelets(id);
             } catch (SecurityException e) {
               logger.debug("Prevented loading of protected content from inherited page {} for composer {}", pageURI, id);
             }
+            if (contentProvider == null) {
+              logger.debug("Ancestor page {} could not be loaded", pageUrl);
+              continue;
+            }
+            content = contentProvider.getPagelets(id);
           }
         }
       }
@@ -633,8 +633,20 @@ public class ComposerTagSupport extends WebloungeTag {
       int beforePageletResult = beforePagelet(pagelet, position, writer);
 
       // Do we need to process this pagelet?
-      if (beforePageletResult == SKIP_PAGELET)
+      if (beforePageletResult == SKIP_PAGELET) {
+        // At least close pagelet properly before returning
+        try {
+          afterPagelet(pagelet, position, writer);
+        } catch (ContentRepositoryException e) {
+          logger.warn("Failed to close pagelet: {}", e.getMessage());
+          response.invalidate();
+        } catch (ContentRepositoryUnavailableException e) {
+          logger.warn("Failed to close pagelet due to missing content repository");
+          response.invalidate();
+        }
+
         return;
+      }
 
       renderingState = RenderingState.InsidePagelet;
       writer.flush();
