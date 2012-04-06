@@ -114,11 +114,11 @@ public class I18nDictionaryImpl implements I18nDictionary {
    */
   public String get(String key, Language language) {
     Properties p = null;
-    if (language != null) {
+    if (language != null)
       p = i18n.get(language);
-    } else {
+
+    if (p == null)
       p = defaults;
-    }
 
     String dictEntry = null;
     if (p != null)
@@ -127,6 +127,11 @@ public class I18nDictionaryImpl implements I18nDictionary {
     // Either return the entry or try the default language fallback
     if (dictEntry != null)
       return dictEntry;
+    else {
+      dictEntry = defaults.getProperty(key);
+      if (dictEntry != null)
+        return dictEntry;
+    }
 
     // Last resort: return the key itself
     return key;
@@ -235,7 +240,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
       } else {
         p = defaults;
       }
-      
+
       boolean warnInvalidKeys = false;
       boolean warnInvalidValues = false;
 
@@ -247,20 +252,21 @@ public class I18nDictionaryImpl implements I18nDictionary {
         Node messageNode = nodes.item(j);
         String key = XPathHelper.valueOf(messageNode, "@name", path);
         String value = XPathHelper.valueOf(messageNode, "text()", path);
-        if (p.containsKey(key)) {
-          logger.warn("I18n key '{}' redefined in {}", key, url);
-        }
         if (key == null) {
           warnInvalidKeys = true;
           continue;
-        } else if (value == null) {
+        }
+        if (value == null) {
           logger.warn("I18n dictionary {} contains invalid value (null) for key '{}'", url, key);
           warnInvalidValues = true;
           continue;
         }
+        if (p.containsKey(key)) {
+          logger.warn("I18n key '{}' redefined in {}", key, url);
+        }
         p.put(key, value);
       }
-      
+
       if (warnInvalidKeys)
         logger.warn("I18n dictionary {} contains null keys", url);
       if (warnInvalidValues)
