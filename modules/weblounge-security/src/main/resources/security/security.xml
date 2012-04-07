@@ -14,10 +14,7 @@
   <!-- The login form can't be protected -->
 
   <sec:http request-matcher="regex" pattern="^/weblounge/login/.*" security="none"/>
-  
-  <!-- Some resources are open to everybody -->
-  <sec:http request-matcher="regex" pattern="^/favicon.ico" security="none"/>
-  
+
   <!-- These need to be open to load preliminaries to the editor -->
   <sec:http request-matcher="regex" pattern="^/weblounge/jquery/.*" security="none"/>
   <sec:http request-matcher="regex" pattern="^/weblounge/jqueryui/.*" security="none"/>
@@ -31,10 +28,8 @@
     request-matcher="regex" 
     access-decision-manager-ref="accessDecisionManager">
 
-    <!-- The login form can't be protected -->
-    <!-- 
-    <sec:intercept-url pattern="^/weblounge/login/.*" access="weblounge:guest"/>
-     -->
+    <!-- Some resources are open to everyone -->
+    <sec:intercept-url pattern="^/favicon.ico" access="weblounge:guest"/>
 
     <!-- Shared resources should not be protected -->
     <sec:intercept-url pattern="^/weblounge-shared/.*" access="weblounge:guest"/>
