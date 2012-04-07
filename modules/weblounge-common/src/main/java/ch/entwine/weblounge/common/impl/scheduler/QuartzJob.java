@@ -271,8 +271,8 @@ public final class QuartzJob implements Job {
     try {
       clazz = (Class<JobWorker>) classLoader.loadClass(className);
     } catch (ClassNotFoundException e) {
-      logger.error("Error the implementation for job '{}'", identifier);
-      throw new IllegalStateException();
+      logger.error("The implementation class {} for job '{}' could not be found", className, identifier);
+      throw new IllegalStateException(e);
     }
 
     // Read execution schedule
