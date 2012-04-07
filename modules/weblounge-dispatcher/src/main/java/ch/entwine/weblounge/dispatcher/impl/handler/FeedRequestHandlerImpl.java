@@ -343,7 +343,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     query.withVersion(Resource.LIVE);
     query.withTypes(Page.TYPE);
     query.withLimit(limit);
-    query.sortByModificationDate(Order.Descending);
+    query.sortByPublishingDate(Order.Descending);
     for (String subject : subjects) {
       query.withSubject(subject);
     }
