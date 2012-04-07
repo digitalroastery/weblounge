@@ -127,27 +127,8 @@ public class I18nDictionaryImplTest {
   public void testGetString() {
     assertEquals(germanValue, i18n.get(key, german));
     assertEquals(frenchValue, i18n.get(key, french));
-    assertEquals(key, i18n.get(key, italian));
-  }
-
-  /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.site.I18nDictionaryImpl#get(java.lang.String, ch.entwine.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testGetStringLanguage() {
-    assertEquals(germanValue, i18n.get(key, german));
-    assertEquals(frenchValue, i18n.get(key, french));
-    assertEquals(key, i18n.get(key, italian));
-  }
-
-  /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.site.I18nDictionaryImpl#get(java.lang.String, ch.entwine.weblounge.common.language.Language, boolean)}.
-   */
-  @Test
-  public void testGetStringLanguageBoolean() {
-    assertEquals(germanValue, i18n.get(key, german));
-    assertEquals(frenchValue, i18n.get(key, french));
-    assertEquals(key, i18n.get(key, italian));
+    assertEquals(englishValue, i18n.get(key, italian));
+    assertEquals(englishValue, i18n.get(key, english));
   }
 
   /**
@@ -158,7 +139,8 @@ public class I18nDictionaryImplTest {
     String testKey = "test.key";
     String testValue = "Grüezi!";
     String testValueHtml = "Gr&uuml;ezi!";
-    i18n.add(testKey, testValue, german);
+    i18n.add(testKey, testValue);
+    assertEquals(testValueHtml, i18n.getAsHTML(testKey));
     assertEquals(testValueHtml, i18n.getAsHTML(testKey, german));
   }
 
@@ -170,8 +152,10 @@ public class I18nDictionaryImplTest {
     String testKey = "test.key";
     String testValue = "Grüezi!";
     String testValueHtml = "Gr&uuml;ezi!";
-    i18n.add(testKey, testValue);
-    assertEquals(testValueHtml, i18n.getAsHTML(testKey));
+    i18n.add(testKey, testValue, german);
+    assertEquals(testValueHtml, i18n.getAsHTML(testKey, german));
+    assertEquals(testKey, i18n.getAsHTML(testKey));
+    assertEquals(testKey, i18n.getAsHTML(testKey, english));
   }
 
   /**
@@ -180,7 +164,7 @@ public class I18nDictionaryImplTest {
   @Test
   public void testRemoveStringLanguage() {
     i18n.remove(key, german);
-    assertEquals(key, i18n.get(key, german));
+    assertEquals(englishValue, i18n.get(key, german));
   }
 
   /**
@@ -207,9 +191,9 @@ public class I18nDictionaryImplTest {
     assertEquals("hello", i18n.get(helloKey));
     assertEquals("world", i18n.get(worldKey));
     assertEquals("bonjour", i18n.get(helloKey, french));
-    assertEquals("tout le monde", i18n.get(worldKey, french));
-    assertEquals(helloKey, i18n.get(helloKey, italian));
-    assertEquals(worldKey, i18n.get(worldKey, italian));
+    assertEquals("world", i18n.get(worldKey, french));
+    assertEquals("hello", i18n.get(helloKey, italian));
+    assertEquals("world", i18n.get(worldKey, italian));
   }
 
   /**
@@ -220,13 +204,13 @@ public class I18nDictionaryImplTest {
     String helloKey = "welcome.hello";
     String worldKey = "welcome.world";
     URL frenchDictionaryUrl = I18nDictionaryImplTest.class.getResource(frenchDictionaryFile);
-    i18n.addDictionary(frenchDictionaryUrl, italian);
+    i18n.addDictionary(frenchDictionaryUrl, french);
     assertEquals(helloKey, i18n.get(helloKey));
     assertEquals(worldKey, i18n.get(worldKey));
-    assertEquals(helloKey, i18n.get(helloKey, french));
+    assertEquals(helloKey, i18n.get(helloKey, italian));
+    assertEquals(worldKey, i18n.get(worldKey, italian));
+    assertEquals("bonjour", i18n.get(helloKey, french));
     assertEquals(worldKey, i18n.get(worldKey, french));
-    assertEquals("bonjour", i18n.get(helloKey, italian));
-    assertEquals("tout le monde", i18n.get(worldKey, italian));
   }
 
 }
