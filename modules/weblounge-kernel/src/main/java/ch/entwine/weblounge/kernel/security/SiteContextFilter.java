@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.security.SecurityService;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -67,6 +68,12 @@ public class SiteContextFilter implements Filter {
   /** The site service tracker */
   private SiteTracker siteTracker = null;
 
+  /** The environment service tracker */
+  private EnvironmentTracker environmentTracker = null;
+
+  /** The environment */
+  private Environment environment = Environment.Production;
+
   /**
    * Creates a new weblounge security filter, which is populating the required
    * fields for the current request in the security service.
@@ -79,6 +86,12 @@ public class SiteContextFilter implements Filter {
 
     Bundle bundle = FrameworkUtil.getBundle(getClass());
     BundleContext ctx = bundle.getBundleContext();
+
+    // Start tracking the environment
+    environmentTracker = new EnvironmentTracker(bundle.getBundleContext());
+    environmentTracker.open();
+
+    // Start tracking the sites
     siteTracker = new SiteTracker(bundle.getBundleContext());
     siteTracker.open();
 
@@ -147,9 +160,17 @@ public class SiteContextFilter implements Filter {
    */
   public void destroy() {
     sitesByServerName.clear();
+
+    // Stop tracking sites
     if (siteTracker != null) {
       siteTracker.close();
       siteTracker = null;
+    }
+
+    // Stop tracking the environment
+    if (environmentTracker != null) {
+      environmentTracker.close();
+      environmentTracker = null;
     }
   }
 
@@ -160,11 +181,13 @@ public class SiteContextFilter implements Filter {
    *          the new site
    */
   void addSite(Site site) {
-    for (SiteURL connector : site.getHostnames()) {
-      String hostName = connector.getURL().getHost();
+    for (SiteURL url : site.getHostnames()) {
+      if (!environment.equals(url.getEnvironment()))
+        continue;
+      String hostName = url.getURL().getHost();
       Site registeredFirst = sitesByServerName.get(hostName);
       if (registeredFirst != null && !site.equals(registeredFirst)) {
-        logger.warn("Another site is already registered to " + connector);
+        logger.warn("Another site is already registered to " + url);
         continue;
       }
       sitesByServerName.put(hostName, site);
@@ -234,17 +257,40 @@ public class SiteContextFilter implements Filter {
   }
 
   /**
+   * OSGi callback that passes in the environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
+  }
+
+  /**
+   * OSGi callback that removes the environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void removeEnvironment(Environment environment) {
+    if (Environment.Production.equals(this.environment)) {
+      logger.info("Changing site environments to {}", Environment.Production);
+      for (Site site : sitesByServerName.values()) {
+        site.initialize(Environment.Production);
+      }
+    }
+    this.environment = null;
+  }
+
+  /**
    * This tracker is used to track <code>Site</code> services. Once a site is
-   * detected, it registers that site with the
-   * <code>SiteDispatcherService</code>.
+   * detected, it registers that site with the <code>SiteContextFilter</code>.
    */
   private final class SiteTracker extends ServiceTracker {
 
     /**
      * Creates a new <code>SiteTracker</code>.
      * 
-     * @param siteManager
-     *          the site dispatcher
      * @param context
      *          the site dispatcher's bundle context
      */
@@ -272,6 +318,49 @@ public class SiteContextFilter implements Filter {
     public void removedService(ServiceReference reference, Object service) {
       Site site = (Site) service;
       removeSite(site);
+      if (reference.getBundle() != null) {
+        super.removedService(reference, service);
+      }
+    }
+
+  }
+
+  /**
+   * This tracker is used to track <code>Environment</code> services. Once the
+   * environment is detected, it is registered with the site context filter.
+   */
+  private final class EnvironmentTracker extends ServiceTracker {
+
+    /**
+     * Creates a new <code>EnvironmentTracker</code>.
+     * 
+     * @param context
+     *          the site dispatcher's bundle context
+     */
+    public EnvironmentTracker(BundleContext context) {
+      super(context, Environment.class.getName(), null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
+     */
+    public Object addingService(ServiceReference reference) {
+      Environment environment = (Environment) super.addingService(reference);
+      setEnvironment(environment);
+      return environment;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference,
+     *      java.lang.Object)
+     */
+    public void removedService(ServiceReference reference, Object service) {
+      Environment environment = (Environment) service;
+      removeEnvironment(environment);
       if (reference.getBundle() != null) {
         super.removedService(reference, service);
       }
