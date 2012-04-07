@@ -5,34 +5,37 @@
        http://www.springframework.org/schema/osgi  
        http://www.springframework.org/schema/osgi/spring-osgi.xsd
        http://www.springframework.org/schema/security
-       http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+       http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+  <!-- ######################################## -->
+  <!-- # Open and unsecured url patterns      # -->
+  <!-- ######################################## -->
+
+  <!-- The login form can't be protected -->
+
+  <sec:http request-matcher="regex" pattern="^/weblounge/login/.*" security="none"/>
+  
+  <!-- Some resources are open to everybody -->
+  <sec:http request-matcher="regex" pattern="^/favicon.ico" security="none"/>
+  
+  <!-- These need to be open to load preliminaries to the editor -->
+  <sec:http request-matcher="regex" pattern="^/weblounge/jquery/.*" security="none"/>
+  <sec:http request-matcher="regex" pattern="^/weblounge/jqueryui/.*" security="none"/>
+  <sec:http request-matcher="regex" pattern="^/weblounge/steal/.*" security="none"/>
 
   <sec:http 
     create-session="ifRequired"
     servlet-api-provision="true" 
     realm="Weblounge"
     entry-point-ref="userEntryPoint" 
-    path-type="regex" 
+    request-matcher="regex" 
     access-decision-manager-ref="accessDecisionManager">
 
-    <!-- Login / Logout -->
-
     <!-- The login form can't be protected -->
-    <sec:intercept-url pattern="^/weblounge/login/.*" filters="none"/>
-
-    <!-- Editor -->
-
-    <!-- Some resources are open to everybody -->
-    <sec:intercept-url pattern="^/favicon.ico" access="weblounge:guest"/>
-    
-    <sec:intercept-url pattern="^/weblounge/jquery/.*" filters="none"/>
-    <sec:intercept-url pattern="^/weblounge/jqueryui/.*" filters="none"/>
-    <sec:intercept-url pattern="^/weblounge/steal/.*" filters="none"/>
     <!-- 
-    <sec:intercept-url pattern=".*\.js.*" filters="none"/>
-    <sec:intercept-url pattern=".*\.css.*" filters="none"/>
+    <sec:intercept-url pattern="^/weblounge/login/.*" access="weblounge:guest"/>
      -->
- 
+
     <!-- Shared resources should not be protected -->
     <sec:intercept-url pattern="^/weblounge-shared/.*" access="weblounge:guest"/>
 

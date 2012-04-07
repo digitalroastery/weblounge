@@ -1,0 +1,18 @@
+# Weblounge
+ext/
+lib/
+logs/
+sites/
+sites-data/
+work/
+
+# Maven
+target
+
+# Eclipse
+.classpath
+.project
+.settings
+
+# Mac OS X
+.DS_Store
