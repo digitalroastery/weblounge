@@ -12,19 +12,16 @@
   <!-- ######################################## -->
 
   <!-- The login form can't be protected -->
-  <!-- 
-  <sec:http pattern="^/weblounge/login/.*" security="none"/>
- -->
+
+  <sec:http request-matcher="regex" pattern="^/weblounge/login/.*" security="none"/>
+  
   <!-- Some resources are open to everybody -->
-  <sec:http pattern="^/favicon.ico" security="none"/>
+  <sec:http request-matcher="regex" pattern="^/favicon.ico" security="none"/>
   
   <!-- These need to be open to load preliminaries to the editor -->
-  <sec:http pattern="^/weblounge/jquery/.*" security="none"/>
-  <sec:http pattern="^/weblounge/jqueryui/.*" security="none"/>
-  <sec:http pattern="^/weblounge/steal/.*" security="none"/>
-
-  <!-- Shared resources should not be protected -->
-  <sec:http pattern="^/weblounge-shared/.*" security="none"/>
+  <sec:http request-matcher="regex" pattern="^/weblounge/jquery/.*" security="none"/>
+  <sec:http request-matcher="regex" pattern="^/weblounge/jqueryui/.*" security="none"/>
+  <sec:http request-matcher="regex" pattern="^/weblounge/steal/.*" security="none"/>
 
   <sec:http 
     create-session="ifRequired"
@@ -35,7 +32,12 @@
     access-decision-manager-ref="accessDecisionManager">
 
     <!-- The login form can't be protected -->
+    <!-- 
     <sec:intercept-url pattern="^/weblounge/login/.*" access="weblounge:guest"/>
+     -->
+
+    <!-- Shared resources should not be protected -->
+    <sec:intercept-url pattern="^/weblounge-shared/.*" access="weblounge:guest"/>
 
     <!-- The rest of the editor functionality needs to be protected -->
     <sec:intercept-url pattern="^/weblounge/.*" access="weblounge:editor"/>
