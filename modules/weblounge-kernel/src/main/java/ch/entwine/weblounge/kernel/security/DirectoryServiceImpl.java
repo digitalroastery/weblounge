@@ -115,18 +115,22 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     // Collect all of the roles from each of the directories for this user
     User user = null;
     for (DirectoryProvider directory : providers) {
-      User u = directory.loadUser(login, site);
-      if (u == null) {
-        continue;
-      } else if (user == null) {
-        user = u;
-      } else {
-        for (Object c : u.getPublicCredentials()) {
-          user.addPublicCredentials(c);
+      try {
+        User u = directory.loadUser(login, site);
+        if (u == null) {
+          continue;
+        } else if (user == null) {
+          user = u;
+        } else {
+          for (Object c : u.getPublicCredentials()) {
+            user.addPublicCredentials(c);
+          }
+          for (Object c : u.getPrivateCredentials()) {
+            user.addPrivateCredentials(c);
+          }
         }
-        for (Object c : u.getPrivateCredentials()) {
-          user.addPrivateCredentials(c);
-        }
+      } catch (Throwable t) {
+        logger.warn("Error looking up user from {}: {}", directory, t.getMessage());
       }
     }
 
