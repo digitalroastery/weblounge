@@ -1,6 +1,7 @@
 # Weblounge
 ext/
-lib/
+lib/ext
+lib/weblounge
 logs/
 sites/
 sites-data/

@@ -14,15 +14,6 @@ if [ -z "$WEBLOUNGE_HOME" ]; then
   fi
 fi
 
-##
-# Configure these variables to match your environment
-##
-
-if [ -z "$WEBLOUNGE_HOME" ]; then
-  echo "Please define WEBLOUNGE_HOME"
-  exit 1
-fi
-
 # Main Weblounge path configuration. Make sure that the user executing Weblounge
 # has write access to WEBLOUNGE_WORK_DIR.
 
@@ -47,8 +38,8 @@ WEBLOUNGE_TEMP_DIR="$WEBLOUNGE_WORK_DIR/work"
 WEBLOUNGE_CACHE_DIR="$WEBLOUNGE_TEMP_DIR/felix"
 WEBLOUNGE_SITES_DIR="$WEBLOUNGE_WORK_DIR/sites"
 WEBLOUNGE_SITESDATA_DIR="$WEBLOUNGE_WORK_DIR/sites-data"
-WEBLOUNGE_LIB_DIR="$WEBLOUNGE_HOME/lib"
-WEBLOUNGE_EXT_DIR="$WEBLOUNGE_HOME/ext"
+WEBLOUNGE_LIB_DIR="$WEBLOUNGE_HOME/lib/weblounge"
+WEBLOUNGE_EXT_DIR="$WEBLOUNGE_HOME/lib/ext"
 
 ##
 # Only change the line below if you want to customize the server
@@ -57,7 +48,7 @@ WEBLOUNGE_EXT_DIR="$WEBLOUNGE_HOME/ext"
 WEBLOUNGE_HOME_OPTS="-Dweblounge.home=$WEBLOUNGE_HOME"
 WEBLOUNGE_SITES_OPTS="-Dweblounge.sitesdir=$WEBLOUNGE_SITES_DIR"
 WEBLOUNGE_SITES_DATA_OPTS="-Dweblounge.sitesdatadir=$WEBLOUNGE_SITESDATA_DIR"
-WEBLOUNGE_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$WEBLOUNGE_HOME/load"
+WEBLOUNGE_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$WEBLOUNGE_CONFIG_DIR/load"
 WEBLOUNGE_LIB_OPTS="-Dweblounge.libdir=$WEBLOUNGE_LIB_DIR"
 WEBLOUNGE_EXT_OPTS="-Dweblounge.extdir=$WEBLOUNGE_EXT_DIR"
 FELIX_CONFIG_OPTS="-Dfelix.config.properties=file:${WEBLOUNGE_CONFIG_DIR}/config.properties -Dfelix.system.properties=file:${WEBLOUNGE_CONFIG_DIR}/system.properties"
