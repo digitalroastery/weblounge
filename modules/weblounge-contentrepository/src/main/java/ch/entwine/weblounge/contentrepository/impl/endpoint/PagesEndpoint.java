@@ -1483,7 +1483,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         result = repository.find(q);
       }
     } catch (ContentRepositoryException e) {
-      throw new WebApplicationException();
+      throw new WebApplicationException(e);
     }
 
     StringBuffer buf = new StringBuffer("<pages ");
