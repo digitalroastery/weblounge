@@ -323,7 +323,7 @@ public class SearchRequest {
     // Prepare the solr query
     SolrQuery q = new SolrQuery(solrQuery.toString());
     q.setStart(query.getOffset() > 0 ? query.getOffset() : 0);
-    q.setRows(query.getLimit() > 0 ? query.getLimit() : Integer.MAX_VALUE);
+    q.setRows(query.getLimit() > 0 ? query.getLimit() : 10);
 
     // Filter query
     if (query.getFilter() != null) {
