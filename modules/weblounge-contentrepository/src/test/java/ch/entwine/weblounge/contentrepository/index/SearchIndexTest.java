@@ -293,6 +293,7 @@ public class SearchIndexTest {
 
     try {
       SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPathPrefix(path1);
+      q.withLimit(100);
       assertEquals(21, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
