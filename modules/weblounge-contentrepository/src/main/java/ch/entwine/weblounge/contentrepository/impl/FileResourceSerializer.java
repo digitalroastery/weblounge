@@ -34,6 +34,7 @@ import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.file.FileContent;
+import ch.entwine.weblounge.common.content.file.FilePreviewGenerator;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.impl.content.file.FileContentReader;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
@@ -54,6 +55,9 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,15 +76,14 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /** Alternate uri prefix */
   protected static final String URI_PREFIX = "/weblounge-files/";
 
-  /** The preview generator */
-  protected PreviewGenerator previewGenerator = null;
+  /** The preview generators */
+  protected List<FilePreviewGenerator> previewGenerators = new ArrayList<FilePreviewGenerator>();
 
   /**
    * Creates a new file resource serializer.
    */
   public FileResourceSerializer() {
     super(FileResource.TYPE);
-    // previewGenerator = new FilePreviewGenerator();
   }
 
   /**
@@ -233,10 +236,43 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator()
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator(Resource)
    */
-  public PreviewGenerator getPreviewGenerator() {
-    return previewGenerator;
+  public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
+    for (FilePreviewGenerator generator : previewGenerators) {
+      if (generator.supports(resource)) {
+        logger.trace("File preview generator {} agrees to handle {}", generator, resource);
+        return generator;
+      }
+    }
+    logger.trace("No file preview generator found to handle {}", resource);
+    return null;
+  }
+
+  /**
+   * Adds the preview generator to the list of registered preview generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void addPreviewGenerator(FilePreviewGenerator generator) {
+    previewGenerators.add(generator);
+    Collections.sort(previewGenerators, new Comparator<PreviewGenerator>() {
+      public int compare(PreviewGenerator a, PreviewGenerator b) {
+        return Integer.valueOf(a.getPriority()).compareTo(b.getPriority());
+      }
+    });
+  }
+
+  /**
+   * Removes the preview generator from the list of registered preview
+   * generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void removePreviewGenerator(FilePreviewGenerator generator) {
+    previewGenerators.remove(generator);
   }
 
   /**

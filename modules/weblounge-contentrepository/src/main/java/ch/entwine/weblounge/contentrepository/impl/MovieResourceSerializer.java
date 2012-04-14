@@ -34,6 +34,7 @@ import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.movie.MovieContent;
+import ch.entwine.weblounge.common.content.movie.MoviePreviewGenerator;
 import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.impl.content.movie.MovieContentReader;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceImpl;
@@ -54,6 +55,9 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,15 +76,14 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /** Alternate uri prefix */
   protected static final String URI_PREFIX = "/weblounge-movies/";
 
-  /** The preview generator */
-  protected PreviewGenerator previewGenerator = null;
+  /** The preview generators */
+  protected List<MoviePreviewGenerator> previewGenerators = new ArrayList<MoviePreviewGenerator>();
 
   /**
    * Creates a new image resource serializer.
    */
   public MovieResourceSerializer() {
     super(MovieResource.TYPE);
-    // TODO: Initialize preview generator
   }
 
   /**
@@ -241,10 +244,43 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator()
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator(Resource)
    */
-  public PreviewGenerator getPreviewGenerator() {
-    return previewGenerator;
+  public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
+    for (MoviePreviewGenerator generator : previewGenerators) {
+      if (generator.supports(resource)) {
+        logger.trace("Movie preview generator {} agrees to handle {}", generator, resource);
+        return generator;
+      }
+    }
+    logger.trace("No movie preview generator found to handle {}", resource);
+    return null;
+  }
+
+  /**
+   * Adds the preview generator to the list of registered preview generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void addPreviewGenerator(MoviePreviewGenerator generator) {
+    previewGenerators.add(generator);
+    Collections.sort(previewGenerators, new Comparator<PreviewGenerator>() {
+      public int compare(PreviewGenerator a, PreviewGenerator b) {
+        return Integer.valueOf(a.getPriority()).compareTo(b.getPriority());
+      }
+    });
+  }
+
+  /**
+   * Removes the preview generator from the list of registered preview
+   * generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void removePreviewGenerator(MoviePreviewGenerator generator) {
+    previewGenerators.remove(generator);
   }
 
   /**

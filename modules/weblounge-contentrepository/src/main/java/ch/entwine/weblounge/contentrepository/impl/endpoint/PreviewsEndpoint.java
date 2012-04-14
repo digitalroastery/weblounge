@@ -191,7 +191,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
 
     // Does the serializer come with a preview generator?
-    PreviewGenerator previewGenerator = serializer.getPreviewGenerator();
+    PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource);
     if (previewGenerator == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
@@ -235,7 +235,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
           }
         }
 
-        previewGenerator.createPreview(resource, environment, language, style, contentRepositoryIs, fos);
+        previewGenerator.createPreview(resource, environment, language, style, null, contentRepositoryIs, fos);
         if (scaledResourceFile.length() > 1) {
           scaledResourceFile.setLastModified(lastModified);
         } else {

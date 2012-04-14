@@ -28,23 +28,12 @@ import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 
-import com.sun.media.jai.codec.MemoryCacheSeekableStream;
-import com.sun.media.jai.codec.SeekableStream;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
 
 /**
  * Test case for {@link ImageStyleUtilsTest}.
@@ -242,67 +231,6 @@ public class ImageStyleUtilsTest {
           break;
         default:
           fail("Unknown scaling mode " + style.getScalingMode());
-      }
-    }
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils#style(java.io.InputStream, java.io.OutputStream, java.lang.String, ch.entwine.weblounge.common.content.image.ImageStyle)}
-   * . TODO: This test is off by 1.
-   */
-  @Test
-  @Ignore
-  public void testStyle() throws Exception {
-    for (ImageStyle style : styles) {
-      InputStream is = null;
-      ByteArrayOutputStream bos = null;
-      ByteArrayInputStream bis = null;
-      try {
-        is = imageURL.openStream();
-
-        // Style the original image
-        bos = new ByteArrayOutputStream();
-        ImageStyleUtils.style(is, bos, "jpeg", style);
-
-        // Read the image back in
-        bis = new ByteArrayInputStream(bos.toByteArray());
-        SeekableStream seekableInputStream = new MemoryCacheSeekableStream(bis);
-        RenderedOp image = JAI.create("stream", seekableInputStream);
-
-        // Test width and height
-        switch (style.getScalingMode()) {
-          case Box:
-            assertEquals(styleWidth, image.getWidth());
-            assertEquals(originalHeight * (styleWidth / originalWidth), image.getHeight());
-            break;
-          case Cover:
-            assertEquals(originalWidth * (styleHeight / originalHeight), image.getWidth());
-            assertEquals(styleHeight, image.getHeight());
-            break;
-          case Fill:
-            assertEquals(styleWidth, image.getWidth());
-            assertEquals(styleHeight, image.getHeight());
-            break;
-          case Height:
-            assertEquals(originalWidth * (styleHeight / originalHeight), image.getWidth());
-            assertEquals(styleHeight, image.getHeight());
-            break;
-          case None:
-            assertEquals(originalWidth, image.getWidth());
-            assertEquals(originalHeight, image.getHeight());
-            break;
-          case Width:
-            assertEquals(styleWidth, image.getWidth());
-            assertEquals(originalHeight * (styleWidth / originalWidth), image.getHeight());
-            break;
-          default:
-            fail("Unknown scaling mode " + style.getScalingMode());
-        }
-      } finally {
-        IOUtils.closeQuietly(is);
-        IOUtils.closeQuietly(bos);
-        IOUtils.closeQuietly(bis);
       }
     }
   }

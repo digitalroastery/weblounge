@@ -148,7 +148,7 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
   Resource<S> newResource(Site site);
 
   /**
-   * Creates a new image resource and add the existing Exif data to the image
+   * Creates a new image resource and add the existing EXIF data to the image
    * resource.
    * 
    * @param site
@@ -168,8 +168,10 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * Returns an object for preview generation or <code>null</code> if the
    * resource type does not provide preview generation.
    * 
+   * @param resource
+   *          the resource
    * @return the preview generator
    */
-  PreviewGenerator getPreviewGenerator();
+  PreviewGenerator getPreviewGenerator(Resource<?> resource);
 
 }

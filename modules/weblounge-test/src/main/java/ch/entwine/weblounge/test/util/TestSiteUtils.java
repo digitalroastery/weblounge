@@ -166,8 +166,7 @@ public final class TestSiteUtils {
    */
   public static Map<String, String> loadGreetings() {
     Map<String, String> greetings = new HashMap<String, String>();
-    ClassLoader c = TestSiteUtils.class.getClassLoader();
-    InputStream is = c.getResourceAsStream(GREETING_PROPS);
+    InputStream is = TestSiteUtils.class.getResourceAsStream(GREETING_PROPS);
     try {
       Properties props = new Properties();
       props.load(is);

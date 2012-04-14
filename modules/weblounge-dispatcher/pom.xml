@@ -14,7 +14,7 @@
 
   <properties>
     <weblounge.basedir>${project.basedir}/../..</weblounge.basedir>
-    <weblounge.deploymentdir>lib</weblounge.deploymentdir>
+    <weblounge.deploymentdir>lib/weblounge</weblounge.deploymentdir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
 
@@ -49,6 +49,12 @@
     <dependency>
       <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-preview</artifactId>
       <version>${project.version}</version>
     </dependency>
 

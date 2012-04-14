@@ -18,34 +18,49 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.image;
+package ch.entwine.weblounge.preview.phantomjs;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
+import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Environment;
 
-import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * A <code>PreviewGenerator</code> that will generate previews for image
- * resources.
+ * A <code>PreviewGenerator</code> that will generate previews for pages.
  */
-public class ImagePreviewGenerator implements PreviewGenerator {
+public class PhantomJsPagePreviewGenerator implements PreviewGenerator {
+
+  /** Logger factory */
+  private static final Logger logger = LoggerFactory.getLogger(PhantomJsPagePreviewGenerator.class);
+
+  /** Format for the preview images */
+  private static final String PREVIEW_FORMAT = "png";
+
+  /** Format for the preview images */
+  private static final String PREVIEW_CONTENT_TYPE = "image/png";
+
+  /** Default width for taking screenshots */
+  private static final int DEFAULT_SCREENSHOT_WIDTH = 1024;
+
+  /** Default height for taking screenshots */
+  private static final int DEFAULT_SCREENSHOT_HEIGHT = 768;
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(ch.entwine.weblounge.common.content.Resource,
-   *      ch.entwine.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(ch.entwine.weblounge.common.content.Resource)
    */
-  public boolean supports(Resource<?> resource, Language language) {
-    return resource.getContent(language) != null;
+  public boolean supports(Resource<?> resource) {
+    return (resource instanceof Page);
   }
 
   /**
@@ -55,14 +70,14 @@ public class ImagePreviewGenerator implements PreviewGenerator {
    *      ch.entwine.weblounge.common.site.Environment,
    *      ch.entwine.weblounge.common.language.Language,
    *      ch.entwine.weblounge.common.content.image.ImageStyle,
-   *      java.io.InputStream, java.io.OutputStream)
+   *      String, java.io.InputStream, java.io.OutputStream)
    */
   public void createPreview(Resource<?> resource, Environment environment,
-      Language language, ImageStyle style, InputStream is, OutputStream os)
+      Language language, ImageStyle style, String format, InputStream is, OutputStream os)
       throws IOException {
-    String mimetype = resource.getContent(language).getMimetype();
-    String format = mimetype.substring(mimetype.indexOf("/") + 1);
-    ImageStyleUtils.style(is, os, format, style);
+
+    // TODO: Implement
+
   }
 
   /**
@@ -74,8 +89,7 @@ public class ImagePreviewGenerator implements PreviewGenerator {
    */
   public String getContentType(Resource<?> resource, Language language,
       ImageStyle style) {
-    String mimetype = resource.getContent(language).getMimetype();
-    return mimetype;
+    return PREVIEW_CONTENT_TYPE;
   }
 
   /**
@@ -87,8 +101,16 @@ public class ImagePreviewGenerator implements PreviewGenerator {
    */
   public String getSuffix(Resource<?> resource, Language language,
       ImageStyle style) {
-    String filename = resource.getContent(language).getFilename();
-    return FilenameUtils.getExtension(filename);
+    return PREVIEW_FORMAT;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getPriority()
+   */
+  public int getPriority() {
+    return 100;
   }
 
 }

@@ -21,9 +21,11 @@
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import ch.entwine.weblounge.common.Times;
+import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.image.ImageContent;
+import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
@@ -35,6 +37,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
@@ -56,6 +59,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
@@ -74,8 +81,14 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
   /** Length of a UUID */
   protected static final int UUID_LENGTH = 36;
 
+  /** The server environment */
+  protected Environment environment = null;
+
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(ImageRequestHandlerImpl.class);
+
+  /** The preview generators */
+  private List<ImagePreviewGenerator> previewGenerators = new ArrayList<ImagePreviewGenerator>();
 
   /**
    * Handles the request for an image resource that is believed to be in the
@@ -216,6 +229,24 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return true;
     }
 
+    // Find an image preview generator
+    ImagePreviewGenerator imagePreviewGenerator = null;
+    synchronized (previewGenerators) {
+      for (ImagePreviewGenerator generator : previewGenerators) {
+        if (generator.supports(imageResource)) {
+          imagePreviewGenerator = generator;
+          break;
+        }
+      }
+    }
+
+    // If we did not find a preview generator, we need to let go
+    if (imagePreviewGenerator == null) {
+      logger.debug("Unable to generate image previews since no suitable image preview generator is available");
+      DispatchUtils.sendServiceUnavailable(request, response);
+      return true;
+    }
+
     // Extract the image style and scale the image
     ImageStyle style = null;
     String styleId = StringUtils.trimToNull(request.getParameter(OPT_IMAGE_STYLE));
@@ -310,7 +341,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
         InputStream is = contentRepository.getContent(imageURI, language);
         FileOutputStream fos = new FileOutputStream(scaledImageFile);
         logger.debug("Creating scaled image '{}' at {}", imageResource, scaledImageFile);
-        ImageStyleUtils.style(is, fos, format, style);
+        imagePreviewGenerator.createPreview(imageResource, environment, language, style, format, is, fos);
         IOUtils.closeQuietly(is);
         IOUtils.closeQuietly(fos);
         scaledImageFile.setLastModified(lastModified);
@@ -387,6 +418,46 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return true;
     } finally {
       IOUtils.closeQuietly(imageInputStream);
+    }
+  }
+
+  /**
+   * Sets the server environment.
+   * 
+   * @param environment
+   *          the server environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
+  }
+
+  /**
+   * Adds the preview generator to the list of registered preview generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void addPreviewGenerator(ImagePreviewGenerator generator) {
+    synchronized (previewGenerators) {
+      previewGenerators.add(generator);
+      Collections.sort(previewGenerators, new Comparator<PreviewGenerator>() {
+        public int compare(PreviewGenerator a, PreviewGenerator b) {
+          return Integer.valueOf(a.getPriority()).compareTo(b.getPriority());
+        }
+      });
+    }
+  }
+
+  /**
+   * Removes the preview generator from the list of registered preview
+   * generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void removePreviewGenerator(ImagePreviewGenerator generator) {
+    synchronized (previewGenerators) {
+      previewGenerators.remove(generator);
     }
   }
 

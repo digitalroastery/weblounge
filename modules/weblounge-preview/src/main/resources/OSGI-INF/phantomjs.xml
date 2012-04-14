@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  activate="activate"
+  deactivate="deactivate"
+  name="PhantomJS Library">
+  
+  <implementation class="ch.entwine.weblounge.preview.phantomjs.PhantomJsActivator" />
+  <property name="service.description" value="PhantomJS Library" />
+
+</scr:component>

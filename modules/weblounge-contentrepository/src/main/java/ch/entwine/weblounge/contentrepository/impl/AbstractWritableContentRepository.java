@@ -677,7 +677,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Does the serializer come with a preview generator?
-    PreviewGenerator previewGenerator = serializer.getPreviewGenerator();
+    PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource);
     if (previewGenerator == null) {
       logger.debug("Resource type '{}' does not support previews", resourceType);
       return;
@@ -695,7 +695,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     for (Language language : resource.languages()) {
 
       // Is creating a preview for the current language supported?
-      if (!previewGenerator.supports(resource, language))
+      if (!previewGenerator.supports(resource))
         continue;
 
       logger.debug("Creating {} previews for {} {}", new Object[] {
@@ -866,7 +866,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
           fos = new FileOutputStream(scaledResourceFile);
           logger.debug("Creating preview of '{}' at {}", resource, scaledResourceFile);
-          previewGenerator.createPreview(resource, environment, language, style, contentRepositoryIs, fos);
+          previewGenerator.createPreview(resource, environment, language, style, null, contentRepositoryIs, fos);
           if (scaledResourceFile.length() > 0) {
             scaledResourceFile.setLastModified(lastModified);
           } else {

@@ -9,4 +9,7 @@
     <provide interface="ch.entwine.weblounge.dispatcher.RequestHandler" />
   </service>
 
+  <reference name="previewgenerator" interface="ch.entwine.weblounge.common.content.image.ImagePreviewGenerator" cardinality="0..n" policy="dynamic" bind="addPreviewGenerator" unbind="removePreviewGenerator" />
+	<reference name="environment" interface="ch.entwine.weblounge.common.site.Environment" cardinality="1..1" policy="static" bind="setEnvironment" />
+
 </scr:component>

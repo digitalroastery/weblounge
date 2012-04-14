@@ -34,11 +34,11 @@ import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.image.ImageContent;
+import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.image.ImageContentReader;
 import ch.entwine.weblounge.common.impl.content.image.ImageMetadata;
 import ch.entwine.weblounge.common.impl.content.image.ImageMetadataUtils;
-import ch.entwine.weblounge.common.impl.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceSearchResultItemImpl;
@@ -59,6 +59,9 @@ import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -77,8 +80,8 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /** Alternate uri prefix */
   protected static final String URI_PREFIX = "/weblounge-images/";
 
-  /** The preview generator */
-  protected PreviewGenerator previewGenerator = null;
+  /** The preview generators */
+  protected List<ImagePreviewGenerator> previewGenerators = new ArrayList<ImagePreviewGenerator>();
 
   /**
    * this gets rid of exception for not using native acceleration
@@ -92,7 +95,6 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
    */
   public ImageResourceSerializer() {
     super(ImageResource.TYPE);
-    previewGenerator = new ImagePreviewGenerator();
   }
 
   /**
@@ -260,10 +262,43 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator()
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator(Resource)
    */
-  public PreviewGenerator getPreviewGenerator() {
-    return previewGenerator;
+  public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
+    for (ImagePreviewGenerator generator : previewGenerators) {
+      if (generator.supports(resource)) {
+        logger.trace("Image preview generator {} agrees to handle {}", generator, resource);
+        return generator;
+      }
+    }
+    logger.trace("No image preview generator found to handle {}", resource);
+    return null;
+  }
+
+  /**
+   * Adds the preview generator to the list of registered preview generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void addPreviewGenerator(ImagePreviewGenerator generator) {
+    previewGenerators.add(generator);
+    Collections.sort(previewGenerators, new Comparator<PreviewGenerator>() {
+      public int compare(PreviewGenerator a, PreviewGenerator b) {
+        return Integer.valueOf(a.getPriority()).compareTo(b.getPriority());
+      }
+    });
+  }
+
+  /**
+   * Removes the preview generator from the list of registered preview
+   * generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void removePreviewGenerator(ImagePreviewGenerator generator) {
+    previewGenerators.remove(generator);
   }
 
   /**

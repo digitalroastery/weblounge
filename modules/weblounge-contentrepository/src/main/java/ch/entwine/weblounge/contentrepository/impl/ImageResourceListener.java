@@ -21,9 +21,14 @@
 package ch.entwine.weblounge.contentrepository.impl;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
+import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageResource;
-import ch.entwine.weblounge.common.impl.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.contentrepository.ResourceListener;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * A listener for the life cycle of image resources that will perform certain
@@ -31,9 +36,9 @@ import ch.entwine.weblounge.contentrepository.ResourceListener;
  * extraction.
  */
 public class ImageResourceListener implements ResourceListener<ImageResource> {
-  
-  /** The preview generator */
-  protected PreviewGenerator previewGenerator = new ImagePreviewGenerator();
+
+  /** The preview generators */
+  protected List<ImagePreviewGenerator> previewGenerators = new ArrayList<ImagePreviewGenerator>();
 
   /**
    * {@inheritDoc}
@@ -83,6 +88,32 @@ public class ImageResourceListener implements ResourceListener<ImageResource> {
   public void deleted(ImageResource resource) {
     // TODO Auto-generated method stub
 
+  }
+
+  /**
+   * Adds the preview generator to the list of registered preview generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void addPreviewGenerator(ImagePreviewGenerator generator) {
+    previewGenerators.add(generator);
+    Collections.sort(previewGenerators, new Comparator<PreviewGenerator>() {
+      public int compare(PreviewGenerator a, PreviewGenerator b) {
+        return Integer.valueOf(a.getPriority()).compareTo(b.getPriority());
+      }
+    });
+  }
+
+  /**
+   * Removes the preview generator from the list of registered preview
+   * generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void removePreviewGenerator(ImagePreviewGenerator generator) {
+    previewGenerators.remove(generator);
   }
 
   /**

@@ -14,7 +14,7 @@
 
   <properties>
     <weblounge.basedir>${project.basedir}/../..</weblounge.basedir>
-    <weblounge.deploymentdir>lib</weblounge.deploymentdir>
+    <weblounge.deploymentdir>lib/weblounge</weblounge.deploymentdir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
 

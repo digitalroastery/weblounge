@@ -36,8 +36,8 @@ import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.PagePreviewGenerator;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
-import ch.entwine.weblounge.common.impl.content.page.PagePreviewGenerator;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
@@ -49,13 +49,15 @@ import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.PageInputDocument;
 
 import org.apache.commons.io.IOUtils;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,32 +72,14 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(PageSerializer.class);
 
-  /** The preview generator */
-  protected PagePreviewGenerator previewGenerator = null;
+  /** The preview generators */
+  protected List<PagePreviewGenerator> previewGenerators = new ArrayList<PagePreviewGenerator>();
 
   /**
    * Creates a new page serializer.
    */
   public PageSerializer() {
     super(Page.TYPE);
-    previewGenerator = new PagePreviewGenerator();
-  }
-
-  /**
-   * Callback from OSGi declarative services on component startup.
-   * 
-   * @param ctx
-   *          the component context
-   */
-  void activate(ComponentContext ctx) {
-    previewGenerator.activate(ctx);
-  }
-
-  /**
-   * Callback from OSGi declarative services on component shutdown.
-   */
-  void deactivate() {
-    previewGenerator.deactivate();
   }
 
   /**
@@ -237,10 +221,43 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator()
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator(Resource)
    */
-  public PreviewGenerator getPreviewGenerator() {
-    return previewGenerator;
+  public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
+    for (PagePreviewGenerator generator : previewGenerators) {
+      if (generator.supports(resource)) {
+        logger.trace("Page preview generator {} agrees to handle {}", generator, resource);
+        return generator;
+      }
+    }
+    logger.trace("No page preview generator found to handle {}", resource);
+    return null;
+  }
+
+  /**
+   * Adds the preview generator to the list of registered preview generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void addPreviewGenerator(PagePreviewGenerator generator) {
+    previewGenerators.add(generator);
+    Collections.sort(previewGenerators, new Comparator<PreviewGenerator>() {
+      public int compare(PreviewGenerator a, PreviewGenerator b) {
+        return Integer.valueOf(a.getPriority()).compareTo(b.getPriority());
+      }
+    });
+  }
+
+  /**
+   * Removes the preview generator from the list of registered preview
+   * generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void removePreviewGenerator(PagePreviewGenerator generator) {
+    previewGenerators.remove(generator);
   }
 
   /**

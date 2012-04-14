@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
   immediate="true"
-  activate="activate"
-  deactivate="deactivate"
   name="Weblounge Page Serializer">	
   
   <implementation class="ch.entwine.weblounge.contentrepository.impl.PageSerializer" />
@@ -10,5 +8,7 @@
   <service>
     <provide interface="ch.entwine.weblounge.contentrepository.ResourceSerializer" />
   </service>
+
+  <reference name="previewgenerator" interface="ch.entwine.weblounge.common.content.page.PagePreviewGenerator" cardinality="0..n" policy="dynamic" bind="addPreviewGenerator" unbind="removePreviewGenerator" />
 
 </scr:component>

@@ -39,11 +39,9 @@ public interface PreviewGenerator {
    * 
    * @param resource
    *          the resource
-   * @param language
-   *          the language
    * @return <code>true</code> if creating a preview is supported
    */
-  boolean supports(Resource<?> resource, Language language);
+  boolean supports(Resource<?> resource);
 
   /**
    * Creates a preview image for a resource and writes the content to the
@@ -57,6 +55,9 @@ public interface PreviewGenerator {
    *          the preview language
    * @param style
    *          the image style
+   * @param format
+   *          the output format. If <code>format</code> is <code>null</code>, it
+   *          will be taken from the resource's mime type
    * @param is
    *          the resource content stream
    * @param os
@@ -65,8 +66,8 @@ public interface PreviewGenerator {
    *           if the resource content cannot be read
    */
   void createPreview(Resource<?> resource, Environment environment,
-      Language language, ImageStyle style, InputStream is, OutputStream os)
-      throws IOException;
+      Language language, ImageStyle style, String format, InputStream is,
+      OutputStream os) throws IOException;
 
   /**
    * Creates a filename for the resource preview based on the resource itself,
@@ -96,5 +97,15 @@ public interface PreviewGenerator {
    * @return the filename
    */
   String getSuffix(Resource<?> resource, Language language, ImageStyle style);
+
+  /**
+   * Returns the priority that applies if there is more than one preview
+   * generator that is capable of generating a certain preview.
+   * <p>
+   * Higher values are better.
+   * 
+   * @return the generator's priority
+   */
+  int getPriority();
 
 }

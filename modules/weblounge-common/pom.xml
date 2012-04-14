@@ -14,7 +14,7 @@
 
   <properties>
     <weblounge.basedir>${project.basedir}/../..</weblounge.basedir>
-    <weblounge.deploymentdir>lib</weblounge.deploymentdir>
+    <weblounge.deploymentdir>lib/weblounge</weblounge.deploymentdir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
 
@@ -55,12 +55,6 @@
           <artifactId>activation</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.im4java</groupId>
-      <artifactId>im4java</artifactId>
-      <version>1.2.0</version>
     </dependency>
 
     <dependency>
@@ -137,18 +131,6 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.media.jai</groupId>
-      <artifactId>com.springsource.javax.media.jai.core</artifactId>
-      <version>1.1.3</version>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.media.jai</groupId>
-      <artifactId>com.springsource.javax.media.jai.codec</artifactId>
-      <version>1.1.3</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.freemarker</groupId>
       <artifactId>freemarker</artifactId>
       <version>2.3.18</version>
@@ -161,15 +143,15 @@
     </dependency>
 
     <dependency>
-      <groupId>net.sourceforge.htmlcleaner</groupId>
-      <artifactId>htmlcleaner</artifactId>
-      <version>2.2</version>
+      <groupId>javax.media.jai</groupId>
+      <artifactId>com.springsource.javax.media.jai.core</artifactId>
+      <version>1.1.3</version>
     </dependency>
 
     <dependency>
-      <groupId>org.xhtmlrenderer</groupId>
-      <artifactId>core-renderer</artifactId>
-      <version>9176297</version>
+      <groupId>javax.media.jai</groupId>
+      <artifactId>com.springsource.javax.media.jai.codec</artifactId>
+      <version>1.1.3</version>
     </dependency>
 
     <!-- testing -->
@@ -290,20 +272,15 @@
               ch.entwine.weblounge.common.impl.util.xml;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
-              com.springsource.javax.media.jai.core;inline=true,
-              com.springsource.javax.media.jai.codec;inline=true,
-              core-renderer;inline=true,
               freemarker;inline=true,
               metadata-extractor;inline=true,
-              im4java;inline=true,
-              htmlcleaner;inline=true
+              com.springsource.javax.media.jai.core;inline=true,
+              com.springsource.javax.media.jai.codec;inline=true
             </Embed-Dependency>
             <Private-Package>
               com.drew.metadata,
               freemarker.core,
               freemarker.template,
-              javax.media.jai,
-              org.im4java.core
             </Private-Package>
           </instructions>
         </configuration>

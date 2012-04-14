@@ -18,13 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.page;
+package ch.entwine.weblounge.preview.xhtmlrenderer;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
-import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
+import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.impl.util.html.HTMLUtils;
@@ -75,7 +76,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Servlet;
@@ -85,10 +90,10 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * A <code>PreviewGenerator</code> that will generate previews for pages.
  */
-public class PagePreviewGenerator implements PreviewGenerator {
+public class XhtmlRendererPagePreviewGenerator implements PreviewGenerator {
 
   /** Logger factory */
-  private static final Logger logger = LoggerFactory.getLogger(PagePreviewGenerator.class);
+  private static final Logger logger = LoggerFactory.getLogger(XhtmlRendererPagePreviewGenerator.class);
 
   /** Page request handler path prefix */
   protected static final String PAGE_HANDLER_PREFIX = "/weblounge-pages/";
@@ -108,14 +113,20 @@ public class PagePreviewGenerator implements PreviewGenerator {
   /** The site servlets */
   private static Map<String, Servlet> siteServlets = new HashMap<String, Servlet>();
 
+  /** The preview generators */
+  private List<ImagePreviewGenerator> previewGenerators = new ArrayList<ImagePreviewGenerator>();
+
   /** The user agents per site */
   private static Map<String, WebloungeUserAgent> userAgents = new HashMap<String, WebloungeUserAgent>();
 
   /** Warning flags */
   private boolean isRenderingEnvironmentSane = true;
 
-  /** The cache service tracker */
+  /** The site servlet service tracker */
   private ServiceTracker siteServletTracker = null;
+
+  /** The preview generator service tracker */
+  private ServiceTracker previewGeneratorTracker = null;
 
   /** Filter expression used to look up site servlets */
   private static final String serviceFilter = "(&(objectclass=" + Servlet.class.getName() + ")(" + Site.class.getName().toLowerCase() + "=*))";
@@ -131,6 +142,8 @@ public class PagePreviewGenerator implements PreviewGenerator {
       Filter filter = ctx.getBundleContext().createFilter(serviceFilter);
       siteServletTracker = new SiteServletTracker(ctx.getBundleContext(), filter);
       siteServletTracker.open();
+      previewGeneratorTracker = new ImagePreviewGeneratorTracker(ctx.getBundleContext());
+      previewGeneratorTracker.open();
     } catch (InvalidSyntaxException e) {
       throw new IllegalStateException(e);
     }
@@ -143,16 +156,27 @@ public class PagePreviewGenerator implements PreviewGenerator {
     if (siteServletTracker != null) {
       siteServletTracker.close();
     }
+    if (previewGeneratorTracker != null) {
+      previewGeneratorTracker.close();
+    }
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(ch.entwine.weblounge.common.content.Resource,
-   *      ch.entwine.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(ch.entwine.weblounge.common.content.Resource)
    */
-  public boolean supports(Resource<?> resource, Language language) {
-    return resource.supportsLanguage(language);
+  public boolean supports(Resource<?> resource) {
+    return (resource instanceof Page);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getPriority()
+   */
+  public int getPriority() {
+    return 0;
   }
 
   /**
@@ -162,15 +186,24 @@ public class PagePreviewGenerator implements PreviewGenerator {
    *      ch.entwine.weblounge.common.site.Environment,
    *      ch.entwine.weblounge.common.language.Language,
    *      ch.entwine.weblounge.common.content.image.ImageStyle,
-   *      java.io.InputStream, java.io.OutputStream)
+   *      String, java.io.InputStream, java.io.OutputStream)
    */
   public void createPreview(Resource<?> resource, Environment environment,
-      Language language, ImageStyle style, InputStream is, OutputStream os)
+      Language language, ImageStyle style, String format, InputStream is, OutputStream os)
       throws IOException {
 
     if (!isRenderingEnvironmentSane) {
       logger.debug("Skipping page preview rendering as environment is not sane");
       return;
+    }
+
+    ImagePreviewGenerator imagePreviewGenerator = null;
+    synchronized (previewGenerators) {
+      if (previewGenerators.size() == 0) {
+        logger.debug("Unable to generate page previews since no image renderer is available");
+        return;
+      }
+      imagePreviewGenerator = previewGenerators.get(0);
     }
 
     ResourceURI uri = resource.getURI();
@@ -286,7 +319,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
     // Scale the image to the correct size
     try {
       imageIs = new FileInputStream(imageFile);
-      ImageStyleUtils.style(imageIs, os, PREVIEW_FORMAT, style);
+      imagePreviewGenerator.createPreview(resource, environment, language, style, null, imageIs, os);
     } catch (IOException e) {
       logger.error("Error creating temporary copy of file content at " + xhtmlFile, e);
       throw e;
@@ -392,6 +425,36 @@ public class PagePreviewGenerator implements PreviewGenerator {
   }
 
   /**
+   * Adds the preview generator to the list of registered preview generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void addPreviewGenerator(ImagePreviewGenerator generator) {
+    synchronized (previewGenerators) {
+      previewGenerators.add(generator);
+      Collections.sort(previewGenerators, new Comparator<PreviewGenerator>() {
+        public int compare(PreviewGenerator a, PreviewGenerator b) {
+          return Integer.valueOf(a.getPriority()).compareTo(b.getPriority());
+        }
+      });
+    }
+  }
+
+  /**
+   * Removes the preview generator from the list of registered preview
+   * generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void removePreviewGenerator(ImagePreviewGenerator generator) {
+    synchronized (previewGenerators) {
+      previewGenerators.remove(generator);
+    }
+  }
+
+  /**
    * Adds the site servlet to the list of servlets.
    * 
    * @param id
@@ -458,6 +521,49 @@ public class PagePreviewGenerator implements PreviewGenerator {
     public void removedService(ServiceReference reference, Object service) {
       String site = (String) reference.getProperty("site");
       removeSiteServlet(site);
+    }
+
+  }
+
+  /**
+   * Implementation of a <code>ServiceTracker</code> that is tracking instances
+   * of type {@link ImagePreviewGenerator} with an associated <code>site</code>
+   * attribute.
+   */
+  private class ImagePreviewGeneratorTracker extends ServiceTracker {
+
+    /**
+     * Creates a new service tracker that is using the given bundle context to
+     * look up service instances.
+     * 
+     * @param ctx
+     *          the bundle context
+     */
+    ImagePreviewGeneratorTracker(BundleContext ctx) {
+      super(ctx, ImagePreviewGenerator.class.getName(), null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTracker#addingService(org.osgi.framework.ServiceReference)
+     */
+    @Override
+    public Object addingService(ServiceReference reference) {
+      ImagePreviewGenerator previewGenerator = (ImagePreviewGenerator) super.addingService(reference);
+      addPreviewGenerator(previewGenerator);
+      return previewGenerator;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTracker#removedService(org.osgi.framework.ServiceReference,
+     *      java.lang.Object)
+     */
+    @Override
+    public void removedService(ServiceReference reference, Object service) {
+      removePreviewGenerator((ImagePreviewGenerator) service);
     }
 
   }
