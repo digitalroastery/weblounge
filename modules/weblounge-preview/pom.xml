@@ -196,7 +196,6 @@
               javax.xml.validation,
               javax.xml.xpath,
               sun.awt,
-              org.slf4j;version="[1.5.0,1.6.0)",
               org.osgi.framework;version="1.4.0",
               org.osgi.service.cm;version="1.3.0",
               org.osgi.service.component;version="1.1.0",
