@@ -100,7 +100,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
       String type = serializer.getType();
       if (serializers.containsKey(type)) {
         ResourceSerializer<?, ?> current = serializers.get(type);
-        logger.warn("Replacing extisting resource serializer implementation {} for type '{}'", current, type);
+        logger.warn("Replacing existing resource serializer implementation {} for type '{}'", current, type);
       }
       serializers.put(type, serializer);
     }
