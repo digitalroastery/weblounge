@@ -3,7 +3,7 @@
   immediate="true"
   name="Weblounge File Serializer">	
   
-  <implementation class="ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer" />
+  <implementation class="ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer" />
   <property name="service.description" value="Weblounge File Serializer" />
   <service>
     <provide interface="ch.entwine.weblounge.contentrepository.ResourceSerializer" />
