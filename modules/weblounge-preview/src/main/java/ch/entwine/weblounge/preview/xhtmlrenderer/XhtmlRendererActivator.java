@@ -66,6 +66,8 @@ public class XhtmlRendererActivator {
    *          the component context
    */
   void deactivate(ComponentContext ctx) {
+    if (service == null)
+      return;
     try {
       logger.debug("Unregistering XHTMLRenderer page preview generator");
       previewGenerator.deactivate();

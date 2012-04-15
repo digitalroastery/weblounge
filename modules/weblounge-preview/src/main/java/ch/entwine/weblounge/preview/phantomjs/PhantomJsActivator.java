@@ -69,6 +69,8 @@ public class PhantomJsActivator {
    *          the component context
    */
   void deactivate(ComponentContext ctx) {
+    if (service == null)
+      return;
     try {
       logger.debug("Unregistering PhantomJS page preview generator");
       ctx.getBundleContext().ungetService(service.getReference());

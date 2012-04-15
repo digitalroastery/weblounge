@@ -54,8 +54,10 @@ public class JAIActivator {
     String[] classes = new String[] {
         PreviewGenerator.class.getName(),
         ImagePreviewGenerator.class.getName() };
+    logger.debug("Registering JAI image preview generator");
     previewGenerator = new JAIPreviewGenerator();
     service = ctx.getBundleContext().registerService(classes, previewGenerator, null);
+    logger.info("JAI image preview generator registered");
   }
 
   /**
@@ -65,6 +67,8 @@ public class JAIActivator {
    *          the component context
    */
   void deactivate(ComponentContext ctx) {
+    if (service == null)
+      return;
     try {
       logger.debug("Unregistering JAI image preview generator");
       ctx.getBundleContext().ungetService(service.getReference());

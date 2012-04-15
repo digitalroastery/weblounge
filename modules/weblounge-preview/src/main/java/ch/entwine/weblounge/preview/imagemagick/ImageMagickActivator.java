@@ -59,6 +59,7 @@ public class ImageMagickActivator {
           ImagePreviewGenerator.class.getName() };
       previewGenerator = new ImageMagickPreviewGenerator();
       service = ctx.getBundleContext().registerService(classes, previewGenerator, null);
+      logger.info("ImageMagick image preview generator registered");
     } else {
       logger.debug("Skipping registration of ImageMagick image preview generator");
     }
@@ -71,6 +72,8 @@ public class ImageMagickActivator {
    *          the component context
    */
   void deactivate(ComponentContext ctx) {
+    if (service == null)
+      return;
     try {
       logger.debug("Unregistering ImageMagick image preview generator");
       ctx.getBundleContext().ungetService(service.getReference());
@@ -94,10 +97,10 @@ public class ImageMagickActivator {
       IMOperation versionOp = new IMOperation();
       versionOp.version();
       cmd.run(versionOp);
-      logger.info("Using ImageMagick for image operations");
+      logger.debug("ImageMagick detected and found to be working");
       return true;
     } catch (Throwable e) {
-      logger.info("Using Java Advanced Imaging for image operations ({})", e.getMessage());
+      logger.info("ImageMagick not available: {}", e.getMessage());
       return false;
     }
   }
