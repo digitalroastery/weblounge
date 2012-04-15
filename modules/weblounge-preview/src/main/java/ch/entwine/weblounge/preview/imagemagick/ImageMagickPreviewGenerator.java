@@ -74,7 +74,14 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
   public void createPreview(Resource<?> resource, Environment environment,
       Language language, ImageStyle style, String format, InputStream is,
       OutputStream os) throws IOException {
+
     if (format == null) {
+      if (resource == null)
+        throw new IllegalArgumentException("Resource cannot be null");
+      if (resource.getContent(language) == null) {
+        logger.warn("Skipping creation of preview for {} in language '{}': no content", resource, language.getIdentifier());
+        return;
+      }
       String mimetype = resource.getContent(language).getMimetype();
       logger.trace("Image preview is generated using the resource's mimetype '{}'", mimetype);
       format = mimetype.substring(mimetype.indexOf("/") + 1);

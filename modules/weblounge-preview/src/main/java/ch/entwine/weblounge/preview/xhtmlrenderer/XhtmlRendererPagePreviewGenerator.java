@@ -186,15 +186,23 @@ public class XhtmlRendererPagePreviewGenerator implements PagePreviewGenerator {
    * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(ch.entwine.weblounge.common.content.Resource,
    *      ch.entwine.weblounge.common.site.Environment,
    *      ch.entwine.weblounge.common.language.Language,
-   *      ch.entwine.weblounge.common.content.image.ImageStyle,
-   *      String, java.io.InputStream, java.io.OutputStream)
+   *      ch.entwine.weblounge.common.content.image.ImageStyle, String,
+   *      java.io.InputStream, java.io.OutputStream)
    */
   public void createPreview(Resource<?> resource, Environment environment,
-      Language language, ImageStyle style, String format, InputStream is, OutputStream os)
-      throws IOException {
+      Language language, ImageStyle style, String format, InputStream is,
+      OutputStream os) throws IOException {
 
     if (!isRenderingEnvironmentSane) {
       logger.debug("Skipping page preview rendering as environment is not sane");
+      return;
+    }
+
+    if (resource == null)
+      throw new IllegalArgumentException("Resource cannot be null");
+
+    if (resource.getContent(language) == null) {
+      logger.warn("Skipping creation of preview for {} in language '{}': no content", resource, language.getIdentifier());
       return;
     }
 
