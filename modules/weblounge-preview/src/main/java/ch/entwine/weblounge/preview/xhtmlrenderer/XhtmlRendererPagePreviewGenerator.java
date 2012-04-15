@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.PagePreviewGenerator;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.impl.util.html.HTMLUtils;
@@ -90,7 +91,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * A <code>PreviewGenerator</code> that will generate previews for pages.
  */
-public class XhtmlRendererPagePreviewGenerator implements PreviewGenerator {
+public class XhtmlRendererPagePreviewGenerator implements PagePreviewGenerator {
 
   /** Logger factory */
   private static final Logger logger = LoggerFactory.getLogger(XhtmlRendererPagePreviewGenerator.class);

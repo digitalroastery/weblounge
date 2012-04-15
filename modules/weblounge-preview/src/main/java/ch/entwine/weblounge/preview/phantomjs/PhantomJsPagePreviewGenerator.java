@@ -20,10 +20,10 @@
 
 package ch.entwine.weblounge.preview.phantomjs;
 
-import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.PagePreviewGenerator;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Environment;
 
@@ -37,7 +37,7 @@ import java.io.OutputStream;
 /**
  * A <code>PreviewGenerator</code> that will generate previews for pages.
  */
-public class PhantomJsPagePreviewGenerator implements PreviewGenerator {
+public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
 
   /** Logger factory */
   private static final Logger logger = LoggerFactory.getLogger(PhantomJsPagePreviewGenerator.class);

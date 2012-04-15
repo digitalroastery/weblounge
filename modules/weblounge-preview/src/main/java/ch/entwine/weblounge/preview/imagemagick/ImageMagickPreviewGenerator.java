@@ -20,8 +20,8 @@
 
 package ch.entwine.weblounge.preview.imagemagick;
 
-import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
@@ -48,7 +48,7 @@ import java.io.OutputStream;
 /**
  * Utility class used for dealing with images and image styles.
  */
-public final class ImageMagickPreviewGenerator implements PreviewGenerator {
+public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ImageMagickPreviewGenerator.class);

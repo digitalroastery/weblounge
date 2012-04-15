@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
   immediate="true"
-  name="Weblounge File Serializer">	
+  name="Weblounge Image Serializer">	
   
-  <implementation class="ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer" />
-  <property name="service.description" value="Weblounge File Serializer" />
+  <implementation class="ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer" />
+  <property name="service.description" value="Weblounge Image Serializer" />
   <service>
     <provide interface="ch.entwine.weblounge.contentrepository.ResourceSerializer" />
   </service>

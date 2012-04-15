@@ -32,10 +32,10 @@ import org.slf4j.LoggerFactory;
  * Activator that will register the page preview generator depending on the
  * availability of <code>PhantomJS</code> binaries.
  */
-public class PhantomJSActivator {
+public class PhantomJsActivator {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(PhantomJSActivator.class);
+  private static final Logger logger = LoggerFactory.getLogger(PhantomJsActivator.class);
 
   /** The page preview generator */
   private PhantomJsPagePreviewGenerator previewGenerator = null;
