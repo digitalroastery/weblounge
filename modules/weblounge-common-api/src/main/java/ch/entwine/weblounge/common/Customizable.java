@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common;
 
+import ch.entwine.weblounge.common.site.Environment;
+
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +42,19 @@ public interface Customizable {
    *          the option value
    */
   void setOption(String name, String value);
+
+  /**
+   * Sets option <code>name</code> to <code>value</code>. When the value is set
+   * to <code>null</code>, the option is removed.
+   * 
+   * @param name
+   *          the option name
+   * @param value
+   *          the option value
+   * @param environment
+   *          the environment that this value is valid for
+   */
+  void setOption(String name, String value, Environment environment);
 
   /**
    * Removes the option with name <code>name</code>.
@@ -108,10 +123,18 @@ public interface Customizable {
   String[] getOptionValues(String name);
 
   /**
+   * Returns the option names. Note that this method will only return names for
+   * those options that have a value set for the current environment.
+   * 
+   * @return the option names
+   */
+  String[] getOptionNames();
+
+  /**
    * Returns the options as a <code>Map</code>.
    * 
    * @return the options
    */
-  Map<String, List<String>> getOptions();
+  Map<String, Map<Environment, List<String>>> getOptions();
 
 }

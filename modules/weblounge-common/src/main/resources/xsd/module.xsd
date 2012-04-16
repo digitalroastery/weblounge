@@ -192,11 +192,27 @@
   <xsd:element name="option">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element name="name" type="xsd:string" />
-        <xsd:element name="value" type="xsd:string" maxOccurs="unbounded" />
+        <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1" />
+        <xsd:element name="value" type="optionValueType" minOccurs="1" maxOccurs="unbounded" />
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
+  
+  <xsd:complexType name="optionValueType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="environment" type="environmentType" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  
+  <xsd:simpleType name="environmentType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="production" />
+      <xsd:enumeration value="staging" />
+      <xsd:enumeration value="development" />
+    </xsd:restriction>
+  </xsd:simpleType>
   
   <!-- 
   Type definition for identifiers. Since identifiers are used in path names

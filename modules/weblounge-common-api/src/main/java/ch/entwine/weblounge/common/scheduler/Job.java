@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.scheduler;
 
+import ch.entwine.weblounge.common.site.Environment;
+
 import java.util.Dictionary;
 
 /**
@@ -44,6 +46,14 @@ public interface Job {
    * @return the job identifier
    */
   String getIdentifier();
+
+  /**
+   * Sets the current environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment);
 
   /**
    * Sets the job name.
@@ -115,7 +125,8 @@ public interface Job {
    * &lt;/job&gt;
    * </pre>
    * 
-   * Use {@link #fromXml(org.w3c.dom.Node))} or {@link #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)} to create a
+   * Use {@link #fromXml(org.w3c.dom.Node))} or
+   * {@link #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)} to create a
    * <code>QuartzJob</code> from the serialized output of this method.
    * 
    * @return the <code>XML</code> representation of the context

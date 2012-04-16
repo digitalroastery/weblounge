@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.scheduler.Job;
 import ch.entwine.weblounge.common.scheduler.JobTrigger;
 import ch.entwine.weblounge.common.scheduler.JobWorker;
+import ch.entwine.weblounge.common.site.Environment;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -60,8 +61,14 @@ public final class QuartzJob implements Job {
   /** Job trigger */
   protected JobTrigger trigger = null;
 
+  /** The options */
+  protected OptionsHelper options = null;
+
   /** Job context map */
   protected Dictionary<String, Object> ctx = null;
+
+  /** The environment */
+  protected Environment environment = null;
 
   /**
    * Creates a new job.
@@ -105,6 +112,23 @@ public final class QuartzJob implements Job {
     this.ctx = context;
     if (this.ctx == null)
       ctx = new Hashtable<String, Object>();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.scheduler.Job#setEnvironment(ch.entwine.weblounge.common.site.Environment)
+   */
+  public void setEnvironment(Environment environment) {
+    options.setEnvironment(environment);
+    ctx = new Hashtable<String, Object>();
+    for (String name : options.getOptionNames()) {
+      String[] values = options.getOptionValues(name);
+      if (values.length == 1)
+        ctx.put(name, values[0]);
+      else
+        ctx.put(name, values);
+    }
   }
 
   /**
@@ -284,13 +308,16 @@ public final class QuartzJob implements Job {
     // Read options
     Node nodes = XPathHelper.select(config, "m:options", xPathProcessor);
     OptionsHelper options = OptionsHelper.fromXml(nodes, xPathProcessor);
-    for (Map.Entry<String, List<String>> entry : options.getOptions().entrySet()) {
+    for (Map.Entry<String, Map<Environment, List<String>>> entry : options.getOptions().entrySet()) {
       String key = entry.getKey();
-      String[] values = options.getOptionValues(key);
-      if (values.length == 1)
-        ctx.put(key, values[0]);
-      else
-        ctx.put(key, values);
+      Map<Environment, List<String>> environments = entry.getValue();
+      for (Environment environment : environments.keySet()) {
+        List<String> values = environments.get(environment);
+        if (values.size() == 1)
+          ctx.put(key, values.get(0));
+        else
+          ctx.put(key, values.toArray(new String[values.size()]));
+      }
     }
 
     // Did we find something?

@@ -142,6 +142,13 @@ public class ModuleImpl implements Module {
       action.setEnvironment(environment);
     }
 
+    // Tell the jobs about the environment
+    for (Job job : jobs.values()) {
+      job.setEnvironment(environment);
+    }
+
+    // Switch the options to the new environment
+    options.setEnvironment(environment);
   }
 
   /**
@@ -174,10 +181,10 @@ public class ModuleImpl implements Module {
   public WebUrl getUrl() {
     return getUrl(Environment.Production);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.site.Module#getUrl(ch.entwine.weblounge.common.site.Environment)
    */
   public WebUrl getUrl(Environment environment) {
@@ -414,10 +421,10 @@ public class ModuleImpl implements Module {
   public void setName(String title) {
     this.name = title;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.site.Module#getName()
    */
   public String getName() {
@@ -524,6 +531,16 @@ public class ModuleImpl implements Module {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.Customizable#setOption(java.lang.String,
+   *      java.lang.String, ch.entwine.weblounge.common.site.Environment)
+   */
+  public void setOption(String name, String value, Environment environment) {
+    options.setOption(name, value, environment);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.Customizable#removeOption(java.lang.String)
    */
   public void removeOption(String name) {
@@ -570,9 +587,18 @@ public class ModuleImpl implements Module {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.Customizable#getOptionNames()
+   */
+  public String[] getOptionNames() {
+    return options.getOptionNames();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.Customizable#getOptions()
    */
-  public Map<String, List<String>> getOptions() {
+  public Map<String, Map<Environment, List<String>>> getOptions() {
     return options.getOptions();
   }
 

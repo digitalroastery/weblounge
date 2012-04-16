@@ -179,6 +179,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
   @Override
   public void setEnvironment(Environment environment) {
     processURLTemplates(environment);
+    options.setEnvironment(environment);
     super.setEnvironment(environment);
   }
 
@@ -333,6 +334,16 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.Customizable#setOption(java.lang.String,
+   *      java.lang.String, ch.entwine.weblounge.common.site.Environment)
+   */
+  public void setOption(String name, String value, Environment environment) {
+    options.setOption(name, value, environment);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.Customizable#getOptionValue(java.lang.String)
    */
   public String getOptionValue(String name) {
@@ -363,7 +374,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * 
    * @see ch.entwine.weblounge.common.Customizable#getOptions()
    */
-  public Map<String, List<String>> getOptions() {
+  public Map<String, Map<Environment, List<String>>> getOptions() {
     return options.getOptions();
   }
 
@@ -374,6 +385,15 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   public boolean hasOption(String name) {
     return options.hasOption(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.Customizable#getOptionNames()
+   */
+  public String[] getOptionNames() {
+    return options.getOptionNames();
   }
 
   /**

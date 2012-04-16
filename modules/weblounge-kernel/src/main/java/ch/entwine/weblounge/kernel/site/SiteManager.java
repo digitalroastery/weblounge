@@ -285,12 +285,12 @@ public class SiteManager {
         Configuration config = configurationAdmin.createFactoryConfiguration("ch.entwine.weblounge.contentrepository.factory", null);
         Dictionary<Object, Object> properties = new Hashtable<Object, Object>();
         properties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
-        for (Map.Entry<String, List<String>> option : site.getOptions().entrySet()) {
-          String key = option.getKey();
-          if (option.getValue().size() == 1) {
-            properties.put(key, option.getValue().get(0));
+        for (String name : site.getOptionNames()) {
+          String[] values = site.getOptionValues(name);
+          if (values.length == 1) {
+            properties.put(name, values[0]);
           } else {
-            properties.put(key, option.getValue().toArray(new String[option.getValue().size()]));
+            properties.put(name, values);
           }
         }
         config.update(properties);

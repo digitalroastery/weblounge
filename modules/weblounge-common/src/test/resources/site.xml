@@ -42,6 +42,10 @@
   </templates>
   <options>
     <option>
+    	<name>env.specific</name>
+      <value environment="development"><![CDATA[development]]></value>
+    </option>
+    <option>
       <name>media.url</name>
       <value><![CDATA[http://media.swissunihockey.ch/dev]]></value>
     </option>

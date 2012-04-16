@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.site.Action;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.HTMLAction;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
@@ -85,9 +86,13 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
     }
 
     // Options
-    for (Map.Entry<String, List<String>> option : blueprint.getOptions().entrySet()) {
-      for (String value : option.getValue())
-        action.setOption(option.getKey(), value);
+    for (Map.Entry<String, Map<Environment, List<String>>> option : blueprint.getOptions().entrySet()) {
+      for (Environment environment : option.getValue().keySet()) {
+        List<String> values = option.getValue().get(environment);
+        for (String value : values) {
+          action.setOption(option.getKey(), value, environment);
+        }
+      }
     }
     
     // Recheck time

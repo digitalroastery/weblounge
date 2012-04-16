@@ -38,6 +38,11 @@ public enum Environment {
   /**
    * Development environment
    */
-  Development
+  Development,
+
+  /**
+   * Unspecified environment
+   */
+  Any
 
 }

@@ -234,6 +234,8 @@ public class SiteImpl implements Site {
       module.initialize(environment);
     }
 
+    // Switch the options to the new environment
+    options.setEnvironment(environment);
   }
 
   /**
@@ -1242,6 +1244,16 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.Customizable#setOption(java.lang.String,
+   *      java.lang.String, ch.entwine.weblounge.common.site.Environment)
+   */
+  public void setOption(String name, String value, Environment environment) {
+    options.setOption(name, value, environment);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.Customizable#removeOption(java.lang.String)
    */
   public void removeOption(String name) {
@@ -1288,9 +1300,18 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.Customizable#getOptionNames()
+   */
+  public String[] getOptionNames() {
+    return options.getOptionNames();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.Customizable#getOptions()
    */
-  public Map<String, List<String>> getOptions() {
+  public Map<String, Map<Environment, List<String>>> getOptions() {
     return options.getOptions();
   }
 

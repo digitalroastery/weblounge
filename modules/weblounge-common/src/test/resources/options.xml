@@ -1,5 +1,11 @@
 <options>
   <option>
+    <name>envkey</name>
+    <value environment="development"><![CDATA[developmentValue]]></value>
+    <value environment="production"><![CDATA[otherProductionValue]]></value>
+    <value environment="production"><![CDATA[productionValue]]></value>
+  </option>
+  <option>
     <name>key</name>
     <value><![CDATA[value]]></value>
   </option>
