@@ -174,6 +174,19 @@ public class XhtmlRendererPagePreviewGenerator implements PagePreviewGenerator {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(java.lang.String)
+   */
+  public boolean supports(String format) {
+    for (ImagePreviewGenerator generator : previewGenerators) {
+      if (generator.supports(PREVIEW_FORMAT) && generator.supports(format))
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.PreviewGenerator#getPriority()
    */
   public int getPriority() {

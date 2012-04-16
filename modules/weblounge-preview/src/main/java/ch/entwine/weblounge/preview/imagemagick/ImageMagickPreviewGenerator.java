@@ -35,6 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
 import org.im4java.core.Info;
+import org.im4java.process.OutputConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility class used for dealing with images and image styles.
@@ -53,6 +58,9 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ImageMagickPreviewGenerator.class);
 
+  /** List of supported formats (cached) */
+  private Map<String, Boolean> supportedFormats = new HashMap<String, Boolean>();
+
   /**
    * {@inheritDoc}
    * 
@@ -60,6 +68,45 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
    */
   public boolean supports(Resource<?> resource) {
     return (resource instanceof ImageResource);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(java.lang.String)
+   */
+  public boolean supports(String format) {
+    if (format == null)
+      throw new IllegalArgumentException("Format cannot be null");
+
+    // Check for verified support
+    if (supportedFormats.containsKey(format))
+      return supportedFormats.get(format);
+
+    // Reach out to ImageMagick
+    ConvertCmd imageMagick = new ConvertCmd();
+    IMOperation op = new IMOperation();
+    op.identify().list("format");
+    try {
+      final Pattern p = Pattern.compile("[\\s]+" + format.toUpperCase() + "[\\s]+rw");
+      final Boolean[] supported = new Boolean[1];
+      imageMagick.setOutputConsumer(new OutputConsumer() {
+        public void consumeOutput(InputStream is) throws IOException {
+          String output = IOUtils.toString(is);
+          Matcher m = p.matcher(output);
+          supported[0] = new Boolean(m.find());
+        }
+      });
+      imageMagick.run(op);
+
+      // Cache the result
+      supportedFormats.put(format, supported[0]);
+
+      return supported[0];
+    } catch (Throwable t) {
+      logger.warn("Error looking up formats supported by ImageMagick: {}", t.getMessage());
+      return false;
+    }
   }
 
   /**

@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.scheduler;
 
+import ch.entwine.weblounge.common.Customizable;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.scheduler.Job;
@@ -44,7 +45,7 @@ import javax.xml.xpath.XPathFactory;
 /**
  * Base implementation for jobs.
  */
-public final class QuartzJob implements Job {
+public final class QuartzJob implements Job, Customizable {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(QuartzJob.class);
@@ -231,6 +232,90 @@ public final class QuartzJob implements Job {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Action#setOption(java.lang.String,
+   *      java.lang.String)
+   */
+  public void setOption(String key, String value) {
+    options.setOption(key, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.Customizable#setOption(java.lang.String,
+   *      java.lang.String, ch.entwine.weblounge.common.site.Environment)
+   */
+  public void setOption(String name, String value, Environment environment) {
+    options.setOption(name, value, environment);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.Customizable#getOptionValue(java.lang.String)
+   */
+  public String getOptionValue(String name) {
+    return options.getOptionValue(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.Customizable#getOptionValue(java.lang.String,
+   *      java.lang.String)
+   */
+  public String getOptionValue(String name, String defaultValue) {
+    return options.getOptionValue(name, defaultValue);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.Customizable#getOptionValues(java.lang.String)
+   */
+  public String[] getOptionValues(String name) {
+    return options.getOptionValues(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.Customizable#getOptions()
+   */
+  public Map<String, Map<Environment, List<String>>> getOptions() {
+    return options.getOptions();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.Customizable#hasOption(java.lang.String)
+   */
+  public boolean hasOption(String name) {
+    return options.hasOption(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.Customizable#getOptionNames()
+   */
+  public String[] getOptionNames() {
+    return options.getOptionNames();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.Customizable#removeOption(java.lang.String)
+   */
+  public void removeOption(String name) {
+    options.removeOption(name);
+  }
+
+  /**
    * Returns the string representation of this job, which is equal to the value
    * returned by <code>getName()</code>.
    * 
@@ -323,6 +408,7 @@ public final class QuartzJob implements Job {
     // Did we find something?
 
     QuartzJob job = new QuartzJob(identifier, clazz, ctx, jobTrigger);
+    job.options = options;
 
     // name
     String name = XPathHelper.valueOf(config, "m:name", xPathProcessor);

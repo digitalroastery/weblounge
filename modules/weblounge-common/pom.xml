@@ -269,6 +269,7 @@
               ch.entwine.weblounge.common.impl.util.datatype;version=${project.version},
               ch.entwine.weblounge.common.impl.util.doc;version=${project.version},
               ch.entwine.weblounge.common.impl.util.html;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.process;version=${project.version},
               ch.entwine.weblounge.common.impl.util.xml;version=${project.version}
             </Export-Package>
             <Embed-Dependency>

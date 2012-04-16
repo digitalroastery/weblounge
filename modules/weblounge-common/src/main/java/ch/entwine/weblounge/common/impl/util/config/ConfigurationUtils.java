@@ -21,11 +21,9 @@
 package ch.entwine.weblounge.common.impl.util.config;
 
 import ch.entwine.weblounge.common.Times;
-import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.site.SiteURL;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
@@ -597,24 +595,17 @@ public final class ConfigurationUtils {
    * 
    * @param text
    *          the text to process
-   * @param request
-   *          the request
+   * @param variables
+   *          keys and values to replace with
    * @return the processed text
    */
-  public static String processTemplate(String text, WebloungeRequest request) {
+  public static String processTemplate(String text,
+      Map<String, String> variables) {
     text = processTemplate(text);
-
-    Map<String, String> replacements = new HashMap<String, String>();
-    Site site = request.getSite();
-    SiteURL siteURL = site.getHostname(request.getEnvironment());
-
-    StringBuffer siteRootReplacement = new StringBuffer();
-    siteRootReplacement.append(siteURL.getURL().toExternalForm());
-    siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
-
-    replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
-    for (Map.Entry<String, String> entry : replacements.entrySet()) {
-      text = text.replaceAll(entry.getKey(), entry.getValue());
+    for (Map.Entry<String, String> entry : variables.entrySet()) {
+      String find = "\\$\\{" + entry.getKey() + "\\}";
+      String replace = entry.getValue();
+      text = text.replaceAll(find, replace);
     }
     return text;
   }

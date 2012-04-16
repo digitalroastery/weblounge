@@ -44,6 +44,16 @@ public interface PreviewGenerator {
   boolean supports(Resource<?> resource);
 
   /**
+   * Returns <code>true</code> if the preview generator supports creating a
+   * preview in the given format.
+   * 
+   * @param format
+   *          the format, e. g. <code>png</code>
+   * @return <code>true</code> if creating a preview in this format is supported
+   */
+  boolean supports(String format);
+
+  /**
    * Creates a preview image for a resource and writes the content to the
    * {@link OutputStream}.
    * 

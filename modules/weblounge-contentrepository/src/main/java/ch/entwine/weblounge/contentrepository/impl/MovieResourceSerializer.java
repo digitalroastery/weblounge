@@ -267,7 +267,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
     previewGenerators.add(generator);
     Collections.sort(previewGenerators, new Comparator<PreviewGenerator>() {
       public int compare(PreviewGenerator a, PreviewGenerator b) {
-        return Integer.valueOf(a.getPriority()).compareTo(b.getPriority());
+        return Integer.valueOf(b.getPriority()).compareTo(a.getPriority());
       }
     });
   }

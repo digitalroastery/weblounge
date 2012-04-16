@@ -1,5 +1,6 @@
 # Weblounge
 lib/ext/
+lib/libexec/
 lib/weblounge/
 logs/
 sites/

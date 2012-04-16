@@ -151,6 +151,7 @@
               ch.entwine.weblounge.common.content.page;version=${project.version},
               ch.entwine.weblounge.common.impl.testing;version=${project.version},
               ch.entwine.weblounge.common.impl.util.html;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.process;version=${project.version},
               ch.entwine.weblounge.common.language;version=${project.version},
               ch.entwine.weblounge.common.site;version=${project.version},
               ch.entwine.weblounge.common.url;version=${project.version},

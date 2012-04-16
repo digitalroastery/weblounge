@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.imageio.ImageIO;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
@@ -63,6 +64,17 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
    */
   public boolean supports(Resource<?> resource) {
     return (resource instanceof ImageResource);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(java.lang.String)
+   */
+  public boolean supports(String format) {
+    if (format == null)
+      throw new IllegalArgumentException("Format cannot be null");
+    return ImageIO.getImageWritersBySuffix(format.toLowerCase()).hasNext();
   }
 
   /**

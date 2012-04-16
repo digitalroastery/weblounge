@@ -235,7 +235,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
           }
         }
 
-        previewGenerator.createPreview(resource, environment, language, style, null, contentRepositoryIs, fos);
+        previewGenerator.createPreview(resource, environment, language, style, suffix, contentRepositoryIs, fos);
         if (scaledResourceFile.length() > 1) {
           scaledResourceFile.setLastModified(lastModified);
         } else {

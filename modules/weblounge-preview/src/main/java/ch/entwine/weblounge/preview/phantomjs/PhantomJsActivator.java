@@ -22,11 +22,15 @@ package ch.entwine.weblounge.preview.phantomjs;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.page.PagePreviewGenerator;
+import ch.entwine.weblounge.common.impl.util.process.ProcessExcecutorException;
+import ch.entwine.weblounge.common.impl.util.process.ProcessExecutor;
 
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Activator that will register the page preview generator depending on the
@@ -56,9 +60,11 @@ public class PhantomJsActivator {
           PreviewGenerator.class.getName(),
           PagePreviewGenerator.class.getName() };
       previewGenerator = new PhantomJsPagePreviewGenerator();
+      previewGenerator.activate(ctx);
       service = ctx.getBundleContext().registerService(classes, previewGenerator, null);
+      logger.info("PhantomJS page preview generator registered");
     } else {
-      logger.debug("Skipping registration of PhantomJS page preview generator");
+      logger.info("PhantomJS not found");
     }
   }
 
@@ -73,6 +79,7 @@ public class PhantomJsActivator {
       return;
     try {
       logger.debug("Unregistering PhantomJS page preview generator");
+      previewGenerator.deactivate();
       ctx.getBundleContext().ungetService(service.getReference());
     } catch (Throwable t) {
       // Never mind, seems like we are shutting down
@@ -89,8 +96,52 @@ public class PhantomJsActivator {
    * @return <code>true</code> if the library is available
    */
   private boolean phantomJSAvailable() {
-    // TODO: Implement check for PhantomJS
-    return false;
+    PhantomJsProcessExecutor executor = new PhantomJsProcessExecutor();
+    try {
+      executor.execute();
+    } catch (ProcessExcecutorException e) {
+      logger.warn("PhantomJS availability check failed: {}", e.getMessage());
+      return false;
+    }
+    return executor.getExitCode() == 0;
+  }
+
+  /**
+   * This process executor is used to run <code>PhantomJS</code> in the system
+   * shell.
+   */
+  private static class PhantomJsProcessExecutor extends ProcessExecutor<IOException> {
+
+    /** The exit code */
+    private int exitCode = 0;
+
+    /**
+     * Creates a process executor to check for the PhantomJS availability.
+     */
+    protected PhantomJsProcessExecutor() {
+      super("phantomjs --version");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ch.entwine.weblounge.common.impl.util.process.ProcessExecutor#onProcessFinished(int)
+     */
+    @Override
+    protected void onProcessFinished(int exitCode) throws IOException {
+      super.onProcessFinished(exitCode);
+      this.exitCode = exitCode;
+    }
+
+    /**
+     * Returns the processe's exit code.
+     * 
+     * @return the exitCode
+     */
+    public int getExitCode() {
+      return exitCode;
+    }
+
   }
 
 }

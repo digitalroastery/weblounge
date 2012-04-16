@@ -803,6 +803,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     private Environment environment = null;
     private Language language = null;
     private String filename = null;
+    private String format = null;
     private PreviewGenerator previewGenerator = null;
 
     /**
@@ -831,6 +832,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       this.environment = environment;
       this.language = language;
       this.filename = filename;
+      this.format = FilenameUtils.getExtension(filename);
       this.previewGenerator = previewGenerator;
     }
 
@@ -866,7 +868,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
           fos = new FileOutputStream(scaledResourceFile);
           logger.debug("Creating preview of '{}' at {}", resource, scaledResourceFile);
-          previewGenerator.createPreview(resource, environment, language, style, null, contentRepositoryIs, fos);
+          previewGenerator.createPreview(resource, environment, language, style, format, contentRepositoryIs, fos);
           if (scaledResourceFile.length() > 0) {
             scaledResourceFile.setLastModified(lastModified);
           } else {
