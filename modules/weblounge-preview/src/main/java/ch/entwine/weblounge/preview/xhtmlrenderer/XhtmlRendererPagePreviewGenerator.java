@@ -201,11 +201,6 @@ public class XhtmlRendererPagePreviewGenerator implements PagePreviewGenerator {
     if (resource == null)
       throw new IllegalArgumentException("Resource cannot be null");
 
-    if (resource.getContent(language) == null) {
-      logger.warn("Skipping creation of preview for {} in language '{}': no content", resource, language.getIdentifier());
-      return;
-    }
-
     ImagePreviewGenerator imagePreviewGenerator = null;
     synchronized (previewGenerators) {
       if (previewGenerators.size() == 0) {
@@ -328,7 +323,7 @@ public class XhtmlRendererPagePreviewGenerator implements PagePreviewGenerator {
     // Scale the image to the correct size
     try {
       imageIs = new FileInputStream(imageFile);
-      imagePreviewGenerator.createPreview(resource, environment, language, style, null, imageIs, os);
+      imagePreviewGenerator.createPreview(resource, environment, language, style, PREVIEW_FORMAT, imageIs, os);
     } catch (IOException e) {
       logger.error("Error creating temporary copy of file content at " + xhtmlFile, e);
       throw e;

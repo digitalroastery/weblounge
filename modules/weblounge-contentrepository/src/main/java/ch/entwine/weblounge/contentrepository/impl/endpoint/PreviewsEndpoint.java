@@ -239,26 +239,26 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
         if (scaledResourceFile.length() > 1) {
           scaledResourceFile.setLastModified(lastModified);
         } else {
-          logger.error("Error scaling '{}': file size is 0", resourceURI);
+          logger.debug("Error scaling '{}': file size is 0", resourceURI);
           IOUtils.closeQuietly(resourceInputStream);
           FileUtils.deleteQuietly(scaledResourceFile);
         }
       }
 
       // Did scaling work? If not, cleanup and tell the user
-      if (scaledResourceFile.length() == 0) {
-        FileUtils.deleteQuietly(scaledResourceFile);
-        File f = scaledResourceFile.getParentFile();
-        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-          FileUtils.deleteQuietly(f);
-          f = f.getParentFile();
-        }
+      if (scaledResourceFile.length() == 0)
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-      }
 
       // The scaled resource should now exist
       resourceInputStream = new FileInputStream(scaledResourceFile);
       contentLength = scaledResourceFile.length();
+
+    } catch (WebApplicationException e) {
+      IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
+      if (scaledResourceFile != null)
+        deleteIfEmpty(scaledResourceFile.getParentFile());
+      throw e;
     } catch (ContentRepositoryException e) {
       logger.error("Error loading {} image '{}' from {}: {}", new Object[] {
           language,
@@ -268,46 +268,25 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       logger.error(e.getMessage(), e);
       IOUtils.closeQuietly(resourceInputStream);
       FileUtils.deleteQuietly(scaledResourceFile);
-
-      File f = scaledResourceFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
+      deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
     } catch (IOException e) {
       logger.error("Error scaling image '{}': {}", resourceURI, e.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
-
-      File f = scaledResourceFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
+      if (scaledResourceFile != null)
+        deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
     } catch (IllegalArgumentException e) {
       logger.error("Image '{}' is of unsupported format: {}", resourceURI, e.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
-
-      File f = scaledResourceFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
+      if (scaledResourceFile != null)
+        deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
     } catch (Throwable t) {
       logger.error("Error scaling image '{}': {}", resourceURI, t.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
-
-      File f = scaledResourceFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
+      if (scaledResourceFile != null)
+        deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
     } finally {
       IOUtils.closeQuietly(contentRepositoryIs);
@@ -349,6 +328,20 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
 
     // Send the response
     return response.build();
+  }
+
+  /**
+   * Deletes the directory if it is empty and tries the same for the parent
+   * directory.
+   * 
+   * @param dir
+   *          the directory
+   */
+  private void deleteIfEmpty(File dir) {
+    while (dir != null && dir.isDirectory() && dir.listFiles().length == 0) {
+      FileUtils.deleteQuietly(dir);
+      dir = dir.getParentFile();
+    }
   }
 
   /**
