@@ -87,6 +87,12 @@ public interface WebloungeRequest extends HttpServletRequest {
   String PAGELET = "weblounge-pagelet";
 
   /**
+   * The attribute name used to store the
+   * {@link ch.entwine.weblounge.common.content.SearchResult} in the request
+   */
+  String SEARCH = "weblounge-search";
+
+  /**
    * Returns the requested language. The language is determined by evaluating
    * the request header fields.
    * 

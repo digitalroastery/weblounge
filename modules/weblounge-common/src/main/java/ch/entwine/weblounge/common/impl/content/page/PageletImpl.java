@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.impl.content.page;
 
 import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.CreationContext;
 import ch.entwine.weblounge.common.impl.content.LocalizedModificationContext;
@@ -112,6 +113,17 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
    */
   PageletImpl() {
     this(null, null);
+  }
+
+  /**
+   * Creates a new pagelet data holder for a pagelet that uses the given
+   * renderer to display its data.
+   * 
+   * @param renderer
+   *          the pagelet renderer
+   */
+  public PageletImpl(PageletRenderer renderer) {
+    this(renderer.getModule().getIdentifier(), renderer.getIdentifier());
   }
 
   /**

@@ -212,7 +212,8 @@
               OSGI-INF/feed-requesthandler.xml,
               OSGI-INF/file-requesthandler.xml,
               OSGI-INF/image-requesthandler.xml,
-              OSGI-INF/page-requesthandler.xml
+              OSGI-INF/page-requesthandler.xml,
+              OSGI-INF/search-requesthandler.xml
             </Service-Component>
           </instructions>
         </configuration>

@@ -86,6 +86,15 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceMetadata#isLocalized()
+   */
+  public boolean isLocalized() {
+    return localizedValues != null && localizedValues.size() > 0;
+  }
+
+  /**
    * Adds <code>value</code> to the list of language neutral values.
    * 
    * @param language

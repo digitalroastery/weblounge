@@ -57,6 +57,13 @@ public interface ResourceMetadata<T> {
   Map<Language, List<T>> getLocalizedValues();
 
   /**
+   * Returns <code>true</code> if this metadata item has been localized.
+   * 
+   * @return <code>true</code> if the metadata item is localized
+   */
+  boolean isLocalized();
+
+  /**
    * Adds <code>value</code> to the list of language neutral values.
    * 
    * @param v

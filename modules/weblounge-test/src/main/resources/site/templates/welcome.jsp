@@ -15,6 +15,11 @@
 			i18n: <webl:i18n key="greeting.hello"/> <webl:i18n key="greeting.world"/>
 		</div>
 		<greeter:greeting/>
+		<form action="/weblounge-search">
+			<input type="hidden" name="limit" value="15"/>
+			<input type="hidden" name="target-template" value="search"/>
+			<input type="text" name="query"/><input type="submit" name="Search"/>
+		</form>
 		<webl:composer id="main"/>
 		<webl:composer id="bottom"/>
 	</body>

@@ -42,6 +42,13 @@
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
     </template>
+    <template id="search" composeable="false">
+      <name>Search template</name>
+      <renderer>file://${site.root}/templates/search.jsp</renderer>
+      <stage>main</stage>
+      <recheck>10M</recheck>
+      <valid>1H</valid>
+    </template>
   </templates>
   <options>
   	<option>
