@@ -95,7 +95,7 @@ public class ImageMagickActivator {
     try {
       ConvertCmd cmd = new ConvertCmd();
       IMOperation versionOp = new IMOperation();
-      versionOp.version().quiet();
+      versionOp.version();
       cmd.run(versionOp);
       logger.debug("ImageMagick detected and found to be working");
       return true;
