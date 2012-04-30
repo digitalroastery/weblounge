@@ -95,6 +95,9 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   /** The content */
   private LocalizableContent<Map<String, String[]>> content = null;
 
+  /** Ad-hoc content */
+  private transient Object adhocContent = null;
+
   /** The security context */
   protected SecurityContextImpl securityCtx = null;
 
@@ -553,6 +556,24 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public void setModified(User user, Date date, Language language) {
     modificationCtx.setModified(user, date, language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#setContent(java.lang.Object)
+   */
+  public void setContent(Object content) {
+    adhocContent = content;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getContent()
+   */
+  public Object getContent() {
+    return adhocContent;
   }
 
   /**

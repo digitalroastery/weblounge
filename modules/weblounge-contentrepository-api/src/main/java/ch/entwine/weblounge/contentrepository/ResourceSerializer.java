@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.SearchResultItem;
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -173,5 +174,13 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * @return the preview generator
    */
   PreviewGenerator getPreviewGenerator(Resource<?> resource);
+
+  /**
+   * Returns a renderer that can be used to display the resource, e. g as part
+   * of a search result.
+   * 
+   * @return the preview renderer
+   */
+  PageletRenderer getSearchResultRenderer(Resource<?> resource);
 
 }

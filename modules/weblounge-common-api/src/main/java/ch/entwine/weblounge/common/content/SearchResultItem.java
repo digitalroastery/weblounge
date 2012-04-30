@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.content;
 
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -32,6 +33,9 @@ import ch.entwine.weblounge.common.url.WebUrl;
  * what the relevance value should be for the search results that it adds.
  */
 public interface SearchResultItem extends Comparable<SearchResultItem> {
+
+  /** Identifier used to locate the search result item data in the pagelet */
+  String ITEM_DATA = "search-result-item-data";
 
   /**
    * Returns the search result item's site.
@@ -70,11 +74,19 @@ public interface SearchResultItem extends Comparable<SearchResultItem> {
   String getTitle();
 
   /**
+   * Returns the pagelet renderer that will be used to render the search result
+   * as part of a list of search result items.
+   * 
+   * @return the search result renderer
+   */
+  PageletRenderer getRenderer();
+
+  /**
    * Returns a preview of the search result.
    * 
    * @return the preview
    */
-  Object getPreview();
+  Object getContent();
 
   /**
    * Returns the renderer that is used to render the search result. Depending on

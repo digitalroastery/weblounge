@@ -113,11 +113,11 @@ public class SearchResultItemImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.SearchResultItemImpl#getPreview()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.SearchResultItemImpl#getContent()}.
    */
   @Test
   public void testGetPreview() {
-    assertEquals(previewData, item.getPreview());
+    assertEquals(previewData, item.getContent());
   }
 
   /**

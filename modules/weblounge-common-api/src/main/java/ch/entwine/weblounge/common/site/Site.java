@@ -45,6 +45,9 @@ public interface Site extends Customizable, RequestListener, Serializable {
   /** The modules folder */
   String MODULE_DIR = "module";
 
+  /** Identifier of the special weblounge site module */
+  String WEBLOUNGE_MODULE = "weblounge";
+
   /** Default value for a site's path inside a bundle */
   String BUNDLE_PATH = "/site";
 

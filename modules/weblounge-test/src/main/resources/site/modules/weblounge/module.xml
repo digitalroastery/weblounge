@@ -1,0 +1,78 @@
+<module id="weblounge" xmlns="http://www.entwinemedia.com/weblounge/3.0/module"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
+
+  <enable>true</enable>
+  <name>Weblounge</name>
+
+  <pagelets>
+    <pagelet id="page-result" composeable="false">
+      <name>Page search result</name>
+      <renderer>file://${module.root}/pagelets/page-result.jsp</renderer>
+      <recheck>0</recheck>
+      <valid>0</valid>
+      <includes>
+        <link href="file://${module.root}/css/search.css" rel="stylesheet" type="text/css" />
+        <script src="file://${module.root}/scripts/search.js" type="text/javascript" />
+      </includes>
+    </pagelet>
+    <pagelet id="file-result" composeable="false">
+      <name>File search result</name>
+      <renderer>file://${module.root}/pagelets/file-result.jsp</renderer>
+      <recheck>0</recheck>
+      <valid>0</valid>
+      <includes>
+        <link href="file://${module.root}/css/search.css" rel="stylesheet" type="text/css" />
+        <script src="file://${module.root}/scripts/search.js" type="text/javascript" />
+      </includes>
+    </pagelet>
+    <pagelet id="image-result" composeable="false">
+      <name>Image search result</name>
+      <renderer>file://${module.root}/pagelets/image-result.jsp</renderer>
+      <recheck>0</recheck>
+      <valid>0</valid>
+      <includes>
+        <link href="file://${module.root}/css/search.css" rel="stylesheet" type="text/css" />
+        <script src="file://${module.root}/scripts/search.js" type="text/javascript" />
+      </includes>
+    </pagelet>
+    <pagelet id="movie-result" composeable="false">
+      <name>Move search result</name>
+      <renderer>file://${module.root}/pagelets/movie-result.jsp</renderer>
+      <recheck>0</recheck>
+      <valid>0</valid>
+      <includes>
+        <link href="file://${module.root}/css/search.css" rel="stylesheet" type="text/css" />
+        <script src="file://${module.root}/scripts/search.js" type="text/javascript" />
+      </includes>
+    </pagelet>
+  </pagelets>
+
+  <imagestyles>
+    <imagestyle id="page-result">
+      <name>Page search thumbnail</name>
+      <scalingmode>fill</scalingmode>
+      <width>150</width>
+      <height>150</height>
+    </imagestyle>
+    <imagestyle id="file-result">
+      <name>File search thumbnail</name>
+      <scalingmode>fill</scalingmode>
+      <width>150</width>
+      <height>150</height>
+    </imagestyle>
+    <imagestyle id="image-result">
+      <name>Image search thumbnail</name>
+      <scalingmode>fill</scalingmode>
+      <width>150</width>
+      <height>150</height>
+    </imagestyle>
+    <imagestyle id="movie-result">
+      <name>Movie search thumbnail</name>
+      <scalingmode>fill</scalingmode>
+      <width>150</width>
+      <height>150</height>
+    </imagestyle>
+  </imagestyles>
+
+</module>

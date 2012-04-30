@@ -49,6 +49,8 @@ import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.HTMLAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
+import ch.entwine.weblounge.contentrepository.ResourceSerializer;
+import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
@@ -200,41 +202,69 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
     logger.trace("Adding search result to composer '{}'", stage);
     for (SearchResultItem item : result.getItems()) {
 
+      Renderer renderer = item.getPreviewRenderer();
+
+      // Is this search result coming from the search index or from a module?
+      if (!(item instanceof ResourceSearchResultItem)) {
+        renderer = item.getPreviewRenderer();
+        if (!(renderer instanceof PageletRenderer)) {
+          logger.warn("Skipping search result '{}' since it's preview renderer is not a pagelet", item);
+          continue;
+        }
+        PageletImpl pagelet = new PageletImpl((PageletRenderer) renderer);
+        pagelet.setContent(item.getContent());
+        page.addPagelet(pagelet, stage);
+        continue;
+      }
+
+      // The search result item seems to be coming from the search index
+
       // Convert the search result item into a resource search result item
       ResourceSearchResultItem resourceItem = (ResourceSearchResultItem) item;
+      ResourceURI uri = resourceItem.getResourceURI();
 
-      // Get the renderer and make sure it's a pagelet renderer
-      Renderer renderer = item.getPreviewRenderer();
-      if (!(renderer instanceof PageletRenderer)) {
-        logger.debug("Skipping search result since renderer '{}' is not a pagelet", renderer);
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+      if (serializer == null) {
+        logger.debug("Skipping search result since it's type ({}) is unknown", uri.getType());
         continue;
+      }
+
+      // Load the resource
+      Resource<?> resource = serializer.toResource(site, resourceItem.getMetadata());
+
+      // Get the renderer and make sure it's a pagelet renderer. First check
+      // the item itself, there may already be a renderer attached. If not,
+      // use the serializer to get the appropriate renderer
+      renderer = item.getPreviewRenderer();
+      if (renderer == null) {
+        renderer = serializer.getSearchResultRenderer(resource);
+        if (renderer == null) {
+          logger.warn("Skipping search result since a renderer can't be determined");
+          continue;
+        }
       }
 
       // Create the pagelet
       PageletRenderer pageletRenderer = (PageletRenderer) renderer;
       PageletImpl pagelet = new PageletImpl(pageletRenderer);
+      pagelet.setContent(resource);
 
       // Add the pagelet's data
-      if (item instanceof ResourceSearchResultItem) {
-        for (ResourceMetadata<?> metadata : resourceItem.getMetadata()) {
-          String key = metadata.getName();
-          if (metadata.isLocalized()) {
-            for (Entry<Language, ?> localizedMetadata : metadata.getLocalizedValues().entrySet()) {
-              Language language = localizedMetadata.getKey();
-              List<Object> values = (List<Object>) localizedMetadata.getValue();
-              for (Object value : values) {
-                pagelet.setContent(key, value.toString(), language);
-              }
-            }
-          } else {
-            for (Object value : metadata.getValues()) {
-              pagelet.addProperty(key, value.toString());
+      for (ResourceMetadata<?> metadata : resourceItem.getMetadata()) {
+        String key = metadata.getName();
+        if (metadata.isLocalized()) {
+          for (Entry<Language, ?> localizedMetadata : metadata.getLocalizedValues().entrySet()) {
+            Language language = localizedMetadata.getKey();
+            List<Object> values = (List<Object>) localizedMetadata.getValue();
+            for (Object value : values) {
+              pagelet.setContent(key, value.toString(), language);
             }
           }
+        } else {
+          for (Object value : metadata.getValues()) {
+            pagelet.addProperty(key, value.toString());
+          }
         }
-      } else {
-        Object data = resourceItem.getPreview();
-        pagelet.addProperty(PREVIEW_DATA_KEY, data.toString());
       }
 
       // TODO: Set modified etc.

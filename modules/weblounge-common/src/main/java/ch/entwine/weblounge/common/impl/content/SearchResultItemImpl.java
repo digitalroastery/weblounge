@@ -23,6 +23,7 @@ package ch.entwine.weblounge.common.impl.content;
 import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchResultItem;
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -59,6 +60,9 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /** The renderer used to show the preview */
   protected Renderer previewRenderer = null;
+
+  /** The renderer to use */
+  protected PageletRenderer renderer = null;
 
   /** The resource */
   protected Resource<?> resource = null;
@@ -172,10 +176,30 @@ public class SearchResultItemImpl implements SearchResultItem {
   }
 
   /**
-   * @see ch.entwine.weblounge.common.content.SearchResultItem#getPreview()
+   * @see ch.entwine.weblounge.common.content.SearchResultItem#getContent()
    */
-  public Object getPreview() {
+  public Object getContent() {
     return preview;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchResultItem#getRenderer()
+   */
+  public PageletRenderer getRenderer() {
+    return renderer;
+  }
+
+  /**
+   * Sets the pagelet renderer that is used to render this search result item as
+   * part of a list of result items.
+   * 
+   * @param renderer
+   *          the renderer
+   */
+  public void setRenderer(PageletRenderer renderer) {
+    this.renderer = renderer;
   }
 
   /**
@@ -275,8 +299,8 @@ public class SearchResultItemImpl implements SearchResultItem {
       buf.append("<source>").append(getSource()).append("</source>");
     if (getPreviewRenderer() != null)
       buf.append("<renderer>").append(getPreviewRenderer().toXml()).append("</renderer>");
-    if (getPreview() != null) {
-      Object preview = getPreview();
+    if (getContent() != null) {
+      Object preview = getContent();
       List<Object> previewParts = new ArrayList<Object>();
       if (preview.getClass().isArray()) {
         for (Object previewPart : (Object[]) preview) {

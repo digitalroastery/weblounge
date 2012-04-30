@@ -1,0 +1,27 @@
+.page-result {
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding: 5px;
+	background: blue;
+}
+
+.file-result {
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding: 5px;
+	background: red;
+}
+
+.image-result {
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding: 5px;
+	background: green;
+}
+
+.movie-result {
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding: 5px;
+	background: yellow;
+}

@@ -436,6 +436,24 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#setContent(java.lang.Object)
+   */
+  public void setContent(Object content) {
+    pagelet.setContent(content);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getContent()
+   */
+  public Object getContent() {
+    return pagelet.getContent();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.page.Pagelet#getMultiValueProperty(java.lang.String)
    */
   public String[] getMultiValueProperty(String key) {

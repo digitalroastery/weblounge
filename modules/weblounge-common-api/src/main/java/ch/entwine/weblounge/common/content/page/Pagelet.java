@@ -130,6 +130,26 @@ public interface Pagelet extends Creatable, Publishable, LocalizedModifiable, Se
   String[] getMultiValueProperty(String key);
 
   /**
+   * Sets content that may be used for ad-hoc rendering, such as when a pagelet
+   * is constructed at runtime to form a part of a search result.
+   * <p>
+   * Note that this content will not be serialized when the pagelet is being
+   * stored as part of a page.
+   * 
+   * @param content
+   *          the temporary content
+   */
+  void setContent(Object content);
+
+  /**
+   * Returns content that may have been added when a pagelet has been created
+   * ad-hoc, e. g. as part the creation of a search result.
+   * 
+   * @return the temporary content
+   */
+  Object getContent();
+
+  /**
    * Returns the names of the content elements stored inside this pagelet for
    * the given language.
    * 
