@@ -9,8 +9,6 @@
     <pagelet id="page-result" composeable="false">
       <name>Page search result</name>
       <renderer>file://${module.root}/pagelets/page-result.jsp</renderer>
-      <recheck>0</recheck>
-      <valid>0</valid>
       <includes>
         <link href="file://${module.root}/css/search.css" rel="stylesheet" type="text/css" />
         <script src="file://${module.root}/scripts/search.js" type="text/javascript" />
@@ -19,8 +17,6 @@
     <pagelet id="file-result" composeable="false">
       <name>File search result</name>
       <renderer>file://${module.root}/pagelets/file-result.jsp</renderer>
-      <recheck>0</recheck>
-      <valid>0</valid>
       <includes>
         <link href="file://${module.root}/css/search.css" rel="stylesheet" type="text/css" />
         <script src="file://${module.root}/scripts/search.js" type="text/javascript" />
@@ -29,8 +25,6 @@
     <pagelet id="image-result" composeable="false">
       <name>Image search result</name>
       <renderer>file://${module.root}/pagelets/image-result.jsp</renderer>
-      <recheck>0</recheck>
-      <valid>0</valid>
       <includes>
         <link href="file://${module.root}/css/search.css" rel="stylesheet" type="text/css" />
         <script src="file://${module.root}/scripts/search.js" type="text/javascript" />
@@ -39,8 +33,6 @@
     <pagelet id="movie-result" composeable="false">
       <name>Move search result</name>
       <renderer>file://${module.root}/pagelets/movie-result.jsp</renderer>
-      <recheck>0</recheck>
-      <valid>0</valid>
       <includes>
         <link href="file://${module.root}/css/search.css" rel="stylesheet" type="text/css" />
         <script src="file://${module.root}/scripts/search.js" type="text/javascript" />
@@ -49,25 +41,25 @@
   </pagelets>
 
   <imagestyles>
-    <imagestyle id="page-result">
+    <imagestyle id="page-result-thumbnail">
       <name>Page search thumbnail</name>
       <scalingmode>fill</scalingmode>
       <width>150</width>
       <height>150</height>
     </imagestyle>
-    <imagestyle id="file-result">
+    <imagestyle id="file-result-thumbnail">
       <name>File search thumbnail</name>
       <scalingmode>fill</scalingmode>
       <width>150</width>
       <height>150</height>
     </imagestyle>
-    <imagestyle id="image-result">
+    <imagestyle id="image-result-thumbnail">
       <name>Image search thumbnail</name>
       <scalingmode>fill</scalingmode>
       <width>150</width>
       <height>150</height>
     </imagestyle>
-    <imagestyle id="movie-result">
+    <imagestyle id="movie-result-thumbnail">
       <name>Movie search thumbnail</name>
       <scalingmode>fill</scalingmode>
       <width>150</width>

@@ -1,7 +1,7 @@
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
-<%@ page import="ch.entwine.weblounge.content.file.FileResource" %>
-<webl:context define="filelet, site, language">
-  <% FileResource fileResult = (FileResource)filelet.getContent(); %>
+<%@ page import="ch.entwine.weblounge.common.content.file.FileResource" %>
+<webl:context define="pagelet, site, language">
+  <% FileResource fileResult = (FileResource)pagelet.getContent(); %>
   <% String path = fileResult.getURI().getPath(); %>
   <div class="file-result">
 	  <h1><%= fileResult.getTitle(language) %></h1>

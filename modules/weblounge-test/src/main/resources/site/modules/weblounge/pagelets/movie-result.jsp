@@ -1,5 +1,5 @@
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
-<%@ page import="ch.entwine.weblounge.content.movie.MovieResource" %>
+<%@ page import="ch.entwine.weblounge.common.content.movie.MovieResource" %>
 <webl:context define="pagelet, site, language">
   <% MovieResource pageResult = (MovieResource)pagelet.getContent(); %>
   <% String path = pageResult.getURI().getPath(); %>

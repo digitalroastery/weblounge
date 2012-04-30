@@ -1,7 +1,7 @@
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
-<%@ page import="ch.entwine.weblounge.content.image.ImageResource" %>
-<webl:context define="imagelet, site, language">
-  <% ImageResource imageResult = (ImageResource)imagelet.getContent(); %>
+<%@ page import="ch.entwine.weblounge.common.content.image.ImageResource" %>
+<webl:context define="pagelet, site, language">
+  <% ImageResource imageResult = (ImageResource)pagelet.getContent(); %>
   <% String path = imageResult.getURI().getPath(); %>
   <div class="image-result">
 	  <h1><%= imageResult.getTitle(language) %></h1>

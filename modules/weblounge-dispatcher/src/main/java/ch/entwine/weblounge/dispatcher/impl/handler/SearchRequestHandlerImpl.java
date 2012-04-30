@@ -273,6 +273,11 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
       page.addPagelet(pagelet, stage);
     }
 
+    // Search results are not being cached
+    // TODO: Implement caching strategy
+    response.setCacheExpirationTime(0);
+    response.setClientRevalidationTime(0);
+
     // Finally, let's get some work done!
     try {
       request.setAttribute(WebloungeRequest.PAGE, page);
