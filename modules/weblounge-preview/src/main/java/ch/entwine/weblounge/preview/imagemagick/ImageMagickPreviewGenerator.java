@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.preview.imagemagick;
 
 import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
@@ -32,6 +33,7 @@ import ch.entwine.weblounge.common.site.ImageScalingMode;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
 import org.im4java.core.Info;
@@ -158,7 +160,23 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
    */
   public String getSuffix(Resource<?> resource, Language language,
       ImageStyle style) {
-    String filename = resource.getContent(language).getFilename();
+    // Load the resource
+    ResourceContent content = resource.getContent(language);
+    if (content == null) {
+      content = resource.getOriginalContent();
+      if (content == null) {
+        logger.warn("Trying to get filename suffix for {}, which has no content", resource);
+        return null;
+      }
+    }
+
+    // Get the file name
+    String filename = content.getFilename();
+    if (StringUtils.isBlank(filename)) {
+      logger.warn("Trying to get filename suffix for {}, which has no filename", resource);
+      return null;
+    }
+
     return FilenameUtils.getExtension(filename);
   }
 
