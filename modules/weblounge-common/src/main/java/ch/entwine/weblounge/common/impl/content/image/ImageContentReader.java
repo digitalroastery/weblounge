@@ -132,6 +132,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
         readJAIMetadata(content, mcss);
       } catch (Throwable t) {
         logger.warn("Error extracting metadata using java advanced imaging (jai) from {}: {}", fileName, t.getMessage());
+        throw new IOException(t);
       } finally {
         IOUtils.closeQuietly(is);
       }

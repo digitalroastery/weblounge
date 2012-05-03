@@ -1252,38 +1252,25 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         content = reader.createFromContent(is, user, language, uploadedFile.length(), fileName, mimeType);
       } catch (IOException e) {
         logger.warn("Error reading resource content {} from request", uri);
-        try {
-          contentRepository.delete(resourceURI);
-        } catch (Throwable t) {
-          logger.error("Error deleting orphan resource {}", resourceURI, t);
-        }
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       } catch (ParserConfigurationException e) {
         logger.warn("Error configuring parser to read resource content {}: {}", uri, e.getMessage());
-        try {
-          contentRepository.delete(resourceURI);
-        } catch (Throwable t) {
-          logger.error("Error deleting orphan resource {}", resourceURI, t);
-        }
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       } catch (SAXException e) {
         logger.warn("Error parsing udpated resource {}: {}", uri, e.getMessage());
-        try {
-          contentRepository.delete(resourceURI);
-        } catch (Throwable t) {
-          logger.error("Error deleting orphan resource {}", resourceURI, t);
-        }
         throw new WebApplicationException(Status.BAD_REQUEST);
       } catch (Throwable t) {
         logger.warn("Unknown error while trying to read resource content {}: {}", uri, t.getMessage());
-        try {
-          contentRepository.delete(resourceURI);
-        } catch (Throwable t2) {
-          logger.error("Error deleting orphan resource {}", resourceURI, t2);
-        }
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       } finally {
         IOUtils.closeQuietly(is);
+        if (content == null) {
+          try {
+            contentRepository.delete(resourceURI);
+          } catch (Throwable t) {
+            logger.error("Error deleting orphan resource {}", resourceURI, t);
+          }
+        }
       }
 
       try {
