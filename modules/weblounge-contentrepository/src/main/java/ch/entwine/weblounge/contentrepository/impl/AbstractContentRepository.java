@@ -697,6 +697,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
     if (bundle == null)
       return null;
     BundleContext bundleCtx = bundle.getBundleContext();
+    if (bundleCtx == null) {
+      logger.debug("Bundle {} does not have a bundle context associated", bundle);
+      return null;
+    }
     String siteClass = Site.class.getName();
     try {
       ServiceReference[] refs = bundleCtx.getServiceReferences(siteClass, null);
