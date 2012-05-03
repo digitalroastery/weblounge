@@ -70,7 +70,26 @@ public class PagePreviewTag extends WebloungeTag {
 
   /** Preview stop */
   private static enum Marker {
-    None, Elements, Endmarker, Pagepreview
+
+    /** The whole page content is being shown */
+    None,
+
+    /** Only elements of the given type are being shown */
+    Elements,
+
+    /**
+     * All elements between the elements specified as start and end marker are
+     * shown. If either one of these markers are not present, elements will
+     * start from the top of the page or range until the end of the page,
+     * respectively.
+     */
+    Marker,
+
+    /**
+     * All elements defined as preview elements in <code>module.xml</code> are
+     * shown
+     */
+    Pagepreview
   };
 
   /** The page */
@@ -91,7 +110,10 @@ public class PagePreviewTag extends WebloungeTag {
   /** The lead elements */
   private List<String> previewElements = null;
 
-  /** The marker element */
+  /** The start marker element */
+  private String startOfPreviewElement = null;
+
+  /** The end marker element */
   private String endOfPreviewElement = null;
 
   /** True to have the tag render the contents */
@@ -168,12 +190,42 @@ public class PagePreviewTag extends WebloungeTag {
   }
 
   /**
-   * Defines the element that marks the end of the page preview. The element
-   * needs to be passed in as comma separated strings, e. g.
+   * Defines the element that marks the beginning of the page preview. The
+   * element needs to be passed in the form
+   * <code>&lt;module&gt;/&lt;pagelet&gt;</code>.
+   * <p>
+   * Note that this property is only relevant if the preview type is set to
+   * {@link Marker#Marker}. If the start marker is not set, all elements
+   * starting at the top of the page will be used.
    * 
    * <pre>
-   * text / title
+   * text / preview - start
    * </pre>
+   * 
+   * @param value
+   *          the start element
+   */
+  public void setStart(String value) {
+    if (StringUtils.isBlank(value))
+      return;
+    String[] parts = value.split("/");
+    if (parts.length != 2)
+      throw new IllegalArgumentException("Preview start element '" + value + "' is malformed. Expecting '<module>/<pagelet>'");
+    startOfPreviewElement = value;
+  }
+
+  /**
+   * Defines the element that marks the end of the page preview. The element
+   * needs to be passed in the form <code>&lt;module&gt;/&lt;pagelet&gt;</code>
+   * 
+   * <pre>
+   * text / preview - end
+   * </pre>
+   * 
+   * <p>
+   * Note that this property is only relevant if the preview type is set to
+   * {@link Marker#Marker}. If the start marker is not set, all elements
+   * starting at the top of the page will be used.
    * 
    * @param value
    *          the end element
@@ -208,7 +260,7 @@ public class PagePreviewTag extends WebloungeTag {
    */
   @Override
   public int doStartTag() throws JspException {
-    
+
     Site site = request.getSite();
 
     if (pageId == null) {
@@ -279,11 +331,14 @@ public class PagePreviewTag extends WebloungeTag {
           }
         }
         break;
-      case Endmarker:
+      case Marker:
         if (StringUtils.isBlank(endOfPreviewElement))
           throw new IllegalStateException("No stop marker element set");
         for (Pagelet p : page.getPagelets(stage)) {
-          if (endOfPreviewElement.equals(p.toString())) {
+          if (p.toString().equals(startOfPreviewElement)) {
+            pagelets.clear();
+            continue;
+          } else if (p.toString().equals(endOfPreviewElement)) {
             break;
           }
           pagelets.add(p);
@@ -499,6 +554,7 @@ public class PagePreviewTag extends WebloungeTag {
     previewElements.clear();
     stopMarker = Marker.None;
     render = true;
+    startOfPreviewElement = null;
     endOfPreviewElement = null;
     oldPage = null;
     oldComposer = null;
