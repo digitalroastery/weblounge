@@ -27,7 +27,6 @@ import ch.entwine.weblounge.taglib.WebloungeTag;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
