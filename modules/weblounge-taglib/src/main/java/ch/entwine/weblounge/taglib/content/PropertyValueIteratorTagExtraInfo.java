@@ -26,9 +26,9 @@ import javax.servlet.jsp.tagext.VariableInfo;
 
 /**
  * This class provides runtime information about the
- * <code>PropertyIteratorTag</code> jsp tag.
+ * <code>PropertyValueIteratorTag</code> jsp tag.
  */
-public class PropertyIteratorTagExtraInfo extends TagExtraInfo {
+public class PropertyValueIteratorTagExtraInfo extends TagExtraInfo {
 
   /**
    * Returns the information on the exported tag variables.
@@ -37,10 +37,10 @@ public class PropertyIteratorTagExtraInfo extends TagExtraInfo {
    */
   public VariableInfo[] getVariableInfo(TagData tagData) {
     return new VariableInfo[] {
-        new VariableInfo(ElementIteratorTagVariables.INDEX, Integer.class.getName(), true, VariableInfo.NESTED),
-        new VariableInfo(ElementIteratorTagVariables.ITERATIONS, Integer.class.getName(), true, VariableInfo.NESTED),
-        new VariableInfo(ElementIteratorTagVariables.ELEMENT_NAME, String.class.getName(), true, VariableInfo.NESTED),
-        new VariableInfo(ElementIteratorTagVariables.ELEMENT_VALUE, String.class.getName(), true, VariableInfo.NESTED) };
+        new VariableInfo(PropertyValueIteratorTagVariables.INDEX, Integer.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(PropertyValueIteratorTagVariables.ITERATIONS, Integer.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(PropertyValueIteratorTagVariables.PROPERTY_NAME, String.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(PropertyValueIteratorTagVariables.PROPERTY_VALUE, String.class.getName(), true, VariableInfo.NESTED) };
   }
 
   /**

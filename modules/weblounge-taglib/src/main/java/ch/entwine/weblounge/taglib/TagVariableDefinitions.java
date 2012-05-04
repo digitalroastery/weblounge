@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * Container for a set of export variable definitions.
  */
-public class TagVariableDefinitions {
+public class TagVariableDefinitions implements Iterable<TagVariableDefinition> {
 
 	/** The alias - definition mapping */
 	private Map<String, TagVariableDefinition> variables_ = null;
@@ -104,5 +104,14 @@ public class TagVariableDefinitions {
 	public int size() {
 		return variables_.size();
 	}
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Iterable#iterator()
+   */
+  public Iterator<TagVariableDefinition> iterator() {
+    return variables_.values().iterator();
+  }
 	
 }

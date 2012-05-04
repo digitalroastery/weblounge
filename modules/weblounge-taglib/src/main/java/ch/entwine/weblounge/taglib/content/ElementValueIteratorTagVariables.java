@@ -21,21 +21,20 @@
 package ch.entwine.weblounge.taglib.content;
 
 /**
- * Holds the variable definitions for the <code>PropertyIteratorTag</code> and
- * <code>PropertyValueIteratorTag</code>.
+ * Holds the variable definitions for the <code>ElementvalueIteratorTag</code>.
  */
-public class PropertyIteratorTagVariables {
+public class ElementValueIteratorTagVariables {
 
   /** The current index */
   public static final String INDEX = "index";
 
-  /** The total number of values */
+  /** The total number of element values */
   public static final String ITERATIONS = "iterations";
 
   /** Name of the current element */
-  public static final String PROPERTY_NAME = "propertyName";
+  public static final String ELEMENT_NAME = "elementName";
 
   /** Value of the current element */
-  public static final String PROPERTY_VALUE = "propertyValue";
+  public static final String ELEMENT_VALUE = "elementValue";
 
 }

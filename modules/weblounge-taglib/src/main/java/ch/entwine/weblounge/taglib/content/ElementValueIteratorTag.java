@@ -112,10 +112,10 @@ public class ElementValueIteratorTag extends WebloungeTag {
     // Get the first element value
     String propertyValue = elementValues[index];
 
-    stashAndSetAttribute(ElementIteratorTagVariables.ITERATIONS, new Integer(iterations));
-    stashAndSetAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
-    stashAndSetAttribute(ElementIteratorTagVariables.ELEMENT_NAME, elementName);
-    stashAndSetAttribute(ElementIteratorTagVariables.ELEMENT_VALUE, propertyValue);
+    stashAndSetAttribute(ContentIteratorTagVariables.ITERATIONS, new Integer(iterations));
+    stashAndSetAttribute(ContentIteratorTagVariables.INDEX, new Integer(index));
+    stashAndSetAttribute(ContentIteratorTagVariables.ELEMENT_NAME, elementName);
+    stashAndSetAttribute(ContentIteratorTagVariables.ELEMENT_VALUE, propertyValue);
 
     return EVAL_BODY_INCLUDE;
   }
@@ -133,8 +133,8 @@ public class ElementValueIteratorTag extends WebloungeTag {
     // Get the current element value
     String elementValue = elementValues[index];
 
-    pageContext.setAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
-    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_VALUE, elementValue);
+    pageContext.setAttribute(ContentIteratorTagVariables.INDEX, new Integer(index));
+    pageContext.setAttribute(ContentIteratorTagVariables.ELEMENT_VALUE, elementValue);
 
     return EVAL_BODY_AGAIN;
   }

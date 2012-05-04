@@ -24,7 +24,7 @@ package ch.entwine.weblounge.taglib.content;
  * Holds the variable definitions for the <code>ElementIteratorTag</code> and
  * the <code>ElementValueIteratorTag</code>.
  */
-public class ElementIteratorTagVariables {
+public class ContentIteratorTagVariables {
 
   /** The current index */
   public static final String INDEX = "index";
