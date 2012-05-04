@@ -62,9 +62,20 @@ public abstract class UserCheckTag extends WebloungeTag {
     if (skip(user)) {
       return SKIP_BODY;
     } else if (user != null) {
-      pageContext.setAttribute(UserCheckTagVariables.USER, user);
+      stashAndSetAttribute(UserCheckTagVariables.USER, user);
     }
     return EVAL_BODY_INCLUDE;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
+   */
+  @Override
+  public int doEndTag() throws JspException {
+    removeAndUnstashAttributes();
+    return super.doEndTag();
   }
 
   /**

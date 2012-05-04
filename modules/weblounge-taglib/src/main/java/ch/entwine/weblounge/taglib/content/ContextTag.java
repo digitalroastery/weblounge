@@ -28,9 +28,6 @@ import ch.entwine.weblounge.taglib.WebloungeTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 
@@ -65,9 +62,6 @@ public class ContextTag extends WebloungeTag {
 
   /** The parsed variable definitions */
   private ContextTagVariables variables = null;
-
-  /** Map of existing key-value pairs that are replaced */
-  private Map<String, Object> existingVariables = new HashMap<String, Object>();
 
   /** The application uri */
   // TODO: Implement a better way
@@ -176,9 +170,7 @@ public class ContextTag extends WebloungeTag {
     }
 
     // Restore former values
-    for (Map.Entry<String, Object> entry : existingVariables.entrySet()) {
-      pageContext.setAttribute(entry.getKey(), entry.getValue());
-    }
+    removeAndUnstashAttributes();
 
     return super.doEndTag();
   }
@@ -201,17 +193,9 @@ public class ContextTag extends WebloungeTag {
   private void define(String key, Object value) throws IllegalStateException {
     if (key == null)
       return;
-    Object existingValue = pageContext.getAttribute(key);
-
-    // If there is a value already, keep it for later reference
-    if (existingValue != null) {
-      existingVariables.put(key, existingValue);
-      String existingType = existingValue.getClass().getName();
-      logger.debug("Temporarily replacing context item '" + key + "' of type " + existingType + " with new value");
-    }
 
     // Store the new value
-    pageContext.setAttribute(key, value);
+    stashAndSetAttribute(key, value);
     logger.debug("Defining context item '{}': {}", key, value != null ? value : "null");
   }
 
@@ -224,7 +208,6 @@ public class ContextTag extends WebloungeTag {
   protected void reset() {
     super.reset();
     definitions = null;
-    existingVariables.clear();
     uri = null;
     variables = null;
   }

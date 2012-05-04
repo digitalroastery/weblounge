@@ -253,7 +253,7 @@ public class ImageResourceTag extends WebloungeTag {
         linkToImage += "?style=" + style.getIdentifier();
         imageWidth = ImageStyleUtils.getWidth(imageContent, style);
         imageHeight = ImageStyleUtils.getHeight(imageContent, style);
-        pageContext.setAttribute(ImageResourceTagExtraInfo.STYLE, style);
+        stashAndSetAttribute(ImageResourceTagExtraInfo.STYLE, style);
       } else {
         logger.warn("Image style '{}' not found", imageStyle);
       }
@@ -262,13 +262,13 @@ public class ImageResourceTag extends WebloungeTag {
     // TODO: Check the permissions
 
     // Store the image and the image content in the request
-    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE, image);
-    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_CONTENT, imageContent);
-    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_WIDTH, imageWidth);
-    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_HEIGHT, imageHeight);
-    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_SRC, linkToImage);
-    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_TITLE, image.getTitle(language));
-    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_DESC, image.getDescription(language));
+    stashAndSetAttribute(ImageResourceTagExtraInfo.IMAGE, image);
+    stashAndSetAttribute(ImageResourceTagExtraInfo.IMAGE_CONTENT, imageContent);
+    stashAndSetAttribute(ImageResourceTagExtraInfo.IMAGE_WIDTH, imageWidth);
+    stashAndSetAttribute(ImageResourceTagExtraInfo.IMAGE_HEIGHT, imageHeight);
+    stashAndSetAttribute(ImageResourceTagExtraInfo.IMAGE_SRC, linkToImage);
+    stashAndSetAttribute(ImageResourceTagExtraInfo.IMAGE_TITLE, image.getTitle(language));
+    stashAndSetAttribute(ImageResourceTagExtraInfo.IMAGE_DESC, image.getDescription(language));
 
     // Add the cache tags to the response
     response.addTag(CacheTag.Resource, image.getURI().getIdentifier());
@@ -283,14 +283,7 @@ public class ImageResourceTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE);
-    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_CONTENT);
-    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_WIDTH);
-    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_HEIGHT);
-    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_SRC);
-    pageContext.removeAttribute(ImageResourceTagExtraInfo.STYLE);
-    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_TITLE);
-    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_DESC);
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 

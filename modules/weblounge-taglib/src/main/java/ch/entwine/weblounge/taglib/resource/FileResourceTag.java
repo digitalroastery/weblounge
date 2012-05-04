@@ -147,8 +147,8 @@ public class FileResourceTag extends WebloungeTag {
     // TODO: Check the permissions
 
     // Store the file and the file content in the request
-    pageContext.setAttribute(FileResourceTagExtraInfo.FILE, file);
-    pageContext.setAttribute(FileResourceTagExtraInfo.FILE_CONTENT, fileContent);
+    stashAndSetAttribute(FileResourceTagExtraInfo.FILE, file);
+    stashAndSetAttribute(FileResourceTagExtraInfo.FILE_CONTENT, fileContent);
 
     // Add cache tags to response
     response.addTag(CacheTag.Resource, file.getURI().getIdentifier());
@@ -163,8 +163,7 @@ public class FileResourceTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(FileResourceTagExtraInfo.FILE);
-    pageContext.removeAttribute(FileResourceTagExtraInfo.FILE_CONTENT);
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 

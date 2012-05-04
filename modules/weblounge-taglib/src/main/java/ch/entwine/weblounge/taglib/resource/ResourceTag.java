@@ -149,8 +149,8 @@ public class ResourceTag extends WebloungeTag {
     // TODO: Check the permissions
 
     // Store the resource and the resource content in the request
-    pageContext.setAttribute(ResourceTagExtraInfo.RESOURCE, resource);
-    pageContext.setAttribute(ResourceTagExtraInfo.RESOURCE_CONTENT, resourceContent);
+    stashAndSetAttribute(ResourceTagExtraInfo.RESOURCE, resource);
+    stashAndSetAttribute(ResourceTagExtraInfo.RESOURCE_CONTENT, resourceContent);
 
     // Add cache tags to the response
     response.addTag(CacheTag.Resource, resource.getURI().getIdentifier());
@@ -165,8 +165,7 @@ public class ResourceTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(ResourceTagExtraInfo.RESOURCE);
-    pageContext.removeAttribute(ResourceTagExtraInfo.RESOURCE_CONTENT);
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 

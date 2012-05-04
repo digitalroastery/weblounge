@@ -1,5 +1,6 @@
 <%@ taglib uri="/WEB-INF/greeter.tld" prefix="greeter" %>
 <%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE HTML>
 <html>
 	<head>
@@ -17,5 +18,22 @@
 		</form>
 		<webl:composer id="main"/>
 		<webl:composer id="bottom"/>
+		
+		<webl:property define="hello, world">
+
+  <webl:ifproperty name="hello">
+    <webl:property name="hello" />
+  </webl:ifproperty>
+
+  <webl:ifproperty name="world">
+    <webl:property name="world" />
+  </webl:ifproperty>
+
+  <c:if test="${(not empty hello) or (not empty world)}">
+    Never evaluated, because hello and empty are not set anymore
+  </c:if>
+
+</webl:property>
+
 	</body>
 </html>

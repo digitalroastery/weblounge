@@ -138,8 +138,8 @@ public class VideoResourceTag extends WebloungeTag {
     // TODO: Check the permissions
 
     // Store the resource and the resource content in the request
-    pageContext.setAttribute(VideoResourceTagExtraInfo.VIDEO, video);
-    pageContext.setAttribute(VideoResourceTagExtraInfo.VIDEO_CONTENT, videoContent);
+    stashAndSetAttribute(VideoResourceTagExtraInfo.VIDEO, video);
+    stashAndSetAttribute(VideoResourceTagExtraInfo.VIDEO_CONTENT, videoContent);
 
     // Add cache tags to the response
     response.addTag(CacheTag.Resource, video.getURI().getIdentifier());
@@ -154,8 +154,7 @@ public class VideoResourceTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(VideoResourceTagExtraInfo.VIDEO);
-    pageContext.removeAttribute(VideoResourceTagExtraInfo.VIDEO_CONTENT);
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 

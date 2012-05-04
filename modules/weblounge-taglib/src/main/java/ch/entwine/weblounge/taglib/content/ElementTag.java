@@ -168,7 +168,7 @@ public class ElementTag extends WebloungeTag {
         String value = getElement(name, request.getSite());
         if (value == null)
           value = "";
-        pageContext.setAttribute(alias, value);
+        stashAndSetAttribute(alias, value);
       }
     }
 
@@ -176,7 +176,7 @@ public class ElementTag extends WebloungeTag {
 
     if (name != null) {
       String content = getElement(name, request.getSite());
-      pageContext.setAttribute(name, content);
+      stashAndSetAttribute(name, content);
       try {
         PrintWriter out = response.getWriter();
         pageContext.getOut().flush();
@@ -195,19 +195,7 @@ public class ElementTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    if (variables != null) {
-      if (variables != null) {
-        Iterator<TagVariableDefinition> vars = variables.variables();
-        while (vars.hasNext()) {
-          TagVariableDefinition def = vars.next();
-          String alias = def.getAlias();
-          pageContext.removeAttribute(alias);
-        }
-      }
-    }
-    if (name != null)
-      pageContext.removeAttribute(name);
-
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 

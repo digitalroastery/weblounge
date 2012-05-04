@@ -67,8 +67,19 @@ public abstract class CookieCheckTag extends WebloungeTag {
     if (skip(cookie)) {
       return SKIP_BODY;
     }
-    pageContext.setAttribute("cookie", cookie);
+    stashAndSetAttribute("cookie", cookie);
     return EVAL_BODY_INCLUDE;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
+   */
+  @Override
+  public int doEndTag() throws JspException {
+    removeAndUnstashAttributes();
+    return super.doEndTag();
   }
 
   /**

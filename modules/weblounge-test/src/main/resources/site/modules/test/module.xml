@@ -32,6 +32,10 @@
       <name>I18n internationalization</name>
       <renderer>file://${module.root}/pagelets/i18n.jsp</renderer>
     </pagelet>
+    <pagelet id="nested" composeable="false">
+      <name>Page content</name>
+      <renderer>file://${module.root}/pagelets/nested.jsp</renderer>
+    </pagelet>
   </pagelets>
 
   <actions>

@@ -135,7 +135,7 @@ public class PropertyTag extends WebloungeTag {
         logger.trace("Defining variable '" + alias + "': " + value);
         if (value == null)
           value = "";
-        pageContext.setAttribute(alias, value);
+        stashAndSetAttribute(alias, value);
       }
     }
 
@@ -143,7 +143,7 @@ public class PropertyTag extends WebloungeTag {
 
     if (name != null) {
       String property = getProperty(name, request.getSite());
-      pageContext.setAttribute(name, property);
+      stashAndSetAttribute(name, property);
       try {
         PrintWriter out = response.getWriter();
         pageContext.getOut().flush();
@@ -162,17 +162,7 @@ public class PropertyTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    if (variables != null) {
-      Iterator<TagVariableDefinition> vars = variables.variables();
-      while (vars.hasNext()) {
-        TagVariableDefinition def = vars.next();
-        String alias = def.getAlias();
-        pageContext.removeAttribute(alias);
-      }
-    }
-    if (name != null) {
-      pageContext.removeAttribute(name);
-    }
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 

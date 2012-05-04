@@ -82,3 +82,5 @@ datasource
 lucene
 apache
 etag
+stash
+stashed

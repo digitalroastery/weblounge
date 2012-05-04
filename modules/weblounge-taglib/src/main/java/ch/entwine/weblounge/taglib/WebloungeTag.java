@@ -26,8 +26,12 @@ import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
@@ -48,6 +52,9 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
 
   /** Serial version id */
   private static final long serialVersionUID = 1754816467985401658L;
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(WebloungeTag.class);
 
   /** Css class attribute */
   protected String css = null;
@@ -103,6 +110,12 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
   /** The weblounge response */
   protected WebloungeResponse response = null;
 
+  /** The stash */
+  protected Map<String, Object> stash = new HashMap<String, Object>();
+
+  /** The attributes that were added by this tag instance */
+  protected List<String> attributes = new ArrayList<String>();
+
   /**
    * Resets the properties of this tag to default values. This method is called
    * between <strong>every</strong> request.
@@ -128,6 +141,8 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
     onkeyup = null;
     request = null;
     response = null;
+    stash.clear();
+    attributes.clear();
   }
 
   /**
@@ -515,6 +530,89 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
     super.setPageContext(ctxt);
     request = unwrapRequest(pageContext.getRequest());
     response = unwrapResponse(pageContext.getResponse());
+  }
+
+  /**
+   * Stores any original value for the given attribute away for later reference.
+   * 
+   * @param attribute
+   *          the attribute name
+   */
+  protected void stashAttribute(String attribute) {
+    stashAndSetAttribute(attribute, null);
+  }
+
+  /**
+   * Sets the attribute in the page context and stores any original value away
+   * for later reference.
+   * 
+   * @param attribute
+   *          the attribute name
+   * @param value
+   *          the value
+   */
+  protected void stashAndSetAttribute(String attribute, Object value) {
+    Object existingValue = pageContext.getAttribute(attribute);
+
+    // If there is a value already, keep it for later reference
+    if (existingValue != null) {
+      String existingType = existingValue.getClass().getName();
+      logger.debug("Stashing context item '{}' of type {}", attribute, existingType);
+      stash.put(attribute, existingValue);
+    }
+
+    // Set the attribute
+    if (value != null) {
+      pageContext.setAttribute(attribute, value);
+    }
+    attributes.add(attribute);
+  }
+
+  /**
+   * Removes the given attribute from the page context and replaces it with a
+   * potentially stashed value.
+   * 
+   * @param attribute
+   *          the attribute name
+   */
+  protected void removeAndUnsstashAttribute(String attribute) {
+    Object value = stash.remove(attribute);
+    if (value != null) {
+      String existingType = value.getClass().getName();
+      logger.debug("Applying stashed page context item '{}' of type {}", attribute, existingType);
+      pageContext.setAttribute(attribute, value);
+    } else {
+      pageContext.removeAttribute(attribute);
+    }
+    attributes.remove(attribute);
+  }
+
+  /**
+   * Removes all attributes that have been set by the current tag instance from
+   * the page context and replaces them with potentially stashed values.
+   */
+  protected void removeAndUnstashAttributes() {
+    for (String attribute : attributes) {
+      Object value = stash.remove(attribute);
+      if (value != null) {
+        String existingType = value.getClass().getName();
+        logger.debug("Applying stashed page context item '{}' of type {}", attribute, existingType);
+        pageContext.setAttribute(attribute, value);
+      } else {
+        pageContext.removeAttribute(attribute);
+      }
+    }
+    attributes.clear();
+
+    // Make sure we are not missing out on any stash values
+    for (Map.Entry<String, Object> stashEntry : stash.entrySet()) {
+      String attribute = stashEntry.getKey();
+      Object value = stashEntry.getValue();
+      String existingType = value.getClass().getName();
+      logger.debug("Applying stashed page context item '{}' of type {}", attribute, existingType);
+      pageContext.setAttribute(attribute, value);
+    }
+    stash.clear();
   }
 
   /**

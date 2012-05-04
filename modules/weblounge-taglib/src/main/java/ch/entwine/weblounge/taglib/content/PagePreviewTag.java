@@ -366,8 +366,9 @@ public class PagePreviewTag extends WebloungeTag {
     request.setAttribute(PagePreviewTagVariables.PAGE, page);
     request.setAttribute(PagePreviewTagVariables.PREVIEW, pagePreview);
 
-    pageContext.setAttribute(PagePreviewTagVariables.URL, pageUrl);
-    pageContext.setAttribute(PagePreviewTagVariables.PREVIEW, pagePreview);
+    stashAttribute(PagePreviewTagVariables.PAGELET);
+    stashAndSetAttribute(PagePreviewTagVariables.URL, pageUrl);
+    stashAndSetAttribute(PagePreviewTagVariables.PREVIEW, pagePreview);
 
     // Add included page url to tags
     response.addTag(CacheTag.Url, pageUrl.getLink());
@@ -413,14 +414,11 @@ public class PagePreviewTag extends WebloungeTag {
       }
     }
 
-    pageContext.removeAttribute(PagePreviewTagVariables.URL);
-    pageContext.removeAttribute(PagePreviewTagVariables.PREVIEW);
-    pageContext.removeAttribute(PagePreviewTagVariables.PAGELET);
-
     request.setAttribute(WebloungeRequest.PAGE, oldPage);
     request.setAttribute(WebloungeRequest.COMPOSER, oldComposer);
     request.setAttribute(WebloungeRequest.PAGELET, oldPagelet);
 
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 

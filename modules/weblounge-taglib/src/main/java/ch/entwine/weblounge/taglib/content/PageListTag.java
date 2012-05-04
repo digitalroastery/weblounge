@@ -192,6 +192,10 @@ public class PageListTag extends WebloungeTag {
     // Save the current pagelet so that we can restore it later
     pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
 
+    stashAttribute(PageListTagExtraInfo.PREVIEW_PAGE);
+    stashAttribute(PageListTagExtraInfo.PREVIEW);
+
+
     try {
       return (loadNextPage()) ? EVAL_BODY_INCLUDE : SKIP_BODY;
     } catch (ContentRepositoryUnavailableException e) {
@@ -228,8 +232,7 @@ public class PageListTag extends WebloungeTag {
    * @see ch.entwine.weblounge.taglib.WebloungeTag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(PageListTagExtraInfo.PREVIEW);
-    pageContext.removeAttribute(PageListTagExtraInfo.PREVIEW_PAGE);
+    removeAndUnstashAttributes();
     request.setAttribute(WebloungeRequest.PAGELET, pagelet);
     return super.doEndTag();
   }

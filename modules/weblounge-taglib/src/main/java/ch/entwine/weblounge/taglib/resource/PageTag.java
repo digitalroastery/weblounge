@@ -135,7 +135,7 @@ public class PageTag extends WebloungeTag {
     // TODO: Check the permissions
 
     // Store the page and the page content in the request
-    pageContext.setAttribute(PageTagExtraInfo.PAGE, page);
+    stashAndSetAttribute(PageTagExtraInfo.PAGE, page);
     
     // Add the cache tags to the response
     response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
@@ -150,7 +150,7 @@ public class PageTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(PageTagExtraInfo.PAGE);
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 

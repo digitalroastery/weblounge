@@ -112,10 +112,10 @@ public class ElementValueIteratorTag extends WebloungeTag {
     // Get the first element value
     String propertyValue = elementValues[index];
 
-    pageContext.setAttribute(ElementIteratorTagVariables.ITERATIONS, new Integer(iterations));
-    pageContext.setAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
-    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_NAME, elementName);
-    pageContext.setAttribute(ElementIteratorTagVariables.ELEMENT_VALUE, propertyValue);
+    stashAndSetAttribute(ElementIteratorTagVariables.ITERATIONS, new Integer(iterations));
+    stashAndSetAttribute(ElementIteratorTagVariables.INDEX, new Integer(index));
+    stashAndSetAttribute(ElementIteratorTagVariables.ELEMENT_NAME, elementName);
+    stashAndSetAttribute(ElementIteratorTagVariables.ELEMENT_VALUE, propertyValue);
 
     return EVAL_BODY_INCLUDE;
   }
@@ -169,10 +169,7 @@ public class ElementValueIteratorTag extends WebloungeTag {
    * @see ch.entwine.weblounge.taglib.WebloungeTag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(ElementIteratorTagVariables.ITERATIONS);
-    pageContext.removeAttribute(ElementIteratorTagVariables.INDEX);
-    pageContext.removeAttribute(ElementIteratorTagVariables.ELEMENT_NAME);
-    pageContext.removeAttribute(ElementIteratorTagVariables.ELEMENT_VALUE);
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 

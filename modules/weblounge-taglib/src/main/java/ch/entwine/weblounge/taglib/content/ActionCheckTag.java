@@ -76,7 +76,7 @@ public abstract class ActionCheckTag extends WebloungeTag {
   public int doStartTag() throws JspException {
     super.doStartTag();
     Action handler = (Action) request.getAttribute(WebloungeRequest.ACTION);
-    pageContext.setAttribute(ActionCheckTagVariables.ACTION, handler);
+    stashAndSetAttribute(ActionCheckTagVariables.ACTION, handler);
     if (skip(handler)) {
       return SKIP_BODY;
     }
@@ -89,7 +89,7 @@ public abstract class ActionCheckTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(ActionCheckTagVariables.ACTION);
+    removeAndUnsstashAttribute(ActionCheckTagVariables.ACTION);
     return super.doEndTag();
   }
 

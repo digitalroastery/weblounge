@@ -117,7 +117,7 @@ public abstract class PropertyCheckTag extends WebloungeTag {
     if (skip(property)) {
       return SKIP_BODY;
     } else if (property != null) {
-      pageContext.setAttribute(name, property);
+      stashAndSetAttribute(name, property);
     }
 
     // Tag variable export
@@ -133,7 +133,7 @@ public abstract class PropertyCheckTag extends WebloungeTag {
           value = "";
         if (templates)
           Templates.format(value, false, request.getSite());
-        pageContext.setAttribute(alias, value);
+        stashAndSetAttribute(alias, value);
       }
     }
 
@@ -146,19 +146,7 @@ public abstract class PropertyCheckTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    if (variables != null) {
-      if (variables != null) {
-        Iterator<TagVariableDefinition> vars = variables.variables();
-        while (vars.hasNext()) {
-          TagVariableDefinition def = vars.next();
-          String alias = def.getAlias();
-          pageContext.removeAttribute(alias);
-        }
-      }
-    }
-    if (name != null) {
-      pageContext.removeAttribute(name);
-    }
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 

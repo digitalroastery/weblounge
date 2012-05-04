@@ -249,8 +249,8 @@ public class ResourceIteratorTag extends WebloungeTag {
     if (iterations < 1)
       return SKIP_BODY;
 
-    pageContext.setAttribute(ResourceIteratorTagExtraInfo.INDEX, index);
-    pageContext.setAttribute(ResourceIteratorTagExtraInfo.ITERATIONS, iterations);
+    stashAndSetAttribute(ResourceIteratorTagExtraInfo.INDEX, index);
+    stashAndSetAttribute(ResourceIteratorTagExtraInfo.ITERATIONS, iterations);
 
     ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) searchResult.getItems()[index];
     return setResource(searchResultItem, EVAL_BODY_INCLUDE);
@@ -298,8 +298,8 @@ public class ResourceIteratorTag extends WebloungeTag {
     // TODO: Check the permissions
 
     // Store the resource and the resource content in the request
-    pageContext.setAttribute(ResourceIteratorTagExtraInfo.RESOURCE, resource);
-    pageContext.setAttribute(ResourceIteratorTagExtraInfo.RESOURCE_CONTENT, resourceContent);
+    stashAndSetAttribute(ResourceIteratorTagExtraInfo.RESOURCE, resource);
+    stashAndSetAttribute(ResourceIteratorTagExtraInfo.RESOURCE_CONTENT, resourceContent);
 
     // Add cache tags to the response
     response.addTag(CacheTag.Resource, resource.getURI().getIdentifier());
@@ -333,10 +333,7 @@ public class ResourceIteratorTag extends WebloungeTag {
    */
   @Override
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(ResourceIteratorTagExtraInfo.INDEX);
-    pageContext.removeAttribute(ResourceIteratorTagExtraInfo.ITERATIONS);
-    pageContext.removeAttribute(ResourceIteratorTagExtraInfo.RESOURCE);
-    pageContext.removeAttribute(ResourceIteratorTagExtraInfo.RESOURCE_CONTENT);
+    removeAndUnstashAttributes();
     return super.doEndTag();
   }
 
