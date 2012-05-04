@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <page id="4bb19980-8f98-4873-a813-000000000006" path="/test/search" version="live">
   <head>
-    <template>default</template>
+    <template>search</template>
     <promote>true</promote>
     <index>true</index>
     <metadata>
