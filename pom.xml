@@ -388,9 +388,10 @@
           <version>1.6</version>
           <executions>
             <execution>
+              <id>deploy</id>
               <phase>install</phase>
               <configuration>
-                <target name="[INFO] Deploy to stage" if="weblounge.home">
+                <target name="[INFO] Deploy to stage" if="weblounge.home" unless="deployment.skip">
                   <property name="bundle.file" value="${project.build.directory}/${project.build.finalName}.jar"/>
                   <copy verbose="false" file="${bundle.file}" todir="${weblounge.home}/${weblounge.deploymentdir}" overwrite="true" failonerror="false"/>
                 </target>

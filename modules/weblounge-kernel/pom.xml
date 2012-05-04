@@ -479,7 +479,8 @@
             </Export-Package>
             <Private-Package>
               org.json,
-              org.apache.geronimo.javamail
+              org.apache.geronimo.javamail.authentication,
+              org.apache.geronimo.javamail.handlers
             </Private-Package>
             <Embed-Dependency>
               spring-security-oauth;inline=true,

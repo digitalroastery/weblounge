@@ -165,7 +165,7 @@ public class Precompiler {
 
       // Collect all renderers (from modules and templates) and ask for precompilation
       List<URL> rendererUrls = new ArrayList<URL>();
-      for (Module m: site.getModules()) {
+      for (Module m : site.getModules()) {
         if (!m.isEnabled())
           break;
         for (PageletRenderer p : m.getRenderers()) {
