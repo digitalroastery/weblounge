@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge SMTP Service">
+  
+  <implementation class="ch.entwine.weblounge.kernel.mail.SmtpService" />
+  <property name="service.description" value="Weblounge SMTP Service" />
+  <property name="service.pid" value="ch.entwine.weblounge.smtp" />
+  <service>
+    <provide interface="ch.entwine.weblounge.kernel.mail.SmtpService" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+
+</scr:component>

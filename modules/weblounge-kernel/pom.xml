@@ -81,6 +81,11 @@
       <groupId>javax.activation</groupId>
       <artifactId>activation</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+    </dependency>
     
     <dependency>
       <groupId>commons-lang</groupId>
@@ -92,6 +97,12 @@
       <artifactId>tika-bundle</artifactId>
     </dependency>
     
+    <dependency>
+      <groupId>org.apache.geronimo.javamail</groupId>
+      <artifactId>geronimo-javamail_1.4_provider</artifactId>
+      <version>1.8.3</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle-jaxrs</artifactId>
@@ -442,6 +453,11 @@
               org.slf4j;version="[1.5.0,1.6.0)",
               org.w3c.dom,
               javax.activation,
+              javax.mail;version="1.4",
+              javax.mail.event;version="1.4",
+              javax.mail.internet;version="1.4",
+              javax.mail.search;version="1.4",
+              javax.mail.util;version="1.4",
               javax.servlet;version="2.5.0",
               javax.servlet.http;version="2.5.0",
               javax.ws.rs;version="1.0",
@@ -453,6 +469,7 @@
               ch.entwine.weblounge.kernel.command;version=${project.version},
               ch.entwine.weblounge.kernel.endpoint;version=${project.version},
               ch.entwine.weblounge.kernel.http;version=${project.version},
+              ch.entwine.weblounge.kernel.mail;version=${project.version},
               ch.entwine.weblounge.kernel.publisher;version=${project.version},
               ch.entwine.weblounge.kernel.runtime;version=${project.version},
               ch.entwine.weblounge.kernel.security;version=${project.version},
@@ -461,11 +478,13 @@
               ch.entwine.weblounge.kernel.webconsole;version=${project.version}
             </Export-Package>
             <Private-Package>
-              org.json
+              org.json,
+              org.apache.geronimo.javamail
             </Private-Package>
             <Embed-Dependency>
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,
+              geronimo-javamail_1.4_provider;inline=true
             </Embed-Dependency>
             <Service-Component>
               OSGI-INF/directory-service.xml,
@@ -487,6 +506,7 @@
               OSGI-INF/site-manager-service.xml,
               OSGI-INF/site-rest-service.xml,
               OSGI-INF/site-runtime-information.xml,
+              OSGI-INF/smtp-service.xml,
               OSGI-INF/system-admin-directory-provider.xml,
               OSGI-INF/test-command.xml
             </Service-Component>
