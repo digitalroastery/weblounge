@@ -135,7 +135,10 @@ public class ContentIteratorTag extends WebloungeTag {
     // to be initialized
     if (cardinality == -1) {
       pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
-      cardinality = getCardinality(pagelet);
+      cardinality = getRemainingCardinality(pagelet);
+
+      iterations = Math.min(cardinality, maxOccurs);
+      iterations = Math.max(iterations, minOccurs);
 
       // Do we have a pagelet?
       if (pagelet == null)
@@ -149,9 +152,9 @@ public class ContentIteratorTag extends WebloungeTag {
   }
 
   /**
-   * Selects the set of element values over which to iterate.
+   * Returns the number of remaining data values.
    */
-  private int getCardinality(Pagelet pagelet) {
+  private int getRemainingCardinality(Pagelet pagelet) {
 
     // Check remaining elements
     if (elementNames != null) {
