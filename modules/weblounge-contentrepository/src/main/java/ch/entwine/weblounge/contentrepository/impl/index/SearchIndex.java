@@ -300,6 +300,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
     // Add the alternate version information to each resource's metadata and
     // write it back to the search index (including the new one)
+    List<SolrInputDocument> solrDocuments = new ArrayList<SolrInputDocument>();
     for (Resource<?> r : resources) {
       List<ResourceMetadata<?>> resourceMetadata = serializer.toMetadata(r);
       ResourceMetadataImpl<Long> alternateVersions = new ResourceMetadataImpl<Long>(ALTERNATE_VERSION);
@@ -320,12 +321,14 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       }
 
       // Write the resource to the index
-      SolrInputDocument doc = updateDocument(new SolrInputDocument(), resourceMetadata);
-      try {
-        update(doc);
-      } catch (Throwable t) {
-        throw new ContentRepositoryException("Cannot update versions of resource " + uri + " in index", t);
-      }
+      solrDocuments.add(updateDocument(new SolrInputDocument(), resourceMetadata));
+    }
+
+    // Now update all documents at once
+    try {
+      update(solrDocuments.toArray(new SolrInputDocument[solrDocuments.size()]));
+    } catch (Throwable t) {
+      throw new ContentRepositoryException("Cannot update versions of resource " + uri + " in index", t);
     }
   }
 
@@ -401,21 +404,24 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   /**
    * Posts the input document to the search index.
    * 
-   * @param document
-   *          the input document
+   * @param waitCommit
+   *          wait until the commit finalizes
+   * @param documents
+   *          the input documents
    * @return the query response
    * @throws ContentRepositoryException
    *           if posting to solr fails
    */
-  protected QueryResponse update(SolrInputDocument document)
+  protected QueryResponse update(SolrInputDocument... documents)
       throws ContentRepositoryException {
-    UpdateRequest solrRequest = new UpdateRequest();
+    final UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.setAction(ACTION.COMMIT, true, true);
-    solrRequest.add(document);
+    for (SolrInputDocument doc : documents)
+      solrRequest.add(doc);
     try {
       return solrServer.update(solrRequest);
     } catch (Throwable t) {
-      throw new ContentRepositoryException("Cannot update document " + document + " in index", t);
+      throw new ContentRepositoryException("Cannot update documents in index", t);
     }
   }
 
