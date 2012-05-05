@@ -1,5 +1,5 @@
 <%@ taglib uri="/WEB-INF/greeter.tld" prefix="greeter" %>
-<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
 <!DOCTYPE HTML>
 <html>
 	<head>

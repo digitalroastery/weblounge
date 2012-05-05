@@ -1,4 +1,4 @@
-<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
 <%@ page import="ch.entwine.weblounge.common.content.file.FileResource" %>
 <webl:context define="pagelet, site, language">
   <% FileResource fileResult = (FileResource)pagelet.getContent(); %>

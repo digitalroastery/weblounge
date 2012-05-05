@@ -1,4 +1,4 @@
-<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
 
 <p class="question">
 	<webl:element name="question" templates="true" />

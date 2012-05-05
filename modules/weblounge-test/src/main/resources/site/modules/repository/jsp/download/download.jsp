@@ -1,6 +1,6 @@
 <%@page import="ch.entwine.weblounge.common.content.file.FileResource"%>
 <%@page import="ch.entwine.weblounge.common.impl.content.ResourceURIImpl"%>
-<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
 <%@ taglib uri="/WEB-INF/weblounge-resource.tld" prefix="weblr" %>
 <%@ page import="ch.entwine.weblounge.common.content.ResourceUtils" %>
 <%@ page import="ch.entwine.weblounge.common.url.UrlUtils" %>

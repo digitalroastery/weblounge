@@ -1,4 +1,4 @@
-<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
 <webl:property define="movie, border, color1, color2">
 	<div class="youtube">
 		<object width="560" height="315">

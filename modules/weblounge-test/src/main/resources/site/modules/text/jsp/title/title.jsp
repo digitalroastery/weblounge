@@ -4,7 +4,7 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="ch.entwine.weblounge.common.content.ResourceUtils" %>
-<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
 
 <webl:context define="p=page, language">
 	<%

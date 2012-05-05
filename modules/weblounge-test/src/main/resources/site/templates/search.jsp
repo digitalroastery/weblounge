@@ -1,5 +1,5 @@
 <%@ taglib uri="/WEB-INF/greeter.tld" prefix="greeter" %>
-<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
 <%@ page import="ch.entwine.weblounge.common.content.SearchResult" %>
 <%@ page import="ch.entwine.weblounge.common.request.WebloungeRequest" %>
 <% SearchResult result = (SearchResult)request.getAttribute(WebloungeRequest.SEARCH); %>
