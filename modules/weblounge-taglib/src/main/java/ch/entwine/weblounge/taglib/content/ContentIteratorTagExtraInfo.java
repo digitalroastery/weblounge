@@ -20,6 +20,18 @@
 
 package ch.entwine.weblounge.taglib.content;
 
+import ch.entwine.weblounge.taglib.ParseException;
+import ch.entwine.weblounge.taglib.TagVariableDefinition;
+import ch.entwine.weblounge.taglib.TagVariableDefinitionParser;
+import ch.entwine.weblounge.taglib.TagVariableDefinitions;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.jsp.tagext.TagData;
 import javax.servlet.jsp.tagext.TagExtraInfo;
 import javax.servlet.jsp.tagext.VariableInfo;
@@ -30,16 +42,50 @@ import javax.servlet.jsp.tagext.VariableInfo;
  */
 public class ContentIteratorTagExtraInfo extends TagExtraInfo {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(ContentIteratorTagExtraInfo.class);
+
   /**
    * Returns the information on the exported tag variables.
    * 
    * @see javax.servlet.jsp.tagext.TagExtraInfo#getVariableInfo(javax.servlet.jsp.tagext.TagData)
    */
   public VariableInfo[] getVariableInfo(TagData tagData) {
-    return new VariableInfo[] {
-        new VariableInfo(ContentIteratorTagVariables.INDEX, Integer.class.getName(), true, VariableInfo.NESTED),
-        new VariableInfo(ContentIteratorTagVariables.ITERATIONS, Integer.class.getName(), true, VariableInfo.NESTED)
- };
+    List<VariableInfo> varinfo = new ArrayList<VariableInfo>();
+
+    // Add the default variables
+    varinfo.add(new VariableInfo(ContentIteratorTagVariables.INDEX, Integer.class.getName(), true, VariableInfo.NESTED));
+    varinfo.add(new VariableInfo(ContentIteratorTagVariables.ITERATIONS, Integer.class.getName(), true, VariableInfo.NESTED));
+
+    // Define elements
+    String elements = tagData.getAttributeString("elements");
+    if (StringUtils.isNotBlank(elements)) {
+      try {
+        TagVariableDefinitions elementVariables = TagVariableDefinitionParser.parse(elements);
+        for (TagVariableDefinition def : elementVariables) {
+          String name = def.getAlias() != null ? def.getAlias() : def.getName();
+          varinfo.add(new VariableInfo(name, String.class.getName(), true, VariableInfo.NESTED));
+        }
+      } catch (ParseException e) {
+        logger.info("Error parsing element definition '{}': {}", elements, e.getMessage());
+      }
+    }
+
+    // Define properties
+    String properties = tagData.getAttributeString("properties");
+    if (StringUtils.isNotBlank(properties)) {
+      try {
+        TagVariableDefinitions propertyVariables = TagVariableDefinitionParser.parse(properties);
+        for (TagVariableDefinition def : propertyVariables) {
+          String name = def.getAlias() != null ? def.getAlias() : def.getName();
+          varinfo.add(new VariableInfo(name, String.class.getName(), true, VariableInfo.NESTED));
+        }
+      } catch (ParseException e) {
+        logger.info("Error parsing property definition '{}': {}", properties, e.getMessage());
+      }
+    }
+
+    return varinfo.toArray(new VariableInfo[varinfo.size()]);
   }
 
   /**
