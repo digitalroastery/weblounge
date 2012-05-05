@@ -212,10 +212,10 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
       scaleHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
       scaleHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-      float scaledWidth = scale * image.getWidth();
-      float scaledHeight = scale * image.getHeight();
-      float cropX = 0.0f;
-      float cropY = 0.0f;
+      int scaledWidth = Math.round(scale * image.getWidth());
+      int scaledHeight = Math.round(scale * image.getHeight());
+      int cropX = 0;
+      int cropY = 0;
 
       // If either one of scaledWidth or scaledHeight is < 1.0, then
       // the scale needs to be adapted to scale to 1.0 exactly and accomplish
@@ -223,14 +223,14 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
 
       if (scaledWidth < 1.0f) {
         scale = 1.0f / imageWidth;
-        scaledWidth = 1.0f;
+        scaledWidth = 1;
         cropY = imageHeight - scaledHeight;
-        scaledHeight = imageHeight * scale;
+        scaledHeight = Math.round(imageHeight * scale);
       } else if (scaledHeight < 1.0f) {
         scale = 1.0f / imageHeight;
-        scaledHeight = 1.0f;
+        scaledHeight = 1;
         cropX = imageWidth - scaledWidth;
-        scaledWidth = imageWidth * scale;
+        scaledWidth = Math.round(imageWidth * scale);
       }
 
       if (scale > 1.0) {
@@ -248,8 +248,8 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
       }
 
       // Cropping
-      cropX = Math.max(cropX, (float) Math.ceil(ImageStyleUtils.getCropX(scaledWidth, scaledHeight, style)));
-      cropY = Math.max(cropY, (float) Math.ceil(ImageStyleUtils.getCropY(scaledWidth, scaledHeight, style)));
+      cropX = (int) Math.max(cropX, (float) Math.ceil(ImageStyleUtils.getCropX(scaledWidth, scaledHeight, style)));
+      cropY = (int) Math.max(cropY, (float) Math.ceil(ImageStyleUtils.getCropY(scaledWidth, scaledHeight, style)));
 
       if ((cropX > 0 && Math.floor(cropX / 2.0f) > 0) || (cropY > 0 && Math.floor(cropY / 2.0f) > 0)) {
 

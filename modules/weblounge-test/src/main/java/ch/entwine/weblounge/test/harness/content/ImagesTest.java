@@ -504,8 +504,8 @@ public class ImagesTest extends IntegrationTestBase {
         // Test file size
         if (!ImageScalingMode.None.equals(style.getScalingMode())) {
           float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
-          float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
-          float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
+          int scaledWidth = Math.round(originalWidth * scale) - ImageStyleUtils.getCropX(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
+          int scaledHeight = Math.round(originalHeight * scale) - ImageStyleUtils.getCropY(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
 
           // Load the image from the given input stream
           seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
@@ -587,8 +587,8 @@ public class ImagesTest extends IntegrationTestBase {
         // Test file size
         if (!ImageScalingMode.None.equals(style.getScalingMode())) {
           float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
-          float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
-          float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
+          int scaledWidth = Math.round(originalWidth * scale) - ImageStyleUtils.getCropX(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
+          int scaledHeight = Math.round(originalHeight * scale) - ImageStyleUtils.getCropY(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
 
           // Load the image from the given input stream
           seekableInputStream = new FileCacheSeekableStream(response.getEntity().getContent());
@@ -638,5 +638,4 @@ public class ImagesTest extends IntegrationTestBase {
     TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
     TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
-
 }

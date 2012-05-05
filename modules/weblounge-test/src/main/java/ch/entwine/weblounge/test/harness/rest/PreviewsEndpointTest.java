@@ -231,8 +231,8 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
         // Test file size
         if (!ImageScalingMode.None.equals(imageStyle.getScalingMode())) {
           float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, imageStyle);
-          float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, imageStyle);
-          float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, imageStyle);
+          int scaledWidth = Math.round(originalWidth * scale) - ImageStyleUtils.getCropX(Math.round(originalWidth * scale), Math.round(originalHeight * scale), imageStyle);
+          int scaledHeight = Math.round(originalHeight * scale) - ImageStyleUtils.getCropY(Math.round(originalWidth * scale), Math.round(originalHeight * scale), imageStyle);
 
           // Load the image from the given input stream
           seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());

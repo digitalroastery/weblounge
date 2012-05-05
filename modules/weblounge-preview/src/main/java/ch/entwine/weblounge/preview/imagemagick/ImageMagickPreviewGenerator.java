@@ -248,10 +248,10 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       // Resizing
       float scale = ImageStyleUtils.getScale(imageWidth, imageHeight, style);
 
-      float scaledWidth = scale * imageWidth;
-      float scaledHeight = scale * imageHeight;
-      float cropX = 0.0f;
-      float cropY = 0.0f;
+      int scaledWidth = Math.round(scale * imageWidth);
+      int scaledHeight = Math.round(scale * imageHeight);
+      int cropX = 0;
+      int cropY = 0;
 
       // If either one of scaledWidth or scaledHeight is < 1.0, then
       // the scale needs to be adapted to scale to 1.0 exactly and accomplish
@@ -259,14 +259,14 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
 
       if (scaledWidth < 1.0f) {
         scale = 1.0f / imageWidth;
-        scaledWidth = 1.0f;
+        scaledWidth = 1;
         cropY = imageHeight - scaledHeight;
-        scaledHeight = imageHeight * scale;
+        scaledHeight = Math.round(imageHeight * scale);
       } else if (scaledHeight < 1.0f) {
         scale = 1.0f / imageHeight;
-        scaledHeight = 1.0f;
+        scaledHeight = 1;
         cropX = imageWidth - scaledWidth;
-        scaledWidth = imageWidth * scale;
+        scaledWidth = Math.round(imageWidth * scale);
       }
 
       // Do the scaling
@@ -278,8 +278,8 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       finalFile = scaledFile;
 
       // Cropping
-      cropX = Math.max(cropX, (float) Math.ceil(ImageStyleUtils.getCropX(scaledWidth, scaledHeight, style)));
-      cropY = Math.max(cropY, (float) Math.ceil(ImageStyleUtils.getCropY(scaledWidth, scaledHeight, style)));
+      cropX = (int) Math.max(cropX, Math.ceil(ImageStyleUtils.getCropX(scaledWidth, scaledHeight, style)));
+      cropY = (int) Math.max(cropY, Math.ceil(ImageStyleUtils.getCropY(scaledWidth, scaledHeight, style)));
 
       if ((cropX > 0 && Math.floor(cropX / 2.0f) > 0) || (cropY > 0 && Math.floor(cropY / 2.0f) > 0)) {
 
