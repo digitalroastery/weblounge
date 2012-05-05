@@ -23,7 +23,6 @@ package ch.entwine.weblounge.common.content.image;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.entwine.weblounge.common.impl.content.image.ImageContentImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
@@ -34,6 +33,7 @@ import org.junit.Test;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Test case for {@link ImageStyleUtilsTest}.
@@ -46,20 +46,16 @@ public class ImageStyleUtilsTest {
   /** Image url */
   protected static URL imageURL = null;
 
-  /** The original image's width */
-  protected final float originalWidth = 1000;
-
-  /** The original image's height */
-  protected final float originalHeight = 666;
-
   /** The style's width */
-  protected static final float styleWidth = 250;
+  protected static final float styleWidth = 300;
 
   /** The style's height */
-  protected static final float styleHeight = 250;
+  protected static final float styleHeight = 300;
 
   /** The image styles to test */
   protected static List<ImageStyle> styles = null;
+
+  protected static Map<ImageScalingMode, Map<String, int[]>> expectedResults = null;
 
   /**
    * @throws java.lang.Exception
@@ -88,33 +84,92 @@ public class ImageStyleUtilsTest {
    */
   @Test
   public void testGetScale() {
-    float scaleToWidth = styleWidth / originalWidth;
-    float scaleToHeight = styleHeight / originalHeight;
+
     for (ImageStyle style : styles) {
-      float scale = ImageStyleUtils.getScale((int) originalWidth, (int) originalHeight, style);
       switch (style.getScalingMode()) {
         case Box:
-          assertEquals(scaleToWidth, scale);
-          break;
-        case Cover:
-          assertEquals(scaleToHeight, scale);
+          float[] expectedBoxValues = {
+              0.75f,
+              0.75f,
+              0.75f,
+              0.75f,
+              1,
+              1,
+              0.75f,
+              1,
+              1 };
+          testGetScale(style, expectedBoxValues);
           break;
         case Fill:
-          assertEquals(scaleToHeight, scale);
+          float[] expectedFillValues = {
+              0.75f,
+              1,
+              1.5f,
+              1,
+              1,
+              1.5f,
+              1.5f,
+              1.5f,
+              1.5f };
+          testGetScale(style, expectedFillValues);
+          break;
+        case Cover:
+          float[] expectedCoverValues = {
+              1,
+              1,
+              1.5f,
+              1,
+              1,
+              1.5f,
+              1.5f,
+              1.5f,
+              1.5f };
+          testGetScale(style, expectedCoverValues);
           break;
         case Width:
-          assertEquals(scaleToWidth, scale);
+          float[] expectedWidthValues = {
+              0.75f,
+              0.75f,
+              0.75f,
+              1,
+              1,
+              1,
+              1.5f,
+              1.5f,
+              1.5f };
+          testGetScale(style, expectedWidthValues);
           break;
         case Height:
-          assertEquals(scaleToHeight, scale);
+          float[] expectedHeightValues = {
+              0.75f,
+              1,
+              1.5f,
+              0.75f,
+              1,
+              1.5f,
+              0.75f,
+              1,
+              1.5f };
+          testGetScale(style, expectedHeightValues);
           break;
         case None:
-          assertEquals(1.0f, scale);
           break;
         default:
           fail("Unknown scaling mode " + style.getScalingMode());
       }
     }
+  }
+
+  private void testGetScale(ImageStyle style, float[] expectedValues) {
+    assertEquals(expectedValues[0], ImageStyleUtils.getScale(400, 400, style), 0.1f);
+    assertEquals(expectedValues[1], ImageStyleUtils.getScale(400, 300, style), 0.1f);
+    assertEquals(expectedValues[2], ImageStyleUtils.getScale(400, 200, style), 0.1f);
+    assertEquals(expectedValues[3], ImageStyleUtils.getScale(300, 400, style), 0.1f);
+    assertEquals(expectedValues[4], ImageStyleUtils.getScale(300, 300, style), 0.1f);
+    assertEquals(expectedValues[5], ImageStyleUtils.getScale(300, 200, style), 0.1f);
+    assertEquals(expectedValues[6], ImageStyleUtils.getScale(200, 400, style), 0.1f);
+    assertEquals(expectedValues[7], ImageStyleUtils.getScale(200, 300, style), 0.1f);
+    assertEquals(expectedValues[8], ImageStyleUtils.getScale(200, 200, style), 0.1f);
   }
 
   /**
@@ -125,22 +180,47 @@ public class ImageStyleUtilsTest {
   @Test
   public void testGetCropX() {
     for (ImageStyle style : styles) {
-      float cropX = ImageStyleUtils.getCropX((int) originalWidth, (int) originalHeight, style);
       switch (style.getScalingMode()) {
-        case Fill:
-          assertEquals(originalWidth - styleWidth, cropX);
-          break;
         case Box:
+          int[] expectedBoxValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+          testGetCropX(style, expectedBoxValues);
+          break;
+        case Fill:
+          int[] expectedFillValues = { 0, 100, 300, 0, 0, 150, 0, 0, 0 };
+          testGetCropX(style, expectedFillValues);
+          break;
         case Cover:
+          int[] expectedCoverValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+          testGetCropX(style, expectedCoverValues);
+          break;
         case Width:
+          int[] expectedWidthValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+          testGetCropX(style, expectedWidthValues);
+          break;
         case Height:
+          int[] expectedHeightValues = { 0, 100, 300, 0, 0, 150, 0, 0, 0 };
+          testGetCropX(style, expectedHeightValues);
+          break;
         case None:
-          assertEquals(0.0f, cropX);
+          int[] expectedNoneValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+          testGetCropX(style, expectedNoneValues);
           break;
         default:
           fail("Unknown scaling mode " + style.getScalingMode());
       }
     }
+  }
+
+  private void testGetCropX(ImageStyle style, int[] expectedValues) {
+    assertEquals(expectedValues[0], ImageStyleUtils.getCropX(400, 400, style));
+    assertEquals(expectedValues[1], ImageStyleUtils.getCropX(400, 300, style));
+    assertEquals(expectedValues[2], ImageStyleUtils.getCropX(400, 200, style));
+    assertEquals(expectedValues[3], ImageStyleUtils.getCropX(300, 400, style));
+    assertEquals(expectedValues[4], ImageStyleUtils.getCropX(300, 300, style));
+    assertEquals(expectedValues[5], ImageStyleUtils.getCropX(300, 200, style));
+    assertEquals(expectedValues[6], ImageStyleUtils.getCropX(200, 400, style));
+    assertEquals(expectedValues[7], ImageStyleUtils.getCropX(200, 300, style));
+    assertEquals(expectedValues[8], ImageStyleUtils.getCropX(200, 200, style));
   }
 
   /**
@@ -151,22 +231,47 @@ public class ImageStyleUtilsTest {
   @Test
   public void testGetCropY() {
     for (ImageStyle style : styles) {
-      float cropY = ImageStyleUtils.getCropY((int) originalWidth, (int) originalHeight, style);
       switch (style.getScalingMode()) {
-        case Fill:
-          assertEquals(originalHeight - styleHeight, cropY);
-          break;
         case Box:
+          int[] expectedBoxValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+          testGetCropY(style, expectedBoxValues);
+          break;
+        case Fill:
+          int[] expectedFillValues = { 0, 0, 0, 100, 0, 0, 300, 150, 0 };
+          testGetCropY(style, expectedFillValues);
+          break;
         case Cover:
+          int[] expectedCoverValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+          testGetCropY(style, expectedCoverValues);
+          break;
         case Width:
+          int[] expectedWidthValues = { 0, 0, 0, 100, 0, 0, 300, 150, 0 };
+          testGetCropY(style, expectedWidthValues);
+          break;
         case Height:
+          int[] expectedHeightValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+          testGetCropY(style, expectedHeightValues);
+          break;
         case None:
-          assertEquals(0.0f, cropY);
+          int[] expectedNoneValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+          testGetCropY(style, expectedNoneValues);
           break;
         default:
           fail("Unknown scaling mode " + style.getScalingMode());
       }
     }
+  }
+
+  private void testGetCropY(ImageStyle style, int[] expectedValues) {
+    assertEquals(expectedValues[0], ImageStyleUtils.getCropY(400, 400, style));
+    assertEquals(expectedValues[1], ImageStyleUtils.getCropY(400, 300, style));
+    assertEquals(expectedValues[2], ImageStyleUtils.getCropY(400, 200, style));
+    assertEquals(expectedValues[3], ImageStyleUtils.getCropY(300, 400, style));
+    assertEquals(expectedValues[4], ImageStyleUtils.getCropY(300, 300, style));
+    assertEquals(expectedValues[5], ImageStyleUtils.getCropY(300, 200, style));
+    assertEquals(expectedValues[6], ImageStyleUtils.getCropY(200, 400, style));
+    assertEquals(expectedValues[7], ImageStyleUtils.getCropY(200, 300, style));
+    assertEquals(expectedValues[8], ImageStyleUtils.getCropY(200, 200, style));
   }
 
   /**
@@ -176,29 +281,101 @@ public class ImageStyleUtilsTest {
   @Test
   public void testGetStyledWidth() {
     for (ImageStyle style : styles) {
-      int scaledWidth = ImageStyleUtils.getStyledWidth((int) originalWidth, (int) originalHeight, style);
-      float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
       switch (style.getScalingMode()) {
-        case Fill:
         case Box:
-          assertEquals(styleWidth, scaledWidth);
+          int[] expectedBoxValues = {
+              300,
+              300,
+              300,
+              225,
+              300,
+              300,
+              150,
+              200,
+              200 };
+          testGetStyledWidth(style, expectedBoxValues);
+          break;
+        case Fill:
+          int[] expectedFillValues = {
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300 };
+          testGetStyledWidth(style, expectedFillValues);
           break;
         case Cover:
-          assertEquals(Math.max(scale * originalWidth, styleWidth), scaledWidth);
+          int[] expectedCoverValues = {
+              400,
+              400,
+              600,
+              300,
+              300,
+              450,
+              300,
+              300,
+              300 };
+          testGetStyledWidth(style, expectedCoverValues);
           break;
         case Width:
-          assertEquals(styleWidth, scaledWidth);
+          int[] expectedWidthValues = {
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300 };
+          testGetStyledWidth(style, expectedWidthValues);
           break;
         case Height:
-          assertEquals(Math.round(originalWidth * scale), scaledWidth);
+          int[] expectedHeightValues = {
+              300,
+              300,
+              300,
+              225,
+              300,
+              300,
+              150,
+              200,
+              300 };
+          testGetStyledWidth(style, expectedHeightValues);
           break;
         case None:
-          assertEquals(originalWidth, scaledWidth);
+          int[] expectedNoneValues = {
+              400,
+              400,
+              400,
+              300,
+              300,
+              300,
+              200,
+              200,
+              200 };
+          testGetStyledWidth(style, expectedNoneValues);
           break;
         default:
           fail("Unknown scaling mode " + style.getScalingMode());
       }
     }
+  }
+
+  private void testGetStyledWidth(ImageStyle style, int[] expectedValues) {
+    assertEquals(expectedValues[0], ImageStyleUtils.getStyledWidth(400, 400, style));
+    assertEquals(expectedValues[1], ImageStyleUtils.getStyledWidth(400, 300, style));
+    assertEquals(expectedValues[2], ImageStyleUtils.getStyledWidth(400, 200, style));
+    assertEquals(expectedValues[3], ImageStyleUtils.getStyledWidth(300, 400, style));
+    assertEquals(expectedValues[4], ImageStyleUtils.getStyledWidth(300, 300, style));
+    assertEquals(expectedValues[5], ImageStyleUtils.getStyledWidth(300, 200, style));
+    assertEquals(expectedValues[6], ImageStyleUtils.getStyledWidth(200, 400, style));
+    assertEquals(expectedValues[7], ImageStyleUtils.getStyledWidth(200, 300, style));
+    assertEquals(expectedValues[8], ImageStyleUtils.getStyledWidth(200, 200, style));
   }
 
   /**
@@ -208,26 +385,84 @@ public class ImageStyleUtilsTest {
   @Test
   public void testGetStyledHeight() {
     for (ImageStyle style : styles) {
-      int scaledHeight = ImageStyleUtils.getStyledHeight((int) originalWidth, (int) originalHeight, style);
-      float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
       switch (style.getScalingMode()) {
-        case Fill:
-          assertEquals(styleHeight, scaledHeight);
-          break;
         case Box:
-          assertEquals(Math.round(scale * originalHeight), scaledHeight);
+          int[] expectedBoxValues = {
+              300,
+              225,
+              150,
+              300,
+              300,
+              200,
+              300,
+              300,
+              200 };
+          testGetStyledHeight(style, expectedBoxValues);
+          break;
+        case Fill:
+          int[] expectedFillValues = {
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300 };
+          testGetStyledHeight(style, expectedFillValues);
           break;
         case Cover:
-          assertEquals(styleHeight, scaledHeight);
+          int[] expectedCoverValues = {
+              400,
+              300,
+              300,
+              400,
+              300,
+              300,
+              600,
+              450,
+              300 };
+          testGetStyledHeight(style, expectedCoverValues);
           break;
         case Width:
-          assertEquals(Math.round(scale * originalHeight), scaledHeight);
+          int[] expectedWidthValues = {
+              300,
+              225,
+              150,
+              300,
+              300,
+              200,
+              300,
+              300,
+              300 };
+          testGetStyledHeight(style, expectedWidthValues);
           break;
         case Height:
-          assertEquals(styleHeight, scaledHeight);
+          int[] expectedHeightValues = {
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300,
+              300 };
+          testGetStyledHeight(style, expectedHeightValues);
           break;
         case None:
-          assertEquals(originalHeight, scaledHeight);
+          int[] expectedNoneValues = {
+              400,
+              300,
+              200,
+              400,
+              300,
+              200,
+              400,
+              300,
+              200 };
+          testGetStyledHeight(style, expectedNoneValues);
           break;
         default:
           fail("Unknown scaling mode " + style.getScalingMode());
@@ -235,52 +470,16 @@ public class ImageStyleUtilsTest {
     }
   }
 
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils#getWidth(ImageContent, ch.entwine.weblounge.common.content.image.ImageStyle)}
-   * and
-   * {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils#getWidth(ImageContent, ch.entwine.weblounge.common.content.image.ImageStyle)}
-   * .
-   */
-  @Test
-  public void testGetWidthAndHeigth() {
-    for (ImageStyle style : styles) {
-      ImageContent imageContent = new ImageContentImpl();
-      imageContent.setWidth((int) originalWidth);
-      imageContent.setHeight((int) originalHeight);
-
-      int scaledWidth = ImageStyleUtils.getWidth(imageContent, style);
-      int scaledHeight = ImageStyleUtils.getHeight(imageContent, style);
-
-      switch (style.getScalingMode()) {
-        case Box:
-          assertEquals(styleWidth, scaledWidth);
-          assertEquals(originalHeight * (styleWidth / originalWidth), scaledHeight);
-          break;
-        case Cover:
-          assertEquals(originalWidth * (styleHeight / originalHeight), scaledWidth);
-          assertEquals(styleHeight, scaledHeight);
-          break;
-        case Fill:
-          assertEquals(styleWidth, scaledWidth);
-          assertEquals(styleHeight, scaledHeight);
-          break;
-        case Height:
-          assertEquals(originalWidth * (styleHeight / originalHeight), scaledWidth);
-          assertEquals(styleHeight, scaledHeight);
-          break;
-        case None:
-          assertEquals(originalWidth, scaledWidth);
-          assertEquals(originalHeight, scaledHeight);
-          break;
-        case Width:
-          assertEquals(styleWidth, scaledWidth);
-          assertEquals(originalHeight * (styleWidth / originalWidth), scaledHeight);
-          break;
-        default:
-          fail("Unknown scaling mode " + style.getScalingMode());
-      }
-    }
+  private void testGetStyledHeight(ImageStyle style, int[] expectedValues) {
+    assertEquals(expectedValues[0], ImageStyleUtils.getStyledHeight(400, 400, style));
+    assertEquals(expectedValues[1], ImageStyleUtils.getStyledHeight(400, 300, style));
+    assertEquals(expectedValues[2], ImageStyleUtils.getStyledHeight(400, 200, style));
+    assertEquals(expectedValues[3], ImageStyleUtils.getStyledHeight(300, 400, style));
+    assertEquals(expectedValues[4], ImageStyleUtils.getStyledHeight(300, 300, style));
+    assertEquals(expectedValues[5], ImageStyleUtils.getStyledHeight(300, 200, style));
+    assertEquals(expectedValues[6], ImageStyleUtils.getStyledHeight(200, 400, style));
+    assertEquals(expectedValues[7], ImageStyleUtils.getStyledHeight(200, 300, style));
+    assertEquals(expectedValues[8], ImageStyleUtils.getStyledHeight(200, 200, style));
   }
 
 }

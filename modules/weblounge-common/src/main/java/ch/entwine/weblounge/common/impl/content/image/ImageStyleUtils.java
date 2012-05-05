@@ -60,11 +60,11 @@ public final class ImageStyleUtils {
    * @return the width
    */
   public static int getWidth(ImageContent image, ImageStyle style) {
-    float width = image.getWidth();
-    float height = image.getHeight();
+    int width = image.getWidth();
+    int height = image.getHeight();
     width *= getScale(width, height, style);
     width -= getCropX(width, height, style);
-    return (int) width;
+    return width;
   }
 
   /**
@@ -78,11 +78,11 @@ public final class ImageStyleUtils {
    * @return the height
    */
   public static int getHeight(ImageContent image, ImageStyle style) {
-    float width = image.getWidth();
-    float height = image.getHeight();
+    int width = image.getWidth();
+    int height = image.getHeight();
     height *= getScale(width, height, style);
     height -= getCropY(width, height, style);
-    return (int) height;
+    return height;
   }
 
   /**
@@ -106,8 +106,13 @@ public final class ImageStyleUtils {
     switch (style.getScalingMode()) {
       case Box:
         scale = Math.min(scaleX, scaleY);
+        if (imageWidth <= style.getWidth() && imageHeight <= style.getHeight())
+          scale = 1.0f;
         break;
       case Cover:
+        if (scaleX > 1f || scaleY > 1f)
+          scale = Math.max(scaleX, scaleY);
+        break;
       case Fill:
         scale = Math.max(scaleX, scaleY);
         break;
@@ -139,19 +144,20 @@ public final class ImageStyleUtils {
    *          the image style
    * @return the horizontal cropping amount
    */
-  public static float getCropX(float imageWidth, float imageHeight,
-      ImageStyle style) {
-    float cropX = 0;
+  public static int getCropX(int imageWidth, int imageHeight, ImageStyle style) {
+    int cropX = 0;
+    int styledWidth = getStyledWidth(imageWidth, imageHeight, style);
+    float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
       case Fill:
-        cropX = imageWidth - style.getWidth();
-        break;
       case Box:
       case Cover:
       case Width:
       case Height:
+        if (styledWidth < scale * imageWidth)
+          cropX = Math.round(scale * imageWidth) - styledWidth;
+        break;
       case None:
-        cropX = 0;
         break;
       default:
         throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
@@ -172,17 +178,19 @@ public final class ImageStyleUtils {
    *          the image style
    * @return the vertical cropping amount
    */
-  public static float getCropY(float imageWidth, float imageHeight,
-      ImageStyle style) {
-    float cropY = 0;
+  public static int getCropY(int imageWidth, int imageHeight, ImageStyle style) {
+    int cropY = 0;
+    int styledHeight = getStyledHeight(imageWidth, imageHeight, style);
+    float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
       case Fill:
-        cropY = imageHeight - style.getHeight();
-        break;
       case Box:
       case Cover:
       case Height:
       case Width:
+        if (styledHeight < scale * imageHeight)
+          cropY = Math.round(scale * imageHeight) - styledHeight;
+        break;
       case None:
         break;
       default:
@@ -205,7 +213,7 @@ public final class ImageStyleUtils {
    */
   public static int getStyledWidth(int imageWidth, int imageHeight,
       ImageStyle style) {
-    int width = 0;
+    int width = imageWidth;
     float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
       case Fill:
@@ -213,14 +221,18 @@ public final class ImageStyleUtils {
         width = style.getWidth();
         break;
       case Box:
+        if (scale < 1)
+          width = Math.round(scale * imageWidth);
+        break;
       case Cover:
         width = Math.round(scale * imageWidth);
         break;
       case Height:
         width = Math.round(scale * imageWidth);
+        if (width > style.getWidth())
+          width = style.getWidth();
         break;
       case None:
-        width = imageWidth;
         break;
       default:
         throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
@@ -241,7 +253,7 @@ public final class ImageStyleUtils {
    */
   public static int getStyledHeight(int imageWidth, int imageHeight,
       ImageStyle style) {
-    int height = 0;
+    int height = imageHeight;
     float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
       case Fill:
@@ -249,11 +261,16 @@ public final class ImageStyleUtils {
         height = style.getHeight();
         break;
       case Box:
+        if (scale < 1)
+          height = Math.round(scale * imageHeight);
+        break;
       case Cover:
         height = Math.round(scale * imageHeight);
         break;
       case Width:
         height = Math.round(scale * imageHeight);
+        if (height > style.getHeight())
+          height = style.getHeight();
         break;
       case None:
         height = imageHeight;
