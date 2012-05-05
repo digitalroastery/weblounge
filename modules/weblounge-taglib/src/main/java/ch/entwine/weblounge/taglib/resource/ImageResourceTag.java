@@ -251,8 +251,8 @@ public class ImageResourceTag extends WebloungeTag {
       style = ImageStyleUtils.findStyle(imageStyle, site);
       if (style != null) {
         linkToImage += "?style=" + style.getIdentifier();
-        imageWidth = ImageStyleUtils.getWidth(imageContent, style);
-        imageHeight = ImageStyleUtils.getHeight(imageContent, style);
+        imageWidth = ImageStyleUtils.getStyledWidth(imageContent, style);
+        imageHeight = ImageStyleUtils.getStyledHeight(imageContent, style);
         stashAndSetAttribute(ImageResourceTagExtraInfo.STYLE, style);
       } else {
         logger.warn("Image style '{}' not found", imageStyle);

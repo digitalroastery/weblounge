@@ -59,12 +59,8 @@ public final class ImageStyleUtils {
    *          the image style
    * @return the width
    */
-  public static int getWidth(ImageContent image, ImageStyle style) {
-    int width = image.getWidth();
-    int height = image.getHeight();
-    width *= getScale(width, height, style);
-    width -= getCropX(width, height, style);
-    return width;
+  public static int getStyledWidth(ImageContent image, ImageStyle style) {
+    return getStyledWidth(image.getWidth(), image.getHeight(), style);
   }
 
   /**
@@ -77,12 +73,8 @@ public final class ImageStyleUtils {
    *          the image style
    * @return the height
    */
-  public static int getHeight(ImageContent image, ImageStyle style) {
-    int width = image.getWidth();
-    int height = image.getHeight();
-    height *= getScale(width, height, style);
-    height -= getCropY(width, height, style);
-    return height;
+  public static int getStyledHeight(ImageContent image, ImageStyle style) {
+    return getStyledHeight(image.getWidth(), image.getWidth(), style);
   }
 
   /**
