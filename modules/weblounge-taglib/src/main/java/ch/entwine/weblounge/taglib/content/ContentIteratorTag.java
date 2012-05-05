@@ -135,7 +135,12 @@ public class ContentIteratorTag extends WebloungeTag {
     // to be initialized
     if (cardinality == -1) {
       pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
-      cardinality = getRemainingCardinality(pagelet);
+
+      // Do we have a pagelet?
+      if (pagelet == null)
+        return SKIP_BODY;
+
+      cardinality = getCardinality(pagelet);
 
       // Adjust according to maximum number of iterations
       if (maxOccurs > -1)
@@ -147,27 +152,29 @@ public class ContentIteratorTag extends WebloungeTag {
       if (minOccurs > -1)
         iterations = Math.max(iterations, minOccurs);
 
-      // Do we have a pagelet?
-      if (pagelet == null)
+      if (iterations == 0)
         return SKIP_BODY;
     }
 
     stashAndSetAttribute(ContentIteratorTagVariables.ITERATIONS, new Integer(iterations));
     stashAndSetAttribute(ContentIteratorTagVariables.INDEX, new Integer(index));
 
+    defineElementsAndProperties(index);
+
     return EVAL_BODY_INCLUDE;
   }
 
   /**
-   * Returns the number of remaining data values.
+   * Returns the number of data values.
    */
-  private int getRemainingCardinality(Pagelet pagelet) {
+  private int getCardinality(Pagelet pagelet) {
 
     // Check remaining elements
     if (elementNames != null) {
       Language language = request.getLanguage();
-      for (String element : pagelet.getContentNames(language)) {
-        String[] elementValues = pagelet.getMultiValueContent(element, language);
+      for (TagVariableDefinition element : elementNames) {
+        String name = element.getAlias();
+        String[] elementValues = pagelet.getMultiValueContent(name, language);
         if (elementValues == null)
           continue;
         cardinality = Math.max(cardinality, elementValues.length);
@@ -176,8 +183,9 @@ public class ContentIteratorTag extends WebloungeTag {
 
     // Check remaining properties
     if (propertyNames != null) {
-      for (String property : pagelet.getPropertyNames()) {
-        String[] propertyValues = pagelet.getMultiValueProperty(property);
+      for (TagVariableDefinition property : propertyNames) {
+        String name = property.getAlias();
+        String[] propertyValues = pagelet.getMultiValueProperty(name);
         if (propertyValues == null)
           continue;
         cardinality = Math.max(cardinality, propertyValues.length);
@@ -191,7 +199,7 @@ public class ContentIteratorTag extends WebloungeTag {
       return 0;
 
     // Calculate how many values are left
-    return cardinality - index;
+    return cardinality;
   }
 
   /**
@@ -211,7 +219,7 @@ public class ContentIteratorTag extends WebloungeTag {
       if (values != null && iteration < values.length) {
         value = values[iteration];
       }
-      String name = variable.getAlias() != null ? variable.getAlias() : variable.getName();
+      String name = variable.getAlias();
       logger.debug("Defining element '{}' as '{}'", name, value != null ? null : "null");
       stashAttribute(name);
       pageContext.setAttribute(name, value);
@@ -224,7 +232,7 @@ public class ContentIteratorTag extends WebloungeTag {
       if (values != null && iteration < values.length) {
         value = values[iteration];
       }
-      String name = variable.getAlias() != null ? variable.getAlias() : variable.getName();
+      String name = variable.getAlias();
       logger.debug("Defining property '{}' as '{}'", name, value != null ? null : "null");
       stashAttribute(name);
       pageContext.setAttribute(name, value);
