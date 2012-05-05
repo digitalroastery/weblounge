@@ -74,7 +74,7 @@ public final class ImageStyleUtils {
    * @return the height
    */
   public static int getStyledHeight(ImageContent image, ImageStyle style) {
-    return getStyledHeight(image.getWidth(), image.getWidth(), style);
+    return getStyledHeight(image.getWidth(), image.getHeight(), style);
   }
 
   /**
