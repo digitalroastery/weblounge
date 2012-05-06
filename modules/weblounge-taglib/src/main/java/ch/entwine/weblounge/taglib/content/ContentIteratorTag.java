@@ -242,29 +242,33 @@ public class ContentIteratorTag extends WebloungeTag {
     Language language = request.getLanguage();
 
     // Define the elements
-    for (TagVariableDefinition variable : elementNames) {
-      Object value = null;
-      String[] values = pagelet.getMultiValueContent(variable.getName(), language);
-      if (values != null && iteration < values.length) {
-        value = values[iteration];
+    if (elementNames != null) {
+      for (TagVariableDefinition variable : elementNames) {
+        Object value = null;
+        String[] values = pagelet.getMultiValueContent(variable.getName(), language);
+        if (values != null && iteration < values.length) {
+          value = values[iteration];
+        }
+        String name = variable.getAlias();
+        logger.debug("Defining element '{}' as '{}'", name, value != null ? null : "null");
+        stashAttribute(name);
+        pageContext.setAttribute(name, value);
       }
-      String name = variable.getAlias();
-      logger.debug("Defining element '{}' as '{}'", name, value != null ? null : "null");
-      stashAttribute(name);
-      pageContext.setAttribute(name, value);
     }
 
     // Define the properties
-    for (TagVariableDefinition variable : propertyNames) {
-      Object value = null;
-      String[] values = pagelet.getMultiValueProperty(variable.getName());
-      if (values != null && iteration < values.length) {
-        value = values[iteration];
+    if (propertyNames != null) {
+      for (TagVariableDefinition variable : propertyNames) {
+        Object value = null;
+        String[] values = pagelet.getMultiValueProperty(variable.getName());
+        if (values != null && iteration < values.length) {
+          value = values[iteration];
+        }
+        String name = variable.getAlias();
+        logger.debug("Defining property '{}' as '{}'", name, value != null ? null : "null");
+        stashAttribute(name);
+        pageContext.setAttribute(name, value);
       }
-      String name = variable.getAlias();
-      logger.debug("Defining property '{}' as '{}'", name, value != null ? null : "null");
-      stashAttribute(name);
-      pageContext.setAttribute(name, value);
     }
   }
 
