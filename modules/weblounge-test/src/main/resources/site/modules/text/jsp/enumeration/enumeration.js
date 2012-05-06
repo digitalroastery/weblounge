@@ -27,7 +27,7 @@ $.Controller("Editor.Enumeration",
     
 	//add a new element
 	_addLi: function() {
-		this.element.find('tr:last').parent().append('<tr id="x"><td class="dragHandle">&nbsp;</td><td><textarea name="element:text"></textarea> <img id="x" src="/weblounge-sites/' + 
+		this.element.find('#enumeration').append('<tr id="x"><td class="dragHandle">&nbsp;</td><td><textarea name="element:text"></textarea> <img src="/weblounge-sites/' + 
 				this.options.siteId + '/modules/text/jsp/enumeration/delete.png" alt="del" title="' + 
 				this.options.title + '" /></td></tr>');
 		
@@ -48,10 +48,9 @@ $.Controller("Editor.Enumeration",
 	},
 	
 	_updateIndex: function() {
-		this.element.find('table#enumeration > tbody > tr').each(function(i, tr) {
+		this.element.find('table#enumeration tr').each(function(i, tr) {
 			$(tr).attr('id', i);
 			$(tr).find('img').attr('id', i);
-			$(tr).find('textarea').attr('name', 'element:text' + i);
 		});
 	},
 	
