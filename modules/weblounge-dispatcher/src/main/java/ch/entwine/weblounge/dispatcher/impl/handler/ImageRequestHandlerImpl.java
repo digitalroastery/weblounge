@@ -388,7 +388,8 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // Did scaling work? If not, cleanup and tell the user
     if (scaledImageFile.length() == 0) {
-      File f = scaledImageFile;
+      File f = scaledImageFile.getParentFile();
+      FileUtils.deleteQuietly(scaledImageFile);
       while (f != null && f.isDirectory() && f.listFiles().length == 0) {
         FileUtils.deleteQuietly(f);
         f = f.getParentFile();
