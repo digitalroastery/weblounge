@@ -145,6 +145,11 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
       return null;
     }
 
+    // Add the file identifier name
+    if (StringUtils.isNotBlank(style.getIdentifier())) {
+      filename += "-" + style.getIdentifier();
+    }
+
     return FilenameUtils.getExtension(filename);
   }
 
