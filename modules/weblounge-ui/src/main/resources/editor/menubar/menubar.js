@@ -257,6 +257,9 @@ steal.plugins(
         },
         
         _enableEditing: function() {
+        	
+        	//TODO if pagelet ghost and inherit as css do not show it in editing mode, maybe just change css to work
+        	
         	this.disabled = false;
         	if(this.options.page.isWorkVersion())
         		$('.composer:not(.locked)').editor_composer('enable');
@@ -325,8 +328,16 @@ steal.plugins(
 		
 		"img.wbl-logout click": function(el, ev) {
 			this._delete_cookie("weblounge.editor");
+			
 			var logouturl = '/system/weblounge/logout?path=';
-			location.href = logouturl + location.pathname;
+			$.ajax('/system/weblounge/pages/' + this.options.page.value.id + '?version=0', {
+				success: function() {
+					location.href = logouturl + location.pathname;
+				},
+				error: function() {
+					location.href = logouturl;
+				}
+			});
 		},
 		
 		"li.wbl-newPage click": function(el, ev) {
