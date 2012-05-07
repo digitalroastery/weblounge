@@ -329,7 +329,7 @@ steal.plugins(
 		"img.wbl-logout click": function(el, ev) {
 			this._delete_cookie("weblounge.editor");
 			
-			var logouturl = '/system/weblounge/logout?path=';
+			var logouturl = this.options.runtime.security ? '/system/weblounge/logout?path=' : '';
 			$.ajax('/system/weblounge/pages/' + this.options.page.value.id + '?version=0', {
 				success: function() {
 					location.href = logouturl + location.pathname;

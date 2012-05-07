@@ -14,6 +14,7 @@ steal.then('jsonix')
 		parseXML: function(xml) {
 			var runtime = new Object();
 			runtime.path = $(xml).find('ui path:first').text();
+			runtime.security = $(xml).find('security enabled:first').text() == 'true';
 			runtime.user = new Object();
 			var userElement = $(xml).find('security user:first');
 			runtime.user.login = userElement.attr('id');
