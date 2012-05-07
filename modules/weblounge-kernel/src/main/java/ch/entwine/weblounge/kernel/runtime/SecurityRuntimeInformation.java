@@ -31,10 +31,15 @@ import ch.entwine.weblounge.common.site.Site;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.servlet.Filter;
+
 /**
  * Returns runtime information on the current user.
  */
 public class SecurityRuntimeInformation implements RuntimeInformationProvider {
+
+  /** The security filter */
+  private Filter securityFilter = null;
 
   /**
    * {@inheritDoc}
@@ -58,6 +63,10 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
       return null;
 
     StringBuffer b = new StringBuffer();
+
+    b.append("<enabled>");
+    b.append(securityFilter != null ? "true" : "false");
+    b.append("</enabled>");
 
     b.append("<user id=\"" + user.getLogin() + "\"");
     if (user.getRealm() != null) {
@@ -122,6 +131,16 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
     }
 
     return b.toString();
+  }
+
+  /**
+   * Sets the spring security filter if security is enabled.
+   * 
+   * @param filter
+   *          the filter
+   */
+  void setSecurityFilter(Filter filter) {
+    this.securityFilter = filter;
   }
 
 }
