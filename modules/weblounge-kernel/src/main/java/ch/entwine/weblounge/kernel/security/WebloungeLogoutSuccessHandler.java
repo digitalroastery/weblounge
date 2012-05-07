@@ -3,6 +3,7 @@ package ch.entwine.weblounge.kernel.security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.url.PathUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -36,7 +37,7 @@ public class WebloungeLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler
       throws IOException, ServletException {
 
     String targetUrl = "/";
-    if (request.getParameter(PATH_PARAMETER_NAME) != null) {
+    if (StringUtils.isNotBlank(request.getParameter(PATH_PARAMETER_NAME))) {
       targetUrl = PathUtils.concat("/", request.getParameter(PATH_PARAMETER_NAME));
     }
 

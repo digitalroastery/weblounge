@@ -239,7 +239,7 @@ public class SpringSecurityConfigurationService implements ManagedService {
     Dictionary<String, String> props = new Hashtable<String, String>();
     props.put("pattern", ".*");
     props.put(SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
-    props.put("security", "Weblounge");
+    props.put("security", "weblounge");
     try {
       securityFilterRegistration = bundleCtx.registerService(Filter.class.getName(), securityFilter, props);
       logger.debug("Spring security context registered");

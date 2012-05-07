@@ -257,6 +257,9 @@ steal.plugins(
         },
         
         _enableEditing: function() {
+        	
+        	//TODO if pagelet ghost and inherit as css do not show it in editing mode, maybe just change css to work
+        	
         	this.disabled = false;
         	if(this.options.page.isWorkVersion())
         		$('.composer:not(.locked)').editor_composer('enable');
@@ -325,8 +328,16 @@ steal.plugins(
 		
 		"img.wbl-logout click": function(el, ev) {
 			this._delete_cookie("weblounge.editor");
-			var logouturl = '/system/weblounge/logout?path=';
-			location.href = logouturl + location.pathname;
+			
+			var logouturl = this.options.runtime.security ? '/system/weblounge/logout?path=' : '/';
+			$.ajax('/system/weblounge/pages/' + this.options.page.value.id + '?version=0', {
+				success: function() {
+					location.href = logouturl + location.pathname;
+				},
+				error: function() {
+					location.href = logouturl;
+				}
+			});
 		},
 		
 		"li.wbl-newPage click": function(el, ev) {
@@ -398,6 +409,7 @@ steal.plugins(
 		// trigger editmode
 		"input#wbl-editmode click": function(el, ev) {
 			ev.preventDefault();
+			el.attr('disabled', 'disabled');
 			if(el.is(':checked')) {
 				var isWorkVersion = this.options.page.isWorkVersion();
 				this.options.page.lock(this.options.runtime.getUserLogin(), $.proxy(function() {
@@ -409,15 +421,18 @@ steal.plugins(
 					}
 					this._enableEditing();
 					$('#wbl-pageletcreator').editor_pageletcreator();
+					el.removeAttr("disabled");
 				}, this), $.proxy(function() {
 					$('input#wbl-editmode', this.element).val([]);
 					alert('Locking failed!');
+					el.removeAttr("disabled");
 				}, this));
 			} else {
 				this.options.page.unlock($.proxy(function() {
 					$('input#wbl-editmode', this.element).val([]);
 					this._disableEditing();
 					this.publishDialog.dialog('open');
+					el.removeAttr("disabled");
 				}, this));
 			}
 		}
