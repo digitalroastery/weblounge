@@ -177,6 +177,11 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       return null;
     }
 
+    // Add the file identifier name
+    if (StringUtils.isNotBlank(style.getIdentifier())) {
+      filename += "-" + style.getIdentifier();
+    }
+
     return FilenameUtils.getExtension(filename);
   }
 
@@ -208,6 +213,7 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
    * @throws OutOfMemoryError
    *           if the image is too large to be processed in memory
    */
+  @SuppressWarnings("cast")
   private void style(InputStream is, OutputStream os, String format,
       ImageStyle style) throws IllegalArgumentException, IOException,
       OutOfMemoryError {
