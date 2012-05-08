@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -57,6 +58,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.CharBuffer;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +108,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /** The environment */
   protected Environment environment = Environment.Production;
+
+  /** Holds pages while they are written to the index */
+  protected Map<ResourceURI, Page> pagePutCache = new HashMap<ResourceURI, Page>();
 
   /**
    * Creates a new instance of the content repository.
@@ -263,6 +268,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
+    // Check if resource is in temporary cache
+    if (pagePutCache.containsKey(uri))
+      return pagePutCache.get(uri);
+
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 

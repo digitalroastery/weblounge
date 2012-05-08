@@ -536,9 +536,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public <T extends ResourceContent> Future<Resource<T>> put(
       final Resource<T> resource, AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException, IllegalStateException {
+    if (resource instanceof Page)
+      pagePutCache.put(resource.getURI(), (Page) resource);
     FutureTask<Resource<T>> task = new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
       public Resource<T> call() throws Exception {
-        return put(resource);
+        Resource<T> returnVal = put(resource);
+        if (resource instanceof Page)
+          pagePutCache.put(resource.getURI(), (Page) resource);
+        return returnVal;
       }
     });
     task.run();
