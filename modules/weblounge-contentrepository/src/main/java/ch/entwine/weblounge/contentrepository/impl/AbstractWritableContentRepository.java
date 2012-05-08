@@ -540,7 +540,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       pagePutCache.put(resource.getURI(), (Page) resource);
     FutureTask<Resource<T>> task = new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
       public Resource<T> call() throws Exception {
-        Resource<T> returnVal = put(resource);
+        Resource<T> returnVal = put(resource, false);
         if (resource instanceof Page)
           pagePutCache.put(resource.getURI(), (Page) resource);
         return returnVal;
