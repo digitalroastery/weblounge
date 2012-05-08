@@ -126,6 +126,7 @@ public final class PagesEndpointDocs {
     createPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     createPageEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The target path"));
     createPageEndpoint.addOptionalParameter(new Parameter("content", Parameter.Type.Text, "The page data"));
+    createPageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
     createPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, createPageEndpoint);
 
@@ -142,6 +143,7 @@ public final class PagesEndpointDocs {
     updatePageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     updatePageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
     updatePageEndpoint.addRequiredParameter(new Parameter("content", Parameter.Type.Text, "The page content"));
+    updatePageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
     updatePageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, updatePageEndpoint);
 
@@ -156,6 +158,7 @@ public final class PagesEndpointDocs {
     deletePageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     deletePageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     deletePageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    deletePageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
     deletePageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, deletePageEndpoint);
 
@@ -223,6 +226,7 @@ public final class PagesEndpointDocs {
     lockPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     lockPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     lockPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    lockPageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
     lockPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, lockPageEndpoint);
 
@@ -238,6 +242,7 @@ public final class PagesEndpointDocs {
     unlockPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     unlockPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     unlockPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    unlockPageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
     unlockPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, unlockPageEndpoint);
 
@@ -256,6 +261,7 @@ public final class PagesEndpointDocs {
     publishPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
     publishPageEndpoint.addOptionalParameter(new Parameter("startdate", Parameter.Type.String, "The start of the publishing period"));
     publishPageEndpoint.addOptionalParameter(new Parameter("enddate", Parameter.Type.String, "The end of the publishing period"));
+    publishPageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
     publishPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, publishPageEndpoint);
 
@@ -271,6 +277,7 @@ public final class PagesEndpointDocs {
     unpublishPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     unpublishPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     unpublishPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    unpublishPageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
     unpublishPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, unpublishPageEndpoint);
 

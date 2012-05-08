@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
+import ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.language.Language;
@@ -59,6 +60,9 @@ import java.util.Dictionary;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
@@ -232,6 +236,21 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       readOnly = false;
     }
 
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index(ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public Future<Void> index(AsynchronousContentRepositoryListener listener)
+      throws ContentRepositoryException {
+    return new FutureTask<Void>(new Callable<Void>() {
+      public Void call() throws Exception {
+        index();
+        return null;
+      }
+    });
   }
 
   /**

@@ -52,6 +52,7 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
+import ch.entwine.weblounge.contentrepository.impl.util.ForgivingContentRepositoryUpdateListener;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -517,6 +518,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the updated page
    * @param ifMatchHeader
    *          the page's <code>etag</code> value
+   * @param asynchronous
+   *          <code>true</code> to prevent blocking while content is being
+   *          updated
    * @return response an empty response
    * @throws WebApplicationException
    *           if the update fails
@@ -525,7 +529,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @Path("/{page}")
   public Response updatePage(@Context HttpServletRequest request,
       @PathParam("page") String pageId, @FormParam("content") String pageXml,
-      @HeaderParam("If-Match") String ifMatchHeader) {
+      @HeaderParam("If-Match") String ifMatchHeader,
+      @FormParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
@@ -592,13 +597,16 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       page.setModified(user, new Date());
       page.setVersion(Resource.WORK);
-      contentRepository.put(page);
+
+      // TODO: wait for Future and update update listener
+      contentRepository.put(page, new ForgivingContentRepositoryUpdateListener());
 
       // Check if the page has been moved
       String currentPath = currentPage.getURI().getPath();
       String newPath = page.getURI().getPath();
       if (currentPath != null && newPath != null && !currentPath.equals(newPath)) {
-        contentRepository.move(currentPage.getURI(), newPath, true);
+        // TODO: wait for Future and update update listener
+        contentRepository.move(currentPage.getURI(), newPath, true, new ForgivingContentRepositoryUpdateListener());
       }
     } catch (SecurityException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", workURI, site);
@@ -637,12 +645,16 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the new page
    * @param path
    *          the path to store the page at
+   * @param asynchronous
+   *          <code>true</code> to prevent blocking while the page is being
+   *          created in the database
    * @return response the page location
    */
   @POST
   @Path("/")
   public Response createPage(@Context HttpServletRequest request,
-      @FormParam("content") String pageXml, @FormParam("path") String path) {
+      @FormParam("content") String pageXml, @FormParam("path") String path,
+      @FormParam("asynchronous") boolean asynchronous) {
 
     Site site = getSite(request);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
@@ -747,12 +759,16 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the http request
    * @param pageId
    *          the page identifier
+   * @param asynchronous
+   *          <code>true</code> to prevent blocking while the page is being
+   *          deleted from the database
    * @return response an empty response
    */
   @DELETE
   @Path("/{page}")
   public Response deletePage(@Context HttpServletRequest request,
-      @PathParam("page") String pageId) {
+      @PathParam("page") String pageId,
+      @FormParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
@@ -944,13 +960,17 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the request
    * @param pageId
    *          the page identifier
+   * @param asynchronous
+   *          <code>true</code> to prevent blocking while the page is being
+   *          locked
    * @return the page
    */
   @PUT
   @Path("/{page}/lock")
   public Response lockPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
-      @HeaderParam("If-Match") String ifMatchHeader) {
+      @HeaderParam("If-Match") String ifMatchHeader,
+      @FormParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
@@ -1061,13 +1081,17 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the request
    * @param pageId
    *          the page identifier
+   * @param asynchronous
+   *          <code>true</code> to prevent blocking while the page is being
+   *          unlocked
    * @return the page
    */
   @DELETE
   @Path("/{page}/lock")
   public Response unlockPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
-      @HeaderParam("If-Match") String ifMatchHeader) {
+      @HeaderParam("If-Match") String ifMatchHeader,
+      @FormParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
@@ -1164,6 +1188,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the optional publishing start date
    * @param endDateText
    *          the optional publishing end date
+   * @param asynchronous
+   *          <code>true</code> to prevent blocking while the page is being
+   *          published
    * @return the page
    */
   @PUT
@@ -1172,7 +1199,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       @PathParam("page") String pageId,
       @FormParam("startdate") String startDateText,
       @FormParam("enddate") String endDateText,
-      @HeaderParam("If-Match") String ifMatchHeader) {
+      @HeaderParam("If-Match") String ifMatchHeader,
+      @FormParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
@@ -1326,13 +1354,17 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the page identifier
    * @param enddate
    *          the optional publishing end date
+   * @param asynchronous
+   *          <code>true</code> to prevent blocking while the page is being
+   *          unpublished
    * @return the page
    */
   @DELETE
   @Path("/{page}/publish")
   public Response unpublishPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
-      @HeaderParam("If-Match") String ifMatchHeader) {
+      @HeaderParam("If-Match") String ifMatchHeader,
+      @FormParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
