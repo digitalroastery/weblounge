@@ -2,10 +2,6 @@
 	min-height: 50px;
 }
 
-.editor_composer.empty {
-	display: none;
-}
-
 .editor_composer a.wbl-addPagelet {
 	cursor: pointer;
 	background: url("../menubar/images/menu_add.png") center center no-repeat ;

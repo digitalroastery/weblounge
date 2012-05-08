@@ -261,6 +261,7 @@ steal.plugins(
         	if(this.options.page.isWorkVersion())
         		$('.composer:not(.locked)').editor_composer('enable');
         	$('#wbl-pageletcreator').editor_pageletcreator('enable');
+        	$('.composer:not(.locked)').editor_composer('hideGhostComposer');
 //        	this.element.find('img.wbl-add').show();
 //        	this.element.find('img.wbl-more').show();
         	this.element.find('img.wbl-pageSettings').show();
@@ -271,6 +272,8 @@ steal.plugins(
         	if(this.options.page.isWorkVersion())
         		$('.composer:not(.locked)').editor_composer('disable');
         	$('#wbl-pageletcreator').editor_pageletcreator('disable');
+        	
+        	$('.composer:not(.locked)').editor_composer('handleGhostComposer');
 //        	this.element.find('img.wbl-add').hide();
 //        	this.element.find('img.wbl-more').hide();
         	this.element.find('img.wbl-pageSettings').hide();
