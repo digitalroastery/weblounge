@@ -60,6 +60,9 @@ import java.util.Dictionary;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
@@ -240,10 +243,14 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index(ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
    */
-  public void index(AsynchronousContentRepositoryListener listener)
+  public Future<Void> index(AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException {
-    // TODO: Implement asynchronous indexing
-    index();
+    return new FutureTask<Void>(new Callable<Void>() {
+      public Void call() throws Exception {
+        index();
+        return null;
+      }
+    });
   }
 
   /**

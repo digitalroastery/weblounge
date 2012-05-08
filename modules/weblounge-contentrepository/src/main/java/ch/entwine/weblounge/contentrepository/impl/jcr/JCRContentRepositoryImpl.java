@@ -31,6 +31,9 @@ import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 /**
  * JRC implementation of the <code>WritableContentRepository</code> interface.
@@ -108,10 +111,14 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index(ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
    */
-  public void index(AsynchronousContentRepositoryListener listener)
+  public Future<Void> index(AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException {
-    // TODO: Implement asynchronous indexing
-    index();
+    return new FutureTask<Void>(new Callable<Void>() {
+      public Void call() throws Exception {
+        index();
+        return null;
+      }
+    });
   }
 
   /**
@@ -131,7 +138,8 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResourceContent(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.content.ResourceContent, java.io.InputStream)
+   *      ch.entwine.weblounge.common.content.ResourceContent,
+   *      java.io.InputStream)
    */
   protected <T extends ResourceContent> T storeResourceContent(ResourceURI uri,
       T content, InputStream is) throws IOException {

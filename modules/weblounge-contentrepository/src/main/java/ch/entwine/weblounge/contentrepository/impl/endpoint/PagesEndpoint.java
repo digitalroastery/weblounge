@@ -52,6 +52,7 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
+import ch.entwine.weblounge.contentrepository.impl.util.ForgivingContentRepositoryUpdateListener;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -596,13 +597,16 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       page.setModified(user, new Date());
       page.setVersion(Resource.WORK);
-      contentRepository.put(page);
+
+      // TODO: wait for Future and update update listener
+      contentRepository.put(page, new ForgivingContentRepositoryUpdateListener());
 
       // Check if the page has been moved
       String currentPath = currentPage.getURI().getPath();
       String newPath = page.getURI().getPath();
       if (currentPath != null && newPath != null && !currentPath.equals(newPath)) {
-        contentRepository.move(currentPage.getURI(), newPath, true);
+        // TODO: wait for Future and update update listener
+        contentRepository.move(currentPage.getURI(), newPath, true, new ForgivingContentRepositoryUpdateListener());
       }
     } catch (SecurityException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", workURI, site);

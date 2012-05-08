@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.security.User;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Future;
 
 /**
  * This type of repository implements methods to write contents to it.
@@ -94,7 +95,7 @@ public interface WritableContentRepository extends ContentRepository {
    *           than what is specified in the updated document
    * @return the updated resource
    */
-  <T extends ResourceContent> Resource<T> put(Resource<T> resource,
+  <T extends ResourceContent> Future<Resource<T>> put(Resource<T> resource,
       AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException, IllegalStateException;
 
@@ -143,7 +144,7 @@ public interface WritableContentRepository extends ContentRepository {
    *           type
    * @return the updated resource
    */
-  <T extends ResourceContent> Resource<T> putContent(ResourceURI uri,
+  <T extends ResourceContent> Future<Resource<T>> putContent(ResourceURI uri,
       T content, InputStream is, AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException, IllegalStateException;
 
@@ -184,7 +185,8 @@ public interface WritableContentRepository extends ContentRepository {
    *           if the parent resource does not exist
    * @return the updated resource
    */
-  <T extends ResourceContent> Resource<T> deleteContent(ResourceURI uri,
+  <T extends ResourceContent> Future<Resource<T>> deleteContent(
+      ResourceURI uri,
       T content, AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException, IllegalStateException;
 
@@ -227,7 +229,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if moving fails due to a database error
    */
-  void move(ResourceURI uri, String path, boolean moveChildren,
+  Future<Void> move(ResourceURI uri, String path, boolean moveChildren,
       AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException;
 
@@ -261,7 +263,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if removal fails due to a database error
    */
-  boolean delete(ResourceURI uri, AsynchronousContentRepositoryListener listener)
+  Future<Boolean> delete(ResourceURI uri,
+      AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException;
 
   /**
@@ -302,7 +305,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if removal fails due to a database error
    */
-  boolean delete(ResourceURI uri, boolean allRevisions,
+  Future<Boolean> delete(ResourceURI uri, boolean allRevisions,
       AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException;
 
@@ -331,7 +334,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ContentRepositoryException
    *           if the index operation fails
    */
-  void index(AsynchronousContentRepositoryListener listener)
+  Future<Void> index(AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException;
 
   /**
@@ -387,7 +390,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ContentRepositoryException
    *           if the resource can't be accessed
    */
-  Resource<?> lock(ResourceURI uri, User user,
+  Future<Resource<?>> lock(ResourceURI uri, User user,
       AsynchronousContentRepositoryListener listener) throws IOException,
       ContentRepositoryException, IllegalStateException;
 
@@ -422,7 +425,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ContentRepositoryException
    *           if the resource can't be accessed
    */
-  Resource<?> unlock(ResourceURI uri, User user,
+  Future<Resource<?>> unlock(ResourceURI uri, User user,
       AsynchronousContentRepositoryListener listener) throws IOException,
       ContentRepositoryException;
 
