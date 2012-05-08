@@ -23,6 +23,7 @@ package ch.entwine.weblounge.contentrepository.impl.jcr;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository;
@@ -100,6 +101,17 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
   public void index() throws ContentRepositoryException {
     // TODO Auto-generated method stub
 
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index(ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public void index(AsynchronousContentRepositoryListener listener)
+      throws ContentRepositoryException {
+    // TODO: Implement asynchronous indexing
+    index();
   }
 
   /**

@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
+import ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.language.Language;
@@ -232,6 +233,17 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       readOnly = false;
     }
 
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index(ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public void index(AsynchronousContentRepositoryListener listener)
+      throws ContentRepositoryException {
+    // TODO: Implement asynchronous indexing
+    index();
   }
 
   /**
