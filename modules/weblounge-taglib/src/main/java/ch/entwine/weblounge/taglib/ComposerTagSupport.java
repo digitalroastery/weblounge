@@ -22,6 +22,7 @@ package ch.entwine.weblounge.taglib;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -201,6 +202,8 @@ public class ComposerTagSupport extends WebloungeTag {
    * 
    * @param writer
    *          the jsp output writer
+   * @param composer
+   *          the composer
    * @throws IOException
    *           if writing to the output fails
    * @throws ContentRepositoryException
@@ -209,9 +212,29 @@ public class ComposerTagSupport extends WebloungeTag {
    *           if the content repository is offline
    * @see #beforeComposer(JspWriter)
    */
-  protected void afterComposer(JspWriter writer) throws IOException,
-      ContentRepositoryException, ContentRepositoryUnavailableException {
+  protected void afterComposer(JspWriter writer, Composer composer)
+      throws IOException, ContentRepositoryException,
+      ContentRepositoryUnavailableException {
     writer.println("</div>");
+
+    if (ghostPaglets.length > 0) {
+      writer.print("<div id=\"" + id + "-ghost\">");
+
+      // Render the ghost pagelets
+      for (int i = 0; i < ghostPaglets.length; i++) {
+
+        Pagelet pagelet = ghostPaglets[i];
+
+        // Add pagelet and composer to the request
+        request.setAttribute(WebloungeRequest.COMPOSER, composer);
+        request.setAttribute(WebloungeRequest.PAGELET, pagelet);
+
+        doPagelet(pagelet, i, writer, true);
+      }
+
+      writer.println("</div>");
+    }
+
   }
 
   /**
@@ -569,17 +592,6 @@ public class ComposerTagSupport extends WebloungeTag {
           response.addTag(CacheTag.Url, contentProvider.getURI().getPath());
         }
 
-        // Render the ghost pagelets
-        for (int i = 0; i < ghostPaglets.length; i++) {
-          Pagelet pagelet = ghostPaglets[i];
-
-          // Add pagelet and composer to the request
-          request.setAttribute(WebloungeRequest.PAGELET, pagelet);
-          request.setAttribute(WebloungeRequest.COMPOSER, composer);
-
-          doPagelet(pagelet, i, writer, true);
-        }
-
         // Render the pagelets
         for (int i = 0; i < pagelets.length; i++) {
           Pagelet pagelet = pagelets[i];
@@ -595,7 +607,7 @@ public class ComposerTagSupport extends WebloungeTag {
 
         // Syntactically close the composer
         if (renderingState.equals(RenderingState.InsideComposer)) {
-          afterComposer(writer);
+          afterComposer(writer, composer);
           renderingState = RenderingState.Outside;
           writer.flush();
         }
@@ -813,9 +825,11 @@ public class ComposerTagSupport extends WebloungeTag {
     contentInheritanceEnabled = false;
     contentIsInherited = false;
     contentProvider = null;
+    ghostContentProvider = null;
     debug = false;
     initialized = false;
     pagelets = null;
+    ghostPaglets = null;
     renderingState = RenderingState.Outside;
     targetPage = null;
   }
