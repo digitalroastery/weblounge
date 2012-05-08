@@ -245,12 +245,14 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   public Future<Void> index(AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException {
-    return new FutureTask<Void>(new Callable<Void>() {
+    FutureTask<Void> task = new FutureTask<Void>(new Callable<Void>() {
       public Void call() throws Exception {
         index();
         return null;
       }
     });
+    task.run();
+    return task;
   }
 
   /**

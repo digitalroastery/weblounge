@@ -233,11 +233,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public Future<Resource<?>> lock(final ResourceURI uri, final User user,
       AsynchronousContentRepositoryListener listener) throws IOException,
       ContentRepositoryException, IllegalStateException {
-    return new FutureTask<Resource<?>>(new Callable<Resource<?>>() {
+    FutureTask<Resource<?>> task = new FutureTask<Resource<?>>(new Callable<Resource<?>>() {
       public Resource<?> call() throws Exception {
         return lock(uri, user);
       }
     });
+    task.run();
+    return task;
   }
 
   /**
@@ -270,11 +272,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public Future<Resource<?>> unlock(final ResourceURI uri, final User user,
       AsynchronousContentRepositoryListener listener) throws IOException,
       ContentRepositoryException {
-    return new FutureTask<Resource<?>>(new Callable<Resource<?>>() {
+    FutureTask<Resource<?>> task = new FutureTask<Resource<?>>(new Callable<Resource<?>>() {
       public Resource<?> call() throws Exception {
         return unlock(uri, user);
       }
     });
+    task.run();
+    return task;
   }
 
   /**
@@ -306,11 +310,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public Future<Boolean> delete(final ResourceURI uri,
       AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException {
-    return new FutureTask<Boolean>(new Callable<Boolean>() {
+    FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
       public Boolean call() throws Exception {
         return delete(uri, false);
       }
     });
+    task.run();
+    return task;
   }
 
   /**
@@ -379,11 +385,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public Future<Boolean> delete(final ResourceURI uri,
       final boolean allRevisions, AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException {
-    return new FutureTask<Boolean>(new Callable<Boolean>() {
+    FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
       public Boolean call() throws Exception {
         return delete(uri, allRevisions);
       }
     });
+    task.run();
+    return task;
   }
 
   /**
@@ -499,12 +507,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public Future<Void> move(final ResourceURI uri, final String path,
       final boolean moveChildren, AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException {
-    return new FutureTask<Void>(new Callable<Void>() {
+    FutureTask<Void> task = new FutureTask<Void>(new Callable<Void>() {
       public Void call() throws Exception {
         move(uri, path, moveChildren);
         return null;
       }
     });
+    task.run();
+    return task;
   }
 
   /**
@@ -526,11 +536,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public <T extends ResourceContent> Future<Resource<T>> put(
       final Resource<T> resource, AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException, IllegalStateException {
-    return new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
+    FutureTask<Resource<T>> task = new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
       public Resource<T> call() throws Exception {
         return put(resource);
       }
     });
+    task.run();
+    return task;
   }
 
   /**
@@ -677,11 +689,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       final ResourceURI uri, final T content, final InputStream is,
       AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException, IllegalStateException {
-    return new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
+    FutureTask<Resource<T>> task = new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
       public Resource<T> call() throws Exception {
         return putContent(uri, content, is);
       }
     });
+    task.run();
+    return task;
   }
 
   /**
@@ -741,11 +755,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       final ResourceURI uri, final T content,
       AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException, IllegalStateException {
-    return new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
+    FutureTask<Resource<T>> task = new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
       public Resource<T> call() throws Exception {
         return deleteContent(uri, content);
       }
     });
+    task.run();
+    return task;
   };
 
   /**
