@@ -20,8 +20,6 @@
 
 package ch.entwine.weblounge.taglib.content;
 
-import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
@@ -30,7 +28,6 @@ import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
-import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.ComposerTagSupport;
@@ -70,27 +67,15 @@ public class ComposerTag extends ComposerTagSupport {
   @Override
   protected void beforeComposer(JspWriter writer) throws IOException,
       ContentRepositoryException, ContentRepositoryUnavailableException {
-    User user = request.getUser();
-    long version = request.getVersion();
-    Page targetPage = getTargetPage();
-    Page contentPage = getContentProvider();
-
-    boolean isPageLocked = targetPage != null && targetPage.isLocked();
-    boolean isPageLockedByCurrentUser = targetPage != null && isPageLocked && user.equals(targetPage.getLockOwner());
-    boolean isWorkVersion = version == Resource.WORK;
-    boolean allowContentInheritance = contentInheritanceEnabled && !isPageLockedByCurrentUser && !isWorkVersion;
-
-    // Enable / disable content inheritance for this composer
-    setInherit(allowContentInheritance);
 
     // Mark inherited composer and ghost content in locked work mode
-    if (isWorkVersion && isPageLockedByCurrentUser) {
-      if (allowContentInheritance)
+    if (RequestUtils.isEditingState(request)) {
+      if (contentInheritanceEnabled)
         addCssClass(CLASS_INHERIT_CONTENT);
-      if (targetPage != null && !targetPage.equals(contentPage))
+      if (getContent().length == 0)
         addCssClass(CLASS_GHOST_CONTENT);
     }
-    
+
     // Mark composer as locked
     if (isComposerLocked)
       addCssClass(CLASS_LOCKED);
@@ -103,12 +88,12 @@ public class ComposerTag extends ComposerTagSupport {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.taglib.ComposerTagSupport#beforePagelet(ch.entwine.weblounge.common.content.page.Pagelet,
-   *      int, javax.servlet.jsp.JspWriter)
+   * @see ch.entwine.weblounge.taglib.ComposerTagSupport#beforePagelet(Pagelet,
+   *      int, JspWriter, boolean)
    */
   @Override
-  protected int beforePagelet(Pagelet pagelet, int position, JspWriter writer)
-      throws IOException, ContentRepositoryException,
+  protected int beforePagelet(Pagelet pagelet, int position, JspWriter writer,
+      boolean isGhostContent) throws IOException, ContentRepositoryException,
       ContentRepositoryUnavailableException {
 
     if (RequestUtils.isEditingState(request)) {
@@ -123,15 +108,20 @@ public class ComposerTag extends ComposerTagSupport {
           hasEditor = true;
       }
 
-      // if pagelet has no editor add a cssClass noEditor
-      if (hasEditor) {
-        writer.println("<div class=\"pagelet\">");
-      } else {
-        writer.println("<div class=\"pagelet wbl-noEditor\">");
-      }
+      writer.print("<div class=\"pagelet ");
+
+      // if pagelet has no editor add a cssClass wbl-noEditor
+      if (!hasEditor)
+        writer.print("wbl-noEditor");
+      // if pagelet is ghost content add a cssClass ghost
+      if (isGhostContent)
+        writer.print("ghost");
+
+      writer.print("\" />");
+      writer.newLine();
       writer.flush();
     }
-    return super.beforePagelet(pagelet, position, writer);
+    return super.beforePagelet(pagelet, position, writer, isGhostContent);
   }
 
   /**

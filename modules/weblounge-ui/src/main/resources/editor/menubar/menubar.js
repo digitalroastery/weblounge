@@ -257,9 +257,6 @@ steal.plugins(
         },
         
         _enableEditing: function() {
-        	
-        	//TODO if pagelet ghost and inherit as css do not show it in editing mode, maybe just change css to work
-        	
         	this.disabled = false;
         	if(this.options.page.isWorkVersion())
         		$('.composer:not(.locked)').editor_composer('enable');

@@ -169,7 +169,7 @@ public interface Page extends Resource<ResourceContent> {
   /**
    * Returns all pagelets from this page.
    * 
-   * @return the pagelets
+   * @return the pagelets or an empty array
    */
   Pagelet[] getPagelets();
 

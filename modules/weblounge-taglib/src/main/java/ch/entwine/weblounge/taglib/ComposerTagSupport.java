@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -98,11 +99,17 @@ public class ComposerTagSupport extends WebloungeTag {
   /** The content providing page */
   protected Page contentProvider = null;
 
+  /** The ghost content providing page */
+  protected Page ghostContentProvider = null;
+
   /** True if the content is not coming from the target page directly */
   protected boolean contentIsInherited = false;
 
   /** The pagelets within this composer */
   protected Pagelet[] pagelets = null;
+
+  /** The ghost pagelets within this composer */
+  protected Pagelet[] ghostPaglets;
 
   /** The current rendering state */
   protected RenderingState renderingState = RenderingState.Outside;
@@ -240,6 +247,8 @@ public class ComposerTagSupport extends WebloungeTag {
    *          the pagelet's position inside the composer
    * @param writer
    *          the writer
+   * @param isGhostContent
+   *          true if ghost content
    * 
    * @return <code>{@link #EVAL_PAGELET}</code> or
    *         <code>{@link #SKIP_PAGELET}</code>
@@ -250,8 +259,8 @@ public class ComposerTagSupport extends WebloungeTag {
    * @throws ContentRepositoryUnavailableException
    *           if the content repository is offline
    */
-  protected int beforePagelet(Pagelet pagelet, int position, JspWriter writer)
-      throws IOException, ContentRepositoryException,
+  protected int beforePagelet(Pagelet pagelet, int position, JspWriter writer,
+      boolean isGhostContent) throws IOException, ContentRepositoryException,
       ContentRepositoryUnavailableException {
     return EVAL_PAGELET;
   }
@@ -322,14 +331,17 @@ public class ComposerTagSupport extends WebloungeTag {
         }
       }
 
-      Page contentProvider = targetPage;
+      if (contentProvider == null)
+        contentProvider = targetPage;
+
       Pagelet[] content = contentProvider.getPagelets(id);
+      Pagelet[] ghostContent = new Pagelet[0];
 
       // If composer is empty and ghost content is enabled, go up the page
       // hierarchy and try to find content for this composer
       if (inheritFromParent) {
         String pageUrl = contentProvider.getURI().getPath();
-        while (content.length == 0 && pageUrl.length() > 1) {
+        while ((content.length == 0 || ghostContent.length == 0) && pageUrl.length() > 1) {
           if (pageUrl.endsWith("/") && !"/".equals(pageUrl))
             pageUrl = pageUrl.substring(0, pageUrl.length() - 1);
           int urlSeparator = pageUrl.lastIndexOf("/");
@@ -346,20 +358,34 @@ public class ComposerTagSupport extends WebloungeTag {
             } catch (SecurityException e) {
               logger.debug("Prevented loading of protected content from inherited page {} for composer {}", pageURI, id);
             }
+
+            // Did we find anything? If not, keep looking...
             if (contentProvider == null) {
               logger.debug("Ancestor page {} could not be loaded", pageUrl);
               continue;
             }
-            content = contentProvider.getPagelets(id);
+
+            // Set the content that is being displayed
+            if ((content == null || content.length == 0) && contentProvider.equals(targetPage))
+              content = contentProvider.getPagelets(id);
+
+            // If potential ghost content is available, keep it
+            if (!contentProvider.equals(targetPage)) {
+              ghostContentProvider = contentProvider;
+              ghostContent = contentProvider.getPagelets(id);
+            }
+
           }
         }
       }
 
       // If pagelets have been found, set them in the composer
-      if (content != null && content.length > 0) {
-        pagelets = content;
-      } else {
-        pagelets = new Pagelet[] {};
+      ghostPaglets = ghostContent;
+      pagelets = content;
+      boolean isEditing = RequestUtils.isEditingState(request);
+
+      // Mark empty composers while editing the current page
+      if (isEditing && content.length == 0) {
         addCssClass(getEmptyComposerClass());
       }
 
@@ -407,6 +433,23 @@ public class ComposerTagSupport extends WebloungeTag {
   }
 
   /**
+   * Returns the page that actually delivers the ghost content for this
+   * composer.
+   * 
+   * @return the ghost content delivering page
+   */
+  protected Page getGhostContentProvider() {
+    if (!initialized) {
+      try {
+        loadContent(contentInheritanceEnabled);
+      } catch (Exception e) {
+        logger.warn("Unable to load composer ghost content: {}", e.getMessage());
+      }
+    }
+    return ghostContentProvider;
+  }
+
+  /**
    * Returns the composer's pagelets. Note that the pagelets are only available
    * on or after the first call to {@link #beforeComposer(JspWriter)}.
    * 
@@ -425,6 +468,27 @@ public class ComposerTagSupport extends WebloungeTag {
     if (pagelets == null)
       pagelets = new Pagelet[] {};
     return pagelets;
+  }
+
+  /**
+   * Returns the composer's ghost pagelets. Note that the pagelets are only
+   * available on or after the first call to {@link #beforeComposer(JspWriter)}.
+   * 
+   * @return the pagelets
+   * @throws ContentRepositoryException
+   *           if loading the content fails
+   * @throws ContentRepositoryUnavailableException
+   *           if the content repository is offline
+   * @throws SecurityException
+   *           if accessing the content is forbidden
+   */
+  protected Pagelet[] getGhostContent() throws SecurityException,
+      ContentRepositoryException, ContentRepositoryUnavailableException {
+    if (ghostContentProvider == null)
+      loadContent(contentInheritanceEnabled);
+    if (ghostContentProvider == null)
+      ghostPaglets = new Pagelet[] {};
+    return ghostPaglets;
   }
 
   /**
@@ -505,6 +569,17 @@ public class ComposerTagSupport extends WebloungeTag {
           response.addTag(CacheTag.Url, contentProvider.getURI().getPath());
         }
 
+        // Render the ghost pagelets
+        for (int i = 0; i < ghostPaglets.length; i++) {
+          Pagelet pagelet = ghostPaglets[i];
+
+          // Add pagelet and composer to the request
+          request.setAttribute(WebloungeRequest.PAGELET, pagelet);
+          request.setAttribute(WebloungeRequest.COMPOSER, composer);
+
+          doPagelet(pagelet, i, writer, true);
+        }
+
         // Render the pagelets
         for (int i = 0; i < pagelets.length; i++) {
           Pagelet pagelet = pagelets[i];
@@ -513,7 +588,7 @@ public class ComposerTagSupport extends WebloungeTag {
           request.setAttribute(WebloungeRequest.PAGELET, pagelet);
           request.setAttribute(WebloungeRequest.COMPOSER, composer);
 
-          doPagelet(pagelet, i, writer);
+          doPagelet(pagelet, i, writer, false);
         }
 
       } finally {
@@ -563,8 +638,8 @@ public class ComposerTagSupport extends WebloungeTag {
    * @throws IOException
    *           if writing to the jsp fails
    */
-  protected void doPagelet(Pagelet pagelet, int position, JspWriter writer)
-      throws IOException {
+  protected void doPagelet(Pagelet pagelet, int position, JspWriter writer,
+      boolean isGhostContent) throws IOException {
 
     Site site = request.getSite();
     WebUrl url = request.getUrl();
@@ -630,7 +705,7 @@ public class ComposerTagSupport extends WebloungeTag {
       response.setCacheExpirationTime(renderer.getValidTime());
 
       // Pass control to callback
-      int beforePageletResult = beforePagelet(pagelet, position, writer);
+      int beforePageletResult = beforePagelet(pagelet, position, writer, isGhostContent);
 
       // Do we need to process this pagelet?
       if (beforePageletResult == SKIP_PAGELET) {
