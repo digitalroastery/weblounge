@@ -70,10 +70,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
@@ -84,6 +87,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /** The logging facility */
   static final Logger logger = LoggerFactory.getLogger(AbstractWritableContentRepository.class);
+
+  /** Holds pages while they are written to the index */
+  protected Map<ResourceURI, Resource<?>> pagePutCache = new HashMap<ResourceURI, Resource<?>>();
 
   /** The image style tracker */
   private ImageStyleTracker imageStyleTracker = null;
@@ -205,22 +211,36 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
+   */
+  @Override
+  public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
+    // Check if resource is in temporary cache
+    if (pagePutCache.containsKey(uri))
+      return pagePutCache.get(uri);
+
+    // If not, have the super implementation get the content for us
+    return super.get(uri);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#lock(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.security.User)
    */
   public Resource<?> lock(ResourceURI uri, User user)
       throws IllegalStateException, ContentRepositoryException, IOException {
-    Resource<?> resource = null;
-    Date date = new Date();
-    for (ResourceURI u : getVersions(uri)) {
-      Resource<?> r = get(u);
-      r.lock(user);
-      r.setModified(user, date);
-      put(r, false);
-      if (r.getVersion() == uri.getVersion())
-        resource = r;
+    try {
+      Future<Resource<?>> futureResource = lock(uri, user, null);
+      return futureResource.get();
+    } catch (Exception e) {
+      if (e.getCause() instanceof ContentRepositoryException)
+        throw (ContentRepositoryException) e.getCause();
+      else if (e.getCause() instanceof IOException)
+        throw (IOException) e.getCause();
+      throw new ContentRepositoryException(e.getCause());
     }
-    return resource;
   }
 
   /**
@@ -233,11 +253,35 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public Future<Resource<?>> lock(final ResourceURI uri, final User user,
       AsynchronousContentRepositoryListener listener) throws IOException,
       ContentRepositoryException, IllegalStateException {
+
+    // Update all resources in memory
+    final List<Resource<?>> resourcesToUpdate = new ArrayList<Resource<?>>();
+    Resource<?> resource = null;
+    Date date = new Date();
+    for (ResourceURI u : getVersions(uri)) {
+      Resource<?> r = get(u);
+      r.lock(user);
+      r.setModified(user, date);
+      resourcesToUpdate.add(r);
+      if (r.getVersion() == uri.getVersion())
+        resource = r;
+    }
+
+    // Execute the actual storing of the resource
+    final Resource<?> returnedResource = resource;
     FutureTask<Resource<?>> task = new FutureTask<Resource<?>>(new Callable<Resource<?>>() {
       public Resource<?> call() throws Exception {
-        return lock(uri, user);
+        for (Resource<?> r : resourcesToUpdate) {
+          try {
+            put(r, false);
+          } catch (Throwable t) {
+            throw new ExecutionException(t);
+          }
+        }
+        return returnedResource;
       }
     });
+
     task.run();
     return task;
   }
@@ -249,17 +293,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   public Resource<?> unlock(ResourceURI uri, User user)
       throws ContentRepositoryException, IllegalStateException, IOException {
-    Resource<?> resource = null;
-    Date date = new Date();
-    for (ResourceURI u : getVersions(uri)) {
-      Resource<?> r = get(u);
-      r.unlock();
-      r.setModified(user, date);
-      put(r, false);
-      if (r.getVersion() == uri.getVersion())
-        resource = r;
+    try {
+      Future<Resource<?>> futureResource = unlock(uri, user, null);
+      return futureResource.get();
+    } catch (Exception e) {
+      if (e.getCause() instanceof ContentRepositoryException)
+        throw (ContentRepositoryException) e.getCause();
+      else if (e.getCause() instanceof IOException)
+        throw (IOException) e.getCause();
+      throw new ContentRepositoryException(e.getCause());
     }
-    return resource;
   }
 
   /**
@@ -272,11 +315,35 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public Future<Resource<?>> unlock(final ResourceURI uri, final User user,
       AsynchronousContentRepositoryListener listener) throws IOException,
       ContentRepositoryException {
+
+    // Update all resources in memory
+    final List<Resource<?>> resourcesToUpdate = new ArrayList<Resource<?>>();
+    Resource<?> resource = null;
+    Date date = new Date();
+    for (ResourceURI u : getVersions(uri)) {
+      Resource<?> r = get(u);
+      r.unlock();
+      r.setModified(user, date);
+      resourcesToUpdate.add(r);
+      if (r.getVersion() == uri.getVersion())
+        resource = r;
+    }
+
+    // Execute the actual storing of the resource
+    final Resource<?> returnedResource = resource;
     FutureTask<Resource<?>> task = new FutureTask<Resource<?>>(new Callable<Resource<?>>() {
       public Resource<?> call() throws Exception {
-        return unlock(uri, user);
+        for (Resource<?> r : resourcesToUpdate) {
+          try {
+            put(r, false);
+          } catch (Throwable t) {
+            throw new ExecutionException(t);
+          }
+        }
+        return returnedResource;
       }
     });
+
     task.run();
     return task;
   }
@@ -360,6 +427,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Delete the index entries
     for (long revision : revisions) {
+      pagePutCache.remove(new ResourceURIImpl(uri, revision));
       index.delete(new ResourceURIImpl(uri, revision));
     }
 
@@ -536,13 +604,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public <T extends ResourceContent> Future<Resource<T>> put(
       final Resource<T> resource, AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException, IllegalStateException {
-    if (resource instanceof Page)
-      pagePutCache.put(resource.getURI(), (Page) resource);
+    pagePutCache.put(resource.getURI(), resource);
     FutureTask<Resource<T>> task = new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
       public Resource<T> call() throws Exception {
         Resource<T> returnVal = put(resource, false);
-        if (resource instanceof Page)
-          pagePutCache.put(resource.getURI(), (Page) resource);
+        pagePutCache.remove(resource.getURI());
         return returnVal;
       }
     });
@@ -569,7 +635,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *           if the resource exists but contains different resource content
    *           than what is specified in the updated document
    */
-  private <T extends ResourceContent> Resource<T> put(Resource<T> resource,
+  protected <T extends ResourceContent> Resource<T> put(Resource<T> resource,
       boolean updatePreviews) throws ContentRepositoryException, IOException,
       IllegalStateException {
 
