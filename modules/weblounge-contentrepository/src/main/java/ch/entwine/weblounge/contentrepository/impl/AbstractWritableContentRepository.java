@@ -231,8 +231,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   public Resource<?> lock(ResourceURI uri, User user)
       throws IllegalStateException, ContentRepositoryException, IOException {
+    Future<Resource<?>> futureResource = lock(uri, user, null);
     try {
-      Future<Resource<?>> futureResource = lock(uri, user, null);
       return futureResource.get();
     } catch (Exception e) {
       if (e.getCause() instanceof ContentRepositoryException)
