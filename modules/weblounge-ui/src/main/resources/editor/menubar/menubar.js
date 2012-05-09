@@ -258,10 +258,11 @@ steal.plugins(
         
         _enableEditing: function() {
         	this.disabled = false;
-        	if(this.options.page.isWorkVersion())
+        	if(this.options.page.isWorkVersion()) {
         		$('.composer:not(.locked)').editor_composer('enable');
+        		$('.composer:not(.locked)').editor_composer('hideGhostComposer');
+        	}
         	$('#wbl-pageletcreator').editor_pageletcreator('enable');
-        	$('.composer:not(.locked)').editor_composer('hideGhostComposer');
 //        	this.element.find('img.wbl-add').show();
 //        	this.element.find('img.wbl-more').show();
         	this.element.find('img.wbl-pageSettings').show();
@@ -269,11 +270,12 @@ steal.plugins(
         
         _disableEditing: function() {
         	this.disabled = true;
-        	if(this.options.page.isWorkVersion())
+        	if(this.options.page.isWorkVersion()) {
         		$('.composer:not(.locked)').editor_composer('disable');
+        		$('.composer:not(.locked)').editor_composer('handleGhostComposer');
+        	}
         	$('#wbl-pageletcreator').editor_pageletcreator('disable');
         	
-        	$('.composer:not(.locked)').editor_composer('handleGhostComposer');
 //        	this.element.find('img.wbl-add').hide();
 //        	this.element.find('img.wbl-more').hide();
         	this.element.find('img.wbl-pageSettings').hide();
@@ -329,13 +331,13 @@ steal.plugins(
 		"img.wbl-logout click": function(el, ev) {
 			this._delete_cookie("weblounge.editor");
 			
-			var logouturl = this.options.runtime.security ? '/system/weblounge/logout?path=' : '/';
+			var logouturl = this.options.runtime.security ? '/system/weblounge/logout?path=' : '';
 			$.ajax('/system/weblounge/pages/' + this.options.page.value.id + '?version=0', {
 				success: function() {
-					location.href = logouturl + location.pathname;
+					location.href = logouturl + location.pathname + '?_=' + new Date().getTime();
 				},
 				error: function() {
-					location.href = logouturl;
+					location.href = logouturl + '/?_=' + new Date().getTime();
 				}
 			});
 		},

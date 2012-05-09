@@ -181,7 +181,7 @@ public class ComposerTagSupport extends WebloungeTag {
       ContentRepositoryException, ContentRepositoryUnavailableException {
     StringBuffer buf = new StringBuffer("<div ");
     addCssClass(CLASS_COMPOSER);
-    if (request.getVersion() == Resource.WORK && targetPage.isLocked()) {
+    if (request.getVersion() == Resource.WORK && getTargetPage().isLocked()) {
       addCssClass(CLASS_LOCKED);
     }
 
@@ -217,7 +217,7 @@ public class ComposerTagSupport extends WebloungeTag {
       ContentRepositoryUnavailableException {
     writer.println("</div>");
 
-    if (ghostPaglets.length > 0) {
+    if (ghostPaglets.length > 0 && RequestUtils.isEditingState(request)) {
       writer.print("<div id=\"" + id + "-ghost\">");
 
       // Render the ghost pagelets
@@ -601,6 +601,20 @@ public class ComposerTagSupport extends WebloungeTag {
           request.setAttribute(WebloungeRequest.COMPOSER, composer);
 
           doPagelet(pagelet, i, writer, false);
+        }
+
+        // If just ghost pagelets render them
+        if (pagelets.length == 0 && !RequestUtils.isEditingState(request)) {
+          // Render the ghost pagelets
+          for (int i = 0; i < ghostPaglets.length; i++) {
+            Pagelet pagelet = ghostPaglets[i];
+
+            // Add pagelet and composer to the request
+            request.setAttribute(WebloungeRequest.PAGELET, pagelet);
+            request.setAttribute(WebloungeRequest.COMPOSER, composer);
+
+            doPagelet(pagelet, i, writer, false);
+          }
         }
 
       } finally {
