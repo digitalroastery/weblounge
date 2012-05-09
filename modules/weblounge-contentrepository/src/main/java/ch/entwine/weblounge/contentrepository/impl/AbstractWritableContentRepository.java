@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
@@ -72,6 +73,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 /**
  * Abstract base implementation of a <code>WritableContentRepository</code>.
@@ -222,6 +226,25 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#lock(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.security.User,
+   *      ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public Future<Resource<?>> lock(final ResourceURI uri, final User user,
+      AsynchronousContentRepositoryListener listener) throws IOException,
+      ContentRepositoryException, IllegalStateException {
+    FutureTask<Resource<?>> task = new FutureTask<Resource<?>>(new Callable<Resource<?>>() {
+      public Resource<?> call() throws Exception {
+        return lock(uri, user);
+      }
+    });
+    task.run();
+    return task;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#unlock(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public Resource<?> unlock(ResourceURI uri, User user)
@@ -242,6 +265,25 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#unlock(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.security.User,
+   *      ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public Future<Resource<?>> unlock(final ResourceURI uri, final User user,
+      AsynchronousContentRepositoryListener listener) throws IOException,
+      ContentRepositoryException {
+    FutureTask<Resource<?>> task = new FutureTask<Resource<?>>(new Callable<Resource<?>>() {
+      public Resource<?> call() throws Exception {
+        return unlock(uri, user);
+      }
+    });
+    task.run();
+    return task;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#isLocked(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public boolean isLocked(ResourceURI uri) throws ContentRepositoryException {
@@ -257,6 +299,24 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public boolean delete(ResourceURI uri) throws ContentRepositoryException,
       IOException {
     return delete(uri, false);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public Future<Boolean> delete(final ResourceURI uri,
+      AsynchronousContentRepositoryListener listener)
+      throws ContentRepositoryException, IOException {
+    FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
+      public Boolean call() throws Exception {
+        return delete(uri, false);
+      }
+    });
+    task.run();
+    return task;
   }
 
   /**
@@ -313,6 +373,25 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     return true;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI,
+   *      boolean,
+   *      ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public Future<Boolean> delete(final ResourceURI uri,
+      final boolean allRevisions, AsynchronousContentRepositoryListener listener)
+      throws ContentRepositoryException, IOException {
+    FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
+      public Boolean call() throws Exception {
+        return delete(uri, allRevisions);
+      }
+    });
+    task.run();
+    return task;
   }
 
   /**
@@ -421,11 +500,49 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#move(ch.entwine.weblounge.common.content.ResourceURI,
+   *      java.lang.String, boolean,
+   *      ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public Future<Void> move(final ResourceURI uri, final String path,
+      final boolean moveChildren, AsynchronousContentRepositoryListener listener)
+      throws ContentRepositoryException, IOException {
+    FutureTask<Void> task = new FutureTask<Void>(new Callable<Void>() {
+      public Void call() throws Exception {
+        move(uri, path, moveChildren);
+        return null;
+      }
+    });
+    task.run();
+    return task;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#put(ch.entwine.weblounge.common.content.Resource)
    */
   public <T extends ResourceContent> Resource<T> put(Resource<T> resource)
       throws ContentRepositoryException, IOException, IllegalStateException {
     return put(resource, true);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#put(ch.entwine.weblounge.common.content.Resource,
+   *      ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public <T extends ResourceContent> Future<Resource<T>> put(
+      final Resource<T> resource, AsynchronousContentRepositoryListener listener)
+      throws ContentRepositoryException, IOException, IllegalStateException {
+    FutureTask<Resource<T>> task = new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
+      public Resource<T> call() throws Exception {
+        return put(resource);
+      }
+    });
+    task.run();
+    return task;
   }
 
   /**
@@ -563,6 +680,27 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#putContent(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.content.ResourceContent,
+   *      java.io.InputStream,
+   *      ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public <T extends ResourceContent> Future<Resource<T>> putContent(
+      final ResourceURI uri, final T content, final InputStream is,
+      AsynchronousContentRepositoryListener listener)
+      throws ContentRepositoryException, IOException, IllegalStateException {
+    FutureTask<Resource<T>> task = new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
+      public Resource<T> call() throws Exception {
+        return putContent(uri, content, is);
+      }
+    });
+    task.run();
+    return task;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#deleteContent(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.content.ResourceContent)
    */
@@ -605,6 +743,26 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     return resource;
   }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#deleteContent(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.content.ResourceContent,
+   *      ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   */
+  public <T extends ResourceContent> Future<Resource<T>> deleteContent(
+      final ResourceURI uri, final T content,
+      AsynchronousContentRepositoryListener listener)
+      throws ContentRepositoryException, IOException, IllegalStateException {
+    FutureTask<Resource<T>> task = new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
+      public Resource<T> call() throws Exception {
+        return deleteContent(uri, content);
+      }
+    });
+    task.run();
+    return task;
+  };
 
   /**
    * Writes a new resource to the repository storage.

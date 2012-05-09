@@ -400,7 +400,8 @@
               zookeeper;inline=true
             </Embed-Dependency>
             <Private-Package>
-              org.apache.solr.core;-split-package:=merge-first
+              org.apache.solr.core;-split-package:=merge-first,
+              ch.entwine.weblounge.contentrepository.impl.util
             </Private-Package>
             <Service-Component>
               OSGI-INF/file-serializer.xml,
