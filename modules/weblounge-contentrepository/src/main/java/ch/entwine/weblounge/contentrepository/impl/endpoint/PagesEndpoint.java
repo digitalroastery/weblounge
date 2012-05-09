@@ -768,7 +768,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @Path("/{page}")
   public Response deletePage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
-      @FormParam("asynchronous") boolean asynchronous) {
+      @PathParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
@@ -1091,7 +1091,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   public Response unlockPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
       @HeaderParam("If-Match") String ifMatchHeader,
-      @FormParam("asynchronous") boolean asynchronous) {
+      @PathParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
@@ -1364,7 +1364,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   public Response unpublishPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
       @HeaderParam("If-Match") String ifMatchHeader,
-      @FormParam("asynchronous") boolean asynchronous) {
+      @PathParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
