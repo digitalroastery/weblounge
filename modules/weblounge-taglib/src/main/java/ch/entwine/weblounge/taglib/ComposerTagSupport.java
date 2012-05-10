@@ -389,7 +389,7 @@ public class ComposerTagSupport extends WebloungeTag {
             }
 
             // Set the content that is being displayed
-            if ((content == null || content.length == 0) && contentProvider.equals(targetPage))
+            if (content.length == 0 && contentProvider.equals(targetPage))
               content = contentProvider.getPagelets(id);
 
             // If potential ghost content is available, keep it
@@ -623,7 +623,6 @@ public class ComposerTagSupport extends WebloungeTag {
         if (renderingState.equals(RenderingState.InsideComposer)) {
           afterComposer(writer, composer);
           renderingState = RenderingState.Outside;
-          writer.flush();
         }
 
         // Cleanup request
