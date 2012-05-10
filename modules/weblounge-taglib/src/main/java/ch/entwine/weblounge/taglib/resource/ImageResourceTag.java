@@ -188,7 +188,7 @@ public class ImageResourceTag extends WebloungeTag {
         return SKIP_BODY;
       }
       if (result.getHitCount() > 1)
-        logger.info("Search returned {} images for subjects '{}'. Will take no. 1 for further processing.", result.getHitCount(), StringUtils.join(imageSubjects, ", "));
+        logger.debug("Search returned {} images for subjects '{}'. Will take no. 1 for further processing.", result.getHitCount(), StringUtils.join(imageSubjects, ", "));
       if (result.getHitCount() > 0)
         uri = new ImageResourceURIImpl(site, null, result.getItems()[0].getId());
     }
