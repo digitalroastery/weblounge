@@ -4,7 +4,7 @@
   <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-base</artifactId>
   <packaging>pom</packaging>
-  <version>3.0.0-SNAPSHOT</version>
+  <version>3.0.0</version>
   <name>Weblounge</name>
   <description>Weblounge is a multilingual web content management system</description>
   <url>http://www.entwinemedia.com/weblounge</url>
@@ -392,8 +392,8 @@
               <phase>install</phase>
               <configuration>
                 <target name="[INFO] Deploy to stage" if="weblounge.home" unless="deployment.skip">
-                  <property name="bundle.file" value="${project.build.directory}/${project.build.finalName}.jar"/>
-                  <copy verbose="false" file="${bundle.file}" todir="${weblounge.home}/${weblounge.deploymentdir}" overwrite="true" failonerror="false"/>
+                  <property name="bundle.file" value="${project.build.directory}/${project.build.finalName}.jar" />
+                  <copy verbose="false" file="${bundle.file}" todir="${weblounge.home}/${weblounge.deploymentdir}" overwrite="true" failonerror="false" />
                 </target>
               </configuration>
               <goals>
