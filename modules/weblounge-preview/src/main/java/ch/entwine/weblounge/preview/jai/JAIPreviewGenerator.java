@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.RenderingHints;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -102,6 +103,29 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
       logger.trace("Image preview is generated using the resource's mimetype '{}'", mimetype);
       format = mimetype.substring(mimetype.indexOf("/") + 1);
     }
+    style(is, os, format, style);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.image.ImagePreviewGenerator#createPreview(java.io.File,
+   *      ch.entwine.weblounge.common.site.Environment,
+   *      ch.entwine.weblounge.common.language.Language,
+   *      ch.entwine.weblounge.common.content.image.ImageStyle,
+   *      java.lang.String, java.io.InputStream, java.io.OutputStream)
+   */
+  public void createPreview(File imageFile, Environment environment,
+      Language language, ImageStyle style, String format, InputStream is,
+      OutputStream os) throws IOException {
+
+    if (format == null) {
+      if (imageFile == null)
+        throw new IllegalArgumentException("Image file cannot be null");
+      format = FilenameUtils.getExtension(imageFile.getName());
+      logger.trace("Image preview is generated as '{}'", format);
+    }
+
     style(is, os, format, style);
   }
 

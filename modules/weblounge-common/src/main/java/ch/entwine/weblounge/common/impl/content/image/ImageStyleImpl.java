@@ -72,10 +72,15 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    * @param composeable
    *          <code>true</code> if the image is composeable
    * @throws IllegalArgumentException
+   *           if id parameter is blank
+   * @throws IllegalArgumentException
    *           if width and height parameter are zero or negative
    */
-  public ImageStyleImpl(String id, int width, int height, ImageScalingMode scaling,
-      boolean composeable) throws IllegalArgumentException {
+  public ImageStyleImpl(String id, int width, int height,
+      ImageScalingMode scaling, boolean composeable)
+      throws IllegalArgumentException {
+    if (StringUtils.isBlank(id))
+      throw new IllegalArgumentException("Identifier cannot be null");
     this.identifier = id;
     this.width = width;
     this.height = height;
@@ -122,9 +127,12 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
   /**
    * Creates a new composeable image style.
+   * 
+   * @param id
+   *          the style identifier
    */
-  public ImageStyleImpl() {
-    this(null, -1, -1, None, true);
+  public ImageStyleImpl(String id) {
+    this(id, -1, -1, None, true);
   }
 
   /**

@@ -276,6 +276,25 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   }
 
   /**
+   * Returns the highest ranked image preview generator that supports the given
+   * format or <code>null</code> if no preview generator is available.
+   * 
+   * @param format
+   *          the format
+   * @return the preview generator
+   */
+  public PreviewGenerator getPreviewGenerator(String format) {
+    for (ImagePreviewGenerator generator : previewGenerators) {
+      if (generator.supports(format)) {
+        logger.trace("Image preview generator {} agrees to handle format '{}'", generator, format);
+        return generator;
+      }
+    }
+    logger.trace("No image preview generator found to handle format '{}'", format);
+    return null;
+  }
+
+  /**
    * Adds the preview generator to the list of registered preview generators.
    * 
    * @param generator
