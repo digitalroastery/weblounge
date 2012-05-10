@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
+import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener;
@@ -39,8 +40,10 @@ import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityExcept
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
+import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
@@ -50,7 +53,6 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
@@ -64,6 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,6 +105,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /** True to create a homepage when an empty repository is started */
   protected boolean createHomepage = true;
+
+  /** the preview generator creates PNG's by default */
+  private static final String PREVIEW_FORMAT = "png";
 
   /**
    * Creates a new instance of the content repository.
@@ -893,95 +899,33 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @param resource
    *          the resource
+   * @param languages
+   *          the languages to build the previews for
    */
-  protected void createPreviews(Resource<?> resource) {
-    ResourceURI resourceURI = resource.getURI();
-    String resourceType = resourceURI.getType();
-
-    // Find the resource serializer
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
-    if (serializer == null) {
-      logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
-      return;
-    }
-
-    // Does the serializer come with a preview generator?
-    PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource);
-    if (previewGenerator == null) {
-      logger.debug("Resource type '{}' does not support previews", resourceType);
-      return;
-    }
+  protected void createPreviews(final Resource<?> resource,
+      Language... languages) {
 
     // Compile the full list of image styles
-    List<ImageStyle> styles = new ArrayList<ImageStyle>();
+    final List<ImageStyle> styles = new ArrayList<ImageStyle>();
     if (imageStyleTracker != null)
       styles.addAll(imageStyleTracker.getImageStyles());
     for (Module m : getSite().getModules()) {
       styles.addAll(Arrays.asList(m.getImageStyles()));
     }
 
-    // Create the previews for all languages.
-    for (Language language : resource.languages()) {
-
-      // Is creating a preview for the current language supported?
-      if (!previewGenerator.supports(resource))
-        continue;
-
-      logger.debug("Creating {} previews for {} {}", new Object[] {
-          language.getDescription(),
-          resourceType,
-          resource });
-
-      ResourceContent resourceContent = resource.getContent(language);
-
-      for (ImageStyle style : styles) {
-
-        // Create the target file name
-        StringBuilder filename = new StringBuilder();
-        String basename = null;
-
-        if (resourceContent != null)
-          basename = FilenameUtils.getBaseName(resourceContent.getFilename());
-        else
-          basename = resource.getIdentifier();
-        filename.append(basename);
-        filename.append("-").append(resource.getVersion());
-        filename.append("-").append(language.getIdentifier());
-
-        String suffix = previewGenerator.getSuffix(resource, language, style);
-        if (StringUtils.isNotBlank(suffix)) {
-          filename.append(".").append(suffix);
-        }
-
-        // Create the preview
-        createPreview(resource, style, environment, language, filename.toString(), previewGenerator);
-      }
+    // If no language has been specified, we create the preview for all
+    // languages
+    if (languages == null || languages.length == 0) {
+      languages = resource.getURI().getSite().getLanguages();
     }
-  }
 
-  /**
-   * Creates a preview from the given resource and returns the preview's file or
-   * <code>null</code> if the preview could not be created.
-   * 
-   * @param resource
-   *          the resource
-   * @param style
-   *          the image style
-   * @param environment
-   *          environment
-   * @param language
-   *          the language
-   * @param filename
-   *          the original filename
-   * @param previewGenerator
-   *          the preview generator
-   */
-  private void createPreview(Resource<?> resource, ImageStyle style,
-      Environment environment, Language language, String filename,
-      PreviewGenerator previewGenerator) {
-    PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, resource, style, environment, language, filename, previewGenerator);
-    Thread t = new Thread(previewWorker);
-    t.start();
+    // Create the previews
+    for (Language language : languages) {
+      PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, resource, environment, language, styles, PREVIEW_FORMAT);
+      Thread t = new Thread(previewWorker);
+      t.start();
+    }
+
   }
 
   /**
@@ -1014,9 +958,20 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     for (ImageStyle style : styles) {
-      File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier(), uri.getIdentifier()));
-      if (language != null)
-        dir = new File(dir, language.getIdentifier());
+      File styledImage = null;
+
+      // Create the path to a sample image
+      if (language != null) {
+        styledImage = ImageStyleUtils.getScaledFile(uri, "test." + PREVIEW_FORMAT, language, style);
+      } else {
+        styledImage = ImageStyleUtils.getScaledFile(uri, "test." + PREVIEW_FORMAT, LanguageUtils.getLanguage("en"), style);
+        styledImage = styledImage.getParentFile();
+      }
+
+      // Remove the parent's directory, which will include the specified
+      // previews
+      File dir = styledImage.getParentFile();
+      logger.debug("Deleting previews in {}", dir.getAbsolutePath());
       FileUtils.deleteQuietly(dir);
     }
   }
@@ -1028,12 +983,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     private ContentRepository contentRepository = null;
     private Resource<?> resource = null;
-    private ImageStyle style = null;
+    private List<ImageStyle> styles = null;
     private Environment environment = null;
     private Language language = null;
-    private String filename = null;
     private String format = null;
-    private PreviewGenerator previewGenerator = null;
 
     /**
      * Creates a new preview worker who will create the corresponding previews
@@ -1041,28 +994,22 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      * 
      * @param resource
      *          the resource
-     * @param style
-     *          the image style
      * @param environment
      *          the current environment
      * @param language
      *          the language
-     * @param filename
-     *          the filename
-     * @param previewGenerator
-     *          the preview generator to use
+     * @param styles
+     *          the image styles
      */
     public PreviewGeneratorWorker(ContentRepository repository,
-        Resource<?> resource, ImageStyle style, Environment environment,
-        Language language, String filename, PreviewGenerator previewGenerator) {
+        Resource<?> resource, Environment environment, Language language,
+        List<ImageStyle> styles, String format) {
       this.contentRepository = repository;
       this.resource = resource;
-      this.style = style;
       this.environment = environment;
       this.language = language;
-      this.filename = filename;
-      this.format = FilenameUtils.getExtension(filename);
-      this.previewGenerator = previewGenerator;
+      this.styles = styles;
+      this.format = format;
     }
 
     /**
@@ -1074,6 +1021,91 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       ResourceURI resourceURI = resource.getURI();
       String resourceType = resourceURI.getType();
 
+      // Find the resource serializer
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+      if (serializer == null) {
+        logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
+        return;
+      }
+
+      // Does the serializer come with a preview generator?
+      PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource);
+      if (previewGenerator == null) {
+        logger.debug("Resource type '{}' does not support previews", resourceType);
+        return;
+      }
+
+      // Create the original preview image for every language
+      ImageStyle original = new ImageStyleImpl("original");
+      File file = createPreview(resource, original, language, previewGenerator, format);
+
+      // Create the scaled images
+      String mimeType = "image/" + format;
+      ResourceSerializer<?, ?> s = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
+      if (s == null) {
+        logger.warn("No resource serializer is capable of dealing with resources of format '{}'", mimeType);
+        return;
+      } else if (!(s instanceof ImageResourceSerializer)) {
+        logger.warn("Resource serializer lookup for format '{}' returned {}", format, s.getClass());
+        return;
+      }
+
+      // Find us an image serializer
+      ImageResourceSerializer irs = (ImageResourceSerializer) s;
+      ImagePreviewGenerator imagePreviewGenerator = (ImagePreviewGenerator) irs.getPreviewGenerator(format);
+      if (imagePreviewGenerator == null) {
+        logger.warn("Image resource serializer {} does not provide support for '{}'", irs, format);
+        return;
+      }
+
+      // Now scale the original preview according to the existing styles
+      for (ImageStyle style : styles) {
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        try {
+          fis = new FileInputStream(file);
+          File scaledFile = ImageStyleUtils.createScaledFile(resourceURI, file.getName(), language, style);
+          fos = new FileOutputStream(scaledFile);
+          imagePreviewGenerator.createPreview(file, environment, language, style, resourceType, fis, fos);
+        } catch (Throwable t) {
+          logger.error("Error scaling {}: {}", file, t.getMessage());
+          continue;
+        } finally {
+          IOUtils.closeQuietly(fis);
+          IOUtils.closeQuietly(fos);
+        }
+      }
+
+    }
+
+    /**
+     * Creates the actual preview.
+     * 
+     * @param resource
+     *          the resource
+     * @param style
+     *          the image style
+     * @param language
+     *          the language
+     * @param previewGenerator
+     *          the preview generator
+     * @param the
+     *          preview format
+     * @return returns the preview file
+     */
+    private File createPreview(Resource<?> resource, ImageStyle style,
+        Language language, PreviewGenerator previewGenerator, String format) {
+
+      ResourceURI resourceURI = resource.getURI();
+      String resourceType = resourceURI.getType();
+
+      // Create the filename
+      ResourceContent content = resource.getContent(language);
+      String filename = content != null ? content.getFilename() : resource.getIdentifier();
+      String suffix = previewGenerator.getSuffix(resource, language, style);
+      filename = FilenameUtils.getBaseName(filename) + "." + suffix;
+
+      // Initiate creation of previews
       InputStream resourceInputStream = null;
       InputStream contentRepositoryIs = null;
       FileOutputStream fos = null;
@@ -1087,7 +1119,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
         // Create the file if it doesn't exist or if it is outdated
         if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
-          ResourceContent content = resource.getContent(language);
           contentRepositoryIs = contentRepository.getContent(resourceURI, language);
 
           // Is this local content?
@@ -1097,6 +1128,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
           fos = new FileOutputStream(scaledResourceFile);
           logger.debug("Creating preview of '{}' at {}", resource, scaledResourceFile);
+
           previewGenerator.createPreview(resource, environment, language, style, format, contentRepositoryIs, fos);
           if (scaledResourceFile.length() > 0) {
             scaledResourceFile.setLastModified(lastModified);
@@ -1155,6 +1187,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         IOUtils.closeQuietly(contentRepositoryIs);
         IOUtils.closeQuietly(fos);
       }
+
+      return scaledResourceFile;
     }
 
   }

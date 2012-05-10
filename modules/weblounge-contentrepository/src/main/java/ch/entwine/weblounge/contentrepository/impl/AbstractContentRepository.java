@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
@@ -27,6 +28,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -57,6 +59,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.CharBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +111,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /** The environment */
   protected Environment environment = Environment.Production;
+
+  /** The image preview generators */
+  protected List<ImagePreviewGenerator> imagePreviewGenerators = new ArrayList<ImagePreviewGenerator>();
 
   /**
    * Creates a new instance of the content repository.
@@ -727,6 +735,36 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   void setEnvironment(Environment environment) {
     this.environment = environment;
+  }
+
+  /**
+   * Adds the preview generator to the list of registered preview generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void addPreviewGenerator(ImagePreviewGenerator generator) {
+    synchronized (imagePreviewGenerators) {
+      imagePreviewGenerators.add(generator);
+      Collections.sort(imagePreviewGenerators, new Comparator<PreviewGenerator>() {
+        public int compare(PreviewGenerator a, PreviewGenerator b) {
+          return Integer.valueOf(b.getPriority()).compareTo(a.getPriority());
+        }
+      });
+    }
+  }
+
+  /**
+   * Removes the preview generator from the list of registered preview
+   * generators.
+   * 
+   * @param generator
+   *          the generator
+   */
+  void removePreviewGenerator(ImagePreviewGenerator generator) {
+    synchronized (imagePreviewGenerators) {
+      imagePreviewGenerators.remove(generator);
+    }
   }
 
 }

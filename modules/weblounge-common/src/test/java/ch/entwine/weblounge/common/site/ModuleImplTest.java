@@ -142,8 +142,7 @@ public class ModuleImplTest {
     renderer = new PageletRendererImpl();
     renderer.setIdentifier(rendererIdentifier);
 
-    imageStyle = new ImageStyleImpl();
-    imageStyle.setIdentifier(imageStyleIdentifier);
+    imageStyle = new ImageStyleImpl(imageStyleIdentifier);
   }
 
   /**
