@@ -768,7 +768,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @Path("/{page}")
   public Response deletePage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
-      @PathParam("asynchronous") boolean asynchronous) {
+      @QueryParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
@@ -1007,7 +1007,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         page = (Page) contentRepository.get(liveURI);
         liveURI.setPath(page.getURI().getPath());
         page.setVersion(Resource.WORK);
-        contentRepository.put(page);
+        contentRepository.put(page, new ForgivingContentRepositoryUpdateListener());
       } else {
         page = (Page) contentRepository.get(workURI);
         workURI.setPath(page.getURI().getPath());
@@ -1091,7 +1091,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   public Response unlockPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
       @HeaderParam("If-Match") String ifMatchHeader,
-      @PathParam("asynchronous") boolean asynchronous) {
+      @QueryParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)
@@ -1364,7 +1364,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   public Response unpublishPage(@Context HttpServletRequest request,
       @PathParam("page") String pageId,
       @HeaderParam("If-Match") String ifMatchHeader,
-      @PathParam("asynchronous") boolean asynchronous) {
+      @QueryParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
     if (pageId == null)

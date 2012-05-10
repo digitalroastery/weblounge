@@ -158,7 +158,7 @@ public final class PagesEndpointDocs {
     deletePageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     deletePageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     deletePageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
-    deletePageEndpoint.addPathParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
+    deletePageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
     deletePageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, deletePageEndpoint);
 
@@ -242,7 +242,7 @@ public final class PagesEndpointDocs {
     unlockPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     unlockPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     unlockPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
-    unlockPageEndpoint.addPathParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
+    unlockPageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
     unlockPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, unlockPageEndpoint);
 
@@ -277,7 +277,7 @@ public final class PagesEndpointDocs {
     unpublishPageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
     unpublishPageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     unpublishPageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
-    unpublishPageEndpoint.addPathParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
+    unpublishPageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
     unpublishPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, unpublishPageEndpoint);
 
