@@ -74,8 +74,8 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git://github.com/entwinemedia/weblounge.git</connection>
-    <developerConnection>scm:git:git://github.com/entwinemedia/weblounge.git</developerConnection>
+    <connection>scm:git:git@github.com:entwinemedia/weblounge.git</connection>
+    <developerConnection>scm:git:git@github.com:entwinemedia/weblounge.git</developerConnection>
     <url>https://github.com/entwinemedia/weblounge</url>
   </scm>
 
