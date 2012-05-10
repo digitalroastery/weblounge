@@ -63,6 +63,9 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
   /** List of supported formats (cached) */
   private Map<String, Boolean> supportedFormats = new HashMap<String, Boolean>();
 
+  /** Flag to indicate whether format detection is supported */
+  private boolean formatDecetionSupported = true;
+
   /**
    * {@inheritDoc}
    * 
@@ -80,6 +83,9 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
   public boolean supports(String format) {
     if (format == null)
       throw new IllegalArgumentException("Format cannot be null");
+
+    if (!formatDecetionSupported)
+      return true;
 
     // Check for verified support
     if (supportedFormats.containsKey(format))
@@ -107,7 +113,9 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       return supported[0];
     } catch (Throwable t) {
       logger.warn("Error looking up formats supported by ImageMagick: {}", t.getMessage());
-      return false;
+      formatDecetionSupported = false;
+      logger.info("ImageMagick format lookup failed, assuming support for all formats");
+      return true;
     }
   }
 
