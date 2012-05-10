@@ -222,8 +222,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   @Override
   public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
     // Check if resource is in temporary cache
-    if (pagePutCache.containsKey(uri))
-      return pagePutCache.get(uri);
+    Resource<?> resource = null;
+    synchronized (pagePutCache) {
+      resource = pagePutCache.get(uri);
+      if (resource != null)
+        return resource;
+    }
 
     // If not, have the super implementation get the content for us
     return super.get(uri);
@@ -240,12 +244,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     Future<Resource<?>> futureResource = lock(uri, user, null);
     try {
       return futureResource.get();
-    } catch (Exception e) {
-      if (e.getCause() instanceof ContentRepositoryException)
-        throw (ContentRepositoryException) e.getCause();
-      else if (e.getCause() instanceof IOException)
-        throw (IOException) e.getCause();
-      throw new ContentRepositoryException(e.getCause());
+    } catch (Throwable t) {
+      if (t.getCause() instanceof ContentRepositoryException)
+        throw (ContentRepositoryException) t.getCause();
+      else if (t.getCause() instanceof IOException)
+        throw (IOException) t.getCause();
+      throw new ContentRepositoryException(t.getCause());
     }
   }
 
@@ -302,12 +306,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     try {
       Future<Resource<?>> futureResource = unlock(uri, user, null);
       return futureResource.get();
-    } catch (Exception e) {
-      if (e.getCause() instanceof ContentRepositoryException)
-        throw (ContentRepositoryException) e.getCause();
-      else if (e.getCause() instanceof IOException)
-        throw (IOException) e.getCause();
-      throw new ContentRepositoryException(e.getCause());
+    } catch (Throwable t) {
+      if (t.getCause() instanceof ContentRepositoryException)
+        throw (ContentRepositoryException) t.getCause();
+      else if (t.getCause() instanceof IOException)
+        throw (IOException) t.getCause();
+      throw new ContentRepositoryException(t.getCause());
     }
   }
 
@@ -433,7 +437,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Delete the index entries
     for (long revision : revisions) {
-      pagePutCache.remove(new ResourceURIImpl(uri, revision));
+      synchronized (pagePutCache) {
+        pagePutCache.remove(new ResourceURIImpl(uri, revision));
+      }
       index.delete(new ResourceURIImpl(uri, revision));
     }
 
@@ -610,11 +616,15 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public <T extends ResourceContent> Future<Resource<T>> put(
       final Resource<T> resource, AsynchronousContentRepositoryListener listener)
       throws ContentRepositoryException, IOException, IllegalStateException {
+    final ResourceURI uri = resource.getURI();
     pagePutCache.put(resource.getURI(), resource);
     FutureTask<Resource<T>> task = new FutureTask<Resource<T>>(new Callable<Resource<T>>() {
       public Resource<T> call() throws Exception {
-        Resource<T> returnVal = put(resource, false);
-        pagePutCache.remove(resource.getURI());
+        Resource<T> returnVal = null;
+        synchronized (pagePutCache) {
+          pagePutCache.remove(uri);
+        }
+        returnVal = put(resource, false);
         return returnVal;
       }
     });
@@ -1038,6 +1048,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       // Create the original preview image for every language
       ImageStyle original = new ImageStyleImpl("original");
       File file = createPreview(resource, original, language, previewGenerator, format);
+      if (file == null || !file.exists() || file.length() == 0) {
+        logger.debug("Preview generation for {} failed", resource);
+        return;
+      }
 
       // Create the scaled images
       String mimeType = "image/" + format;
