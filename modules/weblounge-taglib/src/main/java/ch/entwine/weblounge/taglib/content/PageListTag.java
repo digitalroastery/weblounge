@@ -291,8 +291,10 @@ public class PageListTag extends WebloungeTag {
     // Look for the next header
     while (!found && index < pages.getItems().length) {
       SearchResultItem candidateItem = pages.getItems()[index];
-      if (!(candidateItem instanceof PageSearchResultItem))
+      if (!(candidateItem instanceof PageSearchResultItem)) {
+        index++;
         continue;
+      }
       item = (PageSearchResultItem) candidateItem;
 
       // Store the important properties
