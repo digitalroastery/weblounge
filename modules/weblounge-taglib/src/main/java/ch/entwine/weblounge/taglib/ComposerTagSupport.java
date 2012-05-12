@@ -521,11 +521,21 @@ public class ComposerTagSupport extends WebloungeTag {
    */
   @Override
   public int doStartTag() throws JspException {
-    Enumeration<?> e = request.getAttributeNames();
-    while (e.hasMoreElements()) {
-      String key = (String) e.nextElement();
+    Enumeration<?> names = request.getAttributeNames();
+    while (names.hasMoreElements()) {
+      String key = (String) names.nextElement();
       attributes.put(key, request.getAttribute(key));
     }
+    
+    // Initiate loading the page content
+    try {
+      loadContent(contentInheritanceEnabled);
+    } catch (ContentRepositoryUnavailableException e) {
+      logger.warn("Content repository '{}' unavailable while processing jsp", request.getSite().getIdentifier());
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error accessing content repository '{}': {}", request.getSite().getIdentifier(), e.getMessage());
+    }
+    
     return EVAL_BODY_INCLUDE;
   }
 
