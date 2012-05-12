@@ -167,7 +167,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
       Document stylesXml = TestUtils.parseXMLResponse(response);
-      assertEquals(8, Integer.parseInt(XPathHelper.valueOf(stylesXml, "count(//imagestyle)")));
+      assertEquals(12, Integer.parseInt(XPathHelper.valueOf(stylesXml, "count(//imagestyle)")));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -207,6 +207,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
     }
   }
 
+  @SuppressWarnings("cast")
   private void testImagePreview(String serverUrl, String resourceId,
       ImageStyle imageStyle) throws Exception {
     String requestUrl = UrlUtils.concat(serverUrl, resourceId, "locales", "en", "styles", imageStyle.getIdentifier());
@@ -231,8 +232,8 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
         // Test file size
         if (!ImageScalingMode.None.equals(imageStyle.getScalingMode())) {
           float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, imageStyle);
-          int scaledWidth = Math.round(originalWidth * scale) - ImageStyleUtils.getCropX(Math.round(originalWidth * scale), Math.round(originalHeight * scale), imageStyle);
-          int scaledHeight = Math.round(originalHeight * scale) - ImageStyleUtils.getCropY(Math.round(originalWidth * scale), Math.round(originalHeight * scale), imageStyle);
+          int scaledWidth = (int) Math.round(originalWidth * scale) - (int) ImageStyleUtils.getCropX(Math.round(originalWidth * scale), Math.round(originalHeight * scale), imageStyle);
+          int scaledHeight = (int) Math.round(originalHeight * scale) - (int) ImageStyleUtils.getCropY(Math.round(originalWidth * scale), Math.round(originalHeight * scale), imageStyle);
 
           // Load the image from the given input stream
           seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());

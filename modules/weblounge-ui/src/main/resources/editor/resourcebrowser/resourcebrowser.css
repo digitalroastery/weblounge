@@ -15,6 +15,7 @@
 	line-height: 30px;
 	text-align: left;
 	padding: 10px 5px;
+	background: none;
 }
 
 .editor_resourcebrowser nav.weblounge div.wbl-center {
@@ -45,6 +46,7 @@
 
 .editor_resourcebrowser nav {
 	padding: 10px 0;
+	background: none;
 }
 
 .editor_resourcebrowser nav.weblounge ul,
@@ -185,6 +187,7 @@
 img.wbl-pageThumbnail {
 	height: 200px;
 	width: 300px;
+	background: white;
 }
 
 .wbl-page.wbl-marked div.wbl-imageContainer {

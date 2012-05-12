@@ -1,4 +1,4 @@
-<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
 
 <input type="hidden" name="property:color1" value="0xd6d6d6" />
 <input type="hidden" name="property:color2" value="0xf0f0f0" />

@@ -9,4 +9,6 @@
     <provide interface="ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider" />
   </service>
 
+  <reference name="securityFilter" interface="javax.servlet.Filter" filter="(security=weblounge)" cardinality="0..1" policy="dynamic" bind="setSecurityFilter" /> 
+
 </scr:component>

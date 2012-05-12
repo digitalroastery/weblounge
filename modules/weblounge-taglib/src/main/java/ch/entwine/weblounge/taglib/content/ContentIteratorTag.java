@@ -135,7 +135,12 @@ public class ContentIteratorTag extends WebloungeTag {
     // to be initialized
     if (cardinality == -1) {
       pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
-      cardinality = getRemainingCardinality(pagelet);
+
+      // Do we have a pagelet?
+      if (pagelet == null)
+        return SKIP_BODY;
+
+      cardinality = getCardinality(pagelet);
 
       // Adjust according to maximum number of iterations
       if (maxOccurs > -1)
@@ -147,88 +152,16 @@ public class ContentIteratorTag extends WebloungeTag {
       if (minOccurs > -1)
         iterations = Math.max(iterations, minOccurs);
 
-      // Do we have a pagelet?
-      if (pagelet == null)
+      if (iterations == 0)
         return SKIP_BODY;
     }
 
     stashAndSetAttribute(ContentIteratorTagVariables.ITERATIONS, new Integer(iterations));
     stashAndSetAttribute(ContentIteratorTagVariables.INDEX, new Integer(index));
 
+    defineElementsAndProperties(index);
+
     return EVAL_BODY_INCLUDE;
-  }
-
-  /**
-   * Returns the number of remaining data values.
-   */
-  private int getRemainingCardinality(Pagelet pagelet) {
-
-    // Check remaining elements
-    if (elementNames != null) {
-      Language language = request.getLanguage();
-      for (String element : pagelet.getContentNames(language)) {
-        String[] elementValues = pagelet.getMultiValueContent(element, language);
-        if (elementValues == null)
-          continue;
-        cardinality = Math.max(cardinality, elementValues.length);
-      }
-    }
-
-    // Check remaining properties
-    if (propertyNames != null) {
-      for (String property : pagelet.getPropertyNames()) {
-        String[] propertyValues = pagelet.getMultiValueProperty(property);
-        if (propertyValues == null)
-          continue;
-        cardinality = Math.max(cardinality, propertyValues.length);
-      }
-    }
-
-    // Are there enough values to iterate over?
-    if (minOccurs >= 0 && minOccurs > cardinality)
-      return 0;
-    if (maxOccurs >= 0 && maxOccurs >= index)
-      return 0;
-
-    // Calculate how many values are left
-    return cardinality - index;
-  }
-
-  /**
-   * Defines the variables and their current values in the page context
-   * depending on the <code>iteration</code> value.
-   * 
-   * @param iteration
-   *          the iteration
-   */
-  protected void defineElementsAndProperties(int iteration) {
-    Language language = request.getLanguage();
-
-    // Define the elements
-    for (TagVariableDefinition variable : elementNames) {
-      Object value = null;
-      String[] values = pagelet.getMultiValueContent(variable.getName(), language);
-      if (values != null && iteration < values.length) {
-        value = values[iteration];
-      }
-      String name = variable.getAlias() != null ? variable.getAlias() : variable.getName();
-      logger.debug("Defining element '{}' as '{}'", name, value != null ? null : "null");
-      stashAttribute(name);
-      pageContext.setAttribute(name, value);
-    }
-
-    // Define the properties
-    for (TagVariableDefinition variable : propertyNames) {
-      Object value = null;
-      String[] values = pagelet.getMultiValueProperty(variable.getName());
-      if (values != null && iteration < values.length) {
-        value = values[iteration];
-      }
-      String name = variable.getAlias() != null ? variable.getAlias() : variable.getName();
-      logger.debug("Defining property '{}' as '{}'", name, value != null ? null : "null");
-      stashAttribute(name);
-      pageContext.setAttribute(name, value);
-    }
   }
 
   /**
@@ -258,6 +191,85 @@ public class ContentIteratorTag extends WebloungeTag {
   public int doEndTag() throws JspException {
     removeAndUnstashAttributes();
     return super.doEndTag();
+  }
+
+  /**
+   * Returns the number of data values.
+   */
+  private int getCardinality(Pagelet pagelet) {
+
+    // Check remaining elements
+    if (elementNames != null) {
+      Language language = request.getLanguage();
+      for (TagVariableDefinition element : elementNames) {
+        String name = element.getAlias();
+        String[] elementValues = pagelet.getMultiValueContent(name, language);
+        if (elementValues == null)
+          continue;
+        cardinality = Math.max(cardinality, elementValues.length);
+      }
+    }
+
+    // Check remaining properties
+    if (propertyNames != null) {
+      for (TagVariableDefinition property : propertyNames) {
+        String name = property.getAlias();
+        String[] propertyValues = pagelet.getMultiValueProperty(name);
+        if (propertyValues == null)
+          continue;
+        cardinality = Math.max(cardinality, propertyValues.length);
+      }
+    }
+
+    // Are there enough values to iterate over?
+    if (minOccurs >= 0 && minOccurs > cardinality)
+      return 0;
+    if (maxOccurs >= 0 && maxOccurs >= index)
+      return 0;
+
+    // Calculate how many values are left
+    return cardinality;
+  }
+
+  /**
+   * Defines the variables and their current values in the page context
+   * depending on the <code>iteration</code> value.
+   * 
+   * @param iteration
+   *          the iteration
+   */
+  protected void defineElementsAndProperties(int iteration) {
+    Language language = request.getLanguage();
+
+    // Define the elements
+    if (elementNames != null) {
+      for (TagVariableDefinition variable : elementNames) {
+        Object value = null;
+        String[] values = pagelet.getMultiValueContent(variable.getName(), language);
+        if (values != null && iteration < values.length) {
+          value = values[iteration];
+        }
+        String name = variable.getAlias();
+        logger.debug("Defining element '{}' as '{}'", name, value != null ? null : "null");
+        stashAttribute(name);
+        pageContext.setAttribute(name, value);
+      }
+    }
+
+    // Define the properties
+    if (propertyNames != null) {
+      for (TagVariableDefinition variable : propertyNames) {
+        Object value = null;
+        String[] values = pagelet.getMultiValueProperty(variable.getName());
+        if (values != null && iteration < values.length) {
+          value = values[iteration];
+        }
+        String name = variable.getAlias();
+        logger.debug("Defining property '{}' as '{}'", name, value != null ? null : "null");
+        stashAttribute(name);
+        pageContext.setAttribute(name, value);
+      }
+    }
   }
 
   /**

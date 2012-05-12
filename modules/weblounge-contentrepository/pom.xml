@@ -7,7 +7,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -110,7 +110,7 @@
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
-      <version>3.4.0</version>
+      <version>3.6.0</version>
       <exclusions>
         <exclusion>
           <groupId>org.apache.velocity</groupId>
@@ -126,83 +126,83 @@
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
-      <version>3.4.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-commons-csv</artifactId>
-      <version>3.4.0</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-noggit</artifactId>
-      <version>3.4.0</version>
-      <scope>runtime</scope>
+      <version>3.6.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
-      <version>3.4.0</version>
+      <version>3.6.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-analyzers</artifactId>
-      <version>3.4.0</version>
+      <version>3.6.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-highlighter</artifactId>
-      <version>3.4.0</version>
+      <version>3.6.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-kuromoji</artifactId>
+      <version>3.6.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-memory</artifactId>
-      <version>3.4.0</version>
+      <version>3.6.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-misc</artifactId>
-      <version>3.4.0</version>
+      <version>3.6.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-phonetic</artifactId>
+      <version>3.6.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-queries</artifactId>
-      <version>3.4.0</version>
+      <version>3.6.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-spatial</artifactId>
-      <version>3.4.0</version>
+      <version>3.6.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-spellchecker</artifactId>
-      <version>3.4.0</version>
+      <version>3.6.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-grouping</artifactId>
-      <version>3.4.0</version>
+      <version>3.6.0</version>
     </dependency>
 
     <dependency>
@@ -311,6 +311,7 @@
               org.apache.commons.codec;version="1.3",
               org.apache.commons.codec.binary;version="1.3",
               org.apache.commons.codec.language;version="1.3",
+              org.apache.commons.codec.language.bm;version="1.3",
               org.apache.commons.codec.net;version="1.3",
               org.apache.commons.collections;version="3.2.1",
               org.apache.commons.collections.map;version="3.2.1",
@@ -360,12 +361,11 @@
               org.xml.sax.helpers,
               !com.werken.xpath,
               !javax.sql,
-              !javax.swing.text,
               !jline,
+              !org.apache.http.*,
               !org.apache.log.*,
               !org.apache.log4j.*,
               !org.apache.tools.ant.*,
-              !org.apache.velocity.*,
               !org.mortbay.*,
             </Import-Package>
             <Export-Package>
@@ -381,14 +381,14 @@
               jcr;inline=true,
               solr-core;inline=true,
               solr-solrj;inline=true,
-              solr-commons-csv;inline=true,
-              solr-noggit;inline=true,
               lucene-core;inline=true,
               lucene-analyzers;inline=true,
               lucene-grouping;inline=true,
               lucene-highlighter;inline=true,
+              lucene-kuromoji;inline=true,
               lucene-memory;inline=true,
               lucene-misc;inline=true,
+              lucene-phonetic;inline=true,
               lucene-queries;inline=true,
               lucene-spatial;inline=true,
               lucene-spellchecker;inline=true,
@@ -399,7 +399,8 @@
               zookeeper;inline=true
             </Embed-Dependency>
             <Private-Package>
-              org.apache.solr.core;-split-package:=merge-first
+              org.apache.solr.core;-split-package:=merge-first,
+              ch.entwine.weblounge.contentrepository.impl.util
             </Private-Package>
             <Service-Component>
               OSGI-INF/file-serializer.xml,

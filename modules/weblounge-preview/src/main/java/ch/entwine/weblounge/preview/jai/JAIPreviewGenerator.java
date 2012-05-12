@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.RenderingHints;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -108,6 +109,29 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.image.ImagePreviewGenerator#createPreview(java.io.File,
+   *      ch.entwine.weblounge.common.site.Environment,
+   *      ch.entwine.weblounge.common.language.Language,
+   *      ch.entwine.weblounge.common.content.image.ImageStyle,
+   *      java.lang.String, java.io.InputStream, java.io.OutputStream)
+   */
+  public void createPreview(File imageFile, Environment environment,
+      Language language, ImageStyle style, String format, InputStream is,
+      OutputStream os) throws IOException {
+
+    if (format == null) {
+      if (imageFile == null)
+        throw new IllegalArgumentException("Image file cannot be null");
+      format = FilenameUtils.getExtension(imageFile.getName());
+      logger.trace("Image preview is generated as '{}'", format);
+    }
+
+    style(is, os, format, style);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.PreviewGenerator#getContentType(ch.entwine.weblounge.common.content.Resource,
    *      ch.entwine.weblounge.common.language.Language,
    *      ch.entwine.weblounge.common.content.image.ImageStyle)
@@ -143,6 +167,11 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
     if (StringUtils.isBlank(filename)) {
       logger.warn("Trying to get filename suffix for {}, which has no filename", resource);
       return null;
+    }
+
+    // Add the file identifier name
+    if (StringUtils.isNotBlank(style.getIdentifier())) {
+      filename += "-" + style.getIdentifier();
     }
 
     return FilenameUtils.getExtension(filename);

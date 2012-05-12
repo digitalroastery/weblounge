@@ -388,11 +388,13 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // Did scaling work? If not, cleanup and tell the user
     if (scaledImageFile.length() == 0) {
-      File f = scaledImageFile;
+      File f = scaledImageFile.getParentFile();
+      FileUtils.deleteQuietly(scaledImageFile);
       while (f != null && f.isDirectory() && f.listFiles().length == 0) {
         FileUtils.deleteQuietly(f);
         f = f.getParentFile();
       }
+      logger.error("Scaled image '{}' has content length 0", imageURI);
       DispatchUtils.sendInternalError(request, response);
       return true;
     }
@@ -442,7 +444,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       previewGenerators.add(generator);
       Collections.sort(previewGenerators, new Comparator<PreviewGenerator>() {
         public int compare(PreviewGenerator a, PreviewGenerator b) {
-          return Integer.valueOf(a.getPriority()).compareTo(b.getPriority());
+          return Integer.valueOf(b.getPriority()).compareTo(a.getPriority());
         }
       });
     }

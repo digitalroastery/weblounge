@@ -63,6 +63,9 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
   /** List of supported formats (cached) */
   private Map<String, Boolean> supportedFormats = new HashMap<String, Boolean>();
 
+  /** Flag to indicate whether format detection is supported */
+  private boolean formatDecetionSupported = true;
+
   /**
    * {@inheritDoc}
    * 
@@ -80,6 +83,9 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
   public boolean supports(String format) {
     if (format == null)
       throw new IllegalArgumentException("Format cannot be null");
+
+    if (!formatDecetionSupported)
+      return true;
 
     // Check for verified support
     if (supportedFormats.containsKey(format))
@@ -107,7 +113,9 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       return supported[0];
     } catch (Throwable t) {
       logger.warn("Error looking up formats supported by ImageMagick: {}", t.getMessage());
-      return false;
+      formatDecetionSupported = false;
+      logger.info("ImageMagick format lookup failed, assuming support for all formats");
+      return true;
     }
   }
 
@@ -135,6 +143,29 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       logger.trace("Image preview is generated using the resource's mimetype '{}'", mimetype);
       format = mimetype.substring(mimetype.indexOf("/") + 1);
     }
+    style(is, os, format, style);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.image.ImagePreviewGenerator#createPreview(java.io.File,
+   *      ch.entwine.weblounge.common.site.Environment,
+   *      ch.entwine.weblounge.common.language.Language,
+   *      ch.entwine.weblounge.common.content.image.ImageStyle,
+   *      java.lang.String, java.io.InputStream, java.io.OutputStream)
+   */
+  public void createPreview(File imageFile, Environment environment,
+      Language language, ImageStyle style, String format, InputStream is,
+      OutputStream os) throws IOException {
+
+    if (format == null) {
+      if (imageFile == null)
+        throw new IllegalArgumentException("Image file cannot be null");
+      format = FilenameUtils.getExtension(imageFile.getName());
+      logger.trace("Image preview is generated as '{}'", format);
+    }
+
     style(is, os, format, style);
   }
 
@@ -177,6 +208,11 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       return null;
     }
 
+    // Add the file identifier name
+    if (StringUtils.isNotBlank(style.getIdentifier())) {
+      filename += "-" + style.getIdentifier();
+    }
+
     return FilenameUtils.getExtension(filename);
   }
 
@@ -208,6 +244,7 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
    * @throws OutOfMemoryError
    *           if the image is too large to be processed in memory
    */
+  @SuppressWarnings("cast")
   private void style(InputStream is, OutputStream os, String format,
       ImageStyle style) throws IllegalArgumentException, IOException,
       OutOfMemoryError {

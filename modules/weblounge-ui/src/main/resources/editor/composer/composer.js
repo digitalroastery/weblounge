@@ -147,6 +147,20 @@ steal.plugins('jquery/controller',
 		$(this.element).sortable('enable');
 		$(this.element).find('div.pagelet').editor_pagelet('enable').css('min-height', '35px');
 	},
+	
+	hideGhostComposer: function() {
+		$('div.#' + this.id + '-ghost').hide();
+		$(this.element).show();
+	},
+	
+	handleGhostComposer: function() {
+		if($(this.element).find('div.pagelet').length > 0) {
+			$('div.#' + this.id + '-ghost').hide();
+		} else {
+			$('div.#' + this.id + '-ghost').show();
+			$(this.element).hide();
+		}
+	},
     
     _enablePagelets: function() {
     	$('.composer:not(.locked)').editor_composer('enable');

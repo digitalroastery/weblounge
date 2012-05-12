@@ -12,6 +12,7 @@ table#enumeration img {
 }
 
 td.dragHandle {
+	width: 20px;
 }
 
 td.showDragHandle {

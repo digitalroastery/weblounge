@@ -481,6 +481,7 @@ public class ImagesTest extends IntegrationTestBase {
    * @param style
    *          the image style
    */
+  @SuppressWarnings("cast")
   private void testEnglishScaled(HttpUriRequest request, ImageStyle style,
       List<String> eTags) throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
@@ -504,8 +505,8 @@ public class ImagesTest extends IntegrationTestBase {
         // Test file size
         if (!ImageScalingMode.None.equals(style.getScalingMode())) {
           float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
-          int scaledWidth = Math.round(originalWidth * scale) - ImageStyleUtils.getCropX(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
-          int scaledHeight = Math.round(originalHeight * scale) - ImageStyleUtils.getCropY(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
+          int scaledWidth = (int) Math.round(originalWidth * scale) - (int) ImageStyleUtils.getCropX(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
+          int scaledHeight = (int) Math.round(originalHeight * scale) - (int) ImageStyleUtils.getCropY(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
 
           // Load the image from the given input stream
           seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
@@ -564,6 +565,7 @@ public class ImagesTest extends IntegrationTestBase {
    * @param style
    *          the image style
    */
+  @SuppressWarnings("cast")
   private void testGermanScaled(HttpUriRequest request, ImageStyle style,
       List<String> eTags) throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
@@ -587,8 +589,8 @@ public class ImagesTest extends IntegrationTestBase {
         // Test file size
         if (!ImageScalingMode.None.equals(style.getScalingMode())) {
           float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
-          int scaledWidth = Math.round(originalWidth * scale) - ImageStyleUtils.getCropX(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
-          int scaledHeight = Math.round(originalHeight * scale) - ImageStyleUtils.getCropY(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
+          int scaledWidth = (int) Math.round(originalWidth * scale) - (int) ImageStyleUtils.getCropX(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
+          int scaledHeight = (int) Math.round(originalHeight * scale) - (int) ImageStyleUtils.getCropY(Math.round(originalWidth * scale), Math.round(originalHeight * scale), style);
 
           // Load the image from the given input stream
           seekableInputStream = new FileCacheSeekableStream(response.getEntity().getContent());

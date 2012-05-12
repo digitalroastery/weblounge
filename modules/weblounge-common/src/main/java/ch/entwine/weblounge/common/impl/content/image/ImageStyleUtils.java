@@ -59,12 +59,8 @@ public final class ImageStyleUtils {
    *          the image style
    * @return the width
    */
-  public static int getWidth(ImageContent image, ImageStyle style) {
-    int width = image.getWidth();
-    int height = image.getHeight();
-    width *= getScale(width, height, style);
-    width -= getCropX(width, height, style);
-    return width;
+  public static int getStyledWidth(ImageContent image, ImageStyle style) {
+    return getStyledWidth(image.getWidth(), image.getHeight(), style);
   }
 
   /**
@@ -77,12 +73,8 @@ public final class ImageStyleUtils {
    *          the image style
    * @return the height
    */
-  public static int getHeight(ImageContent image, ImageStyle style) {
-    int width = image.getWidth();
-    int height = image.getHeight();
-    height *= getScale(width, height, style);
-    height -= getCropY(width, height, style);
-    return height;
+  public static int getStyledHeight(ImageContent image, ImageStyle style) {
+    return getStyledHeight(image.getWidth(), image.getHeight(), style);
   }
 
   /**
@@ -338,8 +330,9 @@ public final class ImageStyleUtils {
   }
 
   /**
-   * Creates a file for the scaled image that is identified by
-   * <code>filename</code>, <code>language</code> and <code>style</code>.
+   * Creates a file and its parent directories for the scaled image that is
+   * identified by <code>filename</code>, <code>language</code> and
+   * <code>style</code>.
    * <p>
    * If no filename is specified, the resource's identifier is used.
    * 
@@ -355,11 +348,41 @@ public final class ImageStyleUtils {
    *           if creating the file fails
    * @throws IllegalStateException
    *           if a file is found at the parent directory location
-   * @return
+   * @return the file
    */
   public static File createScaledFile(ResourceURI uri, String filename,
       Language language, ImageStyle style) throws IOException,
       IllegalStateException {
+
+    File scaledFile = getScaledFile(uri, filename, language, style);
+    File dir = scaledFile.getParentFile();
+
+    if (dir.exists() && !dir.isDirectory())
+      throw new IllegalStateException("Found a file at " + dir + " instead of a directory");
+    if (!dir.isDirectory())
+      FileUtils.forceMkdir(dir);
+
+    return scaledFile;
+  }
+
+  /**
+   * Returns the file for the scaled image that is identified by
+   * <code>filename</code>, <code>language</code> and <code>style</code>.
+   * <p>
+   * If no filename is specified, the resource's identifier is used.
+   * 
+   * @param uri
+   *          the resource uri
+   * @param filename
+   *          the file name
+   * @param language
+   *          the language
+   * @param style
+   *          the image style
+   * @return
+   */
+  public static File getScaledFile(ResourceURI uri, String filename,
+      Language language, ImageStyle style) {
 
     if (filename == null)
       filename = uri.getIdentifier();
@@ -368,11 +391,6 @@ public final class ImageStyleUtils {
     // If needed, create the scaled file's parent directory
     Site site = uri.getSite();
     File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier(), uri.getIdentifier(), language.getIdentifier()));
-
-    if (dir.exists() && !dir.isDirectory())
-      throw new IllegalStateException("Found a file at " + dir + " instead of a directory");
-    if (!dir.isDirectory())
-      FileUtils.forceMkdir(dir);
 
     // Create the filename
     StringBuffer scaledFilename = new StringBuffer(FilenameUtils.getBaseName(filename));

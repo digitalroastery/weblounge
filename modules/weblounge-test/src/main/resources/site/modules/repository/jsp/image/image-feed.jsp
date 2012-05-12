@@ -1,4 +1,4 @@
-<%@ taglib uri="/WEB-INF/weblounge-content.tld" prefix="webl" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
 <%@ taglib uri="/WEB-INF/weblounge-resource.tld" prefix="weblr" %>
 <%@ page import="ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils" %>
 <%@ page import="ch.entwine.weblounge.common.content.ResourceUtils" %>

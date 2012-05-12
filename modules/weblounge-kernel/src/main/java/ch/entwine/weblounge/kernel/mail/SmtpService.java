@@ -110,6 +110,10 @@ public class SmtpService implements ManagedService {
    */
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
+    if (properties == null) {
+      logger.debug("Received null smtp configuration");
+      return;
+    }
 
     // Read the mail server properties
     mailProperties.clear();

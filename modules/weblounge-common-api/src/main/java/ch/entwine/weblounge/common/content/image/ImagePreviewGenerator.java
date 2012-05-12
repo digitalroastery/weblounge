@@ -21,10 +21,43 @@
 package ch.entwine.weblounge.common.content.image;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Environment;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Marker interface for image preview generators.
  */
 public interface ImagePreviewGenerator extends PreviewGenerator {
+
+  /**
+   * Creates a preview image for a resource and writes the content to the
+   * {@link OutputStream}.
+   * 
+   * @param imageFile
+   *          the existing image
+   * @param environment
+   *          the environment
+   * @param language
+   *          the preview language
+   * @param style
+   *          the image style
+   * @param format
+   *          the output format. If <code>format</code> is <code>null</code>, it
+   *          will be taken from the resource's mime type
+   * @param is
+   *          the resource content stream
+   * @param os
+   *          the output stream
+   * @throws IOException
+   *           if the resource content cannot be read
+   */
+  void createPreview(File imageFile, Environment environment,
+      Language language, ImageStyle style, String format, InputStream is,
+      OutputStream os) throws IOException;
 
 }

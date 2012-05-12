@@ -4,7 +4,7 @@
   <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-base</artifactId>
   <packaging>pom</packaging>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <name>Weblounge</name>
   <description>Weblounge is a multilingual web content management system</description>
   <url>http://www.entwinemedia.com/weblounge</url>
@@ -74,8 +74,8 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git://github.com/entwinemedia/weblounge.git</connection>
-    <developerConnection>scm:git:git://github.com/entwinemedia/weblounge.git</developerConnection>
+    <connection>scm:git:git@github.com:entwinemedia/weblounge.git</connection>
+    <developerConnection>scm:git:git@github.com:entwinemedia/weblounge.git</developerConnection>
     <url>https://github.com/entwinemedia/weblounge</url>
   </scm>
 
@@ -284,6 +284,18 @@
             </execution>
           </executions>
         </plugin>
+
+				<!-- Release management -->
+				<plugin>
+				  <groupId>org.apache.maven.plugins</groupId>
+				  <artifactId>maven-release-plugin</artifactId>
+				  <version>2.0</version>
+				  <configuration>
+				    <goals>deploy</goals>
+				    <autoVersionSubmodules>true</autoVersionSubmodules>
+						<addSchema>false</addSchema>
+				  </configuration>
+				</plugin>
         
         <!-- Coding and styling rules for source code -->
         <plugin>
