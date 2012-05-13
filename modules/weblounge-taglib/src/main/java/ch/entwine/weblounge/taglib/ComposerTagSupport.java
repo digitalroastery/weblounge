@@ -389,8 +389,7 @@ public class ComposerTagSupport extends WebloungeTag {
             }
 
             // Set the content that is being displayed
-            if (content.length == 0 && contentProvider.equals(targetPage))
-              content = contentProvider.getPagelets(id);
+            content = contentProvider.getPagelets(id);
 
             // If potential ghost content is available, keep it
             if (!contentProvider.equals(targetPage)) {
@@ -526,7 +525,7 @@ public class ComposerTagSupport extends WebloungeTag {
       String key = (String) names.nextElement();
       attributes.put(key, request.getAttribute(key));
     }
-    
+
     // Initiate loading the page content
     try {
       loadContent(contentInheritanceEnabled);
@@ -535,7 +534,7 @@ public class ComposerTagSupport extends WebloungeTag {
     } catch (ContentRepositoryException e) {
       logger.warn("Error accessing content repository '{}': {}", request.getSite().getIdentifier(), e.getMessage());
     }
-    
+
     return EVAL_BODY_INCLUDE;
   }
 
