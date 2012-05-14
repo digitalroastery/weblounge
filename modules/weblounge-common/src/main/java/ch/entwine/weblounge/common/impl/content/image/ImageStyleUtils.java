@@ -146,7 +146,7 @@ public final class ImageStyleUtils {
       case Cover:
       case Width:
       case Height:
-        if (styledWidth < scale * imageWidth)
+        if (styledWidth > -1 && styledWidth < scale * imageWidth)
           cropX = Math.round(scale * imageWidth) - styledWidth;
         break;
       case None:
@@ -180,7 +180,7 @@ public final class ImageStyleUtils {
       case Cover:
       case Height:
       case Width:
-        if (styledHeight < scale * imageHeight)
+        if (styledHeight > -1 && styledHeight < scale * imageHeight)
           cropY = Math.round(scale * imageHeight) - styledHeight;
         break;
       case None:
