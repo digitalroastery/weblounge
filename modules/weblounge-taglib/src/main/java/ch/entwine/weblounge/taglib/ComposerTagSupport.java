@@ -362,14 +362,15 @@ public class ComposerTagSupport extends WebloungeTag {
 
       // If composer is empty and ghost content is enabled, go up the page
       // hierarchy and try to find content for this composer
+      Page contentPage = contentProvider;
       if (inheritFromParent) {
-        String pageUrl = contentProvider.getURI().getPath();
+        String pageUrl = contentPage.getURI().getPath();
         while (ghostContent.length == 0 && pageUrl.length() > 1) {
           if (pageUrl.endsWith("/") && !"/".equals(pageUrl))
             pageUrl = pageUrl.substring(0, pageUrl.length() - 1);
           int urlSeparator = pageUrl.lastIndexOf("/");
           if (urlSeparator < 0) {
-            contentProvider = null;
+            contentPage = null;
             break;
           } else {
             pageUrl = pageUrl.substring(0, urlSeparator);
@@ -377,22 +378,21 @@ public class ComposerTagSupport extends WebloungeTag {
               pageUrl = "/";
             ResourceURI pageURI = new PageURIImpl(site, pageUrl);
             try {
-              contentProvider = (Page) contentRepository.get(pageURI);
+              contentPage = (Page) contentRepository.get(pageURI);
             } catch (SecurityException e) {
               logger.debug("Prevented loading of protected content from inherited page {} for composer {}", pageURI, id);
             }
 
             // Did we find anything? If not, keep looking...
-            if (contentProvider == null) {
+            if (contentPage == null) {
               logger.debug("Ancestor page {} could not be loaded", pageUrl);
               continue;
             }
 
             // If potential ghost content is available, keep it
-            if (!contentProvider.equals(targetPage)) {
-              ghostContentProvider = contentProvider;
-              ghostContent = contentProvider.getPagelets(id);
-			  break;
+            if (!contentPage.equals(targetPage)) {
+              ghostContentProvider = contentPage;
+              ghostContent = contentPage.getPagelets(id);
             }
 
           }
