@@ -273,6 +273,11 @@ steal.plugins(
         	if(this.options.page.isWorkVersion()) {
         		$('.composer:not(.locked)').editor_composer('disable');
         		$('.composer:not(.locked)').editor_composer('handleGhostComposer');
+        	} else {
+        		$('.composer').each(function(i, elem) {
+        			if($(elem).find('div.pagelet').lengt > 0)
+        				$('div.#' + $(elem).attr('id') + '-ghost').hide();
+        		});
         	}
         	$('#wbl-pageletcreator').editor_pageletcreator('disable');
         	
