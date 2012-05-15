@@ -29,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.SavedRequest;
 
@@ -51,6 +50,9 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
 
   /** The logging facility */
   private static Logger logger = LoggerFactory.getLogger(RoleBasedLoginSuccessHandler.class);
+
+  /** Saved request key. Unfortunately, the spring constant is not accessible */
+  private static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -87,7 +89,7 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
     // Try to redirect the user to the initial url
     HttpSession session = request.getSession(false);
     if (session != null) {
-      SavedRequest savedRequest = (SavedRequest) session.getAttribute(WebAttributes.SAVED_REQUEST);
+      SavedRequest savedRequest = (SavedRequest) session.getAttribute(SAVED_REQUEST);
       if (savedRequest != null) {
         response.sendRedirect(addTimeStamp(savedRequest.getRedirectUrl()));
         return;
