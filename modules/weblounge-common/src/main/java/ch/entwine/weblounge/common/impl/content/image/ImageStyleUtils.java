@@ -102,8 +102,12 @@ public final class ImageStyleUtils {
           scale = 1.0f;
         break;
       case Cover:
-        if (scaleX > 1f || scaleY > 1f)
+        if (scaleX >= 1f || scaleY >= 1f)
           scale = Math.max(scaleX, scaleY);
+        else if (scaleX < 0f || scaleY < 1f)
+          scale = Math.max(scaleX, scaleY);
+        else
+          scale = Math.min(scaleX, scaleY);
         break;
       case Fill:
         scale = Math.max(scaleX, scaleY);

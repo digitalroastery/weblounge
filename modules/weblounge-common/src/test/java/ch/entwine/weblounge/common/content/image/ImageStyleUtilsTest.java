@@ -115,7 +115,7 @@ public class ImageStyleUtilsTest {
           break;
         case Cover:
           float[] expectedCoverValues = {
-              1,
+              0.75f,
               1,
               1.5f,
               1,
@@ -310,7 +310,7 @@ public class ImageStyleUtilsTest {
           break;
         case Cover:
           int[] expectedCoverValues = {
-              400,
+              300,
               400,
               600,
               300,
@@ -414,7 +414,7 @@ public class ImageStyleUtilsTest {
           break;
         case Cover:
           int[] expectedCoverValues = {
-              400,
+              300,
               300,
               300,
               400,
