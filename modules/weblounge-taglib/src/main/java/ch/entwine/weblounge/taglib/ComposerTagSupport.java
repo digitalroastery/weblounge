@@ -364,7 +364,7 @@ public class ComposerTagSupport extends WebloungeTag {
       // hierarchy and try to find content for this composer
       if (inheritFromParent) {
         String pageUrl = contentProvider.getURI().getPath();
-        while ((content.length == 0 || ghostContent.length == 0) && pageUrl.length() > 1) {
+        while (ghostContent.length == 0 && pageUrl.length() > 1) {
           if (pageUrl.endsWith("/") && !"/".equals(pageUrl))
             pageUrl = pageUrl.substring(0, pageUrl.length() - 1);
           int urlSeparator = pageUrl.lastIndexOf("/");
@@ -388,13 +388,11 @@ public class ComposerTagSupport extends WebloungeTag {
               continue;
             }
 
-            // Set the content that is being displayed
-            content = contentProvider.getPagelets(id);
-
             // If potential ghost content is available, keep it
             if (!contentProvider.equals(targetPage)) {
               ghostContentProvider = contentProvider;
               ghostContent = contentProvider.getPagelets(id);
+			  break;
             }
 
           }
