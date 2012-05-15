@@ -241,8 +241,8 @@ public class I18nDictionaryImpl implements I18nDictionary {
         p = defaults;
       }
 
-      boolean warnInvalidKeys = false;
-      boolean warnInvalidValues = false;
+      int invalidKeys = 0;
+      int invalidValues = 0;
 
       // Read and store the messages
 
@@ -253,12 +253,12 @@ public class I18nDictionaryImpl implements I18nDictionary {
         String key = XPathHelper.valueOf(messageNode, "@name", path);
         String value = XPathHelper.valueOf(messageNode, "text()", path);
         if (key == null) {
-          warnInvalidKeys = true;
+          invalidKeys++;
           continue;
         }
         if (value == null) {
-          logger.warn("I18n dictionary {} contains invalid value (null) for key '{}'", url, key);
-          warnInvalidValues = true;
+          logger.debug("I18n dictionary {} lacks a value for key '{}'", url, key);
+          invalidValues++;
           continue;
         }
         if (p.containsKey(key)) {
@@ -267,10 +267,10 @@ public class I18nDictionaryImpl implements I18nDictionary {
         p.put(key, value);
       }
 
-      if (warnInvalidKeys)
-        logger.warn("I18n dictionary {} contains null keys", url);
-      if (warnInvalidValues)
-        logger.warn("I18n dictionary {} contains invalid values", url);
+      if (invalidKeys > 0)
+        logger.warn("I18n dictionary {} contains {} entries withou a key", url, invalidKeys);
+      if (invalidValues > 0)
+        logger.warn("I18n dictionary {} contains keys {} without values", url, invalidValues);
 
     } catch (ParserConfigurationException e) {
       logger.warn("Parser configuration error when reading i18n dictionary {}: {}", url, e.getMessage());

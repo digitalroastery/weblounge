@@ -61,7 +61,8 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         },
         
         _initViews: function(page) {
-        	if(page.isWorkVersion()) this._initComposer(page);
+        	if(page.isWorkVersion())
+        		this._initComposer(page);
 			this.menuBar = this.find('#wbl-menubar').editor_menubar({page: page, runtime: this.runtime, language: this.options.language});
             this.pagesTab = this.find('#wbl-pagebrowser');
             this.mediaTab = this.find('#wbl-mediabrowser');

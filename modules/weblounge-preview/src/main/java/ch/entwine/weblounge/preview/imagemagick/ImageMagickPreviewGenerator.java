@@ -329,6 +329,7 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
         IMOperation cropOperation = new IMOperation();
         cropOperation.addImage(scaledFile.getAbsolutePath());
         cropOperation.crop(croppedWidth, croppedHeight, croppedLeft, croppedTop);
+        cropOperation.p_repage(); // Reset the page canvas and position to match the actual cropped image
         cropOperation.addImage(croppedFile.getAbsolutePath());
         imageMagick.run(cropOperation);
         finalFile = croppedFile;

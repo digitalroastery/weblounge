@@ -362,14 +362,15 @@ public class ComposerTagSupport extends WebloungeTag {
 
       // If composer is empty and ghost content is enabled, go up the page
       // hierarchy and try to find content for this composer
+      Page contentPage = contentProvider;
       if (inheritFromParent) {
-        String pageUrl = contentProvider.getURI().getPath();
-        while ((content.length == 0 || ghostContent.length == 0) && pageUrl.length() > 1) {
+        String pageUrl = contentPage.getURI().getPath();
+        while (ghostContent.length == 0 && pageUrl.length() > 1) {
           if (pageUrl.endsWith("/") && !"/".equals(pageUrl))
             pageUrl = pageUrl.substring(0, pageUrl.length() - 1);
           int urlSeparator = pageUrl.lastIndexOf("/");
           if (urlSeparator < 0) {
-            contentProvider = null;
+            contentPage = null;
             break;
           } else {
             pageUrl = pageUrl.substring(0, urlSeparator);
@@ -377,25 +378,21 @@ public class ComposerTagSupport extends WebloungeTag {
               pageUrl = "/";
             ResourceURI pageURI = new PageURIImpl(site, pageUrl);
             try {
-              contentProvider = (Page) contentRepository.get(pageURI);
+              contentPage = (Page) contentRepository.get(pageURI);
             } catch (SecurityException e) {
               logger.debug("Prevented loading of protected content from inherited page {} for composer {}", pageURI, id);
             }
 
             // Did we find anything? If not, keep looking...
-            if (contentProvider == null) {
+            if (contentPage == null) {
               logger.debug("Ancestor page {} could not be loaded", pageUrl);
               continue;
             }
 
-            // Set the content that is being displayed
-            if (content.length == 0 && contentProvider.equals(targetPage))
-              content = contentProvider.getPagelets(id);
-
             // If potential ghost content is available, keep it
-            if (!contentProvider.equals(targetPage)) {
-              ghostContentProvider = contentProvider;
-              ghostContent = contentProvider.getPagelets(id);
+            if (!contentPage.equals(targetPage)) {
+              ghostContentProvider = contentPage;
+              ghostContent = contentPage.getPagelets(id);
             }
 
           }
@@ -526,7 +523,7 @@ public class ComposerTagSupport extends WebloungeTag {
       String key = (String) names.nextElement();
       attributes.put(key, request.getAttribute(key));
     }
-    
+
     // Initiate loading the page content
     try {
       loadContent(contentInheritanceEnabled);
@@ -535,7 +532,7 @@ public class ComposerTagSupport extends WebloungeTag {
     } catch (ContentRepositoryException e) {
       logger.warn("Error accessing content repository '{}': {}", request.getSite().getIdentifier(), e.getMessage());
     }
-    
+
     return EVAL_BODY_INCLUDE;
   }
 

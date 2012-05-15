@@ -333,6 +333,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // Write the scaled file back to the response
     File scaledImageFile = null;
+    boolean scalingFailed = false;
     try {
       String filename = imageContents.getFilename();
       scaledImageFile = ImageStyleUtils.createScaledFile(imageURI, filename, language, style);
@@ -351,39 +352,29 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
           imageURI,
           e.getMessage(),
           e });
-
-      File f = scaledImageFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
+      scalingFailed = true;
       DispatchUtils.sendInternalError(request, response);
       return true;
     } catch (IOException e) {
       logger.error("Error sending image '{}' to the client: {}", imageURI, e.getMessage());
-
-      File f = scaledImageFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
       DispatchUtils.sendInternalError(request, response);
+      scalingFailed = true;
       return true;
     } catch (Throwable t) {
       logger.error("Error creating scaled image '{}': {}", imageURI, t.getMessage());
-
-      File f = scaledImageFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
       DispatchUtils.sendInternalError(request, response);
+      scalingFailed = true;
       return true;
     } finally {
       IOUtils.closeQuietly(imageInputStream);
+      if (scalingFailed) {
+        File f = scaledImageFile;
+        FileUtils.deleteQuietly(scaledImageFile);
+        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+          FileUtils.deleteQuietly(f);
+          f = f.getParentFile();
+        }
+      }
     }
 
     // Did scaling work? If not, cleanup and tell the user

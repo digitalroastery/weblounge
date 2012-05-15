@@ -117,7 +117,7 @@ public class ComposerTag extends ComposerTagSupport {
       if (isGhostContent)
         writer.print("ghost");
 
-      writer.print("\" />");
+      writer.print("\">");
       writer.newLine();
       writer.flush();
     }

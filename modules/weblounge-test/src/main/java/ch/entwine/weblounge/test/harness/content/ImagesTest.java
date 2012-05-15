@@ -514,12 +514,12 @@ public class ImagesTest extends IntegrationTestBase {
           if (image == null)
             throw new IOException("Error reading image from input stream");
 
-          // Get the original image size
+          // Get the actual image size
           int imageWidth = image.getWidth();
           int imageHeight = image.getHeight();
 
-          assertTrue((int) (scaledHeight) == imageHeight || (int) (scaledHeight) + 1 == imageHeight || (int) (scaledHeight) - 1 == imageHeight);
-          assertTrue((int) (scaledWidth) == imageWidth || (int) (scaledWidth) + 1 == imageWidth || (int) (scaledWidth) - 1 == imageWidth);
+          assertEquals(scaledHeight, imageHeight, 1);
+          assertEquals(scaledWidth, imageWidth, 1);
           fileName.append("-").append(style.getIdentifier());
         }
       } finally {
@@ -602,8 +602,8 @@ public class ImagesTest extends IntegrationTestBase {
           int imageWidth = image.getWidth();
           int imageHeight = image.getHeight();
 
-          assertTrue((int) (scaledHeight) == imageHeight || (int) (scaledHeight) + 1 == imageHeight || (int) (scaledHeight) - 1 == imageHeight);
-          assertTrue((int) (scaledWidth) == imageWidth || (int) (scaledWidth) + 1 == imageWidth || (int) (scaledWidth) - 1 == imageWidth);
+          assertEquals(scaledHeight, imageHeight, 1);
+          assertEquals(scaledWidth, imageWidth, 1);
           fileName.append("-").append(style.getIdentifier());
         }
       } finally {
