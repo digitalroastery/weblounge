@@ -231,6 +231,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throw new IllegalStateException("Content repository is not connected");
     try {
       ResourceURI uri = new GeneralResourceURIImpl(getSite(), null, resourceId);
+      if (!index.exists(uri))
+        return null;
       uri.setType(index.getType(uri));
       uri.setPath(index.getPath(uri));
       return uri;
