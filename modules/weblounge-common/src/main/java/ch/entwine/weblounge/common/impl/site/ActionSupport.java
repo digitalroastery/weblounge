@@ -52,6 +52,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.StringUtils;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -112,6 +113,9 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
   /** The current response object */
   protected WebloungeResponse response = null;
 
+  /** The site's bundle context */
+  protected BundleContext bundleContext = null;
+
   /**
    * Default constructor.
    */
@@ -126,6 +130,16 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   public abstract int startResponse(WebloungeRequest request,
       WebloungeResponse response) throws ActionException;
+
+  /**
+   * Returns the site's OSGi bundle context if available, <code>null</code>
+   * otherwise.
+   * 
+   * @return the bundle context
+   */
+  protected BundleContext getBundleContext() {
+    return bundleContext;
+  }
 
   /**
    * Sets the parent module.
@@ -159,6 +173,11 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     this.site = site;
     for (HTMLHeadElement headElement : headers) {
       headElement.setSite(site);
+    }
+
+    // Store the site's bundle context
+    if (site != null && site instanceof SiteImpl) {
+      bundleContext = ((SiteImpl) site).getBundleContext();
     }
   }
 
@@ -199,7 +218,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     if (module == null)
       throw new IllegalStateException("Module cannot be null");
 
-    // Process the head elements (scripts and stylesheet includes)
+    // Process the head elements (scripts and style sheet includes)
     for (HTMLHeadElement headElement : headers) {
       headElement.setEnvironment(environment);
     }
