@@ -45,24 +45,24 @@
   <mailingLists>
     <mailingList>
       <name>Weblounge Announcements</name>
-      <subscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-announce</subscribe>
-      <unsubscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-announce</unsubscribe>
-      <post>weblounge-announce@entwinemedia.com</post>
-      <archive>http://lists.entwinemedia.com/pipermail/weblounge-announce</archive>
+      <subscribe>https://groups.google.com/forum/#!forum/weblounge-announce</subscribe>
+      <unsubscribe>https://groups.google.com/forum/#!forum/weblounge-announce</unsubscribe>
+      <post>weblounge-announce@googlegroups.com</post>
+      <archive>https://groups.google.com/forum/#!forum/weblounge-announce</archive>
     </mailingList>
     <mailingList>
       <name>Weblounge Development</name>
-      <subscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-dev</subscribe>
-      <unsubscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-dev</unsubscribe>
-      <post>weblounge-dev@entwinemedia.com</post>
-      <archive>http://lists.entwinemedia.com/pipermail/weblounge-dev</archive>
+      <subscribe>https://groups.google.com/forum/#!forum/weblounge-dev</subscribe>
+      <unsubscribe>https://groups.google.com/forum/#!forum/weblounge-dev</unsubscribe>
+      <post>weblounge-dev@googlegroups.com</post>
+      <archive>https://groups.google.com/forum/#!forum/weblounge-dev</archive>
     </mailingList>
     <mailingList>
-      <name>Weblounge Talk</name>
-      <subscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-talk</subscribe>
-      <unsubscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-talk</unsubscribe>
-      <post>weblounge-talk@entwinemedia.com</post>
-      <archive>http://lists.entwinemedia.com/pipermail/weblounge-talk</archive>
+      <name>Weblounge Users</name>
+      <subscribe>https://groups.google.com/forum/#!forum/weblounge-users</subscribe>
+      <unsubscribe>https://groups.google.com/forum/#!forum/weblounge-users</unsubscribe>
+      <post>weblounge-users@googlegroups.com</post>
+      <archive>https://groups.google.com/forum/#!forum/weblounge-users</archive>
     </mailingList>
   </mailingLists>
 
