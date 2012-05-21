@@ -293,54 +293,15 @@ public final class LanguageUtils {
   }
 
   /**
-   * Returns a String array containing the language variants of <code>s</code>
-   * for the given language and site, ordered by priority, meaning most
-   * specialized version first, with the originally passed in string last.
-   * <p>
-   * The priorities are evaluated as follows:
-   * <ul>
-   * <li>The requested language <code>l</code></li>
-   * <li>The site default language of <code>site</code></li>
-   * <li>The international version, equal to the original <code>s</code></li>
-   * </ul>
-   * 
-   * @param s
-   *          the file name
-   * @param l
-   *          the preferred language
-   * @param site
-   *          the site
-   * @return the localized variant of the text
-   */
-  public static String[] getLanguageVariantsByPriority(String s, Language l,
-      Language defaultLanguage) {
-    if (s == null)
-      throw new IllegalArgumentException("String must not be null");
-    if (defaultLanguage == null)
-      throw new IllegalArgumentException("Default language must not be null");
-    String[] variants = new String[3 - ((l == null) ? 1 : 0)];
-    if (l != null) {
-      variants[0] = getLanguageVariant(s, l);
-    }
-    variants[1 - ((l == null) ? 1 : 0)] = getLanguageVariant(s, defaultLanguage);
-    variants[2 - ((l == null) ? 1 : 0)] = s;
-    return variants;
-  }
-
-  /**
-   * Returns all language variants of the filename <code>s</code> that are
-   * supported by the given site or, more precise, by the associated
-   * <code>LanguageRegistry</code>.
-   * <p>
-   * The last entry of the returned variants is the original string
-   * <code>s</code>.
+   * Returns all language variants of the filename <code>s</code>, including
+   * <code>s</code> itself (last in line).
    * 
    * @param s
    *          the filename
    * @param languages
    *          the languages used to build the variants
    */
-  public static String[] getLanguageVariants(String s, Language[] languages) {
+  public static String[] getLanguageVariants(String s, Language... languages) {
     String[] result = new String[languages.length + 1];
     result[languages.length] = s;
     for (int i = 0; i < languages.length; i++) {

@@ -206,7 +206,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
     try {
       if ("file".equals(renderer.getProtocol())) {
         // Find the best match for the template
-        String[] filePaths = LanguageUtils.getLanguageVariantsByPriority(renderer.toExternalForm(), language, site.getDefaultLanguage());
+        String[] filePaths = LanguageUtils.getLanguageVariants(renderer.toExternalForm(), language, site.getDefaultLanguage());
         for (String path : filePaths) {
           logger.trace("Looking for jsp {}", path);
           File f = new File(path);

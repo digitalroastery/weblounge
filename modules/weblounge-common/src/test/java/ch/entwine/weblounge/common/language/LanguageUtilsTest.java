@@ -152,20 +152,6 @@ public class LanguageUtilsTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.language.LanguageUtils#getLanguageVariantsByPriority(java.lang.String, ch.entwine.weblounge.common.language.Language, ch.entwine.weblounge.common.site.Site)}
-   * .
-   */
-  @Test
-  public void testGetLanguageVariantsByPriority() {
-    String[] result = LanguageUtils.getLanguageVariantsByPriority("test.jsp", french, italian);
-    assertEquals(3, result.length);
-    assertEquals("test_fr.jsp", result[0]);
-    assertEquals("test_it.jsp", result[1]);
-    assertEquals("test.jsp", result[2]);
-  }
-
-  /**
-   * Test method for
    * {@link ch.entwine.weblounge.common.impl.language.LanguageUtils#getLanguageVariants(java.lang.String, ch.entwine.weblounge.common.language.Language[])}
    * .
    */
