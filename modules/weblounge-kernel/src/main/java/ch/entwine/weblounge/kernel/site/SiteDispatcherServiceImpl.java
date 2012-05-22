@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.kernel.site;
 
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.site.Action;
@@ -46,12 +47,16 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
+import org.osgi.service.prefs.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -98,6 +103,12 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /** Default value for jasper's <code>scratchDir</code> compiler context */
   public static final String DEFAULT_JASPER_SCRATCH_DIR = "jasper";
 
+  /** Prefix for the precompilation date */
+  public static final String X_COMPILE_PREFIX = "X-COMPILE-";
+
+  /** Path to the scratch directory */
+  private String jasperScratchDir = null;
+
   /** The action request handler */
   private ActionRequestHandler actionRequestHandler = null;
 
@@ -118,6 +129,9 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
   /** The security service */
   private SecurityService securityService = null;
+
+  /** The preferences service */
+  private PreferencesService preferencesService = null;
 
   /** The precompiler for java server pages */
   private boolean precompile = true;
@@ -146,8 +160,8 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     // Configure the jasper work directory where compiled java classes go
     String tmpDir = System.getProperty("java.io.tmpdir");
-    String scratchDir = PathUtils.concat(tmpDir, DEFAULT_JASPER_SCRATCH_DIR);
-    jasperConfig.put(OPT_JASPER_SCRATCHDIR, scratchDir);
+    jasperScratchDir = PathUtils.concat(tmpDir, DEFAULT_JASPER_SCRATCH_DIR);
+    jasperConfig.put(OPT_JASPER_SCRATCHDIR, jasperScratchDir);
 
     // Try to get hold of the service configuration
     ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
@@ -193,8 +207,20 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     // Stop precompilers
     for (Precompiler compiler : precompilers.values()) {
-      if (compiler != null)
+      if (compiler.isRunning()) {
         compiler.stop();
+      } else if (preferencesService != null) {
+        Preferences preferences = preferencesService.getSystemPreferences();
+        String date = WebloungeDateFormat.formatStatic(new Date());
+        preferences.put(compiler.getCompilerKey(), date);
+        try {
+          preferences.flush();
+        } catch (BackingStoreException e) {
+          logger.warn("Failed to store precompiler results: {}", e.getMessage());
+        }
+      } else if (preferencesService == null) {
+        logger.warn("Unable to store precompiler results: preference service unavailable");
+      }
     }
 
     logger.info("Site dispatcher stopped");
@@ -366,12 +392,14 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     String siteRoot = UrlUtils.concat(contextRoot, siteContextURI, bundleURI);
 
     // Prepare the Jasper work directory
-    String scratchDir = PathUtils.concat(jasperConfig.get(OPT_JASPER_SCRATCHDIR), site.getIdentifier());
+    String scratchDirPath = PathUtils.concat(jasperConfig.get(OPT_JASPER_SCRATCHDIR), site.getIdentifier());
+    File scratchDir = new File(scratchDirPath);
+    boolean jasperArtifactsExist = scratchDir.isDirectory() && scratchDir.list().length > 0;
     try {
-      FileUtils.forceMkdir(new File(scratchDir));
-      logger.debug("Temporary jsp source files and classes go to {}", scratchDir);
+      FileUtils.forceMkdir(scratchDir);
+      logger.debug("Temporary jsp source files and classes go to {}", scratchDirPath);
     } catch (IOException e) {
-      logger.warn("Unable to create jasper scratch directory at {}: {}", scratchDir, e.getMessage());
+      logger.warn("Unable to create jasper scratch directory at {}: {}", scratchDirPath, e.getMessage());
     }
 
     try {
@@ -383,7 +411,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       servletRegistrationProperties.put("alias", siteRoot);
       servletRegistrationProperties.put("servlet-name", site.getIdentifier());
       servletRegistrationProperties.put(SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
-      servletRegistrationProperties.put("init." + OPT_JASPER_SCRATCHDIR, scratchDir);
+      servletRegistrationProperties.put("init." + OPT_JASPER_SCRATCHDIR, scratchDirPath);
       ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
       servletRegistrations.put(site, servletRegistration);
 
@@ -407,9 +435,34 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
       // Start the precompiler if requested
       if (precompile) {
-        Precompiler precompiler = new Precompiler(siteServlet, environment, securityService, logCompileErrors);
-        precompilers.put(site, precompiler);
-        precompiler.precompile();
+        String compilationKey = X_COMPILE_PREFIX + siteBundle.getBundleId();
+        Date compileDate = null;
+
+        boolean needsCompilation = true;
+
+        // Check if this site has been precompiled already
+        if (preferencesService != null) {
+          Preferences preferences = preferencesService.getSystemPreferences();
+          String compileDateString = preferences.get(compilationKey, null);
+          if (compileDateString != null) {
+            compileDate = WebloungeDateFormat.parseStatic(compileDateString);
+            needsCompilation = false;
+            logger.info("Site '{}' has already been precompiled on {}", site.getIdentifier(), compileDate);
+          }
+        }
+
+        // Does the scratch dir exist?
+        if (!jasperArtifactsExist) {
+          needsCompilation = true;
+          logger.info("Precompiled artifacts for '{}' have been removed", site.getIdentifier());
+        }
+
+        // Let's do the work anyways
+        if (needsCompilation) {
+          Precompiler precompiler = new Precompiler(compilationKey, siteServlet, environment, securityService, logCompileErrors);
+          precompilers.put(site, precompiler);
+          precompiler.precompile();
+        }
       }
 
       logger.debug("Site '{}' registered under site://{}", site, siteRoot);
@@ -438,9 +491,23 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     site.removeSiteListener(this);
 
     // Stop the site's precompiler
-    Precompiler precompiler = precompilers.get(site);
-    if (precompiler != null)
-      precompiler.stop();
+    Precompiler compiler = precompilers.get(site);
+    if (compiler != null) {
+      if (compiler.isRunning()) {
+        compiler.stop();
+      } else if (preferencesService != null) {
+        Preferences preferences = preferencesService.getSystemPreferences();
+        String date = WebloungeDateFormat.formatStatic(new Date());
+        preferences.put(compiler.getCompilerKey(), date);
+        try {
+          preferences.flush();
+        } catch (BackingStoreException e) {
+          logger.warn("Failed to store precompiler results: {}", e.getMessage());
+        }
+      } else if (preferencesService == null) {
+        logger.warn("Unable to store precompiler results: preference service unavailable");
+      }
+    }
 
     siteServlets.remove(site);
 
@@ -640,6 +707,16 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Sets the preferences service.
+   * 
+   * @param preferencesService
+   *          the OSGi preferences service
+   */
+  void setPreferencesService(PreferencesService preferencesService) {
+    this.preferencesService = preferencesService;
   }
 
 }

@@ -66,6 +66,9 @@ public class Precompiler {
   /** Flag to indicate whether to keep working or not */
   protected boolean keepGoing = true;
 
+  /** Running flag */
+  protected boolean isRunning = true;
+
   /** Switch for precompiler error logging */
   protected boolean logErrors = true;
 
@@ -75,9 +78,14 @@ public class Precompiler {
   /** The security service */
   protected SecurityService security = null;
 
+  /** The key used to identify this compilation process */
+  protected String compilerKey = null;
+
   /**
    * Creates a new precompiler for the site identified by the servlet.
    * 
+   * @param key
+   *          the compiler key
    * @param servlet
    *          the site servlet
    * @param environment
@@ -87,8 +95,9 @@ public class Precompiler {
    * @param logErrors
    *          <code>true</code> to log precompilation errors
    */
-  public Precompiler(SiteServlet servlet, Environment environment,
+  public Precompiler(String key, SiteServlet servlet, Environment environment,
       SecurityService security, boolean logErrors) {
+    this.compilerKey = key;
     this.servlet = servlet;
     this.environment = environment;
     this.security = security;
@@ -109,6 +118,24 @@ public class Precompiler {
     workerThread.setPriority(Thread.MIN_PRIORITY);
     workerThread.setDaemon(true);
     workerThread.start();
+  }
+
+  /**
+   * Returns <code>true</code> if the precompiler is still running.
+   * 
+   * @return <code>true</code> if the compiler is still running
+   */
+  public boolean isRunning() {
+    return isRunning;
+  }
+
+  /**
+   * Returns the key that is used to identify this compilation process.
+   * 
+   * @return the compiler key
+   */
+  public String getCompilerKey() {
+    return compilerKey;
   }
 
   /**
@@ -163,7 +190,8 @@ public class Precompiler {
         }
       }
 
-      // Collect all renderers (from modules and templates) and ask for precompilation
+      // Collect all renderers (from modules and templates) and ask for
+      // precompilation
       List<URL> rendererUrls = new ArrayList<URL>();
       for (Module m : site.getModules()) {
         if (!m.isEnabled())
@@ -183,7 +211,7 @@ public class Precompiler {
         if (t.getRenderer() != null)
           rendererUrls.add(t.getRenderer());
       }
-      
+
       if (rendererUrls.size() < 1) {
         logger.debug("No java server pages found to precompile for {}", site);
         return;
@@ -222,6 +250,8 @@ public class Precompiler {
           errorCount++;
         }
       }
+
+      isRunning = false;
 
       security.setUser(null);
       security.setSite(null);

@@ -16,5 +16,6 @@
   <reference name="sitemanager" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" unbind="removeSiteManager" />
   <reference name="environment" interface="ch.entwine.weblounge.common.site.Environment" cardinality="1..1" policy="static" bind="setEnvironment" />
   <reference name="security" interface="ch.entwine.weblounge.common.security.SecurityService" cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="preferences" interface="org.osgi.service.prefs.PreferencesService" cardinality="0..1" policy="dynamic" bind="setPreferencesService" />
 
 </scr:component>
