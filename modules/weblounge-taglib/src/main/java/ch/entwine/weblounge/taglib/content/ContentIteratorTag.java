@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.taglib.content;
 
 import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.taglib.ParseException;
@@ -130,6 +131,10 @@ public class ContentIteratorTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
   public int doStartTag() throws JspException {
+
+    // Don't do work if not needed (which is the case during precompilation)
+    if (RequestUtils.isMockRequest(request))
+      return SKIP_BODY;
 
     // If pagelet is null, then this is the first iteration and the tag needs
     // to be initialized

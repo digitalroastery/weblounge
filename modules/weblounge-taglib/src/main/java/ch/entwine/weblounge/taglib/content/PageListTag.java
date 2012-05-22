@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Site;
@@ -187,6 +188,12 @@ public class PageListTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
   public int doStartTag() throws JspException {
+
+    // Don't do work if not needed (which is the case during precompilation)
+    if (RequestUtils.isMockRequest(request))
+      return SKIP_BODY;
+
+    // Make sure we start at the beginning
     index = 0;
 
     // Save the current pagelet so that we can restore it later

@@ -186,7 +186,8 @@ public class PagePreviewTag extends WebloungeTag {
    * </ul>
    */
   public void setType(String value) {
-    stopMarker = Marker.valueOf(StringUtils.capitalize(value.toLowerCase()));
+    if (StringUtils.isNotBlank(value))
+      stopMarker = Marker.valueOf(StringUtils.capitalize(value.toLowerCase()));
   }
 
   /**
@@ -260,6 +261,10 @@ public class PagePreviewTag extends WebloungeTag {
    */
   @Override
   public int doStartTag() throws JspException {
+
+    // Don't do work if not needed (which is the case during precompilation)
+    if (RequestUtils.isMockRequest(request))
+      return SKIP_BODY;
 
     Site site = request.getSite();
 
