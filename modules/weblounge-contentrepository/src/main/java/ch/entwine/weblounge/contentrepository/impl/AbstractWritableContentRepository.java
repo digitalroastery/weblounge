@@ -292,7 +292,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       }
     });
 
-    task.run();
+    new Thread(task).start();
     return task;
   }
 
@@ -354,7 +354,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       }
     });
 
-    task.run();
+    new Thread(task).start();
     return task;
   }
 
@@ -392,7 +392,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         return delete(uri, false);
       }
     });
-    task.run();
+    new Thread(task).start();
     return task;
   }
 
@@ -470,7 +470,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         return delete(uri, allRevisions);
       }
     });
-    task.run();
+    new Thread(task).start();
     return task;
   }
 
@@ -593,7 +593,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         return null;
       }
     });
-    task.run();
+    new Thread(task).start();
     return task;
   }
 
@@ -628,7 +628,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         return returnVal;
       }
     });
-    task.run();
+    new Thread(task).start();
     return task;
   }
 
@@ -781,7 +781,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         return putContent(uri, content, is);
       }
     });
-    task.run();
+    new Thread(task).start();
     return task;
   }
 
@@ -847,9 +847,25 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         return deleteContent(uri, content);
       }
     });
-    task.run();
+    new Thread(task).start();
     return task;
   };
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#getVersions(ch.entwine.weblounge.common.content.ResourceURI)
+   */
+  @Override
+  public ResourceURI[] getVersions(ResourceURI uri)
+      throws ContentRepositoryException {
+    Set<ResourceURI> uris = new HashSet<ResourceURI>(Arrays.asList(super.getVersions(uri)));
+    for (ResourceURI u : pagePutCache.keySet()) {
+      if (u.getIdentifier().equals(uri.getIdentifier()))
+        uris.add(u);
+    }
+    return uris.toArray(new ResourceURI[uris.size()]);
+  }
 
   /**
    * Writes a new resource to the repository storage.

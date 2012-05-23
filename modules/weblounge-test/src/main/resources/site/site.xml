@@ -9,7 +9,8 @@
     <language>en</language>
   </languages>
   <domains>
-    <url environment="production">http://weblounge.entwinemedia.com</url>
+    <url environment="production">http://localhost:8080</url>
+    <url environment="staging" default="true">http://localhost:8080</url>
     <url environment="development" default="true">http://localhost:8080</url>
     <url environment="development">http://127.0.0.1:8080</url>
     <url environment="development">http://test:8080</url>

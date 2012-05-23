@@ -251,7 +251,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
         return null;
       }
     });
-    task.run();
+    new Thread(task).start();
     return task;
   }
 

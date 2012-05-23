@@ -156,7 +156,7 @@ public class SiteImpl implements Site {
 
   /** Ordered list of site urls */
   protected List<SiteURL> urls = null;
-  
+
   /** Default urls by environment */
   protected Map<Environment, SiteURL> defaultURLByEnvironment = null;
 
@@ -236,6 +236,15 @@ public class SiteImpl implements Site {
 
     // Switch the options to the new environment
     options.setEnvironment(environment);
+  }
+
+  /**
+   * Returns the site's OSGi bundle context.
+   * 
+   * @return the bundle context
+   */
+  public BundleContext getBundleContext() {
+    return bundleContext;
   }
 
   /**
@@ -516,11 +525,12 @@ public class SiteImpl implements Site {
     if (url != null)
       addHostname(url);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.site.Site#setDefaultHostname(ch.entwine.weblounge.common.site.SiteURL, ch.entwine.weblounge.common.site.Environment)
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#setDefaultHostname(ch.entwine.weblounge.common.site.SiteURL,
+   *      ch.entwine.weblounge.common.site.Environment)
    */
   public void setDefaultHostname(SiteURL url, Environment environment) {
     if (url == null)
@@ -528,7 +538,7 @@ public class SiteImpl implements Site {
     if (environment == null)
       throw new IllegalArgumentException("Environment must not be null");
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -538,7 +548,7 @@ public class SiteImpl implements Site {
     if (url == null)
       throw new IllegalArgumentException("Url must not be null");
     urls.add(url);
-    
+
     if (url.isDefault()) {
       defaultURLByEnvironment.put(url.getEnvironment(), url);
       if (Environment.Production.equals(url.getEnvironment()))
@@ -548,7 +558,7 @@ public class SiteImpl implements Site {
     // Make sure we have a default URL
     if (defaultURL == null)
       defaultURL = url;
-    
+
     // ... and a default
     if (defaultURLByEnvironment.get(url.getEnvironment()) == null)
       defaultURLByEnvironment.put(url.getEnvironment(), url);
@@ -584,10 +594,10 @@ public class SiteImpl implements Site {
   public SiteURL getHostname() {
     return defaultURL;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.site.Site#getHostname(ch.entwine.weblounge.common.site.Environment)
    */
   public SiteURL getHostname(Environment environment) {
@@ -1482,7 +1492,7 @@ public class SiteImpl implements Site {
         SiteURLImpl siteURL = new SiteURLImpl(new URL(url));
         siteURL.setDefault(defaultUrl);
         siteURL.setEnvironment(environment);
-        
+
         site.addHostname(siteURL);
       }
     } catch (MalformedURLException e) {

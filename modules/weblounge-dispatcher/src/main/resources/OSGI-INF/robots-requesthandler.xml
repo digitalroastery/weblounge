@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge Robots Request Handler">
+
+  <implementation class="ch.entwine.weblounge.dispatcher.impl.handler.RobotsRequestHandlerImpl" />
+  <property name="service.description" value="Weblounge Robots Request Handler" />
+  <service>
+    <provide interface="ch.entwine.weblounge.dispatcher.RequestHandler" />
+  </service>
+
+</scr:component>
