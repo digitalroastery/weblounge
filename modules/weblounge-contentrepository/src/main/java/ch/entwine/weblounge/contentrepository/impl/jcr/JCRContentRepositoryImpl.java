@@ -119,7 +119,7 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
         return null;
       }
     });
-    task.run();
+    new Thread(task).start();
     return task;
   }
 
