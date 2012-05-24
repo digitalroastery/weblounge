@@ -485,7 +485,14 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   private void removeSite(Site site) {
     // Remove site dispatcher servlet
     ServiceRegistration servletRegistration = servletRegistrations.remove(site);
-    servletRegistration.unregister();
+
+    try {
+      servletRegistration.unregister();
+    } catch (IllegalStateException e) {
+      // Never mind, the service has been unregistered already
+    } catch (Throwable t) {
+      logger.error("Unregistering site '{}' failed: {}", site.getIdentifier(), t.getMessage());
+    }
 
     // We are no longer interested in site events
     site.removeSiteListener(this);

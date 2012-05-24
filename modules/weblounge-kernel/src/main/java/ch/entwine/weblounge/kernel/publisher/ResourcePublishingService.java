@@ -95,7 +95,13 @@ public class ResourcePublishingService implements BundleListener {
         String bundleSymbolicName = entry.getKey();
         ServiceRegistration servlet = entry.getValue();
         logger.debug("Unpublishing resources at {}", bundleSymbolicName);
-        servlet.unregister();
+        try {
+          servlet.unregister();
+        } catch (IllegalStateException e) {
+          // Never mind, the service has been unregistered already
+        } catch (Throwable t) {
+          logger.error("Unregistering resource servlet failed: {}", t.getMessage());
+        }
       }
       resourceRegistrations.clear();
     }

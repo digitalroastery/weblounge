@@ -111,7 +111,13 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
 
     if (dispatcherServiceRegistration != null) {
       logger.debug("Unregistering weblounge dispatcher");
-      dispatcherServiceRegistration.unregister();
+      try {
+        dispatcherServiceRegistration.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering dispatcher failed: {}", t.getMessage());
+      }
     }
 
     logger.debug("Weblounge dispatcher deactivated");

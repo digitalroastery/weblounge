@@ -165,7 +165,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
 
         // If this is a managed service, make sure it's configured properly
         // before the site is connected
-        
+
         if (repository instanceof ManagedService) {
           Dictionary<Object, Object> finalProperties = new Hashtable<Object, Object>();
 
@@ -176,7 +176,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
               Object key = keys.nextElement();
               Object value = configuration.get(key);
               if (value instanceof String)
-                value = ConfigurationUtils.processTemplate((String)value);
+                value = ConfigurationUtils.processTemplate((String) value);
               finalProperties.put(key, value);
             }
           }
@@ -186,12 +186,12 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
             Object key = keys.nextElement();
             Object value = properties.get(key);
             if (value instanceof String)
-              value = ConfigurationUtils.processTemplate((String)value);
+              value = ConfigurationUtils.processTemplate((String) value);
             finalProperties.put(key, value);
           }
 
           // push the repository configuration
-          ((ManagedService)repository).updated(finalProperties);
+          ((ManagedService) repository).updated(finalProperties);
         }
 
         // Register the service
@@ -222,7 +222,13 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
     } catch (ContentRepositoryException e) {
       logger.warn("Error disconnecting repository {}: {}", repository, e.getMessage());
     }
-    registration.unregister();
+    try {
+      registration.unregister();
+    } catch (IllegalStateException e) {
+      // Never mind, the service has been unregistered already
+    } catch (Throwable t) {
+      logger.error("Unregistering content repository failed: {}", t.getMessage());
+    }
   }
 
   /**

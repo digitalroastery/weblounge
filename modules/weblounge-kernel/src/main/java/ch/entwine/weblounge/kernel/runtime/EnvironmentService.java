@@ -112,7 +112,13 @@ public class EnvironmentService implements ManagedService {
   void deactivate(ComponentContext context) throws Exception {
     logger.debug("Unregistering default runtime environment", this);
     if (registration != null) {
-      registration.unregister();
+      try {
+        registration.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering runtime environment failed: {}", t.getMessage());
+      }
       registration = null;
     }
   }
@@ -145,8 +151,15 @@ public class EnvironmentService implements ManagedService {
     // Did the setting change?
     if (!env.equals(environment)) {
       this.environment = env;
-      if (registration != null)
-        registration.unregister();
+      if (registration != null) {
+        try {
+          registration.unregister();
+        } catch (IllegalStateException e) {
+          // Never mind, the service has been unregistered already
+        } catch (Throwable t) {
+          logger.error("Unregistering runtime environment failed: {}", t.getMessage());
+        }
+      }
       registration = bundleContext.registerService(Environment.class.getName(), environment, null);
       logger.info("Runtime environment defaults to '{}'", environment.toString().toLowerCase());
     }

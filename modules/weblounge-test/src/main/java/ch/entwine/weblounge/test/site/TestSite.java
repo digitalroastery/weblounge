@@ -22,10 +22,12 @@ package ch.entwine.weblounge.test.site;
 
 import ch.entwine.weblounge.common.impl.site.SiteImpl;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
+import ch.entwine.weblounge.common.site.SiteException;
 import ch.entwine.weblounge.testing.IntegrationTest;
 
 import org.osgi.framework.Bundle;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,9 @@ public class TestSite extends SiteImpl {
   /** Name of the package containing the tests */
   private static final String TEST_PKG = "ch/entwine/weblounge/test/harness";
 
+  /** The registered integration tests */
+  private List<ServiceRegistration> integrationTestRegistrations = new ArrayList<ServiceRegistration>();
+
   /**
    * Creates a new test site implementation.
    */
@@ -58,21 +63,40 @@ public class TestSite extends SiteImpl {
   }
 
   /**
-   * Callback from the OSGi environment on component activation.
+   * {@inheritDoc}
    * 
-   * @param ctx
-   *          the component context
+   * @see ch.entwine.weblounge.common.impl.site.SiteImpl#start()
    */
   @Override
-  protected void activate(ComponentContext ctx) throws Exception {
-    super.activate(ctx);
-    
-    Bundle bundle = ctx.getBundleContext().getBundle();
-    List<IntegrationTest> tests = loadIntegrationTests(TEST_PKG, bundle);
+  public synchronized void start() throws SiteException, IllegalStateException {
+    super.start();
+
+    BundleContext ctx = getBundleContext();
+    List<IntegrationTest> tests = loadIntegrationTests(TEST_PKG, ctx.getBundle());
     for (IntegrationTest test : tests) {
       logger.debug("Registering integration test " + test.getClass());
-      ctx.getBundleContext().registerService(IntegrationTest.class.getName(), test, null);
+      integrationTestRegistrations.add(ctx.registerService(IntegrationTest.class.getName(), test, null));
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.impl.site.SiteImpl#stop()
+   */
+  @Override
+  public synchronized void stop() throws IllegalStateException {
+    logger.debug("Unregistering integration tests");
+    for (ServiceRegistration registration : integrationTestRegistrations) {
+      try {
+        registration.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering integration test failed: {}", t.getMessage());
+      }
+    }
+    super.stop();
   }
 
   /**
