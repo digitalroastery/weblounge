@@ -82,7 +82,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
   protected static final int UUID_LENGTH = 36;
 
   /** The server environment */
-  protected Environment environment = null;
+  protected Environment environment = Environment.Production;
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(ImageRequestHandlerImpl.class);

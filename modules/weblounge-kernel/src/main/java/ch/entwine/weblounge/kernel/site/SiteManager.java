@@ -77,7 +77,7 @@ public class SiteManager {
   private Map<Site, Bundle> siteBundles = new HashMap<Site, Bundle>();
 
   /** The environment */
-  private Environment environment = null;
+  private Environment environment = Environment.Production;
 
   /** Maps content repositories to site identifier */
   private Map<String, ContentRepository> repositoriesBySite = new HashMap<String, ContentRepository>();
@@ -250,8 +250,8 @@ public class SiteManager {
     // Make sure we have an environment
     Environment env = environment;
     if (env == null) {
-      logger.warn("No environment has been defined. Falling back to {}", Environment.Production);
-      env = environment;
+      logger.warn("No environment has been defined. Assuming '{}'", Environment.Production.toString().toLowerCase());
+      env = Environment.Production;
     }
 
     // Register the site urls and make sure we don't double book
@@ -480,7 +480,7 @@ public class SiteManager {
         site.initialize(Environment.Production);
       }
     }
-    this.environment = null;
+    this.environment = Environment.Production;
   }
 
   /**
@@ -527,10 +527,15 @@ public class SiteManager {
       Site site = (Site) service;
       siteManager.removeSite(site);
       if (reference.getBundle() != null) {
-        super.removedService(reference, service);
+        try {
+          super.removedService(reference, service);
+        } catch (IllegalStateException e) {
+          // The service has been removed, probably due to bundle shutdown
+        } catch (Throwable t) {
+          logger.warn("Error removing service: {}", t.getMessage());
+        }
       }
     }
-
   }
 
   /**

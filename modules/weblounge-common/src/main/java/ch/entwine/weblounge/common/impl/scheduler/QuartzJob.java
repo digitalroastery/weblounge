@@ -69,7 +69,7 @@ public final class QuartzJob implements Job, Customizable {
   protected Dictionary<String, Object> ctx = null;
 
   /** The environment */
-  protected Environment environment = null;
+  protected Environment environment = Environment.Production;
 
   /**
    * Creates a new job.

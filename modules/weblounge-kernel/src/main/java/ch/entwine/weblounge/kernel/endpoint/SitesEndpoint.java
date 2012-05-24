@@ -25,7 +25,6 @@ import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteException;
-import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.kernel.site.SiteManager;
 
 import org.apache.commons.lang.StringUtils;
@@ -55,6 +54,9 @@ public class SitesEndpoint {
 
   /** The sites that are online */
   protected transient SiteManager sites = null;
+
+  /** The request environment */
+  protected Environment environment = Environment.Production;
 
   /** The endpoint documentation */
   private String docs = null;
@@ -108,15 +110,6 @@ public class SitesEndpoint {
     Site site = sites.findSiteByIdentifier(siteId);
     if (site == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
-    }
-
-    // What is the current environment?
-    Environment environment = Environment.Production;
-    for (SiteURL url : site.getHostnames()) {
-      if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
-        environment = url.getEnvironment();
-        break;
-      }
     }
 
     // Create the response
@@ -244,15 +237,6 @@ public class SitesEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
-    // What is the current environment?
-    Environment environment = Environment.Production;
-    for (SiteURL url : site.getHostnames()) {
-      if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
-        environment = url.getEnvironment();
-        break;
-      }
-    }
-
     Module m = site.getModule(moduleId);
     if (m == null)
       throw new WebApplicationException(Status.NOT_FOUND);
@@ -301,6 +285,16 @@ public class SitesEndpoint {
    */
   void removeSiteManager(SiteManager siteManager) {
     this.sites = null;
+  }
+
+  /**
+   * Callback from the OSGi environment when the environment becomes published.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
   }
 
   /**

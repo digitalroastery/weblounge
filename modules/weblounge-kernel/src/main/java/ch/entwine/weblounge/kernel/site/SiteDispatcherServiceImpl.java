@@ -116,7 +116,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   private SiteManager siteManager = null;
 
   /** The default environment */
-  private Environment environment = null;
+  private Environment environment = Environment.Production;
 
   /** Init parameters for jetty */
   private TreeMap<String, String> jasperConfig = new TreeMap<String, String>();
@@ -404,7 +404,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     try {
       // Create and register the site servlet
-      SiteServlet siteServlet = new SiteServlet(site, siteBundle);
+      SiteServlet siteServlet = new SiteServlet(site, siteBundle, environment);
       siteServlet.setSecurityService(securityService);
       Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
       servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
@@ -704,6 +704,9 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   void setEnvironment(Environment environment) {
     this.environment = environment;
+    for (SiteServlet servlet : siteServlets.values()) {
+      servlet.setEnvironment(environment);
+    }
   }
 
   /**

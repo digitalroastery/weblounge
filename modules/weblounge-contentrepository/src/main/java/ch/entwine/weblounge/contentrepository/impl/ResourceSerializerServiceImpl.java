@@ -44,7 +44,7 @@ import java.util.Set;
 public class ResourceSerializerServiceImpl implements ResourceSerializerService {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(ResourceSerializerServiceImpl.class);
+  protected static final Logger logger = LoggerFactory.getLogger(ResourceSerializerServiceImpl.class);
 
   /** The registered content repositories */
   private Map<String, ResourceSerializer<?, ?>> serializers = new HashMap<String, ResourceSerializer<?, ?>>();
@@ -210,7 +210,13 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
     public void removedService(ServiceReference reference, Object service) {
       serializerService.unregisterSerializer((ResourceSerializer<?, ?>) service);
       if (reference.getBundle() != null) {
-        super.removedService(reference, service);
+        try {
+          super.removedService(reference, service);
+        } catch (IllegalStateException e) {
+          // The service has been removed, probably due to bundle shutdown
+        } catch (Throwable t) {
+          logger.warn("Error removing service: {}", t.getMessage());
+        }
       }
     }
 

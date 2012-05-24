@@ -106,12 +106,15 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * @see ch.entwine.weblounge.common.content.page.PageletRenderer#setModule(ch.entwine.weblounge.common.site.Module)
    */
   public void setModule(Module module) {
+    if (module == null)
+      throw new IllegalArgumentException("Module must not be null");
     this.module = module;
     this.site = module.getSite();
     for (HTMLHeadElement htmlHead : headers) {
       htmlHead.setSite(site);
       htmlHead.setModule(module);
     }
+    processURLTemplates(environment);
   }
 
   /**
@@ -125,7 +128,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       throw new IllegalArgumentException("Environment cannot be null");
 
     // Is there anything we need to be doing?
-    if (!environment.equals(this.environment)) {
+    if (!environment.equals(this.environment) && module != null) {
       logger.debug("Processing url templates of {} with environment {}", this, environment);
       processURLTemplates(environment);
     }
@@ -216,7 +219,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   @Override
   public void setRenderer(URL renderer) {
     super.setRenderer(renderer);
-    if (environment != null)
+    if (environment != null && module != null)
       processURLTemplates(environment);
   }
 
@@ -247,7 +250,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void setEditor(URL editor) {
     this.editor = editor;
-    if (environment != null)
+    if (environment != null && module != null)
       processURLTemplates(environment);
   }
 

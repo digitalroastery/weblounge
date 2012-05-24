@@ -30,7 +30,6 @@ import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -102,12 +101,18 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    *          the request to wrap.
    * @param servlet
    *          the servlet used to serve content out of the request's site
+   * @param environment
+   *          the environment
    */
-  public WebloungeRequestImpl(HttpServletRequest request, Servlet servlet) {
+  public WebloungeRequestImpl(HttpServletRequest request, Servlet servlet,
+      Environment environment) {
     super(request);
     HttpSession session = request.getSession();
     if (session != null)
       this.sessionLanguage = (Language) session.getAttribute(LANGUAGE);
+    if (environment == null)
+      throw new IllegalArgumentException("Environment must not be null");
+    this.environment = environment;
     this.siteServlet = servlet;
   }
 
@@ -116,9 +121,12 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * 
    * @param request
    *          the request to wrap.
+   * @param environment
+   *          the environment
    */
-  public WebloungeRequestImpl(HttpServletRequest request) {
-    this(request, null);
+  public WebloungeRequestImpl(HttpServletRequest request,
+      Environment environment) {
+    this(request, null, environment);
   }
 
   /**
@@ -127,20 +135,6 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @see ch.entwine.weblounge.common.request.WebloungeRequest#getEnvironment()
    */
   public Environment getEnvironment() {
-    if (environment != null)
-      return environment;
-
-    // Set the environment to production by default
-    environment = Environment.Production;
-
-    // Find the environment by looking at the url
-    for (SiteURL connector : site.getHostnames()) {
-      if (super.getRequestURL().toString().startsWith(connector.toExternalForm())) {
-        environment = connector.getEnvironment();
-        break;
-      }
-    }
-
     return environment;
   }
 

@@ -49,7 +49,7 @@ public class GeneralComposeable implements Composeable {
   protected String name = null;
 
   /** The execution environment */
-  protected Environment environment = null;
+  protected Environment environment = Environment.Production;
 
   /** HTML head elements */
   protected List<HTMLHeadElement> headers = null;

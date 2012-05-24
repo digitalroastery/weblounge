@@ -59,7 +59,7 @@ import javax.servlet.http.HttpServletResponse;
 public class SiteContextFilter implements Filter {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(SiteContextFilter.class);
+  protected static final Logger logger = LoggerFactory.getLogger(SiteContextFilter.class);
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -353,7 +353,13 @@ public class SiteContextFilter implements Filter {
       Site site = (Site) service;
       removeSite(site);
       if (reference.getBundle() != null) {
-        super.removedService(reference, service);
+        try {
+          super.removedService(reference, service);
+        } catch (IllegalStateException e) {
+          // The service has been removed, probably due to bundle shutdown
+        } catch (Throwable t) {
+          logger.warn("Error removing service: {}", t.getMessage());
+        }
       }
     }
 
@@ -396,7 +402,14 @@ public class SiteContextFilter implements Filter {
       Environment environment = (Environment) service;
       removeEnvironment(environment);
       if (reference.getBundle() != null) {
-        super.removedService(reference, service);
+        try {
+          super.removedService(reference, service);
+        } catch (IllegalStateException e) {
+          // The service has been removed already, probably due to bundle
+          // shutdown
+        } catch (Throwable t) {
+          logger.warn("Error removing service: {}", t.getMessage());
+        }
       }
     }
 

@@ -57,7 +57,7 @@ public class EnvironmentService implements ManagedService {
   public static final Environment DEFAULT_ENVIRONMENT = Environment.Production;
 
   /** The current environment */
-  protected Environment environment = null;
+  protected Environment environment = Environment.Production;
 
   /** The environment registration */
   private ServiceRegistration registration = null;
