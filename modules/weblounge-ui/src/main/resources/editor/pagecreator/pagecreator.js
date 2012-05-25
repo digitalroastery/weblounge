@@ -87,15 +87,22 @@ steal.plugins('jquery',
 						
 						// Create page and update pageData
 						Page.create({path: pageData.url}, $.proxy(function(page) {
+							this.destroy();
 							var path = page.getPath(); // Let this line at this position!!
 							page.saveMetadata(pageData, this.options.language, $.proxy(function() {
 								page.lock(this.options.runtime.getUserLogin(), function() {
 									location.href = path + window.currentLanguage + "?edit&_=" + new Date().getTime();
 								});
 							}, this));
+						}, this), $.proxy(function(jqXHR, textStatus, errorThrown) {
+							if(jqXHR.status == 409) {
+								this.validator.showErrors({"url": 'Page already exists!'});
+								return;
+							} else {
+								alert('Error creating page: ' + errorThrown);
+								return;
+							}
 						}, this));
-						
-						this.destroy();
 					}, this)
 				},
 				close: $.proxy(function () {

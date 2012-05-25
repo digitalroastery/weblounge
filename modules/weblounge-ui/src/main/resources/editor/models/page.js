@@ -59,7 +59,8 @@ steal.then('jsonix')
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
-				}
+				},
+				error: error
 			});
 		},
 		
@@ -81,7 +82,8 @@ steal.then('jsonix')
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
-				}
+				},
+				error: error
 			});
 		},
 		
@@ -97,7 +99,8 @@ steal.then('jsonix')
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
-				}
+				},
+				error: error
 			});
 		},
 		
@@ -119,7 +122,8 @@ steal.then('jsonix')
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
-				}
+				},
+				error: error
 			});
 		},
 		
@@ -133,7 +137,8 @@ steal.then('jsonix')
 					success: function(xml) {
 						var json = Page.parseXML(xml);
 						success(json.value.page);
-					}
+					},
+					error: error
 				});
 			}
 		},
@@ -154,6 +159,7 @@ steal.then('jsonix')
 					async: false,
 					type: 'put',
 					success: success,
+					error: error,
 					headers: headers,
 					dataType: 'xml',
 					data: {content : Page.parseJSON(page)}
@@ -178,8 +184,8 @@ steal.then('jsonix')
 					success: function(data, status, xhr){
 						var url = xhr.getResponseHeader('Location');
 						Page.findOne({id : url.substring(url.lastIndexOf('/') + 1)}, success);
-					}
-
+					},
+					error: error
 				});
 			}	
 		},
@@ -233,7 +239,8 @@ steal.then('jsonix')
 				$.ajax({
 					url: '/system/weblounge/pages/' + params.id + '/lock',
 					type: 'delete',
-					success: success
+					success: success,
+					error: error
 				});
 			}
 		},
@@ -272,7 +279,8 @@ steal.then('jsonix')
 				$.ajax({
 					url: '/system/weblounge/pages/' + params.id + '/publish',
 					type: 'delete',
-					success: success
+					success: success,
+					error: error
 				});
 			}
 		},
