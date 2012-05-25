@@ -26,8 +26,8 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.repository.IndexOperation;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
@@ -38,6 +38,7 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
+import ch.entwine.weblounge.contentrepository.impl.operation.IndexOperationImpl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -60,9 +61,6 @@ import java.util.Dictionary;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
@@ -241,18 +239,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index(ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#indexAsynchronously()
    */
-  public Future<Void> index(AsynchronousContentRepositoryListener listener)
-      throws ContentRepositoryException {
-    FutureTask<Void> task = new FutureTask<Void>(new Callable<Void>() {
-      public Void call() throws Exception {
-        index();
-        return null;
-      }
-    });
-    new Thread(task).start();
-    return task;
+  public IndexOperation indexAsynchronously() throws ContentRepositoryException {
+    IndexOperation op = new IndexOperationImpl();
+    operationsScheduler.enqueue(op);
+    return op;
   }
 
   /**

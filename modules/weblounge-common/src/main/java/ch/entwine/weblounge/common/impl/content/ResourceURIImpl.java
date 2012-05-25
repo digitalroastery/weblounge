@@ -28,7 +28,6 @@ import ch.entwine.weblounge.common.site.Site;
 
 import java.util.UUID;
 
-
 /**
  * Implementation of the {@link ResourceURI} interface.
  */
@@ -48,7 +47,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
 
   /** The resource */
   protected long version = Resource.LIVE;
-  
+
   /** The to string representation */
   private String external = null;
 
@@ -66,8 +65,8 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
   }
 
   /**
-   * Creates a new {@link ResourceURI} pointing to the live version of the resource
-   * identified by <code>site</code> and <code>path</code>.
+   * Creates a new {@link ResourceURI} pointing to the live version of the
+   * resource identified by <code>site</code> and <code>path</code>.
    * 
    * @param type
    *          the resource type
@@ -108,8 +107,8 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
 
   /**
    * Creates a new {@link ResourceURI} pointing to a specific version of the
-   * resource identified by <code>id<code>, <code>site</code>, <code>path</code> and
-   * <code>version</code>.
+   * resource identified by <code>id<code>, <code>site</code>, <code>path</code>
+   * and <code>version</code>.
    * 
    * @param type
    *          the resource type
@@ -130,8 +129,8 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
 
   /**
    * Creates a new {@link ResourceURI} pointing to a specific version of the
-   * resource identified by <code>id<code>, <code>site</code>, <code>path</code> and
-   * <code>version</code>.
+   * resource identified by <code>id<code>, <code>site</code>, <code>path</code>
+   * and <code>version</code>.
    * 
    * @param type
    *          the resource type
@@ -225,13 +224,13 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.ResourceURI#setVersion(long)
    */
   public void setVersion(long version) {
     this.version = version;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -250,10 +249,10 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
       throws MalformedResourceURIException {
     return new ResourceURIImpl(type, site, path, version);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.ResourceURI#setType(java.lang.String)
    */
   public void setType(String type) {
@@ -288,21 +287,44 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
   public boolean equals(Object obj) {
     if (obj instanceof ResourceURI) {
       ResourceURI uri = (ResourceURI) obj;
+      if (id == null) {
+        if (path != null && !pathEquals(uri))
+          return false;
+      } else if (uri.getIdentifier() == null) {
+        if (path != null && !pathEquals(uri))
+          return false;
+      } else if (!id.equals(uri.getIdentifier()))
+        return false;
+      if (!pathEquals(uri))
+        return false;
+      if (version != uri.getVersion())
+        return false;
       if (!site.equals(uri.getSite()))
         return false;
       if (type == null && uri.getType() != null)
         return false;
       if (type != null && !type.equals(uri.getType()))
         return false;
-      if (path == null && uri.getPath() != null)
-        return false;
-      if (path != null && !path.equals(uri.getPath()))
-        return false;
-      if (version != uri.getVersion())
-        return false;
       return true;
     }
     return super.equals(obj);
+  }
+
+  /**
+   * Returns <code>true</code> if the resource uri equals this one with respect
+   * to the path.
+   * 
+   * @param uri
+   *          the uri
+   * @return <code>true</code> if the path of this uri equals that of
+   *         <code>uri</code>
+   */
+  private boolean pathEquals(ResourceURI uri) {
+    if (path == null && uri.getPath() != null)
+      return false;
+    if (path != null && !path.equals(uri.getPath()))
+      return false;
+    return true;
   }
 
   /**
