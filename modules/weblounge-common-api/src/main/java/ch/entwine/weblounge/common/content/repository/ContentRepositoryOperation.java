@@ -43,6 +43,20 @@ public interface ContentRepositoryOperation<T extends Object> {
       throws ContentRepositoryException, IOException;
 
   /**
+   * Blocks and returns the operation result or throws the corresponding
+   * exception if there was no result due to an error.
+   * 
+   * @return the result
+   * @throws ContentRepositoryException
+   *           if the operation fails
+   * @throws IOException
+   *           if the operation fails due to read/write failures
+   * @throws Throwable
+   *           for any remaining error condition
+   */
+  T get() throws ContentRepositoryException, IOException, Throwable;
+
+  /**
    * Returns the operation result or <code>null</code> if there was no result
    * due to an error.
    * <p>

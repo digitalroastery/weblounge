@@ -35,7 +35,7 @@ public final class NotifyingOperationListener implements ContentRepositoryOperat
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener#executionSucceeded(ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation)
    */
-  public void executionSucceeded(ContentRepositoryOperation operation) {
+  public void executionSucceeded(ContentRepositoryOperation<?> operation) {
     synchronized (this) {
       this.notifyAll();
     }
@@ -47,7 +47,8 @@ public final class NotifyingOperationListener implements ContentRepositoryOperat
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener#executionFailed(ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation,
    *      java.lang.Throwable)
    */
-  public void executionFailed(ContentRepositoryOperation operation, Throwable t) {
+  public void executionFailed(ContentRepositoryOperation<?> operation,
+      Throwable t) {
     synchronized (this) {
       this.notifyAll();
     }

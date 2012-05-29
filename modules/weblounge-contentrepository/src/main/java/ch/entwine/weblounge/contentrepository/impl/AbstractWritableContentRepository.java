@@ -160,6 +160,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   @Override
   public void disconnect() throws ContentRepositoryException {
+
+    // TODO: Deal with pending operations
+
     super.disconnect();
 
     // Make sure the bundle is still active. If not, unregistering the trackers
