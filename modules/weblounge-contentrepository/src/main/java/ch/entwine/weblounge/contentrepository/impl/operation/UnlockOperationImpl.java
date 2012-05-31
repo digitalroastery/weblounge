@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.impl.operation;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.UnlockOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -38,28 +39,28 @@ public final class UnlockOperationImpl<T extends ResourceContent> extends Abstra
   private User user = null;
 
   /** The resource to be locked */
-  private Resource<T> resource = null;
+  private ResourceURI uri = null;
 
   /**
    * Creates a new unlocking operation for the given resource.
    * 
-   * @param resource
+   * @param uri
    *          the resource
    * @param user
    *          the unlocking user
    */
-  public UnlockOperationImpl(Resource<T> resource, User user) {
-    this.resource = resource;
+  public UnlockOperationImpl(ResourceURI uri, User user) {
+    this.uri = uri;
     this.user = user;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.UnlockOperation#getResource()
+   * @see ch.entwine.weblounge.common.content.repository.UnlockOperation#getURI()
    */
-  public Resource<T> getResource() {
-    return resource;
+  public ResourceURI getURI() {
+    return uri;
   }
 
   /**
@@ -77,7 +78,7 @@ public final class UnlockOperationImpl<T extends ResourceContent> extends Abstra
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
   public Resource<T> run(WritableContentRepository repository) throws ContentRepositoryException, IOException {
-    return repository.unlock(resource.getURI(), user);
+    return repository.unlock(uri, user);
   }
 
 }

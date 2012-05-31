@@ -24,16 +24,29 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.contentrepository.impl.NotifyingOperationListener;
+
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This class implements the basis for an asynchronously executed content
  * repository operation.
  */
 public abstract class AbstractContentRepositoryOperation<T extends Object> implements ContentRepositoryOperation<T> {
+
+  /** The logger */
+  private static final Logger logger = Logger.getLogger(AbstractContentRepositoryOperation.class);
+
+  /** The operation identifier provider */
+  private static AtomicLong operationIdProvider = new AtomicLong();
+
+  /** The operation identifier */
+  private long operationId = -1;
 
   /** A list of listeners that are interested in the operation's outcome */
   protected List<ContentRepositoryOperationListener> listeners = null;
@@ -49,6 +62,27 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
 
   /** flag to indicate running operations */
   boolean isRunning = true;
+
+  /** The operation listener */
+  private ContentRepositoryOperationListener internalListener;
+
+  /**
+   * Creates a new content repository operation.
+   */
+  protected AbstractContentRepositoryOperation() {
+    internalListener = new NotifyingOperationListener();
+    listeners.add(internalListener);
+    operationId = operationIdProvider.getAndIncrement();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#getIdentifier()
+   */
+  public long getIdentifier() {
+    return operationId;
+  }
 
   /**
    * {@inheritDoc}
@@ -86,7 +120,8 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
     this.repository = repository;
     try {
       isRunning = true;
-      result = run(null);
+      CurrentOperation.set(this);
+      result = run(repository);
       isRunning = false;
       fireOperationSucceeded();
       return result;
@@ -105,6 +140,8 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
       error = t;
       fireOperationFailed(t);
       throw new ContentRepositoryException(t);
+    } finally {
+      CurrentOperation.remove();
     }
   }
 
@@ -115,6 +152,34 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
    */
   protected WritableContentRepository getContentRepository() {
     return repository;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#get()
+   */
+  public T get() throws ContentRepositoryException, IOException {
+    synchronized (listeners) {
+      if (isRunning) {
+        synchronized (internalListener) {
+          try {
+            internalListener.wait();
+          } catch (InterruptedException e) {
+            logger.warn("Interrupted while waiting for the operation result");
+          }
+        }
+      }
+    }
+    if (error != null) {
+      if (error instanceof ContentRepositoryException)
+        throw (ContentRepositoryException) error;
+      else if (error instanceof IOException)
+        throw (IOException) error;
+      else
+        throw new ContentRepositoryException(error);
+    }
+    return result;
   }
 
   /**
@@ -137,6 +202,28 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
     if (isRunning)
       throw new IllegalStateException("Operation is still running");
     return error;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof ContentRepositoryOperation))
+      return false;
+    return ((ContentRepositoryOperation<?>) o).getIdentifier() == operationId;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return Long.valueOf(operationId).hashCode();
   }
 
   /**

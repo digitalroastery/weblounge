@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.impl.operation;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.LockOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -38,28 +39,28 @@ public final class LockOperationImpl<T extends ResourceContent> extends Abstract
   private User user = null;
 
   /** The resource to be locked */
-  private Resource<T> resource = null;
+  private ResourceURI uri = null;
 
   /**
    * Creates a new locking operation for the given resource.
    * 
-   * @param resource
+   * @param uri
    *          the resource
    * @param user
    *          the potential lock owner
    */
-  public LockOperationImpl(Resource<T> resource, User user) {
-    this.resource = resource;
+  public LockOperationImpl(ResourceURI uri, User user) {
+    this.uri = uri;
     this.user = user;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.LockOperation#getResource()
+   * @see ch.entwine.weblounge.common.content.repository.LockOperation#getURI()
    */
-  public Resource<T> getResource() {
-    return resource;
+  public ResourceURI getURI() {
+    return uri;
   }
 
   /**
@@ -77,7 +78,7 @@ public final class LockOperationImpl<T extends ResourceContent> extends Abstract
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
   public Resource<T> run(WritableContentRepository repository) throws ContentRepositoryException, IOException {
-    return repository.lock(resource.getURI(), user);
+    return repository.lock(uri, user);
   }
 
 }

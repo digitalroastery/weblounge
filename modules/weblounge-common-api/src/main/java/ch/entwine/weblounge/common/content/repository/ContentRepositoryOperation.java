@@ -54,7 +54,7 @@ public interface ContentRepositoryOperation<T extends Object> {
    * @throws Throwable
    *           for any remaining error condition
    */
-  T get() throws ContentRepositoryException, IOException, Throwable;
+  T get() throws ContentRepositoryException, IOException;
 
   /**
    * Returns the operation result or <code>null</code> if there was no result
@@ -103,5 +103,14 @@ public interface ContentRepositoryOperation<T extends Object> {
    *          the listener
    */
   void removeOperationListener(ContentRepositoryOperationListener listener);
+
+  /**
+   * Returns the operation's identifier, which is considered to be a constantly
+   * incrementing number, so that there are no two instances of this type with
+   * the same identifier.
+   * 
+   * @return the operation identifier
+   */
+  long getIdentifier();
 
 }

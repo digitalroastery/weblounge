@@ -64,8 +64,11 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.entwine.weblounge.contentrepository.impl.operation.CurrentOperation;
 import ch.entwine.weblounge.contentrepository.impl.operation.DeleteOperationImpl;
+import ch.entwine.weblounge.contentrepository.impl.operation.LockOperationImpl;
 import ch.entwine.weblounge.contentrepository.impl.operation.PutOperationImpl;
+import ch.entwine.weblounge.contentrepository.impl.operation.UnlockOperationImpl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -89,8 +92,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 /**
@@ -234,7 +235,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   @Override
   public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
-    // Check if resource is in temporary cache
+    // TODO: Check if resource is in temporary cache
     Resource<?> resource = null;
     synchronized (operationsScheduler) {
       resource = operationsScheduler.getCurrentResource(uri);
@@ -246,34 +247,39 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return super.get(uri);
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#lock(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.security.User)
+   */
   public <T extends ResourceContent> Resource<T> lock(ResourceURI uri, User user)
       throws IllegalStateException, ContentRepositoryException, IOException {
 
+    // Is this a new request or a scheduled asynchronous execution?
+    if (!(CurrentOperation.get() instanceof LockOperation<?>)) {
+      LockOperation<T> lockOperation = new LockOperationImpl<T>(uri, user);
+      operationsScheduler.enqueue(lockOperation);
+      return lockOperation.get();
+    }
+
+    // Check if resource is in temporary cache already by another operation
+    if (operationsScheduler.isWorkingOnResource(uri)) {
+      // TODO: What do we do?
+    }
+
     // Update all resources in memory
-    Resource<?> resource = null;
-    Date date = new Date();
+    Resource<T> resource = null;
     for (ResourceURI u : getVersions(uri)) {
-      Resource<?> r = get(u);
+      Resource<T> r = (Resource<T>) get(u);
       r.lock(user);
-      r.setModified(user, date);
-      operationsScheduler.enqueue(u, new PutOperationImpl(r));
+      operationsScheduler.enqueue(u, new PutOperationImpl<T>(r));
       put(r, false);
       if (r.getVersion() == uri.getVersion())
         resource = r;
     }
 
-    return returnedResource;
-
-    Future<Resource<?>> futureResource = lock(uri, user, null);
-    try {
-      return futureResource.get();
-    } catch (Throwable t) {
-      if (t.getCause() instanceof ContentRepositoryException)
-        throw (ContentRepositoryException) t.getCause();
-      else if (t.getCause() instanceof IOException)
-        throw (IOException) t.getCause();
-      throw new ContentRepositoryException(t.getCause());
-    }
+    return resource;
   }
 
   /**
@@ -286,23 +292,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       final ResourceURI uri, final User user) throws IOException,
       ContentRepositoryException, IllegalStateException {
 
-    // Execute the actual storing of the resource
-    final Resource<?> returnedResource = resource;
-    FutureTask<Resource<?>> task = new FutureTask<Resource<?>>(new Callable<Resource<?>>() {
-      public Resource<?> call() throws Exception {
-        for (Resource<?> r : resourcesToUpdate) {
-          try {
-            put(r, false);
-          } catch (Throwable t) {
-            throw new ExecutionException(t);
-          }
-        }
-        return returnedResource;
-      }
-    });
-
-    new Thread(task).start();
-    return task;
+    LockOperation<T> lockOperation = new LockOperationImpl<T>(uri, user);
+    operationsScheduler.enqueue(lockOperation);
+    return lockOperation;
   }
 
   /**
@@ -314,16 +306,32 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public synchronized <T extends ResourceContent> Resource<T> unlock(
       ResourceURI uri, User user) throws ContentRepositoryException,
       IllegalStateException, IOException {
-    try {
-      Future<Resource<?>> futureResource = unlock(uri, user, null);
-      return futureResource.get();
-    } catch (Throwable t) {
-      if (t.getCause() instanceof ContentRepositoryException)
-        throw (ContentRepositoryException) t.getCause();
-      else if (t.getCause() instanceof IOException)
-        throw (IOException) t.getCause();
-      throw new ContentRepositoryException(t.getCause());
+
+    // Is this a new request or a scheduled asynchronous execution?
+    if (!(CurrentOperation.get() instanceof LockOperation<?>)) {
+      UnlockOperation<T> lockOperation = new UnlockOperationImpl<T>(uri, user);
+      operationsScheduler.enqueue(lockOperation);
+      return lockOperation.get();
     }
+
+    // Check if resource is in temporary cache already by another operation
+    if (operationsScheduler.isWorkingOnResource(uri)) {
+      // TODO: What do we do?
+    }
+
+    // Update all resources in memory
+    Resource<T> resource = null;
+    for (ResourceURI u : getVersions(uri)) {
+      Resource<T> r = (Resource<T>) get(u);
+      r.unlock();
+      operationsScheduler.enqueue(u, new PutOperationImpl<T>(r));
+      put(r, false);
+      if (r.getVersion() == uri.getVersion())
+        resource = r;
+    }
+
+    return resource;
+
   }
 
   /**
@@ -336,36 +344,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       final ResourceURI uri, final User user) throws IOException,
       ContentRepositoryException {
 
-    // Update all resources in memory
-    final List<Resource<?>> resourcesToUpdate = new ArrayList<Resource<?>>();
-    Resource<?> resource = null;
-    Date date = new Date();
-    for (ResourceURI u : getVersions(uri)) {
-      Resource<?> r = get(u);
-      r.unlock();
-      r.setModified(user, date);
-      resourcesToUpdate.add(r);
-      if (r.getVersion() == uri.getVersion())
-        resource = r;
-    }
-
-    // Execute the actual storing of the resource
-    final Resource<?> returnedResource = resource;
-    FutureTask<Resource<?>> task = new FutureTask<Resource<?>>(new Callable<Resource<?>>() {
-      public Resource<?> call() throws Exception {
-        for (Resource<?> r : resourcesToUpdate) {
-          try {
-            put(r, false);
-          } catch (Throwable t) {
-            throw new ExecutionException(t);
-          }
-        }
-        return returnedResource;
-      }
-    });
-
-    new Thread(task).start();
-    return task;
+    UnlockOperation<T> lockOperation = new UnlockOperationImpl<T>(uri, user);
+    operationsScheduler.enqueue(lockOperation);
+    return lockOperation;
   }
 
   /**
@@ -1323,6 +1304,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     /**
+     * @param uri
+     * @return
+     */
+    public boolean isWorkingOnResource(ResourceURI uri) {
+      ContentRepositoryOperation<?> currentOperation = CurrentOperation.get();
+      // TODO: Test for uri but exclude current operation
+      return false;
+    }
+
+    /**
      * Returns the current state of the resource, assuming that all currently
      * queued operations succeed.
      * 
@@ -1338,7 +1329,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         ContentRepositoryOperation op = operations.get(i);
         if (op instanceof DeleteOperation)
           return null;
-        Resource<?> resource = op.getResource();
+        Resource<?> resource = op.getURI();
         if (resource != null)
           return resource;
       }
@@ -1351,8 +1342,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      * 
      * @param operation
      */
-    public synchronized void enqueue(
-ContentRepositoryOperation<?> operation) {
+    public synchronized void enqueue(ContentRepositoryOperation<?> operation) {
       repositoryOperations.add(operation);
     }
 
