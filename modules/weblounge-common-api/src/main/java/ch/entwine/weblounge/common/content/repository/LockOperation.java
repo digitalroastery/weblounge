@@ -22,21 +22,13 @@ package ch.entwine.weblounge.common.content.repository;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
-import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.security.User;
 
 /**
  * The lock operation represents the process of locking a resource for editing
  * in the content repository.
  */
-public interface LockOperation<T extends ResourceContent> extends ContentRepositoryOperation<Resource<T>> {
-
-  /**
-   * Returns the resource that is to be locked.
-   * 
-   * @return the resource uri
-   */
-  ResourceURI getURI();
+public interface LockOperation<T extends ResourceContent> extends ContentRepositoryResourceOperation<Resource<T>> {
 
   /**
    * Returns the locking user.

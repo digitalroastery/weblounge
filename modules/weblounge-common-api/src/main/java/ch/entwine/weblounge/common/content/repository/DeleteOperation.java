@@ -20,20 +20,12 @@
 
 package ch.entwine.weblounge.common.content.repository;
 
-import ch.entwine.weblounge.common.content.ResourceURI;
 
 /**
  * The delete operation represents the removal of a resource from the content
  * repository.
  */
-public interface DeleteOperation extends ContentRepositoryOperation<Boolean> {
-
-  /**
-   * Returns the uri of the resource to delete.
-   * 
-   * @return the uri
-   */
-  ResourceURI getResourceURI();
+public interface DeleteOperation extends ContentRepositoryResourceOperation<Boolean> {
 
   /**
    * Returns <code>true</code> if all versions of this resource should be

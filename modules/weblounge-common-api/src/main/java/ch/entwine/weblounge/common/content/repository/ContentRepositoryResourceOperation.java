@@ -20,25 +20,18 @@
 
 package ch.entwine.weblounge.common.content.repository;
 
+import ch.entwine.weblounge.common.content.ResourceURI;
+
 /**
- * The move operation represents the process of a resource (and potentially its
- * children) being moved from one path or url to another.
+ * Interface that identifies operations that modify a given resource.
  */
-public interface MoveOperation extends ContentRepositoryResourceOperation<Void> {
+public interface ContentRepositoryResourceOperation<T extends Object> extends ContentRepositoryOperation<T> {
 
   /**
-   * Returns the path that the resource should be moved to.
+   * Returns the resource.
    * 
-   * @return the target path
+   * @return the resource
    */
-  String getTargetPath();
-
-  /**
-   * Returns <code>true</code> if the resource's children should be moved as
-   * well.
-   * 
-   * @return <code>true</code> to move child resources as well
-   */
-  boolean moveChildren();
+  ResourceURI getResourceURI();
 
 }

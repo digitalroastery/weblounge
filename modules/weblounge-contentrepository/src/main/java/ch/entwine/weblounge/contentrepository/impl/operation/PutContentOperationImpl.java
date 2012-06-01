@@ -24,34 +24,40 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.UnlockOperation;
+import ch.entwine.weblounge.common.content.repository.PutContentOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
-import ch.entwine.weblounge.common.security.User;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * This operation implements an unlock of the given resource.
+ * This operation implements a put of content to the given resource.
  */
-public final class UnlockOperationImpl<T extends ResourceContent> extends AbstractContentRepositoryOperation<Resource<T>> implements UnlockOperation<T> {
-
-  /** The potential lock owner */
-  private User user = null;
+public final class PutContentOperationImpl<T extends ResourceContent> extends AbstractContentRepositoryOperation<Resource<T>> implements PutContentOperation<T> {
 
   /** The resource to be locked */
   private ResourceURI uri = null;
 
+  /** The resource content */
+  private T content = null;
+
+  /** The data stream */
+  private InputStream inputStream = null;
+
   /**
-   * Creates a new unlocking operation for the given resource.
+   * Creates a new put operation for the given resource.
    * 
    * @param uri
    *          the resource
-   * @param user
-   *          the unlocking user
+   * @param content
+   *          the resource content
+   * @param is
+   *          the input stream
    */
-  public UnlockOperationImpl(ResourceURI uri, User user) {
+  public PutContentOperationImpl(ResourceURI uri, T content, InputStream is) {
     this.uri = uri;
-    this.user = user;
+    this.content = content;
+    this.inputStream = is;
   }
 
   /**
@@ -66,10 +72,19 @@ public final class UnlockOperationImpl<T extends ResourceContent> extends Abstra
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.UnlockOperation#getUser()
+   * @see ch.entwine.weblounge.common.content.repository.PutContentOperation#getContent()
    */
-  public User getUser() {
-    return user;
+  public T getContent() {
+    return content;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.PutContentOperation#getInputStream()
+   */
+  public InputStream getInputStream() {
+    return inputStream;
   }
 
   /**
@@ -79,8 +94,8 @@ public final class UnlockOperationImpl<T extends ResourceContent> extends Abstra
    */
   @Override
   protected Resource<T> run(WritableContentRepository repository)
-      throws ContentRepositoryException, IOException {
-    return repository.unlock(uri, user);
+      throws ContentRepositoryException, IOException, IllegalStateException {
+    return repository.putContent(uri, content, inputStream);
   }
 
 }

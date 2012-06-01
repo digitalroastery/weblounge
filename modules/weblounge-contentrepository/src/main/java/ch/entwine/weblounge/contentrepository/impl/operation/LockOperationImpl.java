@@ -57,9 +57,9 @@ public final class LockOperationImpl<T extends ResourceContent> extends Abstract
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.LockOperation#getURI()
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#getResourceURI()
    */
-  public ResourceURI getURI() {
+  public ResourceURI getResourceURI() {
     return uri;
   }
 
@@ -77,7 +77,9 @@ public final class LockOperationImpl<T extends ResourceContent> extends Abstract
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
-  public Resource<T> run(WritableContentRepository repository) throws ContentRepositoryException, IOException {
+  @Override
+  protected Resource<T> run(WritableContentRepository repository)
+      throws ContentRepositoryException, IOException, IllegalStateException {
     return repository.lock(uri, user);
   }
 

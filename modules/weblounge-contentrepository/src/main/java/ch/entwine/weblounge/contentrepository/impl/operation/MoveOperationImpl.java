@@ -20,7 +20,6 @@
 
 package ch.entwine.weblounge.contentrepository.impl.operation;
 
-import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.MoveOperation;
@@ -31,7 +30,7 @@ import java.io.IOException;
 /**
  * This operation implements a move of the given resource.
  */
-public final class MoveOperationImpl<T extends ResourceContent> extends AbstractContentRepositoryOperation<Void> implements MoveOperation {
+public final class MoveOperationImpl extends AbstractContentRepositoryOperation<Void> implements MoveOperation {
 
   /** Path where the resource will be moved to */
   private String moveTo = null;
@@ -56,13 +55,13 @@ public final class MoveOperationImpl<T extends ResourceContent> extends Abstract
       boolean moveChildren) {
     this.uri = uri;
     this.moveTo = targetPath;
-    this.moveTo = targetPath;
+    this.moveChildren = moveChildren;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.MoveOperation#getResourceURI()
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#getResourceURI()
    */
   public ResourceURI getResourceURI() {
     return uri;
@@ -91,7 +90,9 @@ public final class MoveOperationImpl<T extends ResourceContent> extends Abstract
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
-  public Void run(WritableContentRepository repository) throws ContentRepositoryException, IOException {
+  @Override
+  protected Void run(WritableContentRepository repository)
+      throws ContentRepositoryException, IOException, IllegalStateException {
     repository.move(uri, moveTo, moveChildren);
     return null;
   }

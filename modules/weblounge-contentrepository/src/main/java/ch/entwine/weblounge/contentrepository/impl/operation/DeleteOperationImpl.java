@@ -23,6 +23,7 @@ package ch.entwine.weblounge.contentrepository.impl.operation;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.DeleteOperation;
+import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.DeleteOperation#getResourceURI()
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#getResourceURI()
    */
   public ResourceURI getResourceURI() {
     return uri;
@@ -74,7 +75,10 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
-  public Boolean run(WritableContentRepository repository) throws ContentRepositoryException, IOException {
+  @Override
+  protected Boolean run(WritableContentRepository repository)
+      throws ContentRepositoryException, IOException,
+      ReferentialIntegrityException {
     return repository.delete(uri, allVersions);
   }
 

@@ -23,10 +23,12 @@ package ch.entwine.weblounge.contentrepository.impl.operation;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener;
+import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.contentrepository.impl.NotifyingOperationListener;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class AbstractContentRepositoryOperation<T extends Object> implements ContentRepositoryOperation<T> {
 
   /** The logger */
-  private static final Logger logger = Logger.getLogger(AbstractContentRepositoryOperation.class);
+  private static final Logger logger = LoggerFactory.getLogger(AbstractContentRepositoryOperation.class);
 
   /** The operation identifier provider */
   private static AtomicLong operationIdProvider = new AtomicLong();
@@ -61,7 +63,7 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
   protected T result = null;
 
   /** flag to indicate running operations */
-  boolean isRunning = true;
+  private boolean isRunning = true;
 
   /** The operation listener */
   private ContentRepositoryOperationListener internalListener;
@@ -71,6 +73,7 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
    */
   protected AbstractContentRepositoryOperation() {
     internalListener = new NotifyingOperationListener();
+    listeners = new ArrayList<ContentRepositoryOperationListener>();
     listeners.add(internalListener);
     operationId = operationIdProvider.getAndIncrement();
   }
@@ -114,7 +117,8 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
   public final T execute(WritableContentRepository repository)
-      throws ContentRepositoryException, IOException {
+      throws ContentRepositoryException, IOException,
+      ReferentialIntegrityException, IllegalStateException {
     if (repository == null)
       throw new IllegalArgumentException("Repository must not be null");
     this.repository = repository;
@@ -122,23 +126,45 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
       isRunning = true;
       CurrentOperation.set(this);
       result = run(repository);
-      isRunning = false;
-      fireOperationSucceeded();
+      synchronized (internalListener) {
+        isRunning = false;
+        fireOperationSucceeded();
+      }
       return result;
+    } catch (ReferentialIntegrityException e) {
+      error = e;
+      synchronized (internalListener) {
+        isRunning = false;
+        fireOperationFailed(e);
+      }
+      throw e;
     } catch (ContentRepositoryException e) {
       error = e;
-      isRunning = false;
-      fireOperationFailed(e);
+      synchronized (internalListener) {
+        isRunning = false;
+        fireOperationFailed(e);
+      }
       throw e;
     } catch (IOException e) {
       error = e;
-      isRunning = false;
-      fireOperationFailed(e);
+      synchronized (internalListener) {
+        isRunning = false;
+        fireOperationFailed(e);
+      }
+      throw e;
+    } catch (IllegalStateException e) {
+      error = e;
+      synchronized (internalListener) {
+        isRunning = false;
+        fireOperationFailed(e);
+      }
       throw e;
     } catch (Throwable t) {
-      isRunning = false;
-      error = t;
-      fireOperationFailed(t);
+      synchronized (internalListener) {
+        isRunning = false;
+        error = t;
+        fireOperationFailed(t);
+      }
       throw new ContentRepositoryException(t);
     } finally {
       CurrentOperation.remove();
@@ -160,14 +186,12 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#get()
    */
   public T get() throws ContentRepositoryException, IOException {
-    synchronized (listeners) {
+    synchronized (internalListener) {
       if (isRunning) {
-        synchronized (internalListener) {
-          try {
-            internalListener.wait();
-          } catch (InterruptedException e) {
-            logger.warn("Interrupted while waiting for the operation result");
-          }
+        try {
+          internalListener.wait();
+        } catch (InterruptedException e) {
+          logger.warn("Interrupted while waiting for the operation result");
         }
       }
     }
@@ -238,7 +262,8 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
    *           if the operation fails due to read/write failures
    */
   protected abstract T run(WritableContentRepository repository)
-      throws ContentRepositoryException, IOException;
+      throws ContentRepositoryException, IOException, IllegalStateException,
+      ReferentialIntegrityException;
 
   /**
    * Informs the registered listeners about success or failure of this content

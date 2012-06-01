@@ -22,21 +22,13 @@ package ch.entwine.weblounge.common.content.repository;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
-import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.security.User;
 
 /**
  * The unlock operation represents the process of unlocking a resource in the
  * content repository.
  */
-public interface UnlockOperation<T extends ResourceContent> extends ContentRepositoryOperation<Resource<T>> {
-
-  /**
-   * Returns the resource that is to be unlocked.
-   * 
-   * @return the resource uri
-   */
-  ResourceURI getURI();
+public interface UnlockOperation<T extends ResourceContent> extends ContentRepositoryResourceOperation<Resource<T>> {
 
   /**
    * Returns the user that was holding on to the lock.

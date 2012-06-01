@@ -27,7 +27,7 @@ import ch.entwine.weblounge.common.content.ResourceContent;
  * The put operation represents the process of writing a resource to the content
  * repository.
  */
-public interface PutOperation<T extends ResourceContent> extends ContentRepositoryOperation<Resource<T>> {
+public interface PutOperation<T extends ResourceContent> extends ContentRepositoryResourceOperation<Resource<T>> {
 
   /**
    * Returns the resource that is to be stored.
@@ -35,5 +35,13 @@ public interface PutOperation<T extends ResourceContent> extends ContentReposito
    * @return the resource
    */
   Resource<T> getResource();
+
+  /**
+   * Returns <code>true</code> if this resource's previews need to be updated as
+   * part of this operation.
+   * 
+   * @return <code>true</code> to update the previews
+   */
+  boolean updatePreviews();
 
 }

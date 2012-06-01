@@ -23,17 +23,26 @@ package ch.entwine.weblounge.common.content.repository;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 
+import java.io.InputStream;
+
 /**
  * The put operation represents the process of writing a resource to the content
  * repository.
  */
-public interface PutContentOperation<T extends ResourceContent> extends ContentRepositoryOperation<Resource<T>> {
+public interface PutContentOperation<T extends ResourceContent> extends ContentRepositoryResourceOperation<Resource<T>> {
 
   /**
    * Returns the resource content that is being added to the resource.
    * 
    * @return the resource content
    */
-  T getResourceContent();
+  T getContent();
+
+  /**
+   * Returns the resource's content data stream.
+   * 
+   * @return the data stream
+   */
+  InputStream getInputStream();
 
 }

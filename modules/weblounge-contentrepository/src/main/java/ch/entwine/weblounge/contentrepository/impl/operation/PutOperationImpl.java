@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.impl.operation;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.PutOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -36,14 +37,20 @@ public final class PutOperationImpl<T extends ResourceContent> extends AbstractC
   /** The resource to be locked */
   private Resource<T> resource = null;
 
+  /** Whether to update the preview as part of this put operation */
+  private boolean updatePreviews = true;
+
   /**
    * Creates a new put operation for the given resource.
    * 
    * @param resource
    *          the resource
+   * @param updatePreviews
+   *          whether to update the resource's previews
    */
-  public PutOperationImpl(Resource<T> resource) {
+  public PutOperationImpl(Resource<T> resource, boolean updatePreviews) {
     this.resource = resource;
+    this.updatePreviews = updatePreviews;
   }
 
   /**
@@ -58,9 +65,29 @@ public final class PutOperationImpl<T extends ResourceContent> extends AbstractC
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#getResourceURI()
+   */
+  public ResourceURI getResourceURI() {
+    return resource.getURI();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.PutOperation#updatePreviews()
+   */
+  public boolean updatePreviews() {
+    return updatePreviews;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
-  public Resource<T> run(WritableContentRepository repository) throws ContentRepositoryException, IOException {
+  @Override
+  protected Resource<T> run(WritableContentRepository repository)
+      throws ContentRepositoryException, IOException {
     return repository.put(resource);
   }
 

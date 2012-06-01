@@ -38,9 +38,14 @@ public interface ContentRepositoryOperation<T extends Object> {
    *           if the operation fails
    * @throws IOException
    *           if the operation fails due to read/write failures
+   * @throws ReferentialIntegrityException
+   *           if a resource is being removed that is still linked
+   * @throws IllegalStateException
+   *           if an illegal state was reached during execution
    */
   T execute(WritableContentRepository repository)
-      throws ContentRepositoryException, IOException;
+      throws ContentRepositoryException, ReferentialIntegrityException,
+      IOException, IllegalStateException;
 
   /**
    * Blocks and returns the operation result or throws the corresponding

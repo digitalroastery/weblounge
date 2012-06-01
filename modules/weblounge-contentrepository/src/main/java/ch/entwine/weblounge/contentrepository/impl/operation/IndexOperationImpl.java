@@ -37,7 +37,8 @@ public final class IndexOperationImpl extends AbstractContentRepositoryOperation
    * @see ch.entwine.weblounge.contentrepository.impl.operation.AbstractContentRepositoryOperation#run(WritableContentRepository)
    */
   @Override
-  protected Void run(WritableContentRepository repository) throws ContentRepositoryException, IOException {
+  protected Void run(WritableContentRepository repository)
+      throws ContentRepositoryException, IOException {
     repository.index();
     return null;
   }

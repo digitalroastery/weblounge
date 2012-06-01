@@ -64,6 +64,39 @@ public interface WritableContentRepository extends ContentRepository {
       throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
+   * Puts the resource to the specified location. Depending on whether the
+   * resource identified by <code>uri</code> already exists, the method either
+   * creates a new resource or updates the existing one.
+   * <p>
+   * The returned resource contains the same data than the one passed in as the
+   * <code>resource</code> argument but with an updated uri.
+   * <p>
+   * <b>Note:</b> do not modify the resource content using this method. Use
+   * {@link #putContent(Resource, InputStream)} instead.
+   * 
+   * @param uri
+   *          the resource uri
+   * @param resource
+   *          the resource
+   * @param updatePreviews
+   *          <code>true</code> to update previews
+   * @throws ContentRepositoryException
+   *           if updating the content repository fails
+   * @throws IOException
+   *           if adding fails due to a database error
+   * @throws IllegalStateException
+   *           if the resource does not exist and contains a non-empty content
+   *           section.
+   * @throws IllegalStateException
+   *           if the resource exists but contains different resource content
+   *           than what is specified in the updated document
+   * @return the updated resource
+   */
+  <T extends ResourceContent> Resource<T> put(Resource<T> resource,
+      boolean updatePreviews) throws ContentRepositoryException, IOException,
+      IllegalStateException;
+
+  /**
    * Puts the resource to the specified location and passes the result to the
    * operation once the process succeeds or fails.
    * <p>
@@ -96,6 +129,42 @@ public interface WritableContentRepository extends ContentRepository {
   <T extends ResourceContent> PutOperation<T> putAsynchronously(
       Resource<T> resource) throws ContentRepositoryException, IOException,
       IllegalStateException;
+
+  /**
+   * Puts the resource to the specified location and passes the result to the
+   * operation once the process succeeds or fails.
+   * <p>
+   * Depending on whether the resource identified by <code>uri</code> already
+   * exists, the method either creates a new resource or updates the existing
+   * one.
+   * <p>
+   * The returned resource contains the same data than the one passed in as the
+   * <code>resource</code> argument but with an updated uri.
+   * <p>
+   * <b>Note:</b> do not modify the resource content using this method. Use
+   * {@link #putContent(Resource, InputStream)} instead.
+   * 
+   * @param uri
+   *          the resource uri
+   * @param resource
+   *          the resource
+   * @param updatePreviews
+   *          <code>true</code> to update previews
+   * @throws ContentRepositoryException
+   *           if updating the content repository fails
+   * @throws IOException
+   *           if adding fails due to a database error
+   * @throws IllegalStateException
+   *           if the resource does not exist and contains a non-empty content
+   *           section.
+   * @throws IllegalStateException
+   *           if the resource exists but contains different resource content
+   *           than what is specified in the updated document
+   * @return the updated resource
+   */
+  <T extends ResourceContent> PutOperation<T> putAsynchronously(
+      Resource<T> resource, boolean updatePreviews)
+      throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
    * Adds the content to the specified resource.
@@ -250,6 +319,8 @@ public interface WritableContentRepository extends ContentRepository {
    *           if updating the content repository fails
    * @throws IOException
    *           if removal fails due to a database error
+   * @throws ReferentialIntegrityException
+   *           if the resource is still being linked to
    */
   DeleteOperation deleteAsynchronously(ResourceURI uri)
       throws ContentRepositoryException, IOException;
@@ -268,9 +339,12 @@ public interface WritableContentRepository extends ContentRepository {
    *           if updating the content repository fails
    * @throws IOException
    *           if removal fails due to a database error
+   * @throws ReferentialIntegrityException
+   *           if the resource is still being linked to
    */
   boolean delete(ResourceURI uri, boolean allRevisions)
-      throws ContentRepositoryException, IOException;
+      throws ContentRepositoryException, IOException,
+      ReferentialIntegrityException;
 
   /**
    * Removes either all or just the specified version of the resource from the

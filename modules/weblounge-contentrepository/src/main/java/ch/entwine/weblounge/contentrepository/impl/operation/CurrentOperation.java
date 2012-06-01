@@ -26,10 +26,17 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation
  * This static class is holding on to the {@link ContentRepositoryOperation}
  * that the current thread is working on.
  */
-public class CurrentOperation {
+public final class CurrentOperation {
 
   /** The operation */
-  public static ThreadLocal<ContentRepositoryOperation<?>> operation = null;
+  private static final ThreadLocal<ContentRepositoryOperation<?>> operation = new ThreadLocal<ContentRepositoryOperation<?>>();
+
+  /**
+   * Prevent instantiation of this type.
+   */
+  private CurrentOperation() {
+    // Nothing to do
+  }
 
   /**
    * Sets the {@link ThreadLocal} that is holding the current content repository

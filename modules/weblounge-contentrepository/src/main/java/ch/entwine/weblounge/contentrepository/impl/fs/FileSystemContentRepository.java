@@ -243,7 +243,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   public IndexOperation indexAsynchronously() throws ContentRepositoryException {
     IndexOperation op = new IndexOperationImpl();
-    operationsScheduler.enqueue(op);
+    processor.enqueue(op);
     return op;
   }
 
