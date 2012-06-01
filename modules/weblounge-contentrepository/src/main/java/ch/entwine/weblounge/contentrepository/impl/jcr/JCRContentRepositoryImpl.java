@@ -23,17 +23,15 @@ package ch.entwine.weblounge.contentrepository.impl.jcr;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.repository.IndexOperation;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
+import ch.entwine.weblounge.contentrepository.impl.operation.IndexOperationImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 /**
  * JRC implementation of the <code>WritableContentRepository</code> interface.
@@ -109,18 +107,12 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index(ch.entwine.weblounge.common.content.repository.AsynchronousContentRepositoryListener)
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#indexAsynchronously()
    */
-  public Future<Void> index(AsynchronousContentRepositoryListener listener)
-      throws ContentRepositoryException {
-    FutureTask<Void> task = new FutureTask<Void>(new Callable<Void>() {
-      public Void call() throws Exception {
-        index();
-        return null;
-      }
-    });
-    new Thread(task).start();
-    return task;
+  public IndexOperation indexAsynchronously() throws ContentRepositoryException {
+    IndexOperation op = new IndexOperationImpl();
+    processor.enqueue(op);
+    return op;
   }
 
   /**

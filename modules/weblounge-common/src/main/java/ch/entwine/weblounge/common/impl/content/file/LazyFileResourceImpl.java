@@ -434,7 +434,7 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getURI()
+   * @see ch.entwine.weblounge.common.content.file.Page#getResourceURI()
    */
   public ResourceURI getURI() {
     return uri;

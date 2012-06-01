@@ -371,11 +371,12 @@
             <Export-Package>
               ch.entwine.weblounge.contentrepository.impl;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.bundle;version=${project.version},
+              ch.entwine.weblounge.contentrepository.impl.endpoint;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.fs;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.index;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.index.solr;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.jcr;version=${project.version},
-              ch.entwine.weblounge.contentrepository.impl.endpoint;version=${project.version}
+              ch.entwine.weblounge.contentrepository.impl.operation;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
               jcr;inline=true,

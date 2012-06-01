@@ -52,7 +52,6 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
-import ch.entwine.weblounge.contentrepository.impl.util.ForgivingContentRepositoryUpdateListener;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -599,14 +598,14 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       page.setVersion(Resource.WORK);
 
       // TODO: wait for Future and update update listener
-      contentRepository.put(page, new ForgivingContentRepositoryUpdateListener());
+      contentRepository.putAsynchronously(page);
 
       // Check if the page has been moved
       String currentPath = currentPage.getURI().getPath();
       String newPath = page.getURI().getPath();
       if (currentPath != null && newPath != null && !currentPath.equals(newPath)) {
         // TODO: wait for Future and update update listener
-        contentRepository.move(currentPage.getURI(), newPath, true, new ForgivingContentRepositoryUpdateListener());
+        contentRepository.moveAsynchronously(currentPage.getURI(), newPath, true);
       }
     } catch (SecurityException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", workURI, site);
@@ -1007,7 +1006,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         page = (Page) contentRepository.get(liveURI);
         liveURI.setPath(page.getURI().getPath());
         page.setVersion(Resource.WORK);
-        contentRepository.put(page, new ForgivingContentRepositoryUpdateListener());
+        contentRepository.putAsynchronously(page);
       } else {
         page = (Page) contentRepository.get(workURI);
         workURI.setPath(page.getURI().getPath());
@@ -1049,7 +1048,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Finally, perform the lock operation (on all resource versions)
     try {
-      contentRepository.lock(workURI, user, new ForgivingContentRepositoryUpdateListener());
+      contentRepository.lockAsynchronously(workURI, user);
       logger.info("Page {} has been locked by {}", workURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to lock page {} of site '{}' without permission", workURI, site);
@@ -1147,7 +1146,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Finally, perform the lock operation (on all resource versions)
     try {
-      contentRepository.unlock(pageURI, user, new ForgivingContentRepositoryUpdateListener());
+      contentRepository.unlockAsynchronously(pageURI, user);
       logger.info("Page {} has been unlocked by {}", pageURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);

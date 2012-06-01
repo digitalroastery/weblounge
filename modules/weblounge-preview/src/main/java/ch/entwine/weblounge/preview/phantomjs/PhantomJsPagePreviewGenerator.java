@@ -118,7 +118,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
     try {
       is = PhantomJsPagePreviewGenerator.class.getResourceAsStream(SCRIPT_FILE);
       scriptTemplate = IOUtils.toString(is);
-      scriptFile = File.createTempFile("phantomjs", "js");
+      scriptFile = File.createTempFile("phantomjs-", ".js");
 
       // Process templates
       Map<String, String> properties = new HashMap<String, String>();
@@ -132,6 +132,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
 
     } catch (IOException e) {
       logger.error("Error reading phantomjs script template from " + SCRIPT_FILE, e);
+      FileUtils.deleteQuietly(scriptFile);
       throw e;
     } finally {
       IOUtils.closeQuietly(is);
@@ -235,6 +236,9 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
       phantomjs.execute();
     } catch (ProcessExcecutorException e) {
       logger.warn("Error creating page preview of {}: {}", pageURL, e.getMessage());
+      FileUtils.deleteQuietly(scriptFile);
+      FileUtils.deleteQuietly(rendererdFile);
+      throw new IOException(e);
     }
 
     FileInputStream imageIs = null;
@@ -252,6 +256,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
     } finally {
       IOUtils.closeQuietly(imageIs);
       FileUtils.deleteQuietly(rendererdFile);
+      FileUtils.deleteQuietly(scriptFile);
     }
 
   }
