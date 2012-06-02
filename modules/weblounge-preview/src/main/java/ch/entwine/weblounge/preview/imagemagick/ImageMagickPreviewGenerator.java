@@ -239,6 +239,8 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
    *          the style
    * @throws IllegalArgumentException
    *           if the image is in an unsupported format
+   * @throws IllegalArgumentException
+   *           if the input stream is empty
    * @throws IOException
    *           if reading from or writing to the stream fails
    * @throws OutOfMemoryError
@@ -248,6 +250,10 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
   private void style(InputStream is, OutputStream os, String format,
       ImageStyle style) throws IllegalArgumentException, IOException,
       OutOfMemoryError {
+
+    // Does the input stream contain any data?
+    if (is.available() == 0)
+      throw new IllegalArgumentException("Empty input stream was passed to image styling");
 
     // Is an image style permitted?
     if (style == null)

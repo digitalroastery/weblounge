@@ -75,7 +75,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
   /** Format for the preview images */
   private static final String PREVIEW_CONTENT_TYPE = "image/png";
 
-  /** Name of the preprational script parameter */
+  /** Name of the script parameter */
   private static final String PARAM_PREPARE_SCRIPT = "prepare.js";
 
   /** Name of the script */
@@ -90,56 +90,11 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
   /** The script template */
   private String scriptTemplate = null;
 
+  /** Directory containing temporary files */
+  private File phantomTmpDir = null;
+
   /** The script */
   private File scriptFile = null;
-
-  /**
-   * Creates an instance of the preview generator.
-   */
-  public PhantomJsPagePreviewGenerator() {
-    try {
-      prepareScript();
-    } catch (IOException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  /**
-   * Reads the script from the resource, processes the variables and writes it
-   * to the file system so it can be accessed by phantomjs.
-   * 
-   * @throws IOException
-   *           if reading the template or writing the file failed
-   */
-  private void prepareScript() throws IOException {
-    InputStream is = null;
-    InputStream fis = null;
-    OutputStream os = null;
-    try {
-      is = PhantomJsPagePreviewGenerator.class.getResourceAsStream(SCRIPT_FILE);
-      scriptTemplate = IOUtils.toString(is);
-      scriptFile = File.createTempFile("phantomjs-", ".js");
-
-      // Process templates
-      Map<String, String> properties = new HashMap<String, String>();
-      properties.put(PARAM_PREPARE_SCRIPT, "return true;");
-      String script = ConfigurationUtils.processTemplate(scriptTemplate, properties);
-
-      // Write the processed script to disk
-      fis = IOUtils.toInputStream(script);
-      os = new FileOutputStream(scriptFile);
-      IOUtils.copy(fis, os);
-
-    } catch (IOException e) {
-      logger.error("Error reading phantomjs script template from " + SCRIPT_FILE, e);
-      FileUtils.deleteQuietly(scriptFile);
-      throw e;
-    } finally {
-      IOUtils.closeQuietly(is);
-      IOUtils.closeQuietly(fis);
-      IOUtils.closeQuietly(os);
-    }
-  }
 
   /**
    * Called by the {@link PhantomJsActivator} on service activation.
@@ -148,6 +103,11 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
    *          the component context
    */
   void activate(ComponentContext ctx) {
+    try {
+      prepareScript();
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
     previewGeneratorTracker = new ImagePreviewGeneratorTracker(ctx.getBundleContext());
     previewGeneratorTracker.open();
   }
@@ -159,6 +119,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
     if (previewGeneratorTracker != null) {
       previewGeneratorTracker.close();
     }
+    FileUtils.deleteQuietly(phantomTmpDir);
   }
 
   /**
@@ -228,7 +189,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
     }
 
     // Create a temporary file
-    File rendererdFile = File.createTempFile("phantomjs-", "." + format);
+    File rendererdFile = File.createTempFile("phantomjs-", "." + format, phantomTmpDir);
 
     // Call PhantomJS to render the page
     try {
@@ -236,7 +197,6 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
       phantomjs.execute();
     } catch (ProcessExcecutorException e) {
       logger.warn("Error creating page preview of {}: {}", pageURL, e.getMessage());
-      FileUtils.deleteQuietly(scriptFile);
       FileUtils.deleteQuietly(rendererdFile);
       throw new IOException(e);
     }
@@ -256,7 +216,6 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
     } finally {
       IOUtils.closeQuietly(imageIs);
       FileUtils.deleteQuietly(rendererdFile);
-      FileUtils.deleteQuietly(scriptFile);
     }
 
   }
@@ -321,6 +280,51 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
   void removePreviewGenerator(ImagePreviewGenerator generator) {
     synchronized (previewGenerators) {
       previewGenerators.remove(generator);
+    }
+  }
+
+  /**
+   * Reads the script from the resource, processes the variables and writes it
+   * to the file system so it can be accessed by PhantomJS.
+   * 
+   * @throws IOException
+   *           if reading the template or writing the file failed
+   */
+  private void prepareScript() throws IOException {
+    InputStream is = null;
+    InputStream fis = null;
+    OutputStream os = null;
+    try {
+      // Create the temporary directory for everything PhantomJS
+      phantomTmpDir = new File(FileUtils.getTempDirectory(), "phantomjs");
+      if (!phantomTmpDir.mkdirs()) {
+        logger.error("Unable to create temp directory for PhantomJS at {}", phantomTmpDir);
+        throw new IOException("Unable to create temp directory for PhantomJS at " + phantomTmpDir);
+      }
+
+      // Create the script
+      is = PhantomJsPagePreviewGenerator.class.getResourceAsStream(SCRIPT_FILE);
+      scriptTemplate = IOUtils.toString(is);
+      scriptFile = new File(phantomTmpDir, "pagepreview.js");
+
+      // Process templates
+      Map<String, String> properties = new HashMap<String, String>();
+      properties.put(PARAM_PREPARE_SCRIPT, "return true;");
+      String script = ConfigurationUtils.processTemplate(scriptTemplate, properties);
+
+      // Write the processed script to disk
+      fis = IOUtils.toInputStream(script);
+      os = new FileOutputStream(scriptFile);
+      IOUtils.copy(fis, os);
+
+    } catch (IOException e) {
+      logger.error("Error reading phantomjs script template from " + SCRIPT_FILE, e);
+      FileUtils.deleteQuietly(scriptFile);
+      throw e;
+    } finally {
+      IOUtils.closeQuietly(is);
+      IOUtils.closeQuietly(fis);
+      IOUtils.closeQuietly(os);
     }
   }
 
