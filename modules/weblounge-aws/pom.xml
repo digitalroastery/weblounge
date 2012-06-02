@@ -130,6 +130,11 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.aws</Bundle-SymbolicName>
             <Import-Package>
+              ch.entwine.weblounge.common.content;version=${project.version},
+              ch.entwine.weblounge.common.content.image;version=${project.version},
+              ch.entwine.weblounge.common.content.page;version=${project.version},
+              ch.entwine.weblounge.common.language;version=${project.version},
+              ch.entwine.weblounge.contentrepository;version=${project.version},
               org.slf4j;version="[1.5.0,1.6.0)",
               org.osgi.framework;version="1.4.0",
               org.osgi.service.cm;version="1.3.0",
