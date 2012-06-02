@@ -144,6 +144,38 @@
       </modules>
     </profile>
 
+    <!-- Release aggregator -->
+    <profile>
+      <id>release</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/weblounge-aws</module>
+        <module>modules/weblounge-bridge</module>
+        <module>modules/weblounge-cache</module>
+        <module>modules/weblounge-cache-api</module>
+        <module>modules/weblounge-common</module>
+        <module>modules/weblounge-common-api</module>
+        <module>modules/weblounge-contentrepository</module>
+        <module>modules/weblounge-contentrepository-api</module>
+        <module>modules/weblounge-dispatcher</module>
+        <module>modules/weblounge-dispatcher-api</module>
+        <module>modules/weblounge-i18n-mygengo</module>
+        <module>modules/weblounge-kernel</module>
+        <module>modules/weblounge-maven-s3-deploy-plugin</module>
+        <module>modules/weblounge-preview</module>
+        <module>modules/weblounge-runtime</module>
+        <module>modules/weblounge-security</module>
+        <module>modules/weblounge-security-sql</module>
+        <module>modules/weblounge-system</module>
+        <module>modules/weblounge-taglib</module>
+        <module>modules/weblounge-test</module>
+        <module>modules/weblounge-ui</module>
+        <module>modules/weblounge-workbench</module>
+      </modules>
+    </profile>
+
     <!-- Performance testing -->
     <profile>
       <id>test</id>
