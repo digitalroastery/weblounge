@@ -1079,6 +1079,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     for (Language language : languages) {
       PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, resource, environment, language, styles, PREVIEW_FORMAT);
       Thread t = new Thread(previewWorker);
+      t.setPriority(Thread.MIN_PRIORITY);
+      t.setDaemon(true);
       t.start();
     }
 
