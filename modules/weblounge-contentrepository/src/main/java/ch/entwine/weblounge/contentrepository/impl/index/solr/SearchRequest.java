@@ -36,8 +36,8 @@ import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_TYPE;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_TYPE_COMPOSER;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_TYPE_COMPOSER_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PARENT_ELEMENTS;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH_PREFIX;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_FROM;
 import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
@@ -141,7 +141,7 @@ public class SearchRequest {
     }
 
     if (query.getPathPrefix() != null) {
-      and(solrQuery, PARENT_ELEMENTS, query.getPathPrefix(), true, true);
+      and(solrQuery, PATH_PREFIX, query.getPathPrefix(), true, true);
     }
 
     // Type
@@ -323,7 +323,7 @@ public class SearchRequest {
     // Prepare the solr query
     SolrQuery q = new SolrQuery(solrQuery.toString());
     q.setStart(query.getOffset() > 0 ? query.getOffset() : 0);
-    q.setRows(query.getLimit() > 0 ? query.getLimit() : 10);
+    q.setRows(query.getLimit() > 0 ? query.getLimit() : Integer.MAX_VALUE);
 
     // Filter query
     if (query.getFilter() != null) {

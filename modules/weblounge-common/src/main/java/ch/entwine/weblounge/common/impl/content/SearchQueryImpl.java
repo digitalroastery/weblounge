@@ -736,8 +736,6 @@ public class SearchQueryImpl implements SearchQuery {
       throw new IllegalArgumentException("Path prefix must not be null");
     if (!pathPrefix.startsWith(WebUrl.separator))
       pathPrefix = WebUrl.separatorChar + pathPrefix;
-    if (!pathPrefix.endsWith(WebUrl.separator))
-      pathPrefix = pathPrefix + WebUrl.separatorChar;
     return this;
   }
 

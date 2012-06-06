@@ -35,7 +35,7 @@ public interface SolrSchema {
   String PATH = "path";
 
   /** Path elements */
-  String PARENT_ELEMENTS = "path_elements";
+  String PATH_PREFIX = "path_prefix";
 
   /** Type field name */
   String TYPE = "type";
