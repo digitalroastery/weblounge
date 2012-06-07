@@ -21,19 +21,15 @@
 package ch.entwine.weblounge.contentrepository.impl;
 
 import ch.entwine.weblounge.cache.ResponseCacheTracker;
-import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation;
@@ -48,7 +44,6 @@ import ch.entwine.weblounge.common.content.repository.UnlockOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
-import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
@@ -58,12 +53,9 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.security.User;
-import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.operation.CurrentOperation;
 import ch.entwine.weblounge.contentrepository.impl.operation.DeleteContentOperationImpl;
 import ch.entwine.weblounge.contentrepository.impl.operation.DeleteOperationImpl;
@@ -74,16 +66,12 @@ import ch.entwine.weblounge.contentrepository.impl.operation.PutOperationImpl;
 import ch.entwine.weblounge.contentrepository.impl.operation.UnlockOperationImpl;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -280,9 +268,19 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           else if (uri.getPath() != null && !uri.getPath().equals(processedURI.getPath()))
             continue;
 
+          // Is a different version of the resource?
+          if (uri.getVersion() != processedURI.getVersion()) {
+            continue;
+          }
+
           // Is the resource simply being updated?
           if (op instanceof PutOperation<?>) {
             resource = ((PutOperation<?>) op).getResource();
+            continue;
+          }
+
+          // Is a different version of the resource being deleted?
+          if (op instanceof DeleteOperation && processedURI.getVersion() != uri.getVersion()) {
             continue;
           }
 
@@ -339,7 +337,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     for (ResourceURI u : getVersions(uri)) {
       Resource<T> r = (Resource<T>) get(u);
       r.lock(user);
-      PutOperation<T> putOp = new PutOperationImpl<T>(resource, false);
+      PutOperation<T> putOp = new PutOperationImpl<T>(r, false);
       try {
         CurrentOperation.set(putOp);
         put(r, false);
@@ -401,7 +399,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     for (ResourceURI u : getVersions(uri)) {
       Resource<T> r = (Resource<T>) get(u);
       r.unlock();
-      PutOperation<T> putOp = new PutOperationImpl<T>(resource, false);
+      PutOperation<T> putOp = new PutOperationImpl<T>(r, false);
       try {
         CurrentOperation.set(putOp);
         put(r, false);
@@ -526,9 +524,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Delete the index entries
     for (long revision : revisions) {
-      synchronized (processor) {
-        index.delete(new ResourceURIImpl(uri, revision));
-      }
+      index.delete(new ResourceURIImpl(uri, revision));
     }
 
     // Delete previews
@@ -980,20 +976,18 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throws ContentRepositoryException {
     Set<ResourceURI> uris = new HashSet<ResourceURI>(Arrays.asList(super.getVersions(uri)));
     Set<ResourceURI> removedUris = new HashSet<ResourceURI>();
-    synchronized (processor) {
-      for (ContentRepositoryOperation<?> op : processor.getOperations()) {
-        if (op instanceof PutOperation<?>) {
-          ResourceURI u = ((PutOperation<?>) op).getResource().getURI();
-          if (u.getIdentifier().equals(uri.getIdentifier())) {
-            uris.add(u);
-          }
-        } else if (op instanceof DeleteOperation) {
-          ResourceURI u = ((PutOperation<?>) op).getResource().getURI();
-          removedUris.add(u);
+    for (ContentRepositoryOperation<?> op : processor.getOperations()) {
+      if (op instanceof PutOperation<?>) {
+        ResourceURI u = ((PutOperation<?>) op).getResource().getURI();
+        if (u.getIdentifier().equals(uri.getIdentifier())) {
+          uris.add(u);
         }
+      } else if (op instanceof DeleteOperation) {
+        ResourceURI u = ((PutOperation<?>) op).getResource().getURI();
+        removedUris.add(u);
       }
-      uris.removeAll(removedUris);
     }
+    uris.removeAll(removedUris);
     return uris.toArray(new ResourceURI[uris.size()]);
   }
 
@@ -1135,231 +1129,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   }
 
   /**
-   * Worker implementation that creates a preview in a separate thread.
-   */
-  private static class PreviewGeneratorWorker implements Runnable {
-
-    private ContentRepository contentRepository = null;
-    private Resource<?> resource = null;
-    private List<ImageStyle> styles = null;
-    private Environment environment = null;
-    private Language language = null;
-    private String format = null;
-
-    /**
-     * Creates a new preview worker who will create the corresponding previews
-     * for the given resource and style.
-     * 
-     * @param resource
-     *          the resource
-     * @param environment
-     *          the current environment
-     * @param language
-     *          the language
-     * @param styles
-     *          the image styles
-     */
-    public PreviewGeneratorWorker(ContentRepository repository,
-        Resource<?> resource, Environment environment, Language language,
-        List<ImageStyle> styles, String format) {
-      this.contentRepository = repository;
-      this.resource = resource;
-      this.environment = environment;
-      this.language = language;
-      this.styles = styles;
-      this.format = format;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Runnable#run()
-     */
-    public void run() {
-      ResourceURI resourceURI = resource.getURI();
-      String resourceType = resourceURI.getType();
-
-      // Find the resource serializer
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
-      if (serializer == null) {
-        logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
-        return;
-      }
-
-      // Does the serializer come with a preview generator?
-      PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource);
-      if (previewGenerator == null) {
-        logger.debug("Resource type '{}' does not support previews", resourceType);
-        return;
-      }
-
-      // Create the original preview image for every language
-      ImageStyle original = new ImageStyleImpl("original");
-      File file = createPreview(resource, original, language, previewGenerator, format);
-      if (file == null || !file.exists() || file.length() == 0) {
-        logger.debug("Preview generation for {} failed", resource);
-        return;
-      }
-
-      // Create the scaled images
-      String mimeType = "image/" + format;
-      ResourceSerializer<?, ?> s = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
-      if (s == null) {
-        logger.warn("No resource serializer is capable of dealing with resources of format '{}'", mimeType);
-        return;
-      } else if (!(s instanceof ImageResourceSerializer)) {
-        logger.warn("Resource serializer lookup for format '{}' returned {}", format, s.getClass());
-        return;
-      }
-
-      // Find us an image serializer
-      ImageResourceSerializer irs = (ImageResourceSerializer) s;
-      ImagePreviewGenerator imagePreviewGenerator = (ImagePreviewGenerator) irs.getPreviewGenerator(format);
-      if (imagePreviewGenerator == null) {
-        logger.warn("Image resource serializer {} does not provide support for '{}'", irs, format);
-        return;
-      }
-
-      // Now scale the original preview according to the existing styles
-      for (ImageStyle style : styles) {
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        try {
-          fis = new FileInputStream(file);
-          File scaledFile = ImageStyleUtils.createScaledFile(resourceURI, file.getName(), language, style);
-          fos = new FileOutputStream(scaledFile);
-          imagePreviewGenerator.createPreview(file, environment, language, style, resourceType, fis, fos);
-        } catch (Throwable t) {
-          logger.error("Error scaling {}: {}", file, t.getMessage());
-          continue;
-        } finally {
-          IOUtils.closeQuietly(fis);
-          IOUtils.closeQuietly(fos);
-        }
-      }
-
-    }
-
-    /**
-     * Creates the actual preview.
-     * 
-     * @param resource
-     *          the resource
-     * @param style
-     *          the image style
-     * @param language
-     *          the language
-     * @param previewGenerator
-     *          the preview generator
-     * @param the
-     *          preview format
-     * @return returns the preview file
-     */
-    private File createPreview(Resource<?> resource, ImageStyle style,
-        Language language, PreviewGenerator previewGenerator, String format) {
-
-      ResourceURI resourceURI = resource.getURI();
-      String resourceType = resourceURI.getType();
-
-      // Create the filename
-      ResourceContent content = resource.getContent(language);
-      String filename = content != null ? content.getFilename() : resource.getIdentifier();
-      String suffix = previewGenerator.getSuffix(resource, language, style);
-      filename = FilenameUtils.getBaseName(filename) + "." + suffix;
-
-      // Initiate creation of previews
-      InputStream resourceInputStream = null;
-      InputStream contentRepositoryIs = null;
-      FileOutputStream fos = null;
-      File scaledResourceFile = null;
-
-      try {
-        scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
-
-        // Find the modification date
-        long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
-
-        // Create the file if it doesn't exist or if it is outdated
-        if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
-          contentRepositoryIs = contentRepository.getContent(resourceURI, language);
-
-          // Is this local content?
-          if (contentRepositoryIs == null && content != null && content.getExternalLocation() != null) {
-            contentRepositoryIs = content.getExternalLocation().openStream();
-          }
-
-          fos = new FileOutputStream(scaledResourceFile);
-          logger.debug("Creating preview of '{}' at {}", resource, scaledResourceFile);
-
-          previewGenerator.createPreview(resource, environment, language, style, format, contentRepositoryIs, fos);
-          if (scaledResourceFile.length() > 0) {
-            scaledResourceFile.setLastModified(lastModified);
-          } else {
-            File f = scaledResourceFile;
-            while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-              FileUtils.deleteQuietly(f);
-              f = f.getParentFile();
-            }
-          }
-        }
-
-      } catch (ContentRepositoryException e) {
-        logger.error("Error loading {} {} '{}' from {}: {}", new Object[] {
-            language,
-            resourceType,
-            resource,
-            this,
-            e.getMessage() });
-        logger.error(e.getMessage(), e);
-        IOUtils.closeQuietly(resourceInputStream);
-
-        File f = scaledResourceFile;
-        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-          FileUtils.deleteQuietly(f);
-          f = f.getParentFile();
-        }
-
-      } catch (IOException e) {
-        logger.warn("Error creating preview for {} '{}': {}", new Object[] {
-            resourceType,
-            resourceURI,
-            e.getMessage() });
-        IOUtils.closeQuietly(resourceInputStream);
-
-        File f = scaledResourceFile;
-        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-          FileUtils.deleteQuietly(f);
-          f = f.getParentFile();
-        }
-
-      } catch (Throwable t) {
-        logger.warn("Error creating preview for {} '{}': {}", new Object[] {
-            resourceType,
-            resourceURI,
-            t.getMessage() });
-        IOUtils.closeQuietly(resourceInputStream);
-
-        File f = scaledResourceFile;
-        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-          FileUtils.deleteQuietly(f);
-          f = f.getParentFile();
-        }
-
-      } finally {
-        IOUtils.closeQuietly(contentRepositoryIs);
-        IOUtils.closeQuietly(fos);
-      }
-
-      return scaledResourceFile;
-    }
-
-  }
-
-  /**
    * This class is used as a way to keep track of what has been added to the
    * repository but has not been flushed to disk.
    */
-  public static final class OperationProcessor {
+  public final class OperationProcessor {
 
     /** The operations counter */
     private Map<ResourceURI, List<ContentRepositoryOperation<?>>> operationsPerResource = new HashMap<ResourceURI, List<ContentRepositoryOperation<?>>>();
@@ -1377,6 +1150,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      * Creates a new operation processor.
      */
     public OperationProcessor(final WritableContentRepository repository) {
+      final OperationProcessor monitor = this;
       processorWorker = new Thread(new Runnable() {
         public void run() {
           while (keepRunning) {
@@ -1394,11 +1168,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
                 // Remove the operation form the operations list
                 synchronized (operations) {
                   operations.remove(op);
+                  operations.notifyAll();
                 }
 
                 // Tell everyone that we are down 1
-                synchronized (OperationProcessor.this) {
-                  OperationProcessor.this.notifyAll();
+                synchronized (monitor) {
+                  monitor.notifyAll();
                 }
               }
             }
@@ -1430,14 +1205,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      *          the uri
      * @return <code>true</code> if it contains a version of this resource
      */
-    public synchronized boolean isProcessingVersionOf(ResourceURI uri) {
-      for (ResourceURI u : operationsPerResource.keySet()) {
-        if (u.getIdentifier().equals(uri.getIdentifier())) {
-          ContentRepositoryOperation<?> currentOp = CurrentOperation.get();
-          if (currentOp instanceof ContentRepositoryResourceOperation<?>) {
-            ResourceURI currentURI = ((ContentRepositoryResourceOperation<?>) currentOp).getResourceURI();
-            if (!u.equals(currentURI))
-              return true;
+    public boolean isProcessingVersionOf(ResourceURI uri) {
+      synchronized (operations) {
+        for (ResourceURI u : operationsPerResource.keySet()) {
+          if (u.getIdentifier().equals(uri.getIdentifier())) {
+            ContentRepositoryOperation<?> currentOp = CurrentOperation.get();
+            if (currentOp instanceof ContentRepositoryResourceOperation<?>) {
+              ResourceURI currentURI = ((ContentRepositoryResourceOperation<?>) currentOp).getResourceURI();
+              if (!u.equals(currentURI))
+                return true;
+            }
           }
         }
       }
@@ -1452,10 +1229,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      *          the uri
      * @return <code>true</code> if the resource is being processed
      */
-    public synchronized boolean isProcessing(ResourceURI uri) {
-      for (ResourceURI u : operationsPerResource.keySet()) {
-        if (u.getIdentifier().equals(uri.getIdentifier()))
-          return true;
+    public boolean isProcessing(ResourceURI uri) {
+      synchronized (operations) {
+        for (ResourceURI u : operationsPerResource.keySet()) {
+          if (u.getIdentifier().equals(uri.getIdentifier()))
+            return true;
+        }
       }
       return false;
     }
@@ -1465,8 +1244,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      * 
      * @return the content repository operations
      */
-    public synchronized List<ContentRepositoryOperation<?>> getOperations() {
-      return operations;
+    public List<ContentRepositoryOperation<?>> getOperations() {
+      return new ArrayList<ContentRepositoryOperation<?>>(operations);
     }
 
     /**
@@ -1476,22 +1255,22 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      * @param operation
      *          the operation
      */
-    public synchronized void enqueue(ContentRepositoryOperation<?> operation) {
+    public void enqueue(ContentRepositoryOperation<?> operation) {
       operations.add(operation);
       synchronized (operations) {
-        operations.notify();
+        operations.notifyAll();
       }
     }
 
     /**
      * Stops the scheduler.
      */
-    public synchronized void stop() {
+    public void stop() {
       keepRunning = false;
       operationsPerResource.clear();
-      operations.clear();
       synchronized (operations) {
-        operations.notify();
+        operations.clear();
+        operations.notifyAll();
       }
     }
 
