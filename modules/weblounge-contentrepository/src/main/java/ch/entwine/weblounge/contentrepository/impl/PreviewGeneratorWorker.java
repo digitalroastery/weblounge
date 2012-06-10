@@ -45,6 +45,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -192,8 +193,9 @@ class PreviewGeneratorWorker implements Runnable {
       // Find the modification date
       long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
 
-      // Create the file if it doesn't exist or if it is out dated
-      if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
+      // Create the file if it doesn't exist or if it is out dated. Note that
+      // the last modified date of a file has a precision of seconds
+      if (!scaledResourceFile.isFile() || FileUtils.isFileOlder(scaledResourceFile, new Date(lastModified))) {
         contentRepositoryIs = contentRepository.getContent(resourceURI, language);
 
         // Is this local content?

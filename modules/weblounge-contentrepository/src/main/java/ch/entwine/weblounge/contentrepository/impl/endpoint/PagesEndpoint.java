@@ -1318,7 +1318,6 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     try {
       if (!page.isPublished())
         page.setPublished(user, startDate, endDate);
-      page.setModified(user, new Date());
       page.setVersion(Resource.LIVE);
       contentRepository.put(page);
       contentRepository.delete(workURI);
@@ -1433,7 +1432,6 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         logger.debug("Creating work version of {}", workURI);
         page.setVersion(Resource.WORK);
         page.setPublished(null, null, null);
-        page.setModified(user, new Date());
         contentRepository.put(page);
       }
       logger.info("Page {} has been unpublished by {}", liveURI, user);
