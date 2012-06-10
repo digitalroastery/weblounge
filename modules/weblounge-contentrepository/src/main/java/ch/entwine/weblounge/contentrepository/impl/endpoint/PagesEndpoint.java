@@ -554,11 +554,11 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Does the page exist?
     Page currentPage = null;
     try {
-      if (!contentRepository.exists(workURI)) {
+      currentPage = (Page) contentRepository.get(workURI);
+      if (currentPage == null) {
         logger.warn("Attempt to update a page without creating a work version first");
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
-      currentPage = (Page) contentRepository.get(workURI);
       workURI.setPath(currentPage.getURI().getPath());
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", workURI, e.getMessage());
@@ -793,8 +793,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     Page page = null;
     try {
-      if (contentRepository.exists(livePageURI)) {
-        page = (Page) contentRepository.get(livePageURI);
+      page = (Page) contentRepository.get(livePageURI);
+      if (page != null) {
         livePageURI.setPath(page.getURI().getPath());
       } else {
         page = (Page) contentRepository.get(workPageURI);
@@ -1003,14 +1003,14 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // to be created as a result of the lock operation
     try {
       ResourceURI liveURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
-      if (!contentRepository.exists(workURI)) {
+      page = (Page) contentRepository.get(workURI);
+      if (page == null) {
         logger.debug("Creating work version of {}", liveURI);
         page = (Page) contentRepository.get(liveURI);
         liveURI.setPath(page.getURI().getPath());
         page.setVersion(Resource.WORK);
-        contentRepository.putAsynchronously(page);
+        contentRepository.putAsynchronously(page, false);
       } else {
-        page = (Page) contentRepository.get(workURI);
         workURI.setPath(page.getURI().getPath());
       }
     } catch (ContentRepositoryException e) {
@@ -1113,9 +1113,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Does the page exist?
     Page page = null;
     try {
-      if (!contentRepository.existsInAnyVersion(pageURI))
+      ResourceURI[] versions = contentRepository.getVersions(pageURI);
+      if (versions.length == 0)
         throw new WebApplicationException(Status.NOT_FOUND);
-      page = (Page) contentRepository.get(contentRepository.getVersions(pageURI)[0]);
+      page = (Page) contentRepository.get(versions[0]);
+      if (page == null)
+        throw new WebApplicationException(Status.NOT_FOUND);
       pageURI.setPath(page.getURI().getPath());
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
@@ -1224,9 +1227,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     try {
       if (!contentRepository.existsInAnyVersion(workURI))
         throw new WebApplicationException(Status.NOT_FOUND);
-      if (!contentRepository.exists(workURI))
-        throw new WebApplicationException(Status.PRECONDITION_FAILED);
       page = (Page) contentRepository.get(workURI);
+      if (page == null)
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
       workURI.setPath(page.getURI().getPath());
     } catch (ContentRepositoryException e) {
       logger.warn("Error looking up page {} from repository: {}", workURI, e.getMessage());

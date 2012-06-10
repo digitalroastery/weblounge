@@ -222,6 +222,86 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI)
+   */
+  @Override
+  public boolean exists(ResourceURI uri) throws ContentRepositoryException {
+    for (ResourceURI u : getVersions(uri)) {
+      if (u.equals(uri))
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#existsInAnyVersion(ch.entwine.weblounge.common.content.ResourceURI)
+   */
+  @Override
+  public boolean existsInAnyVersion(ResourceURI uri)
+      throws ContentRepositoryException {
+    return getVersions(uri).length > 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#getVersions(ch.entwine.weblounge.common.content.ResourceURI)
+   */
+  @Override
+  public ResourceURI[] getVersions(ResourceURI uri)
+      throws ContentRepositoryException {
+    Set<ResourceURI> uris = new HashSet<ResourceURI>();
+    uris.addAll(Arrays.asList(super.getVersions(uri)));
+
+    // Get hold of the current operation
+    ContentRepositoryOperation<?> currentOperation = CurrentOperation.get();
+
+    // Iterate over the resources that are currently being processed
+    synchronized (processor) {
+      for (ContentRepositoryOperation<?> op : processor.getOperations()) {
+
+        // Is this a resource operation?
+        if (!(op instanceof ContentRepositoryResourceOperation<?>))
+          continue;
+
+        // Don't move beyond the current state of work
+        if (op == currentOperation)
+          break;
+
+        ContentRepositoryResourceOperation<?> resourceOp = (ContentRepositoryResourceOperation<?>) op;
+        ResourceURI processedURI = resourceOp.getResourceURI();
+
+        // Is it a different resource?
+        if (uri.getIdentifier() != null && !uri.getIdentifier().equals(processedURI.getIdentifier()))
+          continue;
+        else if (uri.getPath() != null && !uri.getPath().equals(processedURI.getPath()))
+          continue;
+
+        // Is a different version of the resource?
+        if (uri.getVersion() != processedURI.getVersion())
+          continue;
+
+        // Is the resource simply being updated?
+        if (op instanceof PutOperation<?>) {
+          uris.add(resourceOp.getResourceURI());
+        }
+
+        // Is a different version of the resource being deleted?
+        if (op instanceof DeleteOperation) {
+          uris.remove(resourceOp.getResourceURI());
+        }
+
+      }
+    }
+
+    return uris.toArray(new ResourceURI[uris.size()]);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @Override
@@ -269,9 +349,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
             continue;
 
           // Is a different version of the resource?
-          if (uri.getVersion() != processedURI.getVersion()) {
+          if (uri.getVersion() != processedURI.getVersion())
             continue;
-          }
 
           // Is the resource simply being updated?
           if (op instanceof PutOperation<?>) {
@@ -287,6 +366,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           // In all other cases it's impossible to predict what's happening
           // to the resource (deletion may fail, locking as well...)
           waitOnProcessing = true;
+          break;
         }
 
         // If there are still conflicts, let's wait
@@ -965,31 +1045,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     processor.enqueue(deleteContentOperation);
     return deleteContentOperation;
   };
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#getVersions(ch.entwine.weblounge.common.content.ResourceURI)
-   */
-  @Override
-  public ResourceURI[] getVersions(ResourceURI uri)
-      throws ContentRepositoryException {
-    Set<ResourceURI> uris = new HashSet<ResourceURI>(Arrays.asList(super.getVersions(uri)));
-    Set<ResourceURI> removedUris = new HashSet<ResourceURI>();
-    for (ContentRepositoryOperation<?> op : processor.getOperations()) {
-      if (op instanceof PutOperation<?>) {
-        ResourceURI u = ((PutOperation<?>) op).getResource().getURI();
-        if (u.getIdentifier().equals(uri.getIdentifier())) {
-          uris.add(u);
-        }
-      } else if (op instanceof DeleteOperation) {
-        ResourceURI u = ((PutOperation<?>) op).getResource().getURI();
-        removedUris.add(u);
-      }
-    }
-    uris.removeAll(removedUris);
-    return uris.toArray(new ResourceURI[uris.size()]);
-  }
 
   /**
    * Writes a new resource to the repository storage.
