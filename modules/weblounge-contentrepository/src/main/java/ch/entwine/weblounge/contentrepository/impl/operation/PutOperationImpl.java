@@ -88,7 +88,7 @@ public final class PutOperationImpl<T extends ResourceContent> extends AbstractC
   @Override
   protected Resource<T> run(WritableContentRepository repository)
       throws ContentRepositoryException, IOException {
-    return repository.put(resource);
+    return repository.put(resource, updatePreviews);
   }
 
 }
