@@ -600,7 +600,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       page.setVersion(Resource.WORK);
 
       // TODO: wait for Future and update update listener
-      contentRepository.putAsynchronously(page);
+      contentRepository.putAsynchronously(page, false);
 
       // Check if the page has been moved
       String currentPath = currentPage.getURI().getPath();
@@ -1322,8 +1322,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       if (!page.isPublished())
         page.setPublished(user, startDate, endDate);
       page.setVersion(Resource.LIVE);
-      contentRepository.put(page);
-      contentRepository.delete(workURI);
+      contentRepository.putAsynchronously(page, true);
+      contentRepository.deleteAsynchronously(workURI);
       logger.info("Page {} has been published by {}", workURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to publish page {} of site '{}' without permission", workURI, site);
