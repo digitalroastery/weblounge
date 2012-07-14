@@ -306,31 +306,35 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     WebUrl url = request.getUrl();
     Site site = request.getSite();
 
-    // Load the target page used to render the action
-    Page page = null;
     try {
-      page = getTargetPage(action, request);
-      request.setAttribute(WebloungeRequest.PAGE, page);
-      // TODO: Check access rights with action configuration
-    } catch (ContentRepositoryException e) {
-      logger.error("Error loading target page for action {} at {}", action, url);
-      DispatchUtils.sendInternalError(request, response);
-      return;
-    }
+      // Have the action validate the request
+      response.setContentType("text/html");
+      action.configure(request, response, RequestFlavor.HTML);
 
-    // Get hold of the page template
-    PageTemplate template = null;
-    try {
-      template = getTargetTemplate(action, page, request);
-      if (template == null)
-        template = site.getDefaultTemplate();
-    } catch (IllegalStateException e) {
-      logger.warn(e.getMessage());
-      DispatchUtils.sendInternalError(request, response);
-    }
+      // Load the target page used to render the action
+      Page page = null;
+      try {
+        page = getTargetPage(action, request);
+        request.setAttribute(WebloungeRequest.PAGE, page);
+        // TODO: Check access rights with action configuration
+      } catch (ContentRepositoryException e) {
+        logger.error("Error loading target page for action {} at {}", action, url);
+        DispatchUtils.sendInternalError(request, response);
+        return;
+      }
 
-    // Finally, let's get some work done!
-    try {
+      // Get hold of the page template
+      PageTemplate template = null;
+      try {
+        template = getTargetTemplate(action, page, request);
+        if (template == null)
+          template = site.getDefaultTemplate();
+      } catch (IllegalStateException e) {
+        logger.warn(e.getMessage());
+        DispatchUtils.sendInternalError(request, response);
+      }
+      
+      // Save action, page and template in the request for later use
       request.setAttribute(WebloungeRequest.ACTION, action);
       request.setAttribute(WebloungeRequest.PAGE, page);
       request.setAttribute(WebloungeRequest.TEMPLATE, template);
@@ -340,10 +344,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         ((HTMLAction) action).setTemplate(template);
         ((HTMLAction) action).setPage(page);
       }
-
-      // Have the action validate the request
-      response.setContentType("text/html");
-      action.configure(request, response, RequestFlavor.HTML);
 
       // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
