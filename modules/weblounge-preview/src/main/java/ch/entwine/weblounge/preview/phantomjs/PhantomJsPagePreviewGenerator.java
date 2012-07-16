@@ -82,7 +82,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
   private static final String SCRIPT_FILE = "/phantomjs/render.js";
 
   /** The preview generators */
-  private List<ImagePreviewGenerator> previewGenerators = new ArrayList<ImagePreviewGenerator>();
+  private final List<ImagePreviewGenerator> previewGenerators = new ArrayList<ImagePreviewGenerator>();
 
   /** The preview generator service tracker */
   private ServiceTracker previewGeneratorTracker = null;
@@ -297,7 +297,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
     try {
       // Create the temporary directory for everything PhantomJS
       phantomTmpDir = new File(FileUtils.getTempDirectory(), "phantomjs");
-      if (!phantomTmpDir.mkdirs()) {
+      if (!phantomTmpDir.isDirectory() && !phantomTmpDir.mkdirs()) {
         logger.error("Unable to create temp directory for PhantomJS at {}", phantomTmpDir);
         throw new IOException("Unable to create temp directory for PhantomJS at " + phantomTmpDir);
       }
