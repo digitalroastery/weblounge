@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * This class implements the basis for an asynchronously executed content
  * repository operation.
  */
-public abstract class AbstractContentRepositoryOperation<T extends Object> implements ContentRepositoryOperation<T> {
+public abstract class AbstractContentRepositoryOperation<T> implements ContentRepositoryOperation<T> {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(AbstractContentRepositoryOperation.class);
@@ -66,7 +66,7 @@ public abstract class AbstractContentRepositoryOperation<T extends Object> imple
   private boolean isRunning = true;
 
   /** The operation listener */
-  private ContentRepositoryOperationListener internalListener;
+  private final ContentRepositoryOperationListener internalListener;
 
   /**
    * Creates a new content repository operation.

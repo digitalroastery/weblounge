@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl.operation;
 
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.DeleteOperation;
@@ -31,7 +33,7 @@ import java.io.IOException;
 /**
  * This operation implements a delete of the given resource.
  */
-public final class DeleteOperationImpl extends AbstractContentRepositoryOperation<Boolean> implements DeleteOperation {
+public final class DeleteOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<Boolean> implements DeleteOperation<C, R> {
 
   /** True if all versions of this resource should be removed */
   private boolean allVersions = false;
@@ -59,6 +61,20 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
    */
   public ResourceURI getResourceURI() {
     return uri;
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation return <code>null</code> if the resource's uri equals
+   * that of this operation.
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   */
+  public R apply(R resource) {
+    if (!uri.equals(resource.getURI()))
+      return resource;
+    return null;
   }
 
   /**

@@ -66,7 +66,8 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
    * 
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.entwine.weblounge.common.content.Resource)
    */
-  protected <T extends ResourceContent, R extends Resource<T>> R storeResource(
+  @Override
+  protected <C extends ResourceContent, R extends Resource<C>> R storeResource(
       R resource) throws IOException {
     // TODO Auto-generated method stub
     return resource;
@@ -88,6 +89,7 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
    * 
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#openStreamToResource(ch.entwine.weblounge.common.content.ResourceURI)
    */
+  @Override
   protected InputStream openStreamToResource(ResourceURI uri)
       throws IOException {
     // TODO Auto-generated method stub
@@ -135,8 +137,9 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
    *      ch.entwine.weblounge.common.content.ResourceContent,
    *      java.io.InputStream)
    */
-  protected <T extends ResourceContent> T storeResourceContent(ResourceURI uri,
-      T content, InputStream is) throws IOException {
+  @Override
+  protected <C extends ResourceContent, R extends Resource<C>> C storeResourceContent(
+      ResourceURI uri, C content, InputStream is) throws IOException {
     // TODO Auto-generated method stub
     return content;
   }
@@ -148,8 +151,8 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
    *      ch.entwine.weblounge.common.content.ResourceContent)
    */
   @Override
-  protected <T extends ResourceContent> void deleteResourceContent(
-      ResourceURI uri, T content) throws IOException {
+  protected <C extends ResourceContent, R extends Resource<C>> void deleteResourceContent(
+      ResourceURI uri, C content) throws IOException {
     // TODO Auto-generated method stub
 
   }

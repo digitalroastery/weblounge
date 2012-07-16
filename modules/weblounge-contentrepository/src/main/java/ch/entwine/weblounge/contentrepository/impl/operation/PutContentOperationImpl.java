@@ -33,13 +33,13 @@ import java.io.InputStream;
 /**
  * This operation implements a put of content to the given resource.
  */
-public final class PutContentOperationImpl<T extends ResourceContent> extends AbstractContentRepositoryOperation<Resource<T>> implements PutContentOperation<T> {
+public final class PutContentOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<R> implements PutContentOperation<C, R> {
 
   /** The resource to be locked */
   private ResourceURI uri = null;
 
   /** The resource content */
-  private T content = null;
+  private C content = null;
 
   /** The data stream */
   private InputStream inputStream = null;
@@ -54,7 +54,7 @@ public final class PutContentOperationImpl<T extends ResourceContent> extends Ab
    * @param is
    *          the input stream
    */
-  public PutContentOperationImpl(ResourceURI uri, T content, InputStream is) {
+  public PutContentOperationImpl(ResourceURI uri, C content, InputStream is) {
     this.uri = uri;
     this.content = content;
     this.inputStream = is;
@@ -72,9 +72,21 @@ public final class PutContentOperationImpl<T extends ResourceContent> extends Ab
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   */
+  public R apply(R resource) {
+    if (!uri.equals(resource.getURI()))
+      return resource;
+    resource.addContent(content);
+    return resource;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.PutContentOperation#getContent()
    */
-  public T getContent() {
+  public C getContent() {
     return content;
   }
 
@@ -92,10 +104,11 @@ public final class PutContentOperationImpl<T extends ResourceContent> extends Ab
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
+  @SuppressWarnings("unchecked")
   @Override
-  protected Resource<T> run(WritableContentRepository repository)
+  protected R run(WritableContentRepository repository)
       throws ContentRepositoryException, IOException, IllegalStateException {
-    return repository.putContent(uri, content, inputStream);
+    return (R) repository.putContent(uri, content, inputStream);
   }
 
 }

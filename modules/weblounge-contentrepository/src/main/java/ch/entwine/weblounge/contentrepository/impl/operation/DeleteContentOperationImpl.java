@@ -32,13 +32,13 @@ import java.io.IOException;
 /**
  * This operation implements a removal of content from the given resource.
  */
-public final class DeleteContentOperationImpl<T extends ResourceContent> extends AbstractContentRepositoryOperation<Resource<T>> implements DeleteContentOperation<T> {
+public final class DeleteContentOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<R> implements DeleteContentOperation<C, R> {
 
   /** The resource to be locked */
   private ResourceURI uri = null;
 
   /** The resource content */
-  private T content = null;
+  private C content = null;
 
   /**
    * Creates a new delete content operation for the given resource.
@@ -48,9 +48,24 @@ public final class DeleteContentOperationImpl<T extends ResourceContent> extends
    * @param content
    *          the resource content
    */
-  public DeleteContentOperationImpl(ResourceURI uri, T content) {
+  public DeleteContentOperationImpl(ResourceURI uri, C content) {
     this.uri = uri;
     this.content = content;
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation removes the content from the resource if the resource's
+   * uri matches this operation's uri.
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   */
+  public R apply(R resource) {
+    if (!uri.equals(resource.getURI()))
+      return resource;
+    resource.removeContent(content.getLanguage());
+    return resource;
   }
 
   /**
@@ -67,7 +82,7 @@ public final class DeleteContentOperationImpl<T extends ResourceContent> extends
    * 
    * @see ch.entwine.weblounge.common.content.repository.PutContentOperation#getContent()
    */
-  public T getContent() {
+  public C getContent() {
     return content;
   }
 
@@ -76,10 +91,11 @@ public final class DeleteContentOperationImpl<T extends ResourceContent> extends
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
+  @SuppressWarnings("unchecked")
   @Override
-  protected Resource<T> run(WritableContentRepository repository)
+  protected R run(WritableContentRepository repository)
       throws ContentRepositoryException, IOException, IllegalStateException {
-    return repository.deleteContent(uri, content);
+    return (R) repository.deleteContent(uri, content);
   }
 
 }

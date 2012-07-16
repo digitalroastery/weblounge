@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.impl;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
@@ -272,7 +273,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
-  public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
+  @SuppressWarnings("unchecked")
+  public <R extends Resource<? extends ResourceContent>> R get(
+      ResourceURI uri)
+          throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
@@ -316,7 +320,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
         }
         ResourceReader<?, ?> reader = serializer.getReader();
         is = IOUtils.toInputStream(searchResultItem.getResourceXml(), "utf-8");
-        return reader.read(is, site);
+        return (R) reader.read(is, site);
       } catch (Throwable t) {
         logger.error("Error loading {}: {}", uri, t.getMessage());
         throw new ContentRepositoryException(t);
@@ -325,7 +329,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       }
     } else {
       try {
-        Resource<?> resource = loadResource(uri);
+        R resource = (R) loadResource(uri);
         if (resource == null) {
           logger.error("Index inconsistency detected: version '{}' of {} does not exist on disk", ResourceUtils.getVersionString(uri.getVersion()), uri);
           return null;
@@ -547,7 +551,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    *           if populating the index fails
    */
   protected abstract ContentRepositoryIndex loadIndex() throws IOException,
-      ContentRepositoryException;
+  ContentRepositoryException;
 
   /**
    * {@inheritDoc}

@@ -33,7 +33,7 @@ import java.io.IOException;
 /**
  * This operation implements a lock on the given resource.
  */
-public final class LockOperationImpl<T extends ResourceContent> extends AbstractContentRepositoryOperation<Resource<T>> implements LockOperation<T> {
+public final class LockOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<R> implements LockOperation<C, R> {
 
   /** The potential lock owner */
   private User user = null;
@@ -66,6 +66,25 @@ public final class LockOperationImpl<T extends ResourceContent> extends Abstract
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   */
+  public R apply(R resource) {
+
+    // Is it a different resource? We care about id and path, but not about
+    // version
+    ResourceURI u = resource.getURI();
+    if (uri.getIdentifier() != null && !uri.getIdentifier().equals(u.getIdentifier()))
+      return resource;
+    else if (uri.getPath() != null && !uri.getPath().equals(u.getPath()))
+      return resource;
+
+    resource.lock(user);
+    return resource;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.LockOperation#getUser()
    */
   public User getUser() {
@@ -77,10 +96,11 @@ public final class LockOperationImpl<T extends ResourceContent> extends Abstract
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
+  @SuppressWarnings("unchecked")
   @Override
-  protected Resource<T> run(WritableContentRepository repository)
+  protected R run(WritableContentRepository repository)
       throws ContentRepositoryException, IOException, IllegalStateException {
-    return repository.lock(uri, user);
+    return (R) repository.lock(uri, user);
   }
 
 }

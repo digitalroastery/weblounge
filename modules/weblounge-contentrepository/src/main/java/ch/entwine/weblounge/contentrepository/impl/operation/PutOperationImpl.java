@@ -32,10 +32,10 @@ import java.io.IOException;
 /**
  * This operation implements a put of the given resource.
  */
-public final class PutOperationImpl<T extends ResourceContent> extends AbstractContentRepositoryOperation<Resource<T>> implements PutOperation<T> {
+public final class PutOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<R> implements PutOperation<C, R> {
 
   /** The resource to be locked */
-  private Resource<T> resource = null;
+  private Resource<C> resource = null;
 
   /** Whether to update the preview as part of this put operation */
   private boolean updatePreviews = true;
@@ -48,17 +48,17 @@ public final class PutOperationImpl<T extends ResourceContent> extends AbstractC
    * @param updatePreviews
    *          whether to update the resource's previews
    */
-  public PutOperationImpl(Resource<T> resource, boolean updatePreviews) {
+  public PutOperationImpl(Resource<C> resource, boolean updatePreviews) {
     this.resource = resource;
     this.updatePreviews = updatePreviews;
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the resource.
    * 
-   * @see ch.entwine.weblounge.common.content.repository.PutOperation#getResource()
+   * @return the resource
    */
-  public Resource<T> getResource() {
+  public Resource<C> getResource() {
     return resource;
   }
 
@@ -69,6 +69,18 @@ public final class PutOperationImpl<T extends ResourceContent> extends AbstractC
    */
   public ResourceURI getResourceURI() {
     return resource.getURI();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   */
+  @SuppressWarnings("unchecked")
+  public R apply(R resource) {
+    if (!this.resource.equals(resource))
+      return resource;
+    return (R) this.resource;
   }
 
   /**
@@ -85,10 +97,11 @@ public final class PutOperationImpl<T extends ResourceContent> extends AbstractC
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
+  @SuppressWarnings("unchecked")
   @Override
-  protected Resource<T> run(WritableContentRepository repository)
+  protected R run(WritableContentRepository repository)
       throws ContentRepositoryException, IOException {
-    return repository.put(resource, updatePreviews);
+    return (R) repository.put(resource, updatePreviews);
   }
 
 }

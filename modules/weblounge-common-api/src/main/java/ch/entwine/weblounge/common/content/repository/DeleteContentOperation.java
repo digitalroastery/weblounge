@@ -27,13 +27,13 @@ import ch.entwine.weblounge.common.content.ResourceContent;
  * The delete operation represents the removal of a resource from the content
  * repository.
  */
-public interface DeleteContentOperation<T extends ResourceContent> extends ContentRepositoryResourceOperation<Resource<T>> {
+public interface DeleteContentOperation<C extends ResourceContent, R extends Resource<C>> extends ContentRepositoryResourceOperation<C, R, R> {
 
   /**
    * Returns the resource content that is to be deleted from the resource.
    * 
    * @return the resource content
    */
-  T getContent();
+  C getContent();
 
 }

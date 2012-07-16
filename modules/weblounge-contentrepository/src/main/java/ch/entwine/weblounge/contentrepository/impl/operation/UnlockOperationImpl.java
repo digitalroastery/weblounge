@@ -33,7 +33,7 @@ import java.io.IOException;
 /**
  * This operation implements an unlock of the given resource.
  */
-public final class UnlockOperationImpl<T extends ResourceContent> extends AbstractContentRepositoryOperation<Resource<T>> implements UnlockOperation<T> {
+public final class UnlockOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<R> implements UnlockOperation<C, R> {
 
   /** The potential lock owner */
   private User user = null;
@@ -66,6 +66,25 @@ public final class UnlockOperationImpl<T extends ResourceContent> extends Abstra
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   */
+  public R apply(R resource) {
+
+    // Is it a different resource? We care about id and path, but not about
+    // version
+    ResourceURI u = resource.getURI();
+    if (uri.getIdentifier() != null && !uri.getIdentifier().equals(u.getIdentifier()))
+      return resource;
+    else if (uri.getPath() != null && !uri.getPath().equals(u.getPath()))
+      return resource;
+
+    resource.unlock();
+    return resource;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.repository.UnlockOperation#getUser()
    */
   public User getUser() {
@@ -77,10 +96,11 @@ public final class UnlockOperationImpl<T extends ResourceContent> extends Abstra
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
+  @SuppressWarnings("unchecked")
   @Override
-  protected Resource<T> run(WritableContentRepository repository)
+  protected R run(WritableContentRepository repository)
       throws ContentRepositoryException, IOException {
-    return repository.unlock(uri, user);
+    return (R) repository.unlock(uri, user);
   }
 
 }

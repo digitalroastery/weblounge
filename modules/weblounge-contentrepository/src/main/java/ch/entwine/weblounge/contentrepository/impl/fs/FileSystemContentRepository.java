@@ -731,7 +731,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.entwine.weblounge.common.content.resource.Resource)
    */
   @Override
-  protected <T extends ResourceContent, R extends Resource<T>> R storeResource(
+  protected <C extends ResourceContent, R extends Resource<C>> R storeResource(
       R resource) throws IOException {
     File resourceUrl = uriToFile(resource.getURI());
     InputStream is = null;
@@ -758,8 +758,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      java.io.InputStream)
    */
   @Override
-  protected <T extends ResourceContent> T storeResourceContent(ResourceURI uri,
-      T content, InputStream is) throws IOException {
+  protected <C extends ResourceContent, R extends Resource<C>> C storeResourceContent(
+      ResourceURI uri, C content, InputStream is) throws IOException {
 
     if (is == null)
       return content;
@@ -789,8 +789,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#deleteResourceContent(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.content.ResourceContent)
    */
-  protected <T extends ResourceContent> void deleteResourceContent(
-      ResourceURI uri, T content) throws IOException {
+  @Override
+  protected <C extends ResourceContent, R extends Resource<C>> void deleteResourceContent(
+      ResourceURI uri, C content) throws IOException {
     File contentFile = uriToContentFile(uri, content);
     if (contentFile == null)
       throw new IOException("Resource content " + contentFile + " does not exist");
@@ -804,7 +805,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   protected ContentRepositoryIndex loadIndex() throws IOException,
-      ContentRepositoryException {
+  ContentRepositoryException {
     logger.debug("Trying to load site index from {}", idxRootDir);
     return loadIndex(idxRootDir);
   }
@@ -821,7 +822,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *           if creating the content repository index fails
    */
   protected ContentRepositoryIndex loadIndex(File idxRoot) throws IOException,
-      ContentRepositoryException {
+  ContentRepositoryException {
 
     ContentRepositoryIndex idx = null;
 

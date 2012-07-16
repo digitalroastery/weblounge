@@ -201,7 +201,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws ContentRepositoryException
    */
   protected void createHomepage() throws IllegalStateException,
-      ContentRepositoryException {
+  ContentRepositoryException {
     // Make sure there is a home page
     ResourceURI homeURI = new ResourceURIImpl(Page.TYPE, site, "/");
     if (!existsInAnyVersion(homeURI)) {
@@ -263,14 +263,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       for (ContentRepositoryOperation<?> op : processor.getOperations()) {
 
         // Is this a resource operation?
-        if (!(op instanceof ContentRepositoryResourceOperation<?>))
+        if (!(op instanceof ContentRepositoryResourceOperation<?, ?, ?>))
           continue;
 
         // Don't move beyond the current state of work
         if (op == currentOperation)
           break;
 
-        ContentRepositoryResourceOperation<?> resourceOp = (ContentRepositoryResourceOperation<?>) op;
+        ContentRepositoryResourceOperation<?, ?, ?> resourceOp = (ContentRepositoryResourceOperation<?, ?, ?>) op;
         ResourceURI processedURI = resourceOp.getResourceURI();
 
         // Is it a different resource?
@@ -284,7 +284,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           continue;
 
         // Is the resource simply being updated?
-        if (op instanceof PutOperation<?>) {
+        if (op instanceof PutOperation<?, ?>) {
           uris.add(resourceOp.getResourceURI());
         }
 
@@ -304,80 +304,31 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
+  @SuppressWarnings("unchecked")
   @Override
-  public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
+  public <R extends Resource<? extends ResourceContent>> R get(ResourceURI uri)
+      throws ContentRepositoryException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Check if resource is in temporary cache and wait until it's clear which
     // version is the latest one
-    Resource<?> resource = null;
-    boolean waitOnProcessing = true;
-    ContentRepositoryOperation<?> currentOperation = CurrentOperation.get();
+    R resource = super.get(uri);
 
-    while (waitOnProcessing) {
-      waitOnProcessing = false;
+    // Iterate over the resources that are currently being processed
+    synchronized (processor) {
+      for (ContentRepositoryOperation<?> op : processor.getOperations()) {
 
-      // Iterate over the resources that are currently being processed
-      synchronized (processor) {
-        for (ContentRepositoryOperation<?> op : processor.getOperations()) {
+        // Is this a resource operation?
+        if (!(op instanceof ContentRepositoryResourceOperation<?, ?, ?>))
+          continue;
 
-          // Is it the current operation
-          if (op == currentOperation)
-            continue;
-
-          // Is this a resource operation?
-          if (!(op instanceof ContentRepositoryResourceOperation<?>))
-            continue;
-
-          // Lock operations need to read resources
-          if (currentOperation instanceof LockOperation<?>)
-            continue;
-
-          // Unlock operations need to read resources
-          if (currentOperation instanceof UnlockOperation<?>)
-            continue;
-
-          ContentRepositoryResourceOperation<?> resourceOp = (ContentRepositoryResourceOperation<?>) op;
-          ResourceURI processedURI = resourceOp.getResourceURI();
-
-          // Is it a different resource?
-          if (uri.getIdentifier() != null && !uri.getIdentifier().equals(processedURI.getIdentifier()))
-            continue;
-          else if (uri.getPath() != null && !uri.getPath().equals(processedURI.getPath()))
-            continue;
-
-          // Is a different version of the resource?
-          if (uri.getVersion() != processedURI.getVersion())
-            continue;
-
-          // Is the resource simply being updated?
-          if (op instanceof PutOperation<?>) {
-            resource = ((PutOperation<?>) op).getResource();
-            continue;
-          }
-
-          // Is a different version of the resource being deleted?
-          if (op instanceof DeleteOperation && processedURI.getVersion() != uri.getVersion()) {
-            continue;
-          }
-
-          // In all other cases it's impossible to predict what's happening
-          // to the resource (deletion may fail, locking as well...)
-          waitOnProcessing = true;
-          break;
-        }
-
-        // If there are still conflicts, let's wait
-        if (waitOnProcessing) {
-          try {
-            processor.wait();
-          } catch (InterruptedException e) {
-            logger.warn("Interrupted while waiting for resource processing");
-          }
-        }
+        // Apply the changes to the original resource
+        ContentRepositoryResourceOperation<?, R, ?> resourceOp = (ContentRepositoryResourceOperation<?, R, ?>) op;
+        resource = resourceOp.apply(resource);
       }
+
     }
 
     // If we found a resource, let's return it
@@ -395,15 +346,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *      ch.entwine.weblounge.common.security.User)
    */
   @SuppressWarnings("unchecked")
-  public <T extends ResourceContent> Resource<T> lock(ResourceURI uri, User user)
-      throws IllegalStateException, ContentRepositoryException, IOException {
+  public <C extends ResourceContent, R extends Resource<C>> R lock(
+      ResourceURI uri, User user) throws IllegalStateException,
+      ContentRepositoryException, IOException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Is this a new request or a scheduled asynchronous execution?
-    if (!(CurrentOperation.get() instanceof LockOperation<?>)) {
-      return (Resource<T>) lockAsynchronously(uri, user).get();
+    if (!(CurrentOperation.get() instanceof LockOperation<?, ?>)) {
+      return (R) lockAsynchronously(uri, user).get();
     }
 
     // Check if resource is in temporary cache already by another operation
@@ -412,12 +364,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Update all resources in memory
-    Resource<T> resource = null;
+    R resource = null;
     ContentRepositoryOperation<?> lockOperation = CurrentOperation.get();
     for (ResourceURI u : getVersions(uri)) {
-      Resource<T> r = (Resource<T>) get(u);
+      R r = (R) get(u);
       r.lock(user);
-      PutOperation<T> putOp = new PutOperationImpl<T>(r, false);
+      PutOperation<C, R> putOp = new PutOperationImpl<C, R>(r, false);
       try {
         CurrentOperation.set(putOp);
         put(r, false);
@@ -437,14 +389,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#lockAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.security.User)
    */
-  public <T extends ResourceContent> LockOperation<T> lockAsynchronously(
+  public <C extends ResourceContent, R extends Resource<C>> LockOperation<C, R> lockAsynchronously(
       final ResourceURI uri, final User user) throws IOException,
       ContentRepositoryException, IllegalStateException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
-    LockOperation<T> lockOperation = new LockOperationImpl<T>(uri, user);
+    LockOperation<C, R> lockOperation = new LockOperationImpl<C, R>(uri, user);
     processor.enqueue(lockOperation);
     return lockOperation;
   }
@@ -456,16 +408,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *      ch.entwine.weblounge.common.security.User)
    */
   @SuppressWarnings("unchecked")
-  public <T extends ResourceContent> Resource<T> unlock(ResourceURI uri,
-      User user) throws ContentRepositoryException, IllegalStateException,
-      IOException {
+  public <C extends ResourceContent, R extends Resource<C>> R unlock(
+      ResourceURI uri, User user) throws ContentRepositoryException,
+      IllegalStateException, IOException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Is this a new request or a scheduled asynchronous execution?
-    if (!(CurrentOperation.get() instanceof UnlockOperation<?>)) {
-      return (Resource<T>) unlockAsynchronously(uri, user).get();
+    if (!(CurrentOperation.get() instanceof UnlockOperation<?, ?>)) {
+      return (R) unlockAsynchronously(uri, user).get();
     }
 
     // Check if resource is in temporary cache already by another operation
@@ -474,12 +426,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Update all resources in memory
-    Resource<T> resource = null;
+    R resource = null;
     ContentRepositoryOperation<?> unlockOperation = CurrentOperation.get();
     for (ResourceURI u : getVersions(uri)) {
-      Resource<T> r = (Resource<T>) get(u);
+      R r = get(u);
       r.unlock();
-      PutOperation<T> putOp = new PutOperationImpl<T>(r, false);
+      PutOperation<C, R> putOp = new PutOperationImpl<C, R>(r, false);
       try {
         CurrentOperation.set(putOp);
         put(r, false);
@@ -500,7 +452,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#unlockAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.security.User)
    */
-  public <T extends ResourceContent> UnlockOperation<T> unlockAsynchronously(
+  public <C extends ResourceContent, R extends Resource<C>> UnlockOperation<C, R> unlockAsynchronously(
       final ResourceURI uri, final User user) throws IOException,
       ContentRepositoryException {
 
@@ -508,7 +460,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    UnlockOperation<T> lockOperation = new UnlockOperationImpl<T>(uri, user);
+    UnlockOperation<C, R> lockOperation = new UnlockOperationImpl<C, R>(uri, user);
     processor.enqueue(lockOperation);
     return lockOperation;
   }
@@ -539,7 +491,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public boolean delete(ResourceURI uri) throws ContentRepositoryException,
-      IOException {
+  IOException {
     return delete(uri, false);
   }
 
@@ -548,8 +500,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#deleteAsynchronously(ch.entwine.weblounge.common.content.ResourceURI)
    */
-  public DeleteOperation deleteAsynchronously(final ResourceURI uri)
-      throws ContentRepositoryException, IOException {
+  public <C extends ResourceContent, R extends Resource<C>> DeleteOperation<C, R> deleteAsynchronously(
+      final ResourceURI uri) throws ContentRepositoryException, IOException {
     return deleteAsynchronously(uri, false);
   }
 
@@ -626,14 +578,15 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#deleteAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
    *      boolean)
    */
-  public DeleteOperation deleteAsynchronously(ResourceURI uri,
-      boolean allRevisions) throws ContentRepositoryException, IOException {
+  public <C extends ResourceContent, R extends Resource<C>> DeleteOperation<C, R> deleteAsynchronously(
+      ResourceURI uri, boolean allRevisions) throws ContentRepositoryException,
+      IOException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    DeleteOperation deleteOperation = new DeleteOperationImpl(uri, allRevisions);
+    DeleteOperation<C, R> deleteOperation = new DeleteOperationImpl<C, R>(uri, allRevisions);
     processor.enqueue(deleteOperation);
     return deleteOperation;
   }
@@ -644,8 +597,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#move(ch.entwine.weblounge.common.content.ResourceURI,
    *      String, boolean)
    */
-  public void move(ResourceURI uri, String targetPath, boolean moveChildren)
-      throws IOException, ContentRepositoryException {
+  public <C extends ResourceContent, R extends Resource<C>> void move(
+      ResourceURI uri, String targetPath, boolean moveChildren)
+          throws IOException, ContentRepositoryException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
@@ -728,7 +682,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         ResourceURI candidateURI = new ResourceURIImpl(u.getType(), site, null, u.getIdentifier(), version);
 
         // Load the resource, adjust the path and store it again
-        Resource<?> r = get(candidateURI);
+        R r = get(candidateURI);
 
         // Store the updated resource
         r.getURI().setPath(newPath);
@@ -757,15 +711,15 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#moveAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
    *      java.lang.String, boolean)
    */
-  public MoveOperation moveAsynchronously(final ResourceURI uri,
-      final String path, final boolean moveChildren)
-      throws ContentRepositoryException, IOException {
+  public <C extends ResourceContent, R extends Resource<C>> MoveOperation<C, R> moveAsynchronously(
+      final ResourceURI uri, final String path, final boolean moveChildren)
+          throws ContentRepositoryException, IOException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    MoveOperation moveOperation = new MoveOperationImpl(uri, path, moveChildren);
+    MoveOperation<C, R> moveOperation = new MoveOperationImpl<C, R>(uri, path, moveChildren);
     processor.enqueue(moveOperation);
     return moveOperation;
   }
@@ -775,7 +729,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#put(ch.entwine.weblounge.common.content.Resource)
    */
-  public <T extends ResourceContent> Resource<T> put(Resource<T> resource)
+  public <C extends ResourceContent, R extends Resource<C>> R put(R resource)
       throws ContentRepositoryException, IOException, IllegalStateException {
 
     return put(resource, true);
@@ -786,15 +740,15 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#putAsynchronously(ch.entwine.weblounge.common.content.Resource)
    */
-  public <T extends ResourceContent> PutOperation<T> putAsynchronously(
-      Resource<T> resource) throws ContentRepositoryException, IOException,
+  public <C extends ResourceContent, R extends Resource<C>> PutOperation<C, R> putAsynchronously(
+      R resource) throws ContentRepositoryException, IOException,
       IllegalStateException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    PutOperation<T> putOperation = new PutOperationImpl<T>(resource, true);
+    PutOperation<C, R> putOperation = new PutOperationImpl<C, R>(resource, true);
     processor.enqueue(putOperation);
     return putOperation;
   }
@@ -804,15 +758,15 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#putAsynchronously(ch.entwine.weblounge.common.content.Resource)
    */
-  public <T extends ResourceContent> PutOperation<T> putAsynchronously(
-      Resource<T> resource, boolean updatePreviews)
-      throws ContentRepositoryException, IOException, IllegalStateException {
+  public <C extends ResourceContent, R extends Resource<C>> PutOperation<C, R> putAsynchronously(
+      R resource, boolean updatePreviews) throws ContentRepositoryException,
+      IOException, IllegalStateException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    PutOperation<T> putOperation = new PutOperationImpl<T>(resource, updatePreviews);
+    PutOperation<C, R> putOperation = new PutOperationImpl<C, R>(resource, updatePreviews);
     processor.enqueue(putOperation);
     return putOperation;
   }
@@ -823,7 +777,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#put(ch.entwine.weblounge.common.content.Resource,
    *      boolean)
    */
-  public <T extends ResourceContent> Resource<T> put(Resource<T> resource,
+  public <C extends ResourceContent, R extends Resource<C>> R put(R resource,
       boolean updatePreviews) throws ContentRepositoryException, IOException,
       IllegalStateException {
 
@@ -845,7 +799,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Add entry to index
     if (!index.existsInAnyVersion(uri)) {
       if (resource.contents().size() > 0)
-        throw new IllegalStateException("Cannot add content metadata without content");
+        throw new IllegalStateException("Cannot add content metadata withouC content");
       index.add(resource);
     }
 
@@ -857,7 +811,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // We are about to add a new version of a resource
     else {
       if (resource.contents().size() > 0)
-        throw new IllegalStateException("Cannot modify content metadata without content");
+        throw new IllegalStateException("Cannot modify content metadata withouC content");
       index.add(resource);
     }
 
@@ -894,16 +848,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *      java.io.InputStream)
    */
   @SuppressWarnings("unchecked")
-  public <T extends ResourceContent> Resource<T> putContent(ResourceURI uri,
-      T content, InputStream is) throws ContentRepositoryException,
-      IOException, IllegalStateException {
+  public <C extends ResourceContent, R extends Resource<C>> R putContent(
+      ResourceURI uri, C content, InputStream is)
+          throws ContentRepositoryException, IOException, IllegalStateException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Is this a new request or a scheduled asynchronous execution?
     if (!(CurrentOperation.get() instanceof PutContentOperation)) {
-      return putContentAsynchronously(uri, content, is).get();
+      return (R) putContentAsynchronously(uri, content, is).get();
     }
 
     // Check if resource is in temporary cache already by another operation
@@ -914,9 +868,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Make sure the resource exists
     if (!index.exists(uri))
       throw new IllegalStateException("Cannot add content to missing resource " + uri);
-    Resource<T> resource = null;
+    R resource = null;
     try {
-      resource = (Resource<T>) get(uri);
+      resource = (R) get(uri);
       if (resource == null) {
         throw new IllegalStateException("Resource " + uri + " not found");
       }
@@ -957,15 +911,15 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *      ch.entwine.weblounge.common.content.ResourceContent,
    *      java.io.InputStream)
    */
-  public <T extends ResourceContent> PutContentOperation<T> putContentAsynchronously(
-      final ResourceURI uri, final T content, final InputStream is)
-      throws ContentRepositoryException, IOException, IllegalStateException {
+  public <C extends ResourceContent, R extends Resource<C>> PutContentOperation<C, R> putContentAsynchronously(
+      final ResourceURI uri, final C content, final InputStream is)
+          throws ContentRepositoryException, IOException, IllegalStateException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    PutContentOperation<T> putOperation = new PutContentOperationImpl<T>(uri, content, is);
+    PutContentOperation<C, R> putOperation = new PutContentOperationImpl<C, R>(uri, content, is);
     processor.enqueue(putOperation);
     return putOperation;
   }
@@ -977,16 +931,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *      ch.entwine.weblounge.common.content.ResourceContent)
    */
   @SuppressWarnings("unchecked")
-  public <T extends ResourceContent> Resource<T> deleteContent(ResourceURI uri,
-      T content) throws ContentRepositoryException, IOException,
-      IllegalStateException {
+  public <C extends ResourceContent, R extends Resource<C>> R deleteContent(
+      ResourceURI uri, C content) throws ContentRepositoryException,
+      IOException, IllegalStateException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Is this a new request or a scheduled asynchronous execution?
-    if (!(CurrentOperation.get() instanceof DeleteContentOperation<?>)) {
-      return deleteContentAsynchronously(uri, content).get();
+    if (!(CurrentOperation.get() instanceof DeleteContentOperation<?, ?>)) {
+      return (R) deleteContentAsynchronously(uri, content).get();
     }
 
     // Check if resource is in temporary cache already by another operation
@@ -997,9 +951,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Make sure the resource exists
     if (!index.exists(uri))
       throw new IllegalStateException("Cannot remove content from missing resource " + uri);
-    Resource<T> resource = null;
+    R resource = null;
     try {
-      resource = (Resource<T>) get(uri);
+      resource = (R) get(uri);
       if (resource == null) {
         throw new IllegalStateException("Resource " + uri + " not found");
       }
@@ -1033,15 +987,15 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *      ch.entwine.weblounge.common.content.ResourceContent,
    *      ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener)
    */
-  public <T extends ResourceContent> DeleteContentOperation<T> deleteContentAsynchronously(
-      final ResourceURI uri, final T content)
-      throws ContentRepositoryException, IOException, IllegalStateException {
+  public <C extends ResourceContent, R extends Resource<C>> DeleteContentOperation<C, R> deleteContentAsynchronously(
+      final ResourceURI uri, final C content)
+          throws ContentRepositoryException, IOException, IllegalStateException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    DeleteContentOperation<T> deleteContentOperation = new DeleteContentOperationImpl<T>(uri, content);
+    DeleteContentOperation<C, R> deleteContentOperation = new DeleteContentOperationImpl<C, R>(uri, content);
     processor.enqueue(deleteContentOperation);
     return deleteContentOperation;
   };
@@ -1054,7 +1008,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <T extends ResourceContent, R extends Resource<T>> R storeResource(
+  protected abstract <C extends ResourceContent, R extends Resource<C>> R storeResource(
       R resource) throws IOException;
 
   /**
@@ -1069,8 +1023,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <T extends ResourceContent> T storeResourceContent(
-      ResourceURI uri, T content, InputStream is) throws IOException;
+  protected abstract <C extends ResourceContent, R extends Resource<C>> C storeResourceContent(
+      ResourceURI uri, C content, InputStream is) throws IOException;
 
   /**
    * Deletes the indicated revisions of resource <code>uri</code> from the
@@ -1095,8 +1049,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <T extends ResourceContent> void deleteResourceContent(
-      ResourceURI uri, T content) throws IOException;
+  protected abstract <C extends ResourceContent, R extends Resource<C>> void deleteResourceContent(
+      ResourceURI uri, C content) throws IOException;
 
   /**
    * Creates the previews for this resource in all languages and for all known
@@ -1190,7 +1144,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public final class OperationProcessor {
 
     /** The operations counter */
-    private Map<ResourceURI, List<ContentRepositoryOperation<?>>> operationsPerResource = new HashMap<ResourceURI, List<ContentRepositoryOperation<?>>>();
+    private final Map<ResourceURI, List<ContentRepositoryOperation<?>>> operationsPerResource = new HashMap<ResourceURI, List<ContentRepositoryOperation<?>>>();
 
     /** The repository operations */
     protected List<ContentRepositoryOperation<?>> operations = new ArrayList<ContentRepositoryOperation<?>>();
@@ -1265,8 +1219,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         for (ResourceURI u : operationsPerResource.keySet()) {
           if (u.getIdentifier().equals(uri.getIdentifier())) {
             ContentRepositoryOperation<?> currentOp = CurrentOperation.get();
-            if (currentOp instanceof ContentRepositoryResourceOperation<?>) {
-              ResourceURI currentURI = ((ContentRepositoryResourceOperation<?>) currentOp).getResourceURI();
+            if (currentOp instanceof ContentRepositoryResourceOperation<?, ?, ?>) {
+              ResourceURI currentURI = ((ContentRepositoryResourceOperation<?, ?, ?>) currentOp).getResourceURI();
               if (!u.equals(currentURI))
                 return true;
             }

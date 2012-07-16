@@ -26,7 +26,7 @@ import java.io.IOException;
  * A resource operation describes what is performed on a resource in the content
  * repository.
  */
-public interface ContentRepositoryOperation<T extends Object> {
+public interface ContentRepositoryOperation<T> {
 
   /**
    * Executes the operation and returns the corresponding result.
