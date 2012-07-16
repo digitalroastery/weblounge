@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.content.repository.ContentRepositoryException
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.request.CacheTag;
@@ -124,6 +125,7 @@ public class ComposerTagSupport extends WebloungeTag {
   /* Request attributes */
   protected final Map<String, Object> attributes = new HashMap<String, Object>();
 
+  @Override
   public void setId(String id) {
     this.id = id;
   }
@@ -178,7 +180,7 @@ public class ComposerTagSupport extends WebloungeTag {
    * @see #afterComposer(JspWriter)
    */
   protected void beforeComposer(JspWriter writer) throws IOException,
-      ContentRepositoryException, ContentRepositoryUnavailableException {
+  ContentRepositoryException, ContentRepositoryUnavailableException {
     StringBuffer buf = new StringBuffer("<div ");
     addCssClass(CLASS_COMPOSER);
     if (request.getVersion() == Resource.WORK && getTargetPage().isLocked()) {
@@ -323,7 +325,7 @@ public class ComposerTagSupport extends WebloungeTag {
    *           if the content repository is offline
    */
   private void loadContent(boolean inheritFromParent) throws SecurityException,
-      ContentRepositoryException, ContentRepositoryUnavailableException {
+  ContentRepositoryException, ContentRepositoryUnavailableException {
 
     try {
       WebUrl url = getRequest().getUrl();
@@ -399,6 +401,11 @@ public class ComposerTagSupport extends WebloungeTag {
         }
       }
 
+      // Add the ghost content provider to the set of cache tags
+      if (ghostContentProvider != null) {
+        response.addTag(new CacheTagImpl(CacheTag.Resource, ghostContentProvider.getURI().getIdentifier()));
+      }
+
       // If pagelets have been found, set them in the composer
       ghostPaglets = ghostContent;
       pagelets = content;
@@ -429,7 +436,7 @@ public class ComposerTagSupport extends WebloungeTag {
    *           if reading from the content repository fails
    */
   protected Page getTargetPage() throws ContentRepositoryUnavailableException,
-      ContentRepositoryException {
+  ContentRepositoryException {
     if (!initialized) {
       loadContent(contentInheritanceEnabled);
     }
@@ -482,7 +489,7 @@ public class ComposerTagSupport extends WebloungeTag {
    *           if accessing the content is forbidden
    */
   protected Pagelet[] getContent() throws SecurityException,
-      ContentRepositoryException, ContentRepositoryUnavailableException {
+  ContentRepositoryException, ContentRepositoryUnavailableException {
     if (contentProvider == null)
       loadContent(contentInheritanceEnabled);
     if (pagelets == null)
@@ -503,7 +510,7 @@ public class ComposerTagSupport extends WebloungeTag {
    *           if accessing the content is forbidden
    */
   protected Pagelet[] getGhostContent() throws SecurityException,
-      ContentRepositoryException, ContentRepositoryUnavailableException {
+  ContentRepositoryException, ContentRepositoryUnavailableException {
     if (ghostContentProvider == null)
       loadContent(contentInheritanceEnabled);
     if (ghostContentProvider == null)
