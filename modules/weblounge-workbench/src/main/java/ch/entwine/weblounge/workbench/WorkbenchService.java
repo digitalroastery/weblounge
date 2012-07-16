@@ -25,11 +25,9 @@ import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
-import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.impl.content.page.PageletReader;
-import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -310,14 +308,17 @@ public class WorkbenchService {
   }
 
   public String getRenderer(Site site, ResourceURI pageURI, String composerId,
-      int pageletIndex, String pageletXml, String language,
-      Environment environment) throws IOException,
-      ParserConfigurationException, SAXException {
+      int pageletIndex, String pageXml, String language, Environment environment)
+      throws IOException, ParserConfigurationException, SAXException {
 
-    Page page = getPage(site, pageURI);
-    if (page == null) {
-      logger.warn("Client requested pagelet renderer for non existing page {}", pageURI);
-      return null;
+    InputStream is = null;
+    Page page = null;
+    try {
+      PageReader pageReader = new PageReader();
+      is = IOUtils.toInputStream(pageXml, "utf-8");
+      page = pageReader.read(is, site);
+    } finally {
+      IOUtils.closeQuietly(is);
     }
 
     // Load the composer
@@ -327,18 +328,13 @@ public class WorkbenchService {
       return null;
     }
 
-    InputStream is = null;
-    Pagelet pagelet = null;
-    try {
-      PageletReader pageletReader = new PageletReader();
-      PageletURI l = new PageletURIImpl(pageURI, composer.getIdentifier(), pageletIndex);
-      pageletReader.setPageletLocation(l);
-      is = IOUtils.toInputStream(pageletXml);
-      pagelet = pageletReader.read(is);
-    } finally {
-      IOUtils.closeQuietly(is);
+    // Get the pagelet
+    if (composer.getPagelets().length <= pageletIndex || composer.size() <= pageletIndex) {
+      logger.warn("Client requested pagelet renderer for non existing pagelet on page {}", pageURI);
+      return null;
     }
 
+    Pagelet pagelet = composer.getPagelet(pageletIndex);
     Module module = site.getModule(pagelet.getModule());
     if (module == null) {
       logger.warn("Client requested pagelet renderer for non existing module {}", pagelet.getModule());

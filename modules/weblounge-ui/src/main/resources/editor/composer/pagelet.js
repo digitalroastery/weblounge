@@ -101,7 +101,7 @@ steal.plugins('jqueryui/dialog',
 					
 					// Save New Pagelet and show Renderer
 					this.options.composer.page.insertPagelet(newPagelet, this.options.composer.id, this.element.index());
-					this._showRenderer(newPagelet);
+					this._showRenderer(this.options.composer.page);
 					
 					$("body").css({ overflow: 'visible' });
 					this.editorDialog.dialog('destroy');
@@ -259,13 +259,13 @@ steal.plugins('jqueryui/dialog',
 		return pagelet;
     },
     
-    _showRenderer: function(pagelet) {
+    _showRenderer: function(page) {
 		Workbench.getRenderer({
 			id: this.options.composer.page.value.id,
 			composer: this.options.composer.id,
 			language: this.options.composer.language,
 			pageletId: this.element.index(),
-			pagelet: pagelet
+			page: page
 		}, $.proxy(function(renderer) {
 			this.element.html(renderer);
 		}, this));
