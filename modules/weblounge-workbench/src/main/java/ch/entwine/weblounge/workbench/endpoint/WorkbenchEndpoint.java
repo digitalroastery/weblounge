@@ -32,9 +32,12 @@ import ch.entwine.weblounge.workbench.WorkbenchService;
 import ch.entwine.weblounge.workbench.suggest.SimpleSuggestion;
 import ch.entwine.weblounge.workbench.suggest.SuggestionList;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -51,7 +54,7 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("/")
 public class WorkbenchEndpoint {
-  
+
   /** The workbench */
   protected transient WorkbenchService workbench = null;
 
@@ -99,7 +102,7 @@ public class WorkbenchEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     return Response.ok(editor.toXml()).build();
   }
-  
+
   @GET
   @Produces(MediaType.TEXT_HTML)
   @Path("/renderer/{page}/{composer}/{pageletindex}")
@@ -107,21 +110,26 @@ public class WorkbenchEndpoint {
       @PathParam("page") String pageURI,
       @PathParam("composer") String composerId,
       @PathParam("pageletindex") int pageletIndex,
-      @QueryParam("language") String language) {
-    
+      @QueryParam("language") String language,
+      @FormParam("pagelet") String pageletXml) {
+
     // Load the site
     Site site = getSite(request);
-    if(site == null)
+    if (site == null)
       throw new WebApplicationException(Status.NOT_FOUND);
-    
+
     ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.WORK);
     String renderedPagelet;
     try {
-      renderedPagelet = workbench.getRenderer(site, uri, composerId, pageletIndex, language, environment);
-    } catch (IOException e) {
+      if (StringUtils.isBlank(pageletXml)) {
+        renderedPagelet = workbench.getRenderer(site, uri, composerId, pageletIndex, language, environment);
+      } else {
+        renderedPagelet = workbench.getRenderer(site, uri, composerId, pageletIndex, pageletXml, language, environment);
+      }
+    } catch (Exception e) {
       throw new WebApplicationException(e);
     }
-    
+
     if (renderedPagelet == null)
       throw new WebApplicationException(Status.NOT_FOUND);
     return Response.ok(renderedPagelet).build();
