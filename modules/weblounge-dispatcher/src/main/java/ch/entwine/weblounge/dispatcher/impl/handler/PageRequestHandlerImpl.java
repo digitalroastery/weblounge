@@ -255,8 +255,12 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         return true;
       }
 
+      // Check for explicit no cache instructions
+      boolean noCache = request.getParameter(ResponseCache.NOCACHE_PARAM) != null;
+
       // Does the client already have up-to-date content?
-      if (action == null && !ResourceUtils.hasChanged(request, page)) {
+      boolean isCached = !noCache && response.isCached() && response.isValid();
+      if (action == null && !isCached && !ResourceUtils.hasChanged(request, page)) {
         logger.debug("Page {} was not modified", pageURI);
         DispatchUtils.sendNotModified(request, response);
         return true;
@@ -273,9 +277,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         DispatchUtils.sendAccessDenied(request, response);
         return true;
       }
-
-      // Check for explicit no cache instructions
-      boolean noCache = request.getParameter(ResponseCache.NOCACHE_PARAM) != null;
 
       // Check if the page is already part of the cache. If so, our task is
       // already done!
