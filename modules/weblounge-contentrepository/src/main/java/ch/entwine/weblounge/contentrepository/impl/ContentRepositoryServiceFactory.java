@@ -78,7 +78,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
   private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryServiceFactory.class);
 
   /** Service registrations per configuration pid */
-  private Map<String, ServiceRegistration> services = new HashMap<String, ServiceRegistration>();
+  private final Map<String, ServiceRegistration> services = new HashMap<String, ServiceRegistration>();
 
   /** Default content repository type */
   private String repositoryType = null;
@@ -123,7 +123,6 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     String repositoryType = (String) properties.get(OPT_TYPE);
     if (StringUtils.isBlank(repositoryType))
@@ -140,7 +139,6 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
    * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String,
    *      java.util.Dictionary)
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
   public void updated(String pid, Dictionary properties)
       throws ConfigurationException {
 
@@ -240,7 +238,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
    *          the service pid
    * @return the configuration properties
    */
-  @SuppressWarnings({ "unchecked", "cast" })
+  @SuppressWarnings({ "cast" })
   private Dictionary<Object, Object> loadConfiguration(String pid) {
     if (StringUtils.isBlank(pid))
       return null;
