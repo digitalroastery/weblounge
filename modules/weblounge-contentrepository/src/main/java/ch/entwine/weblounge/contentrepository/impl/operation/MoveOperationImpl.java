@@ -37,7 +37,7 @@ import java.io.IOException;
 /**
  * This operation implements a move of the given resource.
  */
-public final class MoveOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<Void> implements MoveOperation<C, R> {
+public final class MoveOperationImpl extends AbstractContentRepositoryOperation<Void> implements MoveOperation {
 
   /** Path where the resource will be moved to */
   private String moveTo = null;
@@ -81,7 +81,7 @@ public final class MoveOperationImpl<C extends ResourceContent, R extends Resour
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
    */
   @Override
-  public R apply(R resource) {
+  public <C extends ResourceContent, R extends Resource<C>> R apply(R resource) {
     if (resource.getPath() == null && !uri.equals(resource.getURI()))
       return resource;
     else if (resource.getPath() == null || uri.equals(resource.getURI())) {

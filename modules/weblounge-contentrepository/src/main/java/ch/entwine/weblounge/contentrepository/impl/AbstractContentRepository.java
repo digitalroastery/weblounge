@@ -273,7 +273,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
-  public <R extends Resource<? extends ResourceContent>> R get(
+  public <C extends ResourceContent, R extends Resource<C>> R get(
       ResourceURI uri)
           throws ContentRepositoryException {
     if (!isStarted())

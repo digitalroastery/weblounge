@@ -110,7 +110,7 @@ public interface ContentRepository {
    *           if reading the resource from the repository fails
    * @return the resource
    */
-  <R extends Resource<? extends ResourceContent>> R get(
+  <C extends ResourceContent, R extends Resource<C>> R get(
       ResourceURI uri)
           throws ContentRepositoryException;
 

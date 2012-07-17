@@ -88,7 +88,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
   protected static final Logger logger = LoggerFactory.getLogger(ImageRequestHandlerImpl.class);
 
   /** The preview generators */
-  private List<ImagePreviewGenerator> previewGenerators = new ArrayList<ImagePreviewGenerator>();
+  private final List<ImagePreviewGenerator> previewGenerators = new ArrayList<ImagePreviewGenerator>();
 
   /**
    * Handles the request for an image resource that is believed to be in the
@@ -164,7 +164,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
       // Try to load the resource
       imageURI = new ImageResourceURIImpl(site, imagePath, id);
-      imageResource = (ImageResource) contentRepository.get(imageURI);
+      imageResource = contentRepository.get(imageURI);
       if (imageResource == null) {
         logger.debug("No image found at {}", imageURI);
         return false;

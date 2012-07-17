@@ -163,8 +163,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @return the updated resource
    */
   <C extends ResourceContent, R extends Resource<C>> PutOperation<C, R> putAsynchronously(
-      R resource, boolean updatePreviews)
-          throws ContentRepositoryException, IOException, IllegalStateException;
+      R resource, boolean updatePreviews) throws ContentRepositoryException,
+      IOException, IllegalStateException;
 
   /**
    * Adds the content to the specified resource.
@@ -290,9 +290,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if moving fails due to a database error
    */
-  <C extends ResourceContent, R extends Resource<C>> MoveOperation<C, R> moveAsynchronously(
-      ResourceURI uri, String path, boolean moveChildren)
-          throws ContentRepositoryException, IOException;
+  MoveOperation moveAsynchronously(ResourceURI uri, String path,
+      boolean moveChildren) throws ContentRepositoryException, IOException;
 
   /**
    * This method removes the given resource in the specified version from the
@@ -324,7 +323,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ReferentialIntegrityException
    *           if the resource is still being linked to
    */
-  <C extends ResourceContent, R extends Resource<C>> DeleteOperation<C, R> deleteAsynchronously(
+  DeleteOperation deleteAsynchronously(
       ResourceURI uri) throws ContentRepositoryException, IOException;
 
   /**
@@ -366,7 +365,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if removal fails due to a database error
    */
-  <C extends ResourceContent, R extends Resource<C>> DeleteOperation<C, R> deleteAsynchronously(
+  DeleteOperation deleteAsynchronously(
       ResourceURI uri, boolean allRevisions) throws ContentRepositoryException,
       IOException;
 

@@ -33,7 +33,7 @@ import java.io.IOException;
 /**
  * This operation implements a delete of the given resource.
  */
-public final class DeleteOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<Boolean> implements DeleteOperation<C, R> {
+public final class DeleteOperationImpl extends AbstractContentRepositoryOperation<Boolean> implements DeleteOperation {
 
   /** True if all versions of this resource should be removed */
   private boolean allVersions = false;
@@ -71,7 +71,7 @@ public final class DeleteOperationImpl<C extends ResourceContent, R extends Reso
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
    */
-  public R apply(R resource) {
+  public <C extends ResourceContent, R extends Resource<C>> R apply(R resource) {
     if (!uri.equals(resource.getURI()))
       return resource;
     return null;

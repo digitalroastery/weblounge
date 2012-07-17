@@ -20,14 +20,12 @@
 
 package ch.entwine.weblounge.common.content.repository;
 
-import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
 
 /**
  * The move operation represents the process of a resource (and potentially its
  * children) being moved from one path or url to another.
  */
-public interface MoveOperation<C extends ResourceContent, R extends Resource<C>> extends ContentRepositoryResourceOperation<C, R, Void> {
+public interface MoveOperation extends ContentRepositoryResourceOperation<Void> {
 
   /**
    * Returns the path that the resource should be moved to.
