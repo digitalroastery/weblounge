@@ -178,7 +178,7 @@ public class WorkbenchService {
     // Load the composer
     Composer composer = page.getComposer(composerId);
     if (composer == null) {
-      logger.warn("Client requested pagelet editor for non existing composer {} on page {}", composerId, pageURI);
+      logger.warn("Client requested pagelet editor for non existing composer '{}' on page {}", composerId, pageURI);
       return null;
     }
 
@@ -257,7 +257,7 @@ public class WorkbenchService {
    */
   public String getRenderer(Site site, ResourceURI pageURI, String composerId,
       int pageletIndex, String language, Environment environment)
-      throws IOException {
+          throws IOException {
 
     Page page = getPage(site, pageURI);
     if (page == null) {
@@ -309,7 +309,7 @@ public class WorkbenchService {
 
   public String getRenderer(Site site, ResourceURI pageURI, String composerId,
       int pageletIndex, String pageXml, String language, Environment environment)
-      throws IOException, ParserConfigurationException, SAXException {
+          throws IOException, ParserConfigurationException, SAXException {
 
     InputStream is = null;
     Page page = null;
