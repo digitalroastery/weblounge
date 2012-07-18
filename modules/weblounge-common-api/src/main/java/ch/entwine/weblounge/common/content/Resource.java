@@ -502,10 +502,10 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
   void setPublished(User publisher, Date from, Date to);
 
   /**
-   * Adds the file content.
+   * Adds the resource content.
    * 
    * @param content
-   *          the file content
+   *          the resource content
    */
   void addContent(T content);
 
