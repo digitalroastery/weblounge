@@ -162,7 +162,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       }
     }
     if (uri.getVersion() < 0) {
-      logger.warn("Resource {} has no version");
+      logger.warn("Resource {} has no version", uri);
     }
 
     // Build the path
@@ -472,8 +472,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
           if (f.isDirectory()) {
             uris.push(f);
           } else {
-            String id = f.getParentFile().getName();
-            long version = ResourceUtils.getVersion(f.getName());
+            long version = Long.parseLong(f.getParentFile().getName());
+            String id = f.getParentFile().getParentFile().getName();
             resourceURIs.add(new ResourceURIImpl(resourceType, getSite(), null, id, version));
           }
         }

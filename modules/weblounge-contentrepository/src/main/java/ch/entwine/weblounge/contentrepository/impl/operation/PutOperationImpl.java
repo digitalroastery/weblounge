@@ -32,10 +32,10 @@ import java.io.IOException;
 /**
  * This operation implements a put of the given resource.
  */
-public final class PutOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<R> implements PutOperation<C, R> {
+public final class PutOperationImpl extends AbstractContentRepositoryOperation<Resource<? extends ResourceContent>> implements PutOperation {
 
   /** The resource to be locked */
-  private Resource<C> resource = null;
+  private Resource<?> resource = null;
 
   /** Whether to update the preview as part of this put operation */
   private boolean updatePreviews = true;
@@ -48,7 +48,8 @@ public final class PutOperationImpl<C extends ResourceContent, R extends Resourc
    * @param updatePreviews
    *          whether to update the resource's previews
    */
-  public PutOperationImpl(Resource<C> resource, boolean updatePreviews) {
+  public PutOperationImpl(Resource<?> resource,
+      boolean updatePreviews) {
     this.resource = resource;
     this.updatePreviews = updatePreviews;
   }
@@ -58,7 +59,7 @@ public final class PutOperationImpl<C extends ResourceContent, R extends Resourc
    * 
    * @return the resource
    */
-  public Resource<C> getResource() {
+  public Resource<? extends ResourceContent> getResource() {
     return resource;
   }
 
@@ -74,11 +75,13 @@ public final class PutOperationImpl<C extends ResourceContent, R extends Resourc
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.content.Resource)
    */
   @SuppressWarnings("unchecked")
-  public R apply(R resource) {
-    if (!this.resource.equals(resource))
+  public <C extends ResourceContent, R extends Resource<C>> R apply(
+      ResourceURI uri, R resource) {
+    if (!this.resource.getURI().equals(uri))
       return resource;
     return (R) this.resource;
   }
@@ -97,11 +100,10 @@ public final class PutOperationImpl<C extends ResourceContent, R extends Resourc
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
-  @SuppressWarnings("unchecked")
   @Override
-  protected R run(WritableContentRepository repository)
+  protected Resource<? extends ResourceContent> run(WritableContentRepository repository)
       throws ContentRepositoryException, IOException {
-    return (R) repository.put(resource, updatePreviews);
+    return repository.put(resource, updatePreviews);
   }
 
 }

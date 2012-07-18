@@ -69,10 +69,12 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
    * This implementation return <code>null</code> if the resource's uri equals
    * that of this operation.
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ResourceURI,
+   *      Resource)
    */
-  public <C extends ResourceContent, R extends Resource<C>> R apply(R resource) {
-    if (!uri.equals(resource.getURI()))
+  public <C extends ResourceContent, R extends Resource<C>> R apply(
+      ResourceURI uri, R resource) {
+    if (!this.uri.equals(uri))
       return resource;
     return null;
   }

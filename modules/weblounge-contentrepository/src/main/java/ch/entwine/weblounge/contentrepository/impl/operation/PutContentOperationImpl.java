@@ -33,13 +33,13 @@ import java.io.InputStream;
 /**
  * This operation implements a put of content to the given resource.
  */
-public final class PutContentOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<R> implements PutContentOperation<C, R> {
+public final class PutContentOperationImpl extends AbstractContentRepositoryOperation<Resource<? extends ResourceContent>> implements PutContentOperation {
 
   /** The resource to be locked */
   private ResourceURI uri = null;
 
   /** The resource content */
-  private C content = null;
+  private ResourceContent content = null;
 
   /** The data stream */
   private InputStream inputStream = null;
@@ -54,7 +54,8 @@ public final class PutContentOperationImpl<C extends ResourceContent, R extends 
    * @param is
    *          the input stream
    */
-  public PutContentOperationImpl(ResourceURI uri, C content, InputStream is) {
+  public PutContentOperationImpl(ResourceURI uri, ResourceContent content,
+      InputStream is) {
     this.uri = uri;
     this.content = content;
     this.inputStream = is;
@@ -72,12 +73,17 @@ public final class PutContentOperationImpl<C extends ResourceContent, R extends 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ResourceURI,
+   *      Resource)
    */
-  public R apply(R resource) {
-    if (!uri.equals(resource.getURI()))
+  @SuppressWarnings("unchecked")
+  public <C extends ResourceContent, R extends Resource<C>> R apply(
+      ResourceURI uri, R resource) {
+    if (resource == null)
+      return null;
+    if (!this.uri.equals(uri))
       return resource;
-    resource.addContent(content);
+    resource.addContent((C) content);
     return resource;
   }
 
@@ -86,7 +92,7 @@ public final class PutContentOperationImpl<C extends ResourceContent, R extends 
    * 
    * @see ch.entwine.weblounge.common.content.repository.PutContentOperation#getContent()
    */
-  public C getContent() {
+  public ResourceContent getContent() {
     return content;
   }
 
@@ -104,11 +110,11 @@ public final class PutContentOperationImpl<C extends ResourceContent, R extends 
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
-  @SuppressWarnings("unchecked")
   @Override
-  protected R run(WritableContentRepository repository)
-      throws ContentRepositoryException, IOException, IllegalStateException {
-    return (R) repository.putContent(uri, content, inputStream);
+  protected Resource<? extends ResourceContent> run(
+      WritableContentRepository repository) throws ContentRepositoryException,
+      IOException, IllegalStateException {
+    return repository.putContent(uri, content, inputStream);
   }
 
 }

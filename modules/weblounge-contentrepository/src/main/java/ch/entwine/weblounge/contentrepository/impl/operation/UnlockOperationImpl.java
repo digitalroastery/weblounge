@@ -33,7 +33,7 @@ import java.io.IOException;
 /**
  * This operation implements an unlock of the given resource.
  */
-public final class UnlockOperationImpl<C extends ResourceContent, R extends Resource<C>> extends AbstractContentRepositoryOperation<R> implements UnlockOperation<C, R> {
+public final class UnlockOperationImpl extends AbstractContentRepositoryOperation<Resource<? extends ResourceContent>> implements UnlockOperation {
 
   /** The potential lock owner */
   private User user = null;
@@ -66,16 +66,19 @@ public final class UnlockOperationImpl<C extends ResourceContent, R extends Reso
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ResourceURI,
+   *      Resource)
    */
-  public R apply(R resource) {
+  public <C extends ResourceContent, R extends Resource<C>> R apply(
+      ResourceURI uri, R resource) {
+    if (resource == null)
+      return null;
 
     // Is it a different resource? We care about id and path, but not about
     // version
-    ResourceURI u = resource.getURI();
-    if (uri.getIdentifier() != null && !uri.getIdentifier().equals(u.getIdentifier()))
+    if (this.uri.getIdentifier() != null && !this.uri.getIdentifier().equals(uri.getIdentifier()))
       return resource;
-    else if (uri.getPath() != null && !uri.getPath().equals(u.getPath()))
+    else if (this.uri.getPath() != null && !this.uri.getPath().equals(uri.getPath()))
       return resource;
 
     resource.unlock();
@@ -96,11 +99,11 @@ public final class UnlockOperationImpl<C extends ResourceContent, R extends Reso
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
-  @SuppressWarnings("unchecked")
   @Override
-  protected R run(WritableContentRepository repository)
-      throws ContentRepositoryException, IOException {
-    return (R) repository.unlock(uri, user);
+  protected Resource<? extends ResourceContent> run(
+      WritableContentRepository repository) throws ContentRepositoryException,
+      IOException {
+    return repository.unlock(uri, user);
   }
 
 }

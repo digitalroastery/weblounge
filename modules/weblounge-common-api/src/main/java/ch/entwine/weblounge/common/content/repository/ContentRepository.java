@@ -21,7 +21,6 @@
 package ch.entwine.weblounge.common.content.repository;
 
 import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
@@ -110,7 +109,7 @@ public interface ContentRepository {
    *           if reading the resource from the repository fails
    * @return the resource
    */
-  <C extends ResourceContent, R extends Resource<C>> R get(
+  <R extends Resource<?>> R get(
       ResourceURI uri)
           throws ContentRepositoryException;
 

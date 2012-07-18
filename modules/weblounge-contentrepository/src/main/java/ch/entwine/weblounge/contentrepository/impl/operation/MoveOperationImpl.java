@@ -78,17 +78,19 @@ public final class MoveOperationImpl extends AbstractContentRepositoryOperation<
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ResourceURI, Resource)
    */
   @Override
-  public <C extends ResourceContent, R extends Resource<C>> R apply(R resource) {
-    if (resource.getPath() == null && !uri.equals(resource.getURI()))
+  public <C extends ResourceContent, R extends Resource<C>> R apply(ResourceURI uri, R resource) {
+    if (resource == null)
+      return null;
+    if (resource.getPath() == null && !this.uri.equals(uri))
       return resource;
-    else if (resource.getPath() == null || uri.equals(resource.getURI())) {
+    else if (resource.getPath() == null || this.uri.equals(uri)) {
       resource.setPath(moveTo);
       return resource;
-    } else if (moveChildren && isExtendedPrefix(uri.getPath(), resource.getPath())) {
-      String originalPathPrefix = uri.getPath();
+    } else if (moveChildren && isExtendedPrefix(this.uri.getPath(), resource.getPath())) {
+      String originalPathPrefix = this.uri.getPath();
       String originalPath = resource.getPath();
       String pathSuffix = originalPath.substring(originalPathPrefix.length());
       String newPath = null;

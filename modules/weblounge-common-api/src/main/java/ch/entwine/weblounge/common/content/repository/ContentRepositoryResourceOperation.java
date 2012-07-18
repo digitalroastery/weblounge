@@ -40,10 +40,13 @@ public interface ContentRepositoryResourceOperation<T> extends ContentRepository
    * Applies this operation to the in-memory instance of <code>resource</code>
    * and returns the modified version.
    * 
+   * @param uri
+   *          the resource uri
    * @param resource
    *          the resource
    * @return the modified resource
    */
-  <C extends ResourceContent, R extends Resource<C>> R apply(R resource);
+  <C extends ResourceContent, R extends Resource<C>> R apply(ResourceURI uri,
+      R resource);
 
 }

@@ -28,7 +28,7 @@ import ch.entwine.weblounge.common.security.User;
  * The unlock operation represents the process of unlocking a resource in the
  * content repository.
  */
-public interface UnlockOperation<C extends ResourceContent, R extends Resource<C>> extends ContentRepositoryResourceOperation<R> {
+public interface UnlockOperation extends ContentRepositoryResourceOperation<Resource<? extends ResourceContent>> {
 
   /**
    * Returns the user that was holding on to the lock.

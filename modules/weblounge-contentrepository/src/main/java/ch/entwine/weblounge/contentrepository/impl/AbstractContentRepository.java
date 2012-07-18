@@ -22,7 +22,6 @@ package ch.entwine.weblounge.contentrepository.impl;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
@@ -273,7 +272,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
-  public <C extends ResourceContent, R extends Resource<C>> R get(
+  @SuppressWarnings("unchecked")
+  public <R extends Resource<?>> R get(
       ResourceURI uri)
           throws ContentRepositoryException {
     if (!isStarted())
@@ -330,7 +330,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     } else {
 
       try {
-        R resource = null;
+        Resource<?> resource = null;
         InputStream is = null;
         try {
           InputStream resourceStream = loadResource(uri);
@@ -339,7 +339,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
           is = new BufferedInputStream(resourceStream);
           ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
           ResourceReader<?, ?> reader = serializer.getReader();
-          resource = (R) reader.read(is, site);
+          resource = reader.read(is, site);
         } catch (Throwable t) {
           String version = ResourceUtils.getVersionString(uri.getVersion());
           throw new IOException("Error reading " + version + " version of " + uri + " (" + uri.getIdentifier() + ")", t);
@@ -352,7 +352,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
           return null;
         }
 
-        return resource;
+        return (R) resource;
       } catch (IOException e) {
         logger.error("Error loading {}: {}", uri, e.getMessage());
         throw new ContentRepositoryException(e);

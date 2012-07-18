@@ -60,8 +60,8 @@ public interface WritableContentRepository extends ContentRepository {
    *           than what is specified in the updated document
    * @return the updated resource
    */
-  <C extends ResourceContent, R extends Resource<C>> R put(R resource)
-      throws ContentRepositoryException, IOException, IllegalStateException;
+  Resource<?> put(Resource<?> resource) throws ContentRepositoryException,
+  IOException, IllegalStateException;
 
   /**
    * Puts the resource to the specified location. Depending on whether the
@@ -92,9 +92,8 @@ public interface WritableContentRepository extends ContentRepository {
    *           than what is specified in the updated document
    * @return the updated resource
    */
-  <C extends ResourceContent, R extends Resource<C>> R put(R resource,
-      boolean updatePreviews) throws ContentRepositoryException, IOException,
-      IllegalStateException;
+  Resource<?> put(Resource<?> resource, boolean updatePreviews)
+      throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
    * Puts the resource to the specified location and passes the result to the
@@ -126,9 +125,8 @@ public interface WritableContentRepository extends ContentRepository {
    *           than what is specified in the updated document
    * @return the updated resource
    */
-  <C extends ResourceContent, R extends Resource<C>> PutOperation<C, R> putAsynchronously(
-      R resource) throws ContentRepositoryException, IOException,
-      IllegalStateException;
+  PutOperation putAsynchronously(Resource<?> resource)
+      throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
    * Puts the resource to the specified location and passes the result to the
@@ -162,9 +160,8 @@ public interface WritableContentRepository extends ContentRepository {
    *           than what is specified in the updated document
    * @return the updated resource
    */
-  <C extends ResourceContent, R extends Resource<C>> PutOperation<C, R> putAsynchronously(
-      R resource, boolean updatePreviews) throws ContentRepositoryException,
-      IOException, IllegalStateException;
+  PutOperation putAsynchronously(Resource<?> resource, boolean updatePreviews)
+      throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
    * Adds the content to the specified resource.
@@ -185,9 +182,9 @@ public interface WritableContentRepository extends ContentRepository {
    *           type
    * @return the updated resource
    */
-  <C extends ResourceContent, R extends Resource<C>> R putContent(
-      ResourceURI uri, C content, InputStream is)
-          throws ContentRepositoryException, IOException, IllegalStateException;
+  Resource<?> putContent(ResourceURI uri, ResourceContent content,
+      InputStream is) throws ContentRepositoryException, IOException,
+      IllegalStateException;
 
   /**
    * Adds the content to the specified resource and passes the result to the
@@ -209,8 +206,8 @@ public interface WritableContentRepository extends ContentRepository {
    *           type
    * @return the updated resource
    */
-  <C extends ResourceContent, R extends Resource<C>> PutContentOperation<C, R> putContentAsynchronously(
-      ResourceURI uri, C content, InputStream is)
+  PutContentOperation putContentAsynchronously(ResourceURI uri,
+      ResourceContent content, InputStream is)
           throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
@@ -228,9 +225,8 @@ public interface WritableContentRepository extends ContentRepository {
    *           if the parent resource does not exist
    * @return the updated resource
    */
-  <C extends ResourceContent, R extends Resource<C>> R deleteContent(
-      ResourceURI uri, C content) throws ContentRepositoryException,
-      IOException, IllegalStateException;
+  Resource<?> deleteContent(ResourceURI uri, ResourceContent content)
+      throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
    * Removes the content from the specified resource and passes the result to
@@ -249,9 +245,9 @@ public interface WritableContentRepository extends ContentRepository {
    *           if the parent resource does not exist
    * @return the updated resource
    */
-  <C extends ResourceContent, R extends Resource<C>> DeleteContentOperation<C, R> deleteContentAsynchronously(
-      ResourceURI uri, C content) throws ContentRepositoryException,
-      IOException, IllegalStateException;
+  DeleteContentOperation deleteContentAsynchronously(ResourceURI uri,
+      ResourceContent content) throws ContentRepositoryException, IOException,
+      IllegalStateException;
 
   /**
    * This method moves the given resource to the new uri.
@@ -269,9 +265,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if moving fails due to a database error
    */
-  <C extends ResourceContent, R extends Resource<C>> void move(ResourceURI uri,
-      String path, boolean moveChildren) throws ContentRepositoryException,
-      IOException;
+  void move(ResourceURI uri, String path, boolean moveChildren)
+      throws ContentRepositoryException, IOException;
 
   /**
    * Moves the resource and optionally its children to the specified path and
@@ -323,8 +318,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ReferentialIntegrityException
    *           if the resource is still being linked to
    */
-  DeleteOperation deleteAsynchronously(
-      ResourceURI uri) throws ContentRepositoryException, IOException;
+  DeleteOperation deleteAsynchronously(ResourceURI uri)
+      throws ContentRepositoryException, IOException;
 
   /**
    * Removes the given resource in the specified version from the database.
@@ -365,9 +360,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if removal fails due to a database error
    */
-  DeleteOperation deleteAsynchronously(
-      ResourceURI uri, boolean allRevisions) throws ContentRepositoryException,
-      IOException;
+  DeleteOperation deleteAsynchronously(ResourceURI uri, boolean allRevisions)
+      throws ContentRepositoryException, IOException;
 
   /**
    * Triggers a re-index of the repository's search index.
@@ -423,9 +417,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ContentRepositoryException
    *           if the resource can't be accessed
    */
-  <C extends ResourceContent, R extends Resource<C>> R lock(ResourceURI uri,
-      User user) throws IOException, ContentRepositoryException,
-      IllegalStateException;
+  Resource<?> lock(ResourceURI uri, User user) throws IOException,
+  ContentRepositoryException, IllegalStateException;
 
   /**
    * Locks the resource for editing by <code>user</code>. This method will throw
@@ -445,9 +438,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ContentRepositoryException
    *           if the resource can't be accessed
    */
-  <C extends ResourceContent, R extends Resource<C>> LockOperation<C, R> lockAsynchronously(
-      ResourceURI uri, User user) throws IOException,
-      ContentRepositoryException, IllegalStateException;
+  LockOperation lockAsynchronously(ResourceURI uri, User user)
+      throws IOException, ContentRepositoryException, IllegalStateException;
 
   /**
    * Removes the editing lock from the resource and returns the user if the
@@ -461,8 +453,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ContentRepositoryException
    *           if the resource can't be accessed
    */
-  <C extends ResourceContent, R extends Resource<C>> R unlock(ResourceURI uri,
-      User user) throws IOException, ContentRepositoryException;
+  Resource<?> unlock(ResourceURI uri, User user) throws IOException,
+  ContentRepositoryException;
 
   /**
    * Removes the editing lock from the resource and returns the user if the
@@ -477,8 +469,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ContentRepositoryException
    *           if the resource can't be accessed
    */
-  <C extends ResourceContent, R extends Resource<C>> UnlockOperation<C, R> unlockAsynchronously(
-      ResourceURI uri, User user) throws IOException,
-      ContentRepositoryException;
+  UnlockOperation unlockAsynchronously(ResourceURI uri, User user)
+      throws IOException, ContentRepositoryException;
 
 }
