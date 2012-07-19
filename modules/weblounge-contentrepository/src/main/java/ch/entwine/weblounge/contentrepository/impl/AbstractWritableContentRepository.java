@@ -370,11 +370,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // If we found a resource, let's return it
-    if (resource != null)
-      return (R) resource;
-
-    // If not, have the super implementation get the content for us
-    return super.get(uri);
+    return (R) resource;
   }
 
   /**
