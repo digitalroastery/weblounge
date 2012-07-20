@@ -335,7 +335,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
         try {
           InputStream resourceStream = loadResource(uri);
           if (resourceStream == null) {
-            logger.error("Index inconsistency detected: version '{}' of {} does not exist on disk", ResourceUtils.getVersionString(uri.getVersion()), uri);
             return null;
           }
           is = new BufferedInputStream(resourceStream);
