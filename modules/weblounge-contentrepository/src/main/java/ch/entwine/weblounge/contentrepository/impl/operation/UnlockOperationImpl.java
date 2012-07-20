@@ -23,6 +23,7 @@ package ch.entwine.weblounge.contentrepository.impl.operation;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.UnlockOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -76,7 +77,7 @@ public final class UnlockOperationImpl extends AbstractContentRepositoryOperatio
 
     // Is it a different resource? We care about id and path, but not about
     // version
-    if (!equalsByIdOrPath(this.uri, uri))
+    if (!ResourceUtils.equalsByIdOrPath(this.uri, uri))
       return resource;
 
     resource.unlock();

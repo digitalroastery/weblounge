@@ -23,6 +23,7 @@ package ch.entwine.weblounge.contentrepository.impl.operation;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.DeleteContentOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -64,7 +65,7 @@ public final class DeleteContentOperationImpl extends AbstractContentRepositoryO
    */
   public <C extends ResourceContent, R extends Resource<C>> R apply(
       ResourceURI uri, R resource) {
-    if (!equalsByIdOrPathAndVersion(this.uri, uri))
+    if (!ResourceUtils.equalsByIdOrPathAndVersion(this.uri, uri))
       return resource;
     resource.removeContent(content.getLanguage());
     return resource;

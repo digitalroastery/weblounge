@@ -25,6 +25,7 @@ import static ch.entwine.weblounge.common.url.UrlUtils.isExtendedPrefix;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.MoveOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -84,9 +85,9 @@ public final class MoveOperationImpl extends AbstractContentRepositoryOperation<
   public <C extends ResourceContent, R extends Resource<C>> R apply(ResourceURI uri, R resource) {
     if (resource == null)
       return null;
-    if (resource.getPath() == null && !equalsByIdOrPathAndVersion(this.uri, uri))
+    if (resource.getPath() == null && !ResourceUtils.equalsByIdOrPathAndVersion(this.uri, uri))
       return resource;
-    else if (resource.getPath() == null || !equalsByIdOrPathAndVersion(this.uri, uri)) {
+    else if (resource.getPath() == null || !ResourceUtils.equalsByIdOrPathAndVersion(this.uri, uri)) {
       resource.setPath(moveTo);
       return resource;
     } else if (moveChildren && isExtendedPrefix(this.uri.getPath(), resource.getPath())) {

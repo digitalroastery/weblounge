@@ -23,6 +23,7 @@ package ch.entwine.weblounge.contentrepository.impl.operation;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.PutOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -81,7 +82,7 @@ public final class PutOperationImpl extends AbstractContentRepositoryOperation<R
   @SuppressWarnings("unchecked")
   public <C extends ResourceContent, R extends Resource<C>> R apply(
       ResourceURI uri, R resource) {
-    if (!equalsByIdOrPathAndVersion(this.resource.getURI(), uri))
+    if (!ResourceUtils.equalsByIdOrPathAndVersion(this.resource.getURI(), uri))
       return resource;
     return (R) this.resource;
   }

@@ -23,6 +23,7 @@ package ch.entwine.weblounge.contentrepository.impl.operation;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.PutContentOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -81,7 +82,7 @@ public final class PutContentOperationImpl extends AbstractContentRepositoryOper
       ResourceURI uri, R resource) {
     if (resource == null)
       return null;
-    if (!equalsByIdOrPathAndVersion(this.uri, uri))
+    if (!ResourceUtils.equalsByIdOrPathAndVersion(this.uri, uri))
       return resource;
     resource.addContent((C) content);
     return resource;

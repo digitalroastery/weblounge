@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import static ch.entwine.weblounge.common.content.ResourceUtils.equalsByIdOrPath;
+
 import ch.entwine.weblounge.cache.ResponseCacheTracker;
 import ch.entwine.weblounge.common.content.MalformedResourceURIException;
 import ch.entwine.weblounge.common.content.Resource;
@@ -316,7 +318,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         }
 
         // Is the resource simply being updated?
-        if (op instanceof PutOperation) {
+        if (op instanceof PutOperation && equalsByIdOrPath(uri, resourceOp.getResourceURI())) {
           uris.add(resourceOp.getResourceURI());
         }
 

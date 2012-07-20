@@ -23,6 +23,7 @@ package ch.entwine.weblounge.contentrepository.impl.operation;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.DeleteOperation;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
@@ -74,9 +75,9 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
    */
   public <C extends ResourceContent, R extends Resource<C>> R apply(
       ResourceURI uri, R resource) {
-    if (allVersions && equalsByIdOrPath(this.uri, uri))
+    if (allVersions && ResourceUtils.equalsByIdOrPath(this.uri, uri))
       return null;
-    else if (!allVersions && equalsByIdOrPathAndVersion(this.uri, uri))
+    else if (!allVersions && ResourceUtils.equalsByIdOrPathAndVersion(this.uri, uri))
       return null;
     return resource;
   }
