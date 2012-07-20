@@ -81,7 +81,7 @@ public final class PutContentOperationImpl extends AbstractContentRepositoryOper
       ResourceURI uri, R resource) {
     if (resource == null)
       return null;
-    if (!this.uri.equals(uri))
+    if (!equalsByIdOrPathAndVersion(this.uri, uri))
       return resource;
     resource.addContent((C) content);
     return resource;

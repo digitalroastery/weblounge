@@ -81,7 +81,7 @@ public final class PutOperationImpl extends AbstractContentRepositoryOperation<R
   @SuppressWarnings("unchecked")
   public <C extends ResourceContent, R extends Resource<C>> R apply(
       ResourceURI uri, R resource) {
-    if (!this.resource.getURI().equals(uri))
+    if (!equalsByIdOrPathAndVersion(this.resource.getURI(), uri))
       return resource;
     return (R) this.resource;
   }

@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.operation;
 
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener;
@@ -248,6 +249,73 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
   @Override
   public int hashCode() {
     return Long.valueOf(operationId).hashCode();
+  }
+
+  /**
+   * Returns <code>true</code> if the two uris match either by id or path. This
+   * implementation takes into account that certain fields such as the id may
+   * not (yet) be set.
+   * 
+   * @param a
+   *          the first uri
+   * @param b
+   *          the second uri
+   * @return <code>true</code> if the two uris point at the same resource
+   */
+  protected boolean equalsByIdOrPathAndVersion(ResourceURI a, ResourceURI b) {
+    return equals(a, b, true);
+  }
+
+  /**
+   * Returns <code>true</code> if the two uris match either by id or path and
+   * version. This implementation takes into account that certain fields such as
+   * the id may not (yet) be set.
+   * 
+   * @param a
+   *          the first uri
+   * @param b
+   *          the second uri
+   * @return <code>true</code> if the two uris point at the same resource
+   */
+  protected boolean equalsByIdOrPath(ResourceURI a, ResourceURI b) {
+    return equals(a, b, false);
+  }
+
+  /**
+   * Returns <code>true</code> if the two uris match. This implementation takes
+   * into account that certain fields such as the id may not (yet) be set.
+   * 
+   * @param a
+   *          the first uri
+   * @param b
+   *          the second uri
+   * @param checkVersions
+   *          <code>true</code> to also check equality on the version
+   * @return <code>true</code> if the two uris point at the same resource
+   */
+  private boolean equals(ResourceURI a, ResourceURI b, boolean checkVersions) {
+    String idA = a.getIdentifier();
+    String idB = b.getIdentifier();
+    long versionA = a.getVersion();
+    long versionB = b.getVersion();
+
+    // Test the identifier
+    if (idA != null && idB != null) {
+      if (idA.equals(idB) && (!checkVersions || versionA == versionB))
+        return true;
+      return false;
+    }
+
+    // Test the path
+    String pathA = a.getPath();
+    String pathB = b.getPath();
+    if (pathA != null && pathB != null) {
+      if (pathA.equals(pathB) && (!checkVersions || versionA == versionB))
+        return true;
+      return false;
+    }
+
+    return false;
   }
 
   /**
