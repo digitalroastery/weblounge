@@ -294,9 +294,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     Set<ResourceURI> uris = new HashSet<ResourceURI>();
     uris.addAll(Arrays.asList(super.getVersions(uri)));
 
-    // Get hold of the current operation
-    ContentRepositoryOperation<?> currentOperation = CurrentOperation.get();
-
     // Iterate over the resources that are currently being processed
     synchronized (processor) {
       for (ContentRepositoryOperation<?> op : processor.getOperations()) {
@@ -305,31 +302,22 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         if (!(op instanceof ContentRepositoryResourceOperation<?>))
           continue;
 
-        // Don't move beyond the current state of work
-        if (op == currentOperation)
-          break;
-
+        // Apply the changes to the original resource
         ContentRepositoryResourceOperation<?> resourceOp = (ContentRepositoryResourceOperation<?>) op;
-        ResourceURI processedURI = resourceOp.getResourceURI();
 
-        // Is it a different resource?
-        if (uri.getIdentifier() != null && !uri.getIdentifier().equals(processedURI.getIdentifier()))
-          continue;
-        else if (uri.getPath() != null && !uri.getPath().equals(processedURI.getPath()))
-          continue;
-
-        // Is a different version of the resource?
-        if (uri.getVersion() != processedURI.getVersion())
-          continue;
+        // Do we need to remove this resource because it's about to be deleted?
+        boolean remove = false;
+        for (ResourceURI u : uris) {
+          if (get(u) == null)
+            remove = true;
+        }
+        if (remove) {
+          uris.remove(resourceOp.getResourceURI());
+        }
 
         // Is the resource simply being updated?
         if (op instanceof PutOperation) {
           uris.add(resourceOp.getResourceURI());
-        }
-
-        // Is a different version of the resource being deleted?
-        if (op instanceof DeleteOperation) {
-          uris.remove(resourceOp.getResourceURI());
         }
 
       }

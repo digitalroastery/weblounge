@@ -74,9 +74,11 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
    */
   public <C extends ResourceContent, R extends Resource<C>> R apply(
       ResourceURI uri, R resource) {
-    if (!equalsByIdOrPathAndVersion(this.uri, uri))
-      return resource;
-    return null;
+    if (allVersions && equalsByIdOrPath(this.uri, uri))
+      return null;
+    else if (!allVersions && equalsByIdOrPathAndVersion(this.uri, uri))
+      return null;
+    return resource;
   }
 
   /**
