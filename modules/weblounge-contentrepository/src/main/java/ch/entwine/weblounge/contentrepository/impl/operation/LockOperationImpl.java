@@ -72,13 +72,14 @@ public final class LockOperationImpl extends AbstractContentRepositoryOperation<
    */
   public <C extends ResourceContent, R extends Resource<C>> R apply(
       ResourceURI uri, R resource) {
-    if (resource == null)
-      return null;
 
     // Is it a different resource? We care about id and path, but not about
     // version
     if (!ResourceUtils.equalsByIdOrPath(this.uri, uri))
       return resource;
+
+    if (resource == null)
+      return null;
 
     resource.lock(user);
     return resource;
