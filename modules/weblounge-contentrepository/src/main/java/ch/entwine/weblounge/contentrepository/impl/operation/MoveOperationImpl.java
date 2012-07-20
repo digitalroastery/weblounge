@@ -85,9 +85,9 @@ public final class MoveOperationImpl extends AbstractContentRepositoryOperation<
   public <C extends ResourceContent, R extends Resource<C>> R apply(ResourceURI uri, R resource) {
     if (resource == null)
       return null;
-    if (resource.getPath() == null && !ResourceUtils.equalsByIdOrPathAndVersion(this.uri, uri))
+    if (resource.getPath() == null && !ResourceUtils.equalsByIdOrPathAndVersion(this.uri, resource.getURI()))
       return resource;
-    else if (resource.getPath() == null || !ResourceUtils.equalsByIdOrPathAndVersion(this.uri, uri)) {
+    else if (resource.getPath() == null || !ResourceUtils.equalsByIdOrPathAndVersion(this.uri, resource.getURI())) {
       resource.setPath(moveTo);
       return resource;
     } else if (moveChildren && isExtendedPrefix(this.uri.getPath(), resource.getPath())) {

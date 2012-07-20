@@ -65,10 +65,13 @@ public final class DeleteContentOperationImpl extends AbstractContentRepositoryO
    */
   public <C extends ResourceContent, R extends Resource<C>> R apply(
       ResourceURI uri, R resource) {
-    if (!ResourceUtils.equalsByIdOrPathAndVersion(this.uri, uri))
-      return resource;
+
     if (resource == null)
       return null;
+
+    if (!ResourceUtils.equalsByIdOrPathAndVersion(this.uri, resource.getURI()))
+      return resource;
+
     resource.removeContent(content.getLanguage());
     return resource;
   }

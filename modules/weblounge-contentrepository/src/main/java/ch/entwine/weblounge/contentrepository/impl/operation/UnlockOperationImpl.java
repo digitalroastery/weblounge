@@ -77,7 +77,7 @@ public final class UnlockOperationImpl extends AbstractContentRepositoryOperatio
 
     // Is it a different resource? We care about id and path, but not about
     // version
-    if (!ResourceUtils.equalsByIdOrPath(this.uri, uri))
+    if (!ResourceUtils.equalsByIdOrPath(this.uri, resource.getURI()))
       return resource;
 
     resource.unlock();

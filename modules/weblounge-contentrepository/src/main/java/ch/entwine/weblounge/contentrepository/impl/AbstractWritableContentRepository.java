@@ -307,19 +307,22 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         // Apply the changes to the original resource
         ContentRepositoryResourceOperation<?> resourceOp = (ContentRepositoryResourceOperation<?>) op;
 
-        // Do we need to remove this resource because it's about to be deleted?
-        boolean remove = false;
-        for (ResourceURI u : uris) {
-          if (get(u) == null)
-            remove = true;
-        }
-        if (remove) {
-          uris.remove(resourceOp.getResourceURI());
+        // Is the resource about to be deleted?
+        ResourceURI opURI = resourceOp.getResourceURI();
+        if (op instanceof DeleteOperation && equalsByIdOrPath(uri, opURI)) {
+          DeleteOperation deleteOp = (DeleteOperation) op;
+          List<ResourceURI> deleteCandidates = new ArrayList<ResourceURI>();
+          for (ResourceURI u : uris) {
+            if (deleteOp.allVersions() || uri.getVersion() == opURI.getVersion()) {
+              deleteCandidates.add(u);
+            }
+          }
+          uris.removeAll(deleteCandidates);
         }
 
         // Is the resource simply being updated?
-        if (op instanceof PutOperation && equalsByIdOrPath(uri, resourceOp.getResourceURI())) {
-          uris.add(resourceOp.getResourceURI());
+        if (op instanceof PutOperation && equalsByIdOrPath(uri, opURI)) {
+          uris.add(opURI);
         }
 
       }
