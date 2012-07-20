@@ -101,6 +101,7 @@ public class PageContentTest extends IntegrationTestBase {
    * 
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
+  @Override
   public void execute(String serverUrl) throws Exception {
     testPage(serverUrl);
     testNonExistingPage(serverUrl);
@@ -155,8 +156,8 @@ public class PageContentTest extends IntegrationTestBase {
       logger.info("Sending request to the {} version of {}", language.getLocale().getDisplayName(), requestUrl);
       HttpGet request = new HttpGet(requestUrl);
       String[][] params = new String[][] { {
-          "language",
-          language.getIdentifier() } };
+        "language",
+        language.getIdentifier() } };
 
       String eTagValue;
       Date modificationDate = null;
@@ -211,8 +212,8 @@ public class PageContentTest extends IntegrationTestBase {
         httpClient.getConnectionManager().shutdown();
       }
 
-      TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-      TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
+      TestSiteUtils.testETagHeader(request, eTagValue, logger, params);
+      TestSiteUtils.testModifiedHeader(request, modificationDate, logger, params);
     }
   }
 
