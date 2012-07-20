@@ -29,10 +29,10 @@ steal.plugins('jquery/model')
 				url += "?language=" + params.language;
 			}
 			if ('id' in params) {
-				if(params.page != undefined) {
+				if(params.pagelet != undefined) {
 					$.ajax(url, {
-						type: 'POST',
-						data: {page : Page.parseJSON(params.page)},
+						type: 'GET',
+						data: params.pagelet,
 						success: success
 					});
 				} else {
