@@ -95,6 +95,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
    * 
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
+  @Override
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of pages endpoint");
 
@@ -588,9 +589,9 @@ public class PagesEndpointTest extends IntegrationTestBase {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       Document pagesXml = TestUtils.parseXMLResponse(response);
-      assertNotNull(XPathHelper.selectList(pageXml, "/pages/page"));
-      assertEquals(id, XPathHelper.valueOf(pagesXml, "/pages/page/@id"));
-      assertEquals(newPath, XPathHelper.valueOf(pagesXml, "/pages/page/@path"));
+      assertNotNull(XPathHelper.valueOf(pageXml, "/pages/page[0]"));
+      assertEquals(id, XPathHelper.valueOf(pagesXml, "/pages/page[0]/@id"));
+      assertEquals(newPath, XPathHelper.valueOf(pagesXml, "/pages/page[0]/@path"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
