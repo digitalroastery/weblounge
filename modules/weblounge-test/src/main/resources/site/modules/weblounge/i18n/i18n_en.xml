@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <string name="module.name">Test Module</string>
-  <string name="ch.entwine.weblounge.test.i18n.modulekey">I18n Module Value</string>
-  <string name="ch.entwine.weblounge.test.i18n.pagekey">I18n Page Value</string>
-</resources>
