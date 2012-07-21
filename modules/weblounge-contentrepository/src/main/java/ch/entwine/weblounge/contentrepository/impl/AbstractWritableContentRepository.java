@@ -313,7 +313,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           DeleteOperation deleteOp = (DeleteOperation) op;
           List<ResourceURI> deleteCandidates = new ArrayList<ResourceURI>();
           for (ResourceURI u : uris) {
-            if (deleteOp.allVersions() || uri.getVersion() == opURI.getVersion()) {
+            if (deleteOp.allVersions() || u.getVersion() == opURI.getVersion()) {
               deleteCandidates.add(u);
             }
           }
