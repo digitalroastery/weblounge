@@ -20,10 +20,11 @@
 
 package ch.entwine.weblounge.contentrepository.impl.operation;
 
+import static ch.entwine.weblounge.common.content.ResourceUtils.equalsByIdOrPathAndVersion;
+
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.PutOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
@@ -49,8 +50,7 @@ public final class PutOperationImpl extends AbstractContentRepositoryOperation<R
    * @param updatePreviews
    *          whether to update the resource's previews
    */
-  public PutOperationImpl(Resource<?> resource,
-      boolean updatePreviews) {
+  public PutOperationImpl(Resource<?> resource, boolean updatePreviews) {
     this.resource = resource;
     this.updatePreviews = updatePreviews;
   }
@@ -82,7 +82,17 @@ public final class PutOperationImpl extends AbstractContentRepositoryOperation<R
   @SuppressWarnings("unchecked")
   public <C extends ResourceContent, R extends Resource<C>> R apply(
       ResourceURI uri, R resource) {
-    if (!ResourceUtils.equalsByIdOrPathAndVersion(this.resource.getURI(), resource.getURI()))
+
+    // Is this a resource creation...
+    if (resource == null) {
+      if (equalsByIdOrPathAndVersion(uri, this.resource.getURI()))
+        return (R) this.resource;
+      return null;
+    }
+
+    // or simply an update (needs to be handled separately because of resource
+    // that could have been moved around, resulting in a different path)?
+    if (!equalsByIdOrPathAndVersion(this.resource.getURI(), resource.getURI()))
       return resource;
     return (R) this.resource;
   }
@@ -102,8 +112,9 @@ public final class PutOperationImpl extends AbstractContentRepositoryOperation<R
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
    */
   @Override
-  protected Resource<? extends ResourceContent> run(WritableContentRepository repository)
-      throws ContentRepositoryException, IOException {
+  protected Resource<? extends ResourceContent> run(
+      WritableContentRepository repository) throws ContentRepositoryException,
+      IOException {
     return repository.put(resource, updatePreviews);
   }
 
