@@ -358,17 +358,27 @@ public class PagesEndpointTest extends IntegrationTestBase {
     // Make sure the page is being issued as a referrer of the original page
     String requestReferrerUrl = UrlUtils.concat(requestUrl, pageId, "referrer");
     HttpGet getPageRequest = new HttpGet(requestReferrerUrl);
-    httpClient = new DefaultHttpClient();
     logger.info("Requesting referrer of {} at {}", pageId, requestReferrerUrl);
-    try {
-      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
-      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      Document referrer = TestUtils.parseXMLResponse(response);
-      assertEquals(1, XPathHelper.selectList(referrer, "/pages/page").getLength());
-      assertEquals(referringPageId, XPathHelper.valueOf(referrer, "/pages/page/@id"));
-    } finally {
-      httpClient.getConnectionManager().shutdown();
+    // Wait as long as 10s for the asynchronous processing
+    boolean success = false;
+    for (int i = 0; i < 5; i++) {
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+        assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        Document referrer = TestUtils.parseXMLResponse(response);
+        assertEquals(1, XPathHelper.selectList(referrer, "/pages/page").getLength());
+        assertEquals(referringPageId, XPathHelper.valueOf(referrer, "/pages/page/@id"));
+        success = true;
+        break;
+      } catch (AssertionError a) {
+        logger.info("Waiting, then retrying due to asynchronous processing");
+        Thread.sleep(2000);
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
     }
+    assertTrue(success);
 
     // Delete the new page
     HttpDelete deleteRequest = new HttpDelete(UrlUtils.concat(requestUrl, referringPageId));
