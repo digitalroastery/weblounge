@@ -100,20 +100,20 @@ public final class ResourceUtils {
     long versionA = a.getVersion();
     long versionB = b.getVersion();
 
-    // Test the path
-    String pathA = a.getPath();
-    String pathB = b.getPath();
-    if (pathA != null && pathB != null) {
-      if (pathA.equals(pathB) && (!checkVersions || versionA == versionB))
-        return true;
-      return false;
-    }
-
     // Test the identifier
     String idA = a.getIdentifier();
     String idB = b.getIdentifier();
     if (idA != null && idB != null) {
       if (idA.equals(idB) && (!checkVersions || versionA == versionB))
+        return true;
+      return false;
+    }
+
+    // Test the path
+    String pathA = a.getPath();
+    String pathB = b.getPath();
+    if (pathA != null && pathB != null) {
+      if (pathA.equals(pathB) && (!checkVersions || versionA == versionB))
         return true;
       return false;
     }
