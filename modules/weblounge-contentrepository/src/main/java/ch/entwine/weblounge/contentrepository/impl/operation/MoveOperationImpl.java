@@ -85,12 +85,13 @@ public final class MoveOperationImpl extends AbstractContentRepositoryOperation<
   public <C extends ResourceContent, R extends Resource<C>> R apply(ResourceURI uri, R resource) {
     if (resource == null)
       return null;
-    if (resource.getPath() == null && !ResourceUtils.equalsByIdOrPath(this.uri, resource.getURI()))
-      return resource;
-    else if (resource.getPath() == null || !ResourceUtils.equalsByIdOrPath(this.uri, resource.getURI())) {
+
+    // If we are looking at the same page, update the path
+    if (ResourceUtils.equalsByIdOrPath(this.uri, resource.getURI()))
       resource.setPath(moveTo);
-      return resource;
-    } else if (moveChildren && isExtendedPrefix(this.uri.getPath(), resource.getPath())) {
+
+    // Let's see if this is a potential child resource
+    else if (moveChildren && isExtendedPrefix(this.uri.getPath(), resource.getPath())) {
       String originalPathPrefix = this.uri.getPath();
       String originalPath = resource.getPath();
       String pathSuffix = originalPath.substring(originalPathPrefix.length());
@@ -104,6 +105,7 @@ public final class MoveOperationImpl extends AbstractContentRepositoryOperation<
 
       resource.setPath(newPath);
     }
+
     return resource;
   }
 
