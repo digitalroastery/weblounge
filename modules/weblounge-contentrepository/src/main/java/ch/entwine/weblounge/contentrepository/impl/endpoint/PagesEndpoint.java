@@ -599,14 +599,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       page.setModified(user, new Date());
       page.setVersion(Resource.WORK);
 
-      // TODO: wait for Future and update update listener
       contentRepository.putAsynchronously(page, false);
 
       // Check if the page has been moved
       String currentPath = currentPage.getURI().getPath();
       String newPath = page.getURI().getPath();
-      if (currentPath != null && newPath != null && !currentPath.equals(newPath)) {
-        // TODO: wait for Future and update update listener
+      if ((currentPath != null && !currentPath.equals(newPath) || (currentPath == null && newPath != null))) {
         contentRepository.moveAsynchronously(currentPage.getURI(), newPath, true);
       }
     } catch (SecurityException e) {
