@@ -1063,7 +1063,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     try {
       indexing = true;
       index.close();
-      logger.info("Moving new index to place {}", idxRootDir);
+      logger.info("Moving new index into place {}", idxRootDir);
       FileUtils.moveDirectory(idxRootDir, oldIdxRootDir);
       FileUtils.moveDirectory(newIdxRootDir, idxRootDir);
       index = new FileSystemContentRepositoryIndex(idxRootDir);
@@ -1240,6 +1240,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           IOUtils.closeQuietly(is);
         }
 
+        logger.info("Indexing {} [{}]", resource, resource.getVersion());
         idx.add(resource);
         resourceVersionCount++;
 
