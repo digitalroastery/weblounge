@@ -49,7 +49,7 @@ public class GeneralComposeable implements Composeable {
   protected String name = null;
 
   /** The execution environment */
-  protected Environment environment = Environment.Production;
+  protected Environment environment = Environment.Any;
 
   /** HTML head elements */
   protected List<HTMLHeadElement> headers = null;
@@ -240,6 +240,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     if (identifier == null)
       throw new IllegalStateException("Composeable object needs an identifier");
@@ -251,6 +252,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(Object o) {
     if (identifier == null)
       throw new IllegalStateException("Composeable object needs an identifier");

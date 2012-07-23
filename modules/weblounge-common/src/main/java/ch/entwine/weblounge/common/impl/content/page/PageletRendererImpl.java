@@ -55,7 +55,7 @@ import javax.xml.xpath.XPathFactory;
 public class PageletRendererImpl extends AbstractRenderer implements PageletRenderer {
 
   /** The logging facility */
-  private Logger logger = LoggerFactory.getLogger(PageletRendererImpl.class);
+  private final Logger logger = LoggerFactory.getLogger(PageletRendererImpl.class);
 
   /** The editor url */
   protected URL editor = null;
