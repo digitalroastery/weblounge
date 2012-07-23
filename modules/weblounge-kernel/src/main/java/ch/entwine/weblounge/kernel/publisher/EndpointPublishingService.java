@@ -266,8 +266,10 @@ public class EndpointPublishingService implements ManagedService {
     try {
       ServiceRegistration reg = endpointRegistrations.get(contextPath);
       reg.unregister();
+    } catch (IllegalStateException e) {
+      // Never mind, the service has been unregistered already
     } catch (Throwable t) {
-      logger.error("Unable to unregister rest endpoint " + contextPath, t);
+      logger.error("Unregistering endpoint at '{}' failed: {}", contextPath, t.getMessage());
     }
 
     // Destroy the servlet

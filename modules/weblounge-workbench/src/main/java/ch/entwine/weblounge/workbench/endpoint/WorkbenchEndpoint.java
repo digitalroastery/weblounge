@@ -25,7 +25,6 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.site.SiteManager;
 import ch.entwine.weblounge.workbench.PageletEditor;
@@ -36,7 +35,9 @@ import ch.entwine.weblounge.workbench.suggest.SuggestionList;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -52,12 +53,15 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("/")
 public class WorkbenchEndpoint {
-  
+
   /** The workbench */
   protected transient WorkbenchService workbench = null;
 
   /** The sites that are online */
   protected transient SiteManager sites = null;
+
+  /** The request environment */
+  protected Environment environment = Environment.Production;
 
   /** The endpoint documentation */
   private String docs = null;
@@ -85,15 +89,6 @@ public class WorkbenchEndpoint {
     if (site == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
-    // What is the current environment?
-    Environment environment = Environment.Production;
-    for (SiteURL url : site.getHostnames()) {
-      if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
-        environment = url.getEnvironment();
-        break;
-      }
-    }
-
     // Return the editor
     ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.WORK);
     PageletEditor editor;
@@ -106,7 +101,35 @@ public class WorkbenchEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     return Response.ok(editor.toXml()).build();
   }
-  
+
+  @POST
+  @Produces(MediaType.TEXT_HTML)
+  @Path("/renderer/{page}/{composer}/{pageletindex}")
+  public Response getRenderer(@Context HttpServletRequest request,
+      @PathParam("page") String pageURI,
+      @PathParam("composer") String composerId,
+      @PathParam("pageletindex") int pageletIndex,
+      @QueryParam("language") String language, @FormParam("page") String pageXml) {
+
+    // Load the site
+    Site site = getSite(request);
+    if (site == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.WORK);
+    String renderedPagelet;
+    try {
+      renderedPagelet = workbench.getRenderer(site, uri, composerId, pageletIndex, pageXml, language, environment);
+    } catch (Exception e) {
+      throw new WebApplicationException(e);
+    }
+
+    if (renderedPagelet == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+    return Response.ok(renderedPagelet).build();
+
+  }
+
   @GET
   @Produces(MediaType.TEXT_HTML)
   @Path("/renderer/{page}/{composer}/{pageletindex}")
@@ -115,32 +138,23 @@ public class WorkbenchEndpoint {
       @PathParam("composer") String composerId,
       @PathParam("pageletindex") int pageletIndex,
       @QueryParam("language") String language) {
-    
+
     // Load the site
     Site site = getSite(request);
-    if(site == null)
+    if (site == null)
       throw new WebApplicationException(Status.NOT_FOUND);
-    
-    // What is the current environment?
-    Environment environment = Environment.Production;
-    for (SiteURL url : site.getHostnames()) {
-      if (request.getRequestURL().toString().startsWith(url.toExternalForm())) {
-        environment = url.getEnvironment();
-        break;
-      }
-    }
 
     ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.WORK);
-    String renderer;
+    String renderedPagelet;
     try {
-      renderer = workbench.getRenderer(site, uri, composerId, pageletIndex, language, environment);
-    } catch (IOException e) {
+      renderedPagelet = workbench.getRenderer(site, uri, composerId, pageletIndex, language, environment);
+    } catch (Exception e) {
       throw new WebApplicationException(e);
     }
-    
-    if (renderer == null)
+
+    if (renderedPagelet == null)
       throw new WebApplicationException(Status.NOT_FOUND);
-    return Response.ok(renderer).build();
+    return Response.ok(renderedPagelet).build();
   }
 
   /**
@@ -236,6 +250,16 @@ public class WorkbenchEndpoint {
    */
   void removeSiteManager(SiteManager siteManager) {
     this.sites = null;
+  }
+
+  /**
+   * Callback from the OSGi environment when the environment becomes published.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
   }
 
   /**

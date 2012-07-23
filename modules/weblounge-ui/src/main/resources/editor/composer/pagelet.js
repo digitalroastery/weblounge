@@ -100,7 +100,8 @@ steal.plugins('jqueryui/dialog',
 					var newPagelet = this._updatePageletValues(pagelet);
 					
 					// Save New Pagelet and show Renderer
-					this.options.composer.page.insertPagelet(newPagelet, this.options.composer.id, this.element.index(), this.callback('_showRenderer'));
+					this.options.composer.page.insertPagelet(newPagelet, this.options.composer.id, this.element.index());
+					this._showRenderer(newPagelet);
 					
 					$("body").css({ overflow: 'visible' });
 					this.editorDialog.dialog('destroy');
@@ -258,12 +259,13 @@ steal.plugins('jqueryui/dialog',
 		return pagelet;
     },
     
-    _showRenderer: function() {
+    _showRenderer: function(pagelet) {
 		Workbench.getRenderer({
 			id: this.options.composer.page.value.id,
 			composer: this.options.composer.id,
 			language: this.options.composer.language,
-			pagelet: this.element.index()
+			pageletId: this.element.index(),
+			pagelet: pagelet
 		}, $.proxy(function(renderer) {
 			this.element.html(renderer);
 		}, this));

@@ -57,7 +57,7 @@ public class CacheServiceFactory implements ManagedServiceFactory {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CacheServiceFactory.class);
-  
+
   /** The factory's service pid */
   static final String SERVICE_PID = "ch.entwine.weblounge.cache.factory";
 
@@ -111,7 +111,7 @@ public class CacheServiceFactory implements ManagedServiceFactory {
       String id = (String) properties.get(CacheServiceImpl.OPT_ID);
       String name = (String) properties.get(CacheServiceImpl.OPT_NAME);
       String diskStorePath = (String) properties.get(CacheServiceImpl.OPT_DISKSTORE_PATH);
-      
+
       try {
         CacheServiceImpl cache = new CacheServiceImpl(id, name, diskStorePath);
         cache.updated(properties);
@@ -138,7 +138,13 @@ public class CacheServiceFactory implements ManagedServiceFactory {
       return;
     }
     CacheService cache = (CacheService) bundleCtx.getService(registration.getReference());
-    registration.unregister();
+    try {
+      registration.unregister();
+    } catch (IllegalStateException e) {
+      // Never mind, the service has been unregistered already
+    } catch (Throwable t) {
+      logger.error("Unregistering cache service failed: {}", t.getMessage());
+    }
     cache.shutdown();
   }
 

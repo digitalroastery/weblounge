@@ -173,6 +173,8 @@ public class SpringSecurityConfigurationService implements ManagedService {
     if (securityMarker != null) {
       try {
         securityMarker.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
       } catch (Throwable t) {
         logger.error("Unregistering security context failed: {}", t.getMessage());
       }
@@ -222,7 +224,13 @@ public class SpringSecurityConfigurationService implements ManagedService {
     }
     if (!digestType.equals(passwordEncoding) && securityMarker != null) {
       passwordEncoding = digestType;
-      securityMarker.unregister();
+      try {
+        securityMarker.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering security marker failed: {}", t.getMessage());
+      }
       publishSecurityMarker();
     }
 
@@ -277,7 +285,7 @@ public class SpringSecurityConfigurationService implements ManagedService {
         securityFilterRegistration.unregister();
         logger.debug("Spring security context unregistered");
       } catch (IllegalStateException e) {
-        logger.debug("Security context was already unregistered");
+        // Never mind, the service has been unregistered already
       } catch (Throwable t) {
         logger.error("Unregistering security context", t.getMessage());
       }

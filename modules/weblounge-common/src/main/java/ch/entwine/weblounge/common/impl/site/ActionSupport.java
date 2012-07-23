@@ -232,7 +232,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @return the action's link
    */
   public WebUrl getUrl() {
-    return getUrl(Environment.Production);
+    return getUrl(environment);
   }
 
   /**

@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.security.SecurityService;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.dispatcher.DispatchListener;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
@@ -73,9 +74,12 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
   /** Value of the X-Powered-By header */
   private static final String POWERED_BY = "Weblounge Content Management System";
-  
+
   /** Response default encoding */
   private static final String DEFAULT_RESPONSE_ENCODING = "UTF-8";
+
+  /** The environment */
+  private Environment environment = Environment.Production;
 
   /** The sites that are online */
   private transient SiteDispatcherService sites = null;
@@ -108,8 +112,12 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
   /**
    * Creates a new instance of the weblounge dispatcher servlet.
+   * 
+   * @param environment
+   *          the environment
    */
-  WebloungeDispatcherServlet() {
+  WebloungeDispatcherServlet(Environment environment) {
+    this.environment = environment;
     requestListeners = new CopyOnWriteArrayList<RequestListener>();
     dispatcher = new CopyOnWriteArrayList<DispatchListener>();
     requestHandler = new TreeSet<RequestHandler>(new Comparator<RequestHandler>() {
@@ -310,7 +318,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     }
 
     // Wrap request and response
-    WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest, siteServlet);
+    WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest, siteServlet, environment);
     WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
 
     // See if a site dispatcher was found, and if so, if it's enabled
@@ -549,6 +557,17 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     }
     if (site != null)
       site.requestFailed(request, response, resp.getStatus());
+  }
+
+  /**
+   * Sets the environment that is used to determine the correct context for
+   * requests.
+   * 
+   * @param environment
+   *          the environment
+   */
+  public void setEnvironment(Environment environment) {
+    this.environment = environment;
   }
 
   /**

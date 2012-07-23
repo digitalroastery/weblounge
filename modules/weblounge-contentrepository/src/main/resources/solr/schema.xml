@@ -517,7 +517,7 @@
     <dynamicField name="content_xml_*" type="text" indexed="false" stored="true"/>
 
     <!-- Additional utility fields -->
-    <field name="path_elements" type="path_elements" indexed="true" stored="false"/>
+    <field name="path_prefix" type="string" indexed="true" stored="false" multiValued="true"/>
 
     <!-- Language sensitive fulltext search -->
     <dynamicField name="fulltext_*" type="text_rev" indexed="true" stored="false"/>
@@ -563,9 +563,6 @@
  <copyField source="title_*" dest="fulltext"/>
  <copyField source="pagelet_contents_*" dest="fulltext"/>
  -->
- 
- <!-- Create individual path elements from full paths -->
- <copyField source="path" dest="path_elements"/>
  
  <!-- Enable auto suggest -->
  <copyField source="fulltext" dest="fulltext_suggest"/>

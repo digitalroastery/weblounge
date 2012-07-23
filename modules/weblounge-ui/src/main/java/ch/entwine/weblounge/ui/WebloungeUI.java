@@ -52,7 +52,7 @@ public final class WebloungeUI {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WebloungeUI.class);
-  
+
   /** File path and name */
   private static final String STYLES_DEFINITION_FILE = "/imagestyles.xml";
 
@@ -103,7 +103,7 @@ public final class WebloungeUI {
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     XPath xpath = XPathFactory.newInstance().newXPath();
     xpath.setNamespaceContext(new XPathNamespaceContext(true));
-    
+
     // Load the style definitions from disk
     URL stylesDefinition = this.getClass().getResource(STYLES_DEFINITION_FILE);
     Document doc = docBuilder.parse(stylesDefinition.openStream());
@@ -130,7 +130,13 @@ public final class WebloungeUI {
     for (ServiceRegistration service : styles) {
       ImageStyle style = (ImageStyle) ctx.getService(service.getReference());
       logger.debug("Unregistering image style '{}'", style);
-      service.unregister();
+      try {
+        service.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering image style failed: {}", t.getMessage());
+      }
     }
   }
 

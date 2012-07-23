@@ -101,6 +101,15 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
   void setCacheExpirationTime(long validTime);
 
   /**
+   * Returns <code>true</code> if this response is being cached. Note that this
+   * method returns <code>true</code> even after a call to {@link #invalidate()}
+   * .
+   * 
+   * @return <code>true</code> if
+   */
+  boolean isCached();
+
+  /**
    * Returns the maximum valid time.
    * 
    * @return the maximum valid time

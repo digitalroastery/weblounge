@@ -23,14 +23,24 @@ steal.plugins('jquery/model')
 		 * Returns the renderer for the given pagelet
 		 */
 		getRenderer: function(params, success, error) {
-			var url = '/system/weblounge/workbench/renderer/' + params.id + '/' + params.composer + '/' + params.pagelet;
+			var url = '/system/weblounge/workbench/renderer/' + params.id + '/' + params.composer + '/' + params.pageletId;
+				
 			if ('language' in params) {
 				url += "?language=" + params.language;
 			}
 			if ('id' in params) {
-				$.ajax(url, {
-					success: success
-				});
+				if(params.pagelet != undefined) {
+					$.ajax(url, {
+						type: 'GET',
+						data: params.pagelet,
+						success: success
+					});
+				} else {
+					$.ajax(url, {
+						type: 'GET',
+						success: success
+					});
+				}
 			}
 		},
 		

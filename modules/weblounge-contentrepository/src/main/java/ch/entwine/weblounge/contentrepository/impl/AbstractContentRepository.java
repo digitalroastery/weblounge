@@ -272,7 +272,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
-  public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
+  @SuppressWarnings("unchecked")
+  public <R extends Resource<?>> R get(
+      ResourceURI uri)
+          throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
@@ -316,26 +319,47 @@ public abstract class AbstractContentRepository implements ContentRepository {
         }
         ResourceReader<?, ?> reader = serializer.getReader();
         is = IOUtils.toInputStream(searchResultItem.getResourceXml(), "utf-8");
-        return reader.read(is, site);
+        return (R) reader.read(is, site);
       } catch (Throwable t) {
         logger.error("Error loading {}: {}", uri, t.getMessage());
         throw new ContentRepositoryException(t);
       } finally {
         IOUtils.closeQuietly(is);
       }
+
     } else {
+
       try {
-        Resource<?> resource = loadResource(uri);
+        Resource<?> resource = null;
+        InputStream is = null;
+        try {
+          InputStream resourceStream = loadResource(uri);
+          if (resourceStream == null) {
+            return null;
+          }
+          is = new BufferedInputStream(resourceStream);
+          ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+          ResourceReader<?, ?> reader = serializer.getReader();
+          resource = reader.read(is, site);
+        } catch (Throwable t) {
+          String version = ResourceUtils.getVersionString(uri.getVersion());
+          throw new IOException("Error reading " + version + " version of " + uri + " (" + uri.getIdentifier() + ")", t);
+        } finally {
+          IOUtils.closeQuietly(is);
+        }
+
         if (resource == null) {
           logger.error("Index inconsistency detected: version '{}' of {} does not exist on disk", ResourceUtils.getVersionString(uri.getVersion()), uri);
           return null;
         }
-        return resource;
+
+        return (R) resource;
       } catch (IOException e) {
         logger.error("Error loading {}: {}", uri, e.getMessage());
         throw new ContentRepositoryException(e);
       }
     }
+
   }
 
   /**
@@ -346,7 +370,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   public InputStream getContent(ResourceURI uri, Language language)
       throws ContentRepositoryException, IOException {
-    return openStreamToResourceContent(uri, language);
+    return loadResourceContent(uri, language);
   }
 
   /**
@@ -515,7 +539,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @throws IOException
    *           if the resource could not be loaded
    */
-  protected abstract InputStream openStreamToResource(ResourceURI uri)
+  protected abstract InputStream loadResource(ResourceURI uri)
       throws IOException;
 
   /**
@@ -531,7 +555,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @throws IOException
    *           if opening the stream to the resource failed
    */
-  protected abstract InputStream openStreamToResourceContent(ResourceURI uri,
+  protected abstract InputStream loadResourceContent(ResourceURI uri,
       Language language) throws IOException;
 
   /**
@@ -547,7 +571,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    *           if populating the index fails
    */
   protected abstract ContentRepositoryIndex loadIndex() throws IOException,
-      ContentRepositoryException;
+  ContentRepositoryException;
 
   /**
    * {@inheritDoc}
@@ -578,31 +602,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
       }
     }
     return false;
-  }
-
-  /**
-   * Returns the resource that is identified by the given uri.
-   * 
-   * @param uri
-   *          the resource uri
-   * @return the resource
-   */
-  protected Resource<?> loadResource(ResourceURI uri) throws IOException {
-    InputStream is = null;
-    try {
-      InputStream resourceStream = openStreamToResource(uri);
-      if (resourceStream == null)
-        return null;
-      is = new BufferedInputStream(resourceStream);
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
-      ResourceReader<?, ?> reader = serializer.getReader();
-      return reader.read(is, site);
-    } catch (Throwable t) {
-      String version = ResourceUtils.getVersionString(uri.getVersion());
-      throw new IOException("Error reading " + version + " version of " + uri + " (" + uri.getIdentifier() + ")", t);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
   }
 
   /**

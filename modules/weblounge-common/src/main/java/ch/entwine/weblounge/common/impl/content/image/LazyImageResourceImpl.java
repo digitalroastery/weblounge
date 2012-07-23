@@ -429,7 +429,7 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getURI()
+   * @see ch.entwine.weblounge.common.content.image.Page#getResourceURI()
    */
   public ResourceURI getURI() {
     return uri;

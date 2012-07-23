@@ -37,7 +37,7 @@ public class EnvironmentTracker extends ServiceTracker {
   private static final Logger logger = LoggerFactory.getLogger(EnvironmentTracker.class);
 
   /** The environment */
-  protected Environment environment = null;
+  protected Environment environment = Environment.Production;
 
   /** The content repository */
   protected AbstractContentRepository contentRepository = null;
@@ -81,7 +81,13 @@ public class EnvironmentTracker extends ServiceTracker {
     logger.trace("Environment '{}' went away", environment);
     this.environment = null;
     if (reference.getBundle() != null) {
-      super.removedService(reference, service);
+      try {
+        super.removedService(reference, service);
+      } catch (IllegalStateException e) {
+        // The service has been removed, probably due to bundle shutdown
+      } catch (Throwable t) {
+        logger.warn("Error removing service: {}", t.getMessage());
+      }
     }
   }
 

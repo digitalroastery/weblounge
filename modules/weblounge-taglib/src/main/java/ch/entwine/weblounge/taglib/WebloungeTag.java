@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.site.Environment;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -683,7 +684,8 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
 
     // Last resort
     if (request instanceof HttpServletRequest)
-      return new WebloungeRequestImpl((HttpServletRequest) request);
+      return new WebloungeRequestImpl((HttpServletRequest) request, Environment.Production);
+    // TOOD: Properly determin the environment
 
     return null;
   }

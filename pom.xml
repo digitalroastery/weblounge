@@ -4,7 +4,7 @@
   <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-base</artifactId>
   <packaging>pom</packaging>
-  <version>3.0.3</version>
+  <version>3.0.5</version>
   <name>Weblounge</name>
   <description>Weblounge is a multilingual web content management system</description>
   <url>http://www.entwinemedia.com/weblounge</url>
@@ -144,6 +144,38 @@
       </modules>
     </profile>
 
+    <!-- Release aggregator -->
+    <profile>
+      <id>release</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/weblounge-aws</module>
+        <module>modules/weblounge-bridge</module>
+        <module>modules/weblounge-cache</module>
+        <module>modules/weblounge-cache-api</module>
+        <module>modules/weblounge-common</module>
+        <module>modules/weblounge-common-api</module>
+        <module>modules/weblounge-contentrepository</module>
+        <module>modules/weblounge-contentrepository-api</module>
+        <module>modules/weblounge-dispatcher</module>
+        <module>modules/weblounge-dispatcher-api</module>
+        <module>modules/weblounge-i18n-mygengo</module>
+        <module>modules/weblounge-kernel</module>
+        <module>modules/weblounge-maven-s3-deploy-plugin</module>
+        <module>modules/weblounge-preview</module>
+        <module>modules/weblounge-runtime</module>
+        <module>modules/weblounge-security</module>
+        <module>modules/weblounge-security-sql</module>
+        <module>modules/weblounge-system</module>
+        <module>modules/weblounge-taglib</module>
+        <module>modules/weblounge-test</module>
+        <module>modules/weblounge-ui</module>
+        <module>modules/weblounge-workbench</module>
+      </modules>
+    </profile>
+
     <!-- Performance testing -->
     <profile>
       <id>test</id>
@@ -239,14 +271,14 @@
     <pluginManagement>
       <plugins>
       
-        <!-- Require Java 5 or higher for building -->
+        <!-- Require Java 6 or higher for building -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>2.3.2</version>
           <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
+            <source>1.6</source>
+            <target>1.6</target>
             <encoding>UTF-8</encoding>
           </configuration>
         </plugin>
@@ -285,17 +317,17 @@
           </executions>
         </plugin>
 
-				<!-- Release management -->
-				<plugin>
-				  <groupId>org.apache.maven.plugins</groupId>
-				  <artifactId>maven-release-plugin</artifactId>
-				  <version>2.0</version>
-				  <configuration>
-				    <goals>deploy</goals>
-				    <autoVersionSubmodules>true</autoVersionSubmodules>
-						<addSchema>false</addSchema>
-				  </configuration>
-				</plugin>
+		<!-- Release management -->
+		<plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-release-plugin</artifactId>
+		  <version>2.0</version>
+		  <configuration>
+		    <goals>deploy</goals>
+		    <autoVersionSubmodules>true</autoVersionSubmodules>
+				<addSchema>false</addSchema>
+		  </configuration>
+		</plugin>
         
         <!-- Coding and styling rules for source code -->
         <plugin>

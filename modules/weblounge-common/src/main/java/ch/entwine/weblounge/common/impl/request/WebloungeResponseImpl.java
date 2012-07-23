@@ -86,6 +86,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see javax.servlet.http.HttpServletResponseWrapper#sendError(int,
    *      java.lang.String)
    */
+  @Override
   public void sendError(int error, String msg) throws IOException {
     hasError = true;
     responseStatus = error;
@@ -97,6 +98,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * 
    * @see javax.servlet.http.HttpServletResponseWrapper#sendError(int)
    */
+  @Override
   public void sendError(int error) throws IOException {
     sendError(error, null);
   }
@@ -408,6 +410,15 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
     // The recheck time can't be longer than the valid time
     setClientRevalidationTime(validTime);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#isCached()
+   */
+  public boolean isCached() {
+    return cache != null && cache.get() != null;
   }
 
   /**

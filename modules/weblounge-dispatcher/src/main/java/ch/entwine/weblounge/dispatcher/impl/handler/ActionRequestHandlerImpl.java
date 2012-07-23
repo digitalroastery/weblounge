@@ -332,18 +332,26 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     // Finally, let's get some work done!
     try {
       request.setAttribute(WebloungeRequest.ACTION, action);
-      request.setAttribute(WebloungeRequest.PAGE, page);
-      request.setAttribute(WebloungeRequest.TEMPLATE, template);
 
-      // Prepare the action
+      // Prepare the action by storing initial values for page and template
       if (action instanceof HTMLAction) {
-        ((HTMLAction) action).setTemplate(template);
         ((HTMLAction) action).setPage(page);
+        ((HTMLAction) action).setTemplate(template);
       }
 
       // Have the action validate the request
       response.setContentType("text/html");
       action.configure(request, response, RequestFlavor.HTML);
+
+      // Store values that may have been updated by the action during
+      // configure()
+      if (action instanceof HTMLAction) {
+        request.setAttribute(WebloungeRequest.PAGE, ((HTMLAction) action).getPage());
+        request.setAttribute(WebloungeRequest.TEMPLATE, ((HTMLAction) action).getTemplate());
+      } else {
+        request.setAttribute(WebloungeRequest.PAGE, page);
+        request.setAttribute(WebloungeRequest.TEMPLATE, template);
+      }
 
       // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {

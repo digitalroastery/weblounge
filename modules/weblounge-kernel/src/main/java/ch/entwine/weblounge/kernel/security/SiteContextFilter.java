@@ -37,8 +37,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
@@ -57,7 +59,7 @@ import javax.servlet.http.HttpServletResponse;
 public class SiteContextFilter implements Filter {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(SiteContextFilter.class);
+  protected static final Logger logger = LoggerFactory.getLogger(SiteContextFilter.class);
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -181,17 +183,7 @@ public class SiteContextFilter implements Filter {
    *          the new site
    */
   void addSite(Site site) {
-    for (SiteURL url : site.getHostnames()) {
-      if (!environment.equals(url.getEnvironment()))
-        continue;
-      String hostName = url.getURL().getHost();
-      Site registeredFirst = sitesByServerName.get(hostName);
-      if (registeredFirst != null && !site.equals(registeredFirst)) {
-        logger.warn("Another site is already registered to " + url);
-        continue;
-      }
-      sitesByServerName.put(hostName, site);
-    }
+    registerSite(site, environment);
   }
 
   /**
@@ -264,6 +256,13 @@ public class SiteContextFilter implements Filter {
    */
   void setEnvironment(Environment environment) {
     this.environment = environment;
+    synchronized (sitesByServerName) {
+      List<Site> sites = new ArrayList<Site>(sitesByServerName.values());
+      sitesByServerName.clear();
+      for (Site site : sites) {
+        registerSite(site, environment);
+      }
+    }
   }
 
   /**
@@ -273,13 +272,48 @@ public class SiteContextFilter implements Filter {
    *          the environment
    */
   void removeEnvironment(Environment environment) {
-    if (Environment.Production.equals(this.environment)) {
-      logger.info("Changing site environments to {}", Environment.Production);
-      for (Site site : sitesByServerName.values()) {
-        site.initialize(Environment.Production);
+    if (Environment.Production.equals(environment))
+      return;
+
+    // Re-register the site with the production environment
+    this.environment = Environment.Production;
+    logger.info("Changing site environments to {}", Environment.Production);
+    synchronized (sitesByServerName) {
+      List<Site> sites = new ArrayList<Site>(sitesByServerName.values());
+      sitesByServerName.clear();
+      for (Site site : sites) {
+        registerSite(site, environment);
       }
     }
-    this.environment = null;
+  }
+
+  /**
+   * Registers the site in the site registry.
+   * 
+   * @param site
+   *          the site
+   * @param environment
+   *          the environment
+   */
+  private void registerSite(Site site, Environment environment) {
+
+    // Register the url
+    for (SiteURL url : site.getHostnames()) {
+      if (!environment.equals(url.getEnvironment()))
+        continue;
+      synchronized (sitesByServerName) {
+        String hostName = url.getURL().getHost();
+        Site registeredFirst = sitesByServerName.get(hostName);
+        if (registeredFirst != null && !site.equals(registeredFirst)) {
+          logger.warn("Another site is already registered to " + url);
+          continue;
+        }
+        sitesByServerName.put(hostName, site);
+      }
+    }
+
+    // Initialize the site
+    site.initialize(environment);
   }
 
   /**
@@ -319,7 +353,13 @@ public class SiteContextFilter implements Filter {
       Site site = (Site) service;
       removeSite(site);
       if (reference.getBundle() != null) {
-        super.removedService(reference, service);
+        try {
+          super.removedService(reference, service);
+        } catch (IllegalStateException e) {
+          // The service has been removed, probably due to bundle shutdown
+        } catch (Throwable t) {
+          logger.warn("Error removing service: {}", t.getMessage());
+        }
       }
     }
 
@@ -362,7 +402,14 @@ public class SiteContextFilter implements Filter {
       Environment environment = (Environment) service;
       removeEnvironment(environment);
       if (reference.getBundle() != null) {
-        super.removedService(reference, service);
+        try {
+          super.removedService(reference, service);
+        } catch (IllegalStateException e) {
+          // The service has been removed already, probably due to bundle
+          // shutdown
+        } catch (Throwable t) {
+          logger.warn("Error removing service: {}", t.getMessage());
+        }
       }
     }
 

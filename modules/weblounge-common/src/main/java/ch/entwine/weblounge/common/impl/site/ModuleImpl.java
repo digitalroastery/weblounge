@@ -111,7 +111,7 @@ public class ModuleImpl implements Module {
   protected List<ModuleListener> moduleListeners = null;
 
   /** The environment */
-  protected Environment environment = null;
+  protected Environment environment = Environment.Production;
 
   /**
    * Creates a new module.
@@ -179,7 +179,7 @@ public class ModuleImpl implements Module {
    * @see ch.entwine.weblounge.common.site.Module#getUrl()
    */
   public WebUrl getUrl() {
-    return getUrl(Environment.Production);
+    return getUrl(environment);
   }
 
   /**

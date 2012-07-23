@@ -89,6 +89,31 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     addField(TYPE, uri.getType(), true);
     addField(VERSION, uri.getVersion(), false);
 
+    // Path elements
+    if (!StringUtils.isBlank(uri.getPath())) {
+      String path = uri.getPath();
+
+      // Index the whole path as prefixes
+      StringBuffer prefix = new StringBuffer();
+      for (int i = 0; i < path.length(); i++) {
+        prefix.append(path.charAt(i));
+        addField(SolrSchema.PATH_PREFIX, prefix.toString(), false);
+      }
+
+      // Index sub paths
+      for (String s : path.split("/")) {
+        if ("".equals(s))
+          continue;
+        addField(SolrSchema.PATH_PREFIX, s, true);
+        StringBuffer subprefix = new StringBuffer("/");
+        for (int i = 0; i < s.length(); i++) {
+          subprefix.append(s.charAt(i));
+          addField(SolrSchema.PATH_PREFIX, subprefix.toString(), false);
+        }
+        addField(SolrSchema.PATH_PREFIX, "/" + s + "/", false);
+      }
+    }
+
     // Resource-level
     for (String subject : resource.getSubjects())
       addField(SUBJECT, subject, true);

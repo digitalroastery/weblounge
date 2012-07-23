@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.test.site;
 
 import ch.entwine.weblounge.common.content.page.Composer;
+import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.site.HTMLActionSupport;
@@ -34,6 +35,7 @@ import ch.entwine.weblounge.test.util.TestSiteUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -45,9 +47,12 @@ public class GreeterHTMLAction extends HTMLActionSupport {
 
   /** Name of the language parameter */
   public static final String LANGUAGE_PARAM = "language";
-  
+
   /** Identifier of the included pagelet */
   public static final String PAGELET_ID = "include";
+
+  /** Parameter name of code template */
+  public static final String CODE_TEMPLATE = "code-template";
 
   /** The greetings */
   protected String greeting = null;
@@ -62,15 +67,30 @@ public class GreeterHTMLAction extends HTMLActionSupport {
    *      ch.entwine.weblounge.common.request.WebloungeResponse,
    *      ch.entwine.weblounge.common.request.RequestFlavor)
    */
+  @Override
   public void configure(WebloungeRequest request, WebloungeResponse response,
       RequestFlavor flavor) throws ActionException {
     super.configure(request, response, flavor);
+
+    // Load the greetings
     Map<String, String> allGreetings = TestSiteUtils.loadGreetings();
     try {
       language = getLanguage(request);
       greeting = allGreetings.get(language);
     } catch (IllegalStateException e) {
       throw new ActionException("Language parameter '" + LANGUAGE_PARAM + "' was not specified");
+    }
+
+    // Load the template
+    String codeTemplate = StringUtils.trimToNull(request.getParameter(CODE_TEMPLATE));
+    if (codeTemplate != null) {
+      PageTemplate t = site.getTemplate(codeTemplate);
+      if (t == null) {
+        logger.warn("Template '{}' does not exist", codeTemplate);
+      } else {
+        logger.info("Setting template to '{}'", codeTemplate);
+        setTemplate(t);
+      }
     }
 
     use(module.getRenderer(PAGELET_ID));
@@ -83,6 +103,7 @@ public class GreeterHTMLAction extends HTMLActionSupport {
    *      ch.entwine.weblounge.common.request.WebloungeResponse,
    *      ch.entwine.weblounge.common.content.page.Composer)
    */
+  @Override
   public int startStage(WebloungeRequest request, WebloungeResponse response,
       Composer composer) throws ActionException {
     try {
@@ -116,7 +137,7 @@ public class GreeterHTMLAction extends HTMLActionSupport {
     }
     return language;
   }
-  
+
   /**
    * {@inheritDoc}
    *

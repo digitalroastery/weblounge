@@ -87,7 +87,7 @@ public interface ContentRepository {
    *           if the content repository is already connected
    */
   void connect(Site site) throws ContentRepositoryException,
-      IllegalStateException;
+  IllegalStateException;
 
   /**
    * Disconnects from the content repository.
@@ -109,7 +109,9 @@ public interface ContentRepository {
    *           if reading the resource from the repository fails
    * @return the resource
    */
-  Resource<?> get(ResourceURI uri) throws ContentRepositoryException;
+  <R extends Resource<?>> R get(
+      ResourceURI uri)
+          throws ContentRepositoryException;
 
   /**
    * Returns the resource content identified by <code>uri</code> and

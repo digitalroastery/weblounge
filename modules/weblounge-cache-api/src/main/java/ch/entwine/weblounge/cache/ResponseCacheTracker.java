@@ -85,7 +85,13 @@ public class ResponseCacheTracker extends ServiceTracker {
       this.cache = null;
     }
     if (reference.getBundle() != null) {
-      super.removedService(reference, service);
+      try {
+        super.removedService(reference, service);
+      } catch (IllegalStateException e) {
+        // The service has been removed, probably due to bundle shutdown
+      } catch (Throwable t) {
+        logger.warn("Error removing service: {}", t.getMessage());
+      }
     }
   }
 

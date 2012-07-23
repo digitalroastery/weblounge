@@ -65,7 +65,7 @@ public class SiteActivator {
 
   /** Tests activation/deactivation option */
   public static final String OPT_TESTS = "tests";
-  
+
   /** The site service registration */
   protected ServiceRegistration siteService = null;
 
@@ -138,15 +138,15 @@ public class SiteActivator {
     } else {
       logger.warn("Site activator was unable to locate site.xml");
     }
-    
+
     // If integration tests are switched off explicitly, don't even bother
-    String testActivation = (String)context.getProperties().get(OPT_TESTS);
+    String testActivation = (String) context.getProperties().get(OPT_TESTS);
     int testCount = 0;
     if (ConfigurationUtils.isDisabled(testActivation)) {
       logger.info("Integration tests are switched off for site '{}'", site);
       return;
     }
-    
+
     // Find and register site-wide integration tests
     Enumeration<URL> siteDirectories = bundleContext.getBundle().findEntries("site", "*", false);
     while (siteDirectories != null && siteDirectories.hasMoreElements()) {
@@ -170,7 +170,7 @@ public class SiteActivator {
         }
       }
     }
-    
+
     if (testCount > 0)
       logger.info("Registered {} integration tests for site '{}'", testCount, site);
   }
@@ -193,8 +193,15 @@ public class SiteActivator {
       ((SiteImpl) site).deactivate(context);
     }
 
-    if (siteService != null)
-      siteService.unregister();
+    if (siteService != null) {
+      try {
+        siteService.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering site failed: {}", t.getMessage());
+      }
+    }
   }
 
   /**
@@ -219,7 +226,7 @@ public class SiteActivator {
 
     int testCount = 0;
     while (entries != null && entries.hasMoreElements()) {
-      URL entry = (URL)entries.nextElement();
+      URL entry = (URL) entries.nextElement();
       Node doc = null;
       try {
         doc = docBuilder.parse(entry.openStream());
@@ -227,7 +234,7 @@ public class SiteActivator {
         test.setGroup(site.getName());
         logger.debug("Registering integration test " + test.getClass());
         bundleContext.registerService(IntegrationTest.class.getName(), test, null);
-        testCount ++;
+        testCount++;
       } catch (SAXException e) {
         throw new IllegalStateException(e);
       } catch (IOException e) {

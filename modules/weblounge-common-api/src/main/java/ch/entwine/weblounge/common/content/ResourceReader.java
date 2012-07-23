@@ -33,7 +33,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * A <code>ResourceReader</code> is able to parse xml for a given type of
  * resources and return it's object representation.
  */
-public interface ResourceReader<S extends ResourceContent, T extends Resource<S>> {
+public interface ResourceReader<C extends ResourceContent, R extends Resource<C>> {
 
   /**
    * Reads the serialized resource from the input stream and returns the
@@ -51,7 +51,7 @@ public interface ResourceReader<S extends ResourceContent, T extends Resource<S>
    * @throws IOException
    *           if reading the input stream fails
    */
-  T read(InputStream is, Site site) throws SAXException, IOException,
+  R read(InputStream is, Site site) throws SAXException, IOException,
       ParserConfigurationException;
 
 }

@@ -72,6 +72,9 @@ public class RuntimeInformationEndpoint {
   /** The security service */
   protected SecurityService securityService = null;
 
+  /** The request environment */
+  protected Environment environment = Environment.Production;
+
   /** The endpoint documentation */
   private String docs = null;
 
@@ -102,7 +105,7 @@ public class RuntimeInformationEndpoint {
       for (Map.Entry<String, RuntimeInformationProvider> entry : runtimeInfoProviders.entrySet()) {
         String component = entry.getKey();
         RuntimeInformationProvider provider = entry.getValue();
-        String runtimeInformation = provider.getRuntimeInformation(site, user, language, Environment.Production);
+        String runtimeInformation = provider.getRuntimeInformation(site, user, language, environment);
         if (StringUtils.isNotBlank(runtimeInformation)) {
           if (StringUtils.isNotBlank(component))
             xml.append("<").append(component).append(">");
@@ -140,7 +143,7 @@ public class RuntimeInformationEndpoint {
       if (provider == null)
         throw new WebApplicationException(Status.NOT_FOUND);
 
-      String runtimeInformation = provider.getRuntimeInformation(site, user, language, Environment.Production);
+      String runtimeInformation = provider.getRuntimeInformation(site, user, language, environment);
       if (StringUtils.isNotBlank(runtimeInformation)) {
         xml.append("<").append(component).append(">");
         xml.append(runtimeInformation);
@@ -247,6 +250,16 @@ public class RuntimeInformationEndpoint {
    */
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Callback from the OSGi environment when the environment becomes published.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
   }
 
   /**

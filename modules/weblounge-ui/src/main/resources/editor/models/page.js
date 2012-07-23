@@ -59,7 +59,8 @@ steal.then('jsonix')
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
-				}
+				},
+				error: error
 			});
 		},
 		
@@ -81,7 +82,8 @@ steal.then('jsonix')
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
-				}
+				},
+				error: error
 			});
 		},
 		
@@ -97,7 +99,8 @@ steal.then('jsonix')
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
-				}
+				},
+				error: error
 			});
 		},
 		
@@ -119,7 +122,8 @@ steal.then('jsonix')
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
-				}
+				},
+				error: error
 			});
 		},
 		
@@ -133,7 +137,8 @@ steal.then('jsonix')
 					success: function(xml) {
 						var json = Page.parseXML(xml);
 						success(json.value.page);
-					}
+					},
+					error: error
 				});
 			}
 		},
@@ -149,11 +154,15 @@ steal.then('jsonix')
 				headers = {"If-Match": params.eTag};
 			
 			if ('id' in params) {
+				var asynchron = false;
+				if('async' in params)
+					asynchron = params.async;
 				$.ajax({
 					url: '/system/weblounge/pages/' + params.id,
-					async: false,
+					async: asynchron,
 					type: 'put',
 					success: success,
+					error: error,
 					headers: headers,
 					dataType: 'xml',
 					data: {content : Page.parseJSON(page)}
@@ -170,16 +179,20 @@ steal.then('jsonix')
 				var data = {path : params.path};
 				if('content' in params)
 					data = {path : params.path, content : Page.parseJSON(params.content)}
+				var asynchron = false;
+				if('async' in params)
+					asynchron = params.async;
 				$.ajax({
 					url: '/system/weblounge/pages/',
+					async: asynchron,
 					type: 'post',
 					dataType: 'xml',
 					data: data,
 					success: function(data, status, xhr){
 						var url = xhr.getResponseHeader('Location');
 						Page.findOne({id : url.substring(url.lastIndexOf('/') + 1)}, success);
-					}
-
+					},
+					error: error
 				});
 			}	
 		},
@@ -233,7 +246,8 @@ steal.then('jsonix')
 				$.ajax({
 					url: '/system/weblounge/pages/' + params.id + '/lock',
 					type: 'delete',
-					success: success
+					success: success,
+					error: error
 				});
 			}
 		},
@@ -272,7 +286,8 @@ steal.then('jsonix')
 				$.ajax({
 					url: '/system/weblounge/pages/' + params.id + '/publish',
 					type: 'delete',
-					success: success
+					success: success,
+					error: error
 				});
 			}
 		},
@@ -535,7 +550,7 @@ steal.then('jsonix')
 	    	delete pagelet.locale.current;
 	    	delete pagelet.locale.original;
 	    	this.value.body.composers[this.getComposerIndex(composerId)].pagelets[index] = pagelet;
-	    	Page.update({id:this.value.id}, this, success);
+	    	Page.update({id:this.value.id, async:false}, this, success);
 	    },
 	    
 	    /**

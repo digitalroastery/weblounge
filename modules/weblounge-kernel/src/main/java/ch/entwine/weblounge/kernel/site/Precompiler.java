@@ -73,7 +73,7 @@ public class Precompiler {
   protected boolean logErrors = true;
 
   /** The default environment */
-  protected Environment environment = null;
+  protected Environment environment = Environment.Production;
 
   /** The security service */
   protected SecurityService security = null;

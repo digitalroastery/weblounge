@@ -116,7 +116,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   private SiteManager siteManager = null;
 
   /** The default environment */
-  private Environment environment = null;
+  private Environment environment = Environment.Production;
 
   /** Init parameters for jetty */
   private TreeMap<String, String> jasperConfig = new TreeMap<String, String>();
@@ -404,7 +404,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     try {
       // Create and register the site servlet
-      SiteServlet siteServlet = new SiteServlet(site, siteBundle);
+      SiteServlet siteServlet = new SiteServlet(site, siteBundle, environment);
       siteServlet.setSecurityService(securityService);
       Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
       servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
@@ -485,7 +485,14 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   private void removeSite(Site site) {
     // Remove site dispatcher servlet
     ServiceRegistration servletRegistration = servletRegistrations.remove(site);
-    servletRegistration.unregister();
+
+    try {
+      servletRegistration.unregister();
+    } catch (IllegalStateException e) {
+      // Never mind, the service has been unregistered already
+    } catch (Throwable t) {
+      logger.error("Unregistering site '{}' failed: {}", site.getIdentifier(), t.getMessage());
+    }
 
     // We are no longer interested in site events
     site.removeSiteListener(this);
@@ -697,6 +704,9 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   void setEnvironment(Environment environment) {
     this.environment = environment;
+    for (SiteServlet servlet : siteServlets.values()) {
+      servlet.setEnvironment(environment);
+    }
   }
 
   /**

@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -45,6 +46,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,6 +61,7 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Implementation of a weblounge workbench. The workbench provides support for
@@ -175,7 +178,7 @@ public class WorkbenchService {
     // Load the composer
     Composer composer = page.getComposer(composerId);
     if (composer == null) {
-      logger.warn("Client requested pagelet editor for non existing composer {} on page {}", composerId, pageURI);
+      logger.warn("Client requested pagelet editor for non existing composer '{}' on page {}", composerId, pageURI);
       return null;
     }
 
@@ -254,12 +257,68 @@ public class WorkbenchService {
    */
   public String getRenderer(Site site, ResourceURI pageURI, String composerId,
       int pageletIndex, String language, Environment environment)
-      throws IOException {
+          throws IOException {
 
     Page page = getPage(site, pageURI);
     if (page == null) {
       logger.warn("Client requested pagelet renderer for non existing page {}", pageURI);
       return null;
+    }
+
+    // Load the composer
+    Composer composer = page.getComposer(composerId);
+    if (composer == null) {
+      logger.warn("Client requested pagelet renderer for non existing composer {} on page {}", composerId, pageURI);
+      return null;
+    }
+
+    // Get the pagelet
+    if (composer.getPagelets().length <= pageletIndex || composer.size() <= pageletIndex) {
+      logger.warn("Client requested pagelet renderer for non existing pagelet on page {}", pageURI);
+      return null;
+    }
+
+    Pagelet pagelet = composer.getPagelet(pageletIndex);
+    Module module = site.getModule(pagelet.getModule());
+    if (module == null) {
+      logger.warn("Client requested pagelet renderer for non existing module {}", pagelet.getModule());
+      return null;
+    }
+
+    PageletRenderer renderer = module.getRenderer(pagelet.getIdentifier());
+    if (renderer == null) {
+      logger.warn("Client requested pagelet renderer for non existing renderer on pagelet {}", pagelet.getIdentifier());
+      return null;
+    }
+
+    // Load the contents of the renderer url
+    renderer.setEnvironment(environment);
+    URL rendererURL = renderer.getRenderer();
+    String rendererContent = null;
+    if (rendererURL != null) {
+      try {
+        rendererContent = loadContents(rendererURL, site, page, composer, pagelet, environment, language);
+      } catch (ServletException e) {
+        logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
+    }
+
+    return rendererContent;
+  }
+
+  public String getRenderer(Site site, ResourceURI pageURI, String composerId,
+      int pageletIndex, String pageXml, String language, Environment environment)
+          throws IOException, ParserConfigurationException, SAXException {
+
+    InputStream is = null;
+    Page page = null;
+    try {
+      PageReader pageReader = new PageReader();
+      is = IOUtils.toInputStream(pageXml, "utf-8");
+      page = pageReader.read(is, site);
+    } finally {
+      IOUtils.closeQuietly(is);
     }
 
     // Load the composer

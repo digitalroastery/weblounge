@@ -26,6 +26,8 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Dictionary;
 import java.util.Properties;
 
@@ -55,7 +57,7 @@ public class SmtpService implements ManagedService {
   /** Parameter name for the mail port */
   private static final String OPT_MAIL_PORT = "mail.smtp.port";
 
-  /** Parameter name for the start tls status */
+  /** Parameter name for the start TLS status */
   private static final String OPT_MAIL_TLS_ENABLE = "mail.smtp.starttls.enable";
 
   /** Parameter name for the authentication setting */
@@ -173,7 +175,13 @@ public class SmtpService implements ManagedService {
     // Mail sender
     String mailFrom = StringUtils.trimToNull((String) properties.get(OPT_MAIL_FROM));
     if (mailFrom == null) {
-      logger.debug("Mail sender defaults to {}", mailFrom);
+      try {
+        mailFrom = "weblounge@" + InetAddress.getLocalHost().getCanonicalHostName();
+        logger.info("Mail sender defaults to '{}'", mailFrom);
+      } catch (UnknownHostException e) {
+        logger.error("Error retreiving localhost hostname used to create default sender address: {}", e.getMessage());
+        throw new ConfigurationException(OPT_MAIL_FROM, "Error retreiving localhost hostname used to create default sender address");
+      }
     } else {
       logger.debug("Mail sender is '{}'", mailFrom);
     }

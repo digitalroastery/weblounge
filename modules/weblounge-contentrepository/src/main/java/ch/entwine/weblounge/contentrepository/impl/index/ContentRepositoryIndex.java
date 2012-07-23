@@ -386,8 +386,8 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Returns all revisions for the specified resource or <code>null</code> if
-   * the resource doesn't exist.
+   * Returns all revisions for the specified resource or an empty array if the
+   * resource doesn't exist.
    * 
    * @param uri
    *          the resource uri
@@ -399,7 +399,7 @@ public class ContentRepositoryIndex {
 
     // Everything ok?
     if (address == -1)
-      throw new IllegalArgumentException("Uri " + uri + " was not found");
+      return new long[] {};
 
     return versionIdx.getVersions(address);
   }

@@ -197,7 +197,7 @@ public class SiteImpl implements Site {
   protected BundleContext bundleContext = null;
 
   /** The current system environment */
-  protected Environment environment = null;
+  protected Environment environment = Environment.Production;
 
   /**
    * Creates a new site that is initially disabled. Use {@link #setEnabled()} to

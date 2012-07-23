@@ -21,6 +21,7 @@ package ch.entwine.weblounge.dispatcher.impl;
 
 import ch.entwine.weblounge.cache.CacheService;
 import ch.entwine.weblounge.common.security.SecurityService;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.dispatcher.DispatcherService;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.SharedHttpContext;
@@ -59,11 +60,14 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   /** Service registration for the main dispatcher servlet */
   private ServiceRegistration dispatcherServiceRegistration = null;
 
+  /** The environment */
+  private Environment environment = Environment.Production;
+
   /**
    * Creates a new instance of the dispatcher service.
    */
   public DispatcherServiceImpl() {
-    dispatcher = new WebloungeDispatcherServlet();
+    dispatcher = new WebloungeDispatcherServlet(environment);
   }
 
   /**
@@ -111,7 +115,13 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
 
     if (dispatcherServiceRegistration != null) {
       logger.debug("Unregistering weblounge dispatcher");
-      dispatcherServiceRegistration.unregister();
+      try {
+        dispatcherServiceRegistration.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering dispatcher failed: {}", t.getMessage());
+      }
     }
 
     logger.debug("Weblounge dispatcher deactivated");
@@ -125,6 +135,18 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    */
   void setSecurityService(SecurityService securityService) {
     dispatcher.setSecurityService(securityService);
+  }
+
+  /**
+   * Callback from the OSGi environment when the environment becomes published.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
+    if (dispatcher != null)
+      dispatcher.setEnvironment(environment);
   }
 
   /**

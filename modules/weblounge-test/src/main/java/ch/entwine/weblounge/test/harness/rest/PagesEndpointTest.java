@@ -95,6 +95,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
    * 
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
+  @Override
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of pages endpoint");
 
@@ -357,17 +358,27 @@ public class PagesEndpointTest extends IntegrationTestBase {
     // Make sure the page is being issued as a referrer of the original page
     String requestReferrerUrl = UrlUtils.concat(requestUrl, pageId, "referrer");
     HttpGet getPageRequest = new HttpGet(requestReferrerUrl);
-    httpClient = new DefaultHttpClient();
     logger.info("Requesting referrer of {} at {}", pageId, requestReferrerUrl);
-    try {
-      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
-      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      Document referrer = TestUtils.parseXMLResponse(response);
-      assertEquals(1, XPathHelper.selectList(referrer, "/pages/page").getLength());
-      assertEquals(referringPageId, XPathHelper.valueOf(referrer, "/pages/page/@id"));
-    } finally {
-      httpClient.getConnectionManager().shutdown();
+    // Wait as long as 10s for the asynchronous processing
+    boolean success = false;
+    for (int i = 0; i < 5; i++) {
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+        assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        Document referrer = TestUtils.parseXMLResponse(response);
+        assertEquals(1, XPathHelper.selectList(referrer, "/pages/page").getLength());
+        assertEquals(referringPageId, XPathHelper.valueOf(referrer, "/pages/page/@id"));
+        success = true;
+        break;
+      } catch (AssertionError a) {
+        logger.info("Waiting, then retrying due to asynchronous processing");
+        Thread.sleep(2000);
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
     }
+    assertTrue(success);
 
     // Delete the new page
     HttpDelete deleteRequest = new HttpDelete(UrlUtils.concat(requestUrl, referringPageId));
@@ -582,24 +593,34 @@ public class PagesEndpointTest extends IntegrationTestBase {
     // the new one
     HttpGet getPageByPathRequest = new HttpGet(requestUrl);
     params = new String[][] { { "path", newPath } };
-    httpClient = new DefaultHttpClient();
     logger.info("Requesting page by path at {}", newPath);
-    try {
-      HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
-      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      Document pagesXml = TestUtils.parseXMLResponse(response);
-      assertNotNull(XPathHelper.selectList(pageXml, "/pages/page"));
-      assertEquals(id, XPathHelper.valueOf(pagesXml, "/pages/page/@id"));
-      assertEquals(newPath, XPathHelper.valueOf(pagesXml, "/pages/page/@path"));
-    } finally {
-      httpClient.getConnectionManager().shutdown();
+    // Wait as long as 10s for the asynchronous processing
+    boolean success = false;
+    for (int i = 0; i < 5; i++) {
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
+        assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        Document pagesXml = TestUtils.parseXMLResponse(response);
+        assertNotNull(XPathHelper.select(pagesXml, "/pages/page[1]"));
+        assertEquals(id, XPathHelper.valueOf(pagesXml, "/pages/page[1]/@id"));
+        assertEquals(newPath, XPathHelper.valueOf(pagesXml, "/pages/page[1]/@path"));
+        success = true;
+        break;
+      } catch (AssertionError a) {
+        logger.info("Waiting for asynchronous processing");
+        Thread.sleep(2000);
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
     }
+    assertTrue(success);
 
     // Check that the page is gone from the old path
     getPageByPathRequest = new HttpGet(requestUrl);
     params = new String[][] { { "path", oldPath } };
     httpClient = new DefaultHttpClient();
-    logger.info("Requesting page by path at {}", oldPath);
+    logger.info("Requesting page using the old (no longer valid path) {}", oldPath);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
@@ -620,6 +641,33 @@ public class PagesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+
+    // Make sure the page is back to the original path
+    getPageByPathRequest = new HttpGet(requestUrl);
+    params = new String[][] { { "path", oldPath } };
+    logger.info("Requesting page by path at {}", oldPath);
+    // Wait as long as 10s for the asynchronous processing
+    success = false;
+    for (int i = 0; i < 5; i++) {
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
+        assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        Document pagesXml = TestUtils.parseXMLResponse(response);
+        assertNotNull(XPathHelper.select(pagesXml, "/pages/page[1]"));
+        assertEquals(id, XPathHelper.valueOf(pagesXml, "/pages/page[1]/@id"));
+        assertEquals(oldPath, XPathHelper.valueOf(pagesXml, "/pages/page[1]/@path"));
+        success = true;
+        break;
+      } catch (AssertionError a) {
+        logger.info("Waiting for asynchronous processing");
+        Thread.sleep(2000);
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+    }
+    assertTrue(success);
+
   }
 
   /**

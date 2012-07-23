@@ -54,6 +54,74 @@ public final class ResourceUtils {
   }
 
   /**
+   * Returns <code>true</code> if the two uris match either by id or path. This
+   * implementation takes into account that certain fields such as the id may
+   * not (yet) be set.
+   * 
+   * @param a
+   *          the first uri
+   * @param b
+   *          the second uri
+   * @return <code>true</code> if the two uris point at the same resource
+   */
+  public static boolean equalsByIdOrPathAndVersion(ResourceURI a, ResourceURI b) {
+    return uriEquals(a, b, true);
+  }
+
+  /**
+   * Returns <code>true</code> if the two uris match either by id or path and
+   * version. This implementation takes into account that certain fields such as
+   * the id may not (yet) be set.
+   * 
+   * @param a
+   *          the first uri
+   * @param b
+   *          the second uri
+   * @return <code>true</code> if the two uris point at the same resource
+   */
+  public static boolean equalsByIdOrPath(ResourceURI a, ResourceURI b) {
+    return uriEquals(a, b, false);
+  }
+
+  /**
+   * Returns <code>true</code> if the two uris match. This implementation takes
+   * into account that certain fields such as the id may not (yet) be set.
+   * 
+   * @param a
+   *          the first uri
+   * @param b
+   *          the second uri
+   * @param checkVersions
+   *          <code>true</code> to also check equality on the version
+   * @return <code>true</code> if the two uris point at the same resource
+   */
+  private static boolean uriEquals(ResourceURI a, ResourceURI b,
+      boolean checkVersions) {
+    long versionA = a.getVersion();
+    long versionB = b.getVersion();
+
+    // Test the identifier
+    String idA = a.getIdentifier();
+    String idB = b.getIdentifier();
+    if (idA != null && idB != null) {
+      if (idA.equals(idB) && (!checkVersions || versionA == versionB))
+        return true;
+      return false;
+    }
+
+    // Test the path
+    String pathA = a.getPath();
+    String pathB = b.getPath();
+    if (pathA != null && pathB != null) {
+      if (pathA.equals(pathB) && (!checkVersions || versionA == versionB))
+        return true;
+      return false;
+    }
+
+    return false;
+  }
+
+  /**
    * Returns <code>true</code> if the resource either is more recent than the
    * cached version on the client side or the request does not contain caching
    * information.
@@ -116,7 +184,7 @@ public final class ResourceUtils {
    */
   public static boolean hasChanged(HttpServletRequest request,
       Resource<?> resource, ImageStyle style, Language language)
-      throws IllegalArgumentException {
+          throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
       return isModified(request, resource, language);
     } else if (request.getHeader("If-None-Match") != null) {

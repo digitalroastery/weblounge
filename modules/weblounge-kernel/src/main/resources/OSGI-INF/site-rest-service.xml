@@ -10,5 +10,6 @@
     <provide interface="ch.entwine.weblounge.kernel.endpoint.SitesEndpoint" />
   </service>
   <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
+  <reference name="environment" interface="ch.entwine.weblounge.common.site.Environment" cardinality="1..1" policy="static" bind="setEnvironment" />
 
 </scr:component>

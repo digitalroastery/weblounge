@@ -64,10 +64,10 @@ public class WebloungeSharedResources implements ManagedService {
 
   /** Option name for the external location of shared resources */
   public static final String OPT_EXT_RESOURCES = "resources.external.dir";
-  
+
   /** Name of the current jQuery version */
   public static final String JQUERY_VERSION = "1.6.4";
-  
+
   /** Name of the current jQuery Tools version */
   public static final String JQUERY_TOOLS_VERSION = "1.2.5";
 
@@ -125,7 +125,13 @@ public class WebloungeSharedResources implements ManagedService {
   void deactivate(ComponentContext context) throws Exception {
     logger.info("Stopping serving of shared resources", this);
     if (servletRegistration != null) {
-      servletRegistration.unregister();
+      try {
+        servletRegistration.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering shared resource servlet failed: {}", t.getMessage());
+      }
       servletRegistration = null;
     }
   }
@@ -161,7 +167,13 @@ public class WebloungeSharedResources implements ManagedService {
 
     // Register the new servlet
     if (servletRegistration != null) {
-      servletRegistration.unregister();
+      try {
+        servletRegistration.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering shared resources servlet failed: {}", t.getMessage());
+      }
     }
     servletRegistration = register(resourcesMountpoint, externalResourcesDir, bundleContext.getBundle());
     logger.info("Serving shared resources at {}", resourcesMountpoint);

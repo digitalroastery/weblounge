@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.SecurityService;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
@@ -95,6 +96,9 @@ public class SiteServlet extends HttpServlet {
   /** Flag to reflect servlet initialization */
   private boolean initialized = false;
 
+  /** The environment */
+  private Environment environment = Environment.Production;
+
   /**
    * Creates a new site servlet for the given bundle and context.
    * 
@@ -104,11 +108,14 @@ public class SiteServlet extends HttpServlet {
    *          the site bundle
    * @param bundle
    *          the site bundle
+   * @param environment
+   *          the environment
    */
-  public SiteServlet(final Site site,
- final Bundle bundle) {
+  public SiteServlet(final Site site, final Bundle bundle,
+      Environment environment) {
     this.site = site;
     this.bundle = bundle;
+    this.environment = environment;
     this.jasperServlet = new JspServletWrapper(bundle);
     this.resourceSets = new ArrayList<ResourceSet>();
     this.resourceSets.add(new SiteResourceSet());
@@ -133,6 +140,16 @@ public class SiteServlet extends HttpServlet {
    */
   public boolean isInitialized() {
     return initialized;
+  }
+
+  /**
+   * Sets the environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  public void setEnvironment(Environment environment) {
+    this.environment = environment;
   }
 
   /**
@@ -217,10 +234,10 @@ public class SiteServlet extends HttpServlet {
       request = httpRequest;
       response = httpResponse;
     } else if (httpRequest instanceof WebloungeRequest) {
-      request = new SiteRequestWrapper((WebloungeRequest)httpRequest, httpRequest.getPathInfo(), false);
+      request = new SiteRequestWrapper((WebloungeRequest) httpRequest, httpRequest.getPathInfo(), false);
       response = httpResponse;
     } else {
-      WebloungeRequestImpl webloungeRequest = new WebloungeRequestImpl(httpRequest);
+      WebloungeRequestImpl webloungeRequest = new WebloungeRequestImpl(httpRequest, environment);
       webloungeRequest.init(site);
       webloungeRequest.setUser(securityService.getUser());
       String requestPath = UrlUtils.concat("/site", httpRequest.getPathInfo());
@@ -302,18 +319,15 @@ public class SiteServlet extends HttpServlet {
     // return;
     // }
 
-    URLConnection conn = url.openConnection();
     String mimeType = tika.detect(bundlePath);
-    String encoding = null;
 
     // Try to get mime type and content encoding from resource
     if (mimeType == null)
-      mimeType = conn.getContentType();
-    encoding = conn.getContentEncoding();
+      mimeType = connection.getContentType();
 
     if (mimeType != null) {
-      if (encoding != null)
-        mimeType += ";" + encoding;
+      if (contentEncoding != null)
+        mimeType += ";" + contentEncoding;
       response.setContentType(mimeType);
     }
 

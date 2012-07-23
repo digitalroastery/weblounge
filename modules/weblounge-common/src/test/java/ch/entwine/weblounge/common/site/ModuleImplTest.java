@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
 import ch.entwine.weblounge.common.impl.site.ModuleImpl;
+import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.language.Language;
 
 import org.easymock.EasyMock;
@@ -39,6 +40,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URL;
 import java.util.Locale;
 
 /**
@@ -134,6 +136,7 @@ public class ModuleImplTest {
   protected void setUpPreliminaries() throws Exception {
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getIdentifier()).andReturn("test");
+    EasyMock.expect(site.getHostname((Environment) EasyMock.anyObject())).andReturn(new SiteURLImpl(new URL("http://localhost"))).anyTimes();
     EasyMock.replay(site);
     
     action = new TestAction();

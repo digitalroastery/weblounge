@@ -27,7 +27,6 @@ import ch.entwine.weblounge.common.security.User;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.Future;
 
 /**
  * This type of repository implements methods to write contents to it.
@@ -61,12 +60,45 @@ public interface WritableContentRepository extends ContentRepository {
    *           than what is specified in the updated document
    * @return the updated resource
    */
-  <T extends ResourceContent> Resource<T> put(Resource<T> resource)
+  Resource<?> put(Resource<?> resource) throws ContentRepositoryException,
+  IOException, IllegalStateException;
+
+  /**
+   * Puts the resource to the specified location. Depending on whether the
+   * resource identified by <code>uri</code> already exists, the method either
+   * creates a new resource or updates the existing one.
+   * <p>
+   * The returned resource contains the same data than the one passed in as the
+   * <code>resource</code> argument but with an updated uri.
+   * <p>
+   * <b>Note:</b> do not modify the resource content using this method. Use
+   * {@link #putContent(Resource, InputStream)} instead.
+   * 
+   * @param uri
+   *          the resource uri
+   * @param resource
+   *          the resource
+   * @param updatePreviews
+   *          <code>true</code> to update previews
+   * @throws ContentRepositoryException
+   *           if updating the content repository fails
+   * @throws IOException
+   *           if adding fails due to a database error
+   * @throws IllegalStateException
+   *           if the resource does not exist and contains a non-empty content
+   *           section.
+   * @throws IllegalStateException
+   *           if the resource exists but contains different resource content
+   *           than what is specified in the updated document
+   * @return the updated resource
+   */
+  Resource<?> put(Resource<?> resource, boolean updatePreviews)
       throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
-   * Puts the resource to the specified location and calls the asynchronous
-   * content repository update listener once the operation succeeds or fails.
+   * Puts the resource to the specified location and passes the result to the
+   * operation once the process succeeds or fails.
+   * <p>
    * Depending on whether the resource identified by <code>uri</code> already
    * exists, the method either creates a new resource or updates the existing
    * one.
@@ -81,8 +113,6 @@ public interface WritableContentRepository extends ContentRepository {
    *          the resource uri
    * @param resource
    *          the resource
-   * @param listener
-   *          the callback for asynchronous repository updates
    * @throws ContentRepositoryException
    *           if updating the content repository fails
    * @throws IOException
@@ -95,8 +125,42 @@ public interface WritableContentRepository extends ContentRepository {
    *           than what is specified in the updated document
    * @return the updated resource
    */
-  <T extends ResourceContent> Future<Resource<T>> put(Resource<T> resource,
-      AsynchronousContentRepositoryListener listener)
+  PutOperation putAsynchronously(Resource<?> resource)
+      throws ContentRepositoryException, IOException, IllegalStateException;
+
+  /**
+   * Puts the resource to the specified location and passes the result to the
+   * operation once the process succeeds or fails.
+   * <p>
+   * Depending on whether the resource identified by <code>uri</code> already
+   * exists, the method either creates a new resource or updates the existing
+   * one.
+   * <p>
+   * The returned resource contains the same data than the one passed in as the
+   * <code>resource</code> argument but with an updated uri.
+   * <p>
+   * <b>Note:</b> do not modify the resource content using this method. Use
+   * {@link #putContent(Resource, InputStream)} instead.
+   * 
+   * @param uri
+   *          the resource uri
+   * @param resource
+   *          the resource
+   * @param updatePreviews
+   *          <code>true</code> to update previews
+   * @throws ContentRepositoryException
+   *           if updating the content repository fails
+   * @throws IOException
+   *           if adding fails due to a database error
+   * @throws IllegalStateException
+   *           if the resource does not exist and contains a non-empty content
+   *           section.
+   * @throws IllegalStateException
+   *           if the resource exists but contains different resource content
+   *           than what is specified in the updated document
+   * @return the updated resource
+   */
+  PutOperation putAsynchronously(Resource<?> resource, boolean updatePreviews)
       throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
@@ -118,13 +182,13 @@ public interface WritableContentRepository extends ContentRepository {
    *           type
    * @return the updated resource
    */
-  <T extends ResourceContent> Resource<T> putContent(ResourceURI uri,
-      T content, InputStream is) throws ContentRepositoryException,
-      IOException, IllegalStateException;
+  Resource<?> putContent(ResourceURI uri, ResourceContent content,
+      InputStream is) throws ContentRepositoryException, IOException,
+      IllegalStateException;
 
   /**
-   * Adds the content to the specified resource and calls the asynchronous
-   * content repository update listener once the operation succeeds or fails.
+   * Adds the content to the specified resource and passes the result to the
+   * operation once the process succeeds or fails.
    * <p>
    * The returned resource contains the same data than the one passed in as the
    * <code>resource</code> argument but with an updated uri.
@@ -133,8 +197,6 @@ public interface WritableContentRepository extends ContentRepository {
    *          the resource uri
    * @param content
    *          the resource content
-   * @param listener
-   *          the callback for asynchronous repository updates
    * @throws ContentRepositoryException
    *           if updating the content repository fails
    * @throws IOException
@@ -144,9 +206,9 @@ public interface WritableContentRepository extends ContentRepository {
    *           type
    * @return the updated resource
    */
-  <T extends ResourceContent> Future<Resource<T>> putContent(ResourceURI uri,
-      T content, InputStream is, AsynchronousContentRepositoryListener listener)
-      throws ContentRepositoryException, IOException, IllegalStateException;
+  PutContentOperation putContentAsynchronously(ResourceURI uri,
+      ResourceContent content, InputStream is)
+          throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
    * Deletes the resource content.
@@ -163,20 +225,18 @@ public interface WritableContentRepository extends ContentRepository {
    *           if the parent resource does not exist
    * @return the updated resource
    */
-  <T extends ResourceContent> Resource<T> deleteContent(ResourceURI uri,
-      T content) throws ContentRepositoryException, IOException,
-      IllegalStateException;
+  Resource<?> deleteContent(ResourceURI uri, ResourceContent content)
+      throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
-   * Deletes the resource content and calls the asynchronous content repository
-   * update listener once the operation succeeds or fails.
+   * Removes the content from the specified resource and passes the result to
+   * the operation once the process succeeds or fails.
+   * <p>
    * 
    * @param uri
    *          the resource uri
    * @param content
    *          the resource content
-   * @param listener
-   *          the callback for asynchronous repository updates
    * @throws ContentRepositoryException
    *           if removing the content repository fails
    * @throws IOException
@@ -185,10 +245,9 @@ public interface WritableContentRepository extends ContentRepository {
    *           if the parent resource does not exist
    * @return the updated resource
    */
-  <T extends ResourceContent> Future<Resource<T>> deleteContent(
-      ResourceURI uri,
-      T content, AsynchronousContentRepositoryListener listener)
-      throws ContentRepositoryException, IOException, IllegalStateException;
+  DeleteContentOperation deleteContentAsynchronously(ResourceURI uri,
+      ResourceContent content) throws ContentRepositoryException, IOException,
+      IllegalStateException;
 
   /**
    * This method moves the given resource to the new uri.
@@ -210,9 +269,8 @@ public interface WritableContentRepository extends ContentRepository {
       throws ContentRepositoryException, IOException;
 
   /**
-   * This method moves the given resource to the new uri and calls the
-   * asynchronous content repository update listener once the operation succeeds
-   * or fails.
+   * Moves the resource and optionally its children to the specified path and
+   * passes the result to the operation once the process succeeds or fails.
    * 
    * @param uri
    *          uri of the resource to move
@@ -220,8 +278,6 @@ public interface WritableContentRepository extends ContentRepository {
    *          the target path
    * @param moveChildren
    *          <code>true</code> to also move children of this resource
-   * @param listener
-   *          the callback for asynchronous repository updates
    * @throws IllegalArgumentException
    *           if <code>path</code> is <code>null</code>, empty or relative
    * @throws ContentRepositoryException
@@ -229,9 +285,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if moving fails due to a database error
    */
-  Future<Void> move(ResourceURI uri, String path, boolean moveChildren,
-      AsynchronousContentRepositoryListener listener)
-      throws ContentRepositoryException, IOException;
+  MoveOperation moveAsynchronously(ResourceURI uri, String path,
+      boolean moveChildren) throws ContentRepositoryException, IOException;
 
   /**
    * This method removes the given resource in the specified version from the
@@ -246,30 +301,28 @@ public interface WritableContentRepository extends ContentRepository {
    *           if removal fails due to a database error
    */
   boolean delete(ResourceURI uri) throws ContentRepositoryException,
-      IOException;
+  IOException;
 
   /**
-   * This method removes the given resource in the specified version from the
-   * repository and calls the asynchronous content repository update listener
-   * once the operation succeeds or fails.
+   * Removes the resource in the given version from the content repository and
+   * passes the result to the operation once the process succeeds or fails.
+   * <p>
    * 
    * @param uri
    *          uri of the resource to remove
-   * @param listener
-   *          the callback for asynchronous repository updates
    * @return <code>true</code> if the resource could be removed
    * @throws ContentRepositoryException
    *           if updating the content repository fails
    * @throws IOException
    *           if removal fails due to a database error
+   * @throws ReferentialIntegrityException
+   *           if the resource is still being linked to
    */
-  Future<Boolean> delete(ResourceURI uri,
-      AsynchronousContentRepositoryListener listener)
+  DeleteOperation deleteAsynchronously(ResourceURI uri)
       throws ContentRepositoryException, IOException;
 
   /**
-   * This method removes the given resource in the specified version from the
-   * database.
+   * Removes the given resource in the specified version from the database.
    * 
    * @param uri
    *          uri of the resource to remove
@@ -282,14 +335,18 @@ public interface WritableContentRepository extends ContentRepository {
    *           if updating the content repository fails
    * @throws IOException
    *           if removal fails due to a database error
+   * @throws ReferentialIntegrityException
+   *           if the resource is still being linked to
    */
   boolean delete(ResourceURI uri, boolean allRevisions)
-      throws ContentRepositoryException, IOException;
+      throws ContentRepositoryException, IOException,
+      ReferentialIntegrityException;
 
   /**
-   * This method removes the given resource in the specified version from the
-   * database and calls the asynchronous content repository update listener once
-   * the operation succeeds or fails.
+   * Removes either all or just the specified version of the resource from the
+   * content repository and passes the result to the operation once the process
+   * succeeds or fails.
+   * <p>
    * 
    * @param uri
    *          uri of the resource to remove
@@ -297,16 +354,13 @@ public interface WritableContentRepository extends ContentRepository {
    *          the version to remove
    * @param allRevisions
    *          <code>true</code> to remove all revisions
-   * @param listener
-   *          the callback for asynchronous repository updates
    * @return <code>true</code> if the resource could be removed
    * @throws ContentRepositoryException
    *           if updating the content repository fails
    * @throws IOException
    *           if removal fails due to a database error
    */
-  Future<Boolean> delete(ResourceURI uri, boolean allRevisions,
-      AsynchronousContentRepositoryListener listener)
+  DeleteOperation deleteAsynchronously(ResourceURI uri, boolean allRevisions)
       throws ContentRepositoryException, IOException;
 
   /**
@@ -321,21 +375,17 @@ public interface WritableContentRepository extends ContentRepository {
   void index() throws ContentRepositoryException;
 
   /**
-   * Triggers a re-index of the repository's search index and calls the
-   * asynchronous content repository update listener once the operation succeeds
-   * or fails.
+   * Triggers a re-index of the repository's search index and and passes the
+   * result to the operation once the process succeeds or fails
    * 
    * <p>
    * Depending on the implementation of the search index, the repository might
    * be locked during this operation.
    * 
-   * @param listener
-   *          the callback for asynchronous repository updates
    * @throws ContentRepositoryException
    *           if the index operation fails
    */
-  Future<Void> index(AsynchronousContentRepositoryListener listener)
-      throws ContentRepositoryException;
+  IndexOperation indexAsynchronously() throws ContentRepositoryException;
 
   /**
    * Returns <code>true</code> if the resource identified by the given uri is
@@ -368,20 +418,18 @@ public interface WritableContentRepository extends ContentRepository {
    *           if the resource can't be accessed
    */
   Resource<?> lock(ResourceURI uri, User user) throws IOException,
-      ContentRepositoryException, IllegalStateException;
+  ContentRepositoryException, IllegalStateException;
 
   /**
    * Locks the resource for editing by <code>user</code>. This method will throw
    * an <code>IllegalStateException</code> if the resource is already locked by
-   * a different user and calls the asynchronous content repository update
-   * listener once the operation succeeds or fails.
+   * a different user and pass the result on to the operation once the process
+   * succeeds or fails.
    * 
    * @param uri
    *          the resource uri
    * @param user
    *          the user locking the resource
-   * @param listener
-   *          the callback for asynchronous repository updates
    * @return the locked resource
    * @throws IllegalStateException
    *           if the resource is already locked by a different user
@@ -390,9 +438,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws ContentRepositoryException
    *           if the resource can't be accessed
    */
-  Future<Resource<?>> lock(ResourceURI uri, User user,
-      AsynchronousContentRepositoryListener listener) throws IOException,
-      ContentRepositoryException, IllegalStateException;
+  LockOperation lockAsynchronously(ResourceURI uri, User user)
+      throws IOException, ContentRepositoryException, IllegalStateException;
 
   /**
    * Removes the editing lock from the resource and returns the user if the
@@ -407,26 +454,22 @@ public interface WritableContentRepository extends ContentRepository {
    *           if the resource can't be accessed
    */
   Resource<?> unlock(ResourceURI uri, User user) throws IOException,
-      ContentRepositoryException;
+  ContentRepositoryException;
 
   /**
    * Removes the editing lock from the resource and returns the user if the
    * resource was locked prior to this call, <code>null</code> otherwise and
-   * calls the asynchronous content repository update listener once the
-   * operation succeeds or fails.
+   * passes the result on to the operation once the process succeeds or fails.
    * 
    * @param uri
    *          the resource uri
-   * @param listener
-   *          the callback for asynchronous repository updates
    * @return the unlocked resource
    * @throws IOException
    *           if unlocking fails due to a database error
    * @throws ContentRepositoryException
    *           if the resource can't be accessed
    */
-  Future<Resource<?>> unlock(ResourceURI uri, User user,
-      AsynchronousContentRepositoryListener listener) throws IOException,
-      ContentRepositoryException;
+  UnlockOperation unlockAsynchronously(ResourceURI uri, User user)
+      throws IOException, ContentRepositoryException;
 
 }

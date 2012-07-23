@@ -355,7 +355,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
           InputStream is = null;
           try {
             ResourceReader<?, ?> reader = serializer.getReader();
-            is = openStreamToResource(uri);
+            is = loadResource(uri);
             resource = reader.read(is, site);
             if (resource == null) {
               logger.warn("Unkown error loading resource {}", uri);
@@ -407,7 +407,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadPage()
    */
   @Override
-  protected InputStream openStreamToResource(ResourceURI uri)
+  protected InputStream loadResource(ResourceURI uri)
       throws IOException {
     String uriPath = uri.getPath();
 
@@ -436,12 +436,12 @@ public class BundleContentRepository extends AbstractContentRepository implement
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#openStreamToResourceContent(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadResourceContent(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.language.Language)
    */
   @SuppressWarnings("unchecked")
   @Override
-  protected InputStream openStreamToResourceContent(ResourceURI uri,
+  protected InputStream loadResourceContent(ResourceURI uri,
       Language language) throws IOException {
     String uriPath = uri.getPath();
 

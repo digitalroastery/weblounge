@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class ProcessExecutor<T extends Exception> {
 
-  /** True to redirect the error stream to std out */
+  /** True to redirect the error stream to standard out */
   private boolean redirectErrorStream = true;
 
   /** Command line to call */
@@ -127,8 +127,8 @@ public class ProcessExecutor<T extends Exception> {
     StreamHelper errorStreamHelper = null;
     try {
       // create process.
-      // no special working dir is set which means the working dir of the
-      // current java process is used.
+      // no special working directory is set which means the working directory
+      // of the current java process is used.
       ProcessBuilder pbuilder = new ProcessBuilder(commandLine);
       pbuilder.redirectErrorStream(redirectErrorStream);
       process = pbuilder.start();
