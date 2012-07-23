@@ -608,7 +608,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
         success = true;
         break;
       } catch (AssertionError a) {
-        logger.info("Waiting, then retrying due to asynchronous processing");
+        logger.info("Waiting for asynchronous processing");
         Thread.sleep(2000);
       } finally {
         httpClient.getConnectionManager().shutdown();
@@ -620,7 +620,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     getPageByPathRequest = new HttpGet(requestUrl);
     params = new String[][] { { "path", oldPath } };
     httpClient = new DefaultHttpClient();
-    logger.info("Requesting page by path at {}", oldPath);
+    logger.info("Requesting page using the old (no longer valid path) {}", oldPath);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
@@ -641,6 +641,33 @@ public class PagesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+
+    // Make sure the page is back to the original path
+    getPageByPathRequest = new HttpGet(requestUrl);
+    params = new String[][] { { "path", oldPath } };
+    logger.info("Requesting page by path at {}", oldPath);
+    // Wait as long as 10s for the asynchronous processing
+    success = false;
+    for (int i = 0; i < 5; i++) {
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
+        assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        Document pagesXml = TestUtils.parseXMLResponse(response);
+        assertNotNull(XPathHelper.select(pagesXml, "/pages/page[1]"));
+        assertEquals(id, XPathHelper.valueOf(pagesXml, "/pages/page[1]/@id"));
+        assertEquals(oldPath, XPathHelper.valueOf(pagesXml, "/pages/page[1]/@path"));
+        success = true;
+        break;
+      } catch (AssertionError a) {
+        logger.info("Waiting for asynchronous processing");
+        Thread.sleep(2000);
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+    }
+    assertTrue(success);
+
   }
 
   /**
