@@ -79,13 +79,13 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
   private String docs = null;
 
   /** The list of image styles */
-  private List<ImageStyle> styles = new ArrayList<ImageStyle>();
+  private final List<ImageStyle> styles = new ArrayList<ImageStyle>();
 
   /** The request environment */
   protected Environment environment = Environment.Production;
 
   /**
-   * OSGi callback on component deactivation.
+   * OSGi callback on component inactivation.
    * 
    * @param ctx
    *          the component context
@@ -290,7 +290,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     final InputStream is = resourceInputStream;
     ResponseBuilder response = Response.ok(new StreamingOutput() {
       public void write(OutputStream os) throws IOException,
-          WebApplicationException {
+      WebApplicationException {
         try {
           IOUtils.copy(is, os);
           os.flush();

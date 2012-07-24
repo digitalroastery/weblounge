@@ -57,6 +57,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A <code>PreviewGenerator</code> that will generate previews for pages.
@@ -189,16 +190,45 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
     }
 
     // Create a temporary file
-    File rendererdFile = File.createTempFile("phantomjs-", "." + format, phantomTmpDir);
+    final File rendererdFile = File.createTempFile("phantomjs-", "." + format, phantomTmpDir);
+    final URL finalPageURL = pageURL;
+    final AtomicBoolean success = new AtomicBoolean();
 
     // Call PhantomJS to render the page
     try {
-      PhantomJsProcessExecutor phantomjs = new PhantomJsProcessExecutor(scriptFile.getAbsolutePath(), pageURL.toExternalForm(), rendererdFile.getAbsolutePath());
+      PhantomJsProcessExecutor phantomjs = new PhantomJsProcessExecutor(scriptFile.getAbsolutePath(), pageURL.toExternalForm(), rendererdFile.getAbsolutePath()) {
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see ch.entwine.weblounge.common.impl.util.process.ProcessExecutor#onProcessFinished(int)
+         */
+        @Override
+        protected void onProcessFinished(int exitCode) throws IOException {
+          super.onProcessFinished(exitCode);
+          switch (exitCode) {
+            case 0:
+              success.set(true);
+              break;
+            default:
+              success.set(false);
+              logger.warn("Error creating page preview of {}", finalPageURL);
+              FileUtils.deleteQuietly(rendererdFile);
+          }
+        }
+
+      };
       phantomjs.execute();
     } catch (ProcessExcecutorException e) {
       logger.warn("Error creating page preview of {}: {}", pageURL, e.getMessage());
       FileUtils.deleteQuietly(rendererdFile);
       throw new IOException(e);
+    }
+
+    // If page preview rendering failed, there is no point in scaling the images
+    if (!success.get()) {
+      logger.debug("Skipping scaling of failed preview rendering {}", pageURL);
+      return;
     }
 
     FileInputStream imageIs = null;

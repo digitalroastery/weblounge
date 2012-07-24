@@ -95,6 +95,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
@@ -136,8 +138,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** Flag to indicate off-site indexing */
   protected boolean indexingOffsite = false;
 
-  /** the preview generator creates PNG's by default */
+  /** Preview generator creates PNG's by default */
   private static final String PREVIEW_FORMAT = "png";
+
+  /** Resources that are currently being rendered for preview */
+  private final Queue<PreviewGeneratorWorker> renderingResources = new PriorityQueue<PreviewGeneratorWorker>();
 
   /**
    * Creates a new instance of the content repository.
@@ -1421,14 +1426,47 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Create the previews
-    for (Language language : languages) {
-      PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, resource, environment, language, styles, PREVIEW_FORMAT);
-      Thread t = new Thread(previewWorker);
-      t.setPriority(Thread.MIN_PRIORITY);
-      t.setDaemon(true);
-      t.start();
+    synchronized (renderingResources) {
+      for (Language language : languages) {
+        if (!resource.supportsLanguage(language))
+          continue;
+        PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, resource, environment, language, styles, PREVIEW_FORMAT);
+
+        // If there is still something in the works, queue it up for later
+        // processing
+        if (!renderingResources.isEmpty()) {
+          renderingResources.add(previewWorker);
+          continue;
+        }
+
+        // If not, get it done right away
+        Thread t = new Thread(previewWorker);
+        t.setPriority(Thread.MIN_PRIORITY);
+        t.setDaemon(true);
+        t.start();
+      }
     }
 
+  }
+
+  /**
+   * Callback for the preview renderer to indicate a finished rendering
+   * operation.
+   * 
+   * @param resource
+   *          the resource
+   */
+  void previewCreated(Resource<?> resource) {
+    synchronized (renderingResources) {
+      renderingResources.remove(resource.getIdentifier());
+      if (!renderingResources.isEmpty()) {
+        PreviewGeneratorWorker worker = renderingResources.poll();
+        Thread t = new Thread(worker);
+        t.setPriority(Thread.MIN_PRIORITY);
+        t.setDaemon(true);
+        t.start();
+      }
+    }
   }
 
   /**
