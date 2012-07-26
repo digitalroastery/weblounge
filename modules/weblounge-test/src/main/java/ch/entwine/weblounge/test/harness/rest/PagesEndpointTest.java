@@ -222,8 +222,10 @@ public class PagesEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
+    // Test E-Tag header
     TestSiteUtils.testETagHeader(getPageRequest, eTagValue, logger, params);
 
+    // Test If-Modified-Since header with non-modified page
     httpClient = new DefaultHttpClient();
     try {
       getPageRequest.removeHeaders("If-None-Match");
@@ -236,6 +238,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
+    // Test If-Modified-Since header with modified page
     httpClient = new DefaultHttpClient();
     try {
       getPageRequest.removeHeaders("If-None-Match");
