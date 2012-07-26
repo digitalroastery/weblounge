@@ -405,4 +405,38 @@ public final class ImageStyleUtils {
     return new File(dir, scaledFilename.toString());
   }
 
+  /**
+   * Returns the base directory for the site's preview images.
+   * 
+   * @param site
+   *          the site
+   * @return the directory holding the site's preview images
+   * @throws IllegalArgumentException
+   *           if <code>site</code> is null
+   */
+  public static File getScaledFileBase(Site site) {
+    if (site == null)
+      throw new IllegalArgumentException("site must not be null");
+    return new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images"));
+  }
+
+  /**
+   * Returns the base directory for the site's preview images.
+   * 
+   * @param site
+   *          the site
+   * @param style
+   *          the image style
+   * @return the directory holding the site's preview images
+   * @throws IllegalArgumentException
+   *           if either one of <code>site</code>, <code>style</code> is null
+   */
+  public static File getScaledFileBase(Site site, ImageStyle style) {
+    if (site == null)
+      throw new IllegalArgumentException("site must not be null");
+    if (style == null)
+      throw new IllegalArgumentException("style must not be null");
+    return new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier()));
+  }
+
 }
