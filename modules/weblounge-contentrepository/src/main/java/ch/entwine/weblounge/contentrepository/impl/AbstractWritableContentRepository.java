@@ -90,9 +90,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -141,8 +143,18 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** Preview generator creates PNG's by default */
   private static final String PREVIEW_FORMAT = "png";
 
-  /** Resources that are currently being rendered for preview */
-  private final Queue<PreviewGeneratorWorker> renderingResources = new PriorityQueue<PreviewGeneratorWorker>();
+  /** The resources for which preview generation is due */
+  private final Map<ResourceURI, PreviewOperation> previews = new HashMap<ResourceURI, PreviewOperation>();
+
+  /** Prioritized list of preview rendering operations */
+  private final Queue<PreviewOperation> previewOperations = new PriorityQueue<PreviewOperation>();
+
+  /** The preview operations that are being worked on at the moment */
+  private final List<PreviewOperation> currentPreviewOperations = new ArrayList<PreviewOperation>();
+
+  /** The maximum number of concurrent preview operations */
+  // TODO: Make this configurable
+  private final int maxPreviewOperations = Integer.MAX_VALUE;
 
   /**
    * Creates a new instance of the content repository.
@@ -1401,7 +1413,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /**
    * Creates the previews for this resource in all languages and for all known
-   * image styles.
+   * image styles. The implementation ensures that there is only one preview
+   * renderer running per resource.
    * 
    * @param resource
    *          the resource
@@ -1413,8 +1426,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Compile the full list of image styles
     final List<ImageStyle> styles = new ArrayList<ImageStyle>();
-    if (imageStyleTracker != null)
-      styles.addAll(imageStyleTracker.getImageStyles());
+    if (imageStyleTracker == null) {
+      logger.info("Skipping preview generation for {}: image styles are unavailable", resource.getURI());
+      return;
+    }
+
+    // Add the global image styles as well as those for the site
+    styles.addAll(imageStyleTracker.getImageStyles());
     for (Module m : getSite().getModules()) {
       styles.addAll(Arrays.asList(m.getImageStyles()));
     }
@@ -1426,27 +1444,46 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Create the previews
-    synchronized (renderingResources) {
-      for (Language language : languages) {
-        if (!resource.supportsLanguage(language))
-          continue;
-        PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, resource, environment, language, styles, PREVIEW_FORMAT);
+    PreviewOperation previewOp = null;
+    synchronized (currentPreviewOperations) {
 
-        // If there is still something in the works, queue it up for later
-        // processing
-        if (!renderingResources.isEmpty()) {
-          renderingResources.add(previewWorker);
-          continue;
-        }
-
-        // If not, get it done right away
-        Thread t = new Thread(previewWorker);
-        t.setPriority(Thread.MIN_PRIORITY);
-        t.setDaemon(true);
-        t.start();
+      // is there an existing operation for this resource? If so, simply update
+      // it and be done.
+      previewOp = previews.get(resource.getURI());
+      if (previewOp != null) {
+        previewOp.addLanguages(Arrays.asList(languages));
+        previewOp.addStyles(styles);
+        return;
       }
-    }
 
+      // Otherwise, a new preview generator needs to be started.
+      previewOp = new PreviewOperation(resource, Arrays.asList(languages), styles, PREVIEW_FORMAT);
+
+      // Make sure nobody is working on the same resource at the moment
+      if (currentPreviewOperations.contains(previewOp)) {
+        logger.info("Queing concurring creation of preview for {}", resource.getURI());
+        previews.put(resource.getURI(), previewOp);
+        previewOperations.add(previewOp);
+        return;
+      }
+
+      // If there is enough being worked on already, there is nothing we can do
+      // right now, the work will be picked up later on
+      if (previews.size() >= maxPreviewOperations) {
+        logger.info("Queing creation of preview for {}", resource.getURI());
+        previews.put(resource.getURI(), previewOp);
+        previewOperations.add(previewOp);
+        return;
+      }
+
+      // It seems like it is safe to start the preview generation
+      currentPreviewOperations.add(previewOp);
+      PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, previewOp.getResource(), environment, previewOp.getLanguages(), previewOp.getStyles(), previewOp.getFormat());
+      Thread t = new Thread(previewWorker);
+      t.setPriority(Thread.MIN_PRIORITY);
+      t.setDaemon(true);
+      t.start();
+    }
   }
 
   /**
@@ -1457,11 +1494,27 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *          the resource
    */
   void previewCreated(Resource<?> resource) {
-    synchronized (renderingResources) {
-      renderingResources.remove(resource.getIdentifier());
-      if (!renderingResources.isEmpty()) {
-        PreviewGeneratorWorker worker = renderingResources.poll();
-        Thread t = new Thread(worker);
+    synchronized (currentPreviewOperations) {
+
+      // Do the cleanup
+      for (Iterator<PreviewOperation> i = currentPreviewOperations.iterator(); i.hasNext();) {
+        if (i.next().getResource().equals(resource)) {
+          i.remove();
+          break;
+        }
+      }
+
+      // Is there more work to do?
+      if (!previewOperations.isEmpty() && currentPreviewOperations.size() < maxPreviewOperations) {
+
+        // Get the next operation and do the bookkeeping
+        PreviewOperation op = previewOperations.remove();
+        currentPreviewOperations.add(op);
+        previews.remove(op.getResource().getURI());
+
+        // Finally start the generation
+        PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, op.getResource(), environment, op.getLanguages(), op.getStyles(), op.getFormat());
+        Thread t = new Thread(previewWorker);
         t.setPriority(Thread.MIN_PRIORITY);
         t.setDaemon(true);
         t.start();
@@ -1661,6 +1714,117 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         operations.clear();
         operations.notifyAll();
       }
+    }
+
+  }
+
+  /**
+   * Data structure that is used to hold all relevant information for preview
+   * generation of a given resource.
+   */
+  private final static class PreviewOperation {
+
+    /** The resource to be rendered */
+    private Resource<?> resource = null;
+
+    /** List of languages that need to be rendered */
+    private final List<Language> languages = new ArrayList<Language>();
+
+    /** List of image styles that need to be rendered */
+    private final List<ImageStyle> styles = new ArrayList<ImageStyle>();
+
+    /** Name of the preview image format */
+    private String format = null;
+
+    /**
+     * Creates a new representation of a preview generation.
+     */
+    public PreviewOperation(Resource<?> resource, List<Language> languages,
+        List<ImageStyle> styles, String format) {
+      this.resource = resource;
+      this.languages.addAll(languages);
+      this.styles.addAll(styles);
+      this.format = format;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      return resource.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object op) {
+      return resource.equals(op);
+    }
+
+    /**
+     * Returns the resource that is to be rendered.
+     * 
+     * @return the resource
+     */
+    public Resource<?> getResource() {
+      return resource;
+    }
+
+    /**
+     * Returns the languages that need preview generation.
+     * 
+     * @return the language
+     */
+    public List<Language> getLanguages() {
+      return languages;
+    }
+
+    /**
+     * Adds the languages to the list of languages.
+     * 
+     * @param languages
+     *          the languages to add
+     */
+    public void addLanguages(Collection<Language> languages) {
+      for (Language l : languages) {
+        if (!this.languages.contains(languages))
+          this.languages.add(l);
+      }
+    }
+
+    /**
+     * Returns the image styles.
+     * 
+     * @return the styles
+     */
+    public List<ImageStyle> getStyles() {
+      return styles;
+    }
+
+    /**
+     * Adds the image styles to the list of styles.
+     * 
+     * @param styles
+     *          the styles to add
+     */
+    public void addStyles(Collection<ImageStyle> styles) {
+      for (ImageStyle s : styles) {
+        if (!this.styles.contains(styles))
+          this.styles.add(s);
+      }
+    }
+
+    /**
+     * @return the format
+     */
+    public String getFormat() {
+      return format;
     }
 
   }
