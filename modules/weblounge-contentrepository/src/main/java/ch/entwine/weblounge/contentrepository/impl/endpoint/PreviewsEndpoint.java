@@ -43,6 +43,7 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
@@ -179,9 +180,6 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       return Response.notModified().build();
     }
 
-    // Load the content
-    ResourceContent resourceContent = resource.getContent(language);
-
     ResourceURI resourceURI = resource.getURI();
     final ContentRepository contentRepository = getContentRepository(site, false);
 
@@ -216,6 +214,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
           throw new WebApplicationException(Response.Status.NOT_FOUND);
 
         contentRepositoryIs = contentRepository.getContent(resourceURI, language);
+        scaledResourceFile = ImageStyleUtils.createScaledFile(resource, language, style);
         fos = new FileOutputStream(scaledResourceFile);
         logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
 
@@ -305,7 +304,13 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     response.tag(eTag);
 
     // Add filename header
-    response.header("Content-Disposition", "inline; filename=" + resourceContent.getFilename());
+    String filename = null;
+    ResourceContent resourceContent = resource.getContent(language);
+    if (resourceContent != null)
+      filename = resourceContent.getFilename();
+    if (StringUtils.isBlank(filename))
+      filename = scaledResourceFile.getName();
+    response.header("Content-Disposition", "inline; filename=" + filename);
 
     // Content length
     response.header("Content-Length", Long.toString(contentLength));
