@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.content.image;
 
-import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.language.Language;
@@ -41,6 +41,8 @@ import java.util.List;
  * Utility class used for dealing with images and image styles.
  */
 public final class ImageStyleUtils {
+
+  public static final String DEFAULT_PREVIEW_FORMAT = "png";
 
   /**
    * This class is not meant to be instantiated.
@@ -340,8 +342,32 @@ public final class ImageStyleUtils {
    * <p>
    * If no filename is specified, the resource's identifier is used.
    * 
-   * @param uri
-   *          the resource uri
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @param style
+   *          the image style
+   * @throws IOException
+   *           if creating the file fails
+   * @throws IllegalStateException
+   *           if a file is found at the parent directory location
+   * @return the file
+   */
+  public static File createScaledFile(Resource<?> resource, Language language,
+      ImageStyle style) throws IOException, IllegalStateException {
+    return createScaledFile(resource, null, language, style);
+  }
+
+  /**
+   * Creates a file and its parent directories for the scaled image that is
+   * identified by <code>filename</code>, <code>language</code> and
+   * <code>style</code>.
+   * <p>
+   * If no filename is specified, the resource's identifier is used.
+   * 
+   * @param resource
+   *          the resource
    * @param filename
    *          the file name
    * @param language
@@ -354,11 +380,11 @@ public final class ImageStyleUtils {
    *           if a file is found at the parent directory location
    * @return the file
    */
-  public static File createScaledFile(ResourceURI uri, String filename,
+  public static File createScaledFile(Resource<?> resource, String filename,
       Language language, ImageStyle style) throws IOException,
       IllegalStateException {
 
-    File scaledFile = getScaledFile(uri, filename, language, style);
+    File scaledFile = getScaledFile(resource, language, style);
     File dir = scaledFile.getParentFile();
 
     if (dir.exists() && !dir.isDirectory())
@@ -375,8 +401,27 @@ public final class ImageStyleUtils {
    * <p>
    * If no filename is specified, the resource's identifier is used.
    * 
-   * @param uri
-   *          the resource uri
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @param style
+   *          the image style
+   * @return
+   */
+  public static File getScaledFile(Resource<?> resource, Language language,
+      ImageStyle style) {
+    return getScaledFile(resource, null, language, style);
+  }
+
+  /**
+   * Returns the file for the scaled image that is identified by
+   * <code>filename</code>, <code>language</code> and <code>style</code>.
+   * <p>
+   * If no filename is specified, the resource's identifier is used.
+   * 
+   * @param resource
+   *          the resource
    * @param filename
    *          the file name
    * @param language
@@ -385,16 +430,21 @@ public final class ImageStyleUtils {
    *          the image style
    * @return
    */
-  public static File getScaledFile(ResourceURI uri, String filename,
+  public static File getScaledFile(Resource<?> resource, String filename,
       Language language, ImageStyle style) {
 
-    if (filename == null)
-      filename = uri.getIdentifier();
+    if (StringUtils.isBlank(filename) && resource.getContent(language) != null)
+      filename = resource.getContent(language).getFilename();
+    if (StringUtils.isBlank(filename))
+      filename = resource.getURI().getIdentifier();
+
     String suffix = FilenameUtils.getExtension(filename);
+    if (StringUtils.isBlank(suffix))
+      suffix = DEFAULT_PREVIEW_FORMAT;
 
     // If needed, create the scaled file's parent directory
-    Site site = uri.getSite();
-    File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier(), uri.getIdentifier(), language.getIdentifier()));
+    Site site = resource.getURI().getSite();
+    File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier(), resource.getIdentifier(), Long.toString(resource.getVersion()), language.getIdentifier()));
 
     // Create the filename
     StringBuffer scaledFilename = new StringBuffer(FilenameUtils.getBaseName(filename));

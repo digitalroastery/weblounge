@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
+import static ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils.DEFAULT_PREVIEW_FORMAT;
+
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
@@ -40,9 +42,7 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
@@ -204,27 +204,12 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     InputStream resourceInputStream = null;
     long contentLength = -1;
 
-    // Create the target file name
-    StringBuilder filename = new StringBuilder();
-    String basename = null;
-    if (resourceContent != null)
-      basename = FilenameUtils.getBaseName(resourceContent.getFilename());
-    else
-      basename = resource.getIdentifier();
-    String suffix = previewGenerator.getSuffix(resource, language, style);
-    filename.append(basename);
-    filename.append("-").append(version);
-    filename.append("-").append(language.getIdentifier());
-    if (StringUtils.isNotBlank(suffix)) {
-      filename.append(".").append(suffix);
-    }
-
     // Load the input stream from the scaled image
+    File scaledResourceFile = null;
     InputStream contentRepositoryIs = null;
     FileOutputStream fos = null;
-    File scaledResourceFile = null;
     try {
-      scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
+      scaledResourceFile = ImageStyleUtils.getScaledFile(resource, language, style);
       long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
       if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
         if (!force)
@@ -234,7 +219,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
         fos = new FileOutputStream(scaledResourceFile);
         logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
 
-        previewGenerator.createPreview(resource, environment, language, style, suffix, contentRepositoryIs, fos);
+        previewGenerator.createPreview(resource, environment, language, style, DEFAULT_PREVIEW_FORMAT, contentRepositoryIs, fos);
         if (scaledResourceFile.length() > 1) {
           scaledResourceFile.setLastModified(lastModified);
         } else {
@@ -320,7 +305,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     response.tag(eTag);
 
     // Add filename header
-    response.header("Content-Disposition", "inline; filename=" + filename);
+    response.header("Content-Disposition", "inline; filename=" + resourceContent.getFilename());
 
     // Content length
     response.header("Content-Length", Long.toString(contentLength));
@@ -525,9 +510,6 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
   private void deletePreview(Resource<?> resource, long version,
       ImageStyle style, Language language) {
 
-    // Load the content
-    ResourceContent resourceContent = resource.getContent(language);
-
     // Find a serializer
     ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resource.getURI().getType());
     if (serializer == null)
@@ -538,25 +520,10 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     if (previewGenerator == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
-    // Create the target file name
-    StringBuilder filename = new StringBuilder();
-    String basename = null;
-    if (resourceContent != null)
-      basename = FilenameUtils.getBaseName(resourceContent.getFilename());
-    else
-      basename = resource.getIdentifier();
-    String suffix = previewGenerator.getSuffix(resource, language, style);
-    filename.append(basename);
-    filename.append("-").append(version);
-    filename.append("-").append(language.getIdentifier());
-    if (StringUtils.isNotBlank(suffix)) {
-      filename.append(".").append(suffix);
-    }
-
     // Load the input stream from the scaled image
     File scaledResourceFile = null;
     try {
-      scaledResourceFile = ImageStyleUtils.createScaledFile(resource.getURI(), filename.toString(), language, style);
+      scaledResourceFile = ImageStyleUtils.getScaledFile(resource, language, style);
       if (scaledResourceFile.exists()) {
         logger.debug("Deleting preview at {}", scaledResourceFile);
         FileUtils.deleteQuietly(scaledResourceFile);

@@ -37,7 +37,6 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -170,7 +169,7 @@ class PreviewGeneratorWorker implements Runnable {
           FileOutputStream fos = null;
           try {
             fis = new FileInputStream(originalPreview);
-            File scaledFile = ImageStyleUtils.createScaledFile(resourceURI, originalPreview.getName(), l, style);
+            File scaledFile = ImageStyleUtils.createScaledFile(resource, l, style);
             fos = new FileOutputStream(scaledFile);
             imagePreviewGenerator.createPreview(originalPreview, environment, l, style, resourceType, fis, fos);
           } catch (Throwable t) {
@@ -211,9 +210,6 @@ class PreviewGeneratorWorker implements Runnable {
 
     // Create the filename
     ResourceContent content = resource.getContent(language);
-    String filename = content != null ? content.getFilename() : resource.getIdentifier();
-    String suffix = previewGenerator.getSuffix(resource, language, style);
-    filename = FilenameUtils.getBaseName(filename) + "." + suffix;
 
     // Initiate creation of previews
     InputStream resourceInputStream = null;
@@ -222,7 +218,7 @@ class PreviewGeneratorWorker implements Runnable {
     File scaledResourceFile = null;
 
     try {
-      scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
+      scaledResourceFile = ImageStyleUtils.createScaledFile(resource, language, style);
 
       // Find the modification date
       long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();

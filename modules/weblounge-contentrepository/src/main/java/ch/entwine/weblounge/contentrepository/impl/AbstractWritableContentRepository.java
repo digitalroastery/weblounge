@@ -140,9 +140,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** Flag to indicate off-site indexing */
   protected boolean indexingOffsite = false;
 
-  /** Preview generator creates PNG's by default */
-  private static final String PREVIEW_FORMAT = "png";
-
   /** The resources for which preview generation is due */
   private final Map<ResourceURI, PreviewOperation> previews = new HashMap<ResourceURI, PreviewOperation>();
 
@@ -410,6 +407,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     ContentRepositoryOperation<?> lockOperation = CurrentOperation.get();
     for (ResourceURI u : getVersions(uri)) {
       Resource<?> r = get(u);
+      if (r == null) {
+        logger.debug("Version {} of {} has been removed in the meantime", u.getVersion(), u);
+        continue;
+      }
       r.lock(user);
       PutOperation putOp = new PutOperationImpl(r, false);
       try {
@@ -556,7 +557,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Is this a new request or a scheduled asynchronous execution?
     if (!(CurrentOperation.get() instanceof DeleteOperation)) {
-      return deleteAsynchronously(uri, allRevisions).get();
+      DeleteOperation deleteOperation = deleteAsynchronously(uri, allRevisions);
+      if (deleteOperation == null)
+        return true;
+      return deleteOperation.get();
     }
 
     // Check if resource is in temporary cache already by another operation
@@ -589,7 +593,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       revisions = index.getRevisions(uri);
     }
 
-    // Delete resources
+    // Delete resources, but get an in-memory representation first
+    Resource<?> resource = ((DeleteOperation) CurrentOperation.get()).getResource();
     deleteResource(uri, revisions);
 
     // Delete the index entries
@@ -598,7 +603,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Delete previews
-    deletePreviews(uri);
+    deletePreviews(resource);
 
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
@@ -623,7 +628,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    DeleteOperation deleteOperation = new DeleteOperationImpl(uri, allRevisions);
+    Resource<?> resource = get(uri);
+    if (resource == null)
+      return null;
+    DeleteOperation deleteOperation = new DeleteOperationImpl(resource, allRevisions);
     processor.enqueue(deleteOperation);
     return deleteOperation;
   }
@@ -1000,7 +1008,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     index.update(resource);
 
     // Delete previews
-    deletePreviews(uri, content.getLanguage());
+    deletePreviews(resource, content.getLanguage());
 
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
@@ -1457,7 +1465,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       }
 
       // Otherwise, a new preview generator needs to be started.
-      previewOp = new PreviewOperation(resource, Arrays.asList(languages), styles, PREVIEW_FORMAT);
+      previewOp = new PreviewOperation(resource, Arrays.asList(languages), styles, ImageStyleUtils.DEFAULT_PREVIEW_FORMAT);
 
       // Make sure nobody is working on the same resource at the moment
       if (currentPreviewOperations.contains(previewOp)) {
@@ -1526,23 +1534,23 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * Deletes the previews for this resource in all languages and for all known
    * image styles.
    * 
-   * @param uri
-   *          the resource uri
+   * @param resource
+   *          the resource
    */
-  protected void deletePreviews(ResourceURI uri) {
-    deletePreviews(uri, null);
+  protected void deletePreviews(Resource<?> resource) {
+    deletePreviews(resource, null);
   }
 
   /**
    * Deletes the previews for this resource in the given languages and for all
    * known image styles.
    * 
-   * @param uri
-   *          the resource uri
+   * @param resource
+   *          the resource
    * @param language
    *          the language
    */
-  protected void deletePreviews(ResourceURI uri, Language language) {
+  protected void deletePreviews(Resource<?> resource, Language language) {
     // Compile the full list of image styles
     List<ImageStyle> styles = new ArrayList<ImageStyle>();
     if (imageStyleTracker != null)
@@ -1556,9 +1564,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
       // Create the path to a sample image
       if (language != null) {
-        styledImage = ImageStyleUtils.getScaledFile(uri, "test." + PREVIEW_FORMAT, language, style);
+        styledImage = ImageStyleUtils.getScaledFile(resource, language, style);
       } else {
-        styledImage = ImageStyleUtils.getScaledFile(uri, "test." + PREVIEW_FORMAT, LanguageUtils.getLanguage("en"), style);
+        styledImage = ImageStyleUtils.getScaledFile(resource, LanguageUtils.getLanguage("en"), style);
         styledImage = styledImage.getParentFile();
       }
 
