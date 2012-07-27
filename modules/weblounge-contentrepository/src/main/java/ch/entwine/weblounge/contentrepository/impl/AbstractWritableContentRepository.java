@@ -257,7 +257,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         page.setTemplate(site.getDefaultTemplate().getIdentifier());
         page.setCreated(siteAdmininstrator, new Date());
         page.setPublished(siteAdmininstrator, new Date(), null);
-        put(page);
+        put(page, true);
         logger.info("Created homepage for {}", site.getIdentifier());
       } catch (IOException e) {
         logger.warn("Error creating home page in empty site '{}': {}", site.getIdentifier(), e.getMessage());
@@ -771,7 +771,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    PutOperation putOperation = new PutOperationImpl(resource, true);
+    PutOperation putOperation = new PutOperationImpl(resource, false);
     processor.enqueue(putOperation);
     return putOperation;
   }
