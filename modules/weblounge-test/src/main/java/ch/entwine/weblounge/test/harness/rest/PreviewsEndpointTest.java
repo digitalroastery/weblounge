@@ -98,7 +98,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
     styles.add(new ImageStyleImpl("width", BOX_WIDTH, -1, ImageScalingMode.Width, false));
     styles.add(new ImageStyleImpl("height", -1, BOX_HEIGHT, ImageScalingMode.Height, false));
     styles.add(new ImageStyleImpl("none", -1, -1, ImageScalingMode.None, false));
-    styles.add(new ImageStyleImpl("weblounge-ui:preview", PREVIEW_WIDTH, PREVIEW_HEIGHT, ImageScalingMode.Cover, false));
+    styles.add(new ImageStyleImpl("weblounge-ui-preview", PREVIEW_WIDTH, PREVIEW_HEIGHT, ImageScalingMode.Cover, false));
   }
 
   public PreviewsEndpointTest() {
