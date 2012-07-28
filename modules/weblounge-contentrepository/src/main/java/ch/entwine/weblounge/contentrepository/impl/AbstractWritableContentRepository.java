@@ -1772,7 +1772,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      */
     @Override
     public boolean equals(Object op) {
-      return resource.equals(op);
+      return resource.equals(((PreviewOperation) op).getResource());
     }
 
     /**

@@ -154,7 +154,7 @@ class PreviewGeneratorWorker implements Runnable {
           continue;
         originalPreview = createPreview(resource, originalStyle, l, previewGenerator, format);
         if (originalPreview == null || !originalPreview.exists() || originalPreview.length() == 0) {
-          AbstractWritableContentRepository.logger.debug("Preview generation for {} failed", resource);
+          AbstractWritableContentRepository.logger.warn("Preview generation for {} failed", resource);
           return;
         }
 
