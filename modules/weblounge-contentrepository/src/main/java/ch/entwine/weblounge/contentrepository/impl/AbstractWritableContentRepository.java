@@ -150,8 +150,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   private final List<PreviewOperation> currentPreviewOperations = new ArrayList<PreviewOperation>();
 
   /** The maximum number of concurrent preview operations */
-  // TODO: Make this configurable
-  private final int maxPreviewOperations = Integer.MAX_VALUE;
+  private final int maxPreviewOperations = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
 
   /**
    * Creates a new instance of the content repository.
