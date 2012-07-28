@@ -222,8 +222,10 @@ public class PagesEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
+    // Test E-Tag header
     TestSiteUtils.testETagHeader(getPageRequest, eTagValue, logger, params);
 
+    // Test If-Modified-Since header with non-modified page
     httpClient = new DefaultHttpClient();
     try {
       getPageRequest.removeHeaders("If-None-Match");
@@ -236,6 +238,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
+    // Test If-Modified-Since header with modified page
     httpClient = new DefaultHttpClient();
     try {
       getPageRequest.removeHeaders("If-None-Match");
@@ -372,7 +375,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
         success = true;
         break;
       } catch (AssertionError a) {
-        logger.info("Waiting, then retrying due to asynchronous processing");
+        logger.debug("Waiting, then retrying due to asynchronous processing");
         Thread.sleep(2000);
       } finally {
         httpClient.getConnectionManager().shutdown();
@@ -608,7 +611,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
         success = true;
         break;
       } catch (AssertionError a) {
-        logger.info("Waiting for asynchronous processing");
+        logger.debug("Waiting for asynchronous processing");
         Thread.sleep(2000);
       } finally {
         httpClient.getConnectionManager().shutdown();
@@ -660,7 +663,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
         success = true;
         break;
       } catch (AssertionError a) {
-        logger.info("Waiting for asynchronous processing");
+        logger.debug("Waiting for asynchronous processing");
         Thread.sleep(2000);
       } finally {
         httpClient.getConnectionManager().shutdown();

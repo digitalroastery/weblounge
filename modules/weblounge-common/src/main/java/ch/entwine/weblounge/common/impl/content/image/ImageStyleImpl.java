@@ -78,7 +78,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    */
   public ImageStyleImpl(String id, int width, int height,
       ImageScalingMode scaling, boolean composeable)
-      throws IllegalArgumentException {
+          throws IllegalArgumentException {
     if (StringUtils.isBlank(id))
       throw new IllegalArgumentException("Identifier cannot be null");
     this.identifier = id;
@@ -123,6 +123,18 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    */
   public ImageStyleImpl(String id, int width, int height) {
     this(id, width, height, None, true);
+  }
+
+  /**
+   * Creates a new composeable image style.
+   * 
+   * @param id
+   *          the style identifier
+   * @param mode
+   *          the scaling mode
+   */
+  public ImageStyleImpl(String id, ImageScalingMode mode) {
+    this(id, -1, -1, mode, true);
   }
 
   /**
@@ -390,6 +402,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    * 
    * @see ch.entwine.weblounge.common.impl.language.LocalizableObject#toString()
    */
+  @Override
   public String toString() {
     StringBuffer buf = new StringBuffer(identifier);
     buf.append(" [scaling=");

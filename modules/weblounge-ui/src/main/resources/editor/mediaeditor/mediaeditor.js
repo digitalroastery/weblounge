@@ -166,7 +166,7 @@ steal.plugins('jquery',
 				player = new MediaElementPlayer(videoTag, {});
 				container.find('div.mejs-container').css('left', left + 'px');
 	    	} else if(this.file[index].name.localPart == 'image'){
-	    		var previewUrl = '/system/weblounge/previews/' + this.file[index].value.id + '/locales/' + this.options.language + '/styles/weblounge-ui:preview';
+	    		var previewUrl = '/system/weblounge/previews/' + this.file[index].value.id + '/locales/' + this.options.language + '/styles/weblounge-ui-preview';
 	    		container.html('<img src="' + previewUrl + '" alt="Vorschaubild" />');
 	    		var imgTag = container.find('img');
 	    		var left = Math.max((container.outerWidth({margin:true}) - imgTag.width()) / 2, 0);

@@ -123,7 +123,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(FilesEndpoint.class);
 
   /** Mime type detector */
-  private Tika mimeTypeDetector = new Tika();
+  private final Tika mimeTypeDetector = new Tika();
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -747,6 +747,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     try {
       resource = contentRepository.deleteContent(uri, content);
       resource.setModified(user, new Date());
+      // TODO: Remove existing preview images
       contentRepository.put(resource);
     } catch (IllegalStateException e) {
       logger.warn("Tried to remove content from missing resource " + uri);
@@ -945,7 +946,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       logger.debug("Creating new resource at {}", resourceURI);
       resource = new FileResourceImpl(resourceURI);
       resource.setCreated(user, new Date());
-      contentRepository.put(resource);
+      contentRepository.put(resource, true);
       uri = new URI(UrlUtils.concat(request.getRequestURL().toString(), resourceURI.getIdentifier()));
     } catch (URISyntaxException e) {
       logger.warn("Error creating a uri for resource {}: {}", resourceURI, e.getMessage());
@@ -1229,7 +1230,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       // Store the new resource
       try {
         uri = new URI(resourceURI.getIdentifier());
-        contentRepository.put(resource);
+        contentRepository.put(resource, true);
       } catch (URISyntaxException e) {
         logger.warn("Error creating a uri for resource {}: {}", resourceURI, e.getMessage());
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

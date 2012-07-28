@@ -60,7 +60,7 @@ public final class PreviewsEndpointDocs {
     // GET /{resource}/locales/{language}/styles/{styleid}
     Endpoint getScaleLocalizedImage = new Endpoint("/{resource}/locales/{language}/styles/{style}", Method.GET, "localizedstyledimage");
     getScaleLocalizedImage.setDescription("Returns a scaled version of the resource with the given identifier and language");
-    getScaleLocalizedImage.addFormat(new Format("resource", null, null));
+    getScaleLocalizedImage.addFormat(new Format("xml", null, null));
     getScaleLocalizedImage.addStatus(ok("the resource was scaled using the specified image style and is returned as part of the response"));
     getScaleLocalizedImage.addStatus(notFound("the resource was not found or could not be loaded"));
     getScaleLocalizedImage.addStatus(notFound("the resource does not exist in the specified language"));
@@ -71,8 +71,39 @@ public final class PreviewsEndpointDocs {
     getScaleLocalizedImage.addPathParameter(new Parameter("language", Parameter.Type.String, "The language identifier"));
     getScaleLocalizedImage.addPathParameter(new Parameter("style", Parameter.Type.String, "The image style identifier"));
     getScaleLocalizedImage.addOptionalParameter(new Parameter("version", Parameter.Type.String, "The version", "0", versions));
+    getScaleLocalizedImage.addOptionalParameter(new Parameter("force", Parameter.Type.Boolean, "Force the creation if not available"));
     getScaleLocalizedImage.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getScaleLocalizedImage);
+
+    // DELETE /
+    Endpoint removeAll = new Endpoint("/", Method.DELETE, "deleteAll");
+    removeAll.setDescription("Deletes all previews of this site");
+    removeAll.addStatus(ok("the preview images were removed"));
+    removeAll.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    removeAll.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, removeAll);
+
+    // DELETE /{resource}}
+    Endpoint removeByResource = new Endpoint("/{resource}", Method.DELETE, "delete");
+    removeByResource.setDescription("Deletes all previews of the resource with the given identifier");
+    removeByResource.addStatus(ok("the preview images were removed"));
+    removeByResource.addStatus(notFound("the resource was not found or could not be loaded"));
+    removeByResource.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    removeByResource.addPathParameter(new Parameter("resource", Parameter.Type.String, "The resource identifier"));
+    removeByResource.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, removeByResource);
+
+    // DELETE /styles/{styleid}
+    Endpoint removeByStyle = new Endpoint("/styles/{style}", Method.DELETE, "deletebystyle");
+    removeByStyle.setDescription("Deletes the previews for the given style");
+    removeByStyle.addStatus(ok("the preview images were removed"));
+    removeByStyle.addStatus(notFound("the resource was not found or could not be loaded"));
+    removeByStyle.addStatus(notFound("the resource does not exist in the specified language"));
+    removeByStyle.addStatus(badRequest("an invalid image or image style identifier was received"));
+    removeByStyle.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    removeByStyle.addPathParameter(new Parameter("style", Parameter.Type.String, "The image style identifier"));
+    removeByStyle.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, removeByStyle);
 
     // GET /styles
     Endpoint getImageStyles = new Endpoint("/styles", Method.GET, "getstyles");

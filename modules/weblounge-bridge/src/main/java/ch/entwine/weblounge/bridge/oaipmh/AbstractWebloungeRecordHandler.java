@@ -300,7 +300,7 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
    */
   protected void addResource(Resource<?> resource) {
     try {
-      contentRepository.put(resource);
+      contentRepository.put(resource, true);
     } catch (IllegalStateException e) {
       logger.warn("Illegal state while adding new resource {}: {}", resource.getURI(), e.getMessage());
       throw new RuntimeException(e);

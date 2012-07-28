@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
+import static ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils.DEFAULT_PREVIEW_FORMAT;
+
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
@@ -40,7 +42,6 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -52,9 +53,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -118,7 +121,8 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       @PathParam("resource") String resourceId,
       @PathParam("language") String languageId,
       @PathParam("style") String styleId,
-      @QueryParam("version") @DefaultValue("0") long version) {
+      @QueryParam("version") @DefaultValue("0") long version,
+      @QueryParam("force") @DefaultValue("false") boolean force) {
 
     // Check the parameters
     if (resourceId == null)
@@ -176,9 +180,6 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       return Response.notModified().build();
     }
 
-    // Load the content
-    ResourceContent resourceContent = resource.getContent(language);
-
     ResourceURI resourceURI = resource.getURI();
     final ContentRepository contentRepository = getContentRepository(site, false);
 
@@ -201,34 +202,23 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     InputStream resourceInputStream = null;
     long contentLength = -1;
 
-    // Create the target file name
-    StringBuilder filename = new StringBuilder();
-    String basename = null;
-    if (resourceContent != null)
-      basename = FilenameUtils.getBaseName(resourceContent.getFilename());
-    else
-      basename = resource.getIdentifier();
-    String suffix = previewGenerator.getSuffix(resource, language, style);
-    filename.append(basename);
-    filename.append("-").append(version);
-    filename.append("-").append(language.getIdentifier());
-    if (StringUtils.isNotBlank(suffix)) {
-      filename.append(".").append(suffix);
-    }
-
     // Load the input stream from the scaled image
+    File scaledResourceFile = null;
     InputStream contentRepositoryIs = null;
     FileOutputStream fos = null;
-    File scaledResourceFile = null;
     try {
-      scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
+      scaledResourceFile = ImageStyleUtils.getScaledFile(resource, language, style);
       long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
       if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
+        if (!force)
+          throw new WebApplicationException(Response.Status.NOT_FOUND);
+
         contentRepositoryIs = contentRepository.getContent(resourceURI, language);
+        scaledResourceFile = ImageStyleUtils.createScaledFile(resource, language, style);
         fos = new FileOutputStream(scaledResourceFile);
         logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
 
-        previewGenerator.createPreview(resource, environment, language, style, suffix, contentRepositoryIs, fos);
+        previewGenerator.createPreview(resource, environment, language, style, DEFAULT_PREVIEW_FORMAT, contentRepositoryIs, fos);
         if (scaledResourceFile.length() > 1) {
           scaledResourceFile.setLastModified(lastModified);
         } else {
@@ -314,6 +304,12 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     response.tag(eTag);
 
     // Add filename header
+    String filename = null;
+    ResourceContent resourceContent = resource.getContent(language);
+    if (resourceContent != null)
+      filename = resourceContent.getFilename();
+    if (StringUtils.isBlank(filename))
+      filename = scaledResourceFile.getName();
     response.header("Content-Disposition", "inline; filename=" + filename);
 
     // Content length
@@ -321,6 +317,232 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
 
     // Send the response
     return response.build();
+  }
+
+  /**
+   * Deletes the preview images for the given resource and language.
+   * 
+   * @param request
+   *          the request
+   * @param resourceId
+   *          the resource identifier
+   * @param languageId
+   *          the language identifier
+   */
+  @DELETE
+  @Path("/")
+  public Response removePreviews(@Context HttpServletRequest request) {
+    Site site = super.getSite(request);
+    File previewsDir = ImageStyleUtils.getScaledFileBase(site);
+    if (FileUtils.deleteQuietly(previewsDir))
+      return Response.ok().build();
+    else
+      return Response.serverError().build();
+  }
+
+  /**
+   * Deletes the preview images for the given resource and language.
+   * 
+   * @param request
+   *          the request
+   * @param resourceId
+   *          the resource identifier
+   * @param languageId
+   *          the language identifier
+   */
+  @DELETE
+  @Path("/{resource}")
+  public Response removePreviewsByStyle(@Context HttpServletRequest request,
+      @PathParam("resource") String styleId) {
+    return removePreview(request, null, null, null);
+  }
+
+  /**
+   * Deletes the preview images for the given resource and language.
+   * 
+   * @param request
+   *          the request
+   * @param resourceId
+   *          the resource identifier
+   * @param languageId
+   *          the language identifier
+   */
+  @DELETE
+  @Path("/styles/{style}")
+  public Response removePreview(@Context HttpServletRequest request,
+      @PathParam("style") String styleId) {
+    Site site = super.getSite(request);
+
+    // Check the parameters
+    if (styleId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Search the site for the image style
+    ImageStyle style = null;
+    for (Module m : site.getModules()) {
+      style = m.getImageStyle(styleId);
+      if (style != null) {
+        break;
+      }
+    }
+
+    // Search the global styles
+    if (style == null) {
+      for (ImageStyle s : styles) {
+        if (s.getIdentifier().equals(styleId)) {
+          style = s;
+          break;
+        }
+      }
+    }
+
+    // The image style was not found
+    if (style == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    File previewsDir = ImageStyleUtils.getScaledFileBase(site, style);
+    if (FileUtils.deleteQuietly(previewsDir))
+      return Response.ok().build();
+    else
+      return Response.serverError().build();
+  }
+
+  /**
+   * Deletes the preview images for the given resource, the language and image
+   * style.
+   * 
+   * @param request
+   *          the request
+   * @param resourceId
+   *          the resource identifier
+   * @param languageId
+   *          the language identifier
+   * @param styleId
+   *          the image style identifier
+   */
+  @DELETE
+  @Path("/{resource}/locales/{language}/styles/{style}")
+  public Response removePreview(@Context HttpServletRequest request,
+      @PathParam("resource") String resourceId,
+      @PathParam("language") String languageId,
+      @PathParam("style") String styleId) {
+
+    // Check the parameters
+    if (resourceId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Get the resource
+    final Site site = getSite(request);
+    final Resource<?> resource = loadResource(request, resourceId, null);
+    if (resource == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    // Extract the language
+    List<Language> languages = new ArrayList<Language>();
+    if (languageId != null) {
+      try {
+        languages.add(LanguageUtils.getLanguage(languageId));
+      } catch (UnknownLanguageException e) {
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
+    } else {
+      languages.addAll(resource.languages());
+    }
+
+    // Search the site for the image style (if applicable)
+    List<ImageStyle> removeStyles = new ArrayList<ImageStyle>();
+    if (styleId != null) {
+      for (Module m : site.getModules()) {
+        ImageStyle s = m.getImageStyle(styleId);
+        if (s != null) {
+          removeStyles.add(s);
+          break;
+        }
+      }
+
+      // Search the global styles
+      if (removeStyles.size() > 0) {
+        for (ImageStyle s : this.styles) {
+          if (s.getIdentifier().equals(styleId)) {
+            removeStyles.add(s);
+            break;
+          }
+        }
+      }
+    } else {
+      removeStyles.addAll(this.styles);
+      for (Module m : site.getModules()) {
+        removeStyles.addAll(Arrays.asList(m.getImageStyles()));
+      }
+    }
+
+    ResourceURI resourceURI = resource.getURI();
+    final ContentRepository contentRepository = getContentRepository(site, false);
+
+    // Load the resource versions from the repository
+    ResourceURI[] versions = null;
+    try {
+      versions = contentRepository.getVersions(resourceURI);
+    } catch (ContentRepositoryException e1) {
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Remove the preview for all versions in the specified styles and languages
+    for (ResourceURI u : versions) {
+      for (ImageStyle style : removeStyles) {
+        for (Language language : languages) {
+          deletePreview(resource, u.getVersion(), style, language);
+        }
+      }
+    }
+
+    // Send the response
+    return Response.status(Status.OK).build();
+  }
+
+  /**
+   * Deletes a single preview image.
+   * 
+   * @param resource
+   *          the resource
+   * @param version
+   *          the resource version
+   * @param style
+   *          the image style
+   * @param language
+   *          the language
+   */
+  private void deletePreview(Resource<?> resource, long version,
+      ImageStyle style, Language language) {
+
+    // Find a serializer
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resource.getURI().getType());
+    if (serializer == null)
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+
+    // Does the serializer come with a preview generator?
+    PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource);
+    if (previewGenerator == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    // Load the input stream from the scaled image
+    File scaledResourceFile = null;
+    try {
+      scaledResourceFile = ImageStyleUtils.getScaledFile(resource, language, style);
+      if (scaledResourceFile.exists()) {
+        logger.debug("Deleting preview at {}", scaledResourceFile);
+        FileUtils.deleteQuietly(scaledResourceFile);
+        File parentDir = scaledResourceFile.getParentFile();
+        while (parentDir.isDirectory() && parentDir.list().length == 0) {
+          logger.debug("Deleting empty preview directory {}", parentDir);
+          FileUtils.deleteQuietly(parentDir);
+          parentDir = parentDir.getParentFile();
+        }
+      }
+    } catch (Throwable t) {
+      logger.error("Error removing preview image '{}': {}", resource.getURI(), t.getMessage());
+      throw new WebApplicationException();
+    }
   }
 
   /**
