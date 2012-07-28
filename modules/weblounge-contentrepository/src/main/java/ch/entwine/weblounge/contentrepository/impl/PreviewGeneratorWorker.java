@@ -32,11 +32,11 @@ import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Environment;
+import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -64,8 +64,8 @@ class PreviewGeneratorWorker implements Runnable {
   /** The environment */
   private Environment environment = null;
 
-  /** The language to render */
-  private Language language = null;
+  /** The languages to render */
+  private List<Language> languages = null;
 
   /** The format */
   private String format = null;
@@ -78,18 +78,22 @@ class PreviewGeneratorWorker implements Runnable {
    *          the resource
    * @param environment
    *          the current environment
-   * @param language
-   *          the language
+   * @param languages
+   *          the languages
    * @param styles
    *          the image styles
    */
   public PreviewGeneratorWorker(AbstractWritableContentRepository repository,
-      Resource<?> resource, Environment environment, Language language,
+      Resource<?> resource, Environment environment, List<Language> languages,
       List<ImageStyle> styles, String format) {
+    if (languages == null || languages.size() == 0)
+      throw new IllegalArgumentException("At least one language must be provided");
+    if (styles == null || styles.size() == 0)
+      throw new IllegalArgumentException("At least one preview style must be provided");
     this.contentRepository = repository;
     this.resource = resource;
     this.environment = environment;
-    this.language = language;
+    this.languages = languages;
     this.styles = styles;
     this.format = format;
   }
@@ -119,14 +123,6 @@ class PreviewGeneratorWorker implements Runnable {
         return;
       }
 
-      // Create the original preview image for every language
-      ImageStyle original = new ImageStyleImpl("original");
-      File file = createPreview(resource, original, language, previewGenerator, format);
-      if (file == null || !file.exists() || file.length() == 0) {
-        AbstractWritableContentRepository.logger.debug("Preview generation for {} failed", resource);
-        return;
-      }
-
       // Create the scaled images
       String mimeType = "image/" + format;
       ResourceSerializer<?, ?> s = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
@@ -147,20 +143,42 @@ class PreviewGeneratorWorker implements Runnable {
       }
 
       // Now scale the original preview according to the existing styles
-      for (ImageStyle style : styles) {
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        try {
-          fis = new FileInputStream(file);
-          File scaledFile = ImageStyleUtils.createScaledFile(resourceURI, file.getName(), language, style);
-          fos = new FileOutputStream(scaledFile);
-          imagePreviewGenerator.createPreview(file, environment, language, style, resourceType, fis, fos);
-        } catch (Throwable t) {
-          AbstractWritableContentRepository.logger.error("Error scaling {}: {}", file, t.getMessage());
+      for (Language l : languages) {
+        if (!resource.supportsContentLanguage(l))
           continue;
-        } finally {
-          IOUtils.closeQuietly(fis);
-          IOUtils.closeQuietly(fos);
+
+        // Create the original preview image for every language
+        ImageStyle originalStyle = new ImageStyleImpl("original", ImageScalingMode.None);
+        File originalPreview = null;
+        if (!resource.supportsContentLanguage(l))
+          continue;
+        originalPreview = createPreview(resource, originalStyle, l, previewGenerator, format);
+        if (originalPreview == null || !originalPreview.exists() || originalPreview.length() == 0) {
+          AbstractWritableContentRepository.logger.warn("Preview generation for {} failed", resource);
+          return;
+        }
+
+        // Create the remaining styles
+        for (ImageStyle style : styles) {
+
+          // The original has been produced already
+          if (ImageScalingMode.None.equals(style.getScalingMode()))
+            continue;
+
+          FileInputStream fis = null;
+          FileOutputStream fos = null;
+          try {
+            fis = new FileInputStream(originalPreview);
+            File scaledFile = ImageStyleUtils.createScaledFile(resource, l, style);
+            fos = new FileOutputStream(scaledFile);
+            imagePreviewGenerator.createPreview(originalPreview, environment, l, style, resourceType, fis, fos);
+          } catch (Throwable t) {
+            AbstractWritableContentRepository.logger.error("Error scaling {}: {}", originalPreview, t.getMessage());
+            continue;
+          } finally {
+            IOUtils.closeQuietly(fis);
+            IOUtils.closeQuietly(fos);
+          }
         }
       }
 
@@ -192,9 +210,6 @@ class PreviewGeneratorWorker implements Runnable {
 
     // Create the filename
     ResourceContent content = resource.getContent(language);
-    String filename = content != null ? content.getFilename() : resource.getIdentifier();
-    String suffix = previewGenerator.getSuffix(resource, language, style);
-    filename = FilenameUtils.getBaseName(filename) + "." + suffix;
 
     // Initiate creation of previews
     InputStream resourceInputStream = null;
@@ -203,7 +218,7 @@ class PreviewGeneratorWorker implements Runnable {
     File scaledResourceFile = null;
 
     try {
-      scaledResourceFile = ImageStyleUtils.createScaledFile(resourceURI, filename.toString(), language, style);
+      scaledResourceFile = ImageStyleUtils.createScaledFile(resource, language, style);
 
       // Find the modification date
       long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();

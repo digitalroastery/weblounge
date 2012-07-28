@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.ResourceImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -81,6 +82,16 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
   public PageImpl(ResourceURI uri) {
     super(new ResourceURIImpl(TYPE, uri.getSite(), uri.getPath(), uri.getIdentifier(), uri.getVersion()));
     this.composers = new HashMap<String, List<Pagelet>>();
+  }
+
+  /**
+   * For pages, the resource langauge support equals the content support.
+   * 
+   * @see ch.entwine.weblounge.common.impl.content.ResourceImpl#supportsContentLanguage(ch.entwine.weblounge.common.language.Language)
+   */
+  @Override
+  public boolean supportsContentLanguage(Language language) {
+    return supportsLanguage(language);
   }
 
   /**

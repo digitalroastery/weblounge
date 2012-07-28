@@ -599,7 +599,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       page.setModified(user, new Date());
       page.setVersion(Resource.WORK);
 
-      contentRepository.putAsynchronously(page, false);
+      contentRepository.putAsynchronously(page, true);
 
       // Check if the page has been moved
       String currentPath = currentPage.getURI().getPath();
@@ -725,7 +725,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Store the new page
     try {
-      contentRepository.put(page);
+      contentRepository.put(page, true);
       uri = new URI(UrlUtils.concat(request.getRequestURL().toString(), pageURI.getIdentifier()));
     } catch (URISyntaxException e) {
       logger.warn("Error creating a uri for page {}: {}", pageURI, e.getMessage());

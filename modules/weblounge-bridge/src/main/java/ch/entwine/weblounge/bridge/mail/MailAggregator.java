@@ -140,7 +140,7 @@ public class MailAggregator implements JobWorker {
             try {
               Page page = aggregate(message, site);
               message.setFlag(Flag.DELETED, true);
-              repository.put(page);
+              repository.put(page, true);
               logger.info("E-Mail message published at {}", page.getURI());
             } catch (Exception e) {
               logger.info("E-Mail message discarded: {}", e.getMessage());
@@ -188,7 +188,7 @@ public class MailAggregator implements JobWorker {
    *           if writing the contents to the output stream fails
    */
   protected Page aggregate(Message message, Site site) throws IOException,
-      MessagingException, IllegalArgumentException {
+  MessagingException, IllegalArgumentException {
 
     ResourceURI uri = new PageURIImpl(site, UUID.randomUUID().toString());
     Page page = new PageImpl(uri);
@@ -230,7 +230,7 @@ public class MailAggregator implements JobWorker {
         body = (String)message.getContent();
       else if (message.getContent() instanceof InputStream)
         body = IOUtils.toString((InputStream)message.getContent());
-      else 
+      else
         throw new IllegalArgumentException("Message body is of unknown type");
       return handleTextPlain(body, page, language);
     }
@@ -324,7 +324,7 @@ public class MailAggregator implements JobWorker {
    *           if no author can be found
    */
   private String getAuthor(Message message) throws MessagingException,
-      IllegalArgumentException {
+  IllegalArgumentException {
     Address[] address = message.getFrom();
     if (address == null || address.length == 0)
       throw new MessagingException("Message has no author");
@@ -344,7 +344,7 @@ public class MailAggregator implements JobWorker {
    *           if no subject can be found
    */
   private String getSubject(Message message) throws MessagingException,
-      IllegalArgumentException {
+  IllegalArgumentException {
     String subject = message.getSubject();
     if (StringUtils.isBlank(subject))
       throw new MessagingException("Message has no subject");

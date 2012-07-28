@@ -39,19 +39,19 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
   /** True if all versions of this resource should be removed */
   private boolean allVersions = false;
 
-  /** The uri of the resource that the operation will work on */
-  private ResourceURI uri = null;
+  /** The resource that is about to be deleted */
+  private Resource<?> resource = null;
 
   /**
    * Creates a new delete operation for the given resource.
    * 
-   * @param uri
-   *          the resource uri
+   * @param resource
+   *          the resource
    * @param allVersions
    *          <code>true</code> if all versions should be removed
    */
-  public DeleteOperationImpl(ResourceURI uri, boolean allVersions) {
-    this.uri = uri;
+  public DeleteOperationImpl(Resource<?> resource, boolean allVersions) {
+    this.resource = resource;
     this.allVersions = allVersions;
   }
 
@@ -61,7 +61,16 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
    * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#getResourceURI()
    */
   public ResourceURI getResourceURI() {
-    return uri;
+    return resource.getURI();
+  }
+
+  /**
+   * Returns the resource that is to be deleted.
+   * 
+   * @return the resource
+   */
+  public Resource<?> getResource() {
+    return resource;
   }
 
   /**
@@ -79,9 +88,9 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
     if (resource == null)
       return null;
 
-    if (allVersions && ResourceUtils.equalsByIdOrPath(this.uri, resource.getURI()))
+    if (allVersions && ResourceUtils.equalsByIdOrPath(this.resource.getURI(), resource.getURI()))
       return null;
-    else if (!allVersions && ResourceUtils.equalsByIdOrPathAndVersion(this.uri, resource.getURI()))
+    else if (!allVersions && ResourceUtils.equalsByIdOrPathAndVersion(this.resource.getURI(), resource.getURI()))
       return null;
 
     return resource;
@@ -105,7 +114,7 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
   protected Boolean run(WritableContentRepository repository)
       throws ContentRepositoryException, IOException,
       ReferentialIntegrityException {
-    return repository.delete(uri, allVersions);
+    return repository.delete(resource.getURI(), allVersions);
   }
 
 }

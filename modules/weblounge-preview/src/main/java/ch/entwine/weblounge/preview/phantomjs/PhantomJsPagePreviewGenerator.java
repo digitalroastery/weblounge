@@ -97,6 +97,13 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
   /** The script */
   private File scriptFile = null;
 
+  /** The list of currently processed pages */
+  private final List<URL> executors = new ArrayList<URL>();
+
+  /** The maximum number of parallel executors */
+  // TODO: Make this a managed service
+  private final int maxExecutors = 1;
+
   /**
    * Called by the {@link PhantomJsActivator} on service activation.
    * 
@@ -121,6 +128,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
       previewGeneratorTracker.close();
     }
     FileUtils.deleteQuietly(phantomTmpDir);
+    executors.clear();
   }
 
   /**
@@ -196,7 +204,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
 
     // Call PhantomJS to render the page
     try {
-      PhantomJsProcessExecutor phantomjs = new PhantomJsProcessExecutor(scriptFile.getAbsolutePath(), pageURL.toExternalForm(), rendererdFile.getAbsolutePath()) {
+      final PhantomJsProcessExecutor phantomjs = new PhantomJsProcessExecutor(scriptFile.getAbsolutePath(), pageURL.toExternalForm(), rendererdFile.getAbsolutePath()) {
 
         /**
          * {@inheritDoc}
@@ -215,10 +223,30 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
               logger.warn("Error creating page preview of {}", finalPageURL);
               FileUtils.deleteQuietly(rendererdFile);
           }
+          synchronized (executors) {
+            executors.remove(finalPageURL);
+            executors.notifyAll();
+          }
         }
 
       };
-      phantomjs.execute();
+
+      // Make sure only one PhantomJS instance is active at a time
+      synchronized (executors) {
+        while (executors.size() >= maxExecutors) {
+          logger.info("Waiting oto scale preview of {}", finalPageURL);
+          try {
+            executors.wait();
+          } catch (InterruptedException e) {
+            logger.debug("Interrupted while waiting to render {}", finalPageURL);
+            return;
+          }
+        }
+        executors.add(finalPageURL);
+        logger.info("Scaling preview of {}", finalPageURL);
+        phantomjs.execute();
+      }
+
     } catch (ProcessExcecutorException e) {
       logger.warn("Error creating page preview of {}: {}", pageURL, e.getMessage());
       FileUtils.deleteQuietly(rendererdFile);
