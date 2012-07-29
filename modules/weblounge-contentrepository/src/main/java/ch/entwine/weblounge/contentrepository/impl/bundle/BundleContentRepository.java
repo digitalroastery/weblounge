@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.language.Language;
@@ -36,10 +37,10 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository;
+import ch.entwine.weblounge.contentrepository.impl.ResourceSelectorImpl;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
@@ -57,9 +58,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -156,11 +158,10 @@ public class BundleContentRepository extends AbstractContentRepository implement
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
-    
+
     // Path to the root directory
     String rootDirPath = (String) properties.get(OPT_ROOT_DIR);
     if (StringUtils.isNotBlank(rootDirPath)) {
@@ -193,6 +194,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
    *          the site
    * @return the bundle
    */
+  @Override
   protected Bundle loadBundle(Site site) {
     BundleContext bundleCtx = FrameworkUtil.getBundle(site.getClass()).getBundleContext();
     String siteClass = Site.class.getName();
@@ -218,6 +220,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
    * 
    * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
+  @Override
   public ResourceURI[] getVersions(ResourceURI uri)
       throws ContentRepositoryException {
     if (uri == null)
@@ -233,44 +236,6 @@ public class BundleContentRepository extends AbstractContentRepository implement
       throw new ContentRepositoryException(e);
     }
 
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      int, long)
-   */
-  @SuppressWarnings("unchecked")
-  public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
-      throws ContentRepositoryException {
-    String resourcePathPrefix = PathUtils.concat(bundlePathPrefix, uri.getPath());
-    if (!resourcePathPrefix.startsWith("/"))
-      throw new IllegalArgumentException("Resource uri must be absolute");
-    int startLevel = StringUtils.countMatches(uri.getPath(), "/");
-    List<ResourceURI> resources = new ArrayList<ResourceURI>();
-    Enumeration<URL> entries = bundle.findEntries(resourcePathPrefix, "*.xml", level > 0);
-    if (entries != null) {
-      while (entries.hasMoreElements()) {
-        URL entry = entries.nextElement();
-        int currentLevel = StringUtils.countMatches(uri.getPath(), "/");
-        if (level > -1 && level < Integer.MAX_VALUE && currentLevel > (startLevel + level))
-          continue;
-        long v = ResourceUtils.getVersion(FilenameUtils.getBaseName(entry.getPath()));
-        if (version != -1 && v != version)
-          continue;
-        try {
-          ResourceURI resourceURI = loadResourceURI(uri.getSite(), entry);
-          if (resourceURI == null)
-            throw new IllegalStateException("Resource " + entry + " has no uri");
-          resources.add(resourceURI);
-          logger.trace("Found revision '{}' of resource {}", v, entry);
-        } catch (IOException e) {
-          throw new ContentRepositoryException("Unable to read id from resource at " + entry, e);
-        }
-      }
-    }
-    return resources.iterator();
   }
 
   /**
@@ -304,11 +269,85 @@ public class BundleContentRepository extends AbstractContentRepository implement
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.repository.ResourceSelector)
+   */
+  public Collection<ResourceURI> list(ResourceSelector selector)
+      throws ContentRepositoryException {
+
+    int index = -1;
+    int selected = 0;
+
+    List<ResourceURI> uris = new ArrayList<ResourceURI>();
+
+    List<?> selectedTypes = Arrays.asList(selector.getTypes());
+    List<?> forbiddenTypes = Arrays.asList(selector.getWithoutTypes());
+    List<?> selectedIds = Arrays.asList(selector.getIdentifiers());
+    List<?> selectedVersions = Arrays.asList(selector.getVersions());
+
+    // Add all known resource types to the index
+    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
+
+    selection: for (ResourceSerializer<?, ?> serializer : serializers) {
+
+      // Rule out types that we don't need
+      if (!selectedTypes.isEmpty() && !selectedTypes.contains(serializer.getType()))
+        continue;
+      if (!forbiddenTypes.isEmpty() && forbiddenTypes.contains(serializer.getType()))
+        continue;
+
+      // Construct this resource type's entry point into the bundle
+      String resourcePath = "/" + serializer.getType() + "s";
+      String prefix = UrlUtils.concat(bundlePathPrefix, resourcePath);
+
+      // List all relevant site resources in the bundle
+      Enumeration<URL> entries = bundle.findEntries(prefix, "*.xml", true);
+      if (entries != null) {
+        while (entries.hasMoreElements()) {
+          URL entry = entries.nextElement();
+
+          try {
+            ResourceURI uri = loadResourceURI(getSite(), entry);
+            if (uri == null)
+              throw new IllegalStateException("Resource " + entry + " has no uri");
+
+            // Rule out resources we are not interested in
+            if (!selectedIds.isEmpty() && !selectedIds.contains(uri.getIdentifier()))
+              continue;
+            if (!selectedVersions.isEmpty() && !selectedVersions.contains(uri.getVersion()))
+              continue;
+
+            index++;
+
+            // Skip everything below the offset
+            if (index < selector.getOffset())
+              continue;
+
+            uris.add(uri);
+            selected++;
+
+            // Only collect as many items as we need
+            if (selector.getLimit() > 0 && selected == selector.getLimit())
+              break selection;
+
+          } catch (IOException e) {
+            throw new ContentRepositoryException("Unable to read id from resource at " + entry, e);
+          }
+        }
+      }
+
+    }
+
+    return uris;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadIndex()
    */
   @Override
   protected ContentRepositoryIndex loadIndex() throws IOException,
-      ContentRepositoryException {
+  ContentRepositoryException {
 
     logger.debug("Creating temporary site index at {}", idxRootDir);
     FileUtils.forceMkdir(idxRootDir);
@@ -344,11 +383,8 @@ public class BundleContentRepository extends AbstractContentRepository implement
       // Add all known resource types to the index
       Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
       for (ResourceSerializer<?, ?> serializer : serializers) {
-        String resourcePath = "/" + serializer.getType() + "s";
-        ResourceURI resourceRootURI = new ResourceURIImpl(serializer.getType(), getSite(), resourcePath);
-        Iterator<ResourceURI> pi = list(resourceRootURI, Integer.MAX_VALUE, -1);
-        while (pi.hasNext()) {
-          ResourceURI uri = pi.next();
+        ResourceSelector selector = new ResourceSelectorImpl(site).withTypes(serializer.getType());
+        for (ResourceURI uri : list(selector)) {
 
           // Load the resource
           Resource<?> resource = null;
@@ -407,8 +443,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadPage()
    */
   @Override
-  protected InputStream loadResource(ResourceURI uri)
-      throws IOException {
+  protected InputStream loadResource(ResourceURI uri) throws IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path
@@ -439,10 +474,9 @@ public class BundleContentRepository extends AbstractContentRepository implement
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadResourceContent(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.language.Language)
    */
-  @SuppressWarnings("unchecked")
   @Override
-  protected InputStream loadResourceContent(ResourceURI uri,
-      Language language) throws IOException {
+  protected InputStream loadResourceContent(ResourceURI uri, Language language)
+      throws IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path

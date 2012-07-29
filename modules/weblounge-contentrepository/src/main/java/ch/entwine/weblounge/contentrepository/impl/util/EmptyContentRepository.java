@@ -27,13 +27,15 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -169,44 +171,12 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.repository.ResourceSelector)
    */
-  public Iterator<ResourceURI> list(ResourceURI uri)
+  @Override
+  public Collection<ResourceURI> list(ResourceSelector selector)
       throws ContentRepositoryException {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      long)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, long version)
-      throws ContentRepositoryException {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      int)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, int level)
-      throws ContentRepositoryException {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      int, long)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
-      throws ContentRepositoryException {
-    return null;
+    return Collections.EMPTY_LIST;
   }
 
   /**

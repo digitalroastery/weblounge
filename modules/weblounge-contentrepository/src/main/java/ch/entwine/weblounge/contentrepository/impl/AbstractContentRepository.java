@@ -62,7 +62,6 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -394,56 +393,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
     } catch (IOException e) {
       throw new ContentRepositoryException(e);
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri)
-      throws ContentRepositoryException {
-    if (!isStarted())
-      throw new IllegalStateException("Content repository is not connected");
-    return list(uri, Integer.MAX_VALUE, -1);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      long[])
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, long version)
-      throws ContentRepositoryException {
-    return list(uri, Integer.MAX_VALUE, version);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      int)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, int level)
-      throws ContentRepositoryException {
-    return list(uri, level, -1);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * This implementation uses the index to get the list.
-   * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      int, long)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
-      throws ContentRepositoryException {
-    if (!isStarted())
-      throw new IllegalStateException("Content repository is not connected");
-
-    return index.list(uri, level, version);
   }
 
   /**

@@ -45,6 +45,7 @@ import ch.entwine.weblounge.common.content.repository.MoveOperation;
 import ch.entwine.weblounge.common.content.repository.PutContentOperation;
 import ch.entwine.weblounge.common.content.repository.PutOperation;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
+import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.content.repository.UnlockOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
@@ -1214,7 +1215,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *           if accessing a file fails
    */
   protected long index(ContentRepositoryIndex idx, String resourceType)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
 
     // Temporary path for rebuilt site
     String resourceDirectory = resourceType + "s";
@@ -1241,10 +1242,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     long resourceCount = 0;
     long resourceVersionCount = 0;
+    ResourceSelector selector = new ResourceSelectorImpl(site).withTypes(resourceType);
 
     // Ask for all existing resources of the current type and index them
-    List<ResourceURI> uris = listResources(resourceType);
-    for (ResourceURI uri : uris) {
+    for (ResourceURI uri : list(selector)) {
       try {
         Resource<?> resource = null;
         ResourceReader<?, ?> reader = serializer.getReader();
@@ -1287,19 +1288,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     return resourceCount;
   }
-
-  /**
-   * Returns a list of resources of the given type that are available in the
-   * content repository.
-   * 
-   * @param resourceType
-   *          the resource type
-   * @return the resource URIs
-   * @throws IOException
-   *           if loading the list of resources failed
-   */
-  protected abstract List<ResourceURI> listResources(String resourceType)
-      throws IOException;
 
   /**
    * {@inheritDoc}
