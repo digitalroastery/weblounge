@@ -126,6 +126,15 @@ public final class PreviewsEndpointDocs {
     getImageStyle.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getImageStyle);
 
+    // POST /
+    Endpoint createPreviews = new Endpoint("/", Method.POST, "createpreviews");
+    createPreviews.setDescription("Creates the missing preview images");
+    createPreviews.addFormat(Format.xml());
+    createPreviews.addStatus(ok("the creation of preview images has been started"));
+    createPreviews.addStatus(serviceUnavailable("the site is temporarily offline"));
+    createPreviews.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, createPreviews);
+
     return EndpointDocumentationGenerator.generate(docs);
   }
 

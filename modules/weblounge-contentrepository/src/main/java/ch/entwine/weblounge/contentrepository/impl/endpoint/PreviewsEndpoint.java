@@ -60,6 +60,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -329,6 +330,25 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
    * @param languageId
    *          the language identifier
    */
+  @POST
+  @Path("/")
+  public Response createPreviews(@Context HttpServletRequest request) {
+    Site site = super.getSite(request);
+    final ContentRepository contentRepository = getContentRepository(site, false);
+    try {
+      contentRepository.createPreviews();
+    } catch (ContentRepositoryException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+    return Response.ok().build();
+  }
+
+  /**
+   * Deletes all preview images.
+   * 
+   * @param request
+   *          the request
+   */
   @DELETE
   @Path("/")
   public Response removePreviews(@Context HttpServletRequest request) {
@@ -341,14 +361,12 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
   }
 
   /**
-   * Deletes the preview images for the given resource and language.
+   * Deletes all preview images for the given resource.
    * 
    * @param request
    *          the request
    * @param resourceId
    *          the resource identifier
-   * @param languageId
-   *          the language identifier
    */
   @DELETE
   @Path("/{resource}")
@@ -358,7 +376,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
   }
 
   /**
-   * Deletes the preview images for the given resource and language.
+   * Deletes the preview images for the given style and language.
    * 
    * @param request
    *          the request
