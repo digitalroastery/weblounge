@@ -53,7 +53,7 @@ import java.util.List;
 class PreviewGeneratorWorker implements Runnable {
 
   /** The content repository */
-  private AbstractWritableContentRepository contentRepository = null;
+  private AbstractContentRepository contentRepository = null;
 
   /** The resource to render */
   private Resource<?> resource = null;
@@ -83,7 +83,7 @@ class PreviewGeneratorWorker implements Runnable {
    * @param styles
    *          the image styles
    */
-  public PreviewGeneratorWorker(AbstractWritableContentRepository repository,
+  public PreviewGeneratorWorker(AbstractContentRepository repository,
       Resource<?> resource, Environment environment, List<Language> languages,
       List<ImageStyle> styles, String format) {
     if (languages == null || languages.size() == 0)
@@ -157,6 +157,8 @@ class PreviewGeneratorWorker implements Runnable {
           AbstractWritableContentRepository.logger.warn("Preview generation for {} failed", resource);
           return;
         }
+
+        long lastModified = ResourceUtils.getModificationDate(resource, l).getTime();
 
         // Create the remaining styles
         for (ImageStyle style : styles) {

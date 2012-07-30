@@ -24,8 +24,6 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.url.PathUtils;
@@ -52,7 +50,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.List;
@@ -436,31 +433,17 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.repository.ResourceSelector)
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#listResources()
    */
-  public Collection<ResourceURI> list(ResourceSelector selector)
-      throws ContentRepositoryException {
-
-    int index = -1;
-    int selected = 0;
+  @Override
+  protected Collection<ResourceURI> listResources() throws IOException {
 
     List<ResourceURI> uris = new ArrayList<ResourceURI>();
-
-    List<?> selectedTypes = Arrays.asList(selector.getTypes());
-    List<?> forbiddenTypes = Arrays.asList(selector.getWithoutTypes());
-    List<?> selectedIds = Arrays.asList(selector.getIdentifiers());
-    List<?> selectedVersions = Arrays.asList(selector.getVersions());
 
     // Add all known resource types to the index
     Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
 
-    selection: for (ResourceSerializer<?, ?> serializer : serializers) {
-
-      // Rule out types that we don't need
-      if (!selectedTypes.isEmpty() && !selectedTypes.contains(serializer.getType()))
-        continue;
-      if (!forbiddenTypes.isEmpty() && forbiddenTypes.contains(serializer.getType()))
-        continue;
+    for (ResourceSerializer<?, ?> serializer : serializers) {
 
       // Temporary path for rebuilt site
       String resourceType = serializer.getType().toLowerCase();
@@ -494,30 +477,13 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
               String id = f.getParentFile().getParentFile().getName();
               ResourceURI uri = new ResourceURIImpl(resourceType, getSite(), null, id, version);
 
-              // Rule out resources we are not interested in
-              if (!selectedIds.isEmpty() && !selectedIds.contains(uri.getIdentifier()))
-                continue;
-              if (!selectedVersions.isEmpty() && !selectedVersions.contains(uri.getVersion()))
-                continue;
-
-              index++;
-
-              // Skip everything below the offset
-              if (index < selector.getOffset())
-                continue;
-
               uris.add(uri);
-              selected++;
-
-              // Only collect as many items as we need
-              if (selector.getLimit() > 0 && selected == selector.getLimit())
-                break selection;
             }
           }
         }
       } catch (Throwable t) {
         logger.error("Error reading available uris from file system: {}", t.getMessage());
-        throw new ContentRepositoryException(t);
+        throw new IOException(t);
       }
 
     }

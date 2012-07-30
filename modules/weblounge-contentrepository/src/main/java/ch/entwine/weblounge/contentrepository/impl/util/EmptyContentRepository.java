@@ -21,7 +21,6 @@
 package ch.entwine.weblounge.contentrepository.impl.util;
 
 import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
@@ -140,9 +139,10 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
-  public Resource<? extends ResourceContent> get(ResourceURI uri)
+  @Override
+  public <R extends Resource<?>> R get(ResourceURI uri)
       throws ContentRepositoryException {
     return null;
   }
@@ -195,6 +195,16 @@ public class EmptyContentRepository implements ContentRepository {
    */
   public long getVersionCount() {
     return 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#createPreviews()
+   */
+  @Override
+  public void createPreviews() throws ContentRepositoryException {
+    return;
   }
 
 }

@@ -230,4 +230,13 @@ public interface ContentRepository {
    */
   long getVersionCount();
 
+  /**
+   * Creates previews for all resources in the content repository. Note that
+   * this method may not necessarily wait until all previews have been created.
+   * 
+   * @throws ContentRepositoryExeption
+   *           if creating the previews fails
+   */
+  void createPreviews() throws ContentRepositoryException;
+
 }

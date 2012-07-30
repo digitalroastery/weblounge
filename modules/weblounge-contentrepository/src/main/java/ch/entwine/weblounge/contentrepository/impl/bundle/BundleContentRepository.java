@@ -58,7 +58,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -269,31 +268,16 @@ public class BundleContentRepository extends AbstractContentRepository implement
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.repository.ResourceSelector)
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#listResources()
    */
-  public Collection<ResourceURI> list(ResourceSelector selector)
-      throws ContentRepositoryException {
-
-    int index = -1;
-    int selected = 0;
-
+  @Override
+  protected Collection<ResourceURI> listResources() throws IOException {
     List<ResourceURI> uris = new ArrayList<ResourceURI>();
-
-    List<?> selectedTypes = Arrays.asList(selector.getTypes());
-    List<?> forbiddenTypes = Arrays.asList(selector.getWithoutTypes());
-    List<?> selectedIds = Arrays.asList(selector.getIdentifiers());
-    List<?> selectedVersions = Arrays.asList(selector.getVersions());
 
     // Add all known resource types to the index
     Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
 
-    selection: for (ResourceSerializer<?, ?> serializer : serializers) {
-
-      // Rule out types that we don't need
-      if (!selectedTypes.isEmpty() && !selectedTypes.contains(serializer.getType()))
-        continue;
-      if (!forbiddenTypes.isEmpty() && forbiddenTypes.contains(serializer.getType()))
-        continue;
+    for (ResourceSerializer<?, ?> serializer : serializers) {
 
       // Construct this resource type's entry point into the bundle
       String resourcePath = "/" + serializer.getType() + "s";
@@ -305,33 +289,11 @@ public class BundleContentRepository extends AbstractContentRepository implement
         while (entries.hasMoreElements()) {
           URL entry = entries.nextElement();
 
-          try {
-            ResourceURI uri = loadResourceURI(getSite(), entry);
-            if (uri == null)
-              throw new IllegalStateException("Resource " + entry + " has no uri");
+          ResourceURI uri = loadResourceURI(getSite(), entry);
+          if (uri == null)
+            throw new IllegalStateException("Resource " + entry + " has no uri");
 
-            // Rule out resources we are not interested in
-            if (!selectedIds.isEmpty() && !selectedIds.contains(uri.getIdentifier()))
-              continue;
-            if (!selectedVersions.isEmpty() && !selectedVersions.contains(uri.getVersion()))
-              continue;
-
-            index++;
-
-            // Skip everything below the offset
-            if (index < selector.getOffset())
-              continue;
-
-            uris.add(uri);
-            selected++;
-
-            // Only collect as many items as we need
-            if (selector.getLimit() > 0 && selected == selector.getLimit())
-              break selection;
-
-          } catch (IOException e) {
-            throw new ContentRepositoryException("Unable to read id from resource at " + entry, e);
-          }
+          uris.add(uri);
         }
       }
 
