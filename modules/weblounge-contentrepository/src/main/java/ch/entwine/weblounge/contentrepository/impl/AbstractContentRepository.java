@@ -870,7 +870,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
       // If there is enough being worked on already, there is nothing we can do
       // right now, the work will be picked up later on
-      if (previews.size() >= maxPreviewOperations) {
+      if (currentPreviewOperations.size() >= maxPreviewOperations) {
         logger.debug("Queing creation of preview for {}", resource.getURI());
         previews.put(resource.getURI(), previewOp);
         previewOperations.add(previewOp);
