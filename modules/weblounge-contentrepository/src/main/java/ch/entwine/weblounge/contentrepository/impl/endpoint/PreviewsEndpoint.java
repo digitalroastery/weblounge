@@ -335,11 +335,15 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
   public Response createPreviews(@Context HttpServletRequest request) {
     Site site = super.getSite(request);
     final ContentRepository contentRepository = getContentRepository(site, false);
-    try {
-      contentRepository.createPreviews();
-    } catch (ContentRepositoryException e) {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    }
+    new Thread(new Runnable() {
+      public void run() {
+        try {
+          contentRepository.createPreviews();
+        } catch (ContentRepositoryException e) {
+          logger.warn("Preview generation returned with an error: {}", e.getMessage());
+        }
+      }
+    }).start();
     return Response.ok().build();
   }
 
