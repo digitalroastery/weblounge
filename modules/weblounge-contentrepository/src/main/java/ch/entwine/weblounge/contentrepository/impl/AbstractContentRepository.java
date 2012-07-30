@@ -74,8 +74,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,7 +88,7 @@ import javax.xml.transform.TransformerFactory;
 public abstract class AbstractContentRepository implements ContentRepository {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(AbstractContentRepository.class);
+  static final Logger logger = LoggerFactory.getLogger(AbstractContentRepository.class);
 
   /** The repository type */
   protected String type = null;
@@ -133,7 +133,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   private final Map<ResourceURI, PreviewOperation> previews = new HashMap<ResourceURI, PreviewOperation>();
 
   /** Prioritized list of preview rendering operations */
-  private final Queue<PreviewOperation> previewOperations = new PriorityQueue<PreviewOperation>();
+  private final Queue<PreviewOperation> previewOperations = new LinkedBlockingQueue<PreviewOperation>();
 
   /** The preview operations that are being worked on at the moment */
   private final List<PreviewOperation> currentPreviewOperations = new ArrayList<PreviewOperation>();
@@ -790,7 +790,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   @Override
   public void createPreviews() throws ContentRepositoryException {
     Collection<ResourceURI> uris = null;
-    logger.info("Starring preview generation");
+    logger.info("Starting preview generation");
 
     // Load the uris
     try {
@@ -862,7 +862,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
       // Make sure nobody is working on the same resource at the moment
       if (currentPreviewOperations.contains(previewOp)) {
-        logger.info("Queing concurring creation of preview for {}", resource.getURI());
+        logger.debug("Queing concurring creation of preview for {}", resource.getURI());
         previews.put(resource.getURI(), previewOp);
         previewOperations.add(previewOp);
         return;
@@ -871,7 +871,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       // If there is enough being worked on already, there is nothing we can do
       // right now, the work will be picked up later on
       if (previews.size() >= maxPreviewOperations) {
-        logger.info("Queing creation of preview for {}", resource.getURI());
+        logger.debug("Queing creation of preview for {}", resource.getURI());
         previews.put(resource.getURI(), previewOp);
         previewOperations.add(previewOp);
         return;
