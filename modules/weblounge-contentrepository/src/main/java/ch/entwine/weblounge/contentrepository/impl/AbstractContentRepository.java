@@ -1015,7 +1015,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * Data structure that is used to hold all relevant information for preview
    * generation of a given resource.
    */
-  private final static class PreviewOperation {
+  private static final class PreviewOperation {
 
     /** The resource to be rendered */
     private Resource<?> resource = null;

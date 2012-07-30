@@ -177,7 +177,7 @@ class PreviewGeneratorWorker implements Runnable {
             if (!scaledFile.isFile() || FileUtils.isFileOlder(scaledFile, new Date(lastModified))) {
               fis = new FileInputStream(originalPreview);
               fos = new FileOutputStream(scaledFile);
-              imagePreviewGenerator.createPreview(originalPreview, environment, l, style, resourceType, fis, fos);
+              imagePreviewGenerator.createPreview(originalPreview, environment, l, style, format, fis, fos);
             }
 
           } catch (Throwable t) {

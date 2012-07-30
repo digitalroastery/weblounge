@@ -61,7 +61,7 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
   private static final Logger logger = LoggerFactory.getLogger(ImageMagickPreviewGenerator.class);
 
   /** List of supported formats (cached) */
-  private Map<String, Boolean> supportedFormats = new HashMap<String, Boolean>();
+  private final Map<String, Boolean> supportedFormats = new HashMap<String, Boolean>();
 
   /** Flag to indicate whether format detection is supported */
   private boolean formatDecetionSupported = true;
@@ -267,8 +267,8 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
     }
 
     File originalFile = File.createTempFile("image-", "." + format);
-    File scaledFile = File.createTempFile("image-scaled", "." + format);
-    File croppedFile = File.createTempFile("image-cropped", "." + format);
+    File scaledFile = File.createTempFile("image-scaled-", "." + format);
+    File croppedFile = File.createTempFile("image-cropped-", "." + format);
 
     try {
 
