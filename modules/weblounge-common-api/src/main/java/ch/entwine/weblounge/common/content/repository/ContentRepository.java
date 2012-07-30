@@ -29,7 +29,7 @@ import ch.entwine.weblounge.common.site.Site;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -109,9 +109,8 @@ public interface ContentRepository {
    *           if reading the resource from the repository fails
    * @return the resource
    */
-  <R extends Resource<?>> R get(
-      ResourceURI uri)
-          throws ContentRepositoryException;
+  <R extends Resource<?>> R get(ResourceURI uri)
+      throws ContentRepositoryException;
 
   /**
    * Returns the resource content identified by <code>uri</code> and
@@ -178,74 +177,15 @@ public interface ContentRepository {
   ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException;
 
   /**
-   * Returns an iteration of all resources with their uri containing
-   * <code>uri</code> as a prefix.
+   * Returns a collection of all resources matching the given resource selector.
    * 
-   * @param uri
-   *          the root uri
+   * @param selector
+   *          the resource selector
    * @return the resource uris
    * @throws ContentRepositoryException
-   *           if listing the repository fails
+   *           if listing the resources fails
    */
-  Iterator<ResourceURI> list(ResourceURI uri) throws ContentRepositoryException;
-
-  /**
-   * Returns an iteration of all resources with version <code>version</code> and
-   * their uri containing <code>uri</code> as a prefix.
-   * <p>
-   * Live versions of resources are returned using {@link Resource#LIVE}, while
-   * work resources are specified using {@link Resource#WORK}.
-   * 
-   * @param uri
-   *          the root uri
-   * @param version
-   *          the resource version to list
-   * @return the resource uris
-   * @throws ContentRepositoryException
-   *           if listing the repository fails
-   */
-  Iterator<ResourceURI> list(ResourceURI uri, long version)
-      throws ContentRepositoryException;
-
-  /**
-   * Returns an iteration of all resources with their uri containing
-   * <code>uri</code> as a prefix.
-   * <p>
-   * Only those resources will be returned that are nested <code>level</code>
-   * levels deep under <code>uri</code>. Therefore, specifying
-   * <code>level</code> as <code>0</code> will return the same result as calling
-   * <code>getVersions(uri)</code>, while specifying <code>level</code> as
-   * <code>1</code> will return resources located at <code>uri</code> as well as
-   * those that are one level below it.
-   * 
-   * @return the resource uris
-   * @throws ContentRepositoryException
-   *           if listing the repository fails
-   */
-  Iterator<ResourceURI> list(ResourceURI uri, int level)
-      throws ContentRepositoryException;
-
-  /**
-   * Returns an iteration of all resources with version <code>version</code> and
-   * their uri containing <code>uri</code> as a prefix.
-   * <p>
-   * Only those resources will be returned that are nested <code>level</code>
-   * levels deep under <code>uri</code>. Therefore, specifying
-   * <code>level</code> as <code>0</code> will return the same result as calling
-   * <code>getVersions(uri)</code>, while specifying <code>level</code> as
-   * <code>1</code> will return resources located at <code>uri</code> as well as
-   * those that are one level below it.
-   * <p>
-   * Live versions of resources are returned using {@link Resource#LIVE}, while
-   * work resources are specified using {@link Resource#WORK}.
-   * 
-   * @return the resource uris
-   * @param versions
-   *          the resource version to list
-   * @throws ContentRepositoryException
-   *           if listing the repository fails
-   */
-  Iterator<ResourceURI> list(ResourceURI uri, int level, long versions)
+  Collection<ResourceURI> list(ResourceSelector selector)
       throws ContentRepositoryException;
 
   /**
@@ -289,5 +229,14 @@ public interface ContentRepository {
    * @return the number of versions
    */
   long getVersionCount();
+
+  /**
+   * Creates previews for all resources in the content repository. Note that
+   * this method may not necessarily wait until all previews have been created.
+   * 
+   * @throws ContentRepositoryExeption
+   *           if creating the previews fails
+   */
+  void createPreviews() throws ContentRepositoryException;
 
 }

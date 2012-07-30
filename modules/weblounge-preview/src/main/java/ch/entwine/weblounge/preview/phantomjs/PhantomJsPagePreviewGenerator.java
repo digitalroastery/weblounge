@@ -234,7 +234,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
       // Make sure only one PhantomJS instance is active at a time
       synchronized (executors) {
         while (executors.size() >= maxExecutors) {
-          logger.info("Waiting oto scale preview of {}", finalPageURL);
+          logger.debug("Waiting to scale preview of {}", finalPageURL);
           try {
             executors.wait();
           } catch (InterruptedException e) {
@@ -243,7 +243,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
           }
         }
         executors.add(finalPageURL);
-        logger.info("Scaling preview of {}", finalPageURL);
+        logger.debug("Creating preview of {}", finalPageURL);
         phantomjs.execute();
       }
 

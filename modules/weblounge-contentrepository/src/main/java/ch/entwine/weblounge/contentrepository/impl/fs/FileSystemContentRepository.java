@@ -50,9 +50,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -432,57 +433,62 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#listResources(java.lang.String)
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#listResources()
    */
   @Override
-  protected List<ResourceURI> listResources(String resourceType)
-      throws IOException {
-    // Temporary path for rebuilt site
-    String resourceDirectory = resourceType + "s";
-    String homePath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), resourceDirectory);
-    File resourcesRootDirectory = new File(homePath);
-    if (resourcesRootDirectory.list().length == 0) {
-      logger.debug("No {}s found to index", resourceType);
-      return Collections.EMPTY_LIST;
-    }
+  protected Collection<ResourceURI> listResources() throws IOException {
 
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
-    if (serializer == null) {
-      logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
-      return Collections.EMPTY_LIST;
-    }
+    List<ResourceURI> uris = new ArrayList<ResourceURI>();
 
-    List<ResourceURI> resourceURIs = new ArrayList<ResourceURI>();
+    // Add all known resource types to the index
+    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
 
-    try {
-      Stack<File> uris = new Stack<File>();
-      uris.push(resourcesRootDirectory);
-      while (!uris.empty()) {
-        File dir = uris.pop();
-        File[] files = dir.listFiles(new FileFilter() {
-          public boolean accept(File path) {
-            if (path.getName().startsWith("."))
-              return false;
-            return path.isDirectory() || path.getName().endsWith(".xml");
-          }
-        });
-        if (files == null || files.length == 0)
-          continue;
-        for (File f : files) {
-          if (f.isDirectory()) {
-            uris.push(f);
-          } else {
-            long version = Long.parseLong(f.getParentFile().getName());
-            String id = f.getParentFile().getParentFile().getName();
-            resourceURIs.add(new ResourceURIImpl(resourceType, getSite(), null, id, version));
+    for (ResourceSerializer<?, ?> serializer : serializers) {
+
+      // Temporary path for rebuilt site
+      String resourceType = serializer.getType().toLowerCase();
+      String resourceDirectory = resourceType + "s";
+      String homePath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), resourceDirectory);
+      File resourcesRootDirectory = new File(homePath);
+      if (resourcesRootDirectory.list().length == 0) {
+        logger.debug("No {}s found to index", resourceType);
+        continue;
+      }
+
+      try {
+        Stack<File> u = new Stack<File>();
+        u.push(resourcesRootDirectory);
+        while (!u.empty()) {
+          File dir = u.pop();
+          File[] files = dir.listFiles(new FileFilter() {
+            public boolean accept(File path) {
+              if (path.getName().startsWith("."))
+                return false;
+              return path.isDirectory() || path.getName().endsWith(".xml");
+            }
+          });
+          if (files == null || files.length == 0)
+            continue;
+          for (File f : files) {
+            if (f.isDirectory()) {
+              u.push(f);
+            } else {
+              long version = Long.parseLong(f.getParentFile().getName());
+              String id = f.getParentFile().getParentFile().getName();
+              ResourceURI uri = new ResourceURIImpl(resourceType, getSite(), null, id, version);
+
+              uris.add(uri);
+            }
           }
         }
+      } catch (Throwable t) {
+        logger.error("Error reading available uris from file system: {}", t.getMessage());
+        throw new IOException(t);
       }
-    } catch (Throwable t) {
-      logger.error("Error reading available uris from file system: {}", t.getMessage());
-      throw new IOException(t);
+
     }
 
-    return resourceURIs;
+    return uris;
   }
+
 }

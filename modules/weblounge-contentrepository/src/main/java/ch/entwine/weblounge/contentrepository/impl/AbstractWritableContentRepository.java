@@ -32,7 +32,6 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation;
@@ -45,21 +44,18 @@ import ch.entwine.weblounge.common.content.repository.MoveOperation;
 import ch.entwine.weblounge.common.content.repository.PutContentOperation;
 import ch.entwine.weblounge.common.content.repository.PutOperation;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
+import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.content.repository.UnlockOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
-import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
-import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
-import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.security.User;
-import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -90,15 +86,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
@@ -115,9 +107,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /** Holds pages while they are written to the index */
   protected OperationProcessor processor = null;
-
-  /** The image style tracker */
-  private ImageStyleTracker imageStyleTracker = null;
 
   /** The response cache tracker */
   private ResponseCacheTracker responseCacheTracker = null;
@@ -139,18 +128,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /** Flag to indicate off-site indexing */
   protected boolean indexingOffsite = false;
-
-  /** The resources for which preview generation is due */
-  private final Map<ResourceURI, PreviewOperation> previews = new HashMap<ResourceURI, PreviewOperation>();
-
-  /** Prioritized list of preview rendering operations */
-  private final Queue<PreviewOperation> previewOperations = new PriorityQueue<PreviewOperation>();
-
-  /** The preview operations that are being worked on at the moment */
-  private final List<PreviewOperation> currentPreviewOperations = new ArrayList<PreviewOperation>();
-
-  /** The maximum number of concurrent preview operations */
-  private final int maxPreviewOperations = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
 
   /**
    * Creates a new instance of the content repository.
@@ -189,8 +166,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     Bundle bundle = loadBundle(site);
     if (bundle != null) {
-      imageStyleTracker = new ImageStyleTracker(bundle.getBundleContext());
-      imageStyleTracker.open();
       responseCacheTracker = new ResponseCacheTracker(bundle.getBundleContext(), site.getIdentifier());
       responseCacheTracker.open();
       environmentTracker = new EnvironmentTracker(bundle.getBundleContext(), this);
@@ -216,12 +191,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     Bundle bundle = loadBundle(site);
     if (bundle == null || bundle.getState() != Bundle.ACTIVE)
       return;
-
-    // Close the image style tracker
-    if (imageStyleTracker != null) {
-      imageStyleTracker.close();
-      imageStyleTracker = null;
-    }
 
     // Close the cache tracker
     if (responseCacheTracker != null) {
@@ -1213,7 +1182,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *           if accessing a file fails
    */
   protected long index(ContentRepositoryIndex idx, String resourceType)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
 
     // Temporary path for rebuilt site
     String resourceDirectory = resourceType + "s";
@@ -1240,10 +1209,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     long resourceCount = 0;
     long resourceVersionCount = 0;
+    ResourceSelector selector = new ResourceSelectorImpl(site).withTypes(resourceType);
 
     // Ask for all existing resources of the current type and index them
-    List<ResourceURI> uris = listResources(resourceType);
-    for (ResourceURI uri : uris) {
+    for (ResourceURI uri : list(selector)) {
       try {
         Resource<?> resource = null;
         ResourceReader<?, ?> reader = serializer.getReader();
@@ -1286,19 +1255,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     return resourceCount;
   }
-
-  /**
-   * Returns a list of resources of the given type that are available in the
-   * content repository.
-   * 
-   * @param resourceType
-   *          the resource type
-   * @return the resource URIs
-   * @throws IOException
-   *           if loading the list of resources failed
-   */
-  protected abstract List<ResourceURI> listResources(String resourceType)
-      throws IOException;
 
   /**
    * {@inheritDoc}
@@ -1417,165 +1373,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   protected abstract <C extends ResourceContent, R extends Resource<C>> void deleteResourceContent(
       ResourceURI uri, C content) throws IOException;
-
-  /**
-   * Creates the previews for this resource in all languages and for all known
-   * image styles. The implementation ensures that there is only one preview
-   * renderer running per resource.
-   * 
-   * @param resource
-   *          the resource
-   * @param languages
-   *          the languages to build the previews for
-   */
-  protected void createPreviews(final Resource<?> resource,
-      Language... languages) {
-
-    // Compile the full list of image styles
-    final List<ImageStyle> styles = new ArrayList<ImageStyle>();
-    if (imageStyleTracker == null) {
-      logger.info("Skipping preview generation for {}: image styles are unavailable", resource.getURI());
-      return;
-    }
-
-    // Add the global image styles as well as those for the site
-    styles.addAll(imageStyleTracker.getImageStyles());
-    for (Module m : getSite().getModules()) {
-      styles.addAll(Arrays.asList(m.getImageStyles()));
-    }
-
-    // If no language has been specified, we create the preview for all
-    // languages
-    if (languages == null || languages.length == 0) {
-      languages = resource.getURI().getSite().getLanguages();
-    }
-
-    // Create the previews
-    PreviewOperation previewOp = null;
-    synchronized (currentPreviewOperations) {
-
-      // is there an existing operation for this resource? If so, simply update
-      // it and be done.
-      previewOp = previews.get(resource.getURI());
-      if (previewOp != null) {
-        previewOp.addLanguages(Arrays.asList(languages));
-        previewOp.addStyles(styles);
-        return;
-      }
-
-      // Otherwise, a new preview generator needs to be started.
-      previewOp = new PreviewOperation(resource, Arrays.asList(languages), styles, ImageStyleUtils.DEFAULT_PREVIEW_FORMAT);
-
-      // Make sure nobody is working on the same resource at the moment
-      if (currentPreviewOperations.contains(previewOp)) {
-        logger.info("Queing concurring creation of preview for {}", resource.getURI());
-        previews.put(resource.getURI(), previewOp);
-        previewOperations.add(previewOp);
-        return;
-      }
-
-      // If there is enough being worked on already, there is nothing we can do
-      // right now, the work will be picked up later on
-      if (previews.size() >= maxPreviewOperations) {
-        logger.info("Queing creation of preview for {}", resource.getURI());
-        previews.put(resource.getURI(), previewOp);
-        previewOperations.add(previewOp);
-        return;
-      }
-
-      // It seems like it is safe to start the preview generation
-      currentPreviewOperations.add(previewOp);
-      PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, previewOp.getResource(), environment, previewOp.getLanguages(), previewOp.getStyles(), previewOp.getFormat());
-      Thread t = new Thread(previewWorker);
-      t.setPriority(Thread.MIN_PRIORITY);
-      t.setDaemon(true);
-      t.start();
-    }
-  }
-
-  /**
-   * Callback for the preview renderer to indicate a finished rendering
-   * operation.
-   * 
-   * @param resource
-   *          the resource
-   */
-  void previewCreated(Resource<?> resource) {
-    synchronized (currentPreviewOperations) {
-
-      // Do the cleanup
-      for (Iterator<PreviewOperation> i = currentPreviewOperations.iterator(); i.hasNext();) {
-        if (i.next().getResource().equals(resource)) {
-          i.remove();
-          break;
-        }
-      }
-
-      // Is there more work to do?
-      if (!previewOperations.isEmpty() && currentPreviewOperations.size() < maxPreviewOperations) {
-
-        // Get the next operation and do the bookkeeping
-        PreviewOperation op = previewOperations.remove();
-        currentPreviewOperations.add(op);
-        previews.remove(op.getResource().getURI());
-
-        // Finally start the generation
-        PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, op.getResource(), environment, op.getLanguages(), op.getStyles(), op.getFormat());
-        Thread t = new Thread(previewWorker);
-        t.setPriority(Thread.MIN_PRIORITY);
-        t.setDaemon(true);
-        t.start();
-      }
-    }
-  }
-
-  /**
-   * Deletes the previews for this resource in all languages and for all known
-   * image styles.
-   * 
-   * @param resource
-   *          the resource
-   */
-  protected void deletePreviews(Resource<?> resource) {
-    deletePreviews(resource, null);
-  }
-
-  /**
-   * Deletes the previews for this resource in the given languages and for all
-   * known image styles.
-   * 
-   * @param resource
-   *          the resource
-   * @param language
-   *          the language
-   */
-  protected void deletePreviews(Resource<?> resource, Language language) {
-    // Compile the full list of image styles
-    List<ImageStyle> styles = new ArrayList<ImageStyle>();
-    if (imageStyleTracker != null)
-      styles.addAll(imageStyleTracker.getImageStyles());
-    for (Module m : getSite().getModules()) {
-      styles.addAll(Arrays.asList(m.getImageStyles()));
-    }
-
-    for (ImageStyle style : styles) {
-      File styledImage = null;
-
-      // Create the path to a sample image
-      if (language != null) {
-        styledImage = ImageStyleUtils.getScaledFile(resource, language, style);
-      } else {
-        styledImage = ImageStyleUtils.getScaledFile(resource, LanguageUtils.getLanguage("en"), style);
-        styledImage = styledImage.getParentFile();
-      }
-
-      // Remove the parent's directory, which will include the specified
-      // previews
-      File dir = styledImage.getParentFile();
-      logger.debug("Deleting previews in {}", dir.getAbsolutePath());
-      FileUtils.deleteQuietly(dir);
-    }
-  }
 
   /**
    * This class is used as a way to keep track of what has been added to the
@@ -1721,117 +1518,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         operations.clear();
         operations.notifyAll();
       }
-    }
-
-  }
-
-  /**
-   * Data structure that is used to hold all relevant information for preview
-   * generation of a given resource.
-   */
-  private final static class PreviewOperation {
-
-    /** The resource to be rendered */
-    private Resource<?> resource = null;
-
-    /** List of languages that need to be rendered */
-    private final List<Language> languages = new ArrayList<Language>();
-
-    /** List of image styles that need to be rendered */
-    private final List<ImageStyle> styles = new ArrayList<ImageStyle>();
-
-    /** Name of the preview image format */
-    private String format = null;
-
-    /**
-     * Creates a new representation of a preview generation.
-     */
-    public PreviewOperation(Resource<?> resource, List<Language> languages,
-        List<ImageStyle> styles, String format) {
-      this.resource = resource;
-      this.languages.addAll(languages);
-      this.styles.addAll(styles);
-      this.format = format;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-      return resource.hashCode();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object op) {
-      return resource.equals(((PreviewOperation) op).getResource());
-    }
-
-    /**
-     * Returns the resource that is to be rendered.
-     * 
-     * @return the resource
-     */
-    public Resource<?> getResource() {
-      return resource;
-    }
-
-    /**
-     * Returns the languages that need preview generation.
-     * 
-     * @return the language
-     */
-    public List<Language> getLanguages() {
-      return languages;
-    }
-
-    /**
-     * Adds the languages to the list of languages.
-     * 
-     * @param languages
-     *          the languages to add
-     */
-    public void addLanguages(Collection<Language> languages) {
-      for (Language l : languages) {
-        if (!this.languages.contains(languages))
-          this.languages.add(l);
-      }
-    }
-
-    /**
-     * Returns the image styles.
-     * 
-     * @return the styles
-     */
-    public List<ImageStyle> getStyles() {
-      return styles;
-    }
-
-    /**
-     * Adds the image styles to the list of styles.
-     * 
-     * @param styles
-     *          the styles to add
-     */
-    public void addStyles(Collection<ImageStyle> styles) {
-      for (ImageStyle s : styles) {
-        if (!this.styles.contains(styles))
-          this.styles.add(s);
-      }
-    }
-
-    /**
-     * @return the format
-     */
-    public String getFormat() {
-      return format;
     }
 
   }
