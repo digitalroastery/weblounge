@@ -226,7 +226,7 @@ class PreviewGeneratorWorker implements Runnable {
     File scaledResourceFile = null;
 
     try {
-      scaledResourceFile = ImageStyleUtils.createScaledFile(resource, language, style);
+      scaledResourceFile = ImageStyleUtils.getScaledFile(resource, language, style);
 
       // Find the modification date
       long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
@@ -241,66 +241,58 @@ class PreviewGeneratorWorker implements Runnable {
           contentRepositoryIs = content.getExternalLocation().openStream();
         }
 
-        fos = new FileOutputStream(scaledResourceFile);
-        AbstractWritableContentRepository.logger.debug("Creating preview of '{}' at {}", resource, scaledResourceFile);
-
-        previewGenerator.createPreview(resource, environment, language, style, format, contentRepositoryIs, fos);
-        if (scaledResourceFile.length() > 0) {
-          scaledResourceFile.setLastModified(lastModified);
-        } else {
-          File f = scaledResourceFile;
-          while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-            FileUtils.deleteQuietly(f);
-            f = f.getParentFile();
-          }
+        // Create the file
+        if (!scaledResourceFile.getParentFile().mkdirs() || !scaledResourceFile.createNewFile()) {
+          AbstractContentRepository.logger.warn("Error creating preview file {}", scaledResourceFile.getAbsolutePath());
+          return null;
         }
+
+        // Create the preview
+        fos = new FileOutputStream(scaledResourceFile);
+        AbstractContentRepository.logger.debug("Creating preview of '{}' at {}", resource, scaledResourceFile);
+        previewGenerator.createPreview(resource, environment, language, style, format, contentRepositoryIs, fos);
+
+        // Adjust the last modified date so the preview doesn't need to be
+        // regenerated
+        scaledResourceFile.setLastModified(lastModified);
       }
 
     } catch (ContentRepositoryException e) {
-      AbstractWritableContentRepository.logger.error("Error loading {} {} '{}' from {}: {}", new Object[] {
+      AbstractContentRepository.logger.error("Error loading {} {} '{}' from {}: {}", new Object[] {
           language,
           resourceType,
           resource,
           this,
           e.getMessage() });
-      AbstractWritableContentRepository.logger.error(e.getMessage(), e);
+      AbstractContentRepository.logger.error(e.getMessage(), e);
       IOUtils.closeQuietly(resourceInputStream);
-
-      File f = scaledResourceFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
     } catch (IOException e) {
-      AbstractWritableContentRepository.logger.warn("Error creating preview for {} '{}': {}", new Object[] {
+      AbstractContentRepository.logger.warn("Error creating preview for {} '{}': {}", new Object[] {
           resourceType,
           resourceURI,
           e.getMessage() });
       IOUtils.closeQuietly(resourceInputStream);
-
-      File f = scaledResourceFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
     } catch (Throwable t) {
-      AbstractWritableContentRepository.logger.warn("Error creating preview for {} '{}': {}", new Object[] {
+      AbstractContentRepository.logger.warn("Error creating preview for {} '{}': {}", new Object[] {
           resourceType,
           resourceURI,
           t.getMessage() });
       IOUtils.closeQuietly(resourceInputStream);
 
-      File f = scaledResourceFile;
-      while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-        FileUtils.deleteQuietly(f);
-        f = f.getParentFile();
-      }
-
     } finally {
       IOUtils.closeQuietly(contentRepositoryIs);
       IOUtils.closeQuietly(fos);
+
+      // Make sure corrupted preview images are being deleted
+      File f = scaledResourceFile;
+      if (f != null && f.length() == 0) {
+        FileUtils.deleteQuietly(f);
+        f = f.getParentFile();
+        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+          FileUtils.deleteQuietly(f);
+          f = f.getParentFile();
+        }
+      }
     }
 
     return scaledResourceFile;
