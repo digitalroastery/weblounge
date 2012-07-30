@@ -170,10 +170,16 @@ class PreviewGeneratorWorker implements Runnable {
           FileInputStream fis = null;
           FileOutputStream fos = null;
           try {
-            fis = new FileInputStream(originalPreview);
             File scaledFile = ImageStyleUtils.createScaledFile(resource, l, style);
-            fos = new FileOutputStream(scaledFile);
-            imagePreviewGenerator.createPreview(originalPreview, environment, l, style, resourceType, fis, fos);
+
+            // Create the file if it doesn't exist or if it is out dated. Note
+            // that the last modified date of a file has a precision of seconds
+            if (!scaledFile.isFile() || FileUtils.isFileOlder(scaledFile, new Date(lastModified))) {
+              fis = new FileInputStream(originalPreview);
+              fos = new FileOutputStream(scaledFile);
+              imagePreviewGenerator.createPreview(originalPreview, environment, l, style, resourceType, fis, fos);
+            }
+
           } catch (Throwable t) {
             AbstractWritableContentRepository.logger.error("Error scaling {}: {}", originalPreview, t.getMessage());
             continue;
