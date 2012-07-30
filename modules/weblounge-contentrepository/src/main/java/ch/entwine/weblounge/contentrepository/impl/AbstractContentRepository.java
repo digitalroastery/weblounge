@@ -139,7 +139,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   private final List<PreviewOperation> currentPreviewOperations = new ArrayList<PreviewOperation>();
 
   /** The maximum number of concurrent preview operations */
-  private final int maxPreviewOperations = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+  private final int maxPreviewOperations = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
 
   /**
    * Creates a new instance of the content repository.
@@ -809,6 +809,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
       }
       createPreviews(resource, site.getLanguages());
     }
+
+    logger.info("Preview generation finished");
 
   }
 
