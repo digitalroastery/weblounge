@@ -97,13 +97,6 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
   /** The script */
   private File scriptFile = null;
 
-  /** The list of currently processed pages */
-  private final List<URL> executors = new ArrayList<URL>();
-
-  /** The maximum number of parallel executors */
-  // TODO: Make this a managed service
-  private final int maxExecutors = 1;
-
   /**
    * Called by the {@link PhantomJsActivator} on service activation.
    * 
@@ -128,7 +121,6 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
       previewGeneratorTracker.close();
     }
     FileUtils.deleteQuietly(phantomTmpDir);
-    executors.clear();
   }
 
   /**
@@ -205,58 +197,37 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
     // Call PhantomJS to render the page
     try {
       final PhantomJsProcessExecutor phantomjs = new PhantomJsProcessExecutor(scriptFile.getAbsolutePath(), pageURL.toExternalForm(), rendererdFile.getAbsolutePath()) {
-
-        /**
-         * {@inheritDoc}
-         * 
-         * @see ch.entwine.weblounge.common.impl.util.process.ProcessExecutor#onProcessFinished(int)
-         */
         @Override
         protected void onProcessFinished(int exitCode) throws IOException {
           super.onProcessFinished(exitCode);
           switch (exitCode) {
             case 0:
               success.set(true);
+              logger.info("Page preview of {} created at {}", finalPageURL, rendererdFile.getAbsolutePath());
               break;
             default:
               success.set(false);
               logger.warn("Error creating page preview of {}", finalPageURL);
               FileUtils.deleteQuietly(rendererdFile);
           }
-          synchronized (executors) {
-            executors.remove(finalPageURL);
-            executors.notifyAll();
-          }
         }
-
       };
 
-      // Make sure only one PhantomJS instance is active at a time
-      synchronized (executors) {
-        while (executors.size() >= maxExecutors) {
-          logger.debug("Waiting to scale preview of {}", finalPageURL);
-          try {
-            executors.wait();
-          } catch (InterruptedException e) {
-            logger.debug("Interrupted while waiting to render {}", finalPageURL);
-            return;
-          }
-        }
-        executors.add(finalPageURL);
-        logger.debug("Creating preview of {}", finalPageURL);
-        phantomjs.execute();
-      }
+      // Finally have PhantomJS create the preview
+      logger.debug("Creating preview of {}", finalPageURL);
+      phantomjs.execute();
 
     } catch (ProcessExcecutorException e) {
       logger.warn("Error creating page preview of {}: {}", pageURL, e.getMessage());
-      FileUtils.deleteQuietly(rendererdFile);
       throw new IOException(e);
-    }
-
-    // If page preview rendering failed, there is no point in scaling the images
-    if (!success.get()) {
-      logger.debug("Skipping scaling of failed preview rendering {}", pageURL);
-      return;
+    } finally {
+      // If page preview rendering failed, there is no point in scaling the
+      // images
+      if (!success.get()) {
+        logger.debug("Skipping scaling of failed preview rendering {}", pageURL);
+        FileUtils.deleteQuietly(rendererdFile);
+        return;
+      }
     }
 
     FileInputStream imageIs = null;
