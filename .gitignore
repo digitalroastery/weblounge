@@ -2,6 +2,7 @@
 lib/ext/
 lib/libexec/
 lib/weblounge/
+lib/weblounge_es/
 logs/
 sites/
 sites-data/

@@ -187,4 +187,16 @@ public class HTMLHeaderTag extends WebloungeTag {
       headElements.add(headElement);
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#release()
+   */
+  @Override
+  public void release() {
+    super.release();
+    headElements = new ArrayList<HTMLHeadElement>();
+    needsJQuery = false;
+  }
+
 }
