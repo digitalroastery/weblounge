@@ -53,6 +53,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -428,7 +429,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @see ch.entwine.weblounge.common.site.Action.module.ActionHandler#configure(ch.entwine.weblounge.api.request.WebloungeRequest,
    *      ch.entwine.weblounge.api.request.WebloungeResponse, java.lang.String)
    */
-  @SuppressWarnings("unchecked")
   public void configure(WebloungeRequest request, WebloungeResponse response,
       RequestFlavor flavor) throws ActionException {
 
@@ -630,33 +630,30 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
   }
 
   /**
-   * {@inheritDoc}
+   * Finds the first service in the service registry and returns it. If not such
+   * service is available, <code>null</code> is returned.
    * 
-   * @see java.lang.Object#hashCode()
+   * @param c
+   *          the class of the service to look for
+   * @return the service
    */
-  @Override
-  public int hashCode() {
-    return identifier.hashCode();
-  }
-
-  /**
-   * Returns <code>true</code> if <code>o</code> equals this action handler.
-   * 
-   * @param o
-   *          the object to test for equality
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object o) {
-    if (o != null && o instanceof ActionSupport) {
-      ActionSupport h = (ActionSupport) o;
-      if (module == null && h.getModule() != null)
-        return false;
-      if (module != null && !module.equals(h.getModule()))
-        return false;
-      return identifier.equals(h.identifier);
+  protected <S extends Object> S getService(Class<S> c) {
+    String className = c.getName();
+    BundleContext ctx = getBundleContext();
+    if (ctx == null)
+      return null;
+    try {
+      ServiceReference serviceRef = ctx.getServiceReference(className);
+      if (serviceRef == null) {
+        logger.debug("No service for class {} found", className);
+        return null;
+      }
+      S smtpService = (S) ctx.getService(serviceRef);
+      return smtpService;
+    } catch (IllegalStateException e) {
+      logger.debug("Service of type {} cannot be received through deactivating bundle {}", className, ctx);
+      return null;
     }
-    return false;
   }
 
   /**
@@ -686,6 +683,36 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     includeCount = 0;
     request = null;
     response = null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return identifier.hashCode();
+  }
+
+  /**
+   * Returns <code>true</code> if <code>o</code> equals this action handler.
+   * 
+   * @param o
+   *          the object to test for equality
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (o != null && o instanceof ActionSupport) {
+      ActionSupport h = (ActionSupport) o;
+      if (module == null && h.getModule() != null)
+        return false;
+      if (module != null && !module.equals(h.getModule()))
+        return false;
+      return identifier.equals(h.identifier);
+    }
+    return false;
   }
 
   /**
@@ -719,7 +746,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    *           if the configuration cannot be parsed
    * @see #toXml()
    */
-  @SuppressWarnings("unchecked")
   public static Action fromXml(Node config, XPath xpath)
       throws IllegalStateException {
 
