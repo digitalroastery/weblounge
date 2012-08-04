@@ -810,8 +810,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
       createPreviews(resource, site.getLanguages());
     }
 
-    logger.info("Preview generation finished");
-
   }
 
   /**
@@ -827,10 +825,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
   protected void createPreviews(final Resource<?> resource,
       Language... languages) {
 
+    ResourceURI uri = resource.getURI();
+
     // Compile the full list of image styles
     final List<ImageStyle> styles = new ArrayList<ImageStyle>();
     if (imageStyleTracker == null) {
-      logger.info("Skipping preview generation for {}: image styles are unavailable", resource.getURI());
+      logger.info("Skipping preview generation for {}: image styles are unavailable", uri);
       return;
     }
 
@@ -843,7 +843,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     // If no language has been specified, we create the preview for all
     // languages
     if (languages == null || languages.length == 0) {
-      languages = resource.getURI().getSite().getLanguages();
+      languages = uri.getSite().getLanguages();
     }
 
     // Create the previews
@@ -852,8 +852,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
       // is there an existing operation for this resource? If so, simply update
       // it and be done.
-      previewOp = previews.get(resource.getURI());
+      previewOp = previews.get(uri);
       if (previewOp != null) {
+        logger.debug("Adding languages and styles to {} for preview generation", uri);
         previewOp.addLanguages(Arrays.asList(languages));
         previewOp.addStyles(styles);
         return;
@@ -864,8 +865,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
       // Make sure nobody is working on the same resource at the moment
       if (currentPreviewOperations.contains(previewOp)) {
-        logger.debug("Queing concurring creation of preview for {}", resource.getURI());
-        previews.put(resource.getURI(), previewOp);
+        logger.debug("Queing concurring creation of preview for {}", uri);
+        previews.put(uri, previewOp);
         previewOperations.add(previewOp);
         return;
       }
@@ -873,9 +874,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
       // If there is enough being worked on already, there is nothing we can do
       // right now, the work will be picked up later on
       if (currentPreviewOperations.size() >= maxPreviewOperations) {
-        logger.debug("Queing creation of preview for {}", resource.getURI());
-        previews.put(resource.getURI(), previewOp);
+        logger.debug("Queing creation of preview for {}", uri);
+        previews.put(uri, previewOp);
         previewOperations.add(previewOp);
+        logger.debug("Preview generation queue now contains {} resources", previews.size());
         return;
       }
 
@@ -885,6 +887,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
       Thread t = new Thread(previewWorker);
       t.setPriority(Thread.MIN_PRIORITY);
       t.setDaemon(true);
+
+      logger.info("Creating preview of {}", uri);
       t.start();
     }
   }
@@ -901,7 +905,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
       // Do the cleanup
       for (Iterator<PreviewOperation> i = currentPreviewOperations.iterator(); i.hasNext();) {
-        if (i.next().getResource().equals(resource)) {
+        Resource<?> r = i.next().getResource();
+        if (r.equals(resource)) {
+          logger.info("Preview creation of {} finished", r.getURI());
           i.remove();
           break;
         }
@@ -912,15 +918,22 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
         // Get the next operation and do the bookkeeping
         PreviewOperation op = previewOperations.remove();
+        Resource<?> r = op.getResource();
         currentPreviewOperations.add(op);
-        previews.remove(op.getResource().getURI());
+        previews.remove(r.getURI());
 
         // Finally start the generation
-        PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, op.getResource(), environment, op.getLanguages(), op.getStyles(), op.getFormat());
+        PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, r, environment, op.getLanguages(), op.getStyles(), op.getFormat());
         Thread t = new Thread(previewWorker);
         t.setPriority(Thread.MIN_PRIORITY);
         t.setDaemon(true);
+
+        logger.info("Creating preview of {}", r.getURI());
+        logger.trace("There are {} more preview operations waiting", previewOperations.size());
+        logger.trace("Currently using {} out of {} preview creation slots", currentPreviewOperations.size(), maxPreviewOperations);
         t.start();
+      } else {
+        logger.debug("No more resources queued for preview creation");
       }
     }
   }

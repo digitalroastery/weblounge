@@ -38,6 +38,8 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,6 +53,9 @@ import java.util.List;
  * Worker implementation that creates a preview in a separate thread.
  */
 class PreviewGeneratorWorker implements Runnable {
+
+  /** The logging facility */
+  private final Logger logger = LoggerFactory.getLogger(PreviewGeneratorWorker.class);
 
   /** The content repository */
   private AbstractContentRepository contentRepository = null;
@@ -112,14 +117,14 @@ class PreviewGeneratorWorker implements Runnable {
       // Find the resource serializer
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
       if (serializer == null) {
-        AbstractWritableContentRepository.logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
+        logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
         return;
       }
 
       // Does the serializer come with a preview generator?
       PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource);
       if (previewGenerator == null) {
-        AbstractWritableContentRepository.logger.debug("Resource type '{}' does not support previews", resourceType);
+        logger.debug("Resource type '{}' does not support previews", resourceType);
         return;
       }
 
@@ -127,10 +132,10 @@ class PreviewGeneratorWorker implements Runnable {
       String mimeType = "image/" + format;
       ResourceSerializer<?, ?> s = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
       if (s == null) {
-        AbstractWritableContentRepository.logger.warn("No resource serializer is capable of dealing with resources of format '{}'", mimeType);
+        logger.warn("No resource serializer is capable of dealing with resources of format '{}'", mimeType);
         return;
       } else if (!(s instanceof ImageResourceSerializer)) {
-        AbstractWritableContentRepository.logger.warn("Resource serializer lookup for format '{}' returned {}", format, s.getClass());
+        logger.warn("Resource serializer lookup for format '{}' returned {}", format, s.getClass());
         return;
       }
 
@@ -138,7 +143,7 @@ class PreviewGeneratorWorker implements Runnable {
       ImageResourceSerializer irs = (ImageResourceSerializer) s;
       ImagePreviewGenerator imagePreviewGenerator = (ImagePreviewGenerator) irs.getPreviewGenerator(format);
       if (imagePreviewGenerator == null) {
-        AbstractWritableContentRepository.logger.warn("Image resource serializer {} does not provide support for '{}'", irs, format);
+        logger.warn("Image resource serializer {} does not provide support for '{}'", irs, format);
         return;
       }
 
@@ -154,7 +159,7 @@ class PreviewGeneratorWorker implements Runnable {
           continue;
         originalPreview = createPreview(resource, originalStyle, l, previewGenerator, format);
         if (originalPreview == null || !originalPreview.exists() || originalPreview.length() == 0) {
-          AbstractWritableContentRepository.logger.warn("Preview generation for {} failed", resource);
+          logger.warn("Preview generation for {} failed", resource);
           return;
         }
 
@@ -178,10 +183,12 @@ class PreviewGeneratorWorker implements Runnable {
               fis = new FileInputStream(originalPreview);
               fos = new FileOutputStream(scaledFile);
               imagePreviewGenerator.createPreview(originalPreview, environment, l, style, format, fis, fos);
+            } else {
+              logger.debug("Skipping creation of existing '{}' preview of {}", style, resource);
             }
 
           } catch (Throwable t) {
-            AbstractWritableContentRepository.logger.error("Error scaling {}: {}", originalPreview, t.getMessage());
+            logger.error("Error scaling {}: {}", originalPreview, t.getMessage());
             continue;
           } finally {
             IOUtils.closeQuietly(fis);
