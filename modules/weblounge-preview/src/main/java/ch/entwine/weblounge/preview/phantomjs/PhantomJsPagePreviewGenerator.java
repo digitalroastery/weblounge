@@ -203,7 +203,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
           switch (exitCode) {
             case 0:
               success.set(true);
-              logger.info("Page preview of {} created at {}", finalPageURL, rendererdFile.getAbsolutePath());
+              logger.debug("Page preview of {} created at {}", finalPageURL, rendererdFile.getAbsolutePath());
               break;
             default:
               success.set(false);
