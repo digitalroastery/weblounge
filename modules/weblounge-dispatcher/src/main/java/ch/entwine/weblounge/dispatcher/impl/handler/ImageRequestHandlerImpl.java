@@ -366,9 +366,10 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return true;
     } finally {
       IOUtils.closeQuietly(imageInputStream);
-      if (scalingFailed) {
+      if (scalingFailed && scaledImageFile != null) {
         File f = scaledImageFile;
         FileUtils.deleteQuietly(scaledImageFile);
+        f = scaledImageFile.getParentFile();
         while (f != null && f.isDirectory() && f.listFiles().length == 0) {
           FileUtils.deleteQuietly(f);
           f = f.getParentFile();
