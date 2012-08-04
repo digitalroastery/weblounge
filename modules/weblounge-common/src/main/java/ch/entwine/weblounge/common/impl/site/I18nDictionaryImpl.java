@@ -57,7 +57,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
   protected Map<Language, Properties> i18n = new HashMap<Language, Properties>();
 
   /** The defaults (language neutral) */
-  private Properties defaults = new Properties();
+  private final Properties defaults = new Properties();
 
   /**
    * {@inheritDoc}
@@ -270,7 +270,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
       if (invalidKeys > 0)
         logger.warn("I18n dictionary {} contains {} entries withou a key", url, invalidKeys);
       if (invalidValues > 0)
-        logger.warn("I18n dictionary {} contains keys {} without values", url, invalidValues);
+        logger.warn("I18n dictionary {} contains {} keys without values", url, invalidValues);
 
     } catch (ParserConfigurationException e) {
       logger.warn("Parser configuration error when reading i18n dictionary {}: {}", url, e.getMessage());
