@@ -58,6 +58,7 @@ public class ImageMagickActivator {
           PreviewGenerator.class.getName(),
           ImagePreviewGenerator.class.getName() };
       previewGenerator = new ImageMagickPreviewGenerator();
+      previewGenerator.activate(ctx);
       service = ctx.getBundleContext().registerService(classes, previewGenerator, null);
       logger.info("ImageMagick image preview generator registered");
     } else {
@@ -76,6 +77,7 @@ public class ImageMagickActivator {
       return;
     try {
       logger.debug("Unregistering ImageMagick image preview generator");
+      previewGenerator.deactivate();
       ctx.getBundleContext().ungetService(service.getReference());
     } catch (Throwable t) {
       // Never mind, seems like we are shutting down
