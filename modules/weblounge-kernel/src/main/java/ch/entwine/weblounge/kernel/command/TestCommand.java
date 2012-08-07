@@ -22,6 +22,7 @@ package ch.entwine.weblounge.kernel.command;
 
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.testing.IntegrationTest;
 
 import org.apache.commons.lang.StringUtils;
@@ -47,7 +48,7 @@ public final class TestCommand {
   private static final Logger logger = LoggerFactory.getLogger(TestCommand.class);
 
   /** The tests */
-  private List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
+  private final List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
 
   /** Comparator used to get the test suite in order */
   private static final IntegrationTestComparator testComparator = new IntegrationTestComparator();
@@ -221,7 +222,7 @@ public final class TestCommand {
     logger.info("------------------------------------------------------------------------");
     for (IntegrationTest test : tests) {
       StringBuffer buf = new StringBuffer();
-      
+
       // Test number
       int pos = 0;
       for (int i = 0; i < this.tests.size(); i++) {
@@ -230,7 +231,7 @@ public final class TestCommand {
           break;
         }
       }
-      
+
       // Test number
       String num = Integer.toString(pos);
       for (int i = num.length(); i < testcount.length(); i++)
@@ -281,7 +282,12 @@ public final class TestCommand {
     logger.info("Running test '" + test + "'");
     logger.info("------------------------------------------------------------------------");
     try {
-      test.execute("http://127.0.0.1:8080");
+      Site site = test.getSite();
+      if (site == null) {
+        logger.warn("Test {} has no site associated", test.getName());
+        return false;
+      }
+      test.execute(test.getSite().getHostname().toExternalForm());
       logger.info("Test '" + test + "' succeeded");
       return true;
     } catch (Throwable t) {
@@ -323,7 +329,7 @@ public final class TestCommand {
           return 1;
         return groupComparison;
       }
-      
+
       // Sort by order
       Integer testOrder = Integer.valueOf(test.getExecutionOrder());
       Integer otherTestOrder = Integer.valueOf(otherTest.getExecutionOrder());

@@ -23,7 +23,6 @@ import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -65,18 +64,6 @@ public class FilesEndpointTest extends IntegrationTestBase {
 
   public FilesEndpointTest() {
     super("Files Endpoint Test", WEBLOUNGE_ENDPOINT_TEST_GROUP);
-  }
-
-  /**
-   * Runs this test on the instance running at
-   * <code>http://127.0.0.1:8080</code>.
-   * 
-   * @throws Exception
-   *           if the test fails
-   */
-  @Test
-  public void execute() throws Exception {
-    execute("http://127.0.0.1:8080");
   }
 
   /**

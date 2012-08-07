@@ -37,7 +37,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -77,18 +76,6 @@ public class HTMLActionTest extends IntegrationTestBase {
    */
   public HTMLActionTest() {
     super("HTML Action Test", WEBLOUNGE_CONTENT_TEST_GROUP);
-  }
-
-  /**
-   * Runs this test on the instance running at
-   * <code>http://127.0.0.1:8080</code>.
-   * 
-   * @throws Exception
-   *           if the test fails
-   */
-  @Test
-  public void execute() throws Exception {
-    execute("http://127.0.0.1:8080");
   }
 
   /**
@@ -158,7 +145,8 @@ public class HTMLActionTest extends IntegrationTestBase {
           logger.debug("Found pagelet content");
 
           // Look for action header includes
-          assertEquals("Action include failed", "1", XPathHelper.valueOf(xml, "count(/html/head/script[contains(@src, '/scripts/greeting.js')])"));
+          String scriptInclude = UrlUtils.concat(site.getHostname().getURL().toExternalForm(), "weblounge-sites", site.getIdentifier(), "modules/test/scripts/greeting.js");
+          assertEquals("Action include failed", scriptInclude, XPathHelper.valueOf(xml, "/html/head/script[1]/@src"));
           logger.debug("Found action javascript include");
 
           // Look for pagelet header includes
