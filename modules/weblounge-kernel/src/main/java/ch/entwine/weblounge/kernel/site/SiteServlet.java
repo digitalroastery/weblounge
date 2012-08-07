@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.kernel.site;
 
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+
 import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.entwine.weblounge.common.impl.request.Http11ResponseType;
@@ -97,7 +99,7 @@ public class SiteServlet extends HttpServlet {
   private boolean initialized = false;
 
   /** The environment */
-  private Environment environment = Environment.Production;
+  private Environment environment = Environment.Any;
 
   /**
    * Creates a new site servlet for the given bundle and context.
@@ -128,6 +130,7 @@ public class SiteServlet extends HttpServlet {
    * 
    * @see JspServletWrapper#init(ServletConfig)
    */
+  @Override
   public void init(final ServletConfig config) throws ServletException {
     jasperServlet.init(config);
     initialized = true;
@@ -175,6 +178,7 @@ public class SiteServlet extends HttpServlet {
    * 
    * @see JspServletWrapper#getServletConfig()
    */
+  @Override
   public ServletConfig getServletConfig() {
     return jasperServlet.getServletConfig();
   }
@@ -186,6 +190,7 @@ public class SiteServlet extends HttpServlet {
    * 
    * @see HttpServlet#service(HttpServletRequest, HttpServletResponse)
    */
+  @Override
   public void service(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
     String filename = FilenameUtils.getName(request.getPathInfo());
@@ -246,6 +251,14 @@ public class SiteServlet extends HttpServlet {
       ((WebloungeResponseImpl) response).setRequest(webloungeRequest);
     }
 
+    // Make sure the resource exists, Jasper will not produce a meaningful error
+    // message, but a PWC6117: File "null" not found
+    String requestPath = request.getRequestURI();
+    if (bundle.getEntry(requestPath) == null) {
+      response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+
     // Configure request and response objects
 
     try {
@@ -259,7 +272,7 @@ public class SiteServlet extends HttpServlet {
     } catch (Throwable t) {
       // re-thrown
       logger.error("Error while serving jsp {}: {}", request.getRequestURI(), t.getMessage());
-      throw new ServletException(t);
+      response.sendError(SC_INTERNAL_SERVER_ERROR, t.getMessage());
     }
   }
 
@@ -368,6 +381,7 @@ public class SiteServlet extends HttpServlet {
    * 
    * @see JspServletWrapper#getServletInfo()
    */
+  @Override
   public String getServletInfo() {
     return jasperServlet.getServletInfo();
   }
@@ -377,6 +391,7 @@ public class SiteServlet extends HttpServlet {
    * 
    * @see JspServletWrapper#destroy()
    */
+  @Override
   public void destroy() {
     jasperServlet.destroy();
   }
