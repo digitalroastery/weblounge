@@ -248,8 +248,15 @@ class PreviewGeneratorWorker implements Runnable {
           contentRepositoryIs = content.getExternalLocation().openStream();
         }
 
-        // Create the file
-        if (!scaledResourceFile.getParentFile().mkdirs() || !scaledResourceFile.createNewFile()) {
+        // Create the parent directory
+        File scaledResourceDir = scaledResourceFile.getParentFile();
+        if (!scaledResourceDir.isDirectory() && !scaledResourceDir.mkdirs()) {
+          AbstractContentRepository.logger.warn("Error creating parent directory of preview file {}", scaledResourceFile.getAbsolutePath());
+          return null;
+        }
+
+        // Create the file if it doesn't exist
+        if (!scaledResourceFile.isFile() && !scaledResourceFile.createNewFile()) {
           AbstractContentRepository.logger.warn("Error creating preview file {}", scaledResourceFile.getAbsolutePath());
           return null;
         }
