@@ -20,10 +20,8 @@
 
 package ch.entwine.weblounge.taglib.content;
 
-import ch.entwine.weblounge.common.editor.EditingState;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
-
-import javax.servlet.http.Cookie;
 
 /**
  * Tag to provide support for &lt;ifediting&gt; and &lt;ifnotediting&gt; tag
@@ -40,19 +38,7 @@ public abstract class EditingCheckTag extends WebloungeTag {
    * @return <code>true</code> if the page is being edited
    */
   protected boolean isEditing() {
-    // Check if ?edit parameter is present
-    if (request.getParameter(EditingState.WORKBENCH_PARAM) != null)
-      return true;
-
-    // Check if editing cookie is present
-    if (request.getCookies() == null)
-      return false;
-    for (Cookie cookie : request.getCookies()) {
-      if (cookie.getName().equals(EditingState.STATE_COOKIE) && "true".equals(cookie.getValue())) {
-        return true;
-      }
-    }
-    return false;
+    return RequestUtils.isEditingState(request);
   }
 
 }

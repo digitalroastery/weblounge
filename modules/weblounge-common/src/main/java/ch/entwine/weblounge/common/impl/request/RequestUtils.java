@@ -20,8 +20,13 @@
 
 package ch.entwine.weblounge.common.impl.request;
 
+import static ch.entwine.weblounge.common.editor.EditingState.STATE_COOKIE;
+import static ch.entwine.weblounge.common.editor.EditingState.WORKBENCH_PARAM;
+import static ch.entwine.weblounge.common.editor.EditingState.WORKBENCH_PREVIEW_PARAM;
+import static ch.entwine.weblounge.common.impl.security.SystemRole.EDITOR;
+import static java.lang.Boolean.TRUE;
+
 import ch.entwine.weblounge.common.editor.EditingState;
-import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.site.ActionSupport;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -486,7 +491,7 @@ public final class RequestUtils {
    */
   public static short getShortParameterWithDefault(WebloungeRequest request,
       Action action, int index, short defaultValue)
-      throws IllegalArgumentException {
+          throws IllegalArgumentException {
     try {
       return getShortParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -607,7 +612,7 @@ public final class RequestUtils {
    */
   private static short getShortParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-      throws IllegalArgumentException, IllegalStateException {
+          throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -685,7 +690,7 @@ public final class RequestUtils {
    */
   public static int getIntegerParameterWithDefault(WebloungeRequest request,
       Action action, int index, int defaultValue)
-      throws IllegalArgumentException {
+          throws IllegalArgumentException {
     try {
       return getIntegerParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -758,7 +763,7 @@ public final class RequestUtils {
    */
   private static int getIntegerParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-      throws IllegalArgumentException, IllegalStateException {
+          throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -884,7 +889,7 @@ public final class RequestUtils {
    */
   public static long getLongParameterWithDefault(WebloungeRequest request,
       Action action, int index, long defaultValue)
-      throws IllegalArgumentException {
+          throws IllegalArgumentException {
     try {
       return getLongParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1084,7 +1089,7 @@ public final class RequestUtils {
    */
   public static float getFloatParameterWithDefault(WebloungeRequest request,
       Action action, int index, float defaultValue)
-      throws IllegalArgumentException {
+          throws IllegalArgumentException {
     try {
       return getFloatParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1157,7 +1162,7 @@ public final class RequestUtils {
    */
   private static float getFloatParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-      throws IllegalArgumentException, IllegalStateException {
+          throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -1242,7 +1247,7 @@ public final class RequestUtils {
   }
 
   /**
-   * Returns <code>true</code> if the editing state is enable, else return
+   * Returns <code>true</code> if the editing state is enabled, else return
    * <code>false</code>
    * 
    * @param request
@@ -1250,15 +1255,13 @@ public final class RequestUtils {
    * @return the editing state
    */
   public static boolean isEditingState(WebloungeRequest request) {
-    if (RequestUtils.isMockRequest(request)) {
-      return true;
-    } else if (request.getHeader("X-Weblounge-Special") != null) {
+    if (request.getHeader("X-Weblounge-Special") != null) {
       return "Page-Preview".equals(request.getHeader("X-Weblounge-Special"));
-    } else if (!SecurityUtils.userHasRole(request.getUser(), SystemRole.EDITOR)) {
+    } else if (!SecurityUtils.userHasRole(request.getUser(), EDITOR)) {
       return false;
-    } else if (request.getParameter(EditingState.WORKBENCH_PREVIEW_PARAM) != null) {
+    } else if (request.getParameter(WORKBENCH_PREVIEW_PARAM) != null) {
       return false;
-    } else if (request.getParameter(EditingState.WORKBENCH_PARAM) != null) {
+    } else if (request.getParameter(WORKBENCH_PARAM) != null) {
       return true;
     } else if (request.getCookies() != null) {
       for (Cookie cookie : request.getCookies()) {
@@ -1266,7 +1269,10 @@ public final class RequestUtils {
           return true;
         }
       }
+    } else if (TRUE.equals(request.getSession().getAttribute(STATE_COOKIE))) {
+      return true;
     }
+
     return false;
   }
 
@@ -1289,7 +1295,7 @@ public final class RequestUtils {
    */
   public static boolean getBooleanParameterWithDefault(
       WebloungeRequest request, String parameterName, boolean defaultValue)
-      throws IllegalArgumentException {
+          throws IllegalArgumentException {
     String p = getParameter(request, parameterName);
     if (p == null)
       return defaultValue;
@@ -1315,7 +1321,7 @@ public final class RequestUtils {
    */
   public static boolean getBooleanParameterWithDefault(
       WebloungeRequest request, Action action, int index, boolean defaultValue)
-      throws IllegalArgumentException {
+          throws IllegalArgumentException {
     try {
       return getBooleanParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1435,7 +1441,7 @@ public final class RequestUtils {
    */
   private static boolean getBooleanParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-      throws IllegalArgumentException, IllegalStateException {
+          throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -1515,7 +1521,7 @@ public final class RequestUtils {
    */
   public static Date getDateParameterWithDefault(WebloungeRequest request,
       Action action, int index, Date defaultValue)
-      throws IllegalArgumentException {
+          throws IllegalArgumentException {
     try {
       return getDateParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1685,7 +1691,7 @@ public final class RequestUtils {
         "yyyy-MM-ddTkk:mmZ",
         "yyyy-MM-ddTkk:mm:ssZ",
         // us date format
-        "MM/dd/yyyy" };
+    "MM/dd/yyyy" };
     return DateUtils.parseDate(datestring, parsePatterns);
   }
 

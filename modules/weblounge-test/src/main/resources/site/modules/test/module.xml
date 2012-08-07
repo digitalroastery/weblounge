@@ -7,7 +7,7 @@
 
   <pagelets>
     <pagelet id="content" composeable="false">
-      <name>Page content</name>
+      <name>Page content showcase</name>
       <renderer>file://${module.root}/pagelets/content.jsp</renderer>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
@@ -19,7 +19,7 @@
       </includes>
     </pagelet>
     <pagelet id="include" composeable="false">
-      <name>Greeting</name>
+      <name>Pagelet includes showcase</name>
       <renderer>file://${module.root}/pagelets/include.jsp</renderer>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
@@ -29,12 +29,17 @@
       </includes>
     </pagelet>
     <pagelet id="i18n" composeable="false">
-      <name>I18n internationalization</name>
+      <name>I18n internationalization showcase</name>
       <renderer>file://${module.root}/pagelets/i18n.jsp</renderer>
     </pagelet>
     <pagelet id="nested" composeable="false">
-      <name>Page content</name>
+      <name>Nested property tags showcase</name>
       <renderer>file://${module.root}/pagelets/nested.jsp</renderer>
+    </pagelet>
+    <pagelet id="editing" composeable="false">
+      <name>Page editing showcase</name>
+      <renderer>file://${module.root}/pagelets/editing.jsp</renderer>
+      <editor>file://${module.root}/pagelets/editing_editor.jsp</editor>
     </pagelet>
   </pagelets>
 
