@@ -187,6 +187,21 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.impl.content.GeneralComposeable#addHTMLHeader(ch.entwine.weblounge.common.content.page.HTMLHeadElement)
+   */
+  @Override
+  public void addHTMLHeader(HTMLHeadElement header) {
+    if (module != null) {
+      header.setModule(module);
+      header.setSite(site);
+      header.setEnvironment(environment);
+    }
+    super.addHTMLHeader(header);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.page.PageletRenderer#getModule()
    */
   public Module getModule() {
@@ -339,7 +354,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * @see #fromXml(Node)
    * @see #toXml()
    */
-  @SuppressWarnings("unchecked")
   public static PageletRenderer fromXml(Node node, XPath xpath)
       throws IllegalStateException {
 
