@@ -10,7 +10,7 @@ steal.then('jsonix')
 	$.Model.extend('Pagelet',
 	/* @Static */
 	{
-		finaAll : "",
+		findAll : "",
 		
 		findOne: function(params, success, error) {
 			if ('id' in params) {
