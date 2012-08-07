@@ -23,6 +23,9 @@ package ch.entwine.weblounge.common.impl.testing;
 import ch.entwine.weblounge.common.impl.request.DelegatingServletOutputStream;
 import ch.entwine.weblounge.common.impl.request.HeaderValueCollection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,6 +50,9 @@ import javax.servlet.http.HttpServletResponse;
  * {@link javax.servlet.http.HttpServletResponse} interface.
  */
 public class MockHttpServletResponse implements HttpServletResponse {
+
+  /** Logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(MockHttpServletResponse.class);
 
   /** Default http server port */
   public static final int DEFAULT_SERVER_PORT = 80;
@@ -95,9 +101,6 @@ public class MockHttpServletResponse implements HttpServletResponse {
 
   /** The response status, default to {@link HttpServletResponse#SC_OK} */
   private int status = HttpServletResponse.SC_OK;
-  
-  /** Number of errors that occured during this response */
-  private int errorCount = 0;
 
   /** The error message */
   private String errorMessage = null;
@@ -497,10 +500,10 @@ public class MockHttpServletResponse implements HttpServletResponse {
    *      java.lang.String)
    */
   public void sendError(int status, String errorMessage) throws IOException {
-    if (isCommitted() && errorCount == 0) {
-      throw new IllegalStateException("Cannot set error status - response is already committed");
+    if (isCommitted()) {
+      logger.debug("Unable to send error " + status + ": response is already committed");
+      return;
     }
-    this.errorCount ++;
     this.status = status;
     this.errorMessage = errorMessage;
     setCommitted(true);
@@ -512,10 +515,10 @@ public class MockHttpServletResponse implements HttpServletResponse {
    * @see javax.servlet.http.HttpServletResponse#sendError(int)
    */
   public void sendError(int status) throws IOException {
-    if (isCommitted() && errorCount == 0) {
-      throw new IllegalStateException("Cannot set error status - response is already committed");
+    if (isCommitted()) {
+      logger.debug("Unable to send error " + status + ": response is already committed");
+      return;
     }
-    this.errorCount ++;
     this.status = status;
     setCommitted(true);
   }
@@ -527,7 +530,8 @@ public class MockHttpServletResponse implements HttpServletResponse {
    */
   public void sendRedirect(String url) throws IOException {
     if (isCommitted()) {
-      throw new IllegalStateException("Cannot send redirect - response is already committed");
+      logger.warn("Unable to send redirect: response is already committed");
+      return;
     }
     if (url == null)
       throw new IllegalArgumentException("Redirect URL must not be null");
@@ -743,12 +747,14 @@ public class MockHttpServletResponse implements HttpServletResponse {
       super(out);
     }
 
+    @Override
     public void write(int b) throws IOException {
       super.write(b);
       super.flush();
       setCommittedIfBufferSizeExceeded();
     }
 
+    @Override
     public void flush() throws IOException {
       super.flush();
       setCommitted(true);
@@ -770,6 +776,7 @@ public class MockHttpServletResponse implements HttpServletResponse {
      * 
      * @see java.io.PrintWriter#write(char[], int, int)
      */
+    @Override
     public void write(char[] buf, int off, int len) {
       super.write(buf, off, len);
       super.flush();
@@ -781,6 +788,7 @@ public class MockHttpServletResponse implements HttpServletResponse {
      * 
      * @see java.io.PrintWriter#write(java.lang.String, int, int)
      */
+    @Override
     public void write(String s, int off, int len) {
       super.write(s, off, len);
       super.flush();
@@ -792,6 +800,7 @@ public class MockHttpServletResponse implements HttpServletResponse {
      * 
      * @see java.io.PrintWriter#write(int)
      */
+    @Override
     public void write(int c) {
       super.write(c);
       super.flush();
@@ -803,6 +812,7 @@ public class MockHttpServletResponse implements HttpServletResponse {
      * 
      * @see java.io.PrintWriter#flush()
      */
+    @Override
     public void flush() {
       super.flush();
       setCommitted(true);
