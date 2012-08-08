@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.cache.impl;
+package ch.entwine.weblounge.common.impl.request;
 
 import javax.servlet.ServletOutputStream;
 
@@ -27,7 +27,7 @@ import javax.servlet.ServletOutputStream;
  * output that has been written to a <code>HtttpServletResponse</code> to the
  * response cache as well as to the client.
  */
-final class CacheOutputStream extends ServletOutputStream {
+public final class CachedOutputStream extends ServletOutputStream {
 
   /** Default buffer size for the response */
   private static final int BUFFER_SIZE = 20 * 1024;
@@ -84,7 +84,7 @@ final class CacheOutputStream extends ServletOutputStream {
    * 
    * @return the content
    */
-  byte[] getContent() {
+  public byte[] getContent() {
     byte[] newbuf = new byte[pos];
     System.arraycopy(buf, 0, newbuf, 0, pos);
     return newbuf;

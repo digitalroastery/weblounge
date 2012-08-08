@@ -23,6 +23,8 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Composer;
+import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
@@ -332,6 +334,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     // Finally, let's get some work done!
     try {
       request.setAttribute(WebloungeRequest.ACTION, action);
+
+      // Add the action's HTML header elements to the response if it's not
+      // only used in editing mode
+      for (HTMLHeadElement header : action.getHTMLHeaders()) {
+        if (!HTMLInclude.Use.Editor.equals(header.getUse()))
+          response.addHTMLHeader(header);
+      }
 
       // Prepare the action by storing initial values for page and template
       if (action instanceof HTMLAction) {

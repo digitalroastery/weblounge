@@ -94,6 +94,7 @@ public class PageContentTest extends IntegrationTestBase {
     testNonExistingPage(serverUrl);
     testWorkPage(serverUrl);
     testPageAsEditor(serverUrl);
+    testComposerInheritance(serverUrl);
   }
 
   /**
@@ -287,6 +288,75 @@ public class PageContentTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
+  }
+
+  /**
+   * Tests the delivery of inherited page content.
+   * 
+   * @param serverUrl
+   *          the base server url
+   * @throws Exception
+   *           if the test fails
+   */
+  private void testComposerInheritance(String serverUrl) throws Exception {
+    logger.info("Preparing test of inherited page content");
+
+    // Prepare the request
+    logger.info("Testing inherited page output");
+
+    String requestUrl = UrlUtils.concat(serverUrl, "/test/ghost/inheriting");
+
+    logger.info("Sending request to {}", requestUrl);
+    HttpGet request = new HttpGet(requestUrl);
+
+    String eTagValue;
+    Date modificationDate = null;
+
+    // Send and the request and examine the response
+    logger.debug("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+      // Get the document contents
+      Document xml = TestUtils.parseXMLResponse(response);
+
+      // Test template output
+      String templateOutput = XPathHelper.valueOf(xml, "/html/head/title");
+      assertNotNull("General template output does not work", templateOutput);
+      assertEquals("Template title is not as expected", "Weblounge Test Site Ghost Template", templateOutput);
+
+      // Look for inherited pagelets
+      String text = XPathHelper.valueOf(xml, "/html/body/div[@id='main']//div[@class='greeting']");
+      assertNotNull("Content of pagelet element 'include' not found", text);
+      logger.debug("Found inherited pagelet content");
+
+      // Look for inherited pagelet header includes
+      assertEquals("Pagelet include failed", "1", XPathHelper.valueOf(xml, "count(/html/head/link[contains(@href, 'greeting.css')])"));
+      logger.debug("Found pagelet stylesheet include");
+
+      // Test for template replacement
+      assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${module.root}')]"));
+      assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${site.root}')]"));
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("ETag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
+
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
 }

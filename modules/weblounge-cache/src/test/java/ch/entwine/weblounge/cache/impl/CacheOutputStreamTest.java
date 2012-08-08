@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.cache.impl;
 
+import ch.entwine.weblounge.common.impl.request.CachedOutputStream;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -27,12 +29,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test case for the implementation at {@link CacheOutputStream}.
+ * Test case for the implementation at {@link CachedOutputStream}.
  */
 public class CacheOutputStreamTest {
 
   /** The output stream to test */
-  protected CacheOutputStream outputStream = null;
+  protected CachedOutputStream outputStream = null;
   
   /** The content length */
   protected int contentLength = 4096;
@@ -45,11 +47,11 @@ public class CacheOutputStreamTest {
    */
   @Before
   public void setUp() throws Exception {
-    outputStream = new CacheOutputStream();
+    outputStream = new CachedOutputStream();
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.cache.impl.CacheOutputStream#write(int)}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.request.CachedOutputStream#write(int)}.
    */
   @Test
   public void testWriteInt() {
@@ -62,7 +64,7 @@ public class CacheOutputStreamTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.cache.impl.CacheOutputStream#write(byte[], int, int)}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.request.CachedOutputStream#write(byte[], int, int)}.
    */
   @Test
   public void testWriteByteArrayIntInt() {
@@ -72,7 +74,7 @@ public class CacheOutputStreamTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.cache.impl.CacheOutputStream#getContent()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.request.CachedOutputStream#getContent()}.
    */
   @Test
   public void testGetContent() throws Exception {

@@ -92,8 +92,6 @@ public class GreeterHTMLAction extends HTMLActionSupport {
         setTemplate(t);
       }
     }
-
-    use(module.getRenderer(PAGELET_ID));
   }
 
   /**

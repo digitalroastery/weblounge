@@ -28,6 +28,8 @@ import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
+import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
@@ -361,6 +363,13 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         expires = System.currentTimeMillis() + Times.MS_PER_MIN;
       }
       response.setDateHeader("Expires", expires);
+
+      // Add the template's HTML header elements to the response if it's not
+      // only used in editing mode
+      for (HTMLHeadElement header : template.getHTMLHeaders()) {
+        if (!HTMLInclude.Use.Editor.equals(header.getUse()))
+          response.addHTMLHeader(header);
+      }
 
       // Select the actual renderer by method and have it render the
       // request. Since renderers are being pooled by the bundle, we

@@ -23,6 +23,8 @@ package ch.entwine.weblounge.taglib;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Composer;
+import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -778,6 +780,12 @@ public class ComposerTagSupport extends WebloungeTag {
           logger.warn("Exception while rendering pagelet through action " + action + " on " + url, e);
           response.invalidate();
         }
+      }
+
+      // Add the pagelet's includes to the request's head section
+      for (HTMLHeadElement header : renderer.getHTMLHeaders()) {
+        if (!HTMLInclude.Use.Editor.equals(header.getUse()))
+          response.addHTMLHeader(header);
       }
 
       logger.debug("Rendering pagelet " + renderer);

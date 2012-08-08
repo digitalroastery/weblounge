@@ -233,14 +233,17 @@ public class SiteServlet extends HttpServlet {
 
     final HttpServletRequest request;
     final HttpServletResponse response;
+    boolean originalRequest = true;
 
     // Wrap request and response if necessary
     if (httpRequest instanceof SiteRequestWrapper) {
       request = httpRequest;
       response = httpResponse;
+      originalRequest = false;
     } else if (httpRequest instanceof WebloungeRequest) {
       request = new SiteRequestWrapper((WebloungeRequest) httpRequest, httpRequest.getPathInfo(), false);
       response = httpResponse;
+      originalRequest = false;
     } else {
       WebloungeRequestImpl webloungeRequest = new WebloungeRequestImpl(httpRequest, environment);
       webloungeRequest.init(site);
@@ -263,6 +266,8 @@ public class SiteServlet extends HttpServlet {
 
     try {
       jasperServlet.service(request, response);
+      if (originalRequest)
+        response.flushBuffer();
     } catch (ServletException e) {
       // re-thrown
       throw e;

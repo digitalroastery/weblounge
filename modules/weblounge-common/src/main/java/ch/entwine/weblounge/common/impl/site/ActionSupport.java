@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.impl.site;
 
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Link;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -626,6 +627,13 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       throw new ActionException(new IllegalArgumentException(msg));
     }
     logger.debug("Including renderer {}", renderer);
+
+    // Add the pagelet's header elements to the response
+    for (HTMLHeadElement header : r.getHTMLHeaders()) {
+      if (!HTMLInclude.Use.Editor.equals(header.getUse()))
+        response.addHTMLHeader(header);
+    }
+
     include(request, response, r, pagelet);
   }
 

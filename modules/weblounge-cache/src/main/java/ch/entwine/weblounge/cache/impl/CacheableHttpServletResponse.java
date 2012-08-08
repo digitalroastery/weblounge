@@ -22,6 +22,7 @@ package ch.entwine.weblounge.cache.impl;
 
 import ch.entwine.weblounge.cache.StreamFilter;
 import ch.entwine.weblounge.cache.impl.filter.FilterWriter;
+import ch.entwine.weblounge.common.impl.request.CachedOutputStream;
 import ch.entwine.weblounge.common.request.CacheHandle;
 
 import org.apache.commons.io.IOUtils;
@@ -195,7 +196,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
       } else if (tx != null) {
         tx.getOutputStream().flush();
         tx.getOutputStream().close();
-        CacheOutputStream cacheOs = tx.getOutputStream();
+        CachedOutputStream cacheOs = tx.getOutputStream();
         OutputStream clientOs = getResponse().getOutputStream();
         ByteArrayInputStream cacheIs = new ByteArrayInputStream(cacheOs.getContent());
         IOUtils.copy(cacheIs, clientOs);

@@ -20,18 +20,27 @@
 
 package ch.entwine.weblounge.common.impl.request;
 
+import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.request.CacheHandle;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
@@ -58,6 +67,20 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /** The response's cache handle */
   private WeakReference<CacheHandle> cacheHandle = null;
 
+  private Set<HTMLHeadElement> htmlHeaders = null;
+
+  /** Whether the getOuputStream has already been called */
+  private boolean osCalled = false;
+
+  /** Holds the special writer that copies the output to the buffer first */
+  private PrintWriter out = null;
+
+  /** A buffer that can hold the output stream prior to writing it back */
+  private CachedOutputStream os = null;
+
+  /** Default encoding */
+  private static final String DEFAULT_ENCODING = "utf-8";
+
   /**
    * Creates a new <code>HttpServletResponse</code> wrapper around the original
    * response object.
@@ -67,6 +90,106 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public WebloungeResponseImpl(HttpServletResponse response) {
     super(response);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.ServletResponseWrapper#getOutputStream()
+   */
+  @Override
+  public ServletOutputStream getOutputStream() throws IOException {
+    if (out != null)
+      throw new IllegalStateException("A writer has already been allocated");
+    osCalled = true;
+
+    String contentType = getContentType();
+    if (contentType != null && contentType.startsWith("text")) {
+      os = new CachedOutputStream();
+      return os;
+    } else {
+      return super.getOutputStream();
+    }
+  }
+
+  /**
+   * Returns the modified writer that enables the caching of the response.
+   * 
+   * @return a PrintWriter object that can return character data to the client
+   * @throws IOException
+   *           if the writer could not be allocated
+   * @see javax.servlet.ServletResponse#getWriter()
+   * @see ch.entwine.weblounge.OldCacheManager.cache.CacheManager
+   */
+  @Override
+  public PrintWriter getWriter() throws IOException {
+    // Check whether there's already a writer allocated
+    if (out != null)
+      return out;
+
+    // Check whether getOutputStream() has already been called
+    if (osCalled)
+      throw new IllegalStateException("An output stream has already been allocated");
+
+    // Get the character encoding
+    String encoding = getCharacterEncoding();
+    if (encoding == null) {
+      encoding = DEFAULT_ENCODING;
+      setCharacterEncoding(encoding);
+    }
+
+    // Install the writer
+    try {
+      String contentType = getContentType();
+      if (contentType != null && contentType.startsWith("text")) {
+        os = new CachedOutputStream();
+        out = new PrintWriter(new OutputStreamWriter(os, encoding));
+      } else {
+        out = new PrintWriter(new OutputStreamWriter(super.getOutputStream(), encoding));
+      }
+    } catch (UnsupportedEncodingException e) {
+      throw new IOException(e.getMessage());
+    }
+
+    // Return the new writer
+    return out;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.ServletResponseWrapper#flushBuffer()
+   */
+  @Override
+  public void flushBuffer() throws IOException {
+    if (isCommitted())
+      return;
+
+    // Make sure to flush any print writer so its content is
+    // written to the cached output stream
+    if (out != null)
+      out.flush();
+
+    // If there is cached content, the headers need to be added
+    if (os != null) {
+
+      // Check if there are includes
+      String response = new String(os.getContent(), DEFAULT_ENCODING);
+      StringBuffer headersHTML = new StringBuffer();
+      if (htmlHeaders != null) {
+        for (HTMLHeadElement e : htmlHeaders) {
+          headersHTML.append(e.toXml()).append('\n');
+        }
+      }
+
+      // Replace the marker with the actual headers
+      response = response.replaceAll(HTML_HEADER_MARKER, headersHTML.toString());
+      setContentLength(response.getBytes().length);
+      IOUtils.write(response, super.getOutputStream(), DEFAULT_ENCODING);
+    }
+
+    // Send the response back to the client
+    super.flushBuffer();
   }
 
   /**
@@ -457,6 +580,30 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public boolean isValid() {
     return isValid;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#addHTMLHeader(ch.entwine.weblounge.common.content.page.HTMLHeadElement)
+   */
+  @Override
+  public void addHTMLHeader(HTMLHeadElement header) {
+    if (htmlHeaders == null)
+      htmlHeaders = new HashSet<HTMLHeadElement>();
+    htmlHeaders.add(header);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#getHTMLHeaders()
+   */
+  @Override
+  public HTMLHeadElement[] getHTMLHeaders() {
+    if (htmlHeaders == null)
+      return new HTMLHeadElement[] {};
+    return htmlHeaders.toArray(new HTMLHeadElement[htmlHeaders.size()]);
   }
 
   /**
