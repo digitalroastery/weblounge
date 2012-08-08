@@ -80,7 +80,6 @@ public final class FileRequestHandlerImpl implements RequestHandler {
    * @param response
    *          the weblounge response
    */
-  @SuppressWarnings("unchecked")
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
 
     WebUrl url = request.getUrl();

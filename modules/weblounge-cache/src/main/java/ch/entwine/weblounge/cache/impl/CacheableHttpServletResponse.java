@@ -58,7 +58,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CacheableHttpServletResponse.class);
-  
+
   /**
    * Holds the special tee writer that copies the output to the network and to
    * the cache.
@@ -136,18 +136,11 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
 
     // Allocate a new writer. If there is a transaction, the output is written
     // to both the original response and the cache output stream.
-    OutputStream os = null;
-    if (tx != null)
-      os = new TeeOutputStream(getResponse().getOutputStream(), tx.getOutputStream());
-    else
-      os = getResponse().getOutputStream();
-
-    // Install the writer
     try {
       if (tx == null || tx.getFilter() == null)
-        out = new PrintWriter(new OutputStreamWriter(os, encoding));
+        out = new PrintWriter(new OutputStreamWriter(super.getOutputStream(), encoding));
       else
-        out = new PrintWriter(new BufferedWriter(new FilterWriter(new OutputStreamWriter(os, encoding), tx.getFilter(), contentType)));
+        out = new PrintWriter(new BufferedWriter(new FilterWriter(new OutputStreamWriter(new TeeOutputStream(super.getOutputStream(), tx.getOutputStream()), encoding), tx.getFilter(), contentType)));
     } catch (UnsupportedEncodingException e) {
       throw new IOException(e.getMessage());
     }
@@ -168,7 +161,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
     if (out != null)
       throw new IllegalStateException("A writer has already been allocated");
     osCalled = true;
-    return tx != null ? tx.getOutputStream() : getResponse().getOutputStream();
+    return tx != null ? tx.getOutputStream() : super.getOutputStream();
   }
 
   /**
@@ -197,14 +190,14 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
         tx.getOutputStream().flush();
         tx.getOutputStream().close();
         CachedOutputStream cacheOs = tx.getOutputStream();
-        OutputStream clientOs = getResponse().getOutputStream();
+        OutputStream clientOs = super.getOutputStream();
         ByteArrayInputStream cacheIs = new ByteArrayInputStream(cacheOs.getContent());
         IOUtils.copy(cacheIs, clientOs);
         clientOs.flush();
         clientOs.close();
       } else {
-        getResponse().getOutputStream().flush();
-        getResponse().getOutputStream().close();
+        super.getOutputStream().flush();
+        super.getOutputStream().close();
       }
     } catch (IOException e) {
       logger.debug("Can't write cached response back to client: " + e.getMessage());
@@ -260,8 +253,13 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   public void flushBuffer() throws IOException {
     if (isCommitted())
       return;
+
+    // Make sure to flush any print writer so its content is
+    // written to the cached output stream
     if (tx != null && out != null)
       out.flush();
+
+    // Finally initiate writing the content back to the client
     super.flushBuffer();
   }
 

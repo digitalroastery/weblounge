@@ -100,7 +100,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private static List<String> wellknownFiles = new ArrayList<String>();
 
   /** List of sites that have already issued a warning once */
-  private List<Site> missingRepositoryWarnings = new ArrayList<Site>();
+  private final List<Site> missingRepositoryWarnings = new ArrayList<Site>();
 
   /** The response caches */
   private Map<String, ResponseCache> caches = null;
@@ -380,6 +380,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
       securityService.setSite(null);
       if (requestServed) {
         response.endResponse();
+        response.flushBuffer();
         logger.debug("Finished processing of {}", httpRequest.getRequestURI());
       } else {
         logger.debug("No handler found for {}", request);

@@ -266,8 +266,10 @@ public class SiteServlet extends HttpServlet {
 
     try {
       jasperServlet.service(request, response);
-      if (originalRequest)
+      if (originalRequest) {
+        ((WebloungeResponseImpl) response).endResponse();
         response.flushBuffer();
+      }
     } catch (ServletException e) {
       // re-thrown
       throw e;

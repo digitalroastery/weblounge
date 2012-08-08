@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.request.WebloungeResponse;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -54,6 +55,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
   /** True if an error has been reported */
   private boolean hasError = false;
+
+  /** Flag to indicate whether the buffered response has been submitted */
+  private boolean submitted = false;
 
   /** Response status */
   private int responseStatus = SC_OK;
@@ -165,28 +169,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     if (isCommitted())
       return;
 
-    // Make sure to flush any print writer so its content is
-    // written to the cached output stream
-    if (out != null)
-      out.flush();
-
-    // If there is cached content, the headers need to be added
-    if (os != null) {
-
-      // Check if there are includes
-      String response = new String(os.getContent(), DEFAULT_ENCODING);
-      StringBuffer headersHTML = new StringBuffer();
-      if (htmlHeaders != null) {
-        for (HTMLHeadElement e : htmlHeaders) {
-          headersHTML.append(e.toXml()).append('\n');
-        }
-      }
-
-      // Replace the marker with the actual headers
-      response = response.replaceAll(HTML_HEADER_MARKER, headersHTML.toString());
-      setContentLength(response.getBytes().length);
-      IOUtils.write(response, super.getOutputStream(), DEFAULT_ENCODING);
-    }
+    if (!submitted)
+      submitResponseBuffer();
 
     // Send the response back to the client
     super.flushBuffer();
@@ -470,6 +454,17 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public void endResponse() throws IllegalStateException {
     try {
+
+      // Make sure to flush any print writer so its content is
+      // written to the cached output stream
+      if (out != null)
+        out.flush();
+
+      // Copy the response buffer to the cached response
+      if (!submitted)
+        submitResponseBuffer();
+
+      // See if there is an active cache transaction
       if (cache == null)
         return;
       ResponseCache cache = this.cache.get();
@@ -480,14 +475,53 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
       // End the response and have the output sent back to the client
       cache.endResponse(this);
+
+    } catch (IOException e) {
+      // The client closed the connection
     } finally {
-      try {
-        flushBuffer();
-      } catch (IOException e) {
-        // The client closed the connection
-      }
       cacheHandle = null;
     }
+  }
+
+  /**
+   * Submits the buffered response to the wrapped response's output stream. This
+   * method returns gracefully if the response has already been submitted.
+   * 
+   * @throws IOException
+   *           if submitting fails
+   */
+  private void submitResponseBuffer() throws IOException {
+
+    // Has content been added?
+    if (os == null)
+      return;
+
+    // Has the content been submitted already?
+    if (submitted)
+      return;
+
+    // Is there an output stream that we can copy to?
+    OutputStream clientOS = super.getOutputStream();
+    if (clientOS == null)
+      return;
+
+    // Check if there are HTML header includes
+    String response = new String(os.getContent(), DEFAULT_ENCODING);
+    StringBuffer headersHTML = new StringBuffer();
+    if (htmlHeaders != null) {
+      for (HTMLHeadElement e : htmlHeaders) {
+        headersHTML.append(e.toXml()).append('\n');
+      }
+    }
+
+    // Replace the marker with the actual headers
+    response = response.replaceAll(HTML_HEADER_MARKER, headersHTML.toString());
+    setContentLength(response.getBytes().length);
+    IOUtils.write(response, clientOS, DEFAULT_ENCODING);
+    clientOS.flush();
+
+    os = null;
+    submitted = true;
   }
 
   /**
