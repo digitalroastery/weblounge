@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<page id="4bb19980-8f98-4873-a813-020000000005" path="/test/ghost/inheriting" version="live">
+  <head>
+    <template>ghost</template>
+    <promote>true</promote>
+    <index>true</index>
+    <metadata>
+      <title language="en"><![CDATA[Title]]></title>
+    </metadata>
+    <created>
+      <user id="hans" realm="testland">Hans Muster</user>
+      <date>2009-01-07T19:05:41Z</date>
+    </created>
+    <modified>
+      <user id="amelie" realm="testland">Amélie Poulard</user>
+      <date>2009-02-18T21:06:40Z</date>
+    </modified>
+    <published>
+      <user id="hans" realm="testland">Hans Muster</user>
+      <from>2006-05-05T16:58:21Z</from>
+      <to>292278994-08-17T07:12:55Z</to>
+    </published>
+  </head>
+  <body/>
+</page>

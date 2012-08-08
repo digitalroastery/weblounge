@@ -36,6 +36,11 @@
       <renderer>file://${site.root}/templates/alternate.jsp</renderer>
       <stage>main</stage>
     </template>
+    <template id="ghost" composeable="false">
+      <name>Ghost template</name>
+      <renderer>file://${site.root}/templates/ghost.jsp</renderer>
+      <stage>main</stage>
+    </template>
     <template id="welcome" composeable="false">
       <name>Welcome page</name>
       <renderer>file://${site.root}/templates/welcome.jsp</renderer>
