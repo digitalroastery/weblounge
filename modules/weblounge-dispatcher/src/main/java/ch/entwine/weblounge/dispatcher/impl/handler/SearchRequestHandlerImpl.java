@@ -155,6 +155,8 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
       q.withVersion(Resource.LIVE);
       q.withOffset(offset);
       q.withLimit(limit);
+      // TODO Add support for other types
+      q.withTypes(Page.TYPE);
     } catch (UnsupportedEncodingException e) {
       throw new WebApplicationException(e);
     }
