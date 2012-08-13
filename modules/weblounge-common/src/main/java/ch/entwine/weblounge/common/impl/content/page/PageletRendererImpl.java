@@ -114,7 +114,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       htmlHead.setSite(site);
       htmlHead.setModule(module);
     }
-    processURLTemplates(environment);
   }
 
   /**
