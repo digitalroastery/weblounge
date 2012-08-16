@@ -1,4 +1,5 @@
-<project xmlns="maven.apache.org/POM/4.0.0" xmlns:xsi="www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="maven.apache.org/POM/4.0.0 maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="maven.apache.org/POM/4.0.0" xmlns:xsi="www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="maven.apache.org/POM/4.0.0 maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <packaging>pom</packaging>
   <artifactId>weblounge-runtime</artifactId>
@@ -57,7 +58,7 @@
       <artifactId>org.apache.felix.scr</artifactId>
       <version>1.6.0</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.prefs</artifactId>
@@ -119,10 +120,11 @@
       <artifactId>geronimo-servlet_2.5_spec</artifactId>
       <version>1.2</version>
     </dependency>
-            
+
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
-      <artifactId>org.apache.servicemix.specs.activation-api-1.1</artifactId>
+      <artifactId>org.apache.servicemix.specs.activation-api-1.1
+      </artifactId>
       <version>${servicemix-specs.version}</version>
     </dependency>
 
@@ -137,7 +139,7 @@
       <artifactId>org.apache.servicemix.specs.stax-api-1.0</artifactId>
       <version>${servicemix-specs.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
       <artifactId>org.apache.servicemix.specs.jaxp-api-1.4</artifactId>
@@ -146,7 +148,8 @@
 
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
-      <artifactId>org.apache.servicemix.specs.jsr311-api-1.1.1</artifactId>
+      <artifactId>org.apache.servicemix.specs.jsr311-api-1.1.1
+      </artifactId>
       <version>${servicemix-specs.version}</version>
     </dependency>
 
@@ -235,7 +238,7 @@
       <artifactId>org.apache.servicemix.bundles.xmlschema</artifactId>
       <version>1.4.3_1</version>
     </dependency>
- 
+
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.xmlresolver</artifactId>
@@ -259,7 +262,7 @@
       <artifactId>org.apache.servicemix.bundles.javax.mail</artifactId>
       <version>1.4.1_3</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.rome</artifactId>
@@ -292,7 +295,8 @@
 
     <dependency>
       <groupId>org.apache.xalan</groupId>
-      <artifactId>com.springsource.org.apache.xml.serializer</artifactId>
+      <artifactId>com.springsource.org.apache.xml.serializer
+      </artifactId>
       <version>2.7.1</version>
     </dependency>
 
@@ -430,7 +434,8 @@
 
     <dependency>
       <groupId>org.apache.taglibs</groupId>
-      <artifactId>com.springsource.org.apache.taglibs.standard</artifactId>
+      <artifactId>com.springsource.org.apache.taglibs.standard
+      </artifactId>
       <version>1.1.2.v20110517</version>
     </dependency>
 
@@ -445,7 +450,7 @@
       <artifactId>tika-parsers</artifactId>
       <version>1.0</version>
     </dependency>
- 
+
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
@@ -469,19 +474,19 @@
       <artifactId>org.eclipse.persistence.core</artifactId>
       <version>${eclipselink.version}</version>
     </dependency>
- 
+
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.jpa</artifactId>
       <version>${eclipselink.version}</version>
     </dependency>
- 
+
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.asm</artifactId>
       <version>${eclipselink.version}</version>
     </dependency>
- 
+
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.antlr</artifactId>
@@ -492,6 +497,80 @@
       <groupId>org.apache.geronimo.javamail</groupId>
       <artifactId>geronimo-javamail_1.4_mail</artifactId>
       <version>1.8.3</version>
+    </dependency>
+
+    <!-- JPA support -->
+
+    <dependency>
+      <groupId>org.apache.openjpa</groupId>
+      <artifactId>openjpa</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries</groupId>
+      <artifactId>org.apache.aries.util</artifactId>
+      <version>0.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries.blueprint</groupId>
+      <artifactId>org.apache.aries.blueprint</artifactId>
+      <version>0.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries.jndi</groupId>
+      <artifactId>org.apache.aries.jndi</artifactId>
+      <version>0.3.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries.jpa</groupId>
+      <artifactId>org.apache.aries.jpa.blueprint.aries</artifactId>
+      <version>0.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries.jpa</groupId>
+      <artifactId>org.apache.aries.jpa.container</artifactId>
+      <version>0.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries.jpa</groupId>
+      <artifactId>org.apache.aries.jpa.container.context</artifactId>
+      <version>0.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries.proxy</groupId>
+      <artifactId>org.apache.aries.proxy</artifactId>
+      <version>0.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries.transaction</groupId>
+      <artifactId>org.apache.aries.transaction.blueprint</artifactId>
+      <version>0.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries.transaction</groupId>
+      <artifactId>org.apache.aries.transaction.manager</artifactId>
+      <version>0.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries.transaction</groupId>
+      <artifactId>org.apache.aries.transaction.wrappers</artifactId>
+      <version>0.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix.karaf.deployer</groupId>
+      <artifactId>org.apache.felix.karaf.deployer.blueprint</artifactId>
+      <version>1.6.0</version>
     </dependency>
 
   </dependencies>
@@ -523,8 +602,10 @@
             <phase>install</phase>
             <configuration>
               <target name="[INFO] Deploy runtime libraries" if="weblounge.home">
-                <copy todir="${weblounge.home}/lib/ext" failonerror="false">
-                  <fileset dir="${project.build.directory}/dependency" includes="**/*" />
+                <copy todir="${weblounge.home}/lib/ext"
+                  failonerror="false">
+                  <fileset dir="${project.build.directory}/dependency"
+                    includes="**/*" />
                 </copy>
               </target>
             </configuration>
