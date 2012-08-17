@@ -588,7 +588,7 @@ public class SiteCommand {
   }
 
   /**
-   * Callback for OSGi's declarative services component dactivation.
+   * Callback for OSGi's declarative services component activation.
    * 
    * @param context
    *          the component context
