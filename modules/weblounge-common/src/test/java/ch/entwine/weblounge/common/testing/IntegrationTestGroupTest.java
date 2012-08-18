@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestCase;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestGroup;
+import ch.entwine.weblounge.common.site.Environment;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +42,9 @@ public class IntegrationTestGroupTest {
 
   /** Name of the test group */
   protected String name = "test-group";
+
+  /** The current environment */
+  protected Environment environment = Environment.Development;
 
   /**
    * @throws java.lang.Exception

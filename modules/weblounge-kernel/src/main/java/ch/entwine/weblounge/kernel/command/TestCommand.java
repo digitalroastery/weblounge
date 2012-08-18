@@ -22,6 +22,7 @@ package ch.entwine.weblounge.kernel.command;
 
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.testing.IntegrationTest;
 
@@ -49,6 +50,9 @@ public final class TestCommand {
 
   /** The tests */
   private final List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
+
+  /** The current environment */
+  private Environment environment = null;
 
   /** Comparator used to get the test suite in order */
   private static final IntegrationTestComparator testComparator = new IntegrationTestComparator();
@@ -118,8 +122,19 @@ public final class TestCommand {
       if ("list".equals(args[0])) {
         list();
       } else if ("all".equals(args[0])) {
+
+        if (environment == null) {
+          System.out.println("Environment is still unknown");
+          return;
+        }
+
         executeAll(tests);
       } else {
+        if (environment == null) {
+          System.out.println("Environment is still unknown");
+          return;
+        }
+
         String id = args[0];
 
         // Look up the test
@@ -141,6 +156,16 @@ public final class TestCommand {
     } else {
       printUsage();
     }
+  }
+
+  /**
+   * OSGi callback to set the environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
   }
 
   /**
@@ -287,7 +312,8 @@ public final class TestCommand {
         logger.warn("Test {} has no site associated", test.getName());
         return false;
       }
-      test.execute(test.getSite().getHostname().toExternalForm());
+      test.init(environment);
+      test.execute(test.getSite().getHostname(environment).toExternalForm());
       logger.info("Test '" + test + "' succeeded");
       return true;
     } catch (Throwable t) {

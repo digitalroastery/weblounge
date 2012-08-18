@@ -97,7 +97,8 @@ public class FilesTest extends IntegrationTestBase {
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   @Override
-  public void execute(String serverUrl) throws Exception {
+  public void execute(String serverUrl)
+      throws Exception {
     logger.info("Preparing test of file request handler");
     testGetDocument(serverUrl);
     testGetDocumentById(serverUrl);

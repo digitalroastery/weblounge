@@ -199,8 +199,14 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   @Override
   public void setEnvironment(Environment environment) {
-    processURLTemplates(environment);
-    options.setEnvironment(environment);
+    if (environment == null)
+      throw new IllegalArgumentException("Environment must not be null");
+
+    if (!this.environment.equals(environment) && module != null) {
+      processURLTemplates(environment);
+      options.setEnvironment(environment);
+    }
+
     super.setEnvironment(environment);
   }
 

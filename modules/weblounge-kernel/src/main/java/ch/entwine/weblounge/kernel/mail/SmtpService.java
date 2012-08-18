@@ -85,7 +85,7 @@ public class SmtpService implements ManagedService {
   private static final String DEFAULT_MAIL_PORT = "587";
 
   /** The mail properties */
-  private Properties mailProperties = new Properties();
+  private final Properties mailProperties = new Properties();
 
   /** Authenticator for a mail session */
   private Authenticator authenticator = null;
@@ -98,7 +98,7 @@ public class SmtpService implements ManagedService {
 
   /** The mail password */
   protected String mailPassword = null;
-  
+
   /** The default mail session */
   private Session defaultMailSession = null;
 
@@ -200,13 +200,14 @@ public class SmtpService implements ManagedService {
 
     // Register the password authenticator
     authenticator = new Authenticator() {
+      @Override
       protected PasswordAuthentication getPasswordAuthentication() {
         return new PasswordAuthentication(mailUser, mailPassword);
       }
     };
 
     defaultMailSession = null;
-    logger.info("Mail service configured with {}", mailHost);
+    logger.info("Mail service configured to {}", mailHost);
 
     // Test
     String mailTest = StringUtils.trimToNull((String) properties.get(OPT_MAIL_TEST));

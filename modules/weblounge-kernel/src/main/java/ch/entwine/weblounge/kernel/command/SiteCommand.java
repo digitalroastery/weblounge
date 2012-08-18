@@ -35,6 +35,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteURL;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -59,7 +60,7 @@ public class SiteCommand {
   private static final Logger logger = LoggerFactory.getLogger(SiteCommand.class);
 
   /** The list of registered sites */
-  private List<Site> sites = new ArrayList<Site>();
+  private final List<Site> sites = new ArrayList<Site>();
 
   /**
    * Command signature that allows to do
@@ -351,11 +352,12 @@ public class SiteCommand {
     query.withText(text.toString());
 
     // Is it a page?
+    Formatter formatter = null;
     try {
       SearchResult result = repository.find(query);
 
       // Format the output
-      Formatter formatter = new Formatter(System.out);
+      formatter = new Formatter(System.out);
       StringBuffer format = new StringBuffer();
       int padding = Long.toString(result.getDocumentCount()).length();
       format.append("%1$#").append(padding).append("s. %2$s\n");
@@ -370,6 +372,8 @@ public class SiteCommand {
     } catch (ContentRepositoryException e) {
       System.err.println("Error trying to access the content repository");
       e.printStackTrace(System.err);
+    } finally {
+      IOUtils.closeQuietly(formatter);
     }
   }
 
