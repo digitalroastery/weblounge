@@ -86,7 +86,13 @@ public class ResourceTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
+  @Override
   public int doStartTag() throws JspException {
+
+    // Don't do work if not needed (which is the case during precompilation)
+    if (RequestUtils.isPrecompileRequest(request))
+      return SKIP_BODY;
+
     Site site = request.getSite();
 
     ContentRepository repository = site.getContentRepository();
@@ -103,8 +109,6 @@ public class ResourceTag extends WebloungeTag {
       uri = new GeneralResourceURIImpl(site, null, resourceId);
     } else if (StringUtils.isNotBlank(resourcePath)) {
       uri = new GeneralResourceURIImpl(site, resourcePath);
-    } else if (RequestUtils.isMockRequest(request)) {
-      return SKIP_BODY;
     } else {
       throw new JspException("Neither uuid nor path were specified for resource");
     }
@@ -164,6 +168,7 @@ public class ResourceTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
    */
+  @Override
   public int doEndTag() throws JspException {
     removeAndUnstashAttributes();
     return super.doEndTag();

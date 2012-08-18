@@ -84,3 +84,5 @@ apache
 etag
 stash
 stashed
+precompile
+jasper

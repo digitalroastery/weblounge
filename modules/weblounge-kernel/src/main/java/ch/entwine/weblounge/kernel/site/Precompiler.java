@@ -32,7 +32,7 @@ import ch.entwine.weblounge.common.impl.content.page.MockPageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.entwine.weblounge.common.impl.security.Guest;
-import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
+import ch.entwine.weblounge.common.impl.site.PrecompileHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.SecurityService;
@@ -175,7 +175,7 @@ public class Precompiler {
       Site site = servlet.getSite();
 
       // Prepare the mock request and response objects
-      MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+      PrecompileHttpServletRequest request = new PrecompileHttpServletRequest();
       request.setServerName(site.getHostname(environment).getURL().getHost());
       request.setServerPort(site.getHostname(environment).getURL().getPort());
       request.setMethod(site.getHostname(environment).getURL().getProtocol());
