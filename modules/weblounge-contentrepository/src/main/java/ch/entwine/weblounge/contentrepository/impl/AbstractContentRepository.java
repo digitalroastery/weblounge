@@ -907,7 +907,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       for (Iterator<PreviewOperation> i = currentPreviewOperations.iterator(); i.hasNext();) {
         Resource<?> r = i.next().getResource();
         if (r.equals(resource)) {
-          logger.info("Preview creation of {} finished", r.getURI());
+          logger.debug("Preview creation of {} finished", r.getURI());
           i.remove();
           break;
         }
