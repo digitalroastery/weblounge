@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.test.harness.content;
 
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -89,7 +91,8 @@ public class PageContentTest extends IntegrationTestBase {
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   @Override
-  public void execute(String serverUrl) throws Exception {
+  public void execute(String serverUrl)
+      throws Exception {
     testPage(serverUrl);
     testNonExistingPage(serverUrl);
     testWorkPage(serverUrl);
@@ -184,6 +187,32 @@ public class PageContentTest extends IntegrationTestBase {
         // Test for template replacement
         assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${module.root}')]"));
         assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${site.root}')]"));
+
+        // Test for reflection of current environment
+        String scriptUrl = XPathHelper.valueOf(xml, "/html/head/script[contains(@src, 'greeting.js')]/@src");
+        assertNotNull("Script include failed", scriptUrl);
+        String stylesheetUrl = XPathHelper.valueOf(xml, "/html/head/link[contains(@href, 'greeting.css')]/@href");
+        assertNotNull("Stylesheet include failed", stylesheetUrl);
+        switch (environment) {
+          case Any:
+            fail("Environment has not yet been initialized");
+            break;
+          case Development:
+            assertTrue("Script url does not reflect environment", scriptUrl.startsWith("http://localhost:8080"));
+            assertTrue("Stylesheet url does not reflect environment", stylesheetUrl.startsWith("http://localhost:8080"));
+            break;
+          case Production:
+            assertTrue("Script url does not reflect environment", scriptUrl.startsWith("http://test:8080"));
+            assertTrue("Stylesheet url does not reflect environment", stylesheetUrl.startsWith("http://test:8080"));
+            break;
+          case Staging:
+            assertTrue("Script url does not reflect environment", scriptUrl.startsWith("http://127.0.0.1:8080"));
+            assertTrue("Stylesheet url does not reflect environment", stylesheetUrl.startsWith("http://127.0.0.1:8080"));
+            break;
+          default:
+            fail("Unknown environment " + environment + " encountered");
+            break;
+        }
 
         // Test ETag header
         Header eTagHeader = response.getFirstHeader("ETag");

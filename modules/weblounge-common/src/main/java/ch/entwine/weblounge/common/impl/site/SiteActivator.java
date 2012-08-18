@@ -230,7 +230,7 @@ public class SiteActivator {
       try {
         doc = docBuilder.parse(entry.openStream());
         IntegrationTestGroup test = IntegrationTestParser.fromXml(doc);
-        test.init(site);
+        test.setSite(site);
         test.setGroup(site.getName());
         logger.debug("Registering integration test " + test.getClass());
         bundleContext.registerService(IntegrationTest.class.getName(), test, null);

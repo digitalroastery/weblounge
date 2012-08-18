@@ -62,7 +62,7 @@ public class HTMLActionTest extends IntegrationTestBase {
     "/greeting/",
   "/greeting/html" };
 
-  /** The deault path to action */
+  /** The default path to action */
   private static final String defaultActionPath = "/greeting";
 
   /** The path to action configured to render on a specific template */
@@ -145,7 +145,7 @@ public class HTMLActionTest extends IntegrationTestBase {
           logger.debug("Found pagelet content");
 
           // Look for action header includes
-          String scriptInclude = UrlUtils.concat(site.getHostname().getURL().toExternalForm(), "weblounge-sites", site.getIdentifier(), "modules/test/scripts/greeting.js");
+          String scriptInclude = UrlUtils.concat(site.getHostname(environment).getURL().toExternalForm(), "weblounge-sites", site.getIdentifier(), "modules/test/scripts/greeting.js");
           assertEquals("Action include failed", scriptInclude, XPathHelper.valueOf(xml, "/html/head/script[1]/@src"));
           logger.debug("Found action javascript include");
 

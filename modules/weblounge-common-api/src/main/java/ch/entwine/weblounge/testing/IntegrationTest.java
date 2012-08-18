@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.testing;
 
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 
 /**
@@ -45,7 +46,7 @@ public interface IntegrationTest {
    * @param site
    *          the site
    */
-  void init(Site site);
+  void setSite(Site site);
 
   /**
    * Returns the site that is associated with this test.
@@ -53,6 +54,14 @@ public interface IntegrationTest {
    * @return the site
    */
   Site getSite();
+
+  /**
+   * Initializes the test with information.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void init(Environment environment);
 
   /**
    * Runs the integration test.

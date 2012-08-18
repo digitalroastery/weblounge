@@ -73,7 +73,8 @@ public class CacheTest extends IntegrationTestBase {
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   @Override
-  public void execute(String serverUrl) throws Exception {
+  public void execute(String serverUrl)
+      throws Exception {
     logger.info("Testing if response cache is activated");
 
     boolean responseCacheIsActivated = false;
@@ -103,7 +104,7 @@ public class CacheTest extends IntegrationTestBase {
       logger.warn("Response cache is not available and won't be tested");
       return;
     }
-    
+
     testCacheHeaders(serverUrl);
   }
 

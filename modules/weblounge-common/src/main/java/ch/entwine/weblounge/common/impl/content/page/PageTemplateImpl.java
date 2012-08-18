@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.content.page;
 
+import static ch.entwine.weblounge.common.site.Environment.Any;
+
 import ch.entwine.weblounge.common.content.RenderException;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.Link;
@@ -56,7 +58,7 @@ import javax.xml.xpath.XPathFactory;
 public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
   /** The logging facility */
-  private Logger logger = LoggerFactory.getLogger(PageTemplateImpl.class);
+  private final Logger logger = LoggerFactory.getLogger(PageTemplateImpl.class);
 
   /** Default composer for action output */
   protected String stage = DEFAULT_STAGE;
@@ -97,9 +99,16 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    * @see ch.entwine.weblounge.common.content.page.PageTemplate#setSite(ch.entwine.weblounge.common.site.Site)
    */
   public void setSite(Site site) {
+    if (site == null)
+      throw new IllegalArgumentException("Site must not be null");
+
     this.site = site;
     for (HTMLHeadElement htmlHead : headers) {
       htmlHead.setSite(site);
+    }
+
+    if (!Any.equals(environment)) {
+      processURLTemplates(environment);
     }
   }
 
@@ -238,7 +247,6 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    * @see #fromXml(Node)
    * @see #toXml()
    */
-  @SuppressWarnings("unchecked")
   public static PageTemplate fromXml(Node node, XPath xpath)
       throws IllegalStateException {
 
@@ -461,7 +469,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       throw new IllegalArgumentException("Environment cannot be null");
 
     // Is there anything we need to be doing?
-    if (!environment.equals(this.environment)) {
+    if (!environment.equals(this.environment) && site != null) {
       logger.debug("Processing url templates of {} with environment {}", this, environment);
       processURLTemplates(environment);
     }
