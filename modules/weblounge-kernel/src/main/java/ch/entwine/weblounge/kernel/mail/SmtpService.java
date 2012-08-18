@@ -76,8 +76,11 @@ public class SmtpService implements ManagedService {
   /** Parameter name for the test setting */
   private static final String OPT_SMTP_TEST = "test";
 
+  /** Default value for the mail server */
+  private static final String DEFAULT_SMTP_HOST = "localhost";
+
   /** Default value for the mail port */
-  private static final String DEFAULT_MAIL_PORT = "25";
+  private static final String DEFAULT_SMTP_PORT = "25";
 
   /** The mail properties */
   private final Properties mailProperties = new Properties();
@@ -115,16 +118,19 @@ public class SmtpService implements ManagedService {
     // The mail host is mandatory
     String propName = getConfigurationKey(OPT_SMTP_HOST);
     mailHost = StringUtils.trimToNull((String) properties.get(propName));
-    if (mailHost == null)
-      throw new ConfigurationException(propName, "is not set");
-    logger.debug("Mail host is {}", mailHost);
+    if (mailHost == null) {
+      mailHost = DEFAULT_SMTP_HOST;
+      logger.debug("Mail server defaults to '{}'", mailHost);
+    } else {
+      logger.debug("Mail host is {}", mailHost);
+    }
     mailProperties.put(getJavaMailSmtpKey(OPT_SMTP_HOST), mailHost);
 
     // Mail port
     propName = getConfigurationKey(OPT_SMTP_PORT);
     String mailPort = StringUtils.trimToNull((String) properties.get(propName));
     if (mailPort == null) {
-      mailPort = DEFAULT_MAIL_PORT;
+      mailPort = DEFAULT_SMTP_PORT;
       logger.debug("Mail server port defaults to '{}'", mailPort);
     } else {
       logger.debug("Mail server port is '{}'", mailPort);
