@@ -187,10 +187,11 @@ public class PageListTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
+  @Override
   public int doStartTag() throws JspException {
 
     // Don't do work if not needed (which is the case during precompilation)
-    if (RequestUtils.isMockRequest(request))
+    if (RequestUtils.isPrecompileRequest(request))
       return SKIP_BODY;
 
     // Make sure we start at the beginning
@@ -218,6 +219,7 @@ public class PageListTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doAfterBody()
    */
+  @Override
   public int doAfterBody() throws JspException {
     index++;
     try {
@@ -238,6 +240,7 @@ public class PageListTag extends WebloungeTag {
    * 
    * @see ch.entwine.weblounge.taglib.WebloungeTag#doEndTag()
    */
+  @Override
   public int doEndTag() throws JspException {
     removeAndUnstashAttributes();
     request.setAttribute(WebloungeRequest.PAGELET, pagelet);
@@ -255,7 +258,7 @@ public class PageListTag extends WebloungeTag {
    *           if the repository is offline
    */
   private boolean loadNextPage() throws ContentRepositoryException,
-      ContentRepositoryUnavailableException {
+  ContentRepositoryUnavailableException {
     Site site = request.getSite();
 
     // Check if headers have already been loaded
