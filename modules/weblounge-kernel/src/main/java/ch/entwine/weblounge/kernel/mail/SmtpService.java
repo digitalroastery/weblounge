@@ -256,7 +256,7 @@ public class SmtpService implements ManagedService {
   private void sendTestMessage(String recipient) throws MessagingException {
     MimeMessage message = createMessage();
     message.addRecipient(RecipientType.TO, new InternetAddress(recipient));
-    message.setSubject("Test from Matterhorn");
+    message.setSubject("Test from Weblounge");
     message.setText("Hello world");
     message.saveChanges();
     send(message);
