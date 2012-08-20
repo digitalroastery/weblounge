@@ -116,13 +116,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       return false;
     }
 
-    // Check the request method
-    String requestMethod = request.getMethod();
-    if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
-      logger.debug("Page handler answered head request for {}", request.getUrl());
-      return true;
-    }
-
     // Determine the editing state
     boolean isEditing = RequestUtils.isEditingState(request);
 
@@ -248,6 +241,20 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
           DispatchUtils.sendInternalError(request, response);
           return true;
         }
+      }
+
+      // Check the request method. This handler only supports GET
+      String requestMethod = request.getMethod().toUpperCase();
+      if ("OPTIONS".equals(requestMethod)) {
+        String verbs = "OPTIONS,GET";
+        logger.trace("Answering options request to {} with {}", url, verbs);
+        response.setHeader("Allow", verbs);
+        response.setContentLength(0);
+        return true;
+      } else if (!"GET".equals(requestMethod)) {
+        logger.debug("Url {} does not handle {} requests", url, requestMethod);
+        DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
+        return true;
       }
 
       // Is it published?

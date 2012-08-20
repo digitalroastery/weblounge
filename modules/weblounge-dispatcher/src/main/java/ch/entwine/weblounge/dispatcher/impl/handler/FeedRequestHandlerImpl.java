@@ -48,6 +48,7 @@ import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
+import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
@@ -88,6 +89,7 @@ import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * The feed request handler will answer requests that are looking for
@@ -175,6 +177,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
 
     Site site = request.getSite();
+    WebUrl url = request.getUrl();
     String path = request.getRequestURI();
     String feedType = null;
     String feedVersion = null;
@@ -182,13 +185,6 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     // Currently, we only support feeds mapped to our well-known uri
     if (!path.startsWith(URI_PREFIX) || !(path.length() > URI_PREFIX.length()))
       return false;
-
-    // Check the request method. Only GET is supported right now.
-    String requestMethod = request.getMethod();
-    if (!"GET".equals(requestMethod)) {
-      logger.debug("Feed request handler does not support {} requests", requestMethod);
-      return false;
-    }
 
     // Check for feed type and version
     String feedURI = path.substring(URI_PREFIX.length());
@@ -199,6 +195,20 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     } else if (feedURIParts.length == 1) {
       logger.debug("Feed request {} does not include feed version", path);
       return false;
+    }
+
+    // Check the request method. This handler only supports GET
+    String requestMethod = request.getMethod().toUpperCase();
+    if ("OPTIONS".equals(requestMethod)) {
+      String verbs = "OPTIONS,GET";
+      logger.trace("Answering options request to {} with {}", url, verbs);
+      response.setHeader("Allow", verbs);
+      response.setContentLength(0);
+      return true;
+    } else if (!"GET".equals(requestMethod)) {
+      logger.debug("Feed request handler does not support {} requests", url, requestMethod);
+      DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
+      return true;
     }
 
     feedType = feedURIParts[0];
@@ -287,7 +297,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
    */
   private SyndFeed createFeed(String feedType, String feedVersion, Site site,
       WebloungeRequest request, WebloungeResponse response)
-      throws ContentRepositoryException {
+          throws ContentRepositoryException {
     // Extract the subjects. The parameter may be specified multiple times
     // and add more than one subject by separating them using a comma.
     String[] subjectParameter = request.getParameterValues(PARAM_SUBJECT);
@@ -478,7 +488,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
    */
   private String loadContents(URL rendererURL, Site site, Page page,
       Composer composer, Pagelet pagelet, Environment environment)
-      throws IOException, ServletException {
+          throws IOException, ServletException {
 
     Servlet servlet = siteServlets.get(site.getIdentifier());
 

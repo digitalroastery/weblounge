@@ -116,7 +116,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     synchronized (urlCache) {
       for (RequestFlavor flavor : action.getFlavors()) {
         WebUrl actionUrl = new WebUrlImpl(action.getSite(), action.getPath(), Resource.LIVE, flavor);
-        String normalizedUrl = actionUrl.normalize(false, false, false, true);
+        String normalizedUrl = actionUrl.normalize(false, false, true);
         urlCache.put(normalizedUrl, pool);
         if (flavors.length() > 0)
           flavors.append(",");
@@ -198,11 +198,24 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     try {
 
       // Check the request method. We won't handle just everything
-      String requestMethod = request.getMethod();
-      if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
-        logger.debug("Actions are not supposed to handle {} requests", requestMethod);
-        DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
-        return true;
+      String requestMethod = request.getMethod().toUpperCase();
+      if (!action.supportsMethod(requestMethod)) {
+        if ("OPTIONS".equals(requestMethod)) {
+          StringBuffer verbs = new StringBuffer();
+          for (String verb : action.getMethods()) {
+            if (verbs.length() > 0)
+              verbs.append(",");
+            verbs.append(verb);
+          }
+          logger.trace("Answering options request to {} with {}", action, verbs.toString());
+          response.setHeader("Allow", verbs.toString());
+          response.setContentLength(0);
+          return true;
+        } else {
+          logger.debug("Action {} does not support {} requests", action, requestMethod);
+          DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
+          return true;
+        }
       }
 
       // Check for explicit no cache instructions
@@ -674,7 +687,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    * @return the handler
    */
   private ActionPool getActionForUrl(WebUrl url, RequestFlavor flavor) {
-    String normalizedUrl = url.normalize(false, false, false, true);
+    String normalizedUrl = url.normalize(false, false, true);
 
     // Try to use the url cache
     ActionPool actionPool = urlCache.get(normalizedUrl);

@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
+import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -32,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * This request handler deals with requests to <code>/robots.txt</code> if the
@@ -98,17 +101,24 @@ public class RobotsRequestHandlerImpl implements RequestHandler {
     WebUrl url = request.getUrl();
     String path = url.getPath();
 
-    // Check the request method. Only GET is supported right now.
-    String requestMethod = request.getMethod();
-    if (!"GET".equals(requestMethod)) {
-      logger.debug("Robots.txt request handler does not support {} requests", requestMethod);
-      return false;
-    }
-
     // Is the request intended for this handler?
     if (!path.equals(URI_PREFIX)) {
       logger.debug("Skipping request for {}, request path does not start with {}", URI_PREFIX);
       return false;
+    }
+
+    // Check the request method. Only GET is supported right now.
+    String requestMethod = request.getMethod().toUpperCase();
+    if ("OPTIONS".equals(requestMethod)) {
+      String verbs = "OPTIONS,GET";
+      logger.trace("Answering options request to {} with {}", url, verbs);
+      response.setHeader("Allow", verbs);
+      response.setContentLength(0);
+      return true;
+    } else if (!"GET".equals(requestMethod)) {
+      logger.debug("Robots request handler does not support {} requests", requestMethod);
+      DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
+      return true;
     }
 
     // Decide on which directives to send

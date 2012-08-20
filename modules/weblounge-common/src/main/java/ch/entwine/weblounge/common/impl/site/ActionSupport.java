@@ -44,7 +44,6 @@ import ch.entwine.weblounge.common.site.ActionException;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -103,6 +102,9 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
   /** The parent module */
   protected Module module = null;
 
+  /** List of supported methods */
+  private Set<String> verbs = null;
+
   /** Map containing uploaded files */
   protected List<FileItem> files = null;
 
@@ -122,6 +124,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * Default constructor.
    */
   public ActionSupport() {
+    verbs = new HashSet<String>();
   }
 
   /**
@@ -132,6 +135,106 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   public abstract int startResponse(WebloungeRequest request,
       WebloungeResponse response) throws ActionException;
+
+  /**
+   * Enables support for the given HTTP verb.
+   * 
+   * @param method
+   *          the method
+   * @throws IllegalArgumentException
+   *           if <code>method</code> is <code>null</code> or empty
+   * @see Action#supportsMethod(String)
+   */
+  protected void enableMethod(String method) {
+    if (StringUtils.isBlank(method))
+      throw new IllegalArgumentException("Method must not be blank");
+    if (verbs == null)
+      verbs = new HashSet<String>();
+    verbs.add(method.toUpperCase());
+  }
+
+  /**
+   * Enables support for the given HTTP verbs.
+   * 
+   * @param methods
+   *          the HTTP verbs to support
+   * @throws IllegalArgumentException
+   *           if <code>methods</code> is <code>null</code>
+   * @see Action#supportsMethod(String)
+   */
+  protected void enableMethods(String... methods) {
+    if (methods == null)
+      throw new IllegalArgumentException("Methods must not be blank");
+    for (String method : methods) {
+      enableMethod(method);
+    }
+  }
+
+  /**
+   * Disables support for the given HTTP verb.
+   * 
+   * @param method
+   *          the method
+   * @throws IllegalArgumentException
+   *           if <code>method</code> is <code>null</code> or empty
+   * @see Action#supportsMethod(String)
+   */
+  protected void disableMethod(String method) {
+    if (StringUtils.isBlank(method))
+      throw new IllegalArgumentException("Method must not be blank");
+    if (verbs != null)
+      verbs.remove(method.toUpperCase());
+  }
+
+  /**
+   * Disables support for the given HTTP verbs.
+   * 
+   * @param methods
+   *          the methods
+   * @throws IllegalArgumentException
+   *           if <code>methods</code> is <code>null</code>
+   * @see Action#supportsMethod(String)
+   */
+  protected void disableMethods(String... methods) {
+    if (methods == null)
+      throw new IllegalArgumentException("Methods must not be blank");
+    for (String method : methods) {
+      disableMethod(method);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Note that this default implementation enables support for <code>GET</code>
+   * requests only.
+   * 
+   * @throws IllegalArgumentException
+   *           if <code>method</code> is <code>null</code>
+   * @see ch.entwine.weblounge.common.site.Action#supportsMethod(java.lang.String)
+   */
+  public boolean supportsMethod(String method) {
+    if (StringUtils.isBlank(method))
+      throw new IllegalArgumentException("Method must not be blank");
+    method = method.toUpperCase();
+    if (verbs == null)
+      return "GET".equals(method);
+    return verbs.contains(method.toUpperCase());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Action#getMethods()
+   */
+  @Override
+  public String[] getMethods() {
+    if (verbs == null) {
+      return new String[] { "GET" };
+    } else {
+      return verbs.toArray(new String[verbs.size()]);
+    }
+  }
 
   /**
    * Returns the site's OSGi bundle context if available, <code>null</code>
@@ -240,17 +343,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @return the action's link
    */
   public WebUrl getUrl() {
-    return getUrl(environment);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.site.Action#getUrl(ch.entwine.weblounge.common.site.Environment)
-   */
-  public WebUrl getUrl(Environment environment) {
-    SiteURL siteURL = site.getHostname(environment);
-    return new WebUrlImpl(site, UrlUtils.concat(siteURL.toExternalForm(), mountpoint));
+    return new WebUrlImpl(site, mountpoint);
   }
 
   /**
