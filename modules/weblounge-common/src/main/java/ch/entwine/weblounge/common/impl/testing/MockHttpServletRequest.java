@@ -191,9 +191,9 @@ public class MockHttpServletRequest implements HttpServletRequest {
    * Create a new MockServletRequest with a default {@link MockServletContext}.
    * 
    * @param method
-   *          the request method (may be <code>null)
+   *          the request method such as <code>GET</code> or <code>POST</code> (may be <code>null</code>)
    * @param requestURI
-   *          the request URI (may be <code>null)
+   *          the request URI (may be <code>null</code>)
    * @see #setMethod
    * @see #setRequestURI
    * @see MockServletContext
@@ -207,7 +207,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
    * 
    * @param servletContext
    *          the ServletContext that the request runs in (may be
-   *          <code>null to use a default MockServletContext)
+   *          <code>null</code> to use a default MockServletContext)
    * @see MockServletContext
    */
   public MockHttpServletRequest(ServletContext servletContext) {
@@ -219,11 +219,11 @@ public class MockHttpServletRequest implements HttpServletRequest {
    * 
    * @param servletContext
    *          the ServletContext that the request runs in (may be
-   *          <code>null to use a default MockServletContext)
+   *          <code>null</code> to use a default MockServletContext)
    * @param method
-   *          the request method (may be <code>null)
+   *          the request method such as <code>GET</code> or <code>POST</code> (may be <code>null</code>)
    * @param requestURI
-   *          the request URI (may be <code>null)
+   *          the request URI (may be <code>null</code>)
    * @see #setMethod
    * @see #setRequestURI
    * @see MockServletContext

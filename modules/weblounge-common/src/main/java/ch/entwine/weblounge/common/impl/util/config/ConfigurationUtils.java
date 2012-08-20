@@ -571,12 +571,14 @@ public final class ConfigurationUtils {
    */
   public static String processTemplate(String text) {
     if (text.indexOf("${") >= 0 && text.indexOf("}") > 2) {
-      for (Entry<Object, Object> entry : System.getProperties().entrySet()) {
+      Map<Object, Object> systemProperties = new HashMap<Object, Object>(System.getProperties());
+      for (Entry<Object, Object> entry : systemProperties.entrySet()) {
         String variable = "\\$\\{" + (String) entry.getKey() + "\\}";
         String replacement = (String) entry.getValue();
         text = text.replaceAll(variable, replacement);
       }
-      for (Entry<String, String> entry : System.getenv().entrySet()) {
+      Map<String, String> systemEnv = new HashMap<String, String>(System.getenv());
+      for (Entry<String, String> entry : systemEnv.entrySet()) {
         String variable = "\\$\\{" + entry.getKey() + "\\}";
         String replacement = entry.getValue();
         text = text.replaceAll(variable, replacement);

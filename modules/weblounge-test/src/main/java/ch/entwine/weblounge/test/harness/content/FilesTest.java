@@ -34,7 +34,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,23 +92,13 @@ public class FilesTest extends IntegrationTestBase {
   }
 
   /**
-   * Runs this test on the instance running at
-   * <code>http://127.0.0.1:8080</code>.
-   * 
-   * @throws Exception
-   *           if the test fails
-   */
-  @Test
-  public void execute() throws Exception {
-    execute("http://127.0.0.1:8080");
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
-  public void execute(String serverUrl) throws Exception {
+  @Override
+  public void execute(String serverUrl)
+      throws Exception {
     logger.info("Preparing test of file request handler");
     testGetDocument(serverUrl);
     testGetDocumentById(serverUrl);

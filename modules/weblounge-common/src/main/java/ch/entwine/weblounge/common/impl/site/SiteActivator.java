@@ -85,7 +85,6 @@ public class SiteActivator {
    * @throws Exception
    *           if the site activation fails
    */
-  @SuppressWarnings("unchecked")
   void activate(final ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
 
@@ -231,6 +230,7 @@ public class SiteActivator {
       try {
         doc = docBuilder.parse(entry.openStream());
         IntegrationTestGroup test = IntegrationTestParser.fromXml(doc);
+        test.setSite(site);
         test.setGroup(site.getName());
         logger.debug("Registering integration test " + test.getClass());
         bundleContext.registerService(IntegrationTest.class.getName(), test, null);

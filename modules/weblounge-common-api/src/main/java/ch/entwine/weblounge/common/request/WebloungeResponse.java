@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.request;
 
 import ch.entwine.weblounge.common.content.Taggable;
+import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 
 import java.io.IOException;
 
@@ -32,6 +33,9 @@ import javax.servlet.http.HttpServletResponse;
  * server side caching of the response stream.
  */
 public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTag> {
+
+  /** Marker in the response to identify the correct place for headers */
+  String HTML_HEADER_MARKER = "<webl:headers/>";
 
   /**
    * Starts a cacheable response. By calling this method, the response output
@@ -130,6 +134,22 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
    * @see #invalidate()
    */
   boolean isValid();
+
+  /**
+   * Adds the header which will be written to the response if an
+   * <code>HTMLHeaderTag</code> is found in the document body.
+   * 
+   * @param header
+   *          the html header
+   */
+  void addHTMLHeader(HTMLHeadElement header);
+
+  /**
+   * Returns the header elements.
+   * 
+   * @return the headers
+   */
+  HTMLHeadElement[] getHTMLHeaders();
 
   /**
    * Returns the response status.

@@ -53,7 +53,7 @@ public class TestSite extends SiteImpl {
   private static final String TEST_PKG = "ch/entwine/weblounge/test/harness";
 
   /** The registered integration tests */
-  private List<ServiceRegistration> integrationTestRegistrations = new ArrayList<ServiceRegistration>();
+  private final List<ServiceRegistration> integrationTestRegistrations = new ArrayList<ServiceRegistration>();
 
   /**
    * Creates a new test site implementation.
@@ -134,6 +134,7 @@ public class TestSite extends SiteImpl {
         if (!implementsInterface && !extendsBaseClass)
           continue;
         IntegrationTest test = (IntegrationTest) c.newInstance();
+        test.setSite(this);
         tests.add(test);
       } catch (InstantiationException e) {
         logger.error("Error creating instance of integration test " + c);

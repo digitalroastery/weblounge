@@ -38,6 +38,7 @@ import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
 import org.im4java.core.Info;
 import org.im4java.process.OutputConsumer;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,10 +63,34 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
   private static final Logger logger = LoggerFactory.getLogger(ImageMagickPreviewGenerator.class);
 
   /** List of supported formats (cached) */
-  private Map<String, Boolean> supportedFormats = new HashMap<String, Boolean>();
+  private final Map<String, Boolean> supportedFormats = new HashMap<String, Boolean>();
 
   /** Flag to indicate whether format detection is supported */
   private boolean formatDecetionSupported = true;
+
+  /** The image magic temp directory */
+  private File imageMagickDir = null;
+
+  /**
+   * Called by the {@link ImageMagickActivator} on service activation.
+   * 
+   * @param ctx
+   *          the component context
+   */
+  void activate(ComponentContext ctx) {
+    try {
+      prepareDirectory();
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Called by the {@link ImageMagickActivator} on service inactivation.
+   */
+  void deactivate() {
+    FileUtils.deleteQuietly(imageMagickDir);
+  }
 
   /**
    * {@inheritDoc}
@@ -266,9 +292,10 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       return;
     }
 
-    File originalFile = File.createTempFile("image-", "." + format);
-    File scaledFile = File.createTempFile("image-scaled", "." + format);
-    File croppedFile = File.createTempFile("image-cropped", "." + format);
+    String uuid = UUID.randomUUID().toString();
+    File originalFile = new File(imageMagickDir, "image-" + uuid + "." + format);
+    File scaledFile = new File(imageMagickDir, "image-scaled-" + uuid + "." + format);
+    File croppedFile = new File(imageMagickDir, "image-cropped-" + uuid + "." + format);
 
     try {
 
@@ -335,7 +362,8 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
         IMOperation cropOperation = new IMOperation();
         cropOperation.addImage(scaledFile.getAbsolutePath());
         cropOperation.crop(croppedWidth, croppedHeight, croppedLeft, croppedTop);
-        cropOperation.p_repage(); // Reset the page canvas and position to match the actual cropped image
+        cropOperation.p_repage(); // Reset the page canvas and position to match
+        // the actual cropped image
         cropOperation.addImage(croppedFile.getAbsolutePath());
         imageMagick.run(cropOperation);
         finalFile = croppedFile;
@@ -357,6 +385,21 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       FileUtils.deleteQuietly(scaledFile);
       FileUtils.deleteQuietly(croppedFile);
     }
+  }
+
+  /**
+   * Makes sure that a temp directory exists.
+   * 
+   * @throws IOException
+   *           if the directory cannot be created
+   */
+  private void prepareDirectory() throws IOException {
+    imageMagickDir = new File(FileUtils.getTempDirectory(), "imagemagick");
+    if (!imageMagickDir.isDirectory() && !imageMagickDir.mkdirs()) {
+      logger.error("Unable to create temp directory for ImageMagick at {}", imageMagickDir);
+      throw new IOException("Unable to create temp directory for ImageMagick at " + imageMagickDir);
+    }
+
   }
 
 }

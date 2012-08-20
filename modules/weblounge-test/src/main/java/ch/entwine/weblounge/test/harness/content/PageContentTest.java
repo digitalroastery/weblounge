@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.test.harness.content;
 
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -38,7 +40,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -85,28 +86,18 @@ public class PageContentTest extends IntegrationTestBase {
   }
 
   /**
-   * Runs this test on the instance running at
-   * <code>http://127.0.0.1:8080</code>.
-   * 
-   * @throws Exception
-   *           if the test fails
-   */
-  @Test
-  public void execute() throws Exception {
-    execute("http://127.0.0.1:8080");
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   @Override
-  public void execute(String serverUrl) throws Exception {
+  public void execute(String serverUrl)
+      throws Exception {
     testPage(serverUrl);
     testNonExistingPage(serverUrl);
     testWorkPage(serverUrl);
     testPageAsEditor(serverUrl);
+    testComposerInheritance(serverUrl);
   }
 
   /**
@@ -196,6 +187,32 @@ public class PageContentTest extends IntegrationTestBase {
         // Test for template replacement
         assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${module.root}')]"));
         assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${site.root}')]"));
+
+        // Test for reflection of current environment
+        String scriptUrl = XPathHelper.valueOf(xml, "/html/head/script[contains(@src, 'greeting.js')]/@src");
+        assertNotNull("Script include failed", scriptUrl);
+        String stylesheetUrl = XPathHelper.valueOf(xml, "/html/head/link[contains(@href, 'greeting.css')]/@href");
+        assertNotNull("Stylesheet include failed", stylesheetUrl);
+        switch (environment) {
+          case Any:
+            fail("Environment has not yet been initialized");
+            break;
+          case Development:
+            assertTrue("Script url does not reflect environment", scriptUrl.startsWith("http://localhost:8080"));
+            assertTrue("Stylesheet url does not reflect environment", stylesheetUrl.startsWith("http://localhost:8080"));
+            break;
+          case Production:
+            assertTrue("Script url does not reflect environment", scriptUrl.startsWith("http://test:8080"));
+            assertTrue("Stylesheet url does not reflect environment", stylesheetUrl.startsWith("http://test:8080"));
+            break;
+          case Staging:
+            assertTrue("Script url does not reflect environment", scriptUrl.startsWith("http://127.0.0.1:8080"));
+            assertTrue("Stylesheet url does not reflect environment", stylesheetUrl.startsWith("http://127.0.0.1:8080"));
+            break;
+          default:
+            fail("Unknown environment " + environment + " encountered");
+            break;
+        }
 
         // Test ETag header
         Header eTagHeader = response.getFirstHeader("ETag");
@@ -300,6 +317,75 @@ public class PageContentTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
+  }
+
+  /**
+   * Tests the delivery of inherited page content.
+   * 
+   * @param serverUrl
+   *          the base server url
+   * @throws Exception
+   *           if the test fails
+   */
+  private void testComposerInheritance(String serverUrl) throws Exception {
+    logger.info("Preparing test of inherited page content");
+
+    // Prepare the request
+    logger.info("Testing inherited page output");
+
+    String requestUrl = UrlUtils.concat(serverUrl, "/test/ghost/inheriting");
+
+    logger.info("Sending request to {}", requestUrl);
+    HttpGet request = new HttpGet(requestUrl);
+
+    String eTagValue;
+    Date modificationDate = null;
+
+    // Send and the request and examine the response
+    logger.debug("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+      // Get the document contents
+      Document xml = TestUtils.parseXMLResponse(response);
+
+      // Test template output
+      String templateOutput = XPathHelper.valueOf(xml, "/html/head/title");
+      assertNotNull("General template output does not work", templateOutput);
+      assertEquals("Template title is not as expected", "Weblounge Test Site Ghost Template", templateOutput);
+
+      // Look for inherited pagelets
+      String text = XPathHelper.valueOf(xml, "/html/body/div[@id='main']//div[@class='greeting']");
+      assertNotNull("Content of pagelet element 'include' not found", text);
+      logger.debug("Found inherited pagelet content");
+
+      // Look for inherited pagelet header includes
+      assertEquals("Pagelet include failed", "1", XPathHelper.valueOf(xml, "count(/html/head/link[contains(@href, 'greeting.css')])"));
+      logger.debug("Found pagelet stylesheet include");
+
+      // Test for template replacement
+      assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${module.root}')]"));
+      assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${site.root}')]"));
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("ETag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
+
+      // Test Last-Modified header
+      Header modifiedHeader = response.getFirstHeader("Last-Modified");
+      assertNotNull(modifiedHeader);
+      modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
+
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
+    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
 }

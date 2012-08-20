@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.taglib;
 
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -41,6 +42,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.ServletResponseWrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TryCatchFinally;
@@ -473,9 +475,9 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
   }
 
   /**
-   * Returns the standard attributes ready to inserted in an html tag.
+   * Returns the standard attributes ready to inserted in an HTML tag.
    * 
-   * @return the standard html attributes
+   * @return the standard HTML attributes
    */
   protected Map<String, String> getStandardAttributes() {
     Map<String, String> attributes = new HashMap<String, String>();
@@ -527,6 +529,7 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
    * 
    * @see javax.servlet.jsp.tagext.Tag#setPageContext(javax.servlet.jsp.PageContext)
    */
+  @Override
   public void setPageContext(PageContext ctxt) {
     super.setPageContext(ctxt);
     request = unwrapRequest(pageContext.getRequest());
@@ -683,11 +686,28 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
     }
 
     // Last resort
-    if (request instanceof HttpServletRequest)
+    if (request instanceof HttpServletRequest) {
+      logger.warn("Found vanilla servlet request, defaulting to production environment");
+      // TOOD: Properly determine the environment
       return new WebloungeRequestImpl((HttpServletRequest) request, Environment.Production);
-    // TOOD: Properly determin the environment
+    }
 
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
+   */
+  @Override
+  public int doStartTag() throws JspException {
+
+    // Don't do work if not needed (which is the case during precompilation)
+    if (RequestUtils.isPrecompileRequest(request))
+      return SKIP_BODY;
+
+    return super.doStartTag();
   }
 
   /**

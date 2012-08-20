@@ -119,10 +119,10 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   private Environment environment = Environment.Production;
 
   /** Init parameters for jetty */
-  private TreeMap<String, String> jasperConfig = new TreeMap<String, String>();
+  private final TreeMap<String, String> jasperConfig = new TreeMap<String, String>();
 
   /** Maps sites to site servlets */
-  private Map<Site, SiteServlet> siteServlets = new HashMap<Site, SiteServlet>();
+  private final Map<Site, SiteServlet> siteServlets = new HashMap<Site, SiteServlet>();
 
   /** The site servlet registrations */
   private Map<Site, ServiceRegistration> servletRegistrations = null;
@@ -137,7 +137,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   private boolean precompile = true;
 
   /** List of precompilers */
-  private WeakHashMap<Site, Precompiler> precompilers = new WeakHashMap<Site, Precompiler>();
+  private final WeakHashMap<Site, Precompiler> precompilers = new WeakHashMap<Site, Precompiler>();
 
   /** True to log errors that appear during precompilation */
   private boolean logCompileErrors = false;
@@ -153,7 +153,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    *           if service configuration fails
    */
   void activate(ComponentContext context) throws IOException,
-      ConfigurationException {
+  ConfigurationException {
 
     BundleContext bundleContext = context.getBundleContext();
     logger.info("Starting site dispatcher");
@@ -449,6 +449,8 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
             needsCompilation = false;
             logger.info("Site '{}' has already been precompiled on {}", site.getIdentifier(), compileDate);
           }
+        } else {
+          logger.info("Precompilation status cannot be determined, consider deploying a preferences service implementation");
         }
 
         // Does the scratch dir exist?

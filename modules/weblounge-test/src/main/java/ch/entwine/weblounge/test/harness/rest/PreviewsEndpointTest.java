@@ -17,14 +17,12 @@ import ch.entwine.weblounge.test.util.TestSiteUtils;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -98,7 +96,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
     styles.add(new ImageStyleImpl("width", BOX_WIDTH, -1, ImageScalingMode.Width, false));
     styles.add(new ImageStyleImpl("height", -1, BOX_HEIGHT, ImageScalingMode.Height, false));
     styles.add(new ImageStyleImpl("none", -1, -1, ImageScalingMode.None, false));
-    styles.add(new ImageStyleImpl("weblounge-ui:preview", PREVIEW_WIDTH, PREVIEW_HEIGHT, ImageScalingMode.Cover, false));
+    styles.add(new ImageStyleImpl("weblounge-ui-preview", PREVIEW_WIDTH, PREVIEW_HEIGHT, ImageScalingMode.Cover, false));
   }
 
   public PreviewsEndpointTest() {
@@ -106,22 +104,11 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
   }
 
   /**
-   * Runs this test on the instance running at
-   * <code>http://127.0.0.1:8080</code>.
-   * 
-   * @throws Exception
-   *           if the test fails
-   */
-  @Test
-  public void execute() throws Exception {
-    execute("http://127.0.0.1:8080");
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
+  @Override
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of previews endpoint");
 
@@ -215,9 +202,10 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
     Date modificationDate = null;
+    String[][] params = new String[][] { { "force", "true" } };
     logger.info("Requesting image preview at {}", requestUrl);
     try {
-      HttpResponse response = TestUtils.request(httpClient, getPreviewRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, getPreviewRequest, params);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -227,7 +215,6 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       assertEquals(1, response.getHeaders("Content-Disposition").length);
 
       SeekableStream seekableInputStream = null;
-      StringBuilder fileName = new StringBuilder(FilenameUtils.getBaseName(filename));
       try {
         // Test file size
         if (!ImageScalingMode.None.equals(imageStyle.getScalingMode())) {
@@ -246,7 +233,6 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
           int imageHeight = image.getHeight();
           assertTrue((int) (scaledHeight) == imageHeight || (int) (scaledHeight) + 1 == imageHeight || (int) (scaledHeight) - 1 == imageHeight);
           assertTrue((int) (scaledWidth) == imageWidth || (int) (scaledWidth) + 1 == imageWidth || (int) (scaledWidth) - 1 == imageWidth);
-          fileName.append("-0-en");
         } else {
           response.getEntity().consumeContent();
         }
@@ -255,9 +241,8 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
       }
 
       // Test filename
-      fileName.append(".").append(FilenameUtils.getExtension(filename));
       String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
-      assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
+      assertTrue(contentDisposition.startsWith("inline; filename=" + filename.toString()));
 
       // Test ETag header
       Header eTagHeader = response.getFirstHeader("ETag");
@@ -286,7 +271,8 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
     String eTagValue = null;
     Date modificationDate = null;
     logger.info("Requesting image preview at {}", requestUrl);
-    HttpResponse response = TestUtils.request(httpClient, getPreviewRequest, null);
+    String[][] params = new String[][] { { "force", "true" } };
+    HttpResponse response = TestUtils.request(httpClient, getPreviewRequest, params);
     if (ImageScalingMode.None.equals(imageStyle.getScalingMode())) {
       assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() < 1);
@@ -302,7 +288,7 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
         assertEquals(1, response.getHeaders("Content-Disposition").length);
 
         // Test filename
-        StringBuilder fileName = new StringBuilder(pageId).append("-0-fr.png");
+        StringBuilder fileName = new StringBuilder(pageId).append("-").append(imageStyle.getIdentifier()).append(".png");
         String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
         assertTrue(contentDisposition.startsWith("inline; filename=" + fileName.toString()));
 

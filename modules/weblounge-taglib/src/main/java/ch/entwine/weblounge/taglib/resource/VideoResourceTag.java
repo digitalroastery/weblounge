@@ -85,7 +85,13 @@ public class VideoResourceTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
+  @Override
   public int doStartTag() throws JspException {
+
+    // Don't do work if not needed (which is the case during precompilation)
+    if (RequestUtils.isPrecompileRequest(request))
+      return SKIP_BODY;
+
     Site site = request.getSite();
     Language language = request.getLanguage();
 
@@ -103,8 +109,6 @@ public class VideoResourceTag extends WebloungeTag {
       uri = new MovieResourceURIImpl(site, null, videoId);
     } else if (StringUtils.isNotBlank(videoResourcePath)) {
       uri = new MovieResourceURIImpl(site, videoResourcePath);
-    } else if (RequestUtils.isMockRequest(request)) {
-      return SKIP_BODY;
     } else {
       throw new JspException("Neither video id nor video path were specified");
     }
@@ -153,6 +157,7 @@ public class VideoResourceTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
    */
+  @Override
   public int doEndTag() throws JspException {
     removeAndUnstashAttributes();
     return super.doEndTag();

@@ -23,6 +23,8 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Composer;
+import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
@@ -114,7 +116,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     synchronized (urlCache) {
       for (RequestFlavor flavor : action.getFlavors()) {
         WebUrl actionUrl = new WebUrlImpl(action.getSite(), action.getPath(), Resource.LIVE, flavor);
-        String normalizedUrl = actionUrl.normalize(false, false, false, true);
+        String normalizedUrl = actionUrl.normalize(false, false, true);
         urlCache.put(normalizedUrl, pool);
         if (flavors.length() > 0)
           flavors.append(",");
@@ -196,11 +198,24 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     try {
 
       // Check the request method. We won't handle just everything
-      String requestMethod = request.getMethod();
-      if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
-        logger.debug("Actions are not supposed to handle {} requests", requestMethod);
-        DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
-        return true;
+      String requestMethod = request.getMethod().toUpperCase();
+      if (!action.supportsMethod(requestMethod)) {
+        if ("OPTIONS".equals(requestMethod)) {
+          StringBuffer verbs = new StringBuffer();
+          for (String verb : action.getMethods()) {
+            if (verbs.length() > 0)
+              verbs.append(",");
+            verbs.append(verb);
+          }
+          logger.trace("Answering options request to {} with {}", action, verbs.toString());
+          response.setHeader("Allow", verbs.toString());
+          response.setContentLength(0);
+          return true;
+        } else {
+          logger.debug("Action {} does not support {} requests", action, requestMethod);
+          DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
+          return true;
+        }
       }
 
       // Check for explicit no cache instructions
@@ -332,6 +347,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     // Finally, let's get some work done!
     try {
       request.setAttribute(WebloungeRequest.ACTION, action);
+
+      // Add the action's HTML header elements to the response if it's not
+      // only used in editing mode
+      for (HTMLHeadElement header : action.getHTMLHeaders()) {
+        if (!HTMLInclude.Use.Editor.equals(header.getUse()))
+          response.addHTMLHeader(header);
+      }
 
       // Prepare the action by storing initial values for page and template
       if (action instanceof HTMLAction) {
@@ -665,7 +687,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    * @return the handler
    */
   private ActionPool getActionForUrl(WebUrl url, RequestFlavor flavor) {
-    String normalizedUrl = url.normalize(false, false, false, true);
+    String normalizedUrl = url.normalize(false, false, true);
 
     // Try to use the url cache
     ActionPool actionPool = urlCache.get(normalizedUrl);

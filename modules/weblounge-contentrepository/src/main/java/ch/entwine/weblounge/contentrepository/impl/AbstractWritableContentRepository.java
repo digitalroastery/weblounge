@@ -32,7 +32,6 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation;
@@ -45,21 +44,18 @@ import ch.entwine.weblounge.common.content.repository.MoveOperation;
 import ch.entwine.weblounge.common.content.repository.PutContentOperation;
 import ch.entwine.weblounge.common.content.repository.PutOperation;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
+import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.content.repository.UnlockOperation;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
-import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
-import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
-import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.security.User;
-import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -112,9 +108,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** Holds pages while they are written to the index */
   protected OperationProcessor processor = null;
 
-  /** The image style tracker */
-  private ImageStyleTracker imageStyleTracker = null;
-
   /** The response cache tracker */
   private ResponseCacheTracker responseCacheTracker = null;
 
@@ -135,9 +128,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /** Flag to indicate off-site indexing */
   protected boolean indexingOffsite = false;
-
-  /** the preview generator creates PNG's by default */
-  private static final String PREVIEW_FORMAT = "png";
 
   /**
    * Creates a new instance of the content repository.
@@ -176,8 +166,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     Bundle bundle = loadBundle(site);
     if (bundle != null) {
-      imageStyleTracker = new ImageStyleTracker(bundle.getBundleContext());
-      imageStyleTracker.open();
       responseCacheTracker = new ResponseCacheTracker(bundle.getBundleContext(), site.getIdentifier());
       responseCacheTracker.open();
       environmentTracker = new EnvironmentTracker(bundle.getBundleContext(), this);
@@ -203,12 +191,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     Bundle bundle = loadBundle(site);
     if (bundle == null || bundle.getState() != Bundle.ACTIVE)
       return;
-
-    // Close the image style tracker
-    if (imageStyleTracker != null) {
-      imageStyleTracker.close();
-      imageStyleTracker = null;
-    }
 
     // Close the cache tracker
     if (responseCacheTracker != null) {
@@ -252,7 +234,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         page.setTemplate(site.getDefaultTemplate().getIdentifier());
         page.setCreated(siteAdmininstrator, new Date());
         page.setPublished(siteAdmininstrator, new Date(), null);
-        put(page);
+        put(page, true);
         logger.info("Created homepage for {}", site.getIdentifier());
       } catch (IOException e) {
         logger.warn("Error creating home page in empty site '{}': {}", site.getIdentifier(), e.getMessage());
@@ -393,6 +375,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     ContentRepositoryOperation<?> lockOperation = CurrentOperation.get();
     for (ResourceURI u : getVersions(uri)) {
       Resource<?> r = get(u);
+      if (r == null) {
+        logger.debug("Version {} of {} has been removed in the meantime", u.getVersion(), u);
+        continue;
+      }
       r.lock(user);
       PutOperation putOp = new PutOperationImpl(r, false);
       try {
@@ -539,7 +525,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Is this a new request or a scheduled asynchronous execution?
     if (!(CurrentOperation.get() instanceof DeleteOperation)) {
-      return deleteAsynchronously(uri, allRevisions).get();
+      DeleteOperation deleteOperation = deleteAsynchronously(uri, allRevisions);
+      if (deleteOperation == null)
+        return true;
+      return deleteOperation.get();
     }
 
     // Check if resource is in temporary cache already by another operation
@@ -572,7 +561,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       revisions = index.getRevisions(uri);
     }
 
-    // Delete resources
+    // Delete resources, but get an in-memory representation first
+    Resource<?> resource = ((DeleteOperation) CurrentOperation.get()).getResource();
     deleteResource(uri, revisions);
 
     // Delete the index entries
@@ -581,7 +571,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Delete previews
-    deletePreviews(uri);
+    deletePreviews(resource);
 
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
@@ -606,7 +596,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    DeleteOperation deleteOperation = new DeleteOperationImpl(uri, allRevisions);
+    Resource<?> resource = get(uri);
+    if (resource == null)
+      return null;
+    DeleteOperation deleteOperation = new DeleteOperationImpl(resource, allRevisions);
     processor.enqueue(deleteOperation);
     return deleteOperation;
   }
@@ -766,7 +759,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // Create an asynchronous operation representation and return it
-    PutOperation putOperation = new PutOperationImpl(resource, true);
+    PutOperation putOperation = new PutOperationImpl(resource, false);
     processor.enqueue(putOperation);
     return putOperation;
   }
@@ -983,7 +976,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     index.update(resource);
 
     // Delete previews
-    deletePreviews(uri, content.getLanguage());
+    deletePreviews(resource, content.getLanguage());
 
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
@@ -1189,7 +1182,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *           if accessing a file fails
    */
   protected long index(ContentRepositoryIndex idx, String resourceType)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
 
     // Temporary path for rebuilt site
     String resourceDirectory = resourceType + "s";
@@ -1216,10 +1209,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     long resourceCount = 0;
     long resourceVersionCount = 0;
+    ResourceSelector selector = new ResourceSelectorImpl(site).withTypes(resourceType);
 
     // Ask for all existing resources of the current type and index them
-    List<ResourceURI> uris = listResources(resourceType);
-    for (ResourceURI uri : uris) {
+    for (ResourceURI uri : list(selector)) {
       try {
         Resource<?> resource = null;
         ResourceReader<?, ?> reader = serializer.getReader();
@@ -1262,19 +1255,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     return resourceCount;
   }
-
-  /**
-   * Returns a list of resources of the given type that are available in the
-   * content repository.
-   * 
-   * @param resourceType
-   *          the resource type
-   * @return the resource URIs
-   * @throws IOException
-   *           if loading the list of resources failed
-   */
-  protected abstract List<ResourceURI> listResources(String resourceType)
-      throws IOException;
 
   /**
    * {@inheritDoc}
@@ -1393,91 +1373,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   protected abstract <C extends ResourceContent, R extends Resource<C>> void deleteResourceContent(
       ResourceURI uri, C content) throws IOException;
-
-  /**
-   * Creates the previews for this resource in all languages and for all known
-   * image styles.
-   * 
-   * @param resource
-   *          the resource
-   * @param languages
-   *          the languages to build the previews for
-   */
-  protected void createPreviews(final Resource<?> resource,
-      Language... languages) {
-
-    // Compile the full list of image styles
-    final List<ImageStyle> styles = new ArrayList<ImageStyle>();
-    if (imageStyleTracker != null)
-      styles.addAll(imageStyleTracker.getImageStyles());
-    for (Module m : getSite().getModules()) {
-      styles.addAll(Arrays.asList(m.getImageStyles()));
-    }
-
-    // If no language has been specified, we create the preview for all
-    // languages
-    if (languages == null || languages.length == 0) {
-      languages = resource.getURI().getSite().getLanguages();
-    }
-
-    // Create the previews
-    for (Language language : languages) {
-      PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, resource, environment, language, styles, PREVIEW_FORMAT);
-      Thread t = new Thread(previewWorker);
-      t.setPriority(Thread.MIN_PRIORITY);
-      t.setDaemon(true);
-      t.start();
-    }
-
-  }
-
-  /**
-   * Deletes the previews for this resource in all languages and for all known
-   * image styles.
-   * 
-   * @param uri
-   *          the resource uri
-   */
-  protected void deletePreviews(ResourceURI uri) {
-    deletePreviews(uri, null);
-  }
-
-  /**
-   * Deletes the previews for this resource in the given languages and for all
-   * known image styles.
-   * 
-   * @param uri
-   *          the resource uri
-   * @param language
-   *          the language
-   */
-  protected void deletePreviews(ResourceURI uri, Language language) {
-    // Compile the full list of image styles
-    List<ImageStyle> styles = new ArrayList<ImageStyle>();
-    if (imageStyleTracker != null)
-      styles.addAll(imageStyleTracker.getImageStyles());
-    for (Module m : getSite().getModules()) {
-      styles.addAll(Arrays.asList(m.getImageStyles()));
-    }
-
-    for (ImageStyle style : styles) {
-      File styledImage = null;
-
-      // Create the path to a sample image
-      if (language != null) {
-        styledImage = ImageStyleUtils.getScaledFile(uri, "test." + PREVIEW_FORMAT, language, style);
-      } else {
-        styledImage = ImageStyleUtils.getScaledFile(uri, "test." + PREVIEW_FORMAT, LanguageUtils.getLanguage("en"), style);
-        styledImage = styledImage.getParentFile();
-      }
-
-      // Remove the parent's directory, which will include the specified
-      // previews
-      File dir = styledImage.getParentFile();
-      logger.debug("Deleting previews in {}", dir.getAbsolutePath());
-      FileUtils.deleteQuietly(dir);
-    }
-  }
 
   /**
    * This class is used as a way to keep track of what has been added to the

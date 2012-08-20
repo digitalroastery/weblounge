@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.testing;
 
+import ch.entwine.weblounge.common.site.Environment;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.testing.IntegrationTest;
 
 /**
@@ -35,6 +37,12 @@ public abstract class IntegrationTestBase implements IntegrationTest {
 
   /** Execution order */
   protected int executionOrder = 0;
+
+  /** The site */
+  protected Site site = null;
+
+  /** The environment */
+  protected Environment environment = null;
 
   /**
    * Creates a new test base for an integration test with the given name.
@@ -85,6 +93,44 @@ public abstract class IntegrationTestBase implements IntegrationTest {
     this.name = name;
     this.groupName = groupName;
     this.executionOrder = executionOrder;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.testing.IntegrationTest#setSite(ch.entwine.weblounge.common.site.Site)
+   */
+  @Override
+  public void setSite(Site site) {
+    this.site = site;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.testing.IntegrationTest#init(ch.entwine.weblounge.common.site.Environment)
+   */
+  @Override
+  public void init(Environment environment) {
+    this.environment = environment;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.testing.IntegrationTest#getSite()
+   */
+  public Site getSite() {
+    return site;
+  }
+
+  /**
+   * Returns the current environment.
+   * 
+   * @return the environment
+   */
+  protected Environment getEnvironment() {
+    return environment;
   }
 
   /**

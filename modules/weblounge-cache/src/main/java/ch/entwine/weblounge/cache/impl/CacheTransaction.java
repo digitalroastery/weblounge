@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.cache.impl;
 
 import ch.entwine.weblounge.cache.StreamFilter;
+import ch.entwine.weblounge.common.impl.request.CachedOutputStream;
 import ch.entwine.weblounge.common.request.CacheHandle;
 import ch.entwine.weblounge.common.request.CacheTag;
 
@@ -36,7 +37,7 @@ final class CacheTransaction {
   private CacheHandle hnd = null;
 
   /** The associated cache output stream */
-  private CacheOutputStream os = new CacheOutputStream();
+  private CachedOutputStream os = new CachedOutputStream();
 
   /** The cached response meta info */
   private CacheableHttpServletResponseHeaders headers = new CacheableHttpServletResponseHeaders();
@@ -78,7 +79,7 @@ final class CacheTransaction {
    * 
    * @return the output stream
    */
-  CacheOutputStream getOutputStream() {
+  CachedOutputStream getOutputStream() {
     return os;
   }
 

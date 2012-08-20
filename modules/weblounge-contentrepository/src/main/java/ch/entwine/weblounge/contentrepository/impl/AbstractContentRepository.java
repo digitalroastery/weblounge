@@ -29,19 +29,25 @@ import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
+import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
+import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Environment;
+import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
@@ -60,11 +66,16 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,7 +88,7 @@ import javax.xml.transform.TransformerFactory;
 public abstract class AbstractContentRepository implements ContentRepository {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(AbstractContentRepository.class);
+  static final Logger logger = LoggerFactory.getLogger(AbstractContentRepository.class);
 
   /** The repository type */
   protected String type = null;
@@ -112,8 +123,23 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /** The environment */
   protected Environment environment = Environment.Production;
 
+  /** The image style tracker */
+  private ImageStyleTracker imageStyleTracker = null;
+
   /** The image preview generators */
   protected List<ImagePreviewGenerator> imagePreviewGenerators = new ArrayList<ImagePreviewGenerator>();
+
+  /** The resources for which preview generation is due */
+  private final Map<ResourceURI, PreviewOperation> previews = new HashMap<ResourceURI, PreviewOperation>();
+
+  /** Prioritized list of preview rendering operations */
+  private final Queue<PreviewOperation> previewOperations = new LinkedBlockingQueue<PreviewOperation>();
+
+  /** The preview operations that are being worked on at the moment */
+  private final List<PreviewOperation> currentPreviewOperations = new ArrayList<PreviewOperation>();
+
+  /** The maximum number of concurrent preview operations */
+  private final int maxPreviewOperations = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
 
   /**
    * Creates a new instance of the content repository.
@@ -161,6 +187,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throw new ContentRepositoryException("Error loading repository index", e);
     }
 
+    Bundle bundle = loadBundle(site);
+    if (bundle != null) {
+      imageStyleTracker = new ImageStyleTracker(bundle.getBundleContext());
+      imageStyleTracker.open();
+    }
+
     connected = true;
   }
 
@@ -172,6 +204,13 @@ public abstract class AbstractContentRepository implements ContentRepository {
   public void disconnect() throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Cannot stop a disconnected content repository");
+
+    // Close the image style tracker
+    if (imageStyleTracker != null) {
+      imageStyleTracker.close();
+      imageStyleTracker = null;
+    }
+
     try {
       connected = false;
       index.close();
@@ -273,9 +312,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @SuppressWarnings("unchecked")
-  public <R extends Resource<?>> R get(
-      ResourceURI uri)
-          throws ContentRepositoryException {
+  public <R extends Resource<?>> R get(ResourceURI uri)
+      throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
@@ -399,56 +437,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri)
-      throws ContentRepositoryException {
-    if (!isStarted())
-      throw new IllegalStateException("Content repository is not connected");
-    return list(uri, Integer.MAX_VALUE, -1);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      long[])
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, long version)
-      throws ContentRepositoryException {
-    return list(uri, Integer.MAX_VALUE, version);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      int)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, int level)
-      throws ContentRepositoryException {
-    return list(uri, level, -1);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * This implementation uses the index to get the list.
-   * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      int, long)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
-      throws ContentRepositoryException {
-    if (!isStarted())
-      throw new IllegalStateException("Content repository is not connected");
-
-    return index.list(uri, level, version);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getResourceCount()
    */
   public long getResourceCount() {
@@ -522,6 +510,63 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.repository.ResourceSelector)
+   */
+  public Collection<ResourceURI> list(ResourceSelector selector)
+      throws ContentRepositoryException {
+
+    int index = -1;
+    int selected = 0;
+
+    Collection<ResourceURI> uris = null;
+    Collection<ResourceURI> result = new ArrayList<ResourceURI>();
+
+    List<?> selectedTypes = Arrays.asList(selector.getTypes());
+    List<?> forbiddenTypes = Arrays.asList(selector.getWithoutTypes());
+    List<?> selectedIds = Arrays.asList(selector.getIdentifiers());
+    List<?> selectedVersions = Arrays.asList(selector.getVersions());
+
+    try {
+      uris = listResources();
+    } catch (IOException e) {
+      logger.error("Error reading available uris: {}", e.getMessage());
+      throw new ContentRepositoryException(e);
+    }
+
+    for (ResourceURI uri : uris) {
+
+      // Rule out types that we don't need
+      if (!selectedTypes.isEmpty() && !selectedTypes.contains(uri.getType()))
+        continue;
+      if (!forbiddenTypes.isEmpty() && forbiddenTypes.contains(uri.getType()))
+        continue;
+
+      // Rule out resources we are not interested in
+      if (!selectedIds.isEmpty() && !selectedIds.contains(uri.getIdentifier()))
+        continue;
+      if (!selectedVersions.isEmpty() && !selectedVersions.contains(uri.getVersion()))
+        continue;
+
+      index++;
+
+      // Skip everything below the offset
+      if (index < selector.getOffset())
+        continue;
+
+      result.add(uri);
+      selected++;
+
+      // Only collect as many items as we need
+      if (selector.getLimit() > 0 && selected == selector.getLimit())
+        break;
+    }
+
+    return result;
+  }
+
+  /**
    * Returns <code>true</code> if the repository is connected and started.
    * 
    * @return <code>true</code> if the repository is started
@@ -529,6 +574,15 @@ public abstract class AbstractContentRepository implements ContentRepository {
   protected boolean isStarted() {
     return connected;
   }
+
+  /**
+   * Lists the resources in the content repository.
+   * 
+   * @return the list of resources
+   * @throws IOException
+   *           if listing the resources fails
+   */
+  protected abstract Collection<ResourceURI> listResources() throws IOException;
 
   /**
    * Loads and returns the resource from the repository.
@@ -729,6 +783,210 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#createPreviews()
+   */
+  @Override
+  public void createPreviews() throws ContentRepositoryException {
+    Collection<ResourceURI> uris = null;
+    logger.info("Starting preview generation");
+
+    // Load the uris
+    try {
+      uris = listResources();
+    } catch (IOException e) {
+      logger.warn("Error retrieving list of resources: {}", e.getMessage());
+      return;
+    }
+
+    // Initiate preview generation
+    for (ResourceURI uri : uris) {
+      Resource<?> resource = get(uri);
+      if (resource == null) {
+        logger.warn("Skipping missing {} for preview generation", uri);
+        continue;
+      }
+      createPreviews(resource, site.getLanguages());
+    }
+
+  }
+
+  /**
+   * Creates the previews for this resource in all languages and for all known
+   * image styles. The implementation ensures that there is only one preview
+   * renderer running per resource.
+   * 
+   * @param resource
+   *          the resource
+   * @param languages
+   *          the languages to build the previews for
+   */
+  protected void createPreviews(final Resource<?> resource,
+      Language... languages) {
+
+    ResourceURI uri = resource.getURI();
+
+    // Compile the full list of image styles
+    final List<ImageStyle> styles = new ArrayList<ImageStyle>();
+    if (imageStyleTracker == null) {
+      logger.info("Skipping preview generation for {}: image styles are unavailable", uri);
+      return;
+    }
+
+    // Add the global image styles as well as those for the site
+    styles.addAll(imageStyleTracker.getImageStyles());
+    for (Module m : getSite().getModules()) {
+      styles.addAll(Arrays.asList(m.getImageStyles()));
+    }
+
+    // If no language has been specified, we create the preview for all
+    // languages
+    if (languages == null || languages.length == 0) {
+      languages = uri.getSite().getLanguages();
+    }
+
+    // Create the previews
+    PreviewOperation previewOp = null;
+    synchronized (currentPreviewOperations) {
+
+      // is there an existing operation for this resource? If so, simply update
+      // it and be done.
+      previewOp = previews.get(uri);
+      if (previewOp != null) {
+        logger.debug("Adding languages and styles to {} for preview generation", uri);
+        previewOp.addLanguages(Arrays.asList(languages));
+        previewOp.addStyles(styles);
+        return;
+      }
+
+      // Otherwise, a new preview generator needs to be started.
+      previewOp = new PreviewOperation(resource, Arrays.asList(languages), styles, ImageStyleUtils.DEFAULT_PREVIEW_FORMAT);
+
+      // Make sure nobody is working on the same resource at the moment
+      if (currentPreviewOperations.contains(previewOp)) {
+        logger.debug("Queing concurring creation of preview for {}", uri);
+        previews.put(uri, previewOp);
+        previewOperations.add(previewOp);
+        return;
+      }
+
+      // If there is enough being worked on already, there is nothing we can do
+      // right now, the work will be picked up later on
+      if (currentPreviewOperations.size() >= maxPreviewOperations) {
+        logger.debug("Queing creation of preview for {}", uri);
+        previews.put(uri, previewOp);
+        previewOperations.add(previewOp);
+        logger.debug("Preview generation queue now contains {} resources", previews.size());
+        return;
+      }
+
+      // It seems like it is safe to start the preview generation
+      currentPreviewOperations.add(previewOp);
+      PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, previewOp.getResource(), environment, previewOp.getLanguages(), previewOp.getStyles(), previewOp.getFormat());
+      Thread t = new Thread(previewWorker);
+      t.setPriority(Thread.MIN_PRIORITY);
+      t.setDaemon(true);
+
+      logger.info("Creating preview of {}", uri);
+      t.start();
+    }
+  }
+
+  /**
+   * Callback for the preview renderer to indicate a finished rendering
+   * operation.
+   * 
+   * @param resource
+   *          the resource
+   */
+  void previewCreated(Resource<?> resource) {
+    synchronized (currentPreviewOperations) {
+
+      // Do the cleanup
+      for (Iterator<PreviewOperation> i = currentPreviewOperations.iterator(); i.hasNext();) {
+        Resource<?> r = i.next().getResource();
+        if (r.equals(resource)) {
+          logger.debug("Preview creation of {} finished", r.getURI());
+          i.remove();
+          break;
+        }
+      }
+
+      // Is there more work to do?
+      if (!previewOperations.isEmpty() && currentPreviewOperations.size() < maxPreviewOperations) {
+
+        // Get the next operation and do the bookkeeping
+        PreviewOperation op = previewOperations.remove();
+        Resource<?> r = op.getResource();
+        currentPreviewOperations.add(op);
+        previews.remove(r.getURI());
+
+        // Finally start the generation
+        PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, r, environment, op.getLanguages(), op.getStyles(), op.getFormat());
+        Thread t = new Thread(previewWorker);
+        t.setPriority(Thread.MIN_PRIORITY);
+        t.setDaemon(true);
+
+        logger.info("Creating preview of {}", r.getURI());
+        logger.trace("There are {} more preview operations waiting", previewOperations.size());
+        logger.trace("Currently using {} out of {} preview creation slots", currentPreviewOperations.size(), maxPreviewOperations);
+        t.start();
+      } else {
+        logger.debug("No more resources queued for preview creation");
+      }
+    }
+  }
+
+  /**
+   * Deletes the previews for this resource in all languages and for all known
+   * image styles.
+   * 
+   * @param resource
+   *          the resource
+   */
+  protected void deletePreviews(Resource<?> resource) {
+    deletePreviews(resource, null);
+  }
+
+  /**
+   * Deletes the previews for this resource in the given languages and for all
+   * known image styles.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   */
+  protected void deletePreviews(Resource<?> resource, Language language) {
+    // Compile the full list of image styles
+    List<ImageStyle> styles = new ArrayList<ImageStyle>();
+    if (imageStyleTracker != null)
+      styles.addAll(imageStyleTracker.getImageStyles());
+    for (Module m : getSite().getModules()) {
+      styles.addAll(Arrays.asList(m.getImageStyles()));
+    }
+
+    for (ImageStyle style : styles) {
+      File styledImage = null;
+
+      // Create the path to a sample image
+      if (language != null) {
+        styledImage = ImageStyleUtils.getScaledFile(resource, language, style);
+      } else {
+        styledImage = ImageStyleUtils.getScaledFile(resource, LanguageUtils.getLanguage("en"), style);
+        styledImage = styledImage.getParentFile();
+      }
+
+      // Remove the parent's directory, which will include the specified
+      // previews
+      File dir = styledImage.getParentFile();
+      logger.debug("Deleting previews in {}", dir.getAbsolutePath());
+      FileUtils.deleteQuietly(dir);
+    }
+  }
+
+  /**
    * Callback from OSGi to set the environment.
    * 
    * @param environment
@@ -766,6 +1024,117 @@ public abstract class AbstractContentRepository implements ContentRepository {
     synchronized (imagePreviewGenerators) {
       imagePreviewGenerators.remove(generator);
     }
+  }
+
+  /**
+   * Data structure that is used to hold all relevant information for preview
+   * generation of a given resource.
+   */
+  private static final class PreviewOperation {
+
+    /** The resource to be rendered */
+    private Resource<?> resource = null;
+
+    /** List of languages that need to be rendered */
+    private final List<Language> languages = new ArrayList<Language>();
+
+    /** List of image styles that need to be rendered */
+    private final List<ImageStyle> styles = new ArrayList<ImageStyle>();
+
+    /** Name of the preview image format */
+    private String format = null;
+
+    /**
+     * Creates a new representation of a preview generation.
+     */
+    public PreviewOperation(Resource<?> resource, List<Language> languages,
+        List<ImageStyle> styles, String format) {
+      this.resource = resource;
+      this.languages.addAll(languages);
+      this.styles.addAll(styles);
+      this.format = format;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      return resource.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object op) {
+      return resource.equals(((PreviewOperation) op).getResource());
+    }
+
+    /**
+     * Returns the resource that is to be rendered.
+     * 
+     * @return the resource
+     */
+    public Resource<?> getResource() {
+      return resource;
+    }
+
+    /**
+     * Returns the languages that need preview generation.
+     * 
+     * @return the language
+     */
+    public List<Language> getLanguages() {
+      return languages;
+    }
+
+    /**
+     * Adds the languages to the list of languages.
+     * 
+     * @param languages
+     *          the languages to add
+     */
+    public void addLanguages(Collection<Language> languages) {
+      for (Language l : languages) {
+        if (!this.languages.contains(languages))
+          this.languages.add(l);
+      }
+    }
+
+    /**
+     * Returns the image styles.
+     * 
+     * @return the styles
+     */
+    public List<ImageStyle> getStyles() {
+      return styles;
+    }
+
+    /**
+     * Adds the image styles to the list of styles.
+     * 
+     * @param styles
+     *          the styles to add
+     */
+    public void addStyles(Collection<ImageStyle> styles) {
+      for (ImageStyle s : styles) {
+        if (!this.styles.contains(styles))
+          this.styles.add(s);
+      }
+    }
+
+    /**
+     * @return the format
+     */
+    public String getFormat() {
+      return format;
+    }
+
   }
 
 }

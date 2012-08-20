@@ -28,6 +28,8 @@ import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
+import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
@@ -112,13 +114,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     if (!HTML.equals(contentFlavor)) {
       logger.debug("Skipping request for {}, flavor {} is not supported", path, request.getFlavor());
       return false;
-    }
-
-    // Check the request method
-    String requestMethod = request.getMethod();
-    if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
-      logger.debug("Page handler answered head request for {}", request.getUrl());
-      return true;
     }
 
     // Determine the editing state
@@ -248,6 +243,20 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         }
       }
 
+      // Check the request method. This handler only supports GET
+      String requestMethod = request.getMethod().toUpperCase();
+      if ("OPTIONS".equals(requestMethod)) {
+        String verbs = "OPTIONS,GET";
+        logger.trace("Answering options request to {} with {}", url, verbs);
+        response.setHeader("Allow", verbs);
+        response.setContentLength(0);
+        return true;
+      } else if (!"GET".equals(requestMethod)) {
+        logger.debug("Url {} does not handle {} requests", url, requestMethod);
+        DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
+        return true;
+      }
+
       // Is it published?
       if (!page.isPublished() && !(page.getVersion() == Resource.WORK)) {
         logger.debug("Access to unpublished page {}", pageURI);
@@ -361,6 +370,13 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         expires = System.currentTimeMillis() + Times.MS_PER_MIN;
       }
       response.setDateHeader("Expires", expires);
+
+      // Add the template's HTML header elements to the response if it's not
+      // only used in editing mode
+      for (HTMLHeadElement header : template.getHTMLHeaders()) {
+        if (!HTMLInclude.Use.Editor.equals(header.getUse()))
+          response.addHTMLHeader(header);
+      }
 
       // Select the actual renderer by method and have it render the
       // request. Since renderers are being pooled by the bundle, we

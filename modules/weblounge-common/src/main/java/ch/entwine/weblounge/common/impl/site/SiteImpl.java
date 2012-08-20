@@ -662,10 +662,10 @@ public class SiteImpl implements Site {
     ContentRepository oldRepository = contentRepository;
     this.contentRepository = repository;
     if (repository != null) {
-      logger.info("Content repository {} connected to site '{}'", repository, this);
+      logger.debug("Content repository {} connected to site '{}'", repository, this);
       fireRepositoryConnected(repository);
     } else {
-      logger.info("Content repository {} disconnected from site '{}'", oldRepository, this);
+      logger.debug("Content repository {} disconnected from site '{}'", oldRepository, this);
       fireRepositoryDisconnected(oldRepository);
     }
   }
@@ -1131,7 +1131,6 @@ public class SiteImpl implements Site {
    * @throws Exception
    *           if the site activation fails
    */
-  @SuppressWarnings("unchecked")
   protected void activate(ComponentContext context) throws Exception {
 
     bundleContext = context.getBundleContext();
@@ -1442,7 +1441,6 @@ public class SiteImpl implements Site {
    *           if the site cannot be parsed
    * @see #toXml()
    */
-  @SuppressWarnings("unchecked")
   public static Site fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();

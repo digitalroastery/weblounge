@@ -41,6 +41,7 @@ import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
+import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
@@ -65,6 +66,7 @@ import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
+import ch.entwine.weblounge.contentrepository.impl.ResourceSelectorImpl;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 
@@ -74,13 +76,13 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -771,42 +773,20 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
-  public void testListResourceURI() {
-    fail("Not yet implemented"); // TODO
-  }
+  public void testListResources() throws ContentRepositoryException {
+    ResourceSelector selector = new ResourceSelectorImpl(site);
+    Collection<String> uris = new ArrayList<String>();
+    for (Resource<?> r : pages) {
+      uris.add(r.getURI().getIdentifier());
+    }
+    uris.add(jpeg.getURI().getIdentifier());
+    uris.add(file.getURI().getIdentifier());
 
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI, long)}
-   * .
-   */
-  @Test
-  @Ignore
-  public void testListResourceURILong() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI, int)}
-   * .
-   */
-  @Test
-  @Ignore
-  public void testListResourceURIInt() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI, int, long)}
-   * .
-   */
-  @Test
-  @Ignore
-  public void testListResourceURIIntLong() {
-    fail("Not yet implemented"); // TODO
+    populateRepository();
+    for (ResourceURI uri : repository.list(selector)) {
+      uris.remove(uri.getIdentifier());
+    }
+    assertTrue(uris.isEmpty());
   }
 
   /**

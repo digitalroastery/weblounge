@@ -72,6 +72,7 @@ public class WorkbenchTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
+  @Override
   public int doEndTag() throws JspException {
     boolean isMockRequest = RequestUtils.isMockRequest(request);
 
@@ -96,6 +97,9 @@ public class WorkbenchTag extends WebloungeTag {
         }
       }
 
+      // Make sure to remove the session flag
+      request.getSession().removeAttribute(EditingState.STATE_COOKIE);
+
       return super.doEndTag();
     }
 
@@ -109,19 +113,11 @@ public class WorkbenchTag extends WebloungeTag {
       Cookie cookie = new Cookie(EditingState.STATE_COOKIE, "true");
       cookie.setPath("/");
       response.addCookie(cookie);
+      request.getSession().setAttribute(EditingState.STATE_COOKIE, Boolean.TRUE);
       writeWorkbenchScript(getRequest(), getResponse());
       return super.doEndTag();
-    }
-
-    // If not, do we have the cookie instead?
-    if (request.getCookies() == null)
-      return super.doEndTag();
-
-    for (Cookie cookie : request.getCookies()) {
-      if (cookie.getName().equals(EditingState.STATE_COOKIE) && "true".equals(cookie.getValue())) {
-        writeWorkbenchScript(getRequest(), getResponse());
-        break;
-      }
+    } else if (RequestUtils.isEditingState(request)) {
+      writeWorkbenchScript(request, response);
     }
 
     return super.doEndTag();

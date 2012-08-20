@@ -9,8 +9,12 @@
     <language>en</language>
   </languages>
   <domains>
+    <url environment="production" default="true">http://test:8080</url>
     <url environment="production">http://localhost:8080</url>
-    <url environment="staging" default="true">http://localhost:8080</url>
+    <url environment="production">http://127.0.0.1:8080</url>
+    <url environment="staging" default="true">http://127.0.0.1:8080</url>
+    <url environment="staging">http://localhost:8080</url>
+    <url environment="staging">http://test:8080</url>
     <url environment="development" default="true">http://localhost:8080</url>
     <url environment="development">http://127.0.0.1:8080</url>
     <url environment="development">http://test:8080</url>
@@ -34,6 +38,11 @@
     <template id="alternate" composeable="true">
       <name>Default template</name>
       <renderer>file://${site.root}/templates/alternate.jsp</renderer>
+      <stage>main</stage>
+    </template>
+    <template id="ghost" composeable="false">
+      <name>Ghost template</name>
+      <renderer>file://${site.root}/templates/ghost.jsp</renderer>
       <stage>main</stage>
     </template>
     <template id="welcome" composeable="false">

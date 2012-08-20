@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.content.page;
 
+import static ch.entwine.weblounge.common.site.Environment.Any;
+
 import ch.entwine.weblounge.common.content.RenderException;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.Link;
@@ -114,7 +116,9 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       htmlHead.setSite(site);
       htmlHead.setModule(module);
     }
-    processURLTemplates(environment);
+    if (!Any.equals(environment)) {
+      processURLTemplates(environment);
+    }
   }
 
   /**
@@ -125,7 +129,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   @Override
   public void setEnvironment(Environment environment) {
     if (environment == null)
-      throw new IllegalArgumentException("Environment cannot be null");
+      throw new IllegalArgumentException("Environment must not be null");
 
     // Is there anything we need to be doing?
     if (!environment.equals(this.environment) && module != null) {
@@ -187,6 +191,24 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.impl.content.GeneralComposeable#addHTMLHeader(ch.entwine.weblounge.common.content.page.HTMLHeadElement)
+   */
+  @Override
+  public void addHTMLHeader(HTMLHeadElement header) {
+    if (module != null) {
+      if (module != null)
+        header.setModule(module);
+      if (site != null)
+        header.setSite(site);
+      if (!Any.equals(environment))
+        header.setEnvironment(environment);
+    }
+    super.addHTMLHeader(header);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.page.PageletRenderer#getModule()
    */
   public Module getModule() {
@@ -219,7 +241,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   @Override
   public void setRenderer(URL renderer) {
     super.setRenderer(renderer);
-    if (environment != null && module != null)
+    if (!Any.equals(environment) && module != null)
       processURLTemplates(environment);
   }
 
@@ -250,7 +272,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void setEditor(URL editor) {
     this.editor = editor;
-    if (environment != null && module != null)
+    if (!Any.equals(environment) && module != null)
       processURLTemplates(environment);
   }
 
@@ -339,7 +361,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * @see #fromXml(Node)
    * @see #toXml()
    */
-  @SuppressWarnings("unchecked")
   public static PageletRenderer fromXml(Node node, XPath xpath)
       throws IllegalStateException {
 

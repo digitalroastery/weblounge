@@ -45,7 +45,7 @@ steal.then('jsonix')
 		 * Get all Pages
 		 */
 		findAll: function(params, success, error) {
-			var url = "/system/weblounge/pages/?sort=created-asc&limit=0&offset=0";
+			var url = "/system/weblounge/pages/?sort=created-asc&limit=50&offset=0";
 			if ('version' in params) {
 				url += "&version=" + params.version;
 			}
@@ -91,7 +91,7 @@ steal.then('jsonix')
 		 * Get Pending Pages
 		 */
 		findPending: function(params, success, error) {
-			var url = "/system/weblounge/pages/pending?limit=0";
+			var url = "/system/weblounge/pages/pending?limit=8";
 			if ('filter' in params) {
 				url += "?filter=" + params.filter;
 			}

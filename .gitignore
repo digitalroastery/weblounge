@@ -2,6 +2,7 @@
 lib/ext/
 lib/libexec/
 lib/weblounge/
+lib/weblounge_es/
 logs/
 sites/
 sites-data/
@@ -14,7 +15,8 @@ target
 # Eclipse
 .classpath
 .project
-.settings
+.settings/
+.metadata/
 
 # Mac OS X
 .DS_Store

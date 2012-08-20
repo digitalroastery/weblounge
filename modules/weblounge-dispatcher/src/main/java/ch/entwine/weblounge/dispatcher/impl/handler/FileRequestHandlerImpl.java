@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -80,20 +81,12 @@ public final class FileRequestHandlerImpl implements RequestHandler {
    * @param response
    *          the weblounge response
    */
-  @SuppressWarnings("unchecked")
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
 
     WebUrl url = request.getUrl();
     Site site = request.getSite();
     String path = url.getPath();
     String fileName = null;
-
-    // Check the request method. Only GET is supported right now.
-    String requestMethod = request.getMethod();
-    if (!"GET".equals(requestMethod)) {
-      logger.debug("File request handler does not support {} requests", requestMethod);
-      return false;
-    }
 
     // Get hold of the content repository
     ContentRepository contentRepository = site.getContentRepository();
@@ -165,6 +158,20 @@ public final class FileRequestHandlerImpl implements RequestHandler {
 
     // Try to serve the file
     logger.debug("File handler agrees to handle {}", path);
+
+    // Check the request method. Only GET is supported right now.
+    String requestMethod = request.getMethod().toUpperCase();
+    if ("OPTIONS".equals(requestMethod)) {
+      String verbs = "OPTIONS,GET";
+      logger.trace("Answering options request to {} with {}", url, verbs);
+      response.setHeader("Allow", verbs);
+      response.setContentLength(0);
+      return true;
+    } else if (!"GET".equals(requestMethod)) {
+      logger.debug("File request handler does not support {} requests", requestMethod);
+      DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
+      return true;
+    }
 
     // Is it published?
     // TODO: Fix this. fileResource.isPublished() currently returns false,

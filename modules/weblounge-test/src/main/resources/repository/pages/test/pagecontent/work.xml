@@ -92,6 +92,22 @@
           <property id="world"><![CDATA[world]]></property>
         </properties>
       </pagelet>
+      <pagelet module="test" id="editing">
+        <security>
+          <owner>
+            <user id="hans" realm="testland">Hans Muster</user>
+          </owner>
+        </security>
+        <created>
+          <user id="hans" realm="testland">Hans Muster</user>
+          <date>2009-01-07T19:05:41Z</date>
+        </created>
+        <published>
+          <user id="hans" realm="testland">Hans Muster</user>
+          <from>2009-01-07T19:05:41Z</from>
+          <to>292278994-08-17T07:12:55Z</to>
+        </published>
+      </pagelet>
     </composer>
   </body>
 </page>

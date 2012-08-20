@@ -204,7 +204,7 @@ steal.plugins('jqueryui/dialog',
     _updatePageletValues: function(pagelet) {
 		var allInputs = this.editorDialog.find(':input');
 		
-		if(pagelet.locale.current == undefined) {
+		if(pagelet.locale == undefined || pagelet.locale.current == undefined) {
 			pagelet = this._createNewLocale(pagelet, this.options.composer.language);
 		} else {
 			pagelet.locale.current.text = {};
@@ -275,6 +275,8 @@ steal.plugins('jqueryui/dialog',
      * Create a new locale
      */
     _createNewLocale: function(pagelet, language) {
+    	if (pagelet.locale == undefined)
+    		pagelet.locale = [];
     	pagelet.locale.current = {
     		text: {},
     		language: language,

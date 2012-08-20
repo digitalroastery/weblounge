@@ -20,6 +20,9 @@
 
 package ch.entwine.weblounge.testing;
 
+import ch.entwine.weblounge.common.site.Environment;
+import ch.entwine.weblounge.common.site.Site;
+
 /**
  * Interface definition for integration tests. An integration test is executed
  * against a running instance of a system.
@@ -36,6 +39,29 @@ public interface IntegrationTest {
 
   /** Special group for weblounge rest endpoint tests */
   String WEBLOUNGE_ENDPOINT_TEST_GROUP = "WEBLOUNGE ENDPOINT TESTS";
+
+  /**
+   * Initializes the test with the associated site.
+   * 
+   * @param site
+   *          the site
+   */
+  void setSite(Site site);
+
+  /**
+   * Returns the site that is associated with this test.
+   * 
+   * @return the site
+   */
+  Site getSite();
+
+  /**
+   * Initializes the test with information.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void init(Environment environment);
 
   /**
    * Runs the integration test.

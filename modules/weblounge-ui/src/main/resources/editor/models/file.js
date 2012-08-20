@@ -37,7 +37,7 @@ steal.then('jsonix')
 		 * Get all Files
 		 */
 		findAll: function(params, success, error) {
-			var url = "/system/weblounge/files/?sort=created-asc&limit=0&offset=0";
+			var url = "/system/weblounge/files/?sort=created-asc&limit=50&offset=0";
 			if ('filter' in params) {
 				url += "&filter=" + params.filter;
 			}
@@ -75,7 +75,7 @@ steal.then('jsonix')
 		 * Get Pending Files
 		 */
 		findPending: function(params, success, error) {
-			var url = "/system/weblounge/files/pending?limit=0";
+			var url = "/system/weblounge/files/pending?limit=8";
 			if ('filter' in params) {
 				url += "?filter=" + params.filter;
 			}

@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.testing;
 
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.content;
 
+import static ch.entwine.weblounge.common.site.Environment.Any;
+
 import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.Composeable;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
@@ -49,7 +51,7 @@ public class GeneralComposeable implements Composeable {
   protected String name = null;
 
   /** The execution environment */
-  protected Environment environment = Environment.Any;
+  protected Environment environment = Any;
 
   /** HTML head elements */
   protected List<HTMLHeadElement> headers = null;

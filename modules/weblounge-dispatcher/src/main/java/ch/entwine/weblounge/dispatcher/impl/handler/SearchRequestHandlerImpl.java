@@ -63,6 +63,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
 
 /**
@@ -97,7 +98,6 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
    * @see ch.entwine.weblounge.dispatcher.RequestHandler#service(ch.entwine.weblounge.common.request.WebloungeRequest,
    *      ch.entwine.weblounge.common.request.WebloungeResponse)
    */
-  @SuppressWarnings("unchecked")
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
     Site site = request.getSite();
     WebUrl url = request.getUrl();
@@ -113,17 +113,24 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
       return false;
     }
 
-    // Check the request method. Only GET is supported right now.
-    String requestMethod = request.getMethod();
-    if (!"GET".equals(requestMethod)) {
-      logger.debug("Search request handler does not support {} requests", requestMethod);
-      return false;
-    }
-
     // Is this request intended for the search handler?
     if (!path.startsWith(URI_PREFIX)) {
       logger.debug("Skipping request for {}, request path does not start with {}", URI_PREFIX);
       return false;
+    }
+
+    // Check the request method. Only GET is supported right now.
+    String requestMethod = request.getMethod().toUpperCase();
+    if ("OPTIONS".equals(requestMethod)) {
+      String verbs = "OPTIONS,GET";
+      logger.trace("Answering options request to {} with {}", url, verbs);
+      response.setHeader("Allow", verbs);
+      response.setContentLength(0);
+      return true;
+    } else if (!"GET".equals(requestMethod)) {
+      logger.debug("Search request handler does not support {} requests", requestMethod);
+      DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
+      return true;
     }
 
     int limit = 0;
@@ -155,6 +162,8 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
       q.withVersion(Resource.LIVE);
       q.withOffset(offset);
       q.withLimit(limit);
+      // TODO Add support for other types
+      q.withTypes(Page.TYPE);
     } catch (UnsupportedEncodingException e) {
       throw new WebApplicationException(e);
     }

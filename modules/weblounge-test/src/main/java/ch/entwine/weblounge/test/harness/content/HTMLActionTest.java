@@ -33,11 +33,12 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.test.site.GreeterHTMLAction;
 import ch.entwine.weblounge.test.util.TestSiteUtils;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -63,7 +64,7 @@ public class HTMLActionTest extends IntegrationTestBase {
     "/greeting/",
   "/greeting/html" };
 
-  /** The deault path to action */
+  /** The default path to action */
   private static final String defaultActionPath = "/greeting";
 
   /** The path to action configured to render on a specific template */
@@ -80,24 +81,13 @@ public class HTMLActionTest extends IntegrationTestBase {
   }
 
   /**
-   * Runs this test on the instance running at
-   * <code>http://127.0.0.1:8080</code>.
-   * 
-   * @throws Exception
-   *           if the test fails
-   */
-  @Test
-  public void execute() throws Exception {
-    execute("http://127.0.0.1:8080");
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   @Override
   public void execute(String serverUrl) throws Exception {
+    testActionURL(serverUrl);
     testParametersAndLanguage(serverUrl);
     testConfiguredTargetPage(serverUrl);
     testOverridenTargetPage(serverUrl);
@@ -158,7 +148,8 @@ public class HTMLActionTest extends IntegrationTestBase {
           logger.debug("Found pagelet content");
 
           // Look for action header includes
-          assertEquals("Action include failed", "1", XPathHelper.valueOf(xml, "count(/html/head/script[contains(@src, '/scripts/greeting.js')])"));
+          String scriptInclude = UrlUtils.concat(site.getHostname(environment).getURL().toExternalForm(), "weblounge-sites", site.getIdentifier(), "modules/test/scripts/greeting.js");
+          assertEquals("Action include failed", scriptInclude, XPathHelper.valueOf(xml, "/html/head/script[1]/@src"));
           logger.debug("Found action javascript include");
 
           // Look for pagelet header includes
@@ -173,6 +164,40 @@ public class HTMLActionTest extends IntegrationTestBase {
           httpClient.getConnectionManager().shutdown();
         }
       }
+    }
+  }
+
+  /**
+   * Tests whether the action returns its url correctly.
+   * 
+   * @param serverUrl
+   *          the server url
+   */
+  private void testActionURL(String serverUrl) {
+    // Prepare the request
+    logger.info("Testing action url");
+
+    HttpOptions request = new HttpOptions(UrlUtils.concat(serverUrl, defaultActionPath));
+
+    // Send the request and make sure it ends up on the expected page
+    logger.info("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+      // Make sure there is a Location header in the response
+      Header locationHeader = response.getFirstHeader("Location");
+      assertNotNull("Action did not return 'Location' header", locationHeader);
+      String location = locationHeader.getValue();
+
+      // Check that the action's url starts with the correct environment
+      assertEquals("Action reports invalid url", defaultActionPath + "/", location);
+
+    } catch (Throwable e) {
+      fail("Request to " + request.getURI() + " failed" + e.getMessage());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
     }
   }
 

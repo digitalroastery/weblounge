@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Link;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
@@ -49,7 +50,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -100,13 +100,10 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   protected List<String> errorMessages = null;
 
   /** The runtime head elements */
-  protected List<HTMLHeadElement> runtimeHeaders = null;
+  // protected Set<HTMLHeadElement> runtimeHeaders = null;
 
   /** Flag to indicate that output has been written to the client */
   protected boolean outputStarted = false;
-
-  /** Flag to indicate that headers have been processed */
-  protected boolean headersPassed = false;
 
   /**
    * Creates a new action implementation that directly supports the generation
@@ -136,16 +133,15 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * 
    * @see ch.entwine.weblounge.common.site.Action#passivate()
    */
+  @Override
   public void passivate() {
     super.passivate();
     page = null;
     template = null;
-    runtimeHeaders = null;
     infoMessages = null;
     warningMessages = null;
     errorMessages = null;
     outputStarted = false;
-    headersPassed = false;
   }
 
   /**
@@ -154,6 +150,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * @param site
    *          the associated site
    */
+  @Override
   public void setSite(Site site) {
     super.setSite(site);
     if (site == null)
@@ -339,6 +336,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    *          the request
    * @return <code>true</code> if <code>composer</code> is the main stage
    */
+  @Override
   protected boolean isStage(String composer, WebloungeRequest request) {
     if (composer == null)
       throw new IllegalArgumentException("Composer may not be null!");
@@ -365,6 +363,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    *          the servlet response
    * @return {@link ch.entwine.weblounge.common.site.Action#EVAL_REQUEST}
    */
+  @Override
   public int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
     String characterEncoding = response.getCharacterEncoding();
@@ -374,20 +373,6 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       response.setContentType("text/html");
     outputStarted = true;
     return EVAL_REQUEST;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.impl.content.GeneralComposeable#getHTMLHeaders()
-   */
-  @Override
-  public HTMLHeadElement[] getHTMLHeaders() {
-    List<HTMLHeadElement> headerList = new ArrayList<HTMLHeadElement>();
-    headerList.addAll(Arrays.asList(super.getHTMLHeaders()));
-    if (runtimeHeaders != null)
-      headerList.addAll(runtimeHeaders);
-    return headerList.toArray(new HTMLHeadElement[headerList.size()]);
   }
 
   /**
@@ -407,10 +392,6 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public int startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
-
-    // Take note that headers have been passed
-    headersPassed = true;
-
     return EVAL_HEADER;
   }
 
@@ -502,6 +483,13 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       response.invalidate();
       return;
     }
+
+    // Add the pagelet's header elements to the response
+    for (HTMLHeadElement header : renderer.getHTMLHeaders()) {
+      if (!HTMLInclude.Use.Editor.equals(header.getUse()))
+        response.addHTMLHeader(header);
+    }
+
     try {
       renderer.render(request, response);
     } catch (Throwable t) {
@@ -603,63 +591,6 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   }
 
   /**
-   * Announces the use of the given renderer during the execution of this
-   * action. This will lead to the inclusion of the pagelet renderer's scripts
-   * and links in the action's head section.
-   * <p>
-   * <strong>Note:</strong> Elements need to be announced <i>before</i> the
-   * request has started processed, which means that the perfect place to do it
-   * would be in either one of
-   * {@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)} or
-   * {@link #startResponse(WebloungeRequest, WebloungeResponse)}.
-   * 
-   * @param renderer
-   *          the renderer
-   * @throws IllegalStateException
-   *           if the head elements are being added <i>after</i> the action's
-   *           head section has been processed
-   */
-  protected void use(PageletRenderer renderer) {
-    if (renderer == null)
-      throw new IllegalArgumentException("Renderer must not be null");
-    if (outputStarted)
-      throw new IllegalStateException("HTMLHead elements can't be added after the head section has been processed");
-
-    // Register the renderer's head elements
-    for (HTMLHeadElement headElement : renderer.getHTMLHeaders()) {
-      addRuntimeHeader(headElement);
-    }
-  }
-
-  /**
-   * Adds an {@link HTMLHeadElement} to the list of headers that will be written
-   * to the <code>&lt;head&gt;</code> section of the page. This method should be
-   * called if actions intend to include pagelets that require
-   * <code>&lt;script&gt;</code> or <code>&lt;link&gt;</code> tags in the
-   * <code>&lt;head&gt;</code> section of the page.
-   * <p>
-   * <strong>Note:</strong> Header elements obviously need to be added
-   * <i>before</i> the headers have been processed, which means that the perfect
-   * place to do it would be in either one of
-   * {@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)},
-   * {@link #startResponse(WebloungeRequest, WebloungeResponse)} or
-   * {@link #startHeader(WebloungeRequest, WebloungeResponse)}.
-   * 
-   * @param headElement
-   *          the head element to add
-   * @throws IllegalStateException
-   *           if the head elements are being added <i>after</i> the action's
-   *           head section has been processed
-   */
-  protected void addRuntimeHeader(HTMLHeadElement headElement) {
-    if (headersPassed)
-      throw new IllegalStateException("HTMLHead elements can't be added after the head section has been processed");
-    if (runtimeHeaders == null)
-      runtimeHeaders = new ArrayList<HTMLHeadElement>();
-    runtimeHeaders.add(headElement);
-  }
-
-  /**
    * Adds the message to the list of error messages.
    * 
    * @param msg
@@ -727,6 +658,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * 
    * @see ch.entwine.weblounge.common.site.Action#toXml()
    */
+  @Override
   public String toXml() {
     StringBuffer b = new StringBuffer();
     b.append("<action id=\"");

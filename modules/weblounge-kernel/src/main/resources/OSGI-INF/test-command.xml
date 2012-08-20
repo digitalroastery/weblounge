@@ -7,5 +7,6 @@
   <implementation class="ch.entwine.weblounge.kernel.command.TestCommand" />
   <property name="service.description" value="Weblounge Test Command" />
   <reference name="test" interface="ch.entwine.weblounge.testing.IntegrationTest" cardinality="0..n" policy="dynamic" bind="addIntegrationTest" unbind="removeIntegrationTest" />
+  <reference name="environment" interface="ch.entwine.weblounge.common.site.Environment" cardinality="0..1" policy="dynamic" bind="setEnvironment" />
 
 </scr:component>

@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.impl.site;
 
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Link;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -43,7 +44,6 @@ import ch.entwine.weblounge.common.site.ActionException;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
@@ -53,6 +53,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -101,6 +102,9 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
   /** The parent module */
   protected Module module = null;
 
+  /** List of supported methods */
+  private Set<String> verbs = null;
+
   /** Map containing uploaded files */
   protected List<FileItem> files = null;
 
@@ -120,6 +124,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * Default constructor.
    */
   public ActionSupport() {
+    verbs = new HashSet<String>();
   }
 
   /**
@@ -130,6 +135,106 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   public abstract int startResponse(WebloungeRequest request,
       WebloungeResponse response) throws ActionException;
+
+  /**
+   * Enables support for the given HTTP verb.
+   * 
+   * @param method
+   *          the method
+   * @throws IllegalArgumentException
+   *           if <code>method</code> is <code>null</code> or empty
+   * @see Action#supportsMethod(String)
+   */
+  protected void enableMethod(String method) {
+    if (StringUtils.isBlank(method))
+      throw new IllegalArgumentException("Method must not be blank");
+    if (verbs == null)
+      verbs = new HashSet<String>();
+    verbs.add(method.toUpperCase());
+  }
+
+  /**
+   * Enables support for the given HTTP verbs.
+   * 
+   * @param methods
+   *          the HTTP verbs to support
+   * @throws IllegalArgumentException
+   *           if <code>methods</code> is <code>null</code>
+   * @see Action#supportsMethod(String)
+   */
+  protected void enableMethods(String... methods) {
+    if (methods == null)
+      throw new IllegalArgumentException("Methods must not be blank");
+    for (String method : methods) {
+      enableMethod(method);
+    }
+  }
+
+  /**
+   * Disables support for the given HTTP verb.
+   * 
+   * @param method
+   *          the method
+   * @throws IllegalArgumentException
+   *           if <code>method</code> is <code>null</code> or empty
+   * @see Action#supportsMethod(String)
+   */
+  protected void disableMethod(String method) {
+    if (StringUtils.isBlank(method))
+      throw new IllegalArgumentException("Method must not be blank");
+    if (verbs != null)
+      verbs.remove(method.toUpperCase());
+  }
+
+  /**
+   * Disables support for the given HTTP verbs.
+   * 
+   * @param methods
+   *          the methods
+   * @throws IllegalArgumentException
+   *           if <code>methods</code> is <code>null</code>
+   * @see Action#supportsMethod(String)
+   */
+  protected void disableMethods(String... methods) {
+    if (methods == null)
+      throw new IllegalArgumentException("Methods must not be blank");
+    for (String method : methods) {
+      disableMethod(method);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Note that this default implementation enables support for <code>GET</code>
+   * requests only.
+   * 
+   * @throws IllegalArgumentException
+   *           if <code>method</code> is <code>null</code>
+   * @see ch.entwine.weblounge.common.site.Action#supportsMethod(java.lang.String)
+   */
+  public boolean supportsMethod(String method) {
+    if (StringUtils.isBlank(method))
+      throw new IllegalArgumentException("Method must not be blank");
+    method = method.toUpperCase();
+    if (verbs == null)
+      return "GET".equals(method);
+    return verbs.contains(method.toUpperCase());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Action#getMethods()
+   */
+  @Override
+  public String[] getMethods() {
+    if (verbs == null) {
+      return new String[] { "GET" };
+    } else {
+      return verbs.toArray(new String[verbs.size()]);
+    }
+  }
 
   /**
    * Returns the site's OSGi bundle context if available, <code>null</code>
@@ -197,8 +302,14 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   @Override
   public void setEnvironment(Environment environment) {
-    processURLTemplates(environment);
-    options.setEnvironment(environment);
+    if (environment == null)
+      throw new IllegalArgumentException("Environment must not be null");
+
+    if (!this.environment.equals(environment) && module != null) {
+      processURLTemplates(environment);
+      options.setEnvironment(environment);
+    }
+
     super.setEnvironment(environment);
   }
 
@@ -232,17 +343,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @return the action's link
    */
   public WebUrl getUrl() {
-    return getUrl(environment);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.site.Action#getUrl(ch.entwine.weblounge.common.site.Environment)
-   */
-  public WebUrl getUrl(Environment environment) {
-    SiteURL siteURL = site.getHostname(environment);
-    return new WebUrlImpl(site, UrlUtils.concat(siteURL.toExternalForm(), mountpoint));
+    return new WebUrlImpl(site, mountpoint);
   }
 
   /**
@@ -428,7 +529,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @see ch.entwine.weblounge.common.site.Action.module.ActionHandler#configure(ch.entwine.weblounge.api.request.WebloungeRequest,
    *      ch.entwine.weblounge.api.request.WebloungeResponse, java.lang.String)
    */
-  @SuppressWarnings("unchecked")
   public void configure(WebloungeRequest request, WebloungeResponse response,
       RequestFlavor flavor) throws ActionException {
 
@@ -626,7 +726,70 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       throw new ActionException(new IllegalArgumentException(msg));
     }
     logger.debug("Including renderer {}", renderer);
+
+    // Add the pagelet's header elements to the response
+    for (HTMLHeadElement header : r.getHTMLHeaders()) {
+      if (!HTMLInclude.Use.Editor.equals(header.getUse()))
+        response.addHTMLHeader(header);
+    }
+
     include(request, response, r, pagelet);
+  }
+
+  /**
+   * Finds the first service in the service registry and returns it. If not such
+   * service is available, <code>null</code> is returned.
+   * 
+   * @param c
+   *          the class of the service to look for
+   * @return the service
+   */
+  protected <S extends Object> S getService(Class<S> c) {
+    String className = c.getName();
+    BundleContext ctx = getBundleContext();
+    if (ctx == null)
+      return null;
+    try {
+      ServiceReference serviceRef = ctx.getServiceReference(className);
+      if (serviceRef == null) {
+        logger.debug("No service for class {} found", className);
+        return null;
+      }
+      S smtpService = (S) ctx.getService(serviceRef);
+      return smtpService;
+    } catch (IllegalStateException e) {
+      logger.debug("Service of type {} cannot be received through deactivating bundle {}", className, ctx);
+      return null;
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * When overwriting this method, please make sure to call
+   * <code>super.activate()</code> as well.
+   * 
+   * @see ch.entwine.weblounge.common.site.Action#activate()
+   */
+  public void activate() {
+    logger.trace("Activating action {}", this);
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * When overwriting this method, please make sure to call
+   * <code>super.passivate()</code> as well.
+   * 
+   * @see ch.entwine.weblounge.common.site.Action#passivate()
+   */
+  public void passivate() {
+    logger.trace("Passivating action {}", this);
+    flavor = null;
+    files = null;
+    includeCount = 0;
+    request = null;
+    response = null;
   }
 
   /**
@@ -660,35 +823,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
   }
 
   /**
-   * {@inheritDoc}
-   * <p>
-   * When overwriting this method, please make sure to call
-   * <code>super.activate()</code> as well.
-   * 
-   * @see ch.entwine.weblounge.common.site.Action#activate()
-   */
-  public void activate() {
-    logger.trace("Activating action {}", this);
-  }
-
-  /**
-   * {@inheritDoc}
-   * <p>
-   * When overwriting this method, please make sure to call
-   * <code>super.passivate()</code> as well.
-   * 
-   * @see ch.entwine.weblounge.common.site.Action#passivate()
-   */
-  public void passivate() {
-    logger.trace("Passivating action {}", this);
-    flavor = null;
-    files = null;
-    includeCount = 0;
-    request = null;
-    response = null;
-  }
-
-  /**
    * Initializes this action from an XML node that was generated using
    * {@link #toXml()}.
    * <p>
@@ -719,7 +853,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    *           if the configuration cannot be parsed
    * @see #toXml()
    */
-  @SuppressWarnings("unchecked")
   public static Action fromXml(Node config, XPath xpath)
       throws IllegalStateException {
 

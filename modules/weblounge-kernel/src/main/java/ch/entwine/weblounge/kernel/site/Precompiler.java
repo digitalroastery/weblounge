@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.kernel.site;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+
 import ch.entwine.weblounge.common.content.Renderer.RendererType;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
@@ -30,7 +32,7 @@ import ch.entwine.weblounge.common.impl.content.page.MockPageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.entwine.weblounge.common.impl.security.Guest;
-import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
+import ch.entwine.weblounge.common.impl.site.PrecompileHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.SecurityService;
@@ -45,6 +47,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * This precompiler searches an OSGi bundle for Java Server Pages (JSP) and
@@ -73,7 +77,7 @@ public class Precompiler {
   protected boolean logErrors = true;
 
   /** The default environment */
-  protected Environment environment = Environment.Production;
+  protected Environment environment = Environment.Any;
 
   /** The security service */
   protected SecurityService security = null;
@@ -171,12 +175,11 @@ public class Precompiler {
       Site site = servlet.getSite();
 
       // Prepare the mock request and response objects
-      MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+      PrecompileHttpServletRequest request = new PrecompileHttpServletRequest();
       request.setServerName(site.getHostname(environment).getURL().getHost());
       request.setServerPort(site.getHostname(environment).getURL().getPort());
       request.setMethod(site.getHostname(environment).getURL().getProtocol());
       request.setServletPath("");
-      MockHttpServletResponse response = new MockHttpServletResponse();
 
       // Prepare a fake page in order to prevent erratic behavior during
       // precompilation
@@ -190,8 +193,7 @@ public class Precompiler {
         }
       }
 
-      // Collect all renderers (from modules and templates) and ask for
-      // precompilation
+      // Collect all renderers from modules and ask for precompilation
       List<URL> rendererUrls = new ArrayList<URL>();
       for (Module m : site.getModules()) {
         if (!m.isEnabled())
@@ -207,6 +209,8 @@ public class Precompiler {
             rendererUrls.add(p.getEditor());
         }
       }
+
+      // Collect all site templates and ask for precompilation
       for (PageTemplate t : site.getTemplates()) {
         if (t.getRenderer() != null)
           rendererUrls.add(t.getRenderer());
@@ -225,12 +229,12 @@ public class Precompiler {
       int errorCount = 0;
       Iterator<URL> rendererIterator = rendererUrls.iterator();
       while (keepGoing && rendererIterator.hasNext()) {
+        MockHttpServletResponse response = new MockHttpServletResponse();
         URL entry = rendererIterator.next();
         String path = entry.getPath();
         String pathInfo = path.substring(path.indexOf(site.getIdentifier()) + site.getIdentifier().length());
         request.setPathInfo(pathInfo);
         request.setRequestURI(pathInfo);
-
         request.setAttribute(WebloungeRequest.PAGE, page);
         request.setAttribute(WebloungeRequest.COMPOSER, page.getComposer(PageTemplate.DEFAULT_STAGE));
         if (pagelet != null)
@@ -239,6 +243,20 @@ public class Precompiler {
         try {
           logger.debug("Precompiling {}:/{}", site, pathInfo);
           servlet.service(request, response);
+          switch (response.getStatus()) {
+            case HttpServletResponse.SC_OK:
+              logger.debug("Precompilation of {}:/{} finished", site, pathInfo);
+              break;
+            case SC_NOT_FOUND:
+              logger.error("Precompilation failed: {}:/{}: not found", site, pathInfo);
+              break;
+            default:
+              logger.error("Precompilation of {}:/{} failed with status {}", new Object[] {
+                  site,
+                  pathInfo,
+                  response.getStatus() });
+              break;
+          }
         } catch (Throwable t) {
           while (t != t.getCause() && t.getCause() != null)
             t = t.getCause();
@@ -269,7 +287,6 @@ public class Precompiler {
         logger.info("Precompilation for '{}' finished", site);
       }
     }
-
   }
 
 }

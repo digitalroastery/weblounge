@@ -21,19 +21,20 @@
 package ch.entwine.weblounge.contentrepository.impl.util;
 
 import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -138,9 +139,10 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
-  public Resource<? extends ResourceContent> get(ResourceURI uri)
+  @Override
+  public <R extends Resource<?>> R get(ResourceURI uri)
       throws ContentRepositoryException {
     return null;
   }
@@ -169,44 +171,12 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.repository.ResourceSelector)
    */
-  public Iterator<ResourceURI> list(ResourceURI uri)
+  @Override
+  public Collection<ResourceURI> list(ResourceSelector selector)
       throws ContentRepositoryException {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      long)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, long version)
-      throws ContentRepositoryException {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      int)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, int level)
-      throws ContentRepositoryException {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI,
-   *      int, long)
-   */
-  public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
-      throws ContentRepositoryException {
-    return null;
+    return Collections.EMPTY_LIST;
   }
 
   /**
@@ -225,6 +195,16 @@ public class EmptyContentRepository implements ContentRepository {
    */
   public long getVersionCount() {
     return 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#createPreviews()
+   */
+  @Override
+  public void createPreviews() throws ContentRepositoryException {
+    return;
   }
 
 }
