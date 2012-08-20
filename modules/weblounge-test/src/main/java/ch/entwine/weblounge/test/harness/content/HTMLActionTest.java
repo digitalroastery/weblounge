@@ -33,9 +33,11 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.test.site.GreeterHTMLAction;
 import ch.entwine.weblounge.test.util.TestSiteUtils;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +87,7 @@ public class HTMLActionTest extends IntegrationTestBase {
    */
   @Override
   public void execute(String serverUrl) throws Exception {
+    testActionURL(serverUrl);
     testParametersAndLanguage(serverUrl);
     testConfiguredTargetPage(serverUrl);
     testOverridenTargetPage(serverUrl);
@@ -161,6 +164,40 @@ public class HTMLActionTest extends IntegrationTestBase {
           httpClient.getConnectionManager().shutdown();
         }
       }
+    }
+  }
+
+  /**
+   * Tests whether the action returns its url correctly.
+   * 
+   * @param serverUrl
+   *          the server url
+   */
+  private void testActionURL(String serverUrl) {
+    // Prepare the request
+    logger.info("Testing action url");
+
+    HttpOptions request = new HttpOptions(UrlUtils.concat(serverUrl, defaultActionPath));
+
+    // Send the request and make sure it ends up on the expected page
+    logger.info("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+      // Make sure there is a Location header in the response
+      Header locationHeader = response.getFirstHeader("Location");
+      assertNotNull("Action did not return 'Location' header", locationHeader);
+      String location = locationHeader.getValue();
+
+      // Check that the action's url starts with the correct environment
+      assertEquals("Action reports invalid url", defaultActionPath + "/", location);
+
+    } catch (Throwable e) {
+      fail("Request to " + request.getURI() + " failed" + e.getMessage());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
     }
   }
 

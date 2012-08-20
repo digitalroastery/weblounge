@@ -45,6 +45,11 @@ import java.util.Map;
  */
 public class GreeterHTMLAction extends HTMLActionSupport {
 
+  /** Ways to call this action */
+  protected enum Method {
+    Greet, Announce
+  }
+
   /** Name of the language parameter */
   public static final String LANGUAGE_PARAM = "language";
 
@@ -59,6 +64,17 @@ public class GreeterHTMLAction extends HTMLActionSupport {
 
   /** The greeting's language */
   protected String language = null;
+
+  /** How this action is being called */
+  protected Method currentMethod = null;
+
+  /**
+   * Creates a new greeter action with explicit support for <code>GET</code> and
+   * <code>OPTIONS</code> requests.
+   */
+  public GreeterHTMLAction() {
+    enableMethods("GET", "OPTIONS");
+  }
 
   /**
    * {@inheritDoc}
@@ -97,6 +113,23 @@ public class GreeterHTMLAction extends HTMLActionSupport {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.impl.site.HTMLActionSupport#startResponse(ch.entwine.weblounge.common.request.WebloungeRequest,
+   *      ch.entwine.weblounge.common.request.WebloungeResponse)
+   */
+  @Override
+  public int startResponse(WebloungeRequest request, WebloungeResponse response)
+      throws ActionException {
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+      response.setHeader("Allow", "OPTIONS,GET");
+      response.setHeader("Location", getUrl().getLink());
+      return SKIP_REQUEST;
+    }
+    return super.startResponse(request, response);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.impl.site.HTMLActionSupport#startStage(ch.entwine.weblounge.common.request.WebloungeRequest,
    *      ch.entwine.weblounge.common.request.WebloungeResponse,
    *      ch.entwine.weblounge.common.content.page.Composer)
@@ -118,10 +151,11 @@ public class GreeterHTMLAction extends HTMLActionSupport {
 
   /**
    * Returns the language, which is either taken from the request parameter
-   * <code>language</code> or from the language sent by the client browser.
-   * The final fallback is <code>English</code>.
+   * <code>language</code> or from the language sent by the client browser. The
+   * final fallback is <code>English</code>.
    * 
-   * @param request the request
+   * @param request
+   *          the request
    * @return the language name
    */
   protected String getLanguage(WebloungeRequest request) {
@@ -138,13 +172,14 @@ public class GreeterHTMLAction extends HTMLActionSupport {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.impl.site.HTMLActionSupport#passivate()
    */
   @Override
   public void passivate() {
     greeting = null;
     language = null;
+    currentMethod = null;
     super.passivate();
   }
 
