@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,10 +54,10 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   private static final Pattern pathInspector = Pattern.compile("^(.*)/(work|index|live|[0-9]*)(_[a-zA-Z]+)?\\.([a-zA-Z0-9]+)$");
 
   /** Regular expression for /path/to/resource/de/html */
-  private static final Pattern segmentInspector = Pattern.compile("^(.*://)?(.*?)(/[a-zA-Z][a-zA-Z]+)?(/[a-zA-Z0-9]+)?/$");
+  private static final Pattern segmentInspector = Pattern.compile("^(/([a-zA-Z0-9\\-\\,\\.\\;/^#^\\?])*+)+$");
 
   /** The default request flavor */
-  private RequestFlavor defaultFlavor = RequestFlavor.ANY;
+  private final RequestFlavor defaultFlavor = RequestFlavor.ANY;
 
   /** The associated site */
   protected Site site = null;
@@ -340,22 +342,18 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @see ch.entwine.weblounge.common.url.WebUrl#normalize()
    */
   public String normalize() {
-    return normalize(true, true, true, true);
+    return normalize(true, true, true);
   }
 
   /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.url.WebUrl#normalize(boolean, boolean,
-   *      boolean, boolean)
+   *      boolean)
    */
-  public String normalize(boolean includeHost, boolean includeVersion,
-      boolean includeLanguage, boolean includeFlavor) {
+  public String normalize(boolean includeVersion, boolean includeLanguage,
+      boolean includeFlavor) {
     StringBuffer buf = new StringBuffer();
-
-    // Site
-    if (includeHost)
-      buf.append(site.getHostname());
 
     // Path
     buf.append(pathElementSeparatorChar).append(path);
@@ -392,7 +390,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       }
     }
 
-    return UrlUtils.trim(buf.toString());
+    return trim(buf.toString());
   }
 
   /**
@@ -437,6 +435,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * 
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     return super.hashCode() | site.hashCode() >> 16;
   }
@@ -448,6 +447,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(Object object) {
     if (object instanceof WebUrlImpl) {
       WebUrlImpl url = (WebUrlImpl) object;
@@ -481,7 +481,20 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @return the directory path
    */
   protected String analyzePath(String path, char separator) {
+    if (path.contains(":/")) {
+      try {
+        URL u = new URL(path);
+        path = u.getPath();
+      } catch (MalformedURLException e) {
+        throw new IllegalArgumentException("Path " + path + " cannot be parsed");
+      }
+    }
     path = trim(path);
+
+    // Make sure the path is absolute
+    if (!path.startsWith(WebUrlImpl.separator))
+      throw new IllegalArgumentException("Path must be absolute");
+
     Matcher pathMatcher = pathInspector.matcher(path);
     if (pathMatcher.matches()) {
 
@@ -525,67 +538,43 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     // Try the segmented approach for /path/to/resource/<language>/<flavor>
     Matcher segmentMatcher = segmentInspector.matcher(path);
     if (segmentMatcher.matches()) {
-      int group = segmentMatcher.groupCount();
 
-      while (segmentMatcher.group(group) == null || "".equals(segmentMatcher.group(group)))
-        group--;
+      // Extract flavor and language
+      String url = trim(segmentMatcher.group(1));
+      String[] segments = url.split(Character.toString(separator));
+      for (int i = segments.length; i > 0; i--) {
+        String segment = segments[i - 1].replaceAll(Character.toString(separator), "");
+        boolean foundMetadata = false;
 
-      if (group < 3) {
-        String protocol = segmentMatcher.group(1);
-        String url = segmentMatcher.group(2);
-        return trim(protocol != null ? protocol + url : url);
-      }
-
-      // Test group for flavor
-      String f = segmentMatcher.group(group);
-      if (f == null || "".equals(f)) {
-        group--;
-      } else {
-        if (f.startsWith("/"))
-          f = f.substring(1);
+        // Test for flavor
         try {
-          this.flavor = RequestFlavor.parseString(f);
-          group--;
+          this.flavor = RequestFlavor.parseString(segment);
+          url = url.substring(0, url.length() - segment.length() - 1);
+          foundMetadata = true;
+          continue;
         } catch (IllegalArgumentException e) {
-          logger.debug("Found unknown request flavor {}", f);
+          logger.debug("Found unknown request flavor {}", segment);
         }
-      }
 
-      // Done?
-      if (group < 3) {
-        String protocol = segmentMatcher.group(1);
-        String url = segmentMatcher.group(2);
-        return trim(protocol != null ? protocol + url : url);
-      }
-
-      // Test group for language
-      String l = segmentMatcher.group(group);
-      if (l == null || "".equals(l)) {
-        group--;
-      } else {
-        if (l.startsWith("/"))
-          l = l.substring(1);
-        Language language = site.getLanguage(l);
+        // Test group for language
+        Language language = site.getLanguage(segment);
         if (language != null) {
           this.language = language;
           this.languageIsPathEncoded = true;
-          group--;
+          url = url.substring(0, url.length() - segment.length() - 1);
+          foundMetadata = true;
+          continue;
         }
+
+        if (!foundMetadata)
+          break;
       }
 
-      StringBuffer rest = new StringBuffer();
-      int i = 1;
-      while (i <= group) {
-        if (segmentMatcher.group(i) != null)
-          rest.append(segmentMatcher.group(i));
-        i++;
-      }
-      return trim(rest.toString());
+      return trim(url);
     }
 
-    // TODO: We still don't know what we are looking at. Could be
-    // www.weblounge.org or some malformed path (i. e. not absolute etc)
-    return path;
+    // This seems to be a regular path
+    throw new IllegalArgumentException("Path must be absolute");
   }
 
   /**

@@ -72,8 +72,8 @@ public class UrlMatcherImpl implements UrlMatcher {
   public boolean matches(WebUrl url, RequestFlavor flavor) {
     if (!site.equals(url.getSite()))
       return false;
-    String path = url.normalize(false, false, false, false);
-    String normalizedPath = url.normalize(false, false, false, true);
+    String path = url.normalize(false, false, false);
+    String normalizedPath = url.normalize(false, false, true);
     if (!path.startsWith(this.path) && !normalizedPath.startsWith(this.path))
       return false;
     // TODO: check for extension
