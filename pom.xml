@@ -317,18 +317,19 @@
           </executions>
         </plugin>
 
-		<!-- Release management -->
-		<plugin>
-		  <groupId>org.apache.maven.plugins</groupId>
-		  <artifactId>maven-release-plugin</artifactId>
-		  <version>2.0</version>
-		  <configuration>
+        <!-- Release management -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.3.2</version>
+          <configuration>
             <goals>deploy</goals>
             <autoVersionSubmodules>true</autoVersionSubmodules>
             <addSchema>false</addSchema>
             <pushChanges>false</pushChanges>
-		  </configuration>
-		</plugin>
+            <updateWorkingCopyVersions>false</updateWorkingCopyVersions>
+          </configuration>
+        </plugin>
         
         <!-- Coding and styling rules for source code -->
         <plugin>
