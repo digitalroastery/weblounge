@@ -834,10 +834,26 @@ public abstract class AbstractContentRepository implements ContentRepository {
       return;
     }
 
-    // Add the global image styles as well as those for the site
-    styles.addAll(imageStyleTracker.getImageStyles());
+    // Add the global image styles that have the preview flag turned on
+    for (ImageStyle s : imageStyleTracker.getImageStyles()) {
+      if (s.isPreview()) {
+        styles.add(s);
+        logger.debug("Preview images will be generated for {}", s);
+      } else {
+        logger.debug("Preview image generation will be skipped for {}", s);
+      }
+    }
+
+    // Add the site's preview image styles as well as
     for (Module m : getSite().getModules()) {
-      styles.addAll(Arrays.asList(m.getImageStyles()));
+      for (ImageStyle s : m.getImageStyles()) {
+        if (s.isPreview()) {
+          styles.add(s);
+          logger.debug("Preview images will be generated for {}", s);
+        } else {
+          logger.debug("Preview image generation will be skipped for {}", s);
+        }
+      }
     }
 
     // If no language has been specified, we create the preview for all
