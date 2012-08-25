@@ -95,79 +95,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.dispatcher.ActionRequestHandler#register(ch.entwine.weblounge.common.site.Action)
-   */
-  public void register(Action action) {
-    if (action == null)
-      throw new IllegalArgumentException("Action configuration cannot be null");
-
-    // Create a url matcher
-    UrlMatcher matcher = new UrlMatcherImpl(action);
-    ActionPool pool = new ActionPool(action);
-    StringBuffer registration = new StringBuffer(new WebUrlImpl(action.getSite(), action.getPath()).normalize());
-
-    // Register the action
-    synchronized (actions) {
-      actions.put(matcher, pool);
-    }
-
-    // Cache the action urls
-    StringBuffer flavors = new StringBuffer();
-    synchronized (urlCache) {
-      for (RequestFlavor flavor : action.getFlavors()) {
-        WebUrl actionUrl = new WebUrlImpl(action.getSite(), action.getPath(), Resource.LIVE, flavor);
-        String normalizedUrl = actionUrl.normalize(false, false, true);
-        urlCache.put(normalizedUrl, pool);
-        if (flavors.length() > 0)
-          flavors.append(",");
-        flavors.append(flavor.toString().toLowerCase());
-        logger.trace("Caching action '{}' for url {}", action, normalizedUrl);
-      }
-    }
-
-    logger.debug("Action '{}' ({}) registered for site://{}", new Object[] {
-        action,
-        flavors.toString(),
-        registration.toString() });
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.dispatcher.ActionRequestHandler#unregister(ch.entwine.weblounge.common.site.Action)
-   */
-  public boolean unregister(Action action) {
-    ActionPool pool = null;
-
-    // Remove the pool from the actions registry
-    synchronized (actions) {
-      UrlMatcher matcher = new UrlMatcherImpl(action);
-      pool = actions.remove(matcher);
-      if (pool == null) {
-        logger.warn("Tried to unregister unknown action '{}'", action);
-        return false;
-      }
-    }
-
-    // Remove entries from the url cache
-    synchronized (urlCache) {
-      Iterator<Entry<String, ActionPool>> cacheIterator = urlCache.entrySet().iterator();
-      while (cacheIterator.hasNext()) {
-        ActionPool candidate = cacheIterator.next().getValue();
-        if (candidate.equals(pool)) {
-          logger.trace("Removing '{}' from action url cache", action);
-          cacheIterator.remove();
-        }
-      }
-    }
-
-    logger.debug("Unregistering action '{}' from {}", action, new WebUrlImpl(action.getSite(), action.getPath()).normalize());
-    return true;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.dispatcher.RequestHandler#service(ch.entwine.weblounge.common.request.WebloungeRequest,
    *      ch.entwine.weblounge.common.request.WebloungeResponse)
    */
@@ -722,6 +649,79 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     // TODO: Instantiate the action
 
     return actionPool;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.dispatcher.ActionRequestHandler#register(ch.entwine.weblounge.common.site.Action)
+   */
+  public void register(Action action) {
+    if (action == null)
+      throw new IllegalArgumentException("Action configuration cannot be null");
+
+    // Create a url matcher
+    UrlMatcher matcher = new UrlMatcherImpl(action);
+    ActionPool pool = new ActionPool(action);
+    StringBuffer registration = new StringBuffer(new WebUrlImpl(action.getSite(), action.getPath()).normalize());
+
+    // Register the action
+    synchronized (actions) {
+      actions.put(matcher, pool);
+    }
+
+    // Cache the action urls
+    StringBuffer flavors = new StringBuffer();
+    synchronized (urlCache) {
+      for (RequestFlavor flavor : action.getFlavors()) {
+        WebUrl actionUrl = new WebUrlImpl(action.getSite(), action.getPath(), Resource.LIVE, flavor);
+        String normalizedUrl = actionUrl.normalize(false, false, true);
+        urlCache.put(normalizedUrl, pool);
+        if (flavors.length() > 0)
+          flavors.append(",");
+        flavors.append(flavor.toString().toLowerCase());
+        logger.trace("Caching action '{}' for url {}", action, normalizedUrl);
+      }
+    }
+
+    logger.debug("Action '{}' ({}) registered for site://{}", new Object[] {
+        action,
+        flavors.toString(),
+        registration.toString() });
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.dispatcher.ActionRequestHandler#unregister(ch.entwine.weblounge.common.site.Action)
+   */
+  public boolean unregister(Action action) {
+    ActionPool pool = null;
+
+    // Remove the pool from the actions registry
+    synchronized (actions) {
+      UrlMatcher matcher = new UrlMatcherImpl(action);
+      pool = actions.remove(matcher);
+      if (pool == null) {
+        logger.warn("Tried to unregister unknown action '{}'", action);
+        return false;
+      }
+    }
+
+    // Remove entries from the url cache
+    synchronized (urlCache) {
+      Iterator<Entry<String, ActionPool>> cacheIterator = urlCache.entrySet().iterator();
+      while (cacheIterator.hasNext()) {
+        ActionPool candidate = cacheIterator.next().getValue();
+        if (candidate.equals(pool)) {
+          logger.trace("Removing '{}' from action url cache", action);
+          cacheIterator.remove();
+        }
+      }
+    }
+
+    logger.debug("Unregistering action '{}' from {}", action, new WebUrlImpl(action.getSite(), action.getPath()).normalize());
+    return true;
   }
 
   /**
