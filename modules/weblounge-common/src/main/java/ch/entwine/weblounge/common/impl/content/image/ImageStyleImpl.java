@@ -56,6 +56,12 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   protected ImageScalingMode scalingMode = null;
 
   /**
+   * defines whether this image style will be applied to all resources by
+   * default
+   */
+  protected boolean preview = true;
+
+  /**
    * Creates a new image style with the name as its identifier, width and
    * height, the indicated scaling behavior. If <code>composeable</code> is set
    * to <code>true</code>, the image style will be available to the user when it
@@ -70,14 +76,16 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    * @param scaling
    *          the scaling mode
    * @param composeable
-   *          <code>true</code> if the image is composeable
+   *          <code>true</code> if the image style is composeable
+   * @param preview
+   *          <code>true</code> if the image style is automatically created
    * @throws IllegalArgumentException
    *           if id parameter is blank
    * @throws IllegalArgumentException
    *           if width and height parameter are zero or negative
    */
   public ImageStyleImpl(String id, int width, int height,
-      ImageScalingMode scaling, boolean composeable)
+      ImageScalingMode scaling, boolean composeable, boolean preview)
           throws IllegalArgumentException {
     if (StringUtils.isBlank(id))
       throw new IllegalArgumentException("Identifier cannot be null");
@@ -86,6 +94,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     this.height = height;
     this.scalingMode = scaling;
     this.composeable = composeable;
+    this.preview = preview;
     switch (scaling) {
       case Box:
       case Cover:
@@ -122,7 +131,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    *          the image height
    */
   public ImageStyleImpl(String id, int width, int height) {
-    this(id, width, height, None, true);
+    this(id, width, height, None, true, false);
   }
 
   /**
@@ -134,7 +143,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    *          the scaling mode
    */
   public ImageStyleImpl(String id, ImageScalingMode mode) {
-    this(id, -1, -1, mode, true);
+    this(id, -1, -1, mode, true, false);
   }
 
   /**
@@ -144,7 +153,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    *          the style identifier
    */
   public ImageStyleImpl(String id) {
-    this(id, -1, -1, None, true);
+    this(id, -1, -1, None, true, false);
   }
 
   /**
@@ -252,6 +261,27 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.image.ImageStyle#isPreview()
+   */
+  @Override
+  public boolean isPreview() {
+    return preview;
+  }
+
+  /**
+   * Specifies whether this image style should be automatically applied to all
+   * resources.
+   * 
+   * @param autoCreate
+   *          <code>true</code> to automatically create this preview
+   */
+  void setPreview(boolean autoCreate) {
+    this.preview = autoCreate;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.impl.content.GeneralComposeable#hashCode()
    */
   @Override
@@ -331,6 +361,9 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     // Composeable
     boolean composeable = ConfigurationUtils.isTrue(XPathHelper.valueOf(node, "@composeable", xpath), true);
 
+    // Preview
+    boolean preview = ConfigurationUtils.isTrue(XPathHelper.valueOf(node, "@preview", xpath), false);
+
     // Scaling mode
     String mode = XPathHelper.valueOf(node, "m:scalingmode", xpath);
     ImageScalingMode scalingMode = mode == null ? None : ImageScalingMode.parseString(mode);
@@ -347,7 +380,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
       throw new IllegalStateException("Fill scaling needs positive width and height");
 
     // Create the image style
-    ImageStyleImpl imageStyle = new ImageStyleImpl(id, width, height, scalingMode, composeable);
+    ImageStyleImpl imageStyle = new ImageStyleImpl(id, width, height, scalingMode, composeable, preview);
 
     // Names
     String name = XPathHelper.valueOf(node, "m:name", xpath);
@@ -370,6 +403,9 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
     // composeable
     buf.append(" composeable=\"").append(composeable).append("\"");
+
+    // composeable
+    buf.append(" preview=\"").append(preview).append("\"");
 
     buf.append(">");
 
