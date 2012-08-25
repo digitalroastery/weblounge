@@ -39,28 +39,31 @@ public class ImageStyleImplTest {
 
   /** The image style under test */
   protected ImageStyleImpl imageStyle = null;
-  
+
   /** Image style identifier */
   protected String id = "default";
-  
+
   /** Image style width */
-  protected int width = 250; 
+  protected int width = 250;
 
   /** Image style height */
-  protected int height = 300; 
-  
+  protected int height = 300;
+
   /** Scaling mode */
   protected ImageScalingMode scalingMode = ImageScalingMode.Cover;
 
   /** Is the style composeable? */
   protected boolean composeable = false;
 
+  /** Is this style automatically created? */
+  protected boolean preview = true;
+
   /** The German language */
   protected Language german = LanguageUtils.getLanguage("de");
 
   /** The English language */
   protected Language english = LanguageUtils.getLanguage("en");
-  
+
   /** English image style name */
   protected String name = "Default";
 
@@ -69,12 +72,14 @@ public class ImageStyleImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    imageStyle = new ImageStyleImpl(id, width, height, scalingMode, composeable);
+    imageStyle = new ImageStyleImpl(id, width, height, scalingMode, composeable, preview);
     imageStyle.setName(name);
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#getIdentifier()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#getIdentifier()}
+   * .
    */
   @Test
   public void testGetIdentifier() {
@@ -82,7 +87,9 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#getScalingMode()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#getScalingMode()}
+   * .
    */
   @Test
   public void testGetScalingMode() {
@@ -90,7 +97,9 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#getHeight()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#getHeight()}
+   * .
    */
   @Test
   public void testGetHeight() {
@@ -98,7 +107,9 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#getWidth()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#getWidth()}
+   * .
    */
   @Test
   public void testGetWidth() {
@@ -106,7 +117,9 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#isComposeable()}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#isComposeable()}
+   * .
    */
   @Test
   public void testIsComposeable() {
@@ -114,12 +127,24 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#equals(java.lang.Object)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#isPreview()}
+   * .
+   */
+  @Test
+  public void testIsPreview() {
+    assertEquals(preview, imageStyle.isPreview());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl#equals(java.lang.Object)}
+   * .
    */
   @Test
   public void testEqualsObject() {
     assertTrue(imageStyle.equals(new ImageStyleImpl(id, 1, 1)));
-    assertFalse(imageStyle.equals(new ImageStyleImpl("test", width, height, scalingMode, composeable)));
+    assertFalse(imageStyle.equals(new ImageStyleImpl("test", width, height, scalingMode, composeable, preview)));
   }
 
 }
