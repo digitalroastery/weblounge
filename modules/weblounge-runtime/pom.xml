@@ -573,6 +573,12 @@
       <version>1.6.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.serp</artifactId>
+      <version>1.13.1_4</version>
+    </dependency>
+    
   </dependencies>
 
   <build>
