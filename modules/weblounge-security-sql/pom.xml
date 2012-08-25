@@ -82,6 +82,9 @@
             <Service-Component>
               OSGI-INF/sql-directory-service.xml
             </Service-Component>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>
