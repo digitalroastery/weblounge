@@ -44,7 +44,7 @@ public class UrlImpl implements Path {
 
   /** Static constant used to filter out double path separators */
   protected String doublePathElementSeparator = null;
-  
+
   /**
    * Creates a new url from a given path using the default path separator
    * <code>"/"</code>.
@@ -80,7 +80,7 @@ public class UrlImpl implements Path {
   public UrlImpl(String path, char separator) {
     this.pathElementSeparatorChar = separator;
     this.pathElementSeparator = Character.toString(separator);
-    
+
     // Build the double path separator
     StringBuffer buf = new StringBuffer();
     buf.append(separator).append(separator);
@@ -111,7 +111,7 @@ public class UrlImpl implements Path {
   public char getPathSeparator() {
     return pathElementSeparatorChar;
   }
-  
+
   /**
    * Sets the path.
    * 
@@ -232,8 +232,9 @@ public class UrlImpl implements Path {
     if (url.endsWith(pathElementSeparator) || url.equals(pathElementSeparator))
       return url;
     int index = url.lastIndexOf(pathElementSeparator);
-    index = url.indexOf(".", index);
-    if (index < 0)
+    int dotIndex = url.indexOf(".", index);
+    int anchorIndex = url.indexOf("#", index);
+    if (dotIndex == -1 && anchorIndex == -1)
       url += pathElementSeparator;
     return url;
   }
@@ -243,6 +244,7 @@ public class UrlImpl implements Path {
    * 
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     return path.hashCode();
   }
@@ -252,6 +254,7 @@ public class UrlImpl implements Path {
    * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof Path) {
       Path url = (Path) obj;
@@ -267,6 +270,7 @@ public class UrlImpl implements Path {
    * @return the path
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return path;
   }

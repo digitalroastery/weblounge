@@ -98,11 +98,21 @@ public abstract class IntegrationTestBase implements IntegrationTest {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.testing.IntegrationTest#init(ch.entwine.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.testing.IntegrationTest#setSite(ch.entwine.weblounge.common.site.Site)
    */
   @Override
-  public void init(Site site) {
+  public void setSite(Site site) {
     this.site = site;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.testing.IntegrationTest#init(ch.entwine.weblounge.common.site.Environment)
+   */
+  @Override
+  public void init(Environment environment) {
+    this.environment = environment;
   }
 
   /**

@@ -47,6 +47,12 @@ public class WebUrlImplTest {
   protected WebUrlImpl liveUrl = null;
 
   /** Url instance pointing to JSON output of the document's live version */
+  protected WebUrlImpl liveUrlWithAnchor = null;
+
+  /** Url instance pointing to JSON output of the document's live version */
+  protected WebUrlImpl liveUrlWithPort = null;
+
+  /** Url instance pointing to JSON output of the document's live version */
   protected WebUrlImpl flavoredLiveUrl = null;
 
   /** The localized live url */
@@ -79,14 +85,29 @@ public class WebUrlImplTest {
   /** Site hostname */
   protected SiteURL siteUrl = null;
 
+  /** Site hostname that includes a port */
+  protected SiteURL siteUrlWithPort = null;
+
+  /** Site url */
+  protected String siteAddress = "http://www.test.com";
+
+  /** Site url with port */
+  protected String siteAddressWithPort = "https://www.test.com:8080";
+
   /** Default url path */
   protected String livePath = "/test/";
 
   /** Segmented live path */
   protected String segmentedPath = "/test/";
 
+  /** Segmented live path with anchor */
+  protected String segmentedPathWithAnchor = "/test/#live";
+
   /** Localized live path */
   protected String localizedPath = "/test/index_de.html";
+
+  /** Localized live path with anchor */
+  protected String localizedPathWithAnchor = "/test/index_de.html#live";
 
   /** JSON path to live version */
   protected String flavoredPath = "/test/index.json";
@@ -135,16 +156,24 @@ public class WebUrlImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    siteUrl = new SiteURLImpl(new URL("http://www.test.com"));
-    
+    siteUrl = new SiteURLImpl(new URL(siteAddress));
+    siteUrlWithPort = new SiteURLImpl(new URL(siteAddressWithPort));
+
     siteMock = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(siteMock.getLanguage("de")).andReturn(german).anyTimes();
     EasyMock.expect(siteMock.getDefaultLanguage()).andReturn(english);
     EasyMock.expect(siteMock.getHostname()).andReturn(siteUrl).anyTimes();
     EasyMock.replay(siteMock);
+
     otherSiteMock = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(otherSiteMock.getLanguage("de")).andReturn(german).anyTimes();
+    EasyMock.expect(otherSiteMock.getDefaultLanguage()).andReturn(english);
+    EasyMock.expect(otherSiteMock.getHostname()).andReturn(siteUrlWithPort).anyTimes();
+    EasyMock.replay(otherSiteMock);
 
     liveUrl = new WebUrlImpl(siteMock, livePath);
+    liveUrlWithAnchor = new WebUrlImpl(siteMock, segmentedPathWithAnchor);
+    liveUrlWithPort = new WebUrlImpl(otherSiteMock, livePath);
     localizedLiveUrl = new WebUrlImpl(siteMock, localizedPath);
     flavoredLiveUrl = new WebUrlImpl(siteMock, flavoredPath);
     flavoredLocalizedLiveUrl = new WebUrlImpl(siteMock, flavoredLocalizedPath);
@@ -198,6 +227,9 @@ public class WebUrlImplTest {
     assertEquals(livePath, flavoredVersionedUrl.getPath());
     assertEquals(livePath, localizedVersionedUrl.getPath());
     assertEquals(livePath, flavoredLocalizedVersionedUrl.getPath());
+    assertEquals(livePath, new WebUrlImpl(siteMock, UrlUtils.concat(siteAddress, livePath)).getPath());
+    assertEquals(livePath, new WebUrlImpl(otherSiteMock, UrlUtils.concat(siteAddressWithPort, livePath)).getPath());
+    assertEquals(segmentedPathWithAnchor, liveUrlWithAnchor.getPath());
   }
 
   /**
@@ -207,6 +239,7 @@ public class WebUrlImplTest {
   @Test
   public void testGetLink() {
     assertEquals(livePath, liveUrl.getLink());
+    assertEquals(livePath, liveUrlWithPort.getLink());
     assertTrue(flavoredLiveUrl.getLink().endsWith(flavoredPath));
     assertTrue(localizedLiveUrl.getLink().endsWith(localizedPath));
     assertTrue(flavoredLocalizedLiveUrl.getLink().endsWith(flavoredLocalizedPath));
@@ -323,48 +356,45 @@ public class WebUrlImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.url.WebUrlImpl#normalize(boolean, boolean, boolean, boolean)}
+   * {@link ch.entwine.weblounge.common.impl.url.WebUrlImpl#normalize(boolean, boolean, boolean)}
    * .
    */
   @Test
   public void testNormalize() {
-    String url = siteUrl.toExternalForm(); 
-    assertEquals(UrlUtils.concat(url, segmentedPath), liveUrl.normalize());
-    assertEquals(UrlUtils.concat(url, flavoredSegmentedPath), flavoredSegmentedLiveUrl.normalize());
-    assertEquals(UrlUtils.concat(url, localizedSegmentedPath), localizedSegmentedLiveUrl.normalize());
-    assertEquals(UrlUtils.concat(url, flavoredLocalizedSegmentedPath), flavoredLocalizedSegmentedLiveUrl.normalize());
+    assertEquals(segmentedPath, liveUrl.normalize());
+    assertEquals(flavoredSegmentedPath, flavoredSegmentedLiveUrl.normalize());
+    assertEquals(localizedSegmentedPath, localizedSegmentedLiveUrl.normalize());
+    assertEquals(flavoredLocalizedSegmentedPath, flavoredLocalizedSegmentedLiveUrl.normalize());
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.url.WebUrlImpl#normalize(boolean, boolean, boolean, boolean)}
+   * {@link ch.entwine.weblounge.common.impl.url.WebUrlImpl#normalize(boolean, boolean, boolean)}
    * .
    */
   @Test
   public void testNormalizeBooleanBooleanBoolean() {
     WebUrlImpl url = flavoredLocalizedVersionedUrl;
-    String fullUrl = UrlUtils.concat(siteUrl.toExternalForm(), flavoredLocalizedVersionedPath);
-    assertEquals(fullUrl, url.normalize(true, true, true, true));
 
     // Everything
-    assertTrue(url.normalize(true, true, true, true).indexOf(Long.toString(url.getVersion())) > 0);
-    assertTrue(url.normalize(true, true, true, true).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
-    assertTrue(url.normalize(true, true, true, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
+    assertTrue(url.normalize(true, true, true).indexOf(Long.toString(url.getVersion())) > 0);
+    assertTrue(url.normalize(true, true, true).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
+    assertTrue(url.normalize(true, true, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
 
     // Everything but the version
-    assertTrue(url.normalize(true, false, true, true).indexOf(Long.toString(url.getVersion())) < 0);
-    assertTrue(url.normalize(true, false, true, true).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
-    assertTrue(url.normalize(true, false, true, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
+    assertTrue(url.normalize(false, true, true).indexOf(Long.toString(url.getVersion())) < 0);
+    assertTrue(url.normalize(false, true, true).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
+    assertTrue(url.normalize(false, true, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
 
     // Everything but the language
-    assertTrue(url.normalize(true, true, false, true).indexOf(Long.toString(url.getVersion())) > 0);
-    assertTrue(url.normalize(true, true, false, true).indexOf(url.getLanguage().getIdentifier().toString()) == -1);
-    assertTrue(url.normalize(true, true, false, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
+    assertTrue(url.normalize(true, false, true).indexOf(Long.toString(url.getVersion())) > 0);
+    assertTrue(url.normalize(true, false, true).indexOf(url.getLanguage().getIdentifier().toString()) == -1);
+    assertTrue(url.normalize(true, false, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
 
     // Everything but the flavor
-    assertTrue(url.normalize(true, true, true, false).indexOf(Long.toString(url.getVersion())) > 0);
-    assertTrue(url.normalize(true, true, true, false).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
-    assertTrue(url.normalize(true, true, true, false).indexOf(url.getFlavor().toString().toLowerCase()) == -1);
+    assertTrue(url.normalize(true, true, false).indexOf(Long.toString(url.getVersion())) > 0);
+    assertTrue(url.normalize(true, true, false).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
+    assertTrue(url.normalize(true, true, false).indexOf(url.getFlavor().toString().toLowerCase()) == -1);
   }
 
 }

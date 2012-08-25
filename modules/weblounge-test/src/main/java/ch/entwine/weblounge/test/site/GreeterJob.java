@@ -35,7 +35,6 @@ import java.util.Map;
 /**
  * Test job that will print a friendly greeting to <code>System.out</code>.
  */
-@SuppressWarnings("unchecked")
 public class GreeterJob implements JobWorker {
 
   /** Logging facility */

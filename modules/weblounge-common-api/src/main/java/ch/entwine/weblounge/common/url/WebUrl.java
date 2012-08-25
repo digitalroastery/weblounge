@@ -126,9 +126,6 @@ public interface WebUrl extends Path {
    * By specifying the parameters <code>includeVersion</code>,
    * <code>includeLanguage</code> and <code>includeFlavor</code>, the version,
    * language and flavor of that normalization can be left out.
-   * 
-   * @param includeHost
-   *          <code>true</code> to include the hostname
    * @param includeVersion
    *          <code>true</code> to include the version
    * @param includeLanguage
@@ -139,8 +136,8 @@ public interface WebUrl extends Path {
    * @return the normalized version of the url
    * @see #normalize()
    */
-  String normalize(boolean includeHost, boolean includeVersion,
-      boolean includeLanguage, boolean includeFlavor);
+  String normalize(boolean includeVersion, boolean includeLanguage,
+      boolean includeFlavor);
 
   /**
    * Returns <code>true</code> if the language had originally been encoded into

@@ -15,7 +15,8 @@ target
 # Eclipse
 .classpath
 .project
-.settings
+.settings/
+.metadata/
 
 # Mac OS X
 .DS_Store

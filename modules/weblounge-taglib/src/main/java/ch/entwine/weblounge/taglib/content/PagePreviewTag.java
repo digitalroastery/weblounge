@@ -263,7 +263,7 @@ public class PagePreviewTag extends WebloungeTag {
   public int doStartTag() throws JspException {
 
     // Don't do work if not needed (which is the case during precompilation)
-    if (RequestUtils.isMockRequest(request))
+    if (RequestUtils.isPrecompileRequest(request))
       return SKIP_BODY;
 
     Site site = request.getSite();
@@ -388,6 +388,7 @@ public class PagePreviewTag extends WebloungeTag {
   /**
    * @see javax.servlet.jsp.tagext.IterationTag#doAfterBody()
    */
+  @Override
   public int doAfterBody() throws JspException {
     pageletIndex++;
 
@@ -409,6 +410,7 @@ public class PagePreviewTag extends WebloungeTag {
    * 
    * @return either EVAL_PAGE or SKIP_PAGE
    */
+  @Override
   public int doEndTag() throws JspException {
 
     // If there is no page body, the doAfterBody() method will not be executed.

@@ -133,15 +133,6 @@ public interface Action extends Composeable, Customizable {
   WebUrl getUrl();
 
   /**
-   * Returns the url to this action in the given environment.
-   * 
-   * @param environment
-   *          the environment
-   * @return the action url
-   */
-  WebUrl getUrl(Environment environment);
-
-  /**
    * Adds the given flavor to the list of supported flavors.
    * 
    * @param flavor
@@ -271,5 +262,33 @@ public interface Action extends Composeable, Customizable {
    * @see #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)
    */
   String toXml();
+
+  /**
+   * Returns <code>true</code> if the given HTTP verb is supported by this
+   * action.
+   * <p>
+   * Common methods, amongst others, are:
+   * <ul>
+   * <li>HEAD</li>
+   * <li>OPTIONS</li>
+   * <li>GET</li>
+   * <li>POST</li>
+   * <li>PUT</li>
+   * <li>DELETE</li>
+   * </ul>
+   * 
+   * @param method
+   *          the request method
+   * @return <code>true</code> if <code>method</code> is supported by this
+   *         action
+   */
+  boolean supportsMethod(String method);
+
+  /**
+   * Returns the list of HTTP verbs that are supported by this action.
+   * 
+   * @return the list of supported verbs
+   */
+  String[] getMethods();
 
 }

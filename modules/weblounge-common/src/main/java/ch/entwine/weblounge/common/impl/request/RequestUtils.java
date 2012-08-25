@@ -28,6 +28,7 @@ import static java.lang.Boolean.TRUE;
 
 import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.common.impl.site.ActionSupport;
+import ch.entwine.weblounge.common.impl.site.PrecompileHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.SecurityUtils;
@@ -1742,6 +1743,30 @@ public final class RequestUtils {
     while (request instanceof HttpServletRequestWrapper) {
       request = ((HttpServletRequestWrapper) request).getRequest();
       if (request instanceof MockHttpServletRequest)
+        return true;
+    }
+
+    // Definitely not
+    return false;
+  }
+
+  /**
+   * Returns <code>true</code> if this is a request that was constructed for JSP
+   * precompilation purpose or if <code>request</code> is wrapping such a
+   * request.
+   * 
+   * @param request
+   *          the request
+   * @return <code>true</code> if this is a precompile request
+   */
+  public static boolean isPrecompileRequest(ServletRequest request) {
+    if (request instanceof PrecompileHttpServletRequest)
+      return true;
+
+    // Maybe it's wrapped?
+    while (request instanceof HttpServletRequestWrapper) {
+      request = ((HttpServletRequestWrapper) request).getRequest();
+      if (request instanceof PrecompileHttpServletRequest)
         return true;
     }
 

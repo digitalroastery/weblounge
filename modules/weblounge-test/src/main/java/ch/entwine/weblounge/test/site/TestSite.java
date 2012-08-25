@@ -134,7 +134,7 @@ public class TestSite extends SiteImpl {
         if (!implementsInterface && !extendsBaseClass)
           continue;
         IntegrationTest test = (IntegrationTest) c.newInstance();
-        test.init(this);
+        test.setSite(this);
         tests.add(test);
       } catch (InstantiationException e) {
         logger.error("Error creating instance of integration test " + c);

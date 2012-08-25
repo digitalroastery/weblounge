@@ -130,10 +130,11 @@ public class ContentIteratorTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
+  @Override
   public int doStartTag() throws JspException {
 
     // Don't do work if not needed (which is the case during precompilation)
-    if (RequestUtils.isMockRequest(request))
+    if (RequestUtils.isPrecompileRequest(request))
       return SKIP_BODY;
 
     // If pagelet is null, then this is the first iteration and the tag needs
@@ -174,6 +175,7 @@ public class ContentIteratorTag extends WebloungeTag {
    * 
    * @see ch.entwine.weblounge.taglib.content.AbstractContentIteratorTag#doAfterBody()
    */
+  @Override
   public int doAfterBody() {
     index++;
     if (index >= iterations)
@@ -193,6 +195,7 @@ public class ContentIteratorTag extends WebloungeTag {
    * 
    * @see ch.entwine.weblounge.taglib.WebloungeTag#doEndTag()
    */
+  @Override
   public int doEndTag() throws JspException {
     removeAndUnstashAttributes();
     return super.doEndTag();

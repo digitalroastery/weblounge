@@ -4,7 +4,7 @@
   <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-base</artifactId>
   <packaging>pom</packaging>
-  <version>3.0.7-SNAPSHOT</version>
+  <version>3.0.8-SNAPSHOT</version>
   <name>Weblounge</name>
   <description>Weblounge is a multilingual web content management system</description>
   <url>http://www.entwinemedia.com/weblounge</url>
@@ -123,6 +123,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
+        <module>modules/weblounge-aws</module>
         <module>modules/weblounge-bridge</module>
         <module>modules/weblounge-cache-api</module>
         <module>modules/weblounge-cache</module>
@@ -133,6 +134,7 @@
         <module>modules/weblounge-dispatcher-api</module>
         <module>modules/weblounge-dispatcher</module>
         <module>modules/weblounge-kernel</module>
+        <module>modules/weblounge-maven-s3-deploy-plugin</module>
         <module>modules/weblounge-preview</module>
         <module>modules/weblounge-security</module>
         <module>modules/weblounge-security-sql</module>
@@ -317,17 +319,19 @@
           </executions>
         </plugin>
 
-		<!-- Release management -->
-		<plugin>
-		  <groupId>org.apache.maven.plugins</groupId>
-		  <artifactId>maven-release-plugin</artifactId>
-		  <version>2.0</version>
-		  <configuration>
-		    <goals>deploy</goals>
-		    <autoVersionSubmodules>true</autoVersionSubmodules>
-				<addSchema>false</addSchema>
-		  </configuration>
-		</plugin>
+        <!-- Release management -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.3.2</version>
+          <configuration>
+            <goals>deploy</goals>
+            <autoVersionSubmodules>true</autoVersionSubmodules>
+            <addSchema>false</addSchema>
+            <pushChanges>false</pushChanges>
+            <updateWorkingCopyVersions>false</updateWorkingCopyVersions>
+          </configuration>
+        </plugin>
         
         <!-- Coding and styling rules for source code -->
         <plugin>

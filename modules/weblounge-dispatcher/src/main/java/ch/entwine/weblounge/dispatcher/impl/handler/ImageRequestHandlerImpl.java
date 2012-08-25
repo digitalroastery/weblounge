@@ -64,6 +64,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -109,13 +110,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     Site site = request.getSite();
     String path = url.getPath();
     String fileName = null;
-
-    // Check the request method. Only GET is supported right now.
-    String requestMethod = request.getMethod();
-    if (!"GET".equals(requestMethod)) {
-      logger.debug("Image request handler does not support {} requests", requestMethod);
-      return false;
-    }
 
     // Get hold of the content repository
     ContentRepository contentRepository = site.getContentRepository();
@@ -181,6 +175,20 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // Agree to serve the image
     logger.debug("Image handler agrees to handle {}", path);
+
+    // Check the request method. Only GET is supported right now.
+    String requestMethod = request.getMethod().toUpperCase();
+    if ("OPTIONS".equals(requestMethod)) {
+      String verbs = "OPTIONS,GET";
+      logger.trace("Answering options request to {} with {}", url, verbs);
+      response.setHeader("Allow", verbs);
+      response.setContentLength(0);
+      return true;
+    } else if (!"GET".equals(requestMethod)) {
+      logger.debug("Image request handler does not support {} requests", requestMethod);
+      DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
+      return true;
+    }
 
     // Is it published?
     // TODO: Fix this. imageResource.isPublished() currently returns false,

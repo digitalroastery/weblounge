@@ -86,7 +86,13 @@ public class FileResourceTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
+  @Override
   public int doStartTag() throws JspException {
+
+    // Don't do work if not needed (which is the case during precompilation)
+    if (RequestUtils.isPrecompileRequest(request))
+      return SKIP_BODY;
+
     Site site = request.getSite();
 
     ContentRepository repository = site.getContentRepository();
@@ -97,14 +103,12 @@ public class FileResourceTag extends WebloungeTag {
     }
 
     // Create the file uri, either from the id or the path. If none is
-    // specified, and we are not in jsp compilation mode, issue a warning
+    // specified, issue a warning
     ResourceURI uri = null;
     if (StringUtils.isNotBlank(fileId)) {
       uri = new FileResourceURIImpl(site, null, fileId);
     } else if (StringUtils.isNotBlank(filePath)) {
       uri = new FileResourceURIImpl(site, filePath, null);
-    } else if (RequestUtils.isMockRequest(request)) {
-      return SKIP_BODY;
     } else {
       throw new JspException("Neither resource id nor resource path were specified");
     }
@@ -162,6 +166,7 @@ public class FileResourceTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
    */
+  @Override
   public int doEndTag() throws JspException {
     removeAndUnstashAttributes();
     return super.doEndTag();

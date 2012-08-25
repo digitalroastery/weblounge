@@ -31,7 +31,6 @@ import ch.entwine.weblounge.common.impl.site.ModuleImpl;
 import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.request.RequestFlavor;
-import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 
 import org.easymock.EasyMock;
@@ -124,7 +123,7 @@ public class ActionSupportTest {
     module = new ModuleImpl();
     module.setIdentifier(identifier);
 
-    actionUrl = new WebUrlImpl(site, UrlUtils.concat(siteUrl, mountpoint));
+    actionUrl = new WebUrlImpl(site, mountpoint);
   }
 
   /**

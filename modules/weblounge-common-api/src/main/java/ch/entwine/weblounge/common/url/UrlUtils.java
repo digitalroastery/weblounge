@@ -124,8 +124,9 @@ public final class UrlUtils {
       return url;
 
     int index = url.lastIndexOf("/");
-    index = url.indexOf(".", index);
-    if (index == -1)
+    int dotIndex = url.indexOf(".", index);
+    int anchorIndex = url.indexOf("#", index);
+    if (dotIndex == -1 && anchorIndex == -1)
       url += "/";
     return url;
   }

@@ -157,7 +157,13 @@ public class ImageResourceTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
+  @Override
   public int doStartTag() throws JspException {
+
+    // Don't do work if not needed (which is the case during precompilation)
+    if (RequestUtils.isPrecompileRequest(request))
+      return SKIP_BODY;
+
     Site site = request.getSite();
 
     ContentRepository repository = site.getContentRepository();
@@ -196,8 +202,6 @@ public class ImageResourceTag extends WebloungeTag {
       uri = new ImageResourceURIImpl(site, null, altImageId);
     if (uri == null && StringUtils.isNotBlank(altImagePath))
       uri = new ImageResourceURIImpl(site, altImagePath, null);
-    if (uri == null && RequestUtils.isMockRequest(request))
-      return SKIP_BODY;
     if (uri == null)
       throw new JspException("None of the several possibilities returned a valid image");
 
@@ -282,6 +286,7 @@ public class ImageResourceTag extends WebloungeTag {
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
    */
+  @Override
   public int doEndTag() throws JspException {
     removeAndUnstashAttributes();
     return super.doEndTag();
