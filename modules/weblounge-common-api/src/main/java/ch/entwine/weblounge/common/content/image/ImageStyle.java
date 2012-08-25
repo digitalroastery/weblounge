@@ -89,6 +89,14 @@ public interface ImageStyle extends Composeable {
   float scale(int width, int height);
 
   /**
+   * Returns <code>true</code> whether this image style should be automatically
+   * created for all resources ahead of access.
+   * 
+   * @return <code>true</code> if this style should be automatically created
+   */
+  boolean isPreview();
+
+  /**
    * Returns an xml representation of this image style.
    * 
    * @return the xml representation

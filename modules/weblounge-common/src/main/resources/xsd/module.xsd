@@ -129,6 +129,7 @@
       </xsd:sequence>
       <xsd:attribute name="id" type="idType" use="required" />
       <xsd:attribute name="composeable" type="xsd:boolean" />
+      <xsd:attribute name="preview" type="xsd:boolean" />
     </xsd:complexType>
   </xsd:element>
 
