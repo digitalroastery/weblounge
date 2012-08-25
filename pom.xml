@@ -123,6 +123,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
+        <module>modules/weblounge-aws</module>
         <module>modules/weblounge-bridge</module>
         <module>modules/weblounge-cache-api</module>
         <module>modules/weblounge-cache</module>
@@ -133,6 +134,7 @@
         <module>modules/weblounge-dispatcher-api</module>
         <module>modules/weblounge-dispatcher</module>
         <module>modules/weblounge-kernel</module>
+        <module>modules/weblounge-maven-s3-deploy-plugin</module>
         <module>modules/weblounge-preview</module>
         <module>modules/weblounge-security</module>
         <module>modules/weblounge-security-sql</module>
