@@ -573,8 +573,8 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       return trim(url);
     }
 
-    // This seems to be a regular path
-    throw new IllegalArgumentException("Path must be absolute");
+    logger.warn("Problem analyzing path '{}'", path);
+    throw new IllegalArgumentException("Invalid path provided");
   }
 
   /**
