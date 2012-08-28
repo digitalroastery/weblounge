@@ -37,6 +37,7 @@ import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
@@ -57,6 +58,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -79,7 +82,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactory;
 
 /**
@@ -194,6 +199,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
 
     connected = true;
+
+    // Make sure previews are available as defined
+    updatePreviews();
   }
 
   /**
@@ -813,6 +821,104 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
+   * Iterates over the existing image styles and determines whether at least one
+   * style has changed or is missing the previews.
+   * 
+   * @throws ContentRepositoryException
+   *           if preview generation fails
+   */
+  protected void updatePreviews() throws ContentRepositoryException {
+
+    // Compile the full list of image styles
+    if (imageStyleTracker == null) {
+      logger.info("Skipping preview generation: image styles are unavailable");
+      return;
+    }
+
+    final List<ImageStyle> allStyles = new ArrayList<ImageStyle>();
+
+    // Add the global image styles that have the preview flag turned on
+    for (ImageStyle s : imageStyleTracker.getImageStyles()) {
+      allStyles.add(s);
+    }
+
+    // Add the site's preview image styles as well as
+    for (Module m : getSite().getModules()) {
+      for (ImageStyle s : m.getImageStyles()) {
+        allStyles.add(s);
+      }
+    }
+
+    // Check whether the image styles still match the current definition. If
+    // not, remove the produced previews and recreate them.
+    boolean styleHasChanged = false;
+    boolean styleIsMissing = false;
+
+    for (ImageStyle s : allStyles) {
+      File baseDir = ImageStyleUtils.getScaledFileBase(site, s);
+      File definitionFile = new File(baseDir, "style.xml");
+
+      // Try and read the file on disk
+      if (definitionFile.isFile()) {
+        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder;
+        Document doc;
+        ImageStyle style;
+        try {
+          docBuilder = docBuilderFactory.newDocumentBuilder();
+          doc = docBuilder.parse(definitionFile);
+          style = ImageStyleImpl.fromXml(doc.getFirstChild());
+
+          // Is the style still the same?
+          boolean stylesMatch = s.getWidth() == style.getWidth();
+          stylesMatch = stylesMatch && s.getHeight() == style.getHeight();
+          stylesMatch = stylesMatch && s.getScalingMode().equals(style.getScalingMode());
+          styleHasChanged = true;
+        } catch (ParserConfigurationException e) {
+          logger.error("Error setting up image style parser: {}", e.getMessage());
+        } catch (SAXException e) {
+          logger.error("Error parsing image style {}: {}", definitionFile, e.getMessage());
+        } catch (IOException e) {
+          logger.error("Error reading image style {}: {}", definitionFile, e.getMessage());
+        }
+      } else {
+        if (s.isPreview()) {
+          logger.debug("No previews found for image style '{}'", s.getIdentifier());
+          styleIsMissing = true;
+        }
+      }
+
+      // The current definition is no longer valid
+      if (styleHasChanged) {
+        logger.info("Image style '{}' has changed, removing existing previews from {}", s.getIdentifier(), baseDir);
+        FileUtils.deleteQuietly(baseDir);
+        if (!baseDir.mkdirs()) {
+          logger.error("Error creating image style directory {}", baseDir);
+          continue;
+        }
+      }
+
+      // Store the new definition
+      if (s.isPreview() && styleHasChanged || styleIsMissing) {
+        try {
+          definitionFile.createNewFile();
+          FileUtils.copyInputStreamToFile(IOUtils.toInputStream(s.toXml(), "UTF-8"), definitionFile);
+        } catch (IOException e) {
+          logger.error("Error creating image style defintion file at {}", definitionFile, e.getMessage());
+          continue;
+        }
+      } else {
+        logger.debug("Image style {} still matching the current definition", s.getIdentifier());
+      }
+    }
+
+    if (styleHasChanged || styleIsMissing) {
+      logger.info("Triggering creation of previews");
+      createPreviews();
+    }
+  }
+
+  /**
    * Creates the previews for this resource in all languages and for all known
    * image styles. The implementation ensures that there is only one preview
    * renderer running per resource.
@@ -828,16 +934,17 @@ public abstract class AbstractContentRepository implements ContentRepository {
     ResourceURI uri = resource.getURI();
 
     // Compile the full list of image styles
-    final List<ImageStyle> styles = new ArrayList<ImageStyle>();
     if (imageStyleTracker == null) {
       logger.info("Skipping preview generation for {}: image styles are unavailable", uri);
       return;
     }
 
+    final List<ImageStyle> previewStyles = new ArrayList<ImageStyle>();
+
     // Add the global image styles that have the preview flag turned on
     for (ImageStyle s : imageStyleTracker.getImageStyles()) {
       if (s.isPreview()) {
-        styles.add(s);
+        previewStyles.add(s);
         logger.debug("Preview images will be generated for {}", s);
       } else {
         logger.debug("Preview image generation will be skipped for {}", s);
@@ -848,7 +955,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     for (Module m : getSite().getModules()) {
       for (ImageStyle s : m.getImageStyles()) {
         if (s.isPreview()) {
-          styles.add(s);
+          previewStyles.add(s);
           logger.debug("Preview images will be generated for {}", s);
         } else {
           logger.debug("Preview image generation will be skipped for {}", s);
@@ -872,12 +979,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
       if (previewOp != null) {
         logger.debug("Adding languages and styles to {} for preview generation", uri);
         previewOp.addLanguages(Arrays.asList(languages));
-        previewOp.addStyles(styles);
+        previewOp.addStyles(previewStyles);
         return;
       }
 
       // Otherwise, a new preview generator needs to be started.
-      previewOp = new PreviewOperation(resource, Arrays.asList(languages), styles, ImageStyleUtils.DEFAULT_PREVIEW_FORMAT);
+      previewOp = new PreviewOperation(resource, Arrays.asList(languages), previewStyles, ImageStyleUtils.DEFAULT_PREVIEW_FORMAT);
 
       // Make sure nobody is working on the same resource at the moment
       if (currentPreviewOperations.contains(previewOp)) {
