@@ -435,7 +435,13 @@ public class SearchRequest {
       float score = fields.contains("score") ? (Float) doc.getFieldValue(SCORE) : 0.0f;
 
       // Have the serializer in charge create a type-specific search result item
-      SearchResultItem item = serializer.toSearchResultItem(site, score, metadata);
+      SearchResultItem item;
+        try {
+          item = serializer.toSearchResultItem(site, score, metadata);
+        } catch (Throwable t) {
+          logger.warn("Error during search result serialization: '{}'. Skipping this search result.", t.getMessage());
+          continue;
+        }
       result.addResultItem(item);
     }
 
