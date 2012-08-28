@@ -1384,6 +1384,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     try {
       result = repository.find(q);
     } catch (ContentRepositoryException e) {
+      logger.warn(e.getMessage());
       throw new WebApplicationException();
     }
 
