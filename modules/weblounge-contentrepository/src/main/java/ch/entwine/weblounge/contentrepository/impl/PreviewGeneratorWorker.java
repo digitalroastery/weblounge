@@ -183,6 +183,15 @@ class PreviewGeneratorWorker implements Runnable {
               fis = new FileInputStream(originalPreview);
               fos = new FileOutputStream(scaledFile);
               imagePreviewGenerator.createPreview(originalPreview, environment, l, style, format, fis, fos);
+
+              // Store the style definition used while creating the preview
+              File baseDir = ImageStyleUtils.getScaledFileBase(resource.getURI().getSite(), style);
+              File definitionFile = new File(baseDir, "style.xml");
+              if (!definitionFile.isFile()) {
+                logger.debug("Storing style definition at {}", definitionFile);
+                definitionFile.createNewFile();
+                FileUtils.copyInputStreamToFile(IOUtils.toInputStream(style.toXml(), "UTF-8"), definitionFile);
+              }
             } else {
               logger.debug("Skipping creation of existing '{}' preview of {}", style, resource);
             }
