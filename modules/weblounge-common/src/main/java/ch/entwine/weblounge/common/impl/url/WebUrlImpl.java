@@ -479,8 +479,11 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @param separator
    *          path separator character
    * @return the directory path
+   * @throws IllegalArgumentException
+   *           if an invalid path is given
    */
-  protected String analyzePath(String path, char separator) {
+  protected String analyzePath(String path, char separator)
+      throws IllegalArgumentException {
     if (path.contains(":/")) {
       try {
         URL u = new URL(path);
