@@ -325,7 +325,11 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   @Override
   public boolean equals(Object o) {
-    // This is to indicate that using the super implementation is sufficient
+    if (!(o instanceof PageletRenderer))
+      return false;
+    PageletRenderer r = (PageletRenderer) o;
+    if (module != null && !module.equals(r.getModule()))
+      return false;
     return super.equals(o);
   }
 
@@ -546,6 +550,16 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
 
     buf.append("</pagelet>");
     return buf.toString();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.impl.content.GeneralComposeable#toString()
+   */
+  @Override
+  public String toString() {
+    return module.getIdentifier() + "/" + identifier;
   }
 
 }
