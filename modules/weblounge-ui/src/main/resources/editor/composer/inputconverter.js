@@ -108,6 +108,7 @@ $.Class.extend('InputConverter',
 	},
 	
 	existsProperty: function(pagelet, property) {
+		if($.isEmptyObject(pagelet.properties)) return false;
 		return !$.isEmptyObject(pagelet.properties.property[property]);
 	},
 	
