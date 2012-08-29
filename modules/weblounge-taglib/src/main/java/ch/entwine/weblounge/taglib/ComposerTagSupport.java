@@ -800,7 +800,7 @@ public class ComposerTagSupport extends WebloungeTag {
 
       } catch (Throwable e) {
         // String params = RequestUtils.getParameters(request);
-        String msg = "Error rendering " + renderer + " on " + url + "'";
+        String msg = "Error rendering '" + renderer + "' on " + site.getIdentifier() + "://" + url;
         String reason = "";
         Throwable o = e.getCause();
         if (o != null) {
