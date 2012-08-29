@@ -217,6 +217,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     if (StringUtils.isBlank(method))
       throw new IllegalArgumentException("Method must not be blank");
     method = method.toUpperCase();
+    // TODO Remove after all actions provide their own verbs
     if (verbs == null || verbs.size() == 0)
       return "GET".equals(method) || "POST".equals(method) || "PUT".equals(method);
     return verbs.contains(method.toUpperCase());
@@ -229,7 +230,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   @Override
   public String[] getMethods() {
-    if (verbs == null) {
+    if (verbs == null || verbs.size() == 0) {
       return new String[] { "GET", "POST", "PUT" };
     } else {
       return verbs.toArray(new String[verbs.size()]);
