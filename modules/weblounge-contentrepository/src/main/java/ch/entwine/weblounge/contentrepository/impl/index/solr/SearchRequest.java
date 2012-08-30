@@ -436,12 +436,13 @@ public class SearchRequest {
 
       // Have the serializer in charge create a type-specific search result item
       SearchResultItem item;
-        try {
-          item = serializer.toSearchResultItem(site, score, metadata);
-        } catch (Throwable t) {
-          logger.warn("Error during search result serialization: '{}'. Skipping this search result.", t.getMessage());
-          continue;
-        }
+      try {
+        item = serializer.toSearchResultItem(site, score, metadata);
+      } catch (Throwable t) {
+        logger.warn("Error during search result serialization: '{}'. Skipping this search result.", t.getMessage());
+        result.setDocumentCount(--size);
+        continue;
+      }
       result.addResultItem(item);
     }
 
