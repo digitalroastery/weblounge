@@ -6,17 +6,18 @@ import static org.junit.Assert.fail;
 import ch.entwine.weblounge.bridge.oaipmh.MatterhornRecordHandler;
 import ch.entwine.weblounge.bridge.oaipmh.WebloungeHarvester;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
@@ -60,19 +61,20 @@ public class WebloungeHarvesterTest {
   /** The mock site */
   private Site site;
 
+  /** The resource serializer */
+  private static ResourceSerializerServiceImpl serializer = null;
+
   /**
-   * Sets up everything valid for all test runs.
-   * 
-   * @throws Exception
-   *           if setup fails
+   * Sets up static test data.
    */
   @BeforeClass
-  public static void setUpClass() throws Exception {
-    // Resource serializers
-    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
-    ResourceSerializerFactory.setResourceSerializerService(serializerService);
-    serializerService.registerSerializer(new MovieResourceSerializer());
-    serializerService.registerSerializer(new PageSerializer());
+  public static void setUpClass() {
+    // Resource serializer
+    serializer = new ResourceSerializerServiceImpl();
+    serializer.addSerializer(new PageSerializer());
+    serializer.addSerializer(new FileResourceSerializer());
+    serializer.addSerializer(new ImageResourceSerializer());
+    serializer.addSerializer(new MovieResourceSerializer());
   }
 
   /**
@@ -108,6 +110,8 @@ public class WebloungeHarvesterTest {
 
     // Connect to the repository
     contentRepository = new FileSystemContentRepository();
+    contentRepository.setSerializer(serializer);
+    contentRepository.setEnvironment(Environment.Production);
     Dictionary<String, Object> repositoryProperties = new Hashtable<String, Object>();
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
     contentRepository.updated(repositoryProperties);

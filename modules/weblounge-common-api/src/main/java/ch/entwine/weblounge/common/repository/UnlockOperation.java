@@ -18,24 +18,23 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
-
-import java.io.InputStream;
+import ch.entwine.weblounge.common.security.User;
 
 /**
- * The put operation represents the process of writing a resource to the content
- * repository.
+ * The unlock operation represents the process of unlocking a resource in the
+ * content repository.
  */
-public interface PutContentOperation extends ContentRepositoryResourceContentOperation<Resource<? extends ResourceContent>> {
+public interface UnlockOperation extends ContentRepositoryResourceOperation<Resource<? extends ResourceContent>> {
 
   /**
-   * Returns the resource's content data stream.
+   * Returns the user that was holding on to the lock.
    * 
-   * @return the data stream
+   * @return the former lock owner
    */
-  InputStream getInputStream();
+  User getUser();
 
 }

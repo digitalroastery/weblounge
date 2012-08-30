@@ -18,30 +18,23 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.security.User;
 
 /**
- * The put operation represents the process of writing a resource to the content
- * repository.
+ * The lock operation represents the process of locking a resource for editing
+ * in the content repository.
  */
-public interface PutOperation extends ContentRepositoryResourceOperation<Resource<? extends ResourceContent>> {
+public interface LockOperation extends ContentRepositoryResourceOperation<Resource<? extends ResourceContent>> {
 
   /**
-   * Returns the resource that is to be stored.
+   * Returns the locking user.
    * 
-   * @return the resource
+   * @return the user
    */
-  Resource<? extends ResourceContent> getResource();
-
-  /**
-   * Returns <code>true</code> if this resource's previews need to be updated as
-   * part of this operation.
-   * 
-   * @return <code>true</code> to update the previews
-   */
-  boolean updatePreviews();
+  User getUser();
 
 }

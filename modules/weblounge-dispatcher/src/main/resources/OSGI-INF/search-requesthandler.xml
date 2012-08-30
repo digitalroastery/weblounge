@@ -9,4 +9,6 @@
     <provide interface="ch.entwine.weblounge.dispatcher.RequestHandler" />
   </service>
 
+  <reference name="serializer" interface="ch.entwine.weblounge.common.repository.ResourceSerializerService" cardinality="1..1" policy="static" bind="setResourceSerializer" />
+
 </scr:component>

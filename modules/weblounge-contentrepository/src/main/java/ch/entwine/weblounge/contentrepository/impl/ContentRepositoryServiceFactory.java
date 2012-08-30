@@ -20,9 +20,11 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 
 import org.apache.commons.lang.StringUtils;
@@ -85,6 +87,12 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
 
   /** This service factory's bundle context */
   private BundleContext bundleCtx = null;
+
+  /** The current environment */
+  private Environment environment = null;
+
+  /** Service managing available resource serializer */
+  private ResourceSerializerService serializer = null;
 
   /**
    * Sets a reference to the service factory's component context.
@@ -160,6 +168,8 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
       try {
         repositoryImplementation = (Class<ContentRepository>) Class.forName(className);
         repository = repositoryImplementation.newInstance();
+        repository.setEnvironment(environment);
+        repository.setSerializer(serializer);
 
         // If this is a managed service, make sure it's configured properly
         // before the site is connected
@@ -257,6 +267,26 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
     }
 
     return null;
+  }
+
+  /**
+   * OSGi callback to set the current environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
+  }
+
+  /**
+   * OSGi callback to set the resource serializer service.
+   * 
+   * @param serializer
+   *          the serializer
+   */
+  void setResourceSerializer(ResourceSerializerService serializer) {
+    this.serializer = serializer;
   }
 
 }

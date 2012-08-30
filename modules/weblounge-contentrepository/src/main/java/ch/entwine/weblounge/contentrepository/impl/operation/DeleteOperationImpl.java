@@ -24,10 +24,10 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.DeleteOperation;
-import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.DeleteOperation;
+import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 
 import java.io.IOException;
 
@@ -58,7 +58,7 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#getResourceURI()
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation#getResourceURI()
    */
   public ResourceURI getResourceURI() {
     return resource.getURI();
@@ -79,7 +79,7 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
    * This implementation return <code>null</code> if the resource's uri equals
    * that of this operation.
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation#apply(ResourceURI,
    *      Resource)
    */
   public <C extends ResourceContent, R extends Resource<C>> R apply(
@@ -99,7 +99,7 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.DeleteOperation#allVersions()
+   * @see ch.entwine.weblounge.common.repository.DeleteOperation#allVersions()
    */
   public boolean allVersions() {
     return allVersions;
@@ -108,7 +108,7 @@ public final class DeleteOperationImpl extends AbstractContentRepositoryOperatio
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.repository.WritableContentRepository)
    */
   @Override
   protected Boolean run(WritableContentRepository repository)

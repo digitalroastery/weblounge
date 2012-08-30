@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
- *  http://entwinemedia.com/weblounge
+ *  Copyright (c) 2012 The Weblounge Team
+ *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,31 +18,28 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
+
 
 /**
- * This exception is thrown if the content repository is unavailable.
+ * The move operation represents the process of a resource (and potentially its
+ * children) being moved from one path or url to another.
  */
-public class ContentRepositoryUnavailableException extends Exception {
-
-  /** Serial version uid */
-  private static final long serialVersionUID = -8768389027972761077L;
+public interface MoveOperation extends ContentRepositoryResourceOperation<Void> {
 
   /**
-   * Creates a new repository exception with the given error message.
-   */
-  public ContentRepositoryUnavailableException() {
-    super();
-  }
-
-  /**
-   * Creates a new repository exception with the given error message.
+   * Returns the path that the resource should be moved to.
    * 
-   * @param message
-   *          the error message
+   * @return the target path
    */
-  public ContentRepositoryUnavailableException(String message) {
-    super(message);
-  }
+  String getTargetPath();
+
+  /**
+   * Returns <code>true</code> if the resource's children should be moved as
+   * well.
+   * 
+   * @return <code>true</code> to move child resources as well
+   */
+  boolean moveChildren();
 
 }

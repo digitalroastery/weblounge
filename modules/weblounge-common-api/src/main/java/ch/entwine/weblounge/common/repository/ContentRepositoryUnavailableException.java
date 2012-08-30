@@ -18,25 +18,31 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository;
-
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.site.Site;
+package ch.entwine.weblounge.common.repository;
 
 /**
- * The <code>ContentRepositoryService</code> provides access to the content
- * repository of a given site.
+ * This exception is thrown if the content repository is unavailable.
  */
-public interface ContentRepositoryService {
+public class ContentRepositoryUnavailableException extends Exception {
+
+  /** Serial version uid */
+  private static final long serialVersionUID = -8768389027972761077L;
 
   /**
-   * Returns the content repository for the given site or <code>null</code> if
-   * no repository exists.
-   * 
-   * @param site
-   *          the site
-   * @return the site's content repository
+   * Creates a new repository exception with the given error message.
    */
-  ContentRepository getRepository(Site site);
+  public ContentRepositoryUnavailableException() {
+    super();
+  }
+
+  /**
+   * Creates a new repository exception with the given error message.
+   * 
+   * @param message
+   *          the error message
+   */
+  public ContentRepositoryUnavailableException(String message) {
+    super(message);
+  }
 
 }

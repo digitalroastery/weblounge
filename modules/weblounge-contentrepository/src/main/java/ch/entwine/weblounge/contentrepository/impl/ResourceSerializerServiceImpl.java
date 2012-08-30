@@ -20,14 +20,9 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerService;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,43 +42,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
   protected static final Logger logger = LoggerFactory.getLogger(ResourceSerializerServiceImpl.class);
 
   /** The registered content repositories */
-  private Map<String, ResourceSerializer<?, ?>> serializers = new HashMap<String, ResourceSerializer<?, ?>>();
-
-  /** The resource serializer tracker */
-  private ResourceSerializerTracker siteTracker = null;
-
-  /**
-   * Callback for OSGi's declarative services component activation.
-   * 
-   * @param context
-   *          the component context
-   * @throws Exception
-   *           if component activation fails
-   */
-  void activate(ComponentContext context) throws Exception {
-    BundleContext bundleContext = context.getBundleContext();
-    logger.info("Starting resource serializer service");
-    ResourceSerializerFactory.setResourceSerializerService(this);
-    siteTracker = new ResourceSerializerTracker(this, bundleContext);
-    siteTracker.open();
-    logger.debug("Resource serializer service activated");
-  }
-
-  /**
-   * Callback for OSGi's declarative services component dactivation.
-   * 
-   * @param context
-   *          the component context
-   * @throws Exception
-   *           if component inactivation fails
-   */
-  void deactivate(ComponentContext context) throws Exception {
-    logger.debug("Deactivating resource serializer service");
-    ResourceSerializerFactory.setResourceSerializerService(null);
-    siteTracker.close();
-    siteTracker = null;
-    logger.info("Resource serializer service stopped");
-  }
+  private final Map<String, ResourceSerializer<?, ?>> serializers = new HashMap<String, ResourceSerializer<?, ?>>();
 
   /**
    * Adds the new serializer to the list of registered resource serializer
@@ -95,7 +54,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
    * @param serializer
    *          the serializer
    */
-  public void registerSerializer(ResourceSerializer<?, ?> serializer) {
+  public void addSerializer(ResourceSerializer<?, ?> serializer) {
     synchronized (serializers) {
       String type = serializer.getType();
       if (serializers.containsKey(type)) {
@@ -116,7 +75,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
    * @param serializer
    *          the serializer
    */
-  public void unregisterSerializer(ResourceSerializer<?, ?> serializer) {
+  public void removeSerializer(ResourceSerializer<?, ?> serializer) {
     synchronized (serializers) {
       String type = serializer.getType();
       serializers.remove(type);
@@ -126,7 +85,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializerByType(java.lang.String)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializerService#getSerializerByType(java.lang.String)
    */
   public ResourceSerializer<?, ?> getSerializerByType(String resourceType) {
     synchronized (serializers) {
@@ -137,7 +96,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializerByMimeType(java.lang.String)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializerService#getSerializerByMimeType(java.lang.String)
    */
   public ResourceSerializer<?, ?> getSerializerByMimeType(String mimeType) {
     ResourceSerializer<?, ?> serializerForMimeType = null;
@@ -155,7 +114,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializers()
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializerService#getSerializers()
    */
   public Set<ResourceSerializer<?, ?>> getSerializers() {
     Set<ResourceSerializer<?, ?>> set = new HashSet<ResourceSerializer<?, ?>>();
@@ -163,63 +122,6 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
       set.addAll(serializers.values());
     }
     return set;
-  }
-
-  /**
-   * Service tracker for {@link ResourceSerializer} instances.
-   */
-  private static class ResourceSerializerTracker extends ServiceTracker {
-
-    /** The enclosing content repository factory */
-    private ResourceSerializerServiceImpl serializerService = null;
-
-    /**
-     * Creates a new site tracker which will call back to the
-     * <code>ContentRepositoryFactory</code> that created it.
-     * 
-     * @param service
-     *          the serializer service
-     * @param context
-     *          the bundle context
-     */
-    public ResourceSerializerTracker(ResourceSerializerServiceImpl service,
-        BundleContext context) {
-      super(context, ResourceSerializer.class.getName(), null);
-      this.serializerService = service;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.osgi.util.tracker.ServiceTracker#addingService(org.osgi.framework.ServiceReference)
-     */
-    @Override
-    public Object addingService(ServiceReference reference) {
-      ResourceSerializer<?, ?> serializer = (ResourceSerializer<?, ?>) super.addingService(reference);
-      serializerService.registerSerializer(serializer);
-      return serializer;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.osgi.util.tracker.ServiceTracker#removedService(org.osgi.framework.ServiceReference,
-     *      java.lang.Object)
-     */
-    @Override
-    public void removedService(ServiceReference reference, Object service) {
-      serializerService.unregisterSerializer((ResourceSerializer<?, ?>) service);
-      if (reference.getBundle() != null) {
-        try {
-          super.removedService(reference, service);
-        } catch (IllegalStateException e) {
-          // The service has been removed, probably due to bundle shutdown
-        } catch (Throwable t) {
-          logger.warn("Error removing service: {}", t.getMessage());
-        }
-      }
-    }
-
   }
 
 }

@@ -61,10 +61,10 @@ import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.index.SearchIndex;
 
 import org.apache.commons.lang.StringUtils;
@@ -93,17 +93,25 @@ public class SearchRequest {
   /** The connection to the solr database */
   private Solr solr = null;
 
+  /** The resource serializer service */
+  private ResourceSerializerService resourceSerializer = null;
+
   /**
    * Creates a new requester for solr that will be using the given connection
    * object to query the search index.
    * 
    * @param connection
    *          the solr connection
+   * @param serializer
+   *          the resource serializer
    */
-  public SearchRequest(Solr connection) {
+  public SearchRequest(Solr connection, ResourceSerializerService serializer) {
     if (connection == null)
       throw new IllegalStateException("Unable to run queries on null connection");
+    if (serializer == null)
+      throw new IllegalStateException("Resource serializer must not be null");
     this.solr = connection;
+    this.resourceSerializer = serializer;
   }
 
   /**
@@ -158,7 +166,7 @@ public class SearchRequest {
     if (query.getSubjects().length > 0) {
       and(solrQuery, SUBJECT, query.getSubjects(), true, true);
     }
-    
+
     // Subjects (AND)
     if (query.getANDSubjects().length > 0) {
       for (String subject : query.getANDSubjects()) {
@@ -409,7 +417,7 @@ public class SearchRequest {
 
       // Get the resource serializer
       String type = (String) doc.getFirstValue(TYPE);
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(type);
+      ResourceSerializer<?, ?> serializer = resourceSerializer.getSerializerByType(type);
       if (serializer == null) {
         logger.warn("Skipping search result due to missing serializer of type {}", type);
         continue;

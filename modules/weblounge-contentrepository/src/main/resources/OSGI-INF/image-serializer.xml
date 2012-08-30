@@ -6,7 +6,8 @@
   <implementation class="ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer" />
   <property name="service.description" value="Weblounge Image Serializer" />
   <service>
-    <provide interface="ch.entwine.weblounge.contentrepository.ResourceSerializer" />
+    <provide interface="ch.entwine.weblounge.common.repository.ResourceSerializer" />
+    <provide interface="ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer" />
   </service>
 
   <reference name="previewgenerator" interface="ch.entwine.weblounge.common.content.image.ImagePreviewGenerator" cardinality="0..n" policy="dynamic" bind="addPreviewGenerator" unbind="removePreviewGenerator" />

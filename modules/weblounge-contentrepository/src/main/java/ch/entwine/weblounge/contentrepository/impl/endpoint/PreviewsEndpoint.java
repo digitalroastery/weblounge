@@ -28,18 +28,18 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -87,6 +87,9 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
 
   /** The request environment */
   protected Environment environment = Environment.Production;
+
+  /** The resource serializer service */
+  private ResourceSerializerService serializerService = null;
 
   /**
    * OSGi callback on component inactivation.
@@ -190,7 +193,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Find a serializer
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceURI.getType());
+    ResourceSerializer<?, ?> serializer = serializerService.getSerializerByType(resourceURI.getType());
     if (serializer == null)
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
 
@@ -538,7 +541,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       ImageStyle style, Language language) {
 
     // Find a serializer
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resource.getURI().getType());
+    ResourceSerializer<?, ?> serializer = serializerService.getSerializerByType(resource.getURI().getType());
     if (serializer == null)
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
 
@@ -702,6 +705,16 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
    */
   void setEnvironment(Environment environment) {
     this.environment = environment;
+  }
+
+  /**
+   * OSGi callback that is setting the resource serializer.
+   * 
+   * @param serializer
+   *          the resource serializer service
+   */
+  void setResourceSerializer(ResourceSerializerService serializer) {
+    this.serializerService  = serializer;
   }
 
   /**
