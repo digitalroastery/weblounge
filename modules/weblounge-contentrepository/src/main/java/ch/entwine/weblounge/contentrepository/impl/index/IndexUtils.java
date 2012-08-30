@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index.solr;
+package ch.entwine.weblounge.contentrepository.impl.index;
 
 import ch.entwine.weblounge.common.security.User;
 
@@ -29,10 +29,10 @@ import java.util.Date;
 /**
  * Utility class for the solr database.
  */
-public final class SolrUtils {
+public final class IndexUtils {
 
   /** The solr supported date format. **/
-  protected static DateFormat dateFormat = new SimpleDateFormat(SolrSchema.SOLR_DATE_FORMAT);
+  protected static DateFormat dateFormat = new SimpleDateFormat(IndexSchema.SOLR_DATE_FORMAT);
 
   /** The solr supported date format for days **/
   protected static DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -43,7 +43,7 @@ public final class SolrUtils {
   /**
    * Utility classes should not be initialized.
    */
-  private SolrUtils() {
+  private IndexUtils() {
   }
 
   /**

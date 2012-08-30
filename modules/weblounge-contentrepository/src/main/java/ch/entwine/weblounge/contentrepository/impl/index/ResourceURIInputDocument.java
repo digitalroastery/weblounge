@@ -18,12 +18,12 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index.solr;
+package ch.entwine.weblounge.contentrepository.impl.index;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 

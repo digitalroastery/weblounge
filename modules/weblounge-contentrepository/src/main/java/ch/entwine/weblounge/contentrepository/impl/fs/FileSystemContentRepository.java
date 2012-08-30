@@ -472,14 +472,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
               String id = f.getParentFile().getParentFile().getName();
               ResourceURI uri = new ResourceURIImpl(resourceType, getSite(), null, id, version);
 
-              uris.add(uri);
-            }
-          }
-        }
-      } catch (Throwable t) {
-        logger.error("Error reading available uris from file system: {}", t.getMessage());
-        throw new IOException(t);
-      }
+    // Add content if there is any
+    idx = new FileSystemContentRepositoryIndex(site, idxRoot);
 
     }
 

@@ -20,13 +20,9 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ALTERNATE_VERSION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.LOCALIZED_FULLTEXT;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
-import static org.apache.solr.client.solrj.request.AbstractUpdateRequest.ACTION.COMMIT;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.ALTERNATE_VERSION;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
@@ -37,70 +33,84 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
-import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.repository.ResourceSerializer;
-import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.PathUtils;
+import ch.entwine.weblounge.contentrepository.ResourceSerializer;
+import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SearchRequest;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.Solr;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SuggestRequest;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchDocument;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchSearchQuery;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.SuggestRequest;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.request.AbstractUpdateRequest.ACTION;
-import org.apache.solr.client.solrj.request.UpdateRequest;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.get.GetRequestBuilder;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.node.Node;
+import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHitField;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * A Solr-based search index implementation.
+ * A search index implementation based on ElasticSearch.
  */
 public class SearchIndex implements VersionedContentRepositoryIndex {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchIndex.class);
 
-  /** Directory name of the solr configuration directory */
-  private static final String CONF_DIR = "conf";
-
-  /** Directory name of the solr configuration directory */
-  private static final String DATA_DIR = "data";
-
   /** Identifier of the root entry */
-  public static final long ROOT_ID = 0L;
+  public static final String ROOT_ID = "root";
 
-  /** Type of the root entry */
-  private static final String ROOT_TYPE = "index";
+  /** Type of the document containing the index version information */
+  private static final String VERSION_TYPE = "version";
 
-  /** Connection to the solr database */
-  private Solr solrServer = null;
+  /** The elastic search settings */
+  private static final String SETTINGS_FILE = "/elasticsearch/settings.yml";
 
-  /** Solr query execution */
-  private SearchRequest searchRequest = null;
+  /** The local elastic search node */
+  private Node elasticSearch = null;
 
-  /** True if this is a readonly index */
+  /** Client for talking to elastic search */
+  private Client nodeClient = null;
+
+  /** True if this is a read only index */
   protected boolean isReadOnly = false;
 
   /** The solr root */
-  protected File solrRoot = null;
+  protected File indexRoot = null;
 
   /** The version number */
   protected int indexVersion = -1;
@@ -109,43 +119,45 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   protected ResourceSerializerService resourceSerializer = null;
 
   /**
-   * Creates a search index that puts solr into the given root directory. If the
-   * directory doesn't exist, it will be created.
+   * Creates a search index.
    * 
-   * @param solrRoot
-   *          the solr root directory
-   * @param resourceSerializer
-   *          the resource serializer
+   * @param site
+   *          the site
+   * @param indexRoot
+   *          the elastic search root directory
    * @param readOnly
    *          <code>true</code> to indicate a read only index
    * @throws IOException
    *           if either loading or creating the index fails
    */
-  public SearchIndex(File solrRoot,
-      ResourceSerializerService resourceSerializer, boolean readOnly)
-          throws IOException {
-    this.solrRoot = solrRoot;
-    this.resourceSerializer = resourceSerializer;
+  public SearchIndex(Site site, File indexRoot, boolean readOnly)
+      throws IOException {
+    this.indexRoot = indexRoot;
     this.isReadOnly = readOnly;
     try {
-      loadSolr(solrRoot);
+      initElasticSearch(site, indexRoot);
     } catch (Throwable t) {
-      throw new IOException("Error loading solr index", t);
+      throw new IOException("Error creating elastic search index", t);
     }
 
   }
 
   /**
-   * Closes this index.
+   * Shuts down the elastic search index node.
    * 
    * @throws IOException
-   *           if closing the index file fails
+   *           if stopping the index fails
    */
   public void close() throws IOException {
     try {
-      solrServer.shutdown();
+      if (nodeClient != null)
+        nodeClient.close();
+      if (elasticSearch != null) {
+        elasticSearch.stop();
+        elasticSearch.close();
+      }
     } catch (Throwable t) {
-      throw new IOException("Error closing the solr connection", t);
+      throw new IOException("Error stopping the elastic search node", t);
     }
   }
 
@@ -159,7 +171,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   }
 
   /**
-   * Makes a request to solr and returns the result set.
+   * Makes a request and returns the result set.
    * 
    * @param query
    *          the search query
@@ -169,27 +181,147 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    */
   public SearchResult getByQuery(SearchQuery query)
       throws ContentRepositoryException {
+
     logger.debug("Searching index using query '{}'", query);
+
+    // See if the index version exists and check if it matches.
+    String indexName = query.getSite().getIdentifier();
+    SearchRequestBuilder requestBuilder = new SearchRequestBuilder(nodeClient);
+    requestBuilder.setIndices(indexName);
+    requestBuilder.setSearchType(SearchType.QUERY_THEN_FETCH);
+    requestBuilder.setPreference("_local");
+    requestBuilder.setQuery(new ElasticSearchSearchQuery(query));
+
+    // Pagination
+    if (query.getOffset() >= 0)
+      requestBuilder.setFrom(query.getOffset());
+    if (query.getLimit() >= 0)
+      requestBuilder.setSize(query.getLimit());
+
+    // Order by publishing date
+    if (!SearchQuery.Order.None.equals(query.getPublishingDateSortOrder())) {
+      switch (query.getPublishingDateSortOrder()) {
+        case Ascending:
+          requestBuilder.addSort(IndexSchema.PUBLISHED_FROM, SortOrder.ASC);
+          break;
+        case Descending:
+          requestBuilder.addSort(IndexSchema.PUBLISHED_FROM, SortOrder.DESC);
+          break;
+        case None:
+        default:
+          break;
+      }
+    }
+
+    // Order by modification date
+    else if (!SearchQuery.Order.None.equals(query.getModificationDateSortOrder())) {
+      switch (query.getModificationDateSortOrder()) {
+        case Ascending:
+          requestBuilder.addSort(IndexSchema.MODIFIED, SortOrder.ASC);
+          break;
+        case Descending:
+          requestBuilder.addSort(IndexSchema.MODIFIED, SortOrder.DESC);
+          break;
+        case None:
+        default:
+          break;
+      }
+    }
+
+    // Order by creation date
+    else if (!SearchQuery.Order.None.equals(query.getCreationDateSortOrder())) {
+      switch (query.getCreationDateSortOrder()) {
+        case Ascending:
+          requestBuilder.addSort(IndexSchema.CREATED, SortOrder.ASC);
+          break;
+        case Descending:
+          requestBuilder.addSort(IndexSchema.CREATED, SortOrder.DESC);
+          break;
+        case None:
+        default:
+          break;
+      }
+    }
+
+    // Order by score
+    // TODO: Order by score
+    // else {
+    // requestBuilder.addSort(IndexSchema.SCORE, SortOrder.DESC);
+    // }
+
     try {
-      return searchRequest.getByQuery(query);
+
+      // Execute the query and try to get hold of a query response
+      SearchResponse response = null;
+      try {
+        response = nodeClient.search(requestBuilder.request()).actionGet();
+      } catch (Throwable t) {
+        throw new ContentRepositoryException(t);
+      }
+
+      // Create and configure the query result
+      long hits = response.getHits().getTotalHits();
+      long size = response.getHits().getHits().length;
+
+      SearchResultImpl result = new SearchResultImpl(query, hits, size);
+      result.setSearchTime(response.getTookInMillis());
+
+      // Walk through response and create new items with title, creator, etc:
+      for (SearchHit doc : response.getHits()) {
+
+        // Get the resource serializer
+        String type = (String) doc.getFields().get(TYPE).getValue();
+        ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(type);
+        if (serializer == null) {
+          logger.warn("Skipping search result due to missing serializer of type {}", type);
+          continue;
+        }
+
+        // Wrap the search result metadata
+        List<ResourceMetadata<?>> metadata = new ArrayList<ResourceMetadata<?>>(doc.getFields().size());
+        for (SearchHitField field : doc.getFields().values()) {
+          String name = field.getName();
+          ResourceMetadata<Object> m = new ResourceMetadataImpl<Object>(name);
+          // TODO: Add values with more care (localized, correct type etc.)
+          if (field.getValues().size() > 1) {
+            for (Object v : field.getValues()) {
+              m.addValue(v);
+            }
+          } else {
+            m.addValue(field.getValue());
+          }
+          metadata.add(m);
+        }
+
+        // Get the score for this item
+        float score = doc.getScore();
+
+        // Have the serializer in charge create a type-specific search result
+        // item
+        SearchResultItem item = serializer.toSearchResultItem(query.getSite(), score, metadata);
+        result.addResultItem(item);
+      }
+
+      return result;
+
     } catch (Throwable t) {
-      throw new ContentRepositoryException("Error querying solr index", t);
+      throw new ContentRepositoryException("Error querying index", t);
     }
   }
 
   /**
-   * Clears the search index. Make sure you know what you are doing.
+   * Clears the search index.
    * 
    * @throws IOException
-   *           if clearing the solr index fails
+   *           if clearing the index fails
    */
   public void clear() throws IOException {
     try {
-      solrServer.shutdown();
-      initSolr(solrRoot);
-      loadSolr(solrRoot);
+      DeleteIndexResponse delete = nodeClient.admin().indices().delete(new DeleteIndexRequest()).actionGet();
+      if (!delete.acknowledged())
+        logger.error("Indices could not be deleted");
     } catch (Throwable t) {
-      throw new IOException("Cannot clear solr index", t);
+      throw new IOException("Cannot clear index", t);
     }
   }
 
@@ -204,15 +336,11 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
     logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
 
-    UpdateRequest solrRequest = new UpdateRequest();
-    StringBuilder query = new StringBuilder();
-    query.append(RESOURCE_ID).append(":").append(uri.getIdentifier()).append(" AND ").append(VERSION).append(":").append(uri.getVersion());
-    solrRequest.setAction(ACTION.COMMIT, true, true);
-    solrRequest.deleteByQuery(query.toString());
-    try {
-      solrServer.update(solrRequest);
-    } catch (Throwable t) {
-      throw new ContentRepositoryException("Unable to clear solr index", t);
+    String index = uri.getSite().getIdentifier();
+    String id = uri.getIdentifier();
+    DeleteResponse delete = nodeClient.prepareDelete(index, uri.getType(), id).execute().actionGet();
+    if (delete.notFound()) {
+      logger.trace("Document {} to delete was not found", uri);
     }
 
     // Adjust the version information
@@ -264,11 +392,11 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     String resourceType = resource.getURI().getType();
     ResourceSerializer<?, ?> serializer = resourceSerializer.getSerializerByType(resourceType);
     if (serializer == null)
-      throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
+      throw new ContentRepositoryException("Unable to create an input document for " + uri + ": no serializer found");
 
     // Add the resource to the index
     List<ResourceMetadata<?>> resourceMetadata = serializer.toMetadata(resource);
-    SolrInputDocument doc = updateDocument(new SolrInputDocument(), resourceMetadata);
+    ElasticSearchDocument doc = new ElasticSearchDocument(uri, resourceMetadata);
     try {
       update(doc);
     } catch (Throwable t) {
@@ -306,9 +434,12 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       resources.add(serializer.toResource(site, resourceMetadata));
     }
 
+    if (resources.size() == 0)
+      return;
+
     // Add the alternate version information to each resource's metadata and
     // write it back to the search index (including the new one)
-    List<SolrInputDocument> solrDocuments = new ArrayList<SolrInputDocument>();
+    List<ElasticSearchDocument> documents = new ArrayList<ElasticSearchDocument>();
     for (Resource<?> r : resources) {
       List<ResourceMetadata<?>> resourceMetadata = serializer.toMetadata(r);
       ResourceMetadataImpl<Long> alternateVersions = new ResourceMetadataImpl<Long>(ALTERNATE_VERSION);
@@ -329,105 +460,53 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       }
 
       // Write the resource to the index
-      solrDocuments.add(updateDocument(new SolrInputDocument(), resourceMetadata));
+      documents.add(new ElasticSearchDocument(r.getURI(), resourceMetadata));
     }
 
     // Now update all documents at once
     try {
-      update(solrDocuments.toArray(new SolrInputDocument[solrDocuments.size()]));
+      update(documents.toArray(new ElasticSearchDocument[documents.size()]));
     } catch (Throwable t) {
       throw new ContentRepositoryException("Cannot update versions of resource " + uri + " in index", t);
     }
   }
 
   /**
-   * Adds <code>metadata</code> as fields to the input document.
-   * 
-   * @param doc
-   *          the solr input document
-   * @param metadata
-   *          the metadata
-   * @return the enriched input document
-   */
-  private SolrInputDocument updateDocument(SolrInputDocument doc,
-      List<ResourceMetadata<?>> metadata) {
-    for (ResourceMetadata<?> entry : metadata) {
-      String metadataKey = entry.getName();
-
-      // Add language neutral metadata values
-      for (Object value : entry.getValues()) {
-        doc.addField(metadataKey, value);
-
-        // Add to fulltext?
-        if (entry.addToFulltext()) {
-          String fulltext = StringUtils.trimToEmpty((String) doc.getFieldValue(SolrSchema.FULLTEXT));
-          if (value.getClass().isArray()) {
-            Object[] fieldValues = (Object[]) value;
-            for (Object v : fieldValues) {
-              fulltext = StringUtils.join(new Object[] { fulltext, v.toString() }, " ");
-            }
-          } else {
-            fulltext = StringUtils.join(new Object[] {
-                fulltext,
-                value.toString() }, " ");
-          }
-          doc.setField(SolrSchema.FULLTEXT, fulltext);
-        }
-      }
-
-      // Add localized metadata values
-      for (Language language : entry.getLocalizedValues().keySet()) {
-        List<?> values = entry.getLocalizedValues().get(language);
-        for (Object value : values) {
-          doc.addField(metadataKey, value);
-
-          // Add to fulltext
-          if (entry.addToFulltext()) {
-
-            // Update the localized fulltext
-            String localizedFieldName = MessageFormat.format(LOCALIZED_FULLTEXT, language.getIdentifier());
-            String localizedFulltext = StringUtils.trimToEmpty((String) doc.getFieldValue(localizedFieldName));
-            if (value.getClass().isArray()) {
-              Object[] fieldValues = (Object[]) value;
-              for (Object v : fieldValues) {
-                localizedFulltext = StringUtils.join(new Object[] {
-                    localizedFulltext,
-                    v.toString() }, " ");
-              }
-            } else {
-              localizedFulltext = StringUtils.join(new Object[] {
-                  localizedFulltext,
-                  value.toString() }, " ");
-            }
-            doc.setField(localizedFieldName, localizedFulltext);
-          }
-        }
-      }
-
-    }
-
-    return doc;
-  }
-
-  /**
    * Posts the input document to the search index.
    * 
-   * @param waitCommit
-   *          wait until the commit finalizes
+   * @param site
+   *          the site that these documents belong to
    * @param documents
    *          the input documents
    * @return the query response
    * @throws ContentRepositoryException
-   *           if posting to solr fails
+   *           if posting to the index fails
    */
-  protected QueryResponse update(SolrInputDocument... documents)
+  protected BulkResponse update(ElasticSearchDocument... documents)
       throws ContentRepositoryException {
-    final UpdateRequest solrRequest = new UpdateRequest();
-    solrRequest.setAction(ACTION.COMMIT, true, true);
-    for (SolrInputDocument doc : documents)
-      solrRequest.add(doc);
+
+    BulkRequestBuilder bulkRequest = nodeClient.prepareBulk();
+    for (ElasticSearchDocument doc : documents) {
+      String index = doc.getSite().getIdentifier();
+      String type = doc.getType();
+      String id = doc.getIdentifier();
+      bulkRequest.add(nodeClient.prepareIndex(index, type, id).setSource(doc));
+    }
+
     try {
-      return solrServer.update(solrRequest);
+      BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+
+      // Check for errors
+      if (bulkResponse.hasFailures()) {
+        for (BulkItemResponse item : bulkResponse.items()) {
+          if (item.isFailed()) {
+            logger.warn("Error updating {}: {}", item, item.failureMessage());
+            throw new ContentRepositoryException(item.getFailureMessage());
+          }
+        }
+      }
+
+      return bulkResponse;
     } catch (Throwable t) {
       throw new ContentRepositoryException("Cannot update documents in index", t);
     }
@@ -476,10 +555,10 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     }
     metadata = new ArrayList<ResourceMetadata<?>>(metadataMap.values());
 
-    // Read the current resource and post the updated data to the search index
+    // Read the current resource and post the updated data to the search
+    // index
     try {
-      SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
-      update(doc);
+      update(new ElasticSearchDocument(resource.getURI(), metadata));
       return true;
     } catch (Throwable t) {
       throw new ContentRepositoryException("Cannot update resource " + uri + " in index", t);
@@ -510,7 +589,10 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     if (StringUtils.isBlank(dictionary))
       throw new IllegalArgumentException("Dictionary must not be blank");
 
-    SuggestRequest request = new SuggestRequest(solrServer, dictionary, onlyMorePopular, count, collate);
+    SuggestRequest request = null;
+    // TODO: Implement
+    // SuggestRequest request = new SuggestRequest(solrServer, dictionary,
+    // onlyMorePopular, count, collate);
     try {
       return request.getSuggestions(seed);
     } catch (Throwable t) {
@@ -523,132 +605,168 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * there, or in the case where either one of solr configuration or data
    * directory is missing, a preceding call to <code>initSolr()</code> is made.
    * 
-   * @param solrRoot
+   * @param indexRoot
    *          the solr root directory
    * @throws Exception
    *           if loading or creating solr fails
    */
-  private void loadSolr(File solrRoot) throws Exception {
-    logger.debug("Setting up solr search index at {}", solrRoot);
-    File configDir = new File(solrRoot, CONF_DIR);
-    File dataDir = new File(solrRoot, DATA_DIR);
+  private void initElasticSearch(Site site, File indexRoot) throws Exception {
+    logger.debug("Setting up elastic search index at {}", indexRoot);
 
-    boolean configExists = configDir.exists() && configDir.list().length >= 6;
-    boolean dataExists = dataDir.exists() && dataDir.list().length > 0;
+    // Prepare the configuration of the elastic search node
+    Settings settings = loadSettings();
 
-    // Create the configuration directory
-    if (configExists && dataExists) {
-      logger.debug("Using solr search index at {}", solrRoot);
-    } else {
-      initSolr(solrRoot);
+    // Configure and start the elastic search node
+    NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().settings(settings);
+    elasticSearch = nodeBuilder.build();
+    elasticSearch.start();
+
+    // Create the client
+    nodeClient = elasticSearch.client();
+
+    // Make sure the site index exists
+    if (!indexExists(site.getIdentifier())) {
+      CreateIndexRequestBuilder siteIdxRequest = nodeClient.admin().indices().prepareCreate(site.getIdentifier());
+      logger.info("Creating site index for '{}'", site.getIdentifier());
+      CreateIndexResponse siteidxResponse = siteIdxRequest.execute().actionGet();
+      if (!siteidxResponse.acknowledged()) {
+        throw new ContentRepositoryException("Unable to create site index for '" + site.getIdentifier() + "'");
+      }
     }
 
-    solrServer = new Solr(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
-    searchRequest = new SearchRequest(solrServer, resourceSerializer);
+    // Store the correct mapping
+    // TODO: Use resource serializers
+    for (String type : new String[] { "version", "page", "file", "image", "movie" }) {
+      PutMappingRequest siteMappingRequest = new PutMappingRequest(site.getIdentifier());
+      siteMappingRequest.source(loadMapping(type));
+      siteMappingRequest.type(type);
+      PutMappingResponse siteMappingResponse = nodeClient.admin().indices().putMapping(siteMappingRequest).actionGet();
+      if (!siteMappingResponse.acknowledged()) {
+        throw new ContentRepositoryException("Unable to install '" + type + "' mapping for index '" + site.getIdentifier() + "'");
+      }
+    }
 
-    // Determine the index version
-    if (configExists && dataExists) {
-      try {
-        StringBuffer q = new StringBuffer(ID).append(":").append(ROOT_ID);
-        QueryResponse r = solrServer.request(q.toString());
-        if (r.getResults().isEmpty()) {
-          logger.warn("Index does not contain version information, triggering reindex");
-          indexVersion = -1;
-        } else {
-          indexVersion = Integer.parseInt(r.getResults().get(0).getFieldValue(VERSION).toString());
-          logger.debug("Search index version is {}", indexVersion);
+    // See if the index version exists and check if it matches.
+    GetRequestBuilder getRequestBuilder = nodeClient.prepareGet(site.getIdentifier(), VERSION_TYPE, ROOT_ID);
+    GetResponse response = getRequestBuilder.execute().actionGet();
+    if (response.field(VERSION) != null) {
+      indexVersion = Integer.parseInt((String) response.field(VERSION).getValue());
+      logger.debug("Search index version is {}", indexVersion);
+    } else {
+      IndexRequestBuilder requestBuilder = nodeClient.prepareIndex(site.getIdentifier(), VERSION_TYPE, ROOT_ID);
+      requestBuilder = requestBuilder.setSource(VERSION, Integer.toString(indexVersion));
+      requestBuilder.execute().actionGet();
+    }
+
+  }
+
+  /**
+   * Loads the settings for the elastic search configuration. An initial attempt
+   * is made to get the configuration from
+   * <code>${weblounge.home}/etc/index/settings.yml</code>.
+   * 
+   * @return
+   */
+  private Settings loadSettings() {
+    Settings settings = null;
+
+    // First, check if a local configuration file is present
+    String webloungeHome = System.getProperty("weblounge.home");
+    if (StringUtils.isNotBlank(webloungeHome)) {
+      File configFile = new File(PathUtils.concat(webloungeHome, "/etc/index/settings.yml"));
+      if (configFile.isFile()) {
+        FileInputStream fis = null;
+        try {
+          fis = new FileInputStream(configFile);
+          settings = ImmutableSettings.settingsBuilder().loadFromStream(configFile.getName(), fis).build();
+        } catch (FileNotFoundException e) {
+          logger.warn("Unable to load elasticsearch settings from {}", configFile.getAbsolutePath());
+        } finally {
+          IOUtils.closeQuietly(fis);
         }
-      } catch (Throwable e) {
-        logger.warn("Index version information cannot be determined ({}), triggering reindex", e.getMessage());
-        indexVersion = -1;
       }
     } else {
-      indexVersion = INDEX_VERSION;
-      SolrInputDocument doc = new SolrInputDocument();
-      doc.put(ID, createSolrInputField(ID, Long.toString(ROOT_ID)));
-      doc.put(RESOURCE_ID, createSolrInputField(RESOURCE_ID, Long.toString(ROOT_ID)));
-      doc.put(TYPE, createSolrInputField(TYPE, ROOT_TYPE));
-      doc.put(VERSION, createSolrInputField(VERSION, Integer.toString(indexVersion)));
-      UpdateRequest updateRequest = new UpdateRequest();
-      updateRequest.add(doc);
-      updateRequest.setAction(COMMIT, true, true);
-      solrServer.update(updateRequest);
+      logger.warn("Unable to locate elasticsearch settings, weblounge.home not specified");
     }
+
+    // If no local settings were found, read them from the bundle resources
+    if (settings == null) {
+      InputStream is = null;
+      try {
+        is = this.getClass().getResourceAsStream(SETTINGS_FILE);
+        logger.warn("Configuring elastic search node from the bundle resources");
+        settings = ImmutableSettings.settingsBuilder().loadFromStream(SETTINGS_FILE, is).build();
+        // TODO: Copy names.txt to configuration directory
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+    }
+
+    return settings;
   }
 
   /**
-   * Creates an ad-hoc solr input field.
+   * Loads the mapping configuration. An initial attempt is made to get the
+   * configuration from
+   * <code>${weblounge.home}/etc/index/&lt;index name&gt;-mapping.json</code>.
+   * If this file can't be found, the default mapping loaded from the classpath.
    * 
-   * @param name
-   *          the field name
-   * @param value
-   *          the field value
-   * @return the field
+   * @param idxName
+   *          name of the index
+   * @return the string containing the configuration
+   * @throws IOException
+   *           if reading the index mapping fails
    */
-  private SolrInputField createSolrInputField(String name, Object value) {
-    SolrInputField field = new SolrInputField(name);
-    field.setValue(value, 0.0f);
-    return field;
+  private String loadMapping(String idxName) throws IOException {
+    String mapping = null;
+
+    // First, check if a local configuration file is present
+    String webloungeHome = System.getProperty("weblounge.home");
+    if (StringUtils.isNotBlank(webloungeHome)) {
+      File configFile = new File(PathUtils.concat(webloungeHome, "/etc/index/", idxName + "-mapping.json"));
+      if (configFile.isFile()) {
+        FileInputStream fis = null;
+        try {
+          fis = new FileInputStream(configFile);
+          mapping = IOUtils.toString(fis);
+        } catch (IOException e) {
+          logger.warn("Unable to load index mapping from {}: {}", configFile.getAbsolutePath(), e.getMessage());
+        } finally {
+          IOUtils.closeQuietly(fis);
+        }
+      }
+    } else {
+      logger.warn("Unable to locate elasticsearch settings, weblounge.home not specified");
+    }
+
+    // If no local settings were found, read them from the bundle resources
+    if (mapping == null) {
+      InputStream is = null;
+      String resourcePath = PathUtils.concat("/elasticsearch/", idxName + "-mapping.json");
+      try {
+        is = this.getClass().getResourceAsStream(resourcePath);
+        if (is != null) {
+          logger.debug("Reading elastic search index mapping '{}' from the bundle resource", idxName);
+          mapping = IOUtils.toString(is);
+        }
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+    }
+
+    return mapping;
   }
 
   /**
-   * Prepares the solr environment by creating the necessary directories and
-   * copying the configuration files into place.
+   * Returns <code>true</code> if the given index exists.
    * 
-   * @param solrRoot
-   *          the solr root directory
+   * @param indexName
+   *          the index name
+   * @return <code>true</code> if the index exists
    */
-  private void initSolr(File solrRoot) {
-    try {
-      logger.debug("Creating search index at {}", solrRoot);
-      File solrConfigDir = new File(solrRoot, CONF_DIR);
-      File solrDataDir = new File(solrRoot, DATA_DIR);
-
-      // Delete and re-create the configuration directory
-      FileUtils.deleteQuietly(solrConfigDir);
-      FileUtils.forceMkdir(solrConfigDir);
-
-      // Delete and re-create the data directory
-      FileUtils.deleteQuietly(solrDataDir);
-      FileUtils.forceMkdir(solrDataDir);
-
-      // Make sure there is a configuration in place
-      copyBundleResourceToFile("/solr/elevate.xml", solrConfigDir);
-      copyBundleResourceToFile("/solr/protwords.txt", solrConfigDir);
-      copyBundleResourceToFile("/solr/schema.xml", solrConfigDir);
-      copyBundleResourceToFile("/solr/scripts.conf", solrConfigDir);
-      copyBundleResourceToFile("/solr/solrconfig.xml", solrConfigDir);
-      copyBundleResourceToFile("/solr/stopwords.txt", solrConfigDir);
-      copyBundleResourceToFile("/solr/synonyms.txt", solrConfigDir);
-
-    } catch (IOException e) {
-      throw new RuntimeException("Error setting up solr index at " + solrRoot, e);
-    }
-  }
-
-  /**
-   * Utility method that will copy the specified class path resource to the
-   * configuration directory.
-   * 
-   * @param classpath
-   *          the path inside the bundle
-   * @param dir
-   *          the configuration directory
-   */
-  private void copyBundleResourceToFile(String classpath, File dir) {
-    InputStream is = null;
-    FileOutputStream fos = null;
-    try {
-      is = SearchIndex.class.getResourceAsStream(classpath);
-      File file = new File(dir, FilenameUtils.getName(classpath));
-      fos = new FileOutputStream(file);
-      IOUtils.copy(is, fos);
-    } catch (IOException e) {
-      throw new RuntimeException("Error copying solr classpath resource to the filesystem", e);
-    } finally {
-      IOUtils.closeQuietly(is);
-      IOUtils.closeQuietly(fos);
-    }
+  private boolean indexExists(String indexName) {
+    IndicesExistsRequest indexExistsRequest = new IndicesExistsRequest(indexName);
+    return nodeClient.admin().indices().exists(indexExistsRequest).actionGet().exists();
   }
 
 }

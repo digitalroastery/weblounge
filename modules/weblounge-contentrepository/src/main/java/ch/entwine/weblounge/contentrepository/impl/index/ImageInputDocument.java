@@ -18,24 +18,25 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index.solr;
+package ch.entwine.weblounge.contentrepository.impl.index;
 
 import ch.entwine.weblounge.common.content.file.FileResource;
+import ch.entwine.weblounge.common.content.image.ImageResource;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
- * posting weblounge resources to solr.
+ * posting weblounge images to solr.
  */
-public class FileInputDocument extends ResourceInputDocument {
+public class ImageInputDocument extends ResourceInputDocument {
 
   /**
-   * Creates an input document for the given resource.
+   * Creates an input document for the given image.
    * 
-   * @param resource
-   *          the resource
+   * @param image
+   *          the image
    */
-  public FileInputDocument(FileResource resource) {
-    init(resource);
+  public ImageInputDocument(ImageResource image) {
+    init(image);
   }
 
   /**
@@ -47,8 +48,7 @@ public class FileInputDocument extends ResourceInputDocument {
   protected void init(FileResource resource) {
     super.init(resource);
 
-    // Preview information
-    // TODO: Create preview
+    // TODO: Create preview and add it to the index
 
   }
 

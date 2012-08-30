@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.fs;
 
-import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import java.io.File;

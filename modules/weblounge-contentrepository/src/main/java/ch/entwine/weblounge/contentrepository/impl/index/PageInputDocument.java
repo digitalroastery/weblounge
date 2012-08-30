@@ -18,26 +18,26 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index.solr;
+package ch.entwine.weblounge.contentrepository.impl.index;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CREATED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.CREATED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.MODIFIED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.MODIFIED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.OWNED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.OWNED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_CONTENTS;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_CONTENTS_LOCALIZED;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_PROPERTIES;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_PROPERTY_VALUE;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_TYPE_COMPOSER;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_TYPE_COMPOSER_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_XML_COMPOSER;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PAGELET_XML_COMPOSER_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PREVIEW_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PUBLISHED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.TEMPLATE;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CREATED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CREATED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.MODIFIED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.MODIFIED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.OWNED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.OWNED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_CONTENTS;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_CONTENTS_LOCALIZED;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_PROPERTIES;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_PROPERTY_VALUE;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_XML_COMPOSER;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_XML_COMPOSER_POSITION;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PREVIEW_XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEMPLATE;
 
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
@@ -77,7 +77,7 @@ public class PageInputDocument extends ResourceInputDocument {
 
     // Page-level
     addField(TEMPLATE, page.getTemplate(), false);
-    addField(SolrSchema.STATIONARY, page.isStationary(), false);
+    addField(IndexSchema.STATIONARY, page.isStationary(), false);
 
     // Determine the stage composer
     String stage = null;
@@ -133,14 +133,14 @@ public class PageInputDocument extends ResourceInputDocument {
       addField(MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, i), p.getModule() + "/" + p.getIdentifier(), false);
 
       // Workflow related
-      addField(OWNED_BY, SolrUtils.serializeUserId(p.getOwner()), false);
-      addField(OWNED_BY_NAME, SolrUtils.serializeUserName(p.getOwner()), true);
-      addField(CREATED_BY, SolrUtils.serializeUserId(p.getCreator()), false);
-      addField(CREATED_BY_NAME, SolrUtils.serializeUserName(p.getCreator()), true);
-      addField(MODIFIED_BY, SolrUtils.serializeUserId(p.getModifier()), false);
-      addField(MODIFIED_BY_NAME, SolrUtils.serializeUserName(p.getModifier()), true);
-      addField(PUBLISHED_BY, SolrUtils.serializeUserId(p.getPublisher()), false);
-      addField(PUBLISHED_BY_NAME, SolrUtils.serializeUserName(p.getPublisher()), true);
+      addField(OWNED_BY, IndexUtils.serializeUserId(p.getOwner()), false);
+      addField(OWNED_BY_NAME, IndexUtils.serializeUserName(p.getOwner()), true);
+      addField(CREATED_BY, IndexUtils.serializeUserId(p.getCreator()), false);
+      addField(CREATED_BY_NAME, IndexUtils.serializeUserName(p.getCreator()), true);
+      addField(MODIFIED_BY, IndexUtils.serializeUserId(p.getModifier()), false);
+      addField(MODIFIED_BY_NAME, IndexUtils.serializeUserName(p.getModifier()), true);
+      addField(PUBLISHED_BY, IndexUtils.serializeUserId(p.getPublisher()), false);
+      addField(PUBLISHED_BY_NAME, IndexUtils.serializeUserName(p.getPublisher()), true);
 
       i++;
     }

@@ -25,8 +25,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
-import ch.entwine.weblounge.common.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -69,6 +68,8 @@ public class ContentRepositoryIndex {
   /**
    * Creates a new index that is located in the indicated folder.
    * 
+   * @param site
+   *          the site
    * @param rootDir
    *          the root directory
    * @param readOnly
@@ -86,7 +87,7 @@ public class ContentRepositoryIndex {
     this.idIdx = new IdIndex(new File(rootDir, "structure"), readOnly);
     this.pathIdx = new PathIndex(new File(rootDir, "structure"), readOnly);
     this.versionIdx = new VersionIndex(new File(rootDir, "structure"), readOnly);
-    this.searchIdx = new SearchIndex(new File(rootDir, "fulltext"), serializer, readOnly);
+    this.searchIdx = new SearchIndex(site, new File(rootDir, "fulltext"), readOnly);
   }
 
   /**

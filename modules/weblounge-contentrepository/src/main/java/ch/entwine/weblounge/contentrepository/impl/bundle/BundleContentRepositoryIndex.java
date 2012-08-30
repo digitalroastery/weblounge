@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.bundle;
 
-import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import java.io.File;
@@ -34,6 +34,8 @@ public class BundleContentRepositoryIndex extends ContentRepositoryIndex {
   /**
    * Creates a new repository index at the specified location.
    * 
+   * @param site
+   *          the site
    * @param rootDir
    *          the index root directory
    * @param serializer

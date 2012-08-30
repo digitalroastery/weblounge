@@ -71,10 +71,10 @@ public class SearchIndexFulltextTest {
   protected static boolean isReadOnly = false;
 
   /** Page template */
-  protected PageTemplate template = null;
+  protected static PageTemplate template = null;
 
   /** The mock site */
-  protected Site site = null;
+  protected static Site site = null;
 
   /** The sample page */
   protected String pageFile = "/page.xml";
@@ -96,17 +96,34 @@ public class SearchIndexFulltextTest {
    */
   @BeforeClass
   public static void setupClass() throws Exception {
+    // Template
+    template = EasyMock.createNiceMock(PageTemplate.class);
+    EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
+    EasyMock.expect(template.getStage()).andReturn("non-existing").anyTimes();
+    EasyMock.replay(template);
+
+    Set<Language> languages = new HashSet<Language>();
+    languages.add(LanguageUtils.getLanguage("en"));
+    languages.add(LanguageUtils.getLanguage("de"));
+
+    // Site
+    site = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
+    EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
+    EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
+    EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
+    EasyMock.replay(site);
+
+    // Resource serializers
+    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
+    ResourceSerializerFactory.setResourceSerializerService(serializerService);
+    serializerService.registerSerializer(new PageSerializer());
+    serializerService.registerSerializer(new FileResourceSerializer());
+    serializerService.registerSerializer(new ImageResourceSerializer());
+
     String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
     idxRoot = new File(rootPath);
-
-    // Resource serializer
-    serializer = new ResourceSerializerServiceImpl();
-    serializer.addSerializer(new PageSerializer());
-    serializer.addSerializer(new FileResourceSerializer());
-    serializer.addSerializer(new ImageResourceSerializer());
-    serializer.addSerializer(new MovieResourceSerializer());
-
-    idx = new SearchIndex(idxRoot, serializer, isReadOnly);
+    idx = new SearchIndex(site, idxRoot, isReadOnly);
   }
 
   /**
@@ -130,24 +147,6 @@ public class SearchIndexFulltextTest {
    */
   @Before
   public void setUp() throws Exception {
-    // Template
-    template = EasyMock.createNiceMock(PageTemplate.class);
-    EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
-    EasyMock.expect(template.getStage()).andReturn("non-existing").anyTimes();
-    EasyMock.replay(template);
-
-    Set<Language> languages = new HashSet<Language>();
-    languages.add(LanguageUtils.getLanguage("en"));
-    languages.add(LanguageUtils.getLanguage("de"));
-
-    // Site
-    site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
-    EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
-    EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
-    EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
-    EasyMock.replay(site);
-
     // Prepare the pages
     PageReader pageReader = new PageReader();
     InputStream is = this.getClass().getResourceAsStream(pageFile);

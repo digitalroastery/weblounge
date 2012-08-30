@@ -281,25 +281,19 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     synchronized (processor) {
       for (ContentRepositoryOperation<?> op : processor.getOperations()) {
 
+        // Don't move beyond the current state of work
+        if (op == currentOperation)
+          break;
+
         // Is this a resource operation?
         if (!(op instanceof ContentRepositoryResourceOperation<?>))
           continue;
 
-        // Apply the changes to the original resource
         ContentRepositoryResourceOperation<?> resourceOp = (ContentRepositoryResourceOperation<?>) op;
 
-        // Is the resource about to be deleted?
-        ResourceURI opURI = resourceOp.getResourceURI();
-        if (op instanceof DeleteOperation && equalsByIdOrPath(uri, opURI)) {
-          DeleteOperation deleteOp = (DeleteOperation) op;
-          List<ResourceURI> deleteCandidates = new ArrayList<ResourceURI>();
-          for (ResourceURI u : uris) {
-            if (deleteOp.allVersions() || u.getVersion() == opURI.getVersion()) {
-              deleteCandidates.add(u);
-            }
-          }
-          uris.removeAll(deleteCandidates);
-        }
+        // Is it a different resource?
+        if (!uri.equals(processedURI))
+          continue;
 
         // Is the resource simply being updated?
         if (op instanceof PutOperation && equalsByIdOrPath(uri, opURI)) {
@@ -1485,7 +1479,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      * @return the content repository operations
      */
     public List<ContentRepositoryOperation<?>> getOperations() {
-      return new ArrayList<ContentRepositoryOperation<?>>(operations);
+      synchronized (operations) {
+        return new ArrayList<ContentRepositoryOperation<?>>(operations);
+      }
     }
 
     /**

@@ -18,13 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.solr;
+package ch.entwine.weblounge.contentrepository.index;
 
 import static org.junit.Assert.assertEquals;
 
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.security.User;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils;
+import ch.entwine.weblounge.contentrepository.impl.index.IndexUtils;
 
 import org.junit.Test;
 
@@ -34,25 +34,25 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Test case for {@link SolrUtils}.
+ * Test case for {@link IndexUtils}.
  */
-public class SolrUtilsTest {
+public class IndexUtilsTest {
 
   /** The date format */
   protected final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils#clean(java.lang.String)}.
+   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#clean(java.lang.String)}.
    */
   @Test
   public void testClean() {
     String test = "+-!(){}[]^\"~*?:&&||&|";
     String expected = "\\+\\-\\!\\(\\)\\{\\}\\[\\]\\^\\\"\\~\\*\\?\\:\\&\\&\\|\\|&|";
-    assertEquals(expected, SolrUtils.clean(test));
+    assertEquals(expected, IndexUtils.clean(test));
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils#serializeDate(java.util.Date)}.
+   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#serializeDate(java.util.Date)}.
    */
   @Test
   public void testSerializeDate() {
@@ -65,11 +65,11 @@ public class SolrUtilsTest {
     d.set(Calendar.MILLISECOND, 0);
     Date date = d.getTime();
     String serializedDate = df.format(date) + "T05:59:13Z";
-    assertEquals(serializedDate, SolrUtils.serializeDate(date));
+    assertEquals(serializedDate, IndexUtils.serializeDate(date));
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils#serializeDateRange(Date, Date)}.
+   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#serializeDateRange(Date, Date)}.
    */
   @Test
   public void testSerializeDateRange() {
@@ -86,11 +86,11 @@ public class SolrUtilsTest {
     String serializedStartDate = df.format(startDate) + "T00:00:00Z";
     String serializedEndDate = df.format(endDate) + "T05:59:00Z";
     String day = "[" + serializedStartDate + " TO " + serializedEndDate + "]";
-    assertEquals(day, SolrUtils.serializeDateRange(startDate, endDate));
+    assertEquals(day, IndexUtils.serializeDateRange(startDate, endDate));
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils#selectDay(java.util.Date)}.
+   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#selectDay(java.util.Date)}.
    */
   @Test
   public void testSelectDay() {
@@ -99,16 +99,16 @@ public class SolrUtilsTest {
     String dayStart = df.format(date) + "T00:00:00Z";
     String dayEnd = df.format(date) + "T23:59:59Z";
     String day = "[" + dayStart + " TO " + dayEnd + "]";
-    assertEquals(day, SolrUtils.selectDay(date));
+    assertEquals(day, IndexUtils.selectDay(date));
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.solr.SolrUtils#serializeUserId(ch.entwine.weblounge.common.security.User)}.
+   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#serializeUserId(ch.entwine.weblounge.common.security.User)}.
    */
   @Test
   public void testSerializeUser() {
     User user = new WebloungeUserImpl("heiri");
-    assertEquals("heiri", SolrUtils.serializeUserId(user));
+    assertEquals("heiri", IndexUtils.serializeUserId(user));
   }
 
 }

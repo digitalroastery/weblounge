@@ -134,12 +134,6 @@ public class ContentRepositoryIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    indexRootDirectory = new File(new File(System.getProperty("java.io.tmpdir")), "index");
-    structuralIndexRootDirectory = new File(indexRootDirectory, "structure");
-    FileUtils.deleteDirectory(indexRootDirectory);
-
-    idx = new FileSystemContentRepositoryIndex(indexRootDirectory, serializer);
-
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
     EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
@@ -159,6 +153,11 @@ public class ContentRepositoryIndexTest {
     otherPage.setTemplate("home");
 
     file = new FileResourceImpl(new FileResourceURIImpl(site));
+
+    indexRootDirectory = new File(new File(System.getProperty("java.io.tmpdir")), "index");
+    structuralIndexRootDirectory = new File(indexRootDirectory, "structure");
+    FileUtils.deleteDirectory(indexRootDirectory);
+    idx = new FileSystemContentRepositoryIndex(site, indexRootDirectory);
   }
 
   /**

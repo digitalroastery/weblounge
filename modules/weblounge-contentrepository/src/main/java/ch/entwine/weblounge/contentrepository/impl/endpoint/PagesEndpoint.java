@@ -988,7 +988,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     ResourceURI workURI = new PageURIImpl(site, null, pageId, Resource.WORK);
 
     // Does the page exist at all?
-    Page page = null;
+    Page workPage = null;
     try {
       if (!contentRepository.existsInAnyVersion(workURI))
         throw new WebApplicationException(Status.NOT_FOUND);
@@ -999,17 +999,18 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Make sure we have a work page. If it doesn't exist yet, it needs
     // to be created as a result of the lock operation
+    ResourceURI liveURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
     try {
-      ResourceURI liveURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
-      page = (Page) contentRepository.get(workURI);
-      if (page == null) {
+      workPage = (Page) contentRepository.get(workURI);
+      if (workPage == null) {
         logger.debug("Creating work version of {}", liveURI);
-        page = (Page) contentRepository.get(liveURI);
-        liveURI.setPath(page.getURI().getPath());
-        page.setVersion(Resource.WORK);
-        contentRepository.putAsynchronously(page, false);
+        PageReader reader = new PageReader();
+        Page livePage = (Page) contentRepository.get(liveURI);
+        workPage = reader.read(IOUtils.toInputStream(livePage.toXml(), "utf-8"), site);
+        workPage.setVersion(Resource.WORK);
+        contentRepository.putAsynchronously(workPage, false);
       } else {
-        workURI.setPath(page.getURI().getPath());
+        workURI.setPath(workPage.getURI().getPath());
       }
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", workURI, e.getMessage());
@@ -1020,11 +1021,17 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     } catch (IOException e) {
       logger.warn("Error putting a page work copy {} to repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (ParserConfigurationException e) {
+      logger.warn("Error reading live page {} from repository: {}", liveURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (SAXException e) {
+      logger.warn("Error reading live page {} from repository: {}", liveURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
-      String etag = ResourceUtils.getETagValue(page);
+      String etag = ResourceUtils.getETagValue(workPage);
       if (!etag.equals(ifMatchHeader)) {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
@@ -1042,7 +1049,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
 
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && (!page.getLockOwner().equals(user) && !isAdmin)) {
+    if (workPage.isLocked() && (!workPage.getLockOwner().equals(user) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
@@ -1066,8 +1073,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(ResourceUtils.getETagValue(page));
-    response.lastModified(page.getModificationDate());
+    response.tag(ResourceUtils.getETagValue(workPage));
+    response.lastModified(workPage.getModificationDate());
     return response.build();
   }
 
@@ -1221,14 +1228,14 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     ResourceURI workURI = new PageURIImpl(site, null, pageId, Resource.WORK);
 
     // Does the work page exist?
-    Page page = null;
+    Page workPage = null;
     try {
       if (!contentRepository.existsInAnyVersion(workURI))
         throw new WebApplicationException(Status.NOT_FOUND);
-      page = (Page) contentRepository.get(workURI);
-      if (page == null)
+      workPage = (Page) contentRepository.get(workURI);
+      if (workPage == null)
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
-      workURI.setPath(page.getURI().getPath());
+      workURI.setPath(workPage.getURI().getPath());
     } catch (ContentRepositoryException e) {
       logger.warn("Error looking up page {} from repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1236,7 +1243,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
-      String etag = ResourceUtils.getETagValue(page);
+      String etag = ResourceUtils.getETagValue(workPage);
       if (!etag.equals(ifMatchHeader)) {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
@@ -1244,20 +1251,20 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Make sure the page does not contain references to resources that don't
     // exist anymore.
-    logger.debug("Checking referenced resources on {}", page);
+    logger.debug("Checking referenced resources on {}", workPage);
     try {
-      for (Pagelet pagelet : page.getPagelets()) {
+      for (Pagelet pagelet : workPage.getPagelets()) {
         String resourceId = pagelet.getProperty("resourceid");
         if (StringUtils.isEmpty(resourceId))
           continue;
         ResourceURI resourceURI = contentRepository.getResourceURI(resourceId);
         if (resourceURI == null) {
-          logger.warn("Page {} references non existing resource '{}'", page, resourceId);
+          logger.warn("Page {} references non existing resource '{}'", workPage, resourceId);
           throw new WebApplicationException(Status.PRECONDITION_FAILED);
         }
         resourceURI.setVersion(Resource.LIVE);
         if (!contentRepository.exists(resourceURI)) {
-          logger.warn("Page {} references unpublished resource '{}'", page, resourceURI);
+          logger.warn("Page {} references unpublished resource '{}'", workPage, resourceURI);
           throw new WebApplicationException(Status.PRECONDITION_FAILED);
         }
       }
@@ -1278,7 +1285,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
 
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && (!page.getLockOwner().equals(user) && !isAdmin)) {
+    if (workPage.isLocked() && (!workPage.getLockOwner().equals(user) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
@@ -1317,10 +1324,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Finally, perform the publish operation
     try {
-      if (!page.isPublished())
-        page.setPublished(user, startDate, endDate);
-      page.setVersion(Resource.LIVE);
-      contentRepository.putAsynchronously(page, true);
+      PageReader reader = new PageReader();
+      Page livePage = reader.read(IOUtils.toInputStream(workPage.toXml(), "utf-8"), site);
+      livePage.setVersion(Resource.LIVE);
+      if (!livePage.isPublished())
+        livePage.setPublished(user, startDate, endDate);
+      contentRepository.putAsynchronously(livePage);
       contentRepository.deleteAsynchronously(workURI);
       logger.info("Page {} has been published by {}", workURI, user);
     } catch (SecurityException e) {
@@ -1335,12 +1344,18 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     } catch (ContentRepositoryException e) {
       logger.warn("Error publishing page {}: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (ParserConfigurationException e) {
+      logger.warn("Error reading work page {} from repository: {}", workURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (SAXException e) {
+      logger.warn("Error reading work page {} from repository: {}", workURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(ResourceUtils.getETagValue(page));
-    response.lastModified(page.getModificationDate());
+    response.tag(ResourceUtils.getETagValue(workPage));
+    response.lastModified(workPage.getModificationDate());
     return response.build();
   }
 
@@ -1384,14 +1399,14 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     ResourceURI liveURI = new PageURIImpl(site, null, pageId, Resource.LIVE);
 
     // Does the page exist?
-    Page page = null;
+    Page livePage = null;
     try {
       if (!contentRepository.existsInAnyVersion(liveURI))
         throw new WebApplicationException(Status.NOT_FOUND);
-      page = (Page) contentRepository.get(liveURI);
-      if (page == null)
+      livePage = (Page) contentRepository.get(liveURI);
+      if (livePage == null)
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
-      liveURI.setPath(page.getURI().getPath());
+      liveURI.setPath(livePage.getURI().getPath());
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1402,7 +1417,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
-      String etag = ResourceUtils.getETagValue(page);
+      String etag = ResourceUtils.getETagValue(livePage);
       if (!etag.equals(ifMatchHeader)) {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
@@ -1420,7 +1435,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     boolean isAdmin = SecurityUtils.userHasRole(user, SystemRole.SITEADMIN);
 
     // If the page is locked by a different user, refuse
-    if (page.isLocked() && (!page.getLockOwner().equals(user) && !isAdmin)) {
+    if (livePage.isLocked() && (!livePage.getLockOwner().equals(user) && !isAdmin)) {
       return Response.status(Status.FORBIDDEN).build();
     }
 
@@ -1431,9 +1446,11 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       ResourceURI workURI = new ResourceURIImpl(liveURI, Resource.WORK);
       if (!contentRepository.exists(workURI)) {
         logger.debug("Creating work version of {}", workURI);
-        page.setVersion(Resource.WORK);
-        page.setPublished(null, null, null);
-        contentRepository.put(page);
+        PageReader reader = new PageReader();
+        Page workPage = reader.read(IOUtils.toInputStream(livePage.toXml(), "utf-8"), site);
+        workPage.setVersion(Resource.WORK);
+        workPage.setPublished(null, null, null);
+        contentRepository.putAsynchronously(workPage);
       }
       logger.info("Page {} has been unpublished by {}", liveURI, user);
     } catch (SecurityException e) {
@@ -1448,12 +1465,18 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     } catch (ContentRepositoryException e) {
       logger.warn("Error unpublishing page {}: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (ParserConfigurationException e) {
+      logger.warn("Error reading live page {} from repository: {}", liveURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (SAXException e) {
+      logger.warn("Error reading live page {} from repository: {}", liveURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(ResourceUtils.getETagValue(page));
-    response.lastModified(ResourceUtils.getModificationDate(page));
+    response.tag(ResourceUtils.getETagValue(livePage));
+    response.lastModified(ResourceUtils.getModificationDate(livePage));
     return response.build();
   }
 

@@ -93,7 +93,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The list of required subjects (ONE) */
   protected List<String> subjects = new ArrayList<String>();
-  
+
   /** The list of required subjects (ALL) */
   protected List<String> andSubjects = new ArrayList<String>();
 
@@ -173,7 +173,7 @@ public class SearchQueryImpl implements SearchQuery {
   protected String filter = null;
 
   /** The query offset */
-  protected int offset = 0;
+  protected int offset = -1;
 
   /** The query limit */
   protected int limit = -1;
@@ -574,7 +574,7 @@ public class SearchQueryImpl implements SearchQuery {
     andSubjects.add(subject);
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -1299,16 +1299,6 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public String[] getSeries() {
     return series.toArray(new String[series.size()]);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString() {
-    return "*:" + (text != null ? text : "*");
   }
 
 }
