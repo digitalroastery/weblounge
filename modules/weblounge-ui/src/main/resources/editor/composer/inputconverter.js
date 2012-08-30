@@ -99,16 +99,19 @@ $.Class.extend('InputConverter',
 	
 	existsCurrent: function(pagelet, element) {
 		if($.isEmptyObject(pagelet.locale.current)) return false;
+		if($.isEmptyObject(pagelet.locale.current.text)) return false;
 		return !$.isEmptyObject(pagelet.locale.current.text[element]);
 	},
 	
 	existsOriginal: function(pagelet, element) {
 		if($.isEmptyObject(pagelet.locale.original)) return false;
+		if($.isEmptyObject(pagelet.locale.original.text)) return false;
 		return !$.isEmptyObject(pagelet.locale.original.text[element]);
 	},
 	
 	existsProperty: function(pagelet, property) {
 		if($.isEmptyObject(pagelet.properties)) return false;
+		if($.isEmptyObject(pagelet.properties.property)) return false;
 		return !$.isEmptyObject(pagelet.properties.property[property]);
 	},
 	
