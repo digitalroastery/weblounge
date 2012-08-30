@@ -1,5 +1,5 @@
 <%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
-<%@ taglib uri="/WEB-INF/weblounge-resource.tld" prefix="weblr" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/resources" prefix="weblr" %>
 
 <webl:context define="site">
 	<script>
