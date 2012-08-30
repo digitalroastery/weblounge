@@ -798,7 +798,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   @Override
   public void createPreviews() throws ContentRepositoryException {
     Collection<ResourceURI> uris = null;
-    logger.info("Starting preview generation");
+    logger.debug("Starting preview generation");
 
     // Load the uris
     try {
@@ -873,7 +873,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
           boolean stylesMatch = s.getWidth() == style.getWidth();
           stylesMatch = stylesMatch && s.getHeight() == style.getHeight();
           stylesMatch = stylesMatch && s.getScalingMode().equals(style.getScalingMode());
-          styleHasChanged = true;
+          stylesMatch = stylesMatch && s.isPreview() == style.isPreview();
+          styleHasChanged = styleHasChanged || !stylesMatch;
         } catch (ParserConfigurationException e) {
           logger.error("Error setting up image style parser: {}", e.getMessage());
         } catch (SAXException e) {
@@ -899,8 +900,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
       }
 
       // Store the new definition
-      if (s.isPreview() && styleHasChanged || styleIsMissing) {
+      if (!definitionFile.isFile() || styleHasChanged) {
         try {
+          definitionFile.getParentFile().mkdirs();
           definitionFile.createNewFile();
           FileUtils.copyInputStreamToFile(IOUtils.toInputStream(s.toXml(), "UTF-8"), definitionFile);
         } catch (IOException e) {
@@ -913,8 +915,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
 
     if (styleHasChanged || styleIsMissing) {
-      logger.info("Triggering creation of previews");
+      logger.info("Triggering creation of missing and outdated previews");
       createPreviews();
+    } else {
+      logger.info("Preview images for {} are still up to date", site.getIdentifier());
     }
   }
 
