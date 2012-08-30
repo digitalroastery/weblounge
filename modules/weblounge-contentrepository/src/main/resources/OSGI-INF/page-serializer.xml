@@ -6,7 +6,7 @@
   <implementation class="ch.entwine.weblounge.contentrepository.impl.PageSerializer" />
   <property name="service.description" value="Weblounge Page Serializer" />
   <service>
-    <provide interface="ch.entwine.weblounge.contentrepository.ResourceSerializer" />
+    <provide interface="ch.entwine.weblounge.common.repository.ResourceSerializer" />
   </service>
 
   <reference name="previewgenerator" interface="ch.entwine.weblounge.common.content.page.PagePreviewGenerator" cardinality="0..n" policy="dynamic" bind="addPreviewGenerator" unbind="removePreviewGenerator" />

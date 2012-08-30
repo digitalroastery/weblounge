@@ -22,8 +22,6 @@ package ch.entwine.weblounge.common.impl.site;
 
 import ch.entwine.weblounge.common.content.page.PageLayout;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJob;
@@ -38,6 +36,8 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.impl.util.xml.XPathNamespaceContext;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.RequestListener;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
@@ -656,7 +656,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#setContentRepository(ch.entwine.weblounge.common.content.repository.ContentRepository)
+   * @see ch.entwine.weblounge.common.site.Site#setContentRepository(ch.entwine.weblounge.common.repository.ContentRepository)
    */
   public void setContentRepository(ContentRepository repository) {
     ContentRepository oldRepository = contentRepository;

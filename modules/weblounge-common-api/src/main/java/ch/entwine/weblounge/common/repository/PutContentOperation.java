@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
- *  http://entwinemedia.com/weblounge
+ *  Copyright (c) 2012 The Weblounge Team
+ *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,31 +18,24 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
+
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceContent;
+
+import java.io.InputStream;
 
 /**
- * This exception is thrown if the content repository is unavailable.
+ * The put operation represents the process of writing a resource to the content
+ * repository.
  */
-public class ContentRepositoryUnavailableException extends Exception {
-
-  /** Serial version uid */
-  private static final long serialVersionUID = -8768389027972761077L;
+public interface PutContentOperation extends ContentRepositoryResourceContentOperation<Resource<? extends ResourceContent>> {
 
   /**
-   * Creates a new repository exception with the given error message.
-   */
-  public ContentRepositoryUnavailableException() {
-    super();
-  }
-
-  /**
-   * Creates a new repository exception with the given error message.
+   * Returns the resource's content data stream.
    * 
-   * @param message
-   *          the error message
+   * @return the data stream
    */
-  public ContentRepositoryUnavailableException(String message) {
-    super(message);
-  }
+  InputStream getInputStream();
 
 }

@@ -18,12 +18,30 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
+
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceContent;
 
 /**
- * The index operation represents the process of indexing all resources in the
- * content repository.
+ * The put operation represents the process of writing a resource to the content
+ * repository.
  */
-public interface IndexOperation extends ContentRepositoryOperation<Void> {
+public interface PutOperation extends ContentRepositoryResourceOperation<Resource<? extends ResourceContent>> {
+
+  /**
+   * Returns the resource that is to be stored.
+   * 
+   * @return the resource
+   */
+  Resource<? extends ResourceContent> getResource();
+
+  /**
+   * Returns <code>true</code> if this resource's previews need to be updated as
+   * part of this operation.
+   * 
+   * @return <code>true</code> to update the previews
+   */
+  boolean updatePreviews();
 
 }

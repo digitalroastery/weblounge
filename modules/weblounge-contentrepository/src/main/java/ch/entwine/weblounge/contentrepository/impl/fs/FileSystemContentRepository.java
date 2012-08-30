@@ -26,10 +26,9 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository;
 
 import org.apache.commons.io.FileUtils;

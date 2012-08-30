@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.operation;
 
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation;
+import ch.entwine.weblounge.common.repository.ContentRepositoryOperation;
 
 /**
  * This static class is holding on to the {@link ContentRepositoryOperation}

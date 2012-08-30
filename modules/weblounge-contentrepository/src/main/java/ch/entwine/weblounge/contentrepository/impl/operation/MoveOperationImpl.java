@@ -26,9 +26,9 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.MoveOperation;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.MoveOperation;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -69,7 +69,7 @@ public final class MoveOperationImpl extends AbstractContentRepositoryOperation<
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#getResourceURI()
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation#getResourceURI()
    */
   @Override
   public ResourceURI getResourceURI() {
@@ -79,7 +79,7 @@ public final class MoveOperationImpl extends AbstractContentRepositoryOperation<
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ResourceURI, Resource)
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation#apply(ResourceURI, Resource)
    */
   @Override
   public <C extends ResourceContent, R extends Resource<C>> R apply(ResourceURI uri, R resource) {
@@ -112,7 +112,7 @@ public final class MoveOperationImpl extends AbstractContentRepositoryOperation<
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.MoveOperation#getTargetPath()
+   * @see ch.entwine.weblounge.common.repository.MoveOperation#getTargetPath()
    */
   @Override
   public String getTargetPath() {
@@ -122,7 +122,7 @@ public final class MoveOperationImpl extends AbstractContentRepositoryOperation<
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.MoveOperation#moveChildren()
+   * @see ch.entwine.weblounge.common.repository.MoveOperation#moveChildren()
    */
   @Override
   public boolean moveChildren() {
@@ -132,7 +132,7 @@ public final class MoveOperationImpl extends AbstractContentRepositoryOperation<
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.impl.operation.AbstractContentRepositoryOperation#run(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
+   * @see ch.entwine.weblounge.contentrepository.impl.operation.AbstractContentRepositoryOperation#run(ch.entwine.weblounge.common.repository.WritableContentRepository)
    */
   @Override
   protected Void run(WritableContentRepository repository)

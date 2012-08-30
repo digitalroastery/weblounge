@@ -20,9 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerService;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -126,7 +125,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializerByType(java.lang.String)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializerService#getSerializerByType(java.lang.String)
    */
   public ResourceSerializer<?, ?> getSerializerByType(String resourceType) {
     synchronized (serializers) {
@@ -137,7 +136,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializerByMimeType(java.lang.String)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializerService#getSerializerByMimeType(java.lang.String)
    */
   public ResourceSerializer<?, ?> getSerializerByMimeType(String mimeType) {
     ResourceSerializer<?, ?> serializerForMimeType = null;
@@ -155,7 +154,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializers()
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializerService#getSerializers()
    */
   public Set<ResourceSerializer<?, ?>> getSerializers() {
     Set<ResourceSerializer<?, ?>> set = new HashSet<ResourceSerializer<?, ?>>();

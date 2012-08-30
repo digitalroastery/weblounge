@@ -24,9 +24,9 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.LockOperation;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.LockOperation;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.security.User;
 
 import java.io.IOException;
@@ -58,7 +58,7 @@ public final class LockOperationImpl extends AbstractContentRepositoryOperation<
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#getResourceURI()
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation#getResourceURI()
    */
   public ResourceURI getResourceURI() {
     return uri;
@@ -67,7 +67,7 @@ public final class LockOperationImpl extends AbstractContentRepositoryOperation<
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation#apply(ResourceURI,
    *      Resource)
    */
   public <C extends ResourceContent, R extends Resource<C>> R apply(
@@ -87,7 +87,7 @@ public final class LockOperationImpl extends AbstractContentRepositoryOperation<
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.LockOperation#getUser()
+   * @see ch.entwine.weblounge.common.repository.LockOperation#getUser()
    */
   public User getUser() {
     return user;
@@ -96,7 +96,7 @@ public final class LockOperationImpl extends AbstractContentRepositoryOperation<
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.repository.WritableContentRepository)
    */
   @Override
   protected Resource<? extends ResourceContent> run(WritableContentRepository repository)

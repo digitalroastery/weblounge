@@ -18,30 +18,20 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
 
-import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 
 /**
- * The put operation represents the process of writing a resource to the content
- * repository.
+ * Interface that identifies operations that modify a given resource.
  */
-public interface PutOperation extends ContentRepositoryResourceOperation<Resource<? extends ResourceContent>> {
+public interface ContentRepositoryResourceContentOperation<T> extends ContentRepositoryResourceOperation<T> {
 
   /**
-   * Returns the resource that is to be stored.
+   * Returns the resource content that is being added to the resource.
    * 
-   * @return the resource
+   * @return the resource content
    */
-  Resource<? extends ResourceContent> getResource();
-
-  /**
-   * Returns <code>true</code> if this resource's previews need to be updated as
-   * part of this operation.
-   * 
-   * @return <code>true</code> to update the previews
-   */
-  boolean updatePreviews();
+  ResourceContent getContent();
 
 }

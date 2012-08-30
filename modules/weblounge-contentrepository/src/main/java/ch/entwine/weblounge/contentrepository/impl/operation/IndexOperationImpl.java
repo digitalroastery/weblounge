@@ -20,9 +20,9 @@
 
 package ch.entwine.weblounge.contentrepository.impl.operation;
 
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.IndexOperation;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.IndexOperation;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 
 import java.io.IOException;
 

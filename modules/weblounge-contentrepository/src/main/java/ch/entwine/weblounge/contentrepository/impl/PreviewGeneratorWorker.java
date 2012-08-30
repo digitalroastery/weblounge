@@ -27,14 +27,13 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

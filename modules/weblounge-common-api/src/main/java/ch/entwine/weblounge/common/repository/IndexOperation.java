@@ -18,22 +18,12 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
-
-import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
+package ch.entwine.weblounge.common.repository;
 
 /**
- * The delete operation represents the removal of a resource from the content
- * repository.
+ * The index operation represents the process of indexing all resources in the
+ * content repository.
  */
-public interface DeleteContentOperation extends ContentRepositoryResourceContentOperation<Resource<? extends ResourceContent>> {
-
-  /**
-   * Returns the resource content that is to be deleted from the resource.
-   * 
-   * @return the resource content
-   */
-  ResourceContent getContent();
+public interface IndexOperation extends ContentRepositoryOperation<Void> {
 
 }

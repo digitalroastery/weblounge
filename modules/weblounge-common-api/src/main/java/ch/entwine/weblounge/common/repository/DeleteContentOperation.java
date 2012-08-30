@@ -18,35 +18,22 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
-import ch.entwine.weblounge.common.content.ResourceURI;
 
 /**
- * Interface that identifies operations that modify a given resource.
+ * The delete operation represents the removal of a resource from the content
+ * repository.
  */
-public interface ContentRepositoryResourceOperation<T> extends ContentRepositoryOperation<T> {
+public interface DeleteContentOperation extends ContentRepositoryResourceContentOperation<Resource<? extends ResourceContent>> {
 
   /**
-   * Returns the resource.
+   * Returns the resource content that is to be deleted from the resource.
    * 
-   * @return the resource
+   * @return the resource content
    */
-  ResourceURI getResourceURI();
-
-  /**
-   * Applies this operation to the in-memory instance of <code>resource</code>
-   * and returns the modified version.
-   * 
-   * @param uri
-   *          the resource uri
-   * @param resource
-   *          the resource
-   * @return the modified resource
-   */
-  <C extends ResourceContent, R extends Resource<C>> R apply(ResourceURI uri,
-      R resource);
+  ResourceContent getContent();
 
 }

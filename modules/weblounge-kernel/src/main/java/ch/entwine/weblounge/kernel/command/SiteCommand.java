@@ -26,12 +26,12 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteURL;
 

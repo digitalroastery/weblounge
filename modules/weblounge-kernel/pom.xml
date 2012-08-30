@@ -265,7 +265,7 @@
             <Import-Package>
               ch.entwine.weblounge.common.content;version=${project.version},
               ch.entwine.weblounge.common.content.page;version=${project.version},
-              ch.entwine.weblounge.common.content.repository;version=${project.version},
+              ch.entwine.weblounge.common.repository;version=${project.version},
               ch.entwine.weblounge.common.language;version=${project.version},
               ch.entwine.weblounge.common.security;version=${project.version},
               ch.entwine.weblounge.common.site;version=${project.version},

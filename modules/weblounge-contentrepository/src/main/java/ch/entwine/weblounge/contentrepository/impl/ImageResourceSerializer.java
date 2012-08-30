@@ -100,7 +100,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
    */
   public String getMimeType(ImageContent resourceContent) {
     return resourceContent.getMimetype();
@@ -109,7 +109,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supports(java.lang.String)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#supports(java.lang.String)
    */
   public boolean supports(String mimeType) {
     return mimeType != null && mimeType.toLowerCase().startsWith("image/");
@@ -118,7 +118,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
    */
   public Resource<ImageContent> newResource(Site site) {
     return new ImageResourceImpl(new ImageResourceURIImpl(site));
@@ -127,7 +127,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
    *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
    *      ch.entwine.weblounge.common.language.Language)
    */
@@ -169,7 +169,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
    */
   public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
     if (resource != null) {
@@ -181,7 +181,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
    *      java.util.List)
    */
   public Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata) {
@@ -210,7 +210,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, List)
    */
   public SearchResultItem toSearchResultItem(Site site, double relevance,
@@ -252,7 +252,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getContentReader()
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getContentReader()
    */
   public ResourceContentReader<ImageContent> getContentReader()
       throws ParserConfigurationException, SAXException {
@@ -262,7 +262,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator(Resource)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getPreviewGenerator(Resource)
    */
   public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
     for (ImagePreviewGenerator generator : previewGenerators) {

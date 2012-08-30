@@ -20,8 +20,8 @@
 
 package ch.entwine.weblounge.kernel.site;
 
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteException;

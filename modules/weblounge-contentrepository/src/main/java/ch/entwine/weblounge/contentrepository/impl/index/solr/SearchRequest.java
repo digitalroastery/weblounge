@@ -61,10 +61,10 @@ import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.index.SearchIndex;
 
 import org.apache.commons.lang.StringUtils;

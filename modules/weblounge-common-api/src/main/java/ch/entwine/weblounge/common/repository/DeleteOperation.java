@@ -18,24 +18,29 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
 
 import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
-
-import java.io.InputStream;
 
 /**
- * The put operation represents the process of writing a resource to the content
+ * The delete operation represents the removal of a resource from the content
  * repository.
  */
-public interface PutContentOperation extends ContentRepositoryResourceContentOperation<Resource<? extends ResourceContent>> {
+public interface DeleteOperation extends ContentRepositoryResourceOperation<Boolean> {
 
   /**
-   * Returns the resource's content data stream.
+   * Returns <code>true</code> if all versions of this resource should be
+   * deleted.
    * 
-   * @return the data stream
+   * @return <code>true</code> if all resources should be deleted
    */
-  InputStream getInputStream();
+  boolean allVersions();
+
+  /**
+   * Returns the resource that is to be deleted.
+   * 
+   * @return the resource
+   */
+  Resource<?> getResource();
 
 }

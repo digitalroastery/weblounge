@@ -24,8 +24,9 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

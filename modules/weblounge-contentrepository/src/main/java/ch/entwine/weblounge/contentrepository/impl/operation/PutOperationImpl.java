@@ -25,9 +25,9 @@ import static ch.entwine.weblounge.common.content.ResourceUtils.equalsByIdOrPath
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.PutOperation;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.PutOperation;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 
 import java.io.IOException;
 
@@ -67,7 +67,7 @@ public final class PutOperationImpl extends AbstractContentRepositoryOperation<R
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#getResourceURI()
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation#getResourceURI()
    */
   public ResourceURI getResourceURI() {
     return resource.getURI();
@@ -76,7 +76,7 @@ public final class PutOperationImpl extends AbstractContentRepositoryOperation<R
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation#apply(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.content.Resource)
    */
   @SuppressWarnings("unchecked")
@@ -100,7 +100,7 @@ public final class PutOperationImpl extends AbstractContentRepositoryOperation<R
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.PutOperation#updatePreviews()
+   * @see ch.entwine.weblounge.common.repository.PutOperation#updatePreviews()
    */
   public boolean updatePreviews() {
     return updatePreviews;
@@ -109,7 +109,7 @@ public final class PutOperationImpl extends AbstractContentRepositoryOperation<R
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.repository.WritableContentRepository)
    */
   @Override
   protected Resource<? extends ResourceContent> run(

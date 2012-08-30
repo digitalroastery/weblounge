@@ -20,11 +20,11 @@
 
 package ch.entwine.weblounge.contentrepository.impl.operation;
 
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener;
-import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ContentRepositoryOperation;
+import ch.entwine.weblounge.common.repository.ContentRepositoryOperationListener;
+import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.contentrepository.impl.NotifyingOperationListener;
 
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#getIdentifier()
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#getIdentifier()
    */
   public long getIdentifier() {
     return operationId;
@@ -90,7 +90,7 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#addOperationListener(ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener)
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#addOperationListener(ch.entwine.weblounge.common.repository.ContentRepositoryOperationListener)
    */
   public void addOperationListener(ContentRepositoryOperationListener listener) {
     if (listeners == null) {
@@ -102,7 +102,7 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#removeOperationListener(ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener)
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#removeOperationListener(ch.entwine.weblounge.common.repository.ContentRepositoryOperationListener)
    */
   public void removeOperationListener(
       ContentRepositoryOperationListener listener) {
@@ -114,7 +114,7 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.repository.WritableContentRepository)
    */
   public final T execute(WritableContentRepository repository)
       throws ContentRepositoryException, IOException,
@@ -183,7 +183,7 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#get()
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#get()
    */
   public T get() throws ContentRepositoryException, IOException {
     synchronized (internalListener) {
@@ -209,7 +209,7 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#getResult()
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#getResult()
    */
   public T getResult() throws IllegalStateException {
     if (isRunning)
@@ -220,7 +220,7 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#getError()
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#getError()
    */
   public Throwable getError() throws IllegalStateException {
     if (isRunning)
