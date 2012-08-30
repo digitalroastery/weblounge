@@ -361,8 +361,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.entwine.weblounge.common.content.resource.Resource)
    */
   @Override
-  protected <C extends ResourceContent, R extends Resource<C>> R storeResource(
-      R resource) throws IOException {
+  protected Resource<?> storeResource(Resource<?> resource) throws IOException {
     File resourceUrl = uriToFile(resource.getURI());
     InputStream is = null;
     OutputStream os = null;
@@ -388,8 +387,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      java.io.InputStream)
    */
   @Override
-  protected <C extends ResourceContent, R extends Resource<C>> C storeResourceContent(
-      ResourceURI uri, C content, InputStream is) throws IOException {
+  protected ResourceContent storeResourceContent(ResourceURI uri,
+      ResourceContent content, InputStream is) throws IOException {
 
     if (is == null)
       return content;
@@ -420,8 +419,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      ch.entwine.weblounge.common.content.ResourceContent)
    */
   @Override
-  protected <C extends ResourceContent, R extends Resource<C>> void deleteResourceContent(
-      ResourceURI uri, C content) throws IOException {
+  protected void deleteResourceContent(ResourceURI uri, ResourceContent content)
+      throws IOException {
     File contentFile = uriToContentFile(uri, content);
     if (contentFile == null)
       throw new IOException("Resource content " + contentFile + " does not exist");

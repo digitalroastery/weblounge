@@ -1324,8 +1324,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <C extends ResourceContent, R extends Resource<C>> R storeResource(
-      R resource) throws IOException;
+  protected abstract Resource<?> storeResource(Resource<?> resource)
+      throws IOException;
 
   /**
    * Writes the resource content to the repository storage.
@@ -1339,8 +1339,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <C extends ResourceContent, R extends Resource<C>> C storeResourceContent(
-      ResourceURI uri, C content, InputStream is) throws IOException;
+  protected abstract ResourceContent storeResourceContent(ResourceURI uri,
+      ResourceContent content, InputStream is) throws IOException;
 
   /**
    * Deletes the indicated revisions of resource <code>uri</code> from the
@@ -1365,8 +1365,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <C extends ResourceContent, R extends Resource<C>> void deleteResourceContent(
-      ResourceURI uri, C content) throws IOException;
+  protected abstract void deleteResourceContent(ResourceURI uri,
+      ResourceContent content) throws IOException;
 
   /**
    * This class is used as a way to keep track of what has been added to the
