@@ -145,17 +145,10 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
    */
   protected void indexBundleContents() throws ContentRepositoryException {
 
-    // Are the serializers already up and running?
-    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-    if (serializers == null) {
-      logger.warn("Unable to index {} while no resource serializers are registered", this);
-      return;
-    }
-
     // See if there are any resources. If that's the case, then we don't need to
     // do anything. If not, we need to copy everything that's currently in the
     // bundle.
-    for (ResourceSerializer<?, ?> serializer : serializers) {
+    for (ResourceSerializer<?, ?> serializer : getSerializers()) {
       String resourceDirectoryPath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), serializer.getType() + "s");
       File resourceDirectory = new File(resourceDirectoryPath);
       if (resourceDirectory.isDirectory() && resourceDirectory.list().length > 0) {
@@ -256,8 +249,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     List<ResourceURI> resourceURIs = new ArrayList<ResourceURI>();
 
     // For every serializer, try to load the resources
-    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-    for (ResourceSerializer<?, ?> serializer : serializers) {
+    for (ResourceSerializer<?, ?> serializer : getSerializers()) {
       String resourceDirectory = serializer.getType() + "s";
       String resourcePathPrefix = UrlUtils.concat(bundlePathPrefix, resourceDirectory);
       Enumeration<URL> entries = bundle.findEntries(resourcePathPrefix, "*.xml", true);
@@ -300,7 +292,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     if (url == null)
       return null;
     try {
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+      ResourceSerializer<?, ?> serializer = getSerializerByType(uri.getType());
       if (serializer == null) {
         logger.warn("Unable to read {} {}: no serializer found", uri.getType(), uri);
         return null;

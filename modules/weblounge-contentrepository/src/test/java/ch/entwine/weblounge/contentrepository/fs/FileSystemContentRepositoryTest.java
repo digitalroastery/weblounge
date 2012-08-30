@@ -58,13 +58,14 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.repository.ResourceSelector;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSelectorImpl;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
@@ -185,6 +186,9 @@ public class FileSystemContentRepositoryTest {
   /** Italian */
   protected Language french = LanguageUtils.getLanguage("fr");
 
+  /** The resource serializer */
+  private static ResourceSerializerServiceImpl serializer = null;
+
   /**
    * Sets up everything valid for all test runs.
    * 
@@ -196,12 +200,12 @@ public class FileSystemContentRepositoryTest {
     jpegContentURL = FileSystemContentRepositoryTest.class.getResource(jpegContentPath);
     pngContentURL = FileSystemContentRepositoryTest.class.getResource(pngContentPath);
 
-    // Resource serializers
-    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
-    ResourceSerializerFactory.setResourceSerializerService(serializerService);
-    serializerService.registerSerializer(new PageSerializer());
-    serializerService.registerSerializer(new FileResourceSerializer());
-    serializerService.registerSerializer(new ImageResourceSerializer());
+    // Resource serializer
+    serializer = new ResourceSerializerServiceImpl();
+    serializer.addSerializer(new PageSerializer());
+    serializer.addSerializer(new FileResourceSerializer());
+    serializer.addSerializer(new ImageResourceSerializer());
+    serializer.addSerializer(new MovieResourceSerializer());
   }
 
   /**
@@ -235,6 +239,8 @@ public class FileSystemContentRepositoryTest {
 
     // Connect to the repository
     repository = new FileSystemContentRepository();
+    repository.setSerializer(serializer);
+    repository.setEnvironment(Environment.Production);
     Dictionary<String, Object> repositoryProperties = new Hashtable<String, Object>();
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
     repository.updated(repositoryProperties);

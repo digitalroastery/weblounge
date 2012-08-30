@@ -114,7 +114,7 @@ class PreviewGeneratorWorker implements Runnable {
     try {
 
       // Find the resource serializer
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+      ResourceSerializer<?, ?> serializer = contentRepository.getSerializerByType(resourceType);
       if (serializer == null) {
         logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
         return;
@@ -129,7 +129,7 @@ class PreviewGeneratorWorker implements Runnable {
 
       // Create the scaled images
       String mimeType = "image/" + format;
-      ResourceSerializer<?, ?> s = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
+      ResourceSerializer<?, ?> s = contentRepository.getSerializerByMimeType(mimeType);
       if (s == null) {
         logger.warn("No resource serializer is capable of dealing with resources of format '{}'", mimeType);
         return;

@@ -61,19 +61,20 @@ public class WebloungeHarvesterTest {
   /** The mock site */
   private Site site;
 
+  /** The resource serializer */
+  private static ResourceSerializerServiceImpl serializer = null;
+
   /**
-   * Sets up everything valid for all test runs.
-   * 
-   * @throws Exception
-   *           if setup fails
+   * Sets up static test data.
    */
   @BeforeClass
-  public static void setUpClass() throws Exception {
-    // Resource serializers
-    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
-    ResourceSerializerFactory.setResourceSerializerService(serializerService);
-    serializerService.registerSerializer(new MovieResourceSerializer());
-    serializerService.registerSerializer(new PageSerializer());
+  public static void setUpClass() {
+    // Resource serializer
+    serializer = new ResourceSerializerServiceImpl();
+    serializer.addSerializer(new PageSerializer());
+    serializer.addSerializer(new FileResourceSerializer());
+    serializer.addSerializer(new ImageResourceSerializer());
+    serializer.addSerializer(new MovieResourceSerializer());
   }
 
   /**
@@ -109,6 +110,8 @@ public class WebloungeHarvesterTest {
 
     // Connect to the repository
     contentRepository = new FileSystemContentRepository();
+    contentRepository.setSerializer(serializer);
+    contentRepository.setEnvironment(Environment.Production);
     Dictionary<String, Object> repositoryProperties = new Hashtable<String, Object>();
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
     contentRepository.updated(repositoryProperties);

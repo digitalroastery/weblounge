@@ -61,7 +61,6 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Content repository that reads pages and resources from the site's
@@ -274,9 +273,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
     List<ResourceURI> uris = new ArrayList<ResourceURI>();
 
     // Add all known resource types to the index
-    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-
-    for (ResourceSerializer<?, ?> serializer : serializers) {
+    for (ResourceSerializer<?, ?> serializer : getSerializers()) {
 
       // Construct this resource type's entry point into the bundle
       String resourcePath = "/" + serializer.getType() + "s";
@@ -314,7 +311,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
     FileUtils.forceMkdir(idxRootDir);
 
     BundleContentRepositoryIndex index = null;
-    index = new BundleContentRepositoryIndex(idxRootDir);
+    index = new BundleContentRepositoryIndex(idxRootDir, resourceSerializer);
     boolean success = false;
 
     // Make sure the version matches the implementation
@@ -322,7 +319,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
       logger.warn("Index version does not match implementation, triggering reindex");
       FileUtils.deleteQuietly(idxRootDir);
       FileUtils.forceMkdir(idxRootDir);
-      index = new BundleContentRepositoryIndex(idxRootDir);
+      index = new BundleContentRepositoryIndex(idxRootDir, resourceSerializer);
     }
 
     // Is there an existing index?
@@ -342,8 +339,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
       ResourceURI previousURI = null;
 
       // Add all known resource types to the index
-      Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-      for (ResourceSerializer<?, ?> serializer : serializers) {
+      for (ResourceSerializer<?, ?> serializer : getSerializers()) {
         ResourceSelector selector = new ResourceSelectorImpl(site).withTypes(serializer.getType());
         for (ResourceURI uri : list(selector)) {
 

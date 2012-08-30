@@ -45,10 +45,10 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
@@ -62,6 +62,7 @@ import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -110,6 +111,22 @@ public class ContentRepositoryIndexTest {
   /** Italian */
   protected Language french = LanguageUtils.getLanguage("fr");
 
+  /** The resource serializer */
+  private static ResourceSerializerServiceImpl serializer = null;
+
+  /**
+   * Sets up static test data.
+   */
+  @BeforeClass
+  public static void setUpClass() {
+    // Resource serializer
+    serializer = new ResourceSerializerServiceImpl();
+    serializer.addSerializer(new PageSerializer());
+    serializer.addSerializer(new FileResourceSerializer());
+    serializer.addSerializer(new ImageResourceSerializer());
+    serializer.addSerializer(new MovieResourceSerializer());
+  }
+
   /**
    * Sets up data structures for each test case.
    * 
@@ -120,7 +137,8 @@ public class ContentRepositoryIndexTest {
     indexRootDirectory = new File(new File(System.getProperty("java.io.tmpdir")), "index");
     structuralIndexRootDirectory = new File(indexRootDirectory, "structure");
     FileUtils.deleteDirectory(indexRootDirectory);
-    idx = new FileSystemContentRepositoryIndex(indexRootDirectory);
+
+    idx = new FileSystemContentRepositoryIndex(indexRootDirectory, serializer);
 
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
@@ -133,13 +151,6 @@ public class ContentRepositoryIndexTest {
     EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
     EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
     EasyMock.replay(site);
-
-    // Resource serializers
-    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
-    ResourceSerializerFactory.setResourceSerializerService(serializerService);
-    serializerService.registerSerializer(new PageSerializer());
-    serializerService.registerSerializer(new FileResourceSerializer());
-    serializerService.registerSerializer(new ImageResourceSerializer());
 
     page = new PageImpl(new PageURIImpl(site, "/weblounge"));
     page.setTemplate("home");
@@ -219,7 +230,7 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testUpdate() throws IllegalArgumentException,
-      ContentRepositoryException {
+  ContentRepositoryException {
 
     String propertyName = "testproperty";
     String propertyValue = "testvalue";
@@ -472,7 +483,7 @@ public class ContentRepositoryIndexTest {
       index.writeInt(0);
       index.close();
 
-      idx = new FileSystemContentRepositoryIndex(indexRootDirectory);
+      idx = new FileSystemContentRepositoryIndex(indexRootDirectory, serializer);
       assertEquals(-1, idx.getIndexVersion());
     } catch (IOException e) {
       fail("Error writing version to index");

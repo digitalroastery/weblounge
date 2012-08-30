@@ -128,6 +128,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   /** The security service */
   protected SecurityService securityService = null;
 
+  /** The resource serializer service */
+  private ResourceSerializerService serializerService = null;
+
   /** The endpoint documentation */
   private String docs = null;
 
@@ -636,7 +639,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       InputStream is = null;
       ResourceContent content = null;
       ResourceContentReader<?> reader = null;
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resource.getURI().getType());
+      ResourceSerializer<?, ?> serializer = serializerService.getSerializerByType(resource.getURI().getType());
       try {
         reader = serializer.getContentReader();
         is = new FileInputStream(uploadedFile);
@@ -848,7 +851,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // TOOD: Extract resource type
     String resourceType = resourceURI.getType();
     try {
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+      ResourceSerializer<?, ?> serializer = serializerService.getSerializerByType(resourceType);
       ResourceReader<?, ?> resourceReader = serializer.getReader();
       resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       resource.setModified(user, new Date());
@@ -1187,10 +1190,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       Resource<?> resource = null;
       ResourceURI resourceURI = null;
       logger.debug("Adding resource to {}", resourceURI);
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
+      ResourceSerializer<?, ?> serializer = serializerService.getSerializerByMimeType(mimeType);
       if (serializer == null) {
         logger.debug("No specialized resource serializer found, using regular file serializer");
-        serializer = ResourceSerializerFactory.getSerializerByType(FileResource.TYPE);
+        serializer = serializerService.getSerializerByType(FileResource.TYPE);
       }
 
       // Create the resource
@@ -1405,6 +1408,16 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
     buf.append("</files>");
     return buf.toString();
+  }
+
+  /**
+   * OSGi callback that is setting the resource serializer.
+   * 
+   * @param serializer
+   *          the resource serializer service
+   */
+  void setResourceSerializer(ResourceSerializerService serializer) {
+    this.serializerService = serializer;
   }
 
   /**

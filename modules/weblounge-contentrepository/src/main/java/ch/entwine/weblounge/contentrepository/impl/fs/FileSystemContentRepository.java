@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -440,9 +439,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     List<ResourceURI> uris = new ArrayList<ResourceURI>();
 
     // Add all known resource types to the index
-    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-
-    for (ResourceSerializer<?, ?> serializer : serializers) {
+    for (ResourceSerializer<?, ?> serializer : getSerializers()) {
 
       // Temporary path for rebuilt site
       String resourceType = serializer.getType().toLowerCase();

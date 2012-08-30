@@ -92,6 +92,9 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
   /** Key to store the search result in the request */
   public static final String SEARCH_RESULT = "webl-searchresult";
 
+  /** The resource serializer */
+  private ResourceSerializerService serializerService = null;
+
   /**
    * {@inheritDoc}
    * 
@@ -232,7 +235,7 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
       ResourceSearchResultItem resourceItem = (ResourceSearchResultItem) item;
       ResourceURI uri = resourceItem.getResourceURI();
 
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+      ResourceSerializer<?, ?> serializer = serializerService.getSerializerByType(uri.getType());
       if (serializer == null) {
         logger.debug("Skipping search result since it's type ({}) is unknown", uri.getType());
         continue;
@@ -462,10 +465,29 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.dispatcher.RequestHandler#getPriority()
+   */
+  public int getPriority() {
+    return 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.dispatcher.RequestHandler#getName()
    */
   public String getName() {
     return "search request handler";
+  }
+
+  /**
+   * OSGi callback that is setting the resource serializer.
+   * 
+   * @param serializer
+   *          the resource serializer service
+   */
+  void setResourceSerializer(ResourceSerializerService serializer) {
+    this.serializerService = serializer;
   }
 
   /**
@@ -476,15 +498,6 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
   @Override
   public String toString() {
     return getName();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.dispatcher.RequestHandler#getPriority()
-   */
-  public int getPriority() {
-    return 0;
   }
 
 }

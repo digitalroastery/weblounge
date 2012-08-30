@@ -88,6 +88,9 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
   /** The request environment */
   protected Environment environment = Environment.Production;
 
+  /** The resource serializer service */
+  private ResourceSerializerService serializerService = null;
+
   /**
    * OSGi callback on component inactivation.
    * 
@@ -190,7 +193,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Find a serializer
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceURI.getType());
+    ResourceSerializer<?, ?> serializer = serializerService.getSerializerByType(resourceURI.getType());
     if (serializer == null)
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
 
@@ -538,7 +541,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       ImageStyle style, Language language) {
 
     // Find a serializer
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resource.getURI().getType());
+    ResourceSerializer<?, ?> serializer = serializerService.getSerializerByType(resource.getURI().getType());
     if (serializer == null)
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
 
@@ -702,6 +705,16 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
    */
   void setEnvironment(Environment environment) {
     this.environment = environment;
+  }
+
+  /**
+   * OSGi callback that is setting the resource serializer.
+   * 
+   * @param serializer
+   *          the resource serializer service
+   */
+  void setResourceSerializer(ResourceSerializerService serializer) {
+    this.serializerService  = serializer;
   }
 
   /**

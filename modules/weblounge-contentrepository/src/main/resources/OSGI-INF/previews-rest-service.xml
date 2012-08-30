@@ -14,5 +14,6 @@
   <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" />
   <reference name="imagestyles" interface="ch.entwine.weblounge.common.content.image.ImageStyle" cardinality="0..n" policy="dynamic" bind="addImageStyle" unbind="removeImageStyle" />
   <reference name="environment" interface="ch.entwine.weblounge.common.site.Environment" cardinality="1..1" policy="static" bind="setEnvironment" />
+  <reference name="serializer" interface="ch.entwine.weblounge.common.repository.ResourceSerializerService" cardinality="1..1" policy="static" bind="setResourceSerializer" />
 
 </scr:component>

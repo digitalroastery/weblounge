@@ -78,6 +78,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -127,6 +128,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /** The environment */
   protected Environment environment = Environment.Production;
+
+  /** The resource serializer service */
+  protected ResourceSerializerService resourceSerializer = null;
 
   /** The image style tracker */
   private ImageStyleTracker imageStyleTracker = null;
@@ -358,7 +362,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
       InputStream is = null;
       try {
-        ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+        ResourceSerializer<?, ?> serializer = getSerializerByType(uri.getType());
         if (serializer == null) {
           logger.warn("No resource serializer for type '{}' found", uri.getType());
           throw new ContentRepositoryException("No resource serializer for type '" + uri.getType() + "' found");
@@ -384,7 +388,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
             return null;
           }
           is = new BufferedInputStream(resourceStream);
-          ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+          ResourceSerializer<?, ?> serializer = getSerializerByType(uri.getType());
           ResourceReader<?, ?> reader = serializer.getReader();
           resource = reader.read(is, site);
         } catch (Throwable t) {
@@ -680,7 +684,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     InputStream is = null;
     try {
       is = new BufferedInputStream(contentUrl.openStream());
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+      ResourceSerializer<?, ?> serializer = getSerializerByType(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
     } catch (Throwable t) {
@@ -1114,13 +1118,73 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
-   * Callback from OSGi to set the environment.
+   * Returns the current environment.
+   * 
+   * @return the environment
+   */
+  protected Environment getEnvironment() {
+    return environment;
+  }
+
+  /**
+   * This method is called right after initialization of the content repository
+   * and sets the environment.
    * 
    * @param environment
    *          the environment
    */
-  void setEnvironment(Environment environment) {
+  public void setEnvironment(Environment environment) {
+    if (environment == null)
+      throw new IllegalStateException("Environment has not been set");
     this.environment = environment;
+  }
+
+  /**
+   * Returns the resource serializer for the given type or <code>null</code> if
+   * no such serializer is registered.
+   * 
+   * @param type
+   *          the resource type
+   * @return the serializer
+   */
+  protected ResourceSerializer<?, ?> getSerializerByType(String type) {
+    if (resourceSerializer == null)
+      throw new IllegalStateException("Serializer service has not been set");
+    return resourceSerializer.getSerializerByType(type);
+  }
+
+  /**
+   * Returns the resource serializer for the given mime type or
+   * <code>null</code> if no such serializer is registered.
+   * 
+   * @param mimeType
+   *          the mime type
+   * @return the serializer
+   */
+  protected ResourceSerializer<?, ?> getSerializerByMimeType(String mimeType) {
+    if (resourceSerializer == null)
+      throw new IllegalStateException("Serializer service has not been set");
+    return resourceSerializer.getSerializerByMimeType(mimeType);
+  }
+
+  /**
+   * Returns the set of available resource serializers.
+   * 
+   * @return the set serializer
+   */
+  protected Set<ResourceSerializer<?, ?>> getSerializers() {
+    return resourceSerializer.getSerializers();
+  }
+
+  /**
+   * This method is called right after initialization of the content repository
+   * and is used to register the factory with a backing service implementation.
+   * 
+   * @param service
+   *          the resource serializer service
+   */
+  public void setSerializer(ResourceSerializerService service) {
+    resourceSerializer = service;
   }
 
   /**

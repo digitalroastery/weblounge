@@ -73,17 +73,20 @@ public class ContentRepositoryIndex {
    *          the root directory
    * @param readOnly
    *          <code>true</code> if the index should be read only
+   * @param serializer
+   *          the resource serializer
    * @throws IOException
    *           if creating the indices fails
    */
-  public ContentRepositoryIndex(File rootDir, boolean readOnly)
-      throws IOException {
+  public ContentRepositoryIndex(File rootDir,
+      ResourceSerializerService serializer, boolean readOnly)
+          throws IOException {
     this.idxRootDir = rootDir;
     this.uriIdx = new URIIndex(new File(rootDir, "structure"), readOnly);
     this.idIdx = new IdIndex(new File(rootDir, "structure"), readOnly);
     this.pathIdx = new PathIndex(new File(rootDir, "structure"), readOnly);
     this.versionIdx = new VersionIndex(new File(rootDir, "structure"), readOnly);
-    this.searchIdx = new SearchIndex(new File(rootDir, "fulltext"), readOnly);
+    this.searchIdx = new SearchIndex(new File(rootDir, "fulltext"), serializer, readOnly);
   }
 
   /**
@@ -226,7 +229,7 @@ public class ContentRepositoryIndex {
    *           if adding to the index fails
    */
   public synchronized ResourceURI add(Resource<?> resource) throws IOException,
-      ContentRepositoryException {
+  ContentRepositoryException {
 
     ResourceURI uri = resource.getURI();
     String id = uri.getIdentifier();
@@ -347,7 +350,7 @@ public class ContentRepositoryIndex {
    *           if deleting the resource fails
    */
   public synchronized boolean delete(ResourceURI uri) throws IOException,
-      ContentRepositoryException, IllegalArgumentException {
+  ContentRepositoryException, IllegalArgumentException {
     String id = uri.getIdentifier();
     String path = StringUtils.trimToNull(uri.getPath());
     long version = uri.getVersion();
@@ -420,7 +423,7 @@ public class ContentRepositoryIndex {
    *           if accessing the index fails
    */
   public String getIdentifier(ResourceURI uri) throws IOException,
-      IllegalArgumentException {
+  IllegalArgumentException {
 
     String path = StringUtils.trimToNull(uri.getPath());
     if (path == null)
@@ -461,7 +464,7 @@ public class ContentRepositoryIndex {
    *           if accessing the index fails
    */
   public String getPath(ResourceURI uri) throws IOException,
-      IllegalArgumentException {
+  IllegalArgumentException {
 
     String id = uri.getIdentifier();
     if (id == null)
@@ -514,7 +517,7 @@ public class ContentRepositoryIndex {
    *           if updating the index fails
    */
   public synchronized void update(Resource<?> resource) throws IOException,
-      ContentRepositoryException {
+  ContentRepositoryException {
     ResourceURI uri = resource.getURI();
 
     if (resource.isIndexed())
@@ -702,7 +705,7 @@ public class ContentRepositoryIndex {
    */
   public List<String> suggest(String dictionary, String seed,
       boolean onlyMorePopular, int count, boolean collate)
-      throws ContentRepositoryException {
+          throws ContentRepositoryException {
     if (StringUtils.isBlank(dictionary))
       throw new IllegalArgumentException("Dictionary cannot be null");
     if (StringUtils.isBlank(seed))

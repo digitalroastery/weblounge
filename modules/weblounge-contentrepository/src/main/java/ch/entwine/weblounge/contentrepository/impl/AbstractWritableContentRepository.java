@@ -1029,7 +1029,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     try {
       logger.info("Creating new index at {}", newIdxRootDir);
       FileUtils.forceMkdir(newIdxRootDir);
-      newIndex = new FileSystemContentRepositoryIndex(newIdxRootDir);
+      newIndex = new FileSystemContentRepositoryIndex(newIdxRootDir, resourceSerializer);
       indexingOffsite = true;
       rebuildIndex(newIndex);
     } catch (IOException e) {
@@ -1058,7 +1058,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       logger.info("Moving new index into place {}", idxRootDir);
       FileUtils.moveDirectory(idxRootDir, oldIdxRootDir);
       FileUtils.moveDirectory(newIdxRootDir, idxRootDir);
-      index = new FileSystemContentRepositoryIndex(idxRootDir);
+      index = new FileSystemContentRepositoryIndex(idxRootDir, resourceSerializer);
       logger.info("Removing old index at {}", oldIdxRootDir);
       FileUtils.forceDelete(oldIdxRootDir);
     } catch (IOException e) {
@@ -1133,12 +1133,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       long resourceCount = 0;
 
       // Index each and every known resource type
-      Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-      if (serializers == null) {
-        logger.warn("Unable to index {} while no resource serializers are registered", this);
-        return;
-      }
-      for (ResourceSerializer<?, ?> serializer : serializers) {
+      for (ResourceSerializer<?, ?> serializer : getSerializers()) {
         long added = index(idx, serializer.getType());
         if (added > 0)
           logger.info("Added {} {}s to index", added, serializer.getType().toLowerCase());
@@ -1195,7 +1190,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     logger.info("Populating site index '{}' with {}s...", site, resourceType);
 
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+    ResourceSerializer<?, ?> serializer = getSerializerByType(resourceType);
     if (serializer == null) {
       logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
       return 0;
@@ -1290,7 +1285,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     FileUtils.forceMkdir(idxRoot);
 
     // Add content if there is any
-    idx = new FileSystemContentRepositoryIndex(idxRoot);
+    idx = new FileSystemContentRepositoryIndex(idxRoot, resourceSerializer);
 
     // Create the idx if there is nothing in place so far
     if (idx.getResourceCount() <= 0) {
