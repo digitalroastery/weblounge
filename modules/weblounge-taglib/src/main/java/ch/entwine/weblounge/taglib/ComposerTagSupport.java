@@ -221,7 +221,7 @@ public class ComposerTagSupport extends WebloungeTag {
       ContentRepositoryUnavailableException {
     writer.println("</div>");
 
-    if (ghostPaglets.length > 0 && RequestUtils.isEditingState(request)) {
+    if (ghostPaglets != null && ghostPaglets.length > 0 && RequestUtils.isEditingState(request)) {
       writer.print("<div id=\"" + id + "-ghost\">");
 
       // Render the ghost pagelets
@@ -531,6 +531,11 @@ public class ComposerTagSupport extends WebloungeTag {
     while (names.hasMoreElements()) {
       String key = (String) names.nextElement();
       attributes.put(key, request.getAttribute(key));
+    }
+
+    // Skip loading of data if this is a precompile request
+    if (RequestUtils.isPrecompileRequest(request)) {
+      return EVAL_BODY_INCLUDE;
     }
 
     // Initiate loading the page content
