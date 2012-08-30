@@ -18,23 +18,30 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
-
-import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
-import ch.entwine.weblounge.common.security.User;
+package ch.entwine.weblounge.common.repository;
 
 /**
- * The unlock operation represents the process of unlocking a resource in the
- * content repository.
+ * This listener is called once the corresponding asynchronous content
+ * repository operations have been executed.
  */
-public interface UnlockOperation extends ContentRepositoryResourceOperation<Resource<? extends ResourceContent>> {
+public interface ContentRepositoryOperationListener {
 
   /**
-   * Returns the user that was holding on to the lock.
+   * This method is called when the operation was executed successfully.
    * 
-   * @return the former lock owner
+   * @param operation
+   *          the operation
    */
-  User getUser();
+  void executionSucceeded(ContentRepositoryOperation<?> operation);
+
+  /**
+   * This method is called when the resource update failed.
+   * 
+   * @param operation
+   *          the operation
+   * @param t
+   *          the reason of failure
+   */
+  void executionFailed(ContentRepositoryOperation<?> operation, Throwable t);
 
 }

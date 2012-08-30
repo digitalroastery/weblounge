@@ -18,30 +18,22 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
+
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceContent;
 
 /**
- * This listener is called once the corresponding asynchronous content
- * repository operations have been executed.
+ * The delete operation represents the removal of a resource from the content
+ * repository.
  */
-public interface ContentRepositoryOperationListener {
+public interface DeleteContentOperation extends ContentRepositoryResourceContentOperation<Resource<? extends ResourceContent>> {
 
   /**
-   * This method is called when the operation was executed successfully.
+   * Returns the resource content that is to be deleted from the resource.
    * 
-   * @param operation
-   *          the operation
+   * @return the resource content
    */
-  void executionSucceeded(ContentRepositoryOperation<?> operation);
-
-  /**
-   * This method is called when the resource update failed.
-   * 
-   * @param operation
-   *          the operation
-   * @param t
-   *          the reason of failure
-   */
-  void executionFailed(ContentRepositoryOperation<?> operation, Throwable t);
+  ResourceContent getContent();
 
 }

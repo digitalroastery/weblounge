@@ -18,13 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 
 import java.io.IOException;
@@ -238,5 +239,21 @@ public interface ContentRepository {
    *           if creating the previews fails
    */
   void createPreviews() throws ContentRepositoryException;
+
+  /**
+   * Sets the current environment.
+   * 
+   * @param environment
+   *          the current environment
+   */
+  void setEnvironment(Environment environment);
+
+  /**
+   * Sets the available resource serializers.
+   * 
+   * @param serializer
+   *          the serializer service
+   */
+  void setSerializer(ResourceSerializerService serializer);
 
 }

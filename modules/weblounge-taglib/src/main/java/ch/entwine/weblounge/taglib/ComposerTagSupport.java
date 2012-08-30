@@ -29,14 +29,14 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Action;
@@ -221,7 +221,7 @@ public class ComposerTagSupport extends WebloungeTag {
       ContentRepositoryUnavailableException {
     writer.println("</div>");
 
-    if (ghostPaglets.length > 0 && RequestUtils.isEditingState(request)) {
+    if (ghostPaglets != null && ghostPaglets.length > 0 && RequestUtils.isEditingState(request)) {
       writer.print("<div id=\"" + id + "-ghost\">");
 
       // Render the ghost pagelets
@@ -533,6 +533,11 @@ public class ComposerTagSupport extends WebloungeTag {
       attributes.put(key, request.getAttribute(key));
     }
 
+    // Skip loading of data if this is a precompile request
+    if (RequestUtils.isPrecompileRequest(request)) {
+      return EVAL_BODY_INCLUDE;
+    }
+
     // Initiate loading the page content
     try {
       loadContent(contentInheritanceEnabled);
@@ -800,7 +805,7 @@ public class ComposerTagSupport extends WebloungeTag {
 
       } catch (Throwable e) {
         // String params = RequestUtils.getParameters(request);
-        String msg = "Error rendering " + renderer + " on " + url + "'";
+        String msg = "Error rendering '" + renderer + "' on " + site.getIdentifier() + "://" + url;
         String reason = "";
         Throwable o = e.getCause();
         if (o != null) {

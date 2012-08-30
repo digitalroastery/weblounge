@@ -35,13 +35,13 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.SearchRequest;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.Solr;
@@ -105,19 +105,27 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   /** The version number */
   protected int indexVersion = -1;
 
+  /** The resource serializer */
+  protected ResourceSerializerService resourceSerializer = null;
+
   /**
    * Creates a search index that puts solr into the given root directory. If the
    * directory doesn't exist, it will be created.
    * 
    * @param solrRoot
    *          the solr root directory
+   * @param resourceSerializer
+   *          the resource serializer
    * @param readOnly
    *          <code>true</code> to indicate a read only index
    * @throws IOException
    *           if either loading or creating the index fails
    */
-  public SearchIndex(File solrRoot, boolean readOnly) throws IOException {
+  public SearchIndex(File solrRoot,
+      ResourceSerializerService resourceSerializer, boolean readOnly)
+          throws IOException {
     this.solrRoot = solrRoot;
+    this.resourceSerializer = resourceSerializer;
     this.isReadOnly = readOnly;
     try {
       loadSolr(solrRoot);
@@ -254,7 +262,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
     // Have the serializer create an input document
     String resourceType = resource.getURI().getType();
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+    ResourceSerializer<?, ?> serializer = resourceSerializer.getSerializerByType(resourceType);
     if (serializer == null)
       throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
 
@@ -284,7 +292,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       throws ContentRepositoryException {
 
     String resourceType = uri.getType();
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+    ResourceSerializer<?, ?> serializer = resourceSerializer.getSerializerByType(resourceType);
     if (serializer == null)
       throw new ContentRepositoryException("Unable to create an input document for " + uri + ": no serializer found");
 
@@ -447,7 +455,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
     // Have the serializer create an input document
     String resourceType = uri.getType();
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+    ResourceSerializer<?, ?> serializer = resourceSerializer.getSerializerByType(resourceType);
     if (serializer == null) {
       logger.error("Unable to create an input document for {}: no serializer found", uri);
       return false;
@@ -496,7 +504,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    */
   public List<String> suggest(String dictionary, String seed,
       boolean onlyMorePopular, int count, boolean collate)
-      throws ContentRepositoryException {
+          throws ContentRepositoryException {
     if (StringUtils.isBlank(seed))
       throw new IllegalArgumentException("Seed must not be blank");
     if (StringUtils.isBlank(dictionary))
@@ -536,7 +544,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     }
 
     solrServer = new Solr(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
-    searchRequest = new SearchRequest(solrServer);
+    searchRequest = new SearchRequest(solrServer, resourceSerializer);
 
     // Determine the index version
     if (configExists && dataExists) {

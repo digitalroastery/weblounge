@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.content.GeneralComposeable;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.impl.util.xml.XPathNamespaceContext;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 
 import org.apache.commons.lang.StringUtils;
@@ -316,6 +317,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    */
   public static ImageStyleImpl fromXml(Node node) throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
+    xpath.setNamespaceContext(new XPathNamespaceContext(true));
     return fromXml(node, xpath);
   }
 

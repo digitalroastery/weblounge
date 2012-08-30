@@ -89,7 +89,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
    */
   public String getMimeType(MovieContent resourceContent) {
     return resourceContent.getMimetype();
@@ -98,7 +98,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supports(java.lang.String)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#supports(java.lang.String)
    */
   public boolean supports(String mimeType) {
     if (mimeType == null)
@@ -113,7 +113,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
    */
   public Resource<MovieContent> newResource(Site site) {
     return new MovieResourceImpl(new MovieResourceURIImpl(site));
@@ -122,7 +122,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
    *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
    *      ch.entwine.weblounge.common.language.Language)
    */
@@ -151,7 +151,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
    */
   public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
     if (resource != null) {
@@ -163,7 +163,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
    *      java.util.List)
    */
   public Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata) {
@@ -192,7 +192,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, List)
    */
   public SearchResultItem toSearchResultItem(Site site, double relevance,
@@ -234,7 +234,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getContentReader()
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getContentReader()
    */
   public ResourceContentReader<MovieContent> getContentReader()
       throws ParserConfigurationException, SAXException {
@@ -244,7 +244,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator(Resource)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getPreviewGenerator(Resource)
    */
   public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
     for (MoviePreviewGenerator generator : previewGenerators) {

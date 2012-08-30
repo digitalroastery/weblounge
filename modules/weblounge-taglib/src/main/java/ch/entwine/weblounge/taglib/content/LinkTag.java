@@ -22,8 +22,8 @@ package ch.entwine.weblounge.taglib.content;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 

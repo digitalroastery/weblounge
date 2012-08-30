@@ -18,28 +18,29 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.repository;
+package ch.entwine.weblounge.common.repository;
 
+import ch.entwine.weblounge.common.content.Resource;
 
 /**
- * The move operation represents the process of a resource (and potentially its
- * children) being moved from one path or url to another.
+ * The delete operation represents the removal of a resource from the content
+ * repository.
  */
-public interface MoveOperation extends ContentRepositoryResourceOperation<Void> {
+public interface DeleteOperation extends ContentRepositoryResourceOperation<Boolean> {
 
   /**
-   * Returns the path that the resource should be moved to.
+   * Returns <code>true</code> if all versions of this resource should be
+   * deleted.
    * 
-   * @return the target path
+   * @return <code>true</code> if all resources should be deleted
    */
-  String getTargetPath();
+  boolean allVersions();
 
   /**
-   * Returns <code>true</code> if the resource's children should be moved as
-   * well.
+   * Returns the resource that is to be deleted.
    * 
-   * @return <code>true</code> to move child resources as well
+   * @return the resource
    */
-  boolean moveChildren();
+  Resource<?> getResource();
 
 }

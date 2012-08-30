@@ -30,21 +30,22 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ResourceSelector;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSelector;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.FileUtils;
@@ -57,6 +58,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -75,11 +78,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactory;
 
 /**
@@ -123,6 +129,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /** The environment */
   protected Environment environment = Environment.Production;
 
+  /** The resource serializer service */
+  protected ResourceSerializerService resourceSerializer = null;
+
   /** The image style tracker */
   private ImageStyleTracker imageStyleTracker = null;
 
@@ -154,7 +163,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getType()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getType()
    */
   public String getType() {
     return type;
@@ -163,7 +172,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#isReadOnly()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#isReadOnly()
    */
   public boolean isReadOnly() {
     return readOnly || !(this instanceof WritableContentRepository);
@@ -172,7 +181,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#connect(ch.entwine.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#connect(ch.entwine.weblounge.common.site.Site)
    */
   public void connect(Site site) throws ContentRepositoryException {
     if (connected)
@@ -194,12 +203,15 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
 
     connected = true;
+
+    // Make sure previews are available as defined
+    updatePreviews();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#disconnect()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#disconnect()
    */
   public void disconnect() throws ContentRepositoryException {
     if (!connected)
@@ -222,7 +234,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#isIndexing()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#isIndexing()
    */
   public boolean isIndexing() {
     return indexing;
@@ -231,7 +243,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public boolean exists(ResourceURI uri) throws ContentRepositoryException {
     if (!isStarted())
@@ -246,7 +258,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#existsInAnyVersion(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#existsInAnyVersion(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public boolean existsInAnyVersion(ResourceURI uri)
       throws ContentRepositoryException {
@@ -262,7 +274,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getResourceURI(java.lang.String)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getResourceURI(java.lang.String)
    */
   public ResourceURI getResourceURI(String resourceId)
       throws ContentRepositoryException {
@@ -283,7 +295,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#find(ch.entwine.weblounge.common.content.SearchQuery)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#find(ch.entwine.weblounge.common.content.SearchQuery)
    */
   public SearchResult find(SearchQuery query) throws ContentRepositoryException {
     if (!isStarted())
@@ -296,7 +308,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @throws ContentRepositoryException
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#suggest(java.lang.String,
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#suggest(java.lang.String,
    *      java.lang.String, int)
    */
   public List<String> suggest(String dictionary, String seed, int count)
@@ -309,7 +321,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @SuppressWarnings("unchecked")
   public <R extends Resource<?>> R get(ResourceURI uri)
@@ -350,7 +362,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
       InputStream is = null;
       try {
-        ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+        ResourceSerializer<?, ?> serializer = getSerializerByType(uri.getType());
         if (serializer == null) {
           logger.warn("No resource serializer for type '{}' found", uri.getType());
           throw new ContentRepositoryException("No resource serializer for type '" + uri.getType() + "' found");
@@ -376,7 +388,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
             return null;
           }
           is = new BufferedInputStream(resourceStream);
-          ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+          ResourceSerializer<?, ?> serializer = getSerializerByType(uri.getType());
           ResourceReader<?, ?> reader = serializer.getReader();
           resource = reader.read(is, site);
         } catch (Throwable t) {
@@ -403,7 +415,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getContent(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getContent(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.language.Language)
    */
   public InputStream getContent(ResourceURI uri, Language language)
@@ -414,7 +426,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getVersions(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getVersions(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public ResourceURI[] getVersions(ResourceURI uri)
       throws ContentRepositoryException {
@@ -437,7 +449,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getResourceCount()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getResourceCount()
    */
   public long getResourceCount() {
     return index != null ? index.getResourceCount() : -1;
@@ -446,7 +458,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getVersionCount()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getVersionCount()
    */
   public long getVersionCount() {
     return index != null ? index.getRevisionCount() : -1;
@@ -512,7 +524,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.repository.ResourceSelector)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#list(ch.entwine.weblounge.common.repository.ResourceSelector)
    */
   public Collection<ResourceURI> list(ResourceSelector selector)
       throws ContentRepositoryException {
@@ -672,7 +684,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     InputStream is = null;
     try {
       is = new BufferedInputStream(contentUrl.openStream());
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+      ResourceSerializer<?, ?> serializer = getSerializerByType(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
     } catch (Throwable t) {
@@ -785,12 +797,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#createPreviews()
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#createPreviews()
    */
   @Override
   public void createPreviews() throws ContentRepositoryException {
     Collection<ResourceURI> uris = null;
-    logger.info("Starting preview generation");
+    logger.debug("Starting preview generation");
 
     // Load the uris
     try {
@@ -813,6 +825,108 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
+   * Iterates over the existing image styles and determines whether at least one
+   * style has changed or is missing the previews.
+   * 
+   * @throws ContentRepositoryException
+   *           if preview generation fails
+   */
+  protected void updatePreviews() throws ContentRepositoryException {
+
+    // Compile the full list of image styles
+    if (imageStyleTracker == null) {
+      logger.info("Skipping preview generation: image styles are unavailable");
+      return;
+    }
+
+    final List<ImageStyle> allStyles = new ArrayList<ImageStyle>();
+
+    // Add the global image styles that have the preview flag turned on
+    for (ImageStyle s : imageStyleTracker.getImageStyles()) {
+      allStyles.add(s);
+    }
+
+    // Add the site's preview image styles as well as
+    for (Module m : getSite().getModules()) {
+      for (ImageStyle s : m.getImageStyles()) {
+        allStyles.add(s);
+      }
+    }
+
+    // Check whether the image styles still match the current definition. If
+    // not, remove the produced previews and recreate them.
+    boolean styleHasChanged = false;
+    boolean styleIsMissing = false;
+
+    for (ImageStyle s : allStyles) {
+      File baseDir = ImageStyleUtils.getScaledFileBase(site, s);
+      File definitionFile = new File(baseDir, "style.xml");
+
+      // Try and read the file on disk
+      if (definitionFile.isFile()) {
+        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder;
+        Document doc;
+        ImageStyle style;
+        try {
+          docBuilder = docBuilderFactory.newDocumentBuilder();
+          doc = docBuilder.parse(definitionFile);
+          style = ImageStyleImpl.fromXml(doc.getFirstChild());
+
+          // Is the style still the same?
+          boolean stylesMatch = s.getWidth() == style.getWidth();
+          stylesMatch = stylesMatch && s.getHeight() == style.getHeight();
+          stylesMatch = stylesMatch && s.getScalingMode().equals(style.getScalingMode());
+          stylesMatch = stylesMatch && s.isPreview() == style.isPreview();
+          styleHasChanged = styleHasChanged || !stylesMatch;
+        } catch (ParserConfigurationException e) {
+          logger.error("Error setting up image style parser: {}", e.getMessage());
+        } catch (SAXException e) {
+          logger.error("Error parsing image style {}: {}", definitionFile, e.getMessage());
+        } catch (IOException e) {
+          logger.error("Error reading image style {}: {}", definitionFile, e.getMessage());
+        }
+      } else {
+        if (s.isPreview()) {
+          logger.debug("No previews found for image style '{}'", s.getIdentifier());
+          styleIsMissing = true;
+        }
+      }
+
+      // The current definition is no longer valid
+      if (styleHasChanged) {
+        logger.info("Image style '{}' has changed, removing existing previews from {}", s.getIdentifier(), baseDir);
+        FileUtils.deleteQuietly(baseDir);
+        if (!baseDir.mkdirs()) {
+          logger.error("Error creating image style directory {}", baseDir);
+          continue;
+        }
+      }
+
+      // Store the new definition
+      if (!definitionFile.isFile() || styleHasChanged) {
+        try {
+          definitionFile.getParentFile().mkdirs();
+          definitionFile.createNewFile();
+          FileUtils.copyInputStreamToFile(IOUtils.toInputStream(s.toXml(), "UTF-8"), definitionFile);
+        } catch (IOException e) {
+          logger.error("Error creating image style defintion file at {}", definitionFile, e.getMessage());
+          continue;
+        }
+      } else {
+        logger.debug("Image style {} still matching the current definition", s.getIdentifier());
+      }
+    }
+
+    if (styleHasChanged || styleIsMissing) {
+      logger.info("Triggering creation of missing and outdated previews");
+      createPreviews();
+    } else {
+      logger.info("Preview images for {} are still up to date", site.getIdentifier());
+    }
+  }
+
+  /**
    * Creates the previews for this resource in all languages and for all known
    * image styles. The implementation ensures that there is only one preview
    * renderer running per resource.
@@ -828,16 +942,17 @@ public abstract class AbstractContentRepository implements ContentRepository {
     ResourceURI uri = resource.getURI();
 
     // Compile the full list of image styles
-    final List<ImageStyle> styles = new ArrayList<ImageStyle>();
     if (imageStyleTracker == null) {
       logger.info("Skipping preview generation for {}: image styles are unavailable", uri);
       return;
     }
 
+    final List<ImageStyle> previewStyles = new ArrayList<ImageStyle>();
+
     // Add the global image styles that have the preview flag turned on
     for (ImageStyle s : imageStyleTracker.getImageStyles()) {
       if (s.isPreview()) {
-        styles.add(s);
+        previewStyles.add(s);
         logger.debug("Preview images will be generated for {}", s);
       } else {
         logger.debug("Preview image generation will be skipped for {}", s);
@@ -848,7 +963,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     for (Module m : getSite().getModules()) {
       for (ImageStyle s : m.getImageStyles()) {
         if (s.isPreview()) {
-          styles.add(s);
+          previewStyles.add(s);
           logger.debug("Preview images will be generated for {}", s);
         } else {
           logger.debug("Preview image generation will be skipped for {}", s);
@@ -872,12 +987,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
       if (previewOp != null) {
         logger.debug("Adding languages and styles to {} for preview generation", uri);
         previewOp.addLanguages(Arrays.asList(languages));
-        previewOp.addStyles(styles);
+        previewOp.addStyles(previewStyles);
         return;
       }
 
       // Otherwise, a new preview generator needs to be started.
-      previewOp = new PreviewOperation(resource, Arrays.asList(languages), styles, ImageStyleUtils.DEFAULT_PREVIEW_FORMAT);
+      previewOp = new PreviewOperation(resource, Arrays.asList(languages), previewStyles, ImageStyleUtils.DEFAULT_PREVIEW_FORMAT);
 
       // Make sure nobody is working on the same resource at the moment
       if (currentPreviewOperations.contains(previewOp)) {
@@ -1003,13 +1118,73 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
-   * Callback from OSGi to set the environment.
+   * Returns the current environment.
+   * 
+   * @return the environment
+   */
+  protected Environment getEnvironment() {
+    return environment;
+  }
+
+  /**
+   * This method is called right after initialization of the content repository
+   * and sets the environment.
    * 
    * @param environment
    *          the environment
    */
-  void setEnvironment(Environment environment) {
+  public void setEnvironment(Environment environment) {
+    if (environment == null)
+      throw new IllegalStateException("Environment has not been set");
     this.environment = environment;
+  }
+
+  /**
+   * Returns the resource serializer for the given type or <code>null</code> if
+   * no such serializer is registered.
+   * 
+   * @param type
+   *          the resource type
+   * @return the serializer
+   */
+  protected ResourceSerializer<?, ?> getSerializerByType(String type) {
+    if (resourceSerializer == null)
+      throw new IllegalStateException("Serializer service has not been set");
+    return resourceSerializer.getSerializerByType(type);
+  }
+
+  /**
+   * Returns the resource serializer for the given mime type or
+   * <code>null</code> if no such serializer is registered.
+   * 
+   * @param mimeType
+   *          the mime type
+   * @return the serializer
+   */
+  protected ResourceSerializer<?, ?> getSerializerByMimeType(String mimeType) {
+    if (resourceSerializer == null)
+      throw new IllegalStateException("Serializer service has not been set");
+    return resourceSerializer.getSerializerByMimeType(mimeType);
+  }
+
+  /**
+   * Returns the set of available resource serializers.
+   * 
+   * @return the set serializer
+   */
+  protected Set<ResourceSerializer<?, ?>> getSerializers() {
+    return resourceSerializer.getSerializers();
+  }
+
+  /**
+   * This method is called right after initialization of the content repository
+   * and is used to register the factory with a backing service implementation.
+   * 
+   * @param service
+   *          the resource serializer service
+   */
+  public void setSerializer(ResourceSerializerService service) {
+    resourceSerializer = service;
   }
 
   /**

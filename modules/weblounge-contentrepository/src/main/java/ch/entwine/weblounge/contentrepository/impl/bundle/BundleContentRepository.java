@@ -25,16 +25,15 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSelector;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSelectorImpl;
@@ -62,7 +61,6 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Content repository that reads pages and resources from the site's
@@ -275,9 +273,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
     List<ResourceURI> uris = new ArrayList<ResourceURI>();
 
     // Add all known resource types to the index
-    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-
-    for (ResourceSerializer<?, ?> serializer : serializers) {
+    for (ResourceSerializer<?, ?> serializer : getSerializers()) {
 
       // Construct this resource type's entry point into the bundle
       String resourcePath = "/" + serializer.getType() + "s";
@@ -315,7 +311,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
     FileUtils.forceMkdir(idxRootDir);
 
     BundleContentRepositoryIndex index = null;
-    index = new BundleContentRepositoryIndex(idxRootDir);
+    index = new BundleContentRepositoryIndex(idxRootDir, resourceSerializer);
     boolean success = false;
 
     // Make sure the version matches the implementation
@@ -323,7 +319,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
       logger.warn("Index version does not match implementation, triggering reindex");
       FileUtils.deleteQuietly(idxRootDir);
       FileUtils.forceMkdir(idxRootDir);
-      index = new BundleContentRepositoryIndex(idxRootDir);
+      index = new BundleContentRepositoryIndex(idxRootDir, resourceSerializer);
     }
 
     // Is there an existing index?
@@ -343,8 +339,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
       ResourceURI previousURI = null;
 
       // Add all known resource types to the index
-      Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-      for (ResourceSerializer<?, ?> serializer : serializers) {
+      for (ResourceSerializer<?, ?> serializer : getSerializers()) {
         ResourceSelector selector = new ResourceSelectorImpl(site).withTypes(serializer.getType());
         for (ResourceURI uri : list(selector)) {
 

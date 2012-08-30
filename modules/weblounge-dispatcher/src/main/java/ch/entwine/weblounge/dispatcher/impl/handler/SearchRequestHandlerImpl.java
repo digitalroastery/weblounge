@@ -34,14 +34,16 @@ import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -49,8 +51,6 @@ import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.site.HTMLAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
@@ -91,6 +91,9 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
 
   /** Key to store the search result in the request */
   public static final String SEARCH_RESULT = "webl-searchresult";
+
+  /** The resource serializer */
+  private ResourceSerializerService serializerService = null;
 
   /**
    * {@inheritDoc}
@@ -232,7 +235,7 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
       ResourceSearchResultItem resourceItem = (ResourceSearchResultItem) item;
       ResourceURI uri = resourceItem.getResourceURI();
 
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+      ResourceSerializer<?, ?> serializer = serializerService.getSerializerByType(uri.getType());
       if (serializer == null) {
         logger.debug("Skipping search result since it's type ({}) is unknown", uri.getType());
         continue;
@@ -462,10 +465,29 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.dispatcher.RequestHandler#getPriority()
+   */
+  public int getPriority() {
+    return 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.dispatcher.RequestHandler#getName()
    */
   public String getName() {
     return "search request handler";
+  }
+
+  /**
+   * OSGi callback that is setting the resource serializer.
+   * 
+   * @param serializer
+   *          the resource serializer service
+   */
+  void setResourceSerializer(ResourceSerializerService serializer) {
+    this.serializerService = serializer;
   }
 
   /**
@@ -476,15 +498,6 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
   @Override
   public String toString() {
     return getName();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.dispatcher.RequestHandler#getPriority()
-   */
-  public int getPriority() {
-    return 0;
   }
 
 }
