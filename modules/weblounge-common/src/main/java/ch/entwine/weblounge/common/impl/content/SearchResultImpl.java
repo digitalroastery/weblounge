@@ -187,6 +187,16 @@ public class SearchResultImpl implements SearchResult {
   }
 
   /**
+   * Sets the document count.
+   * 
+   * @param count
+   *          the number of documents in this search result
+   */
+  public void setDocumentCount(long count) {
+    this.documentCount = count;
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.SearchResult#toXml()
