@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.bundle;
 
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
@@ -43,9 +44,9 @@ public class BundleContentRepositoryIndex extends ContentRepositoryIndex {
    * @throws IOException
    *           if the index cannot be created at the given location
    */
-  public BundleContentRepositoryIndex(File rootDir,
+  public BundleContentRepositoryIndex(Site site, File rootDir,
       ResourceSerializerService serializer) throws IOException {
-    super(rootDir, serializer, false);
+    super(site, rootDir, serializer, false);
   }
 
 }

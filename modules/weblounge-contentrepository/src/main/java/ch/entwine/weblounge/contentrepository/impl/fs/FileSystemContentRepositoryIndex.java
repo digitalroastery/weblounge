@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.fs;
 
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
@@ -37,6 +38,8 @@ public class FileSystemContentRepositoryIndex extends ContentRepositoryIndex {
    * Creates a new content repository index that lives inside the given
    * directory.
    * 
+   * @param site
+   *           the site
    * @param directory
    *          the index root directory
    * @param serializer
@@ -45,9 +48,9 @@ public class FileSystemContentRepositoryIndex extends ContentRepositoryIndex {
    *           if an existing index cannot be read of if creating new index
    *           files fails
    */
-  public FileSystemContentRepositoryIndex(File directory,
+  public FileSystemContentRepositoryIndex(Site site, File directory,
       ResourceSerializerService serializer) throws IOException {
-    super(directory, serializer, false);
+    super(site, directory, serializer, false);
   }
 
 }

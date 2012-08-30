@@ -34,10 +34,11 @@ import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchDocument;
 import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchSearchQuery;
@@ -125,14 +126,18 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    *          the site
    * @param indexRoot
    *          the elastic search root directory
+   * @param serializer
+   *          the resource serializer
    * @param readOnly
    *          <code>true</code> to indicate a read only index
    * @throws IOException
    *           if either loading or creating the index fails
    */
-  public SearchIndex(Site site, File indexRoot, boolean readOnly)
-      throws IOException {
+  public SearchIndex(Site site, File indexRoot,
+      ResourceSerializerService serializer, boolean readOnly)
+          throws IOException {
     this.indexRoot = indexRoot;
+    this.resourceSerializer = serializer;
     this.isReadOnly = readOnly;
     try {
       initElasticSearch(site, indexRoot);
@@ -262,7 +267,6 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       // Create and configure the query result
       long hits = response.getHits().getTotalHits();
       long size = response.getHits().getHits().length;
-
       SearchResultImpl result = new SearchResultImpl(query, hits, size);
       result.setSearchTime(response.getTookInMillis());
 
@@ -271,7 +275,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
         // Get the resource serializer
         String type = (String) doc.getFields().get(TYPE).getValue();
-        ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(type);
+        ResourceSerializer<?, ?> serializer = resourceSerializer.getSerializerByType(type);
         if (serializer == null) {
           logger.warn("Skipping search result due to missing serializer of type {}", type);
           continue;
@@ -298,8 +302,13 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
         // Have the serializer in charge create a type-specific search result
         // item
-        SearchResultItem item = serializer.toSearchResultItem(query.getSite(), score, metadata);
-        result.addResultItem(item);
+        try {
+          SearchResultItem item = serializer.toSearchResultItem(query.getSite(), score, metadata);
+          result.addResultItem(item);
+        } catch (Throwable t) {
+          logger.warn("Error during search result serialization: '{}'. Skipping this search result.", t.getMessage());
+          continue;
+        }
       }
 
       return result;
@@ -389,10 +398,11 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       throws ContentRepositoryException {
 
     // Have the serializer create an input document
-    String resourceType = resource.getURI().getType();
+    ResourceURI uri = resource.getURI();
+    String resourceType = uri.getType();
     ResourceSerializer<?, ?> serializer = resourceSerializer.getSerializerByType(resourceType);
     if (serializer == null)
-      throw new ContentRepositoryException("Unable to create an input document for " + uri + ": no serializer found");
+      throw new ContentRepositoryException("Unable to create an input document for " + resource + ": no serializer found");
 
     // Add the resource to the index
     List<ResourceMetadata<?>> resourceMetadata = serializer.toMetadata(resource);
@@ -404,7 +414,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     }
 
     // Adjust the version information
-    updateVersions(resource.getURI());
+    updateVersions(uri);
   }
 
   /**
@@ -636,7 +646,12 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
     // Store the correct mapping
     // TODO: Use resource serializers
-    for (String type : new String[] { "version", "page", "file", "image", "movie" }) {
+    for (String type : new String[] {
+        "version",
+        "page",
+        "file",
+        "image",
+    "movie" }) {
       PutMappingRequest siteMappingRequest = new PutMappingRequest(site.getIdentifier());
       siteMappingRequest.source(loadMapping(type));
       siteMappingRequest.type(type);

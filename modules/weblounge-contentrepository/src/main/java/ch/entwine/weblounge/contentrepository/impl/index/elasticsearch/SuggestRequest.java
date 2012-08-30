@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;
 
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 
 import org.apache.commons.lang.StringUtils;
 

@@ -55,7 +55,7 @@ public class SearchResultImpl implements SearchResult {
   protected boolean sorted = true;
 
   /** The search result */
-  protected List<SearchResultItem> result = new ArrayList<SearchResultItem>();
+  protected List<SearchResultItem> result = null;
 
   /**
    * Creates a search result that was created using the given query. Note that
@@ -85,6 +85,8 @@ public class SearchResultImpl implements SearchResult {
    *          the result item
    */
   public void addResultItem(SearchResultItem item) {
+    if (result == null)
+      result = new ArrayList<SearchResultItem>();
     result.add(item);
     sorted = false;
   }
@@ -95,6 +97,8 @@ public class SearchResultImpl implements SearchResult {
    * @see ch.entwine.weblounge.common.content.SearchResult#getItems()
    */
   public SearchResultItem[] getItems() {
+    if (result == null)
+      return new SearchResultItem[] {};
     if (!sorted) {
       Collections.sort(result);
       sorted = true;
@@ -137,7 +141,7 @@ public class SearchResultImpl implements SearchResult {
    * @see ch.entwine.weblounge.common.content.SearchResult#getPageSize()
    */
   public long getPageSize() {
-    return result.size();
+    return result != null ? result.size() : 0;
   }
 
   /**
@@ -183,7 +187,7 @@ public class SearchResultImpl implements SearchResult {
    * @see ch.entwine.weblounge.common.content.SearchResult#getDocumentCount()
    */
   public long getDocumentCount() {
-    return documentCount;
+    return result != null ? result.size() : documentCount;
   }
 
   /**

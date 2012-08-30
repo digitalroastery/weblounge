@@ -311,7 +311,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
     FileUtils.forceMkdir(idxRootDir);
 
     BundleContentRepositoryIndex index = null;
-    index = new BundleContentRepositoryIndex(idxRootDir, resourceSerializer);
+    index = new BundleContentRepositoryIndex(site, idxRootDir, resourceSerializer);
     boolean success = false;
 
     // Make sure the version matches the implementation
@@ -319,7 +319,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
       logger.warn("Index version does not match implementation, triggering reindex");
       FileUtils.deleteQuietly(idxRootDir);
       FileUtils.forceMkdir(idxRootDir);
-      index = new BundleContentRepositoryIndex(idxRootDir, resourceSerializer);
+      index = new BundleContentRepositoryIndex(site, idxRootDir, resourceSerializer);
     }
 
     // Is there an existing index?

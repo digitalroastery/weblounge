@@ -151,12 +151,6 @@
       <scope>runtime</scope>
     </dependency>
 
-    <dependency>
-      <groupId>javax.jcr</groupId>
-      <artifactId>jcr</artifactId>
-      <version>1.0</version>
-    </dependency>
-
     <!-- testing -->
 
     <dependency>
@@ -295,7 +289,6 @@
               ch.entwine.weblounge.contentrepository.impl.fs;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.index;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;version=${project.version},
-              ch.entwine.weblounge.contentrepository.impl.jcr;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.operation;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
@@ -304,8 +297,8 @@
               lucene-highlighter;inline=true,
               lucene-memory;inline=true,
               lucene-queries;inline=true,
-			  elasticsearch;inline=true,
-			  jna;inline=true  
+              elasticsearch;inline=true,
+              jna;inline=true  
             </Embed-Dependency>
             <Private-Package>
               ch.entwine.weblounge.contentrepository.impl.util

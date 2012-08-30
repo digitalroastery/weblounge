@@ -281,19 +281,25 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     synchronized (processor) {
       for (ContentRepositoryOperation<?> op : processor.getOperations()) {
 
-        // Don't move beyond the current state of work
-        if (op == currentOperation)
-          break;
-
         // Is this a resource operation?
         if (!(op instanceof ContentRepositoryResourceOperation<?>))
           continue;
 
+        // Apply the changes to the original resource
         ContentRepositoryResourceOperation<?> resourceOp = (ContentRepositoryResourceOperation<?>) op;
 
-        // Is it a different resource?
-        if (!uri.equals(processedURI))
-          continue;
+        // Is the resource about to be deleted?
+        ResourceURI opURI = resourceOp.getResourceURI();
+        if (op instanceof DeleteOperation && equalsByIdOrPath(uri, opURI)) {
+          DeleteOperation deleteOp = (DeleteOperation) op;
+          List<ResourceURI> deleteCandidates = new ArrayList<ResourceURI>();
+          for (ResourceURI u : uris) {
+            if (deleteOp.allVersions() || u.getVersion() == opURI.getVersion()) {
+              deleteCandidates.add(u);
+            }
+          }
+          uris.removeAll(deleteCandidates);
+        }
 
         // Is the resource simply being updated?
         if (op instanceof PutOperation && equalsByIdOrPath(uri, opURI)) {
@@ -1023,7 +1029,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     try {
       logger.info("Creating new index at {}", newIdxRootDir);
       FileUtils.forceMkdir(newIdxRootDir);
-      newIndex = new FileSystemContentRepositoryIndex(newIdxRootDir, resourceSerializer);
+      newIndex = new FileSystemContentRepositoryIndex(site, newIdxRootDir, resourceSerializer);
       indexingOffsite = true;
       rebuildIndex(newIndex);
     } catch (IOException e) {
@@ -1052,7 +1058,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       logger.info("Moving new index into place {}", idxRootDir);
       FileUtils.moveDirectory(idxRootDir, oldIdxRootDir);
       FileUtils.moveDirectory(newIdxRootDir, idxRootDir);
-      index = new FileSystemContentRepositoryIndex(idxRootDir, resourceSerializer);
+      index = new FileSystemContentRepositoryIndex(site, idxRootDir, resourceSerializer);
       logger.info("Removing old index at {}", oldIdxRootDir);
       FileUtils.forceDelete(oldIdxRootDir);
     } catch (IOException e) {
@@ -1279,7 +1285,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     FileUtils.forceMkdir(idxRoot);
 
     // Add content if there is any
-    idx = new FileSystemContentRepositoryIndex(idxRoot, resourceSerializer);
+    idx = new FileSystemContentRepositoryIndex(site, idxRoot, resourceSerializer);
 
     // Create the idx if there is nothing in place so far
     if (idx.getResourceCount() <= 0) {
@@ -1479,9 +1485,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      * @return the content repository operations
      */
     public List<ContentRepositoryOperation<?>> getOperations() {
-      synchronized (operations) {
-        return new ArrayList<ContentRepositoryOperation<?>>(operations);
-      }
+      return new ArrayList<ContentRepositoryOperation<?>>(operations);
     }
 
     /**

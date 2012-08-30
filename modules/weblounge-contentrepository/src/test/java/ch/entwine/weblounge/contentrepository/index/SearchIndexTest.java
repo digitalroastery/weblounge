@@ -160,13 +160,6 @@ public class SearchIndexTest {
     EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
     EasyMock.replay(site);
 
-    // Resource serializers
-    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
-    ResourceSerializerFactory.setResourceSerializerService(serializerService);
-    serializerService.registerSerializer(new PageSerializer());
-    serializerService.registerSerializer(new FileResourceSerializer());
-    serializerService.registerSerializer(new ImageResourceSerializer());
-
     String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
     idxRoot = new File(rootPath);
 
@@ -177,7 +170,7 @@ public class SearchIndexTest {
     serializer.addSerializer(new ImageResourceSerializer());
     serializer.addSerializer(new MovieResourceSerializer());
 
-    idx = new SearchIndex(idxRoot, serializer, isReadOnly);
+    idx = new SearchIndex(site, idxRoot, serializer, isReadOnly);
   }
 
   /**

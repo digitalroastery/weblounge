@@ -157,7 +157,7 @@ public class ContentRepositoryIndexTest {
     indexRootDirectory = new File(new File(System.getProperty("java.io.tmpdir")), "index");
     structuralIndexRootDirectory = new File(indexRootDirectory, "structure");
     FileUtils.deleteDirectory(indexRootDirectory);
-    idx = new FileSystemContentRepositoryIndex(site, indexRootDirectory);
+    idx = new FileSystemContentRepositoryIndex(site, indexRootDirectory, serializer);
   }
 
   /**
@@ -482,7 +482,7 @@ public class ContentRepositoryIndexTest {
       index.writeInt(0);
       index.close();
 
-      idx = new FileSystemContentRepositoryIndex(indexRootDirectory, serializer);
+      idx = new FileSystemContentRepositoryIndex(site, indexRootDirectory, serializer);
       assertEquals(-1, idx.getIndexVersion());
     } catch (IOException e) {
       fail("Error writing version to index");

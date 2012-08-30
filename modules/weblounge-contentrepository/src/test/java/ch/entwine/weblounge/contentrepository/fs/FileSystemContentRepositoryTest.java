@@ -206,6 +206,9 @@ public class FileSystemContentRepositoryTest {
     serializer.addSerializer(new FileResourceSerializer());
     serializer.addSerializer(new ImageResourceSerializer());
     serializer.addSerializer(new MovieResourceSerializer());
+
+    // Set weblounge.home so that search index can properly be created
+    System.setProperty("weblounge.home", FileUtils.getTempDirectoryPath());
   }
 
   /**
