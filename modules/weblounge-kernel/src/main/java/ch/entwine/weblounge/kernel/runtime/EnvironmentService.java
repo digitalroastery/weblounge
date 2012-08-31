@@ -161,7 +161,7 @@ public class EnvironmentService implements ManagedService {
         }
       }
       registration = bundleContext.registerService(Environment.class.getName(), environment, null);
-      logger.info("Runtime environment defaults to '{}'", environment.toString().toLowerCase());
+      logger.info("Runtime environment set to '{}'", environment.toString().toLowerCase());
     }
   }
 
