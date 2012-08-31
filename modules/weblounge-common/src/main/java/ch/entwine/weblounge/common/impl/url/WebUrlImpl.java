@@ -54,7 +54,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   private static final Pattern pathInspector = Pattern.compile("^(.*)/(work|index|live|[0-9]*)(_[a-zA-Z]+)?\\.([a-zA-Z0-9]+)$");
 
   /** Regular expression for /path/to/resource/de/html */
-  private static final Pattern segmentInspector = Pattern.compile("^(/([a-zA-Z0-9\\-\\,\\.\\;/_^#^\\?])*+)+$");
+  private static final Pattern segmentInspector = Pattern.compile("^(/([a-zA-Z0-9\\-\\,\\.\\;/_%^#^\\?])*+)+$");
 
   /** The default request flavor */
   private final RequestFlavor defaultFlavor = RequestFlavor.ANY;
