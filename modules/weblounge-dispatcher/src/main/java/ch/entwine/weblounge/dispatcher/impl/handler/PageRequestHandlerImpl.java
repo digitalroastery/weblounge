@@ -243,15 +243,15 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         }
       }
 
-      // Check the request method. This handler only supports GET
+      // Check the request method. This handler only supports GET, POST and OPTIONS
       String requestMethod = request.getMethod().toUpperCase();
       if ("OPTIONS".equals(requestMethod)) {
-        String verbs = "OPTIONS,GET";
+        String verbs = "OPTIONS, GET, POST";
         logger.trace("Answering options request to {} with {}", url, verbs);
         response.setHeader("Allow", verbs);
         response.setContentLength(0);
         return true;
-      } else if (!"GET".equals(requestMethod) && !RequestUtils.containsAction(request)) {
+      } else if (!"GET".equals(requestMethod) && !"POST".equals(requestMethod) && !RequestUtils.containsAction(request)) {
         logger.debug("Url {} does not handle {} requests", url, requestMethod);
         DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
         return true;
