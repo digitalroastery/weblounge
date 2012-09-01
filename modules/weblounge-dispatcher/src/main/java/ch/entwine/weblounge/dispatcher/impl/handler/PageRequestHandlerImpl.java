@@ -251,7 +251,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         response.setHeader("Allow", verbs);
         response.setContentLength(0);
         return true;
-      } else if (!"GET".equals(requestMethod) && !RequestUtils.containsAction(request)) {
+      } else if (!("GET".equals(requestMethod) || "POST".equals(requestMethod)) && !RequestUtils.containsAction(request)) {
         logger.debug("Url {} does not handle {} requests", url, requestMethod);
         DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
         return true;
