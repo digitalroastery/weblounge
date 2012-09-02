@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import static ch.entwine.weblounge.common.site.Environment.Development;
+
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceReader;
@@ -919,6 +921,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
 
     if (styleHasChanged || styleIsMissing) {
+      if (environment.equals(Development)) {
+        logger.info("Missing or outdated previews found. Skipping preview generation for current environment 'development'");
+        return;
+      }
       logger.info("Triggering creation of missing and outdated previews");
       createPreviews();
     } else {
