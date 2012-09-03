@@ -93,17 +93,12 @@
 	left: 90px;
 }
 
-.editor_menubar img,
-.editor_menubar .wbl-language,
-div.wbl-overlayIcons span.wbl-more {
-	cursor: pointer;
+.wbl-icon {
+  cursor: pointer;
 }
 
 .editor_menubar img.wbl-user {
-	position: relative;
-	top: 8px;
-	padding-right: 5px;
-	cursor: default;
+  padding: 10px;
 }
 
 .editor_menubar img.wbl-add {
@@ -113,8 +108,6 @@ div.wbl-overlayIcons span.wbl-more {
 }
 
 .editor_menubar img.wbl-pageSettings {
-	position: relative;
-	top: 8px;
 	padding: 0 30px;
 }
 

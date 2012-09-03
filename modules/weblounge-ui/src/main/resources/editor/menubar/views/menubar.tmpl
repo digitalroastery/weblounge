@@ -5,7 +5,7 @@
 
 <!-- <img src="${runtime.getRootPath()}/editor/menubar/images/menu_add.png" class="wbl-add" title="Pagelet Toolbar" alt="Pagelet Toolbar" /> -->
 <!-- <img src="${runtime.getRootPath()}/editor/menubar/images/menu_more.png" class="wbl-more" title="Weitere Befehle..." alt="Weitere Befehle..." /> -->
-<img src="${runtime.getRootPath()}/editor/menubar/images/page-settings.png" class="wbl-pageSettings" title="Seiten-Eigenschaften" alt="Seiten-Eigenschaften" />
+<img src="${runtime.getRootPath()}/editor/menubar/images/page-settings.png" class="wbl-pageSettings wbl-icon" title="Seiten-Eigenschaften" alt="Seiten-Eigenschaften" />
 
 <span class="wbl-editmode">
 	<input type="checkbox" value="editmode" id="wbl-editmode" />
@@ -16,11 +16,11 @@
 
 <button class="wbl-editorSelectionCancel" type="button">Abbrechen</button>
 
-<span class="wbl-language">
+<span class="wbl-language wbl-icon">
 	<img src='${runtime.getRootPath()}/editor/resources/flags/${current}.png' title='${current}'/>
 </span> 
 
-<span class="wbl-languageMenu">
+<span class="wbl-languageMenu wbl-icon">
 	{{each runtime.getLanguages()}}
 		<img src="${runtime.getRootPath()}/editor/resources/flags/${$value.language}.png" alt="${$value.language}" title="${$value.language}" />
     {{/each}}
@@ -32,7 +32,7 @@
 		<img src="${runtime.getRootPath()}/editor/menubar/images/user.png" class="wbl-user" alt="User" />
 		<span id="wbl-user">${runtime.getFirstName()}</span>
 		<!-- <span>&#x25BC;</span> -->
-		<img src="${runtime.getRootPath()}/editor/menubar/images/logout.png" class="wbl-logout" title="Logout" alt="Logout" />
+		<img src="${runtime.getRootPath()}/editor/menubar/images/logout.png" class="wbl-logout wbl-icon" title="Logout" alt="Logout" />
 	</span>
 </span>
 
