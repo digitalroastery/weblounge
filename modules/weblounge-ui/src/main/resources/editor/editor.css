@@ -48,6 +48,7 @@ div.DataTables_sort_wrapper span {
 #wbl-pageleteditor span.editor-sample { 
 	font-size: 10px;
 	color: #666;
+	display: block;
 }
 
 #wbl-pageleteditor p {
@@ -73,4 +74,51 @@ div.DataTables_sort_wrapper span {
 
 #wbl-pageleteditor form ul li {
 	margin-left: 0;
+}
+
+
+
+/* Horizontal form in pagelet-dialogs */
+.ui-dialog-content {
+  padding: 1em;
+  cursor: auto;
+}
+.control-group:after {
+    clear: both;
+}
+.control-group:before, 
+.control-group:after {
+    content: "";
+    display: table;
+    line-height: 0;
+}
+.control-group {
+    margin-bottom: 20px;
+}
+.control-group label {
+  float: left;
+  padding-top: 2px;
+  text-align: right;
+  width: 160px;
+}
+.control-grou.select label {
+  padding-top: 0;
+}
+.control-group.select {
+  margin-bottom: 10px;
+}
+.controls {
+  margin-left: 175px;
+}
+.controls input {
+  margin-bottom: 0;
+}
+.control-group-select .controls {
+  padding-top: 2px;
+}
+legend + .control-group {
+    margin-top: 15px;
+}
+label select {
+  width: auto;
 }
