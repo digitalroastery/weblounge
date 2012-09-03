@@ -1,6 +1,6 @@
 /* mini-rest & general declarations */
 #weblounge-editor {
-   	font-family: arial,verdana,tahoma;
+  font-family: arial,verdana,tahoma;
 	font-size: 12px;
 	display: block;
 	height: 45px;
@@ -12,17 +12,16 @@ div.DataTables_sort_wrapper span {
 }
 
 .ui-effects-transfer {  /* style the transfer element */
-    border: red 2px solid;
-    border-radius: 999px;
-    z-index: 9999;
+  border: red 2px solid;
+  border-radius: 999px;
+  z-index: 9999;
 }
 
 /* general dialog declarations */
 #wbl-pageleteditor input[type=text],
 #wbl-pageleteditor textarea {
-    width: 100%;
-    border: 1px solid #999;
-    padding: 2px;
+  border: 1px solid #999;
+  padding: 2px;
 }
 
 #wbl-pageleteditor h2 {
@@ -46,10 +45,9 @@ div.DataTables_sort_wrapper span {
 	margin-left: 30px;
 }
 
-#wbl-pageleteditor span.editor-sample {
-	font-style: italic;
+#wbl-pageleteditor span.editor-sample { 
 	font-size: 10px;
-	color: blue;
+	color: #666;
 }
 
 #wbl-pageleteditor p {
