@@ -3,7 +3,8 @@ steal.plugins('jqueryui/dialog',
 		'jqueryui/draggable',
 		'jqueryui/droppable',
 		'jqueryui/resizable',
-		'jqueryui/mouse')
+		'jqueryui/mouse',
+        'scripts/bootstrap-tabs')
 .models('../../models/workbench',
 		'../../models/pagelet')
 .resources('trimpath-template')
@@ -121,6 +122,12 @@ steal.plugins('jqueryui/dialog',
 			}, this),
 			create: function(event, ui) {
 				$("body").css({ overflow: 'hidden' });
+                $('.ui-dialog-buttonpane').find('.ui-button:first').addClass('danger').end().find('.ui-button:last').addClass('primary');
+                $('#tabs a').click(function (e) {
+                    e.preventDefault();
+                    $(this).tab('show');
+                });
+                $('#tabs a:first').tab('show');
 			}
 		});
 		this.editorDialog.find("form#wbl-validate").validate();

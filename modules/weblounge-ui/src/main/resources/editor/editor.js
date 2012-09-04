@@ -1,7 +1,7 @@
 steal.plugins(
 'jquery/view/tmpl', 
 'editor/app')
-.css('editor', 'css/jquery-ui', 'css/token-input-facebook', 'css/token-input', 'css/validation', 'css/player/mediaelementplayer')
+.css('editor', 'css/jquery-ui', 'css/token-input-facebook', 'css/token-input', 'css/validation', 'css/player/mediaelementplayer', 'css/buttons')
 .resources('jquery.validate.min', 'jquery.cookie', 'jquery.ba-bbq.min', 'jquery.tools.min', 'mediaelement-and-player.min')
 .then(function($) {
 

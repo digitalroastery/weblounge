@@ -145,6 +145,10 @@ steal.plugins(
 				},
 				open: function(event, ui) {
 					$(document.body).css('overflow', 'hidden');
+
+				},
+				create: function(event, ui) {
+					$('.ui-dialog-buttonpane').find('.ui-button:first').addClass('danger').blur().end().find('.ui-button:last').addClass('primary');
 				},
 				beforeClose: function(event, ui) {
 					$(document.body).css('overflow', 'visible');
