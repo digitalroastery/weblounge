@@ -1,7 +1,7 @@
 /* ------------------------------------------
  * CSS3 GITHUB BUTTONS (Nicolas Gallagher)
  * Licensed under Unlicense
- * http://github.com/necolas/css3-github-buttons
+ *  
  * --------------------------------------- */
 
 
@@ -133,7 +133,7 @@
 /* Standard group
    ========================================================================== */
 
-.button-group {
+.ui-buttonset {
     display: inline-block;
     list-style: none;
     padding: 0;
@@ -144,37 +144,37 @@
 }
 
 .ui-button + .ui-button,
-.ui-button + .button-group,
-.button-group + .ui-button,
-.button-group + .button-group {
+.ui-button + .ui-buttonset,
+.ui-buttonset + .ui-button,
+.ui-buttonset + .ui-buttonset {
     margin-left: 15px;
 }
 
-.button-group li {
+.ui-buttonset li {
     float: left;
     padding: 0;
     margin: 0;
 }
 
-.button-group .ui-button {
+.ui-buttonset .ui-button {
     float: left;
     margin-left: -1px;
 }
 
-.button-group > .ui-button:not(:first-child):not(:last-child),
-.button-group li:not(:first-child):not(:last-child) .ui-button {
+.ui-buttonset > .ui-button:not(:first-child):not(:last-child),
+.ui-buttonset li:not(:first-child):not(:last-child) .ui-button {
     border-radius: 0;
 }
 
-.button-group > .ui-button:first-child,
-.button-group li:first-child .ui-button {
+.ui-buttonset > .ui-button:first-child,
+.ui-buttonset li:first-child .ui-button {
     margin-left: 0;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-.button-group > .ui-button:last-child,
-.button-group li:last-child > .ui-button {
+.ui-buttonset > .ui-button:last-child,
+.ui-buttonset li:last-child > .ui-button {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
@@ -182,24 +182,24 @@
 /* Minor group
    ========================================================================== */
 
-.button-group.minor-group .ui-button {
+.ui-buttonset.minor-group .ui-button {
     border: 1px solid #d4d4d4;
     text-shadow: none;
     background-image: none;
     background-color: #fff;
 }
 
-.button-group.minor-group .ui-button:hover,
-.button-group.minor-group .ui-button:focus {
+.ui-buttonset.minor-group .ui-button:hover,
+.ui-buttonset.minor-group .ui-button:focus {
     background-color: #599bdc;
 }
 
-.button-group.minor-group .ui-button:active,
-.button-group.minor-group .ui-button.active {
+.ui-buttonset.minor-group .ui-button:active,
+.ui-buttonset.minor-group .ui-button.active {
     background-color: #3072b3;
 }
 
-.button-group.minor-group .ui-button.icon:before {
+.ui-buttonset.minor-group .ui-button.icon:before {
     opacity: 0.8;
 }
 
@@ -208,7 +208,7 @@
    ========================================================================== */
 
 .button-container .ui-button,
-.button-container .button-group {
+.button-container .ui-buttonset {
     vertical-align: top;
 }
 

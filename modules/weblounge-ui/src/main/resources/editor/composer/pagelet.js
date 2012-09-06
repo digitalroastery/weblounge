@@ -97,7 +97,12 @@ steal.plugins('jqueryui/dialog',
 				},
 				OK: $.proxy(function () {
 					this.editorDialog.find("form#wbl-validate").submit();
-					if(!this.editorDialog.find("form#wbl-validate").valid()) return;
+					if(!this.editorDialog.find("form#wbl-validate").valid()) { // form is invalid
+                        $('.ui-dialog-buttonpane').prepend('<p>Bitte alle Pflichtfelder ausfuellen</p>');
+                        return;
+                    } else { // form is valid
+                        $('.ui-dialog-buttonpane').empty('p'); 
+                    };
 					var newPagelet = this._updatePageletValues(pagelet);
 					
 					// Save New Pagelet and show Renderer
@@ -113,6 +118,8 @@ steal.plugins('jqueryui/dialog',
 					this._deletePagelet();
 				}
 				this.editorDialog.dialog('destroy');
+                steal.dev.log("close dialog");
+                $('.ui-dialog-buttonpane').emtpy('p');
 			}, this),
 			open: $.proxy(function(event, ui) {
 				this.editorDialog.trigger('pageletEditorOpen', {
@@ -130,6 +137,7 @@ steal.plugins('jqueryui/dialog',
                 $('#tabs a:first').tab('show');
 			}
 		});
+        // Open the dialog
 		this.editorDialog.find("form#wbl-validate").validate();
 		
 		if(scripts.length < 1) {

@@ -126,7 +126,7 @@
   * ============ */
 
   $(function () {
-    $('body').bind('click.tab.data-api', '[data-toggle="tab"], [data-toggle="pill"]', function (e) { //replaced .on with .bind due to an old jquery version
+    $('body').delegate('click.tab.data-api', '[data-toggle="tab"], [data-toggle="pill"]', function (e) { //replaced .on with .delegate due to an old jquery version
       e.preventDefault()
       $(this).tab('show')
     })

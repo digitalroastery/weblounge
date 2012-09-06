@@ -1,13 +1,9 @@
-input.error {
-    background-color: #FFFFD5;
-    border: 2px solid red;
-    color: red;
-    margin: 0;
-}
+#wbl-pageleteditor input.error {
+    border: 1px solid red;
+ }
 
-label.error {
+#wbl-pageleteditor label.error {
     color: red;
-    display: block;
-    font-style: italic;
-    font-weight: normal;
+    text-align: left;
+    width: auto;
 }
