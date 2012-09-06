@@ -189,6 +189,9 @@ public class FileSystemContentRepositoryTest {
   /** The resource serializer */
   private static ResourceSerializerServiceImpl serializer = null;
 
+  /** Root directory for index configuration and test data */
+  private File testRoot = null;
+
   /**
    * Sets up everything valid for all test runs.
    * 
@@ -206,9 +209,6 @@ public class FileSystemContentRepositoryTest {
     serializer.addSerializer(new FileResourceSerializer());
     serializer.addSerializer(new ImageResourceSerializer());
     serializer.addSerializer(new MovieResourceSerializer());
-
-    // Set weblounge.home so that search index can properly be created
-    System.setProperty("weblounge.home", FileUtils.getTempDirectoryPath());
   }
 
   /**
@@ -216,8 +216,29 @@ public class FileSystemContentRepositoryTest {
    */
   @Before
   public void setUp() throws Exception {
-    String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-    repositoryRoot = new File(rootPath);
+
+    testRoot = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
+    repositoryRoot = new File(testRoot, "repository");
+
+    File configurationRoot = new File(PathUtils.concat(testRoot.getAbsolutePath(), "etc", "index"));
+    configurationRoot.mkdirs();
+
+    for (String file : new String[] {
+        "default-mapping.json",
+        "file-mapping.json",
+        "image-mapping.json",
+        "movie-mapping.json",
+        "names.txt",
+        "page-mapping.json",
+        "settings.yml",
+        "version-mapping.json" }) {
+      String bundleLocation = UrlUtils.concat("/elasticsearch", file);
+      File fileLocation = new File(configurationRoot, file);
+      FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(bundleLocation), fileLocation);
+    }
+
+    // Set weblounge.home so that search index can properly be created
+    System.setProperty("weblounge.home", testRoot.getAbsolutePath());
 
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
@@ -286,7 +307,7 @@ public class FileSystemContentRepositoryTest {
   public void tearDown() {
     try {
       repository.disconnect();
-      FileUtils.deleteQuietly(repositoryRoot);
+      FileUtils.deleteQuietly(testRoot);
     } catch (ContentRepositoryException e) {
       fail("Error disconnecting content repository: " + e.getMessage());
     }
