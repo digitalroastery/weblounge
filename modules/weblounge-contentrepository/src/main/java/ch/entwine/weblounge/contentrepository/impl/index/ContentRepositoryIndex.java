@@ -522,6 +522,11 @@ public class ContentRepositoryIndex {
   public synchronized void update(Resource<?> resource) throws IOException,
   ContentRepositoryException {
     ResourceURI uri = resource.getURI();
+    
+    // Make sure the uri has an identifier
+    if (uri.getIdentifier() == null) {
+      uri.setIdentifier(getIdentifier(uri));
+    }
 
     if (resource.isIndexed())
       searchIdx.update(resource);
