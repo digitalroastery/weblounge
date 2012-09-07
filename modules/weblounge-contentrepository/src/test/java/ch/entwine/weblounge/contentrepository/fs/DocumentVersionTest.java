@@ -163,7 +163,7 @@ public class DocumentVersionTest {
 
     // Test empty repository
     q = new SearchQueryImpl(site).withPreferredVersion(WORK);
-    assertEquals(0, repository.find(q).getHitCount());
+    assertEquals(0, repository.find(q).getDocumentCount());
     q = new SearchQueryImpl(site).withPreferredVersion(LIVE);
     assertEquals(0, repository.find(q).getHitCount());
 
