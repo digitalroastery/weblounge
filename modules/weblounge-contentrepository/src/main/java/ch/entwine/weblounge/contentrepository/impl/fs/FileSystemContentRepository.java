@@ -85,15 +85,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /** Name of the index path element right below the repository root */
   public static final String INDEX_PATH = "index";
 
-  /** The repository storage root directory */
-  protected File repositoryRoot = null;
-
-  /** The repository root directory */
-  protected File repositorySiteRoot = null;
-
-  /** The root directory for the temporary bundle index */
-  protected File idxRootDir = null;
-
   /** Flag to indicate off-site indexing */
   protected boolean indexingOffsite = false;
 
