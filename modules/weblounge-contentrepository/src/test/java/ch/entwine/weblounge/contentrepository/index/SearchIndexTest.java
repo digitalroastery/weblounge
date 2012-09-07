@@ -374,7 +374,7 @@ public class SearchIndexTest {
       SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withAuthor(amelie);
       SearchResult result = idx.getByQuery(q);
       assertEquals(pages.length, result.getItems().length);
-      assertEquals(pages.length, result.getHitCount());
+      assertEquals(pages.length, result.getDocumentCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by author");
@@ -394,7 +394,7 @@ public class SearchIndexTest {
       SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withCreator(hans);
       SearchResult result = idx.getByQuery(q);
       assertEquals(pages.length, result.getItems().length);
-      assertEquals(pages.length, result.getHitCount());
+      assertEquals(pages.length, result.getDocumentCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by creator");
@@ -414,7 +414,7 @@ public class SearchIndexTest {
       SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withCreationDate(date);
       SearchResult result = idx.getByQuery(q);
       assertEquals(1, result.getItems().length);
-      assertEquals(1, result.getHitCount());
+      assertEquals(1, result.getDocumentCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by creation date");
@@ -437,7 +437,7 @@ public class SearchIndexTest {
       SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withModifier(amelie);
       SearchResult result = idx.getByQuery(q);
       assertEquals(pages.length, result.getItems().length);
-      assertEquals(pages.length, result.getHitCount());
+      assertEquals(pages.length, result.getDocumentCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by modifier");
@@ -457,7 +457,7 @@ public class SearchIndexTest {
       SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withModificationDate(date);
       SearchResult result = idx.getByQuery(q);
       assertEquals(1, result.getItems().length);
-      assertEquals(1, result.getHitCount());
+      assertEquals(1, result.getDocumentCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by modification date");
@@ -479,7 +479,7 @@ public class SearchIndexTest {
       SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).sortByPublishingDate(Order.Descending);
       SearchResult result = idx.getByQuery(q);
       assertEquals(pages.length, result.getItems().length);
-      assertEquals(pages.length, result.getHitCount());
+      assertEquals(pages.length, result.getDocumentCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying ordered by publishing date");
@@ -499,7 +499,7 @@ public class SearchIndexTest {
       SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPublisher(amelie);
       SearchResult result = idx.getByQuery(q);
       assertEquals(1, result.getItems().length);
-      assertEquals(1, result.getHitCount());
+      assertEquals(1, result.getDocumentCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by publisher");
@@ -519,7 +519,7 @@ public class SearchIndexTest {
       SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPublishingDate(date);
       SearchResult result = idx.getByQuery(q);
       assertEquals(1, result.getItems().length);
-      assertEquals(1, result.getHitCount());
+      assertEquals(1, result.getDocumentCount());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by publishing date");
