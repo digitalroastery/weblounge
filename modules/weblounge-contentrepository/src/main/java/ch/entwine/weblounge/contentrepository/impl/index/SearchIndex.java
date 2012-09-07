@@ -21,7 +21,6 @@
 package ch.entwine.weblounge.contentrepository.impl.index;
 
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.ALTERNATE_VERSION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TYPE;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.Resource;
@@ -99,9 +98,6 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
   /** Type of the document containing the index version information */
   private static final String VERSION_TYPE = "version";
-
-  /** The elastic search settings */
-  private static final String SETTINGS_FILE = "/elasticsearch/settings.yml";
 
   /** The local elastic search node */
   private Node elasticSearch = null;
@@ -198,6 +194,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     requestBuilder.setSearchType(SearchType.QUERY_THEN_FETCH);
     requestBuilder.setPreference("_local");
     requestBuilder.setQuery(new ElasticSearchSearchQuery(query));
+    requestBuilder.addField("*");
 
     // Pagination
     if (query.getOffset() >= 0)
@@ -276,7 +273,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       for (SearchHit doc : response.getHits()) {
 
         // Get the resource serializer
-        String type = (String) doc.getFields().get(TYPE).getValue();
+        String type = doc.getType();
         ResourceSerializer<?, ?> serializer = resourceSerializer.getSerializerByType(type);
         if (serializer == null) {
           logger.warn("Skipping search result due to missing serializer of type {}", type);
@@ -505,6 +502,9 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       bulkRequest.add(nodeClient.prepareIndex(index, type, id).setSource(doc));
     }
 
+    // Make sure the operations are searchable immediately
+    bulkRequest.setRefresh(true);
+
     try {
       BulkResponse bulkResponse = bulkRequest.execute().actionGet();
 
@@ -663,14 +663,27 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       }
     }
 
-    // See if the index version exists and check if it matches.
+    // See if the index version exists and check if it matches. The request will
+    // fail if there is no version index
+    boolean versionIndexExists = false;
     GetRequestBuilder getRequestBuilder = nodeClient.prepareGet(site.getIdentifier(), VERSION_TYPE, ROOT_ID);
-    GetResponse response = getRequestBuilder.execute().actionGet();
-    if (response.field(VERSION) != null) {
-      indexVersion = Integer.parseInt((String) response.field(VERSION).getValue());
-      logger.debug("Search index version is {}", indexVersion);
-    } else {
+    try {
+      GetResponse response = getRequestBuilder.execute().actionGet();
+      if (response.field(VERSION) != null) {
+        indexVersion = Integer.parseInt((String) response.field(VERSION).getValue());
+        versionIndexExists = true;
+        logger.debug("Search index version is {}", indexVersion);
+      }
+    } catch (ElasticSearchException e) {
+      logger.debug("Version index has not been created");
+    }
+
+    // The index does not exist, let's create it
+    if (!versionIndexExists) {
+      indexVersion = VersionedContentRepositoryIndex.INDEX_VERSION;
+      logger.debug("Creating version index for site '{}'", site.getIdentifier());
       IndexRequestBuilder requestBuilder = nodeClient.prepareIndex(site.getIdentifier(), VERSION_TYPE, ROOT_ID);
+      logger.debug("Index version of site '{}' is {}", site.getIdentifier(), indexVersion);
       requestBuilder = requestBuilder.setSource(VERSION, Integer.toString(indexVersion));
       requestBuilder.execute().actionGet();
     }
