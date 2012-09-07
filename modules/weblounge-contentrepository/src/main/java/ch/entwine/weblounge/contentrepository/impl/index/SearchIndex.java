@@ -42,10 +42,12 @@ import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchDocument;
 import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchSearchQuery;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.SuggestRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.ElasticSearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -680,41 +682,36 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * is made to get the configuration from
    * <code>${weblounge.home}/etc/index/settings.yml</code>.
    * 
-   * @return
+   * @return the elastic search settings
+   * @throws IOException
+   *           if the index cannot be created in case it is not there already
    */
-  private Settings loadSettings() {
+  private Settings loadSettings() throws IOException {
     Settings settings = null;
 
-    // First, check if a local configuration file is present
+    // Try to determine the default index location
     String webloungeHome = System.getProperty("weblounge.home");
-    if (StringUtils.isNotBlank(webloungeHome)) {
-      File configFile = new File(PathUtils.concat(webloungeHome, "/etc/index/settings.yml"));
-      if (configFile.isFile()) {
-        FileInputStream fis = null;
-        try {
-          fis = new FileInputStream(configFile);
-          settings = ImmutableSettings.settingsBuilder().loadFromStream(configFile.getName(), fis).build();
-        } catch (FileNotFoundException e) {
-          logger.warn("Unable to load elasticsearch settings from {}", configFile.getAbsolutePath());
-        } finally {
-          IOUtils.closeQuietly(fis);
-        }
-      }
-    } else {
+    if (StringUtils.isBlank(webloungeHome)) {
       logger.warn("Unable to locate elasticsearch settings, weblounge.home not specified");
+      webloungeHome = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath();
     }
 
-    // If no local settings were found, read them from the bundle resources
-    if (settings == null) {
-      InputStream is = null;
-      try {
-        is = this.getClass().getResourceAsStream(SETTINGS_FILE);
-        logger.warn("Configuring elastic search node from the bundle resources");
-        settings = ImmutableSettings.settingsBuilder().loadFromStream(SETTINGS_FILE, is).build();
-        // TODO: Copy names.txt to configuration directory
-      } finally {
-        IOUtils.closeQuietly(is);
-      }
+    // Check if a local configuration file is present
+    File configFile = new File(PathUtils.concat(webloungeHome, "/etc/index/settings.yml"));
+    if (!configFile.isFile()) {
+      logger.warn("Configuring elastic search node from the bundle resources");
+      ElasticSearchUtils.createIndexConfigurationAt(new File(webloungeHome));
+    }
+
+    // Finally, try and load the index settings
+    FileInputStream fis = null;
+    try {
+      fis = new FileInputStream(configFile);
+      settings = ImmutableSettings.settingsBuilder().loadFromStream(configFile.getName(), fis).build();
+    } catch (FileNotFoundException e) {
+      throw new IOException("Unable to load elasticsearch settings from " + configFile.getAbsolutePath());
+    } finally {
+      IOUtils.closeQuietly(fis);
     }
 
     return settings;

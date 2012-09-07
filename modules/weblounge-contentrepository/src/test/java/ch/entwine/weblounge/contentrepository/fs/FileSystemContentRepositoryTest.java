@@ -70,6 +70,7 @@ import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSelectorImpl;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -220,25 +221,9 @@ public class FileSystemContentRepositoryTest {
     testRoot = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
     repositoryRoot = new File(testRoot, "repository");
 
-    File configurationRoot = new File(PathUtils.concat(testRoot.getAbsolutePath(), "etc", "index"));
-    configurationRoot.mkdirs();
-
-    for (String file : new String[] {
-        "default-mapping.json",
-        "file-mapping.json",
-        "image-mapping.json",
-        "movie-mapping.json",
-        "names.txt",
-        "page-mapping.json",
-        "settings.yml",
-        "version-mapping.json" }) {
-      String bundleLocation = UrlUtils.concat("/elasticsearch", file);
-      File fileLocation = new File(configurationRoot, file);
-      FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(bundleLocation), fileLocation);
-    }
-
     // Set weblounge.home so that search index can properly be created
     System.setProperty("weblounge.home", testRoot.getAbsolutePath());
+    ElasticSearchUtils.createIndexConfigurationAt(testRoot);
 
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
@@ -323,9 +308,9 @@ public class FileSystemContentRepositoryTest {
     try {
       int resources = populateRepository();
       repository.index();
-      assertEquals(resources, repository.getResourceCount() - 1);
+      assertEquals(resources, repository.getResourceCount());
     } catch (ContentRepositoryException e) {
-      fail("Error while indexing repository");
+      fail("Error while indexing repository: " + e.getMessage());
     }
   }
 
@@ -665,7 +650,7 @@ public class FileSystemContentRepositoryTest {
       assertEquals(1, repository.find(q).getDocumentCount());
       assertEquals(1, repository.find(q).getHitCount());
     } catch (ContentRepositoryException e) {
-      fail("Error searching");
+      fail("Error searching: " + e.getMessage());
     }
   }
 
