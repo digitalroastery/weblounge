@@ -222,7 +222,7 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
     for (Map.Entry<String, String> entry : query.getElements().entrySet()) {
       // TODO: Language?
       // solrQuery.append(" ").append(PAGELET_CONTENTS).append(":");
-      // solrQuery.append("\"").append(entry.getKey()).append(":=\"");
+      // solrQuery.append("\"").append(entry.getKey()).append("=\"");
       // for (String contentValue : StringUtils.split(entry.getValue())) {
       // solrQuery.append(" \"").append(IndexUtils.clean(contentValue)).append("\"");
       // }
@@ -232,7 +232,7 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
     for (Map.Entry<String, String> entry : query.getProperties().entrySet()) {
       StringBuffer searchTerm = new StringBuffer();
       searchTerm.append(entry.getKey());
-      searchTerm.append(":=").append(entry.getValue());
+      searchTerm.append("=").append(entry.getValue());
       and(PAGELET_PROPERTIES, searchTerm.toString(), true);
     }
 
