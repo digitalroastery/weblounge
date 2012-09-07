@@ -196,6 +196,13 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     requestBuilder.setQuery(new ElasticSearchSearchQuery(query));
     requestBuilder.addField("*");
 
+    // Restrict the scope to the given type
+    if (query.getTypes().length > 0) {
+      requestBuilder.setTypes(query.getTypes());
+    } else {
+      requestBuilder.setTypes("file", "image", "movie", "page");
+    }
+
     // Pagination
     if (query.getOffset() >= 0)
       requestBuilder.setFrom(query.getOffset());
