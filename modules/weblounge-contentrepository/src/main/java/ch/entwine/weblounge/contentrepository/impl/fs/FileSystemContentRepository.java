@@ -484,7 +484,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       String resourceDirectory = resourceType + "s";
       String homePath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), resourceDirectory);
       File resourcesRootDirectory = new File(homePath);
-      if (resourcesRootDirectory.list().length == 0) {
+      if (!resourcesRootDirectory.isDirectory() || resourcesRootDirectory.list().length == 0) {
         logger.debug("No {}s found to index", resourceType);
         continue;
       }
