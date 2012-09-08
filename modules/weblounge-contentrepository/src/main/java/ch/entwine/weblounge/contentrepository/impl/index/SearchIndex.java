@@ -68,6 +68,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -198,7 +199,13 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     requestBuilder.setIndices(indexName);
     requestBuilder.setSearchType(SearchType.QUERY_THEN_FETCH);
     requestBuilder.setPreference("_local");
-    requestBuilder.setQuery(new ElasticSearchSearchQuery(query));
+
+    // Create the actual search query
+    QueryBuilder queryBuilder = new ElasticSearchSearchQuery(query);
+    requestBuilder.setQuery(queryBuilder);
+    logger.debug("Searching for {}", queryBuilder.toString());
+
+    // Make sure all fields are being returned
     requestBuilder.addField("*");
 
     // Restrict the scope to the given type
