@@ -90,19 +90,6 @@ public class IndexUtilsTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#selectDay(java.util.Date)}.
-   */
-  @Test
-  public void testSelectDay() {
-    Date date = new Date();
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    String dayStart = df.format(date) + "T00:00:00Z";
-    String dayEnd = df.format(date) + "T23:59:59Z";
-    String day = "[" + dayStart + " TO " + dayEnd + "]";
-    assertEquals(day, IndexUtils.selectDay(date));
-  }
-
-  /**
    * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#serializeUserId(ch.entwine.weblounge.common.security.User)}.
    */
   @Test
