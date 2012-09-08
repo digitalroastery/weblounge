@@ -57,6 +57,7 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
@@ -111,6 +112,9 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   /** The solr root */
   protected File indexRoot = null;
 
+  /** The site */
+  protected Site site = null;
+
   /** The version number */
   protected int indexVersion = -1;
 
@@ -134,11 +138,12 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   public SearchIndex(Site site, File indexRoot,
       ResourceSerializerService serializer, boolean readOnly)
           throws IOException {
+    this.site = site;
     this.indexRoot = indexRoot;
     this.resourceSerializer = serializer;
     this.isReadOnly = readOnly;
     try {
-      initElasticSearch(site, indexRoot);
+      init(site, indexRoot);
     } catch (Throwable t) {
       throw new IOException("Error creating elastic search index", t);
     }
@@ -335,6 +340,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       DeleteIndexResponse delete = nodeClient.admin().indices().delete(new DeleteIndexRequest()).actionGet();
       if (!delete.acknowledged())
         logger.error("Indices could not be deleted");
+      createIndices();
     } catch (Throwable t) {
       throw new IOException("Cannot clear index", t);
     }
@@ -352,8 +358,12 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
 
     String index = uri.getSite().getIdentifier();
+    String type = uri.getType();
     String id = uri.getIdentifier();
-    DeleteResponse delete = nodeClient.prepareDelete(index, uri.getType(), id).execute().actionGet();
+
+    DeleteRequestBuilder deleteRequest = nodeClient.prepareDelete(index, type, id);
+    deleteRequest.setRefresh(true);
+    DeleteResponse delete = deleteRequest.execute().actionGet();
     if (delete.notFound()) {
       logger.trace("Document {} to delete was not found", uri);
     }
@@ -629,7 +639,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * @throws Exception
    *           if loading or creating solr fails
    */
-  private void initElasticSearch(Site site, File indexRoot) throws Exception {
+  private void init(Site site, File indexRoot) throws Exception {
     logger.debug("Setting up elastic search index at {}", indexRoot);
 
     // Prepare the configuration of the elastic search node
@@ -639,6 +649,20 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().settings(settings);
     elasticSearch = nodeBuilder.build();
     elasticSearch.start();
+
+    // Create indices and type definitions
+    createIndices();
+  }
+
+  /**
+   * Prepares elastic search to take Weblounge data.
+   * 
+   * @throws ContentRepositoryException
+   *           if index and type creation fails
+   * @throws IOException
+   *           if loading of the type definitions fails
+   */
+  private void createIndices() throws ContentRepositoryException, IOException {
 
     // Create the client
     nodeClient = elasticSearch.client();
