@@ -11,7 +11,7 @@
             "version": { "type" : "long", "index" : "not_analyzed", "store" : "yes" },
             "alternate_version": { "type" : "long", "index" : "not_analyzed", "store" : "yes" },
 
-            "subjects": { "type" : "string", "index" : "not_analyzed", "store" : "yes" }, 
+            "subjects": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
             "template": { "type" : "string", "index" : "not_analyzed", "store" : "yes" }, 
             "stationary": { "type" : "boolean", "index" : "not_analyzed", "store" : "yes" }, 
             "series": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
@@ -51,8 +51,8 @@
 
             "content_source": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
             "content_external_representation": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
-            "content_mimetype": { "type" : "string", "index" : "analyzed", "store" : "no" },
-            "content_filename": { "type" : "string", "index" : "analyzed", "store" : "no" }
+            "content_mimetype": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "content_filename": { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
 
         },
         "dynamic_templates" : [           
