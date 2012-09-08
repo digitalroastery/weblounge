@@ -203,7 +203,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     // Create the actual search query
     QueryBuilder queryBuilder = new ElasticSearchSearchQuery(query);
     requestBuilder.setQuery(queryBuilder);
-    logger.debug("Searching for {}", queryBuilder.toString());
+    logger.debug("Searching for {}", requestBuilder.toString());
 
     // Make sure all fields are being returned
     requestBuilder.addField("*");
