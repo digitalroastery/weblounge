@@ -546,7 +546,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       SearchQuery searchByResource = new SearchQueryImpl(uri.getSite());
       searchByResource.withVersion(Resource.LIVE);
       searchByResource.withProperty("resourceid", uri.getIdentifier());
-      if (index.find(searchByResource).getItems().length > 0) {
+      if (index.find(searchByResource).getDocumentCount() > 0) {
         logger.debug("Resource '{}' is still being referenced", uri);
         throw new ReferentialIntegrityException(uri.getIdentifier());
       }
