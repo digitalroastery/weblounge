@@ -336,7 +336,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
         if (values.size() == 1)
           booleanQuery.must(new TermsQueryBuilder(entry.getKey(), values.iterator().next()));
         else
-          booleanQuery.must(new TermsQueryBuilder(entry.getKey(), values));
+          booleanQuery.must(new TermsQueryBuilder(entry.getKey(), values.toArray(new String[values.size()])));
       }
       this.queryBuilder = booleanQuery;
     }
@@ -348,7 +348,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
         if (values.size() == 1)
           booleanQuery.mustNot(new TermsQueryBuilder(entry.getKey(), values.iterator().next()));
         else
-          booleanQuery.mustNot(new TermsQueryBuilder(entry.getKey(), values));
+          booleanQuery.mustNot(new TermsQueryBuilder(entry.getKey(), values.toArray(new String[values.size()])));
       }
       this.queryBuilder = booleanQuery;
     }
