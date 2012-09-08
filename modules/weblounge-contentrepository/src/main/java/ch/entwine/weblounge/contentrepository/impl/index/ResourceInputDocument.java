@@ -83,6 +83,9 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
   protected void init(Resource<?> resource) {
     ResourceURI uri = resource.getURI();
 
+    if (uri.getIdentifier() == null)
+      throw new IllegalArgumentException("Resource must have an identifier");
+
     addField(ID, uri.getIdentifier() + uri.getVersion(), true);
     addField(RESOURCE_ID, uri.getIdentifier(), true);
     addField(PATH, uri.getPath(), true);
