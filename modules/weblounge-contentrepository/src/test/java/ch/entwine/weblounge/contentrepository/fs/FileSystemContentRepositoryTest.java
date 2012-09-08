@@ -76,6 +76,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -102,7 +103,7 @@ public class FileSystemContentRepositoryTest {
   protected FileSystemContentRepository repository = null;
 
   /** The repository root directory */
-  protected File repositoryRoot = null;
+  protected static File repositoryRoot = null;
 
   /** The mock site */
   protected Site site = null;
@@ -192,7 +193,7 @@ public class FileSystemContentRepositoryTest {
   private static ResourceSerializerServiceImpl serializer = null;
 
   /** Root directory for index configuration and test data */
-  private File testRoot = null;
+  private static File testRoot = null;
 
   /**
    * Sets up everything valid for all test runs.
@@ -211,13 +212,6 @@ public class FileSystemContentRepositoryTest {
     serializer.addSerializer(new FileResourceSerializer());
     serializer.addSerializer(new ImageResourceSerializer());
     serializer.addSerializer(new MovieResourceSerializer());
-  }
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @Before
-  public void setUp() throws Exception {
 
     testRoot = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
     repositoryRoot = new File(testRoot, "repository");
@@ -225,6 +219,13 @@ public class FileSystemContentRepositoryTest {
     // Set weblounge.home so that search index can properly be created
     System.setProperty("weblounge.home", testRoot.getAbsolutePath());
     ElasticSearchUtils.createIndexConfigurationAt(testRoot);
+  }
+
+  /**
+   * @throws java.lang.Exception
+   */
+  @Before
+  public void setUp() throws Exception {
 
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
@@ -293,10 +294,17 @@ public class FileSystemContentRepositoryTest {
   public void tearDown() {
     try {
       repository.disconnect();
-      FileUtils.deleteQuietly(testRoot);
     } catch (ContentRepositoryException e) {
       fail("Error disconnecting content repository: " + e.getMessage());
     }
+  }
+
+  /**
+   * Does the cleanup after all tests.
+   */
+  @AfterClass
+  public void tearDownAfterClass() {
+    FileUtils.deleteQuietly(testRoot);
   }
 
   /**
