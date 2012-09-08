@@ -50,6 +50,7 @@ import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -105,6 +106,10 @@ public class DocumentVersionTest {
   public void setUp() throws Exception {
     String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
     repositoryRoot = new File(rootPath);
+
+    // Create the index configuration
+    System.setProperty("weblounge.home", rootPath);
+    ElasticSearchUtils.createIndexConfigurationAt(repositoryRoot);
 
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
@@ -165,7 +170,7 @@ public class DocumentVersionTest {
     q = new SearchQueryImpl(site).withPreferredVersion(WORK);
     assertEquals(0, repository.find(q).getDocumentCount());
     q = new SearchQueryImpl(site).withPreferredVersion(LIVE);
-    assertEquals(0, repository.find(q).getHitCount());
+    assertEquals(0, repository.find(q).getDocumentCount());
 
     // Create URI and pages and add them to the repository
     ResourceURI liveOnlyURI = new PageURIImpl(site, "/liveonly", LIVE);
@@ -189,70 +194,70 @@ public class DocumentVersionTest {
 
     // Add the live only live page
     repository.put(liveOnly);
-    assertEquals(0, repository.find(workOnlyQuery).getHitCount());
-    assertEquals(1, repository.find(liveOnlyQuery).getHitCount());
+    assertEquals(0, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(1, repository.find(liveOnlyQuery).getDocumentCount());
     result = repository.find(workPreferredQuery);
-    assertEquals(1, result.getHitCount());
+    assertEquals(1, result.getDocumentCount());
     ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
     assertEquals(LIVE, searchResultItem.getResourceURI().getVersion());
     result = repository.find(livePreferredQuery);
-    assertEquals(1, result.getHitCount());
+    assertEquals(1, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
 
     // Add the work only work page
     repository.put(workOnly);
-    assertEquals(1, repository.find(workOnlyQuery).getHitCount());
-    assertEquals(1, repository.find(liveOnlyQuery).getHitCount());
+    assertEquals(1, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(1, repository.find(liveOnlyQuery).getDocumentCount());
     result = repository.find(workPreferredQuery);
-    assertEquals(2, result.getHitCount());
+    assertEquals(2, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     result = repository.find(livePreferredQuery);
-    assertEquals(2, result.getHitCount());
+    assertEquals(2, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
 
     // Add the live and work live page
     repository.put(liveAndWorkLive);
-    assertEquals(1, repository.find(workOnlyQuery).getHitCount());
-    assertEquals(2, repository.find(liveOnlyQuery).getHitCount());
+    assertEquals(1, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(2, repository.find(liveOnlyQuery).getDocumentCount());
     result = repository.find(workPreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
     result = repository.find(livePreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
 
     // Add the live and work work page
     repository.put(liveAndWorkWork);
-    assertEquals(2, repository.find(workOnlyQuery).getHitCount());
-    assertEquals(2, repository.find(liveOnlyQuery).getHitCount());
+    assertEquals(2, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(2, repository.find(liveOnlyQuery).getDocumentCount());
     result = repository.find(workPreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
     result = repository.find(livePreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
 
     // Lock the page, which will trigger a call to index.update()
     repository.lock(liveAndWorkWorkURI, new UserImpl("user"));
-    assertEquals(2, repository.find(workOnlyQuery).getHitCount());
-    assertEquals(2, repository.find(liveOnlyQuery).getHitCount());
+    assertEquals(2, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(2, repository.find(liveOnlyQuery).getDocumentCount());
     result = repository.find(workPreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
     result = repository.find(livePreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
