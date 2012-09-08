@@ -324,9 +324,9 @@ public class SearchIndexTest {
   @Test
   public void testGetWithWildcardText() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withText("Tec", false);
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withText("Tec", true);
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
-    q = new SearchQueryImpl(site).withTypes(Page.TYPE).withText("/a", false);
+    q = new SearchQueryImpl(site).withTypes(Page.TYPE).withText("/a", true);
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 

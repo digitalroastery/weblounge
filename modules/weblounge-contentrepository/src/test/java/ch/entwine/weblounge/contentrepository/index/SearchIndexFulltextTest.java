@@ -188,7 +188,7 @@ public class SearchIndexFulltextTest {
   public void testGetWithPathPrefix() throws Exception {
     String path = page.getURI().getPath();
     String pathPrefix = path.substring(0, path.indexOf('/', 1));
-    SearchQuery q = new SearchQueryImpl(site).withText(pathPrefix);
+    SearchQuery q = new SearchQueryImpl(site).withText(pathPrefix, true);
     assertEquals(1, idx.getByQuery(q).getItems().length);
   }
 

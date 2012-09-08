@@ -66,6 +66,7 @@ import org.elasticsearch.index.query.QueryBuilderException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.TextQueryBuilder;
 import org.elasticsearch.index.query.WildcardQueryBuilder;
 
 import java.io.IOException;
@@ -362,6 +363,13 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     }
 
     // Text
+    if (text != null) {
+      TextQueryBuilder textQueryBuilder = QueryBuilders.textQuery(FULLTEXT, text);
+      booleanQuery.must(textQueryBuilder);
+      this.queryBuilder = booleanQuery;
+    }
+
+    // Wildcard text
     if (wildcardText != null) {
       WildcardQueryBuilder wcQueryBuilder = QueryBuilders.wildcardQuery(FULLTEXT, wildcardText);
       booleanQuery.must(wcQueryBuilder);
