@@ -30,6 +30,7 @@ import ch.entwine.weblounge.contentrepository.impl.index.IndexSchema;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,40 +56,33 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
       List<ResourceMetadata<?>> resource) {
     this.uri = uri;
 
+    List<String> fulltext = new ArrayList<String>();
+
     for (ResourceMetadata<?> entry : resource) {
       String metadataKey = entry.getName();
 
-      // Add language neutral metadata values
-      for (Object value : entry.getValues()) {
-        put(metadataKey, value);
+      // Store the metadata element as is
+      put(metadataKey, entry.getValues());
 
-        // Add to fulltext?
-        if (entry.addToFulltext()) {
-          String fulltext = StringUtils.trimToEmpty((String) get(IndexSchema.FULLTEXT));
+      // Add to fulltext?
+      if (entry.addToFulltext()) {
+
+        // Language neutral elements
+        for (Object value : entry.getValues()) {
           if (value.getClass().isArray()) {
             Object[] fieldValues = (Object[]) value;
             for (Object v : fieldValues) {
-              fulltext = StringUtils.join(new Object[] { fulltext, v.toString() }, " ");
+              fulltext.add(v.toString());
             }
           } else {
-            fulltext = StringUtils.join(new Object[] {
-                fulltext,
-                value.toString() }, " ");
+            fulltext.add(value.toString());
           }
-          put(IndexSchema.FULLTEXT, fulltext);
         }
-      }
 
-      // Add localized metadata values
-      for (Language language : entry.getLocalizedValues().keySet()) {
-        List<?> values = entry.getLocalizedValues().get(language);
-        for (Object value : values) {
-          put(metadataKey, value);
-
-          // Add to fulltext
-          if (entry.addToFulltext()) {
-
-            // Update the localized fulltext
+        // Add localized metadata values
+        for (Language language : entry.getLocalizedValues().keySet()) {
+          List<?> values = entry.getLocalizedValues().get(language);
+          for (Object value : values) {
             String localizedFieldName = MessageFormat.format(LOCALIZED_FULLTEXT, language.getIdentifier());
             String localizedFulltext = StringUtils.trimToEmpty((String) get(localizedFieldName));
             if (value.getClass().isArray()) {
@@ -109,6 +103,8 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
       }
 
     }
+
+    put(IndexSchema.FULLTEXT, fulltext);
   }
 
   /**
