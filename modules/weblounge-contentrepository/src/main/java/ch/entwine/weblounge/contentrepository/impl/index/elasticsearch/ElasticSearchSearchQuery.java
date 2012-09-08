@@ -45,7 +45,6 @@ import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.SUBJ
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEMPLATE;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TYPE;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexUtils.clean;
 
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -56,12 +55,22 @@ import ch.entwine.weblounge.contentrepository.impl.index.IndexSchema;
 import ch.entwine.weblounge.contentrepository.impl.index.IndexUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.common.io.BytesStream;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilderException;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.WildcardQueryBuilder;
 
+import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -70,7 +79,7 @@ import java.util.Set;
 /**
  * Weblounge implementation of the elastic search query builder.
  */
-public class ElasticSearchSearchQuery extends BoolQueryBuilder {
+public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /** Term queries on fields */
   private Map<String, Set<Object>> searchTerms = null;
@@ -84,6 +93,21 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
   /** Fields that must not be empty */
   private Set<String> nonEmptyFields = null;
 
+  /** Fields that query a date range */
+  private Set<DateRange> dateRanges = null;
+
+  /** Filter expression */
+  private String filter = null;
+
+  /** Text query */
+  private String text = null;
+
+  /** Wildcard text query */
+  private String wildcardText = null;
+
+  /** The boolean query */
+  private QueryBuilder queryBuilder = null;
+
   /**
    * Creates a new elastic search query based on the Weblounge query.
    * 
@@ -92,6 +116,7 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
    */
   public ElasticSearchSearchQuery(SearchQuery query) {
     init(query);
+    createQuery();
   }
 
   /**
@@ -104,7 +129,7 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
 
     // Resource id
     if (query.getIdentifier().length > 0) {
-      and(IndexSchema.ID, query.getIdentifier(), true);
+      and(IndexSchema.RESOURCE_ID, query.getIdentifier(), true);
     }
 
     // Version / Preferred version
@@ -168,9 +193,9 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
     // Creation date
     if (query.getCreationDate() != null) {
       if (query.getCreationDateEnd() != null)
-        and(CREATED, IndexUtils.serializeDateRange(query.getCreationDate(), query.getCreationDateEnd()), false);
+        and(CREATED, query.getCreationDate(), query.getCreationDateEnd());
       else
-        and(CREATED, IndexUtils.selectDay(query.getCreationDate()), false);
+        and(CREATED, IndexUtils.beginningOfDay(query.getCreationDate()), IndexUtils.endOfDay(query.getCreationDate()));
     }
 
     // Modifier
@@ -181,9 +206,10 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
     // Modification date
     if (query.getModificationDate() != null) {
       if (query.getCreationDateEnd() != null)
-        and(MODIFIED, IndexUtils.serializeDateRange(query.getModificationDate(), query.getModificationDateEnd()), false);
-      else
-        and(MODIFIED, IndexUtils.selectDay(query.getModificationDate()), false);
+        and(MODIFIED, query.getModificationDate(), query.getModificationDateEnd());
+      else {
+        and(MODIFIED, IndexUtils.beginningOfDay(query.getModificationDate()), IndexUtils.endOfDay(query.getModificationDate()));
+      }
     }
 
     // Without Modification
@@ -199,9 +225,9 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
     // Publication date
     if (query.getPublishingDate() != null) {
       if (query.getCreationDateEnd() != null)
-        and(PUBLISHED_FROM, IndexUtils.serializeDateRange(query.getPublishingDate(), query.getPublishingDateEnd()), false);
+        and(PUBLISHED_FROM, query.getPublishingDate(), query.getPublishingDateEnd());
       else
-        and(PUBLISHED_FROM, IndexUtils.selectDay(query.getPublishingDate()), false);
+        and(PUBLISHED_FROM, IndexUtils.beginningOfDay(query.getPublishingDate()), IndexUtils.endOfDay(query.getPublishingDate()));
     }
 
     // Without Publication
@@ -219,14 +245,14 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
     }
 
     // Pagelet elements
-    for (Map.Entry<String, String> entry : query.getElements().entrySet()) {
-      // TODO: Language?
-      // solrQuery.append(" ").append(PAGELET_CONTENTS).append(":");
-      // solrQuery.append("\"").append(entry.getKey()).append("=\"");
-      // for (String contentValue : StringUtils.split(entry.getValue())) {
-      // solrQuery.append(" \"").append(IndexUtils.clean(contentValue)).append("\"");
-      // }
-    }
+    // for (Map.Entry<String, String> entry : query.getElements().entrySet()) {
+    // TODO: Language?
+    // solrQuery.append(" ").append(PAGELET_CONTENTS).append(":");
+    // solrQuery.append("\"").append(entry.getKey()).append("=\"");
+    // for (String contentValue : StringUtils.split(entry.getValue())) {
+    // solrQuery.append(" \"").append(IndexUtils.clean(contentValue)).append("\"");
+    // }
+    // }
 
     // Pagelet properties
     for (Map.Entry<String, String> entry : query.getProperties().entrySet()) {
@@ -280,25 +306,39 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
     // Fulltext
     if (query.getText() != null) {
       if (query.isWildcardSearch()) {
-        and(FULLTEXT, clean(query.getText()) + "*", false);
+        wildcardText = query.getText() + "*";
       } else {
-        for (String s : StringUtils.split(query.getText())) {
-          and(FULLTEXT, s, true);
-        }
+        text = query.getText();
       }
     }
 
-    // Create the actual query
+    // Filter query
+    if (query.getFilter() != null) {
+      this.filter = query.getFilter();
+    }
+  }
+
+  /**
+   * Create the actual query. We start with a query that matches everything,
+   * then move to the boolean conditions, finally add filter queries.
+   */
+  private void createQuery() {
+
+    queryBuilder = new MatchAllQueryBuilder();
+
+    // The boolean query builder
+    BoolQueryBuilder booleanQuery = new BoolQueryBuilder();
 
     // Terms
     if (searchTerms != null) {
       for (Map.Entry<String, Set<Object>> entry : searchTerms.entrySet()) {
         Set<Object> values = entry.getValue();
         if (values.size() == 1)
-          must(new TermsQueryBuilder(entry.getKey(), values.iterator().next()));
+          booleanQuery.must(new TermsQueryBuilder(entry.getKey(), values.iterator().next()));
         else
-          must(new TermsQueryBuilder(entry.getKey(), values));
+          booleanQuery.must(new TermsQueryBuilder(entry.getKey(), values));
       }
+      this.queryBuilder = booleanQuery;
     }
 
     // Negative terms
@@ -306,31 +346,46 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
       for (Map.Entry<String, Set<Object>> entry : negativeSearchTerms.entrySet()) {
         Set<Object> values = entry.getValue();
         if (values.size() == 1)
-          mustNot(new TermsQueryBuilder(entry.getKey(), values.iterator().next()));
+          booleanQuery.mustNot(new TermsQueryBuilder(entry.getKey(), values.iterator().next()));
         else
-          mustNot(new TermsQueryBuilder(entry.getKey(), values));
+          booleanQuery.mustNot(new TermsQueryBuilder(entry.getKey(), values));
       }
+      this.queryBuilder = booleanQuery;
+    }
+
+    // Date ranges
+    if (dateRanges != null) {
+      for (DateRange dr : dateRanges) {
+        booleanQuery.must(dr.getQueryBuilder());
+      }
+      this.queryBuilder = booleanQuery;
+    }
+
+    // Text
+    if (wildcardText != null) {
+      WildcardQueryBuilder wcQueryBuilder = QueryBuilders.wildcardQuery(FULLTEXT, wildcardText);
+      booleanQuery.must(wcQueryBuilder);
+      this.queryBuilder = booleanQuery;
     }
 
     // Non-Empty fields
     if (nonEmptyFields != null) {
       for (String field : nonEmptyFields) {
-        QueryBuilders.filteredQuery(this, FilterBuilders.existsFilter(field));
+        this.queryBuilder = QueryBuilders.filteredQuery(queryBuilder, FilterBuilders.existsFilter(field));
       }
     }
 
     // Empty fields
     if (emptyFields != null) {
       for (String field : emptyFields) {
-        QueryBuilders.filteredQuery(this, FilterBuilders.missingFilter(field));
+        this.queryBuilder = QueryBuilders.filteredQuery(queryBuilder, FilterBuilders.missingFilter(field));
       }
     }
 
-    // Filter query
-    if (query.getFilter() != null) {
-      QueryBuilders.filteredQuery(this, FilterBuilders.wrapperFilter(query.getFilter()));
+    // Filter expressions
+    if (filter != null) {
+      this.queryBuilder = QueryBuilders.filteredQuery(queryBuilder, FilterBuilders.wrapperFilter(filter));
     }
-
   }
 
   /**
@@ -379,6 +434,31 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
     for (Object v : fieldValues) {
       and(fieldName, v, clean);
     }
+  }
+
+  /**
+   * Stores <code>fieldValue</code> as a search term on the
+   * <code>fieldName</code> field.
+   * 
+   * @param fieldName
+   *          the field name
+   * @param startDate
+   *          the start date
+   * @param endDate
+   *          the end date
+   */
+  protected void and(String fieldName, Date startDate, Date endDate) {
+
+    // Fix the field name, just in case
+    fieldName = StringUtils.trim(fieldName);
+
+    // Make sure the data structures are set up accordingly
+    if (dateRanges == null)
+      dateRanges = new HashSet<DateRange>();
+
+    // Add the term
+    DateRange dateRange = new DateRange(fieldName, startDate, endDate);
+    dateRanges.add(dateRange);
   }
 
   /**
@@ -453,6 +533,100 @@ public class ElasticSearchSearchQuery extends BoolQueryBuilder {
     if (nonEmptyFields == null)
       nonEmptyFields = new HashSet<String>();
     nonEmptyFields.add(StringUtils.trim(fieldName));
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.elasticsearch.common.xcontent.ToXContent#toXContent(org.elasticsearch.common.xcontent.XContentBuilder,
+   *      org.elasticsearch.common.xcontent.ToXContent.Params)
+   */
+  @Override
+  public XContentBuilder toXContent(XContentBuilder builder, Params params)
+      throws IOException {
+    return queryBuilder.toXContent(builder, params);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.elasticsearch.index.query.QueryBuilder#buildAsBytes()
+   */
+  @Override
+  public BytesStream buildAsBytes() throws QueryBuilderException {
+    return queryBuilder.buildAsBytes();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.elasticsearch.index.query.QueryBuilder#buildAsBytes(org.elasticsearch.common.xcontent.XContentType)
+   */
+  @Override
+  public BytesStream buildAsBytes(XContentType contentType) {
+    return queryBuilder.buildAsBytes(contentType);
+  }
+
+  /**
+   * Utility class to hold date range specifications and turn them into elastic
+   * search queries.
+   */
+  private static final class DateRange {
+
+    /** The field name */
+    private String field = null;
+
+    /** The start date */
+    private Date startDate = null;
+
+    /** The end date */
+    private Date endDate = null;
+
+    /**
+     * Creates a new date range specification with the given field name, start
+     * and end dates. <code>null</code> may be passed in for start or end dates
+     * that should remain unspecified.
+     * 
+     * @param field
+     *          the field name
+     * @param start
+     *          the start date
+     * @param end
+     *          the end date
+     */
+    DateRange(String field, Date start, Date end) {
+      this.field = field;
+      this.startDate = start;
+      this.endDate = end;
+    }
+
+    /**
+     * Returns the range query that is represented by this date range.
+     * 
+     * @return the range query builder
+     */
+    QueryBuilder getQueryBuilder() {
+      RangeQueryBuilder rqb = new RangeQueryBuilder(field);
+      if (startDate != null)
+        rqb.from(startDate.getTime());
+      if (endDate != null)
+        rqb.to(endDate.getTime());
+      return rqb;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof DateRange) {
+        return ((DateRange) obj).field.equals(field);
+      }
+      return false;
+    }
+
   }
 
 }
