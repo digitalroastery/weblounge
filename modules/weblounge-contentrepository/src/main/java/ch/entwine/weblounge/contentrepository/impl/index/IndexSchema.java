@@ -26,7 +26,7 @@ package ch.entwine.weblounge.contentrepository.impl.index;
 public interface IndexSchema {
 
   /** The unique identifier */
-  String ID = "uid";
+  String UID = "uid";
 
   /** Resource identifier */
   String RESOURCE_ID = "id";

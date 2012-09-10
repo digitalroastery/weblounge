@@ -522,8 +522,8 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     for (ElasticSearchDocument doc : documents) {
       String index = doc.getSite().getIdentifier();
       String type = doc.getType();
-      String id = doc.getIdentifier();
-      bulkRequest.add(nodeClient.prepareIndex(index, type, id).setSource(doc));
+      String uid = doc.getUID();
+      bulkRequest.add(nodeClient.prepareIndex(index, type, uid).setSource(doc));
     }
 
     // Make sure the operations are searchable immediately

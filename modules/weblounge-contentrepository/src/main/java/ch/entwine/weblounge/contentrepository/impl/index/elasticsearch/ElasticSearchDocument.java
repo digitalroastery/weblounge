@@ -121,8 +121,8 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
    * 
    * @return the identifier
    */
-  public String getIdentifier() {
-    return uri.getIdentifier();
+  public String getUID() {
+    return uri.getIdentifier() + "." + uri.getVersion();
   }
 
   /**

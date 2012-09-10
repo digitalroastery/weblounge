@@ -37,7 +37,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CREA
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.DESCRIPTION;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.DESCRIPTION_LOCALIZED;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.HEADER_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.UID;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.LOCKED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.LOCKED_BY_NAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.MODIFIED;
@@ -86,7 +86,7 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     if (uri.getIdentifier() == null)
       throw new IllegalArgumentException("Resource must have an identifier");
 
-    addField(ID, uri.getIdentifier() + uri.getVersion(), true);
+    addField(UID, uri.getIdentifier() + "." + uri.getVersion(), false);
     addField(RESOURCE_ID, uri.getIdentifier(), true);
     addField(PATH, uri.getPath(), true);
     addField(TYPE, uri.getType(), true);
