@@ -366,13 +366,14 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
     String index = uri.getSite().getIdentifier();
     String type = uri.getType();
-    String id = uri.getIdentifier();
+    String uid = uri.getUID();
 
-    DeleteRequestBuilder deleteRequest = nodeClient.prepareDelete(index, type, id);
+    DeleteRequestBuilder deleteRequest = nodeClient.prepareDelete(index, type, uid);
     deleteRequest.setRefresh(true);
     DeleteResponse delete = deleteRequest.execute().actionGet();
     if (delete.notFound()) {
       logger.trace("Document {} to delete was not found", uri);
+      return false;
     }
 
     // Adjust the version information

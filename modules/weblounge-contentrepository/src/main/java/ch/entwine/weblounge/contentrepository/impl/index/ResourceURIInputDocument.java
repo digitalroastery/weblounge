@@ -20,10 +20,10 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.UID;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.RESOURCE_ID;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TYPE;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.UID;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
@@ -53,7 +53,7 @@ public class ResourceURIInputDocument extends ResourceMetadataCollection {
    *          the resource uri
    */
   private void init(ResourceURI uri) {
-    addField(UID, uri.getIdentifier() + "." + uri.getVersion(), false);
+    addField(UID, uri.getUID(), false);
     addField(RESOURCE_ID, uri.getIdentifier(), false);
     addField(PATH, uri.getPath(), true);
     addField(TYPE, uri.getType(), false);

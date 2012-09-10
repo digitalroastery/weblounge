@@ -122,7 +122,7 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
    * @return the identifier
    */
   public String getUID() {
-    return uri.getIdentifier() + "." + uri.getVersion();
+    return uri.getUID();
   }
 
   /**
