@@ -805,22 +805,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     ResourceURI uri = resource.getURI();
 
-    // Add entry to index
-    if (!index.existsInAnyVersion(uri)) {
+    // If the document exists in the given version, update it otherwise add it
+    // to the index
+    if (index.exists(uri)) {
+      index.update(resource);
+    } else {
       if (resource.contents().size() > 0)
         throw new IllegalStateException("Cannot add content metadata without content");
-      index.add(resource);
-    }
-
-    // The resource exists in some version
-    else if (index.exists(uri)) {
-      index.update(resource);
-    }
-
-    // We are about to add a new version of a resource
-    else {
-      if (resource.contents().size() > 0)
-        throw new IllegalStateException("Cannot modify content metadata without content");
       index.add(resource);
     }
 
