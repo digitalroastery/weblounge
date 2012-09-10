@@ -21,7 +21,6 @@ package ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;
 
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.index.SearchIndexTest;
 
 import org.apache.commons.io.FileUtils;
 
@@ -71,7 +70,7 @@ public final class ElasticSearchUtils {
     for (String file : files) {
       String bundleLocation = UrlUtils.concat("/elasticsearch", file);
       File fileLocation = new File(configurationRoot, file);
-      FileUtils.copyInputStreamToFile(SearchIndexTest.class.getResourceAsStream(bundleLocation), fileLocation);
+      FileUtils.copyInputStreamToFile(ElasticSearchUtils.class.getResourceAsStream(bundleLocation), fileLocation);
     }
 
   }
