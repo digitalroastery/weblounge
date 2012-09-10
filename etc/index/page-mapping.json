@@ -11,7 +11,7 @@
             "version": { "type" : "long", "index" : "not_analyzed", "store" : "yes" },
             "alternate_version": { "type" : "long", "index" : "not_analyzed", "store" : "yes" },
 
-            "subjects": { "type" : "string", "index" : "not_analyzed", "store" : "yes" }, 
+            "subjects": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
             "template": { "type" : "string", "index" : "not_analyzed", "store" : "yes" }, 
             "stationary": { "type" : "boolean", "index" : "not_analyzed", "store" : "yes" }, 
             "series": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
@@ -47,7 +47,7 @@
             "pagelet_property_value": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
             "path_prefix": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
-            "fulltext": { "type" : "string", "index" : "analyzed", "store" : "no" }
+            "fulltext": { "type" : "string", "index" : "not_analyzed", "store" : "no" }
 
         },
         "dynamic_templates" : [
