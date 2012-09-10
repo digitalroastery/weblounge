@@ -1,4 +1,5 @@
 # Weblounge
+index/data/
 lib/ext/
 lib/libexec/
 lib/weblounge/
@@ -20,3 +21,4 @@ target
 
 # Mac OS X
 .DS_Store
+sites-disabled/

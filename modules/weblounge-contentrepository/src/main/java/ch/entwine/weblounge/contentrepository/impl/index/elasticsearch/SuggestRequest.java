@@ -18,23 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index.solr;
+package ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;
+
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.SpellCheckResponse;
-import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
-import org.apache.solr.client.solrj.response.SpellCheckResponse.Correction;
-import org.apache.solr.common.params.CommonParams;
-import org.apache.solr.common.params.MapSolrParams;
-import org.apache.solr.common.params.SpellingParams;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Request for suggestions based on existing values in the search index. This
@@ -92,8 +83,8 @@ public class SuggestRequest {
   /** To provide a query collated with the first matching suggestion */
   protected boolean collate = true;
 
-  /** The connection to the solr database */
-  private Solr solrConnection = null;
+  // /** The connection to the solr database */
+  // private Solr solrConnection = null;
 
   /**
    * Creates a new suggest request which uses the given connection to solr and a
@@ -111,14 +102,14 @@ public class SuggestRequest {
    *          whether to provide a query collated with the first matching
    *          suggestion
    */
-  public SuggestRequest(Solr connection, String dictionary,
-      boolean onlyMorePopular, int count, boolean collate) {
-    this.solrConnection = connection;
-    this.dictionary = dictionary.toLowerCase();
-    this.onlyMorePopular = onlyMorePopular;
-    this.count = count;
-    this.collate = collate;
-  }
+  // public SuggestRequest(Solr connection, String dictionary,
+  // boolean onlyMorePopular, int count, boolean collate) {
+  // this.solrConnection = connection;
+  // this.dictionary = dictionary.toLowerCase();
+  // this.onlyMorePopular = onlyMorePopular;
+  // this.count = count;
+  // this.collate = collate;
+  // }
 
   /**
    * Returns a list of suggestions based on the seed value.
@@ -132,60 +123,12 @@ public class SuggestRequest {
    *           if querying solr fails
    */
   public List<String> getSuggestions(String seed)
-      throws IllegalArgumentException, SolrServerException {
+      throws IllegalArgumentException, ContentRepositoryException {
     if (StringUtils.isBlank(seed))
       throw new IllegalArgumentException("Seed cannot be blank");
-    
-    SolrQuery query = new SolrQuery();
-    query.setQueryType(suggestHandler);
-    query.setQuery(seed);
-    
-    Map<String, String> params = new HashMap<String, String>();
-    params.put(CommonParams.ROWS, Integer.toString(count));
-    params.put(SpellingParams.SPELLCHECK_PREFIX + "field", dictionary);
-    params.put(SpellingParams.SPELLCHECK_PREFIX + "dictionary", dictionary);
-    params.put(SpellingParams.SPELLCHECK_ONLY_MORE_POPULAR, Boolean.toString(onlyMorePopular));
-    params.put(SpellingParams.SPELLCHECK_MAX_COLLATION_TRIES, Integer.toString(1));
-    params.put(SpellingParams.SPELLCHECK_COLLATE_EXTENDED_RESULTS, Boolean.toString(collate));
-    params.put(SpellingParams.SPELLCHECK_COLLATE, Boolean.toString(collate));
-    
-    query.add(new MapSolrParams(params));
 
-    // Execute the query and try to get hold of a query response
-    QueryResponse solrResponse = null;
-    try {
-      solrResponse = solrConnection.request(query);
-    } catch (Throwable t) {
-      throw new SolrServerException(t);
-    }
-
-    SpellCheckResponse spResponse = solrResponse.getSpellCheckResponse();
-    List<String> result = new ArrayList<String>();
-    
-    if (spResponse == null)
-      return result;
-
-    // Add suggestions (100% hits)
-    for (SpellCheckResponse.Suggestion suggestion : spResponse.getSuggestions()) {
-      result.addAll(suggestion.getAlternatives());
-    }
-
-    // Add collation results (including corrections and misspellings)
-
-    if (collate) {
-      List<Collation> collationResults = spResponse.getCollatedResults();
-      if (collationResults != null) {
-        for (Collation collation : collationResults) {
-          for (Correction correction : collation.getMisspellingsAndCorrections()) {
-            String c = correction.getCorrection();
-            if (!result.contains(c))
-              result.add(c);
-          }
-        }
-      }
-    }
-
-    return result;
+    // TODO: Implement
+    return Collections.EMPTY_LIST;
   }
 
 }

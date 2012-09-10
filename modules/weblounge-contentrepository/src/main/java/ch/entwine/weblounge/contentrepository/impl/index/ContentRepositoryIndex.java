@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -69,6 +70,8 @@ public class ContentRepositoryIndex {
   /**
    * Creates a new index that is located in the indicated folder.
    * 
+   * @param site
+   *          the site
    * @param rootDir
    *          the root directory
    * @param readOnly
@@ -78,7 +81,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if creating the indices fails
    */
-  public ContentRepositoryIndex(File rootDir,
+  public ContentRepositoryIndex(Site site, File rootDir,
       ResourceSerializerService serializer, boolean readOnly)
           throws IOException {
     this.idxRootDir = rootDir;
@@ -86,7 +89,7 @@ public class ContentRepositoryIndex {
     this.idIdx = new IdIndex(new File(rootDir, "structure"), readOnly);
     this.pathIdx = new PathIndex(new File(rootDir, "structure"), readOnly);
     this.versionIdx = new VersionIndex(new File(rootDir, "structure"), readOnly);
-    this.searchIdx = new SearchIndex(new File(rootDir, "fulltext"), serializer, readOnly);
+    this.searchIdx = new SearchIndex(site, new File(rootDir, "fulltext"), serializer, readOnly);
   }
 
   /**
@@ -374,19 +377,20 @@ public class ContentRepositoryIndex {
 
     // Adjust/delete the entry. If this is the last version of the file, make
     // sure we remove every evidence
+    boolean deleted = false;
     if (existingVersions.length == 1) {
-      searchIdx.delete(uri);
+      deleted = searchIdx.delete(uri);
       uriIdx.delete(address);
       idIdx.delete(address, id);
       if (path != null)
         pathIdx.delete(path, address);
       versionIdx.delete(address);
     } else {
-      searchIdx.delete(uri);
+      deleted = searchIdx.delete(uri);
       versionIdx.delete(address, version);
     }
 
-    return true;
+    return deleted;
   }
 
   /**
@@ -519,6 +523,11 @@ public class ContentRepositoryIndex {
   public synchronized void update(Resource<?> resource) throws IOException,
   ContentRepositoryException {
     ResourceURI uri = resource.getURI();
+
+    // Make sure the uri has an identifier
+    if (uri.getIdentifier() == null) {
+      uri.setIdentifier(getIdentifier(uri));
+    }
 
     if (resource.isIndexed())
       searchIdx.update(resource);

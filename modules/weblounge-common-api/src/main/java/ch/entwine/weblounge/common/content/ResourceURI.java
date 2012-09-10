@@ -30,6 +30,13 @@ import ch.entwine.weblounge.common.url.Path;
 public interface ResourceURI extends Path {
 
   /**
+   * Returns a string which uniquely identifies this resource and version.
+   * 
+   * @return the uid
+   */
+  String getUID();
+
+  /**
    * Sets the resource identifier.
    * 
    * @param identifier

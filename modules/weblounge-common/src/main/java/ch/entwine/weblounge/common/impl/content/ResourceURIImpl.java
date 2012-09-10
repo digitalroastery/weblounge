@@ -162,6 +162,19 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceURI#getUID()
+   */
+  @Override
+  public String getUID() {
+    if (id != null)
+      return id + "." + version;
+    else
+      return path + "." + version;
+  }
+
+  /**
    * Sets the resource identifier.
    * 
    * @param id
@@ -198,6 +211,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    * 
    * @see ch.entwine.weblounge.common.content.ResourceURI#getPath()
    */
+  @Override
   public String getPath() throws MalformedResourceURIException {
     return path;
   }

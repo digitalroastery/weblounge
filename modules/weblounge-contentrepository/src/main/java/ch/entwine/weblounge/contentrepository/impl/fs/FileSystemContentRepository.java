@@ -26,7 +26,9 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository;
@@ -80,6 +82,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /** Default directory root directory name */
   public static final String ROOT_DIR_DEFAULT = "sites-data";
 
+  /** Name of the index path element right below the repository root */
+  public static final String INDEX_PATH = "index";
+
+  /** Flag to indicate off-site indexing */
+  protected boolean indexingOffsite = false;
+
   /** The document builder factory */
   protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
@@ -122,6 +130,28 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     }
 
     logger.debug("Content repository configured");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#connect(ch.entwine.weblounge.common.site.Site)
+   */
+  @Override
+  public void connect(Site site) throws ContentRepositoryException {
+    repositorySiteRoot = new File(repositoryRoot, site.getIdentifier());
+    logger.debug("Content repository root is located at {}", repositorySiteRoot);
+
+    // Make sure we can create a temporary index
+    idxRootDir = new File(repositorySiteRoot, INDEX_PATH);
+    try {
+      FileUtils.forceMkdir(idxRootDir);
+    } catch (IOException e) {
+      throw new ContentRepositoryException("Unable to create site index at " + idxRootDir, e);
+    }
+
+    // Tell the super implementation
+    super.connect(site);
   }
 
   /**
@@ -275,7 +305,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadResource()
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadResource(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @Override
   protected InputStream loadResource(ResourceURI uri) throws IOException {
@@ -445,7 +475,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       String resourceDirectory = resourceType + "s";
       String homePath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), resourceDirectory);
       File resourcesRootDirectory = new File(homePath);
-      if (resourcesRootDirectory.list().length == 0) {
+      if (!resourcesRootDirectory.isDirectory() || resourcesRootDirectory.list().length == 0) {
         logger.debug("No {}s found to index", resourceType);
         continue;
       }

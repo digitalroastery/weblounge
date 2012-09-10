@@ -18,17 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index.solr;
+package ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;
+
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.FacetField.Count;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.params.ModifiableSolrParams;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -49,8 +45,8 @@ public class FacetedSuggestRequest {
   /** Specifies to return up to 5 suggestions */
   protected int count = 10;
 
-  /** The connection to the solr database */
-  private Solr solrConnection = null;
+  //  /** The connection to the solr database */
+  //  private Solr solrConnection = null;
 
   /**
    * Creates a new suggest request which uses the given connection to solr and a
@@ -64,12 +60,12 @@ public class FacetedSuggestRequest {
    * @param count
    *          number of suggestions to return
    */
-  public FacetedSuggestRequest(Solr connection, String dictionary,
-      int count) {
-    this.solrConnection = connection;
-    this.dictionary = dictionary.toLowerCase();
-    this.count = count;
-  }
+  //  public FacetedSuggestRequest(Solr connection, String dictionary,
+  //      int count) {
+  //    this.solrConnection = connection;
+  //    this.dictionary = dictionary.toLowerCase();
+  //    this.count = count;
+  //  }
 
   /**
    * Returns a list of suggestions based on the seed value.
@@ -83,42 +79,12 @@ public class FacetedSuggestRequest {
    *           if querying solr fails
    */
   public List<String> getSuggestions(String seed)
-      throws IllegalArgumentException, SolrServerException {
+      throws IllegalArgumentException, ContentRepositoryException {
     if (StringUtils.isBlank(seed))
       throw new IllegalArgumentException("Seed cannot be blank");
 
-    String field = dictionary + "_suggest";
-
-    SolrQuery query = new SolrQuery();
-    query.setQuery("*:*");
-
-    ModifiableSolrParams solrParams = new ModifiableSolrParams();
-    solrParams.set("facet", "true");
-    solrParams.set("facet.field", field);
-    solrParams.set("facet.prefix", seed);
-    query.add(solrParams);
-
-    // Execute the query and try to get hold of a query response
-    QueryResponse solrResponse = null;
-    try {
-      solrResponse = solrConnection.request(query);
-    } catch (Throwable t) {
-      throw new SolrServerException(t);
-    }
-
-    List<String> result = new ArrayList<String>();
-
-    // Extract the facet values
-    FacetField facetField = solrResponse.getFacetField(field);
-    if (facetField == null || facetField.getValueCount() == 0)
-      return result;
-
-    // Extract the facet names and add them to the result set
-    for (Count facetCount : facetField.getValues()) {
-      result.add(facetCount.getName());
-    }
-
-    return result;
+    // TODO: Implement
+    return Collections.EMPTY_LIST;
   }
 
 }

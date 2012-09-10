@@ -18,21 +18,22 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index.solr;
+package ch.entwine.weblounge.contentrepository.impl.index;
 
 import ch.entwine.weblounge.common.security.User;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
  * Utility class for the solr database.
  */
-public final class SolrUtils {
+public final class IndexUtils {
 
   /** The solr supported date format. **/
-  protected static DateFormat dateFormat = new SimpleDateFormat(SolrSchema.SOLR_DATE_FORMAT);
+  protected static DateFormat dateFormat = new SimpleDateFormat(IndexSchema.SOLR_DATE_FORMAT);
 
   /** The solr supported date format for days **/
   protected static DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -43,7 +44,7 @@ public final class SolrUtils {
   /**
    * Utility classes should not be initialized.
    */
-  private SolrUtils() {
+  private IndexUtils() {
   }
 
   /**
@@ -98,21 +99,41 @@ public final class SolrUtils {
   }
 
   /**
-   * Returns an expression to search for the given day.
+   * Returns the date with all time related fields set to the start of the day.
    * 
    * @param date
    *          the date
-   * @return the serialized search expression
+   * @return the date with its time component set to the beginning of the day
    */
-  public static String selectDay(Date date) {
+  public static Date beginningOfDay(Date date) {
     if (date == null)
       return null;
-    StringBuffer buf = new StringBuffer("[");
-    buf.append(dayFormat.format(date)).append("T00:00:00Z");
-    buf.append(" TO ");
-    buf.append(dayFormat.format(date)).append("T23:59:59Z");
-    buf.append("]");
-    return buf.toString();
+    Calendar c = Calendar.getInstance();
+    c.setTime(date);
+    c.set(Calendar.HOUR_OF_DAY, 0);
+    c.set(Calendar.MINUTE, 0);
+    c.set(Calendar.SECOND, 0);
+    c.set(Calendar.MILLISECOND, 0);
+    return c.getTime();
+  }
+
+  /**
+   * Returns the date with all time related fields set to the end of the day.
+   * 
+   * @param date
+   *          the date
+   * @return the date with its time component set to the beginning of the day
+   */
+  public static Date endOfDay(Date date) {
+    if (date == null)
+      return null;
+    Calendar c = Calendar.getInstance();
+    c.setTime(date);
+    c.set(Calendar.HOUR_OF_DAY, 23);
+    c.set(Calendar.MINUTE, 59);
+    c.set(Calendar.SECOND, 59);
+    c.set(Calendar.MILLISECOND, 99);
+    return c.getTime();
   }
 
   /**

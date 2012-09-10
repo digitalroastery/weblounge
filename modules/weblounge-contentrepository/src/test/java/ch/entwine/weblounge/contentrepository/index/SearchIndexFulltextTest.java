@@ -39,6 +39,7 @@ import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.index.SearchIndex;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -71,10 +72,10 @@ public class SearchIndexFulltextTest {
   protected static boolean isReadOnly = false;
 
   /** Page template */
-  protected PageTemplate template = null;
+  protected static PageTemplate template = null;
 
   /** The mock site */
-  protected Site site = null;
+  protected static Site site = null;
 
   /** The sample page */
   protected String pageFile = "/page.xml";
@@ -96,8 +97,23 @@ public class SearchIndexFulltextTest {
    */
   @BeforeClass
   public static void setupClass() throws Exception {
-    String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-    idxRoot = new File(rootPath);
+    // Template
+    template = EasyMock.createNiceMock(PageTemplate.class);
+    EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
+    EasyMock.expect(template.getStage()).andReturn("non-existing").anyTimes();
+    EasyMock.replay(template);
+
+    Set<Language> languages = new HashSet<Language>();
+    languages.add(LanguageUtils.getLanguage("en"));
+    languages.add(LanguageUtils.getLanguage("de"));
+
+    // Site
+    site = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
+    EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
+    EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
+    EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
+    EasyMock.replay(site);
 
     // Resource serializer
     serializer = new ResourceSerializerServiceImpl();
@@ -106,7 +122,11 @@ public class SearchIndexFulltextTest {
     serializer.addSerializer(new ImageResourceSerializer());
     serializer.addSerializer(new MovieResourceSerializer());
 
-    idx = new SearchIndex(idxRoot, serializer, isReadOnly);
+    String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
+    idxRoot = new File(rootPath);
+    System.setProperty("weblounge.home", rootPath);
+    ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
+    idx = new SearchIndex(site, idxRoot, serializer, isReadOnly);
   }
 
   /**
@@ -130,24 +150,6 @@ public class SearchIndexFulltextTest {
    */
   @Before
   public void setUp() throws Exception {
-    // Template
-    template = EasyMock.createNiceMock(PageTemplate.class);
-    EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
-    EasyMock.expect(template.getStage()).andReturn("non-existing").anyTimes();
-    EasyMock.replay(template);
-
-    Set<Language> languages = new HashSet<Language>();
-    languages.add(LanguageUtils.getLanguage("en"));
-    languages.add(LanguageUtils.getLanguage("de"));
-
-    // Site
-    site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
-    EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
-    EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
-    EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
-    EasyMock.replay(site);
-
     // Prepare the pages
     PageReader pageReader = new PageReader();
     InputStream is = this.getClass().getResourceAsStream(pageFile);
@@ -186,7 +188,7 @@ public class SearchIndexFulltextTest {
   public void testGetWithPathPrefix() throws Exception {
     String path = page.getURI().getPath();
     String pathPrefix = path.substring(0, path.indexOf('/', 1));
-    SearchQuery q = new SearchQueryImpl(site).withText(pathPrefix);
+    SearchQuery q = new SearchQueryImpl(site).withText(pathPrefix, true);
     assertEquals(1, idx.getByQuery(q).getItems().length);
   }
 

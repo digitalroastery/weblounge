@@ -546,7 +546,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       SearchQuery searchByResource = new SearchQueryImpl(uri.getSite());
       searchByResource.withVersion(Resource.LIVE);
       searchByResource.withProperty("resourceid", uri.getIdentifier());
-      if (index.find(searchByResource).getItems().length > 0) {
+      if (index.find(searchByResource).getDocumentCount() > 0) {
         logger.debug("Resource '{}' is still being referenced", uri);
         throw new ReferentialIntegrityException(uri.getIdentifier());
       }
@@ -805,22 +805,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     ResourceURI uri = resource.getURI();
 
-    // Add entry to index
-    if (!index.existsInAnyVersion(uri)) {
-      if (resource.contents().size() > 0)
-        throw new IllegalStateException("Cannot add content metadata withouC content");
-      index.add(resource);
-    }
-
-    // The resource exists in some version
-    else if (index.exists(uri)) {
+    // If the document exists in the given version, update it otherwise add it
+    // to the index
+    if (index.exists(uri)) {
       index.update(resource);
-    }
-
-    // We are about to add a new version of a resource
-    else {
+    } else {
       if (resource.contents().size() > 0)
-        throw new IllegalStateException("Cannot modify content metadata withouC content");
+        throw new IllegalStateException("Cannot add content metadata without content");
       index.add(resource);
     }
 
@@ -1025,11 +1016,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     File newIdxRootDir = new File(idxRootDir.getParentFile(), newIdxRootDirName);
     FileSystemContentRepositoryIndex newIndex = null;
 
+    // Clear previews directory
+    logger.info("Removing cached preview images");
+    File previewsDir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images"));
+    FileUtils.deleteQuietly(previewsDir);
+
     // Create the new index
     try {
       logger.info("Creating new index at {}", newIdxRootDir);
       FileUtils.forceMkdir(newIdxRootDir);
-      newIndex = new FileSystemContentRepositoryIndex(newIdxRootDir, resourceSerializer);
+      newIndex = new FileSystemContentRepositoryIndex(site, newIdxRootDir, resourceSerializer);
       indexingOffsite = true;
       rebuildIndex(newIndex);
     } catch (IOException e) {
@@ -1058,11 +1054,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       logger.info("Moving new index into place {}", idxRootDir);
       FileUtils.moveDirectory(idxRootDir, oldIdxRootDir);
       FileUtils.moveDirectory(newIdxRootDir, idxRootDir);
-      index = new FileSystemContentRepositoryIndex(idxRootDir, resourceSerializer);
+      index = new FileSystemContentRepositoryIndex(site, idxRootDir, resourceSerializer);
       logger.info("Removing old index at {}", oldIdxRootDir);
       FileUtils.forceDelete(oldIdxRootDir);
     } catch (IOException e) {
-      throw new ContentRepositoryException("Error clearing index " + site.getIdentifier(), e);
+      Throwable cause = e.getCause();
+      if (cause == null)
+        cause = e;
+      throw new ContentRepositoryException("Error during reindex of '" + site.getIdentifier() + "'", cause);
     } finally {
       indexing = false;
       indexingOffsite = false;
@@ -1178,16 +1177,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   protected long index(ContentRepositoryIndex idx, String resourceType)
       throws ContentRepositoryException, IOException {
 
-    // Temporary path for rebuilt site
-    String resourceDirectory = resourceType + "s";
-    String homePath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), resourceDirectory);
-    File resourcesRootDirectory = new File(homePath);
-    FileUtils.forceMkdir(resourcesRootDirectory);
-    if (resourcesRootDirectory.list().length == 0) {
-      logger.debug("No {}s found to index", resourceType);
-      return 0;
-    }
-
     logger.info("Populating site index '{}' with {}s...", site, resourceType);
 
     ResourceSerializer<?, ?> serializer = getSerializerByType(resourceType);
@@ -1195,11 +1184,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
       return 0;
     }
-
-    // Clear previews directory
-    logger.info("Removing cached preview images");
-    File previewsDir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images"));
-    FileUtils.deleteQuietly(previewsDir);
 
     long resourceCount = 0;
     long resourceVersionCount = 0;
@@ -1285,7 +1269,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     FileUtils.forceMkdir(idxRoot);
 
     // Add content if there is any
-    idx = new FileSystemContentRepositoryIndex(idxRoot, resourceSerializer);
+    idx = new FileSystemContentRepositoryIndex(site, idxRoot, resourceSerializer);
 
     // Create the idx if there is nothing in place so far
     if (idx.getResourceCount() <= 0) {

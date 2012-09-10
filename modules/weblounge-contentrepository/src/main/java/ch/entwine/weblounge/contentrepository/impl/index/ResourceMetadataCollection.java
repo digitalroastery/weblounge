@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index.solr;
+package ch.entwine.weblounge.contentrepository.impl.index;
 
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.page.Pagelet;
@@ -97,9 +97,7 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
 
   /**
    * Returns a string representation of the pagelet's element content in the
-   * specified language. If <code>format</code> is <code>true</code> then the
-   * content is formatted as <code>field=&lt;value&gt;;;</code>, otherwise just
-   * the values are added.
+   * specified language.
    * 
    * @param pagelet
    *          the pagelet
@@ -112,9 +110,7 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
     for (String element : pagelet.getContentNames(language)) {
       String[] content = pagelet.getMultiValueContent(element, language, true);
       for (String c : content) {
-        StringBuffer buf = new StringBuffer();
-        buf.append(element).append(":= ").append(c);
-        result.add(buf.toString());
+        result.add(c);
       }
     }
     return result.toArray(new String[result.size()]);
@@ -123,7 +119,7 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
   /**
    * Returns a string representation of the pagelet's element properties. If
    * <code>format</code> is <code>true</code> then the property is formatted as
-   * <code>field=&lt;value&gt;;;</code>, otherwise just the values are added.
+   * <code>field=&lt;value&gt;</code>, otherwise just the values are added.
    * 
    * @param pagelet
    *          the pagelet
@@ -134,7 +130,7 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
     for (String property : pagelet.getPropertyNames()) {
       for (String v : pagelet.getMultiValueProperty(property)) {
         StringBuffer buf = new StringBuffer();
-        buf.append(property).append(":=").append(v);
+        buf.append(property).append("=").append(v);
         result.add(buf.toString());
       }
     }

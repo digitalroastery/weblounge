@@ -18,15 +18,15 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110_1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index.solr;
+package ch.entwine.weblounge.contentrepository.impl.index;
 
 /**
  * Interface defining the mapping between data and field names in solr.
  */
-public interface SolrSchema {
+public interface IndexSchema {
 
   /** The unique identifier */
-  String ID = "solr_id";
+  String UID = "uid";
 
   /** Resource identifier */
   String RESOURCE_ID = "id";

@@ -23,7 +23,7 @@ fi
 WEBLOUNGE_WORK_DIR="$WEBLOUNGE_HOME"
 
 # Memory settings
-MEMORY_OPTS="-Xmx1024m -XX:MaxPermSize=256m"
+MEMORY_OPTS="-Xmx2048m -XX:MaxPermSize=256m"
 
 # Debug options
 DEBUG_PORT="8000"

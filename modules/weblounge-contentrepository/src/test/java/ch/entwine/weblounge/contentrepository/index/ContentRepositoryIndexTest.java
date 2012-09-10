@@ -57,6 +57,7 @@ import ch.entwine.weblounge.contentrepository.impl.index.IdIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.PathIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.URIIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.VersionIndex;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -82,7 +83,7 @@ public class ContentRepositoryIndexTest {
   protected ContentRepositoryIndex idx = null;
 
   /** The index' root directory */
-  protected File indexRootDirectory = null;
+  protected File idxRoot = null;
 
   /** The structural index' root directory */
   protected File structuralIndexRootDirectory = null;
@@ -134,12 +135,6 @@ public class ContentRepositoryIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    indexRootDirectory = new File(new File(System.getProperty("java.io.tmpdir")), "index");
-    structuralIndexRootDirectory = new File(indexRootDirectory, "structure");
-    FileUtils.deleteDirectory(indexRootDirectory);
-
-    idx = new FileSystemContentRepositoryIndex(indexRootDirectory, serializer);
-
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
     EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
@@ -159,6 +154,14 @@ public class ContentRepositoryIndexTest {
     otherPage.setTemplate("home");
 
     file = new FileResourceImpl(new FileResourceURIImpl(site));
+
+    idxRoot = new File(new File(System.getProperty("java.io.tmpdir")), "index");
+    structuralIndexRootDirectory = new File(idxRoot, "structure");
+    FileUtils.deleteDirectory(idxRoot);
+
+    ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
+    System.setProperty("weblounge.home", idxRoot.getAbsolutePath());
+    idx = new FileSystemContentRepositoryIndex(site, idxRoot, serializer);
   }
 
   /**
@@ -167,7 +170,7 @@ public class ContentRepositoryIndexTest {
   @After
   public void tearDown() throws Exception {
     idx.close();
-    FileUtils.deleteDirectory(indexRootDirectory);
+    FileUtils.deleteDirectory(idxRoot);
   }
 
   /**
@@ -477,13 +480,13 @@ public class ContentRepositoryIndexTest {
     try {
       idx.close();
 
-      File idIdxFile = new File(PathUtils.concat(indexRootDirectory.getAbsolutePath(), "structure"), IdIndex.ID_IDX_NAME);
+      File idIdxFile = new File(PathUtils.concat(idxRoot.getAbsolutePath(), "structure"), IdIndex.ID_IDX_NAME);
       RandomAccessFile index = new RandomAccessFile(idIdxFile, "rwd");
       index.seek(0);
       index.writeInt(0);
       index.close();
 
-      idx = new FileSystemContentRepositoryIndex(indexRootDirectory, serializer);
+      idx = new FileSystemContentRepositoryIndex(site, idxRoot, serializer);
       assertEquals(-1, idx.getIndexVersion());
     } catch (IOException e) {
       fail("Error writing version to index");
