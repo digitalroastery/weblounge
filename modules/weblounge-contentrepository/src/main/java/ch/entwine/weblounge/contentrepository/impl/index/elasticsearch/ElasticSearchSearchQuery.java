@@ -635,6 +635,16 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
       return false;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      return field.hashCode();
+    }
+
   }
 
 }
