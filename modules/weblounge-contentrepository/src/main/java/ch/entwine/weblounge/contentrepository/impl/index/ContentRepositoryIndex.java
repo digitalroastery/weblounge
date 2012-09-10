@@ -377,19 +377,20 @@ public class ContentRepositoryIndex {
 
     // Adjust/delete the entry. If this is the last version of the file, make
     // sure we remove every evidence
+    boolean deleted = false;
     if (existingVersions.length == 1) {
-      searchIdx.delete(uri);
+      deleted = searchIdx.delete(uri);
       uriIdx.delete(address);
       idIdx.delete(address, id);
       if (path != null)
         pathIdx.delete(path, address);
       versionIdx.delete(address);
     } else {
-      searchIdx.delete(uri);
+      deleted = searchIdx.delete(uri);
       versionIdx.delete(address, version);
     }
 
-    return true;
+    return deleted;
   }
 
   /**
@@ -522,7 +523,7 @@ public class ContentRepositoryIndex {
   public synchronized void update(Resource<?> resource) throws IOException,
   ContentRepositoryException {
     ResourceURI uri = resource.getURI();
-    
+
     // Make sure the uri has an identifier
     if (uri.getIdentifier() == null) {
       uri.setIdentifier(getIdentifier(uri));
