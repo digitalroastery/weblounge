@@ -611,13 +611,22 @@ public class PagesEndpointTest extends IntegrationTestBase {
     params = new String[][] { { "path", oldPath } };
     httpClient = new DefaultHttpClient();
     logger.info("Requesting page using the old (no longer valid path) {}", oldPath);
-    try {
-      HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
-      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      assertNull(XPathHelper.select(TestUtils.parseXMLResponse(response), "/pages/page"));
-    } finally {
-      httpClient.getConnectionManager().shutdown();
+    success = false;
+    for (int i = 0; i < 5; i++) {
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
+        assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        assertNull(XPathHelper.select(TestUtils.parseXMLResponse(response), "/pages/page"));
+        success = true;
+      } catch (AssertionError a) {
+        logger.debug("Waiting for asynchronous processing");
+        Thread.sleep(2000);
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
     }
+    assertTrue(success);
 
     // Move the page back
     movePageRequest = new HttpPut(UrlUtils.concat(requestUrl, id));
