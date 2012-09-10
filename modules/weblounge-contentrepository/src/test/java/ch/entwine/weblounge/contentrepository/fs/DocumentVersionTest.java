@@ -106,6 +106,7 @@ public class DocumentVersionTest {
   public void setUp() throws Exception {
     String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
     repositoryRoot = new File(rootPath);
+    FileUtils.deleteQuietly(repositoryRoot);
 
     // Create the index configuration
     System.setProperty("weblounge.home", rootPath);
@@ -163,14 +164,21 @@ public class DocumentVersionTest {
    */
   @Test
   public void testWithPreferredVersion() throws Exception {
-    SearchQuery q = null;
     SearchResult result = null;
 
+    // Make sure the homepage doesn't get into our way
+    repository.delete(new PageURIImpl(site, "/"), true);
+
+    SearchQuery workPreferredQuery = new SearchQueryImpl(site).withPreferredVersion(WORK).sortByCreationDate(Order.Ascending);
+    SearchQuery livePreferredQuery = new SearchQueryImpl(site).withPreferredVersion(LIVE).sortByCreationDate(Order.Ascending);
+    SearchQuery workOnlyQuery = new SearchQueryImpl(site).withVersion(WORK).sortByCreationDate(Order.Ascending);
+    SearchQuery liveOnlyQuery = new SearchQueryImpl(site).withVersion(LIVE).sortByCreationDate(Order.Ascending);
+
     // Test empty repository
-    q = new SearchQueryImpl(site).withPreferredVersion(WORK);
-    assertEquals(0, repository.find(q).getDocumentCount());
-    q = new SearchQueryImpl(site).withPreferredVersion(LIVE);
-    assertEquals(0, repository.find(q).getDocumentCount());
+    assertEquals(0, repository.find(workPreferredQuery).getDocumentCount());
+    assertEquals(0, repository.find(livePreferredQuery).getDocumentCount());
+    assertEquals(0, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(0, repository.find(liveOnlyQuery).getDocumentCount());
 
     // Create URI and pages and add them to the repository
     ResourceURI liveOnlyURI = new PageURIImpl(site, "/liveonly", LIVE);
@@ -186,11 +194,6 @@ public class DocumentVersionTest {
     liveAndWorkWork.setTemplate(template.getIdentifier());
     Page workOnly = new PageImpl(workOnlyURI);
     workOnly.setTemplate(template.getIdentifier());
-
-    SearchQuery workPreferredQuery = new SearchQueryImpl(site).withPreferredVersion(WORK).sortByCreationDate(Order.Ascending);
-    SearchQuery livePreferredQuery = new SearchQueryImpl(site).withPreferredVersion(LIVE).sortByCreationDate(Order.Ascending);
-    SearchQuery workOnlyQuery = new SearchQueryImpl(site).withVersion(WORK).sortByCreationDate(Order.Ascending);
-    SearchQuery liveOnlyQuery = new SearchQueryImpl(site).withVersion(LIVE).sortByCreationDate(Order.Ascending);
 
     // Add the live only live page
     repository.put(liveOnly);
