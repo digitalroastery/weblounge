@@ -82,12 +82,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /** Default directory root directory name */
   public static final String ROOT_DIR_DEFAULT = "sites-data";
 
-  /** Name of the index path element right below the repository root */
-  public static final String INDEX_PATH = "index";
-
-  /** Flag to indicate off-site indexing */
-  protected boolean indexingOffsite = false;
-
   /** The document builder factory */
   protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
@@ -142,16 +136,34 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     repositorySiteRoot = new File(repositoryRoot, site.getIdentifier());
     logger.debug("Content repository root is located at {}", repositorySiteRoot);
 
-    // Make sure we can create a temporary index
-    idxRootDir = new File(repositorySiteRoot, INDEX_PATH);
-    try {
-      FileUtils.forceMkdir(idxRootDir);
-    } catch (IOException e) {
-      throw new ContentRepositoryException("Unable to create site index at " + idxRootDir, e);
-    }
-
     // Tell the super implementation
     super.connect(site);
+  }
+
+  /**
+   * Removes all content.
+   * 
+   * @throws ContentRepositoryException
+   *           if clearing the repository fails
+   */
+  public void clear() throws ContentRepositoryException {
+    logger.info("Clearing the content repository at {}", repositorySiteRoot);
+
+    // Clear the index
+    try {
+      index.clear();
+    } catch (IOException e) {
+      logger.error("");
+    }
+
+    // Clear those directories that aren't the home to the index
+    for (File f : repositorySiteRoot.listFiles()) {
+      logger.debug("Removing {}", f.getAbsolutePath());
+      FileUtils.deleteQuietly(f);
+    }
+
+    // The home page needs to come back
+    super.createHomepage();
   }
 
   /**
@@ -344,9 +356,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     });
 
     // Make sure everything looks consistent
-    if (localizedFiles.length == 0)
+    if (localizedFiles == null || localizedFiles.length == 0)
       return null;
-    else if (localizedFiles.length > 1)
+
+    if (localizedFiles != null && localizedFiles.length > 1)
       logger.warn("Inconsistencies found in resource {} content {}", language, uri);
 
     // Finally return the content

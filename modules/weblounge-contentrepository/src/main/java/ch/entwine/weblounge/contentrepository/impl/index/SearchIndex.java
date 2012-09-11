@@ -110,9 +110,6 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   /** True if this is a read only index */
   protected boolean isReadOnly = false;
 
-  /** The solr root */
-  protected File indexRoot = null;
-
   /** The site */
   protected Site site = null;
 
@@ -127,8 +124,6 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * 
    * @param site
    *          the site
-   * @param indexRoot
-   *          the elastic search root directory
    * @param serializer
    *          the resource serializer
    * @param readOnly
@@ -136,15 +131,13 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if either loading or creating the index fails
    */
-  public SearchIndex(Site site, File indexRoot,
-      ResourceSerializerService serializer, boolean readOnly)
-          throws IOException {
+  public SearchIndex(Site site, ResourceSerializerService serializer,
+      boolean readOnly) throws IOException {
     this.site = site;
-    this.indexRoot = indexRoot;
     this.resourceSerializer = serializer;
     this.isReadOnly = readOnly;
     try {
-      init(site, indexRoot);
+      init();
     } catch (Throwable t) {
       throw new IOException("Error creating elastic search index", t);
     }
@@ -218,6 +211,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     // Pagination
     if (query.getOffset() >= 0)
       requestBuilder.setFrom(query.getOffset());
+
     if (query.getLimit() >= 0)
       requestBuilder.setSize(query.getLimit());
 
@@ -642,13 +636,11 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * there, or in the case where either one of solr configuration or data
    * directory is missing, a preceding call to <code>initSolr()</code> is made.
    * 
-   * @param indexRoot
-   *          the solr root directory
    * @throws Exception
    *           if loading or creating solr fails
    */
-  private void init(Site site, File indexRoot) throws Exception {
-    logger.debug("Setting up elastic search index at {}", indexRoot);
+  private void init() throws Exception {
+    logger.debug("Setting up elastic search index");
 
     // Prepare the configuration of the elastic search node
     Settings settings = loadSettings();

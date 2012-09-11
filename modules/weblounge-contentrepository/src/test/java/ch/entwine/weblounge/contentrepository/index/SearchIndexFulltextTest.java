@@ -126,7 +126,7 @@ public class SearchIndexFulltextTest {
     idxRoot = new File(rootPath);
     System.setProperty("weblounge.home", rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
-    idx = new SearchIndex(site, idxRoot, serializer, isReadOnly);
+    idx = new SearchIndex(site, serializer, isReadOnly);
   }
 
   /**

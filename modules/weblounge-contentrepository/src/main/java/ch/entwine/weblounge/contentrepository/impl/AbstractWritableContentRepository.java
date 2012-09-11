@@ -91,7 +91,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Abstract base implementation of a <code>WritableContentRepository</code>.
@@ -100,9 +99,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /** The logging facility */
   static final Logger logger = LoggerFactory.getLogger(AbstractWritableContentRepository.class);
-
-  /** Name of the index path element right below the repository root */
-  public static final String INDEX_PATH = "index";
 
   /** Holds pages while they are written to the index */
   protected OperationProcessor processor = null;
@@ -121,9 +117,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /** The repository root directory */
   protected File repositorySiteRoot = null;
-
-  /** The root directory for the temporary bundle index */
-  protected File idxRootDir = null;
 
   /** Flag to indicate off-site indexing */
   protected boolean indexingOffsite = false;
@@ -148,14 +141,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public void connect(Site site) throws ContentRepositoryException {
     repositorySiteRoot = new File(repositoryRoot, site.getIdentifier());
     logger.debug("Content repository root is located at {}", repositorySiteRoot);
-
-    // Make sure we can create a temporary index
-    idxRootDir = new File(repositorySiteRoot, INDEX_PATH);
-    try {
-      FileUtils.forceMkdir(idxRootDir);
-    } catch (IOException e) {
-      throw new ContentRepositoryException("Unable to create site index at " + idxRootDir, e);
-    }
 
     super.connect(site);
 
@@ -1012,8 +997,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     readOnly = true;
     logger.info("Switching site '{}' to read only mode", site);
 
-    String newIdxRootDirName = idxRootDir.getName() + "-new-" + UUID.randomUUID().toString();
-    File newIdxRootDir = new File(idxRootDir.getParentFile(), newIdxRootDirName);
     FileSystemContentRepositoryIndex newIndex = null;
 
     // Clear previews directory
@@ -1023,18 +1006,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Create the new index
     try {
-      logger.info("Creating new index at {}", newIdxRootDir);
-      FileUtils.forceMkdir(newIdxRootDir);
-      newIndex = new FileSystemContentRepositoryIndex(site, newIdxRootDir, resourceSerializer);
+      newIndex = new FileSystemContentRepositoryIndex(site, resourceSerializer);
       indexingOffsite = true;
       rebuildIndex(newIndex);
     } catch (IOException e) {
       indexingOffsite = false;
-      try {
-        FileUtils.forceDelete(newIdxRootDir);
-      } catch (IOException e1) {
-        logger.error("Error removing incomplete new index at {}: {}", newIdxRootDir, e.getMessage());
-      }
       throw new ContentRepositoryException("Error creating index " + site.getIdentifier(), e);
     } finally {
       try {
@@ -1045,18 +1021,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       }
     }
 
-    String oldIdxRootDirName = idxRootDir.getName() + "-old-" + UUID.randomUUID().toString();
-    File oldIdxRootDir = new File(idxRootDir.getParentFile(), oldIdxRootDirName);
-
     try {
       indexing = true;
       index.close();
-      logger.info("Moving new index into place {}", idxRootDir);
-      FileUtils.moveDirectory(idxRootDir, oldIdxRootDir);
-      FileUtils.moveDirectory(newIdxRootDir, idxRootDir);
-      index = new FileSystemContentRepositoryIndex(site, idxRootDir, resourceSerializer);
-      logger.info("Removing old index at {}", oldIdxRootDir);
-      FileUtils.forceDelete(oldIdxRootDir);
+      logger.info("Loading new index");
+      index = new FileSystemContentRepositoryIndex(site, resourceSerializer);
     } catch (IOException e) {
       Throwable cause = e.getCause();
       if (cause == null)
@@ -1125,7 +1094,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       // Clear the current index, which might be null if the site has not been
       // started yet.
       if (idx == null)
-        idx = loadIndex(idxRootDir);
+        idx = loadIndex();
 
       logger.info("Creating site index '{}'...", site.getIdentifier());
       long time = System.currentTimeMillis();
@@ -1242,34 +1211,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   @Override
   protected ContentRepositoryIndex loadIndex() throws IOException,
   ContentRepositoryException {
-    logger.debug("Trying to load site index from {}", idxRootDir);
-    return loadIndex(idxRootDir);
-  }
-
-  /**
-   * Loads the index from a given directory on the filesystem.
-   * 
-   * @param idxRoot
-   *          the root directory
-   * @return the content repository
-   * @throws IOException
-   *           if reading from the filesystem fails
-   * @throws ContentRepositoryException
-   *           if creating the content repository index fails
-   */
-  protected ContentRepositoryIndex loadIndex(File idxRoot) throws IOException,
-  ContentRepositoryException {
+    logger.debug("Trying to load site index");
 
     ContentRepositoryIndex idx = null;
 
-    logger.debug("Trying to load site index from {}", idxRoot);
-
-    // Is this a new index?
-    boolean created = !idxRoot.exists() || idxRoot.list().length == 0;
-    FileUtils.forceMkdir(idxRoot);
+    logger.debug("Loading site index");
 
     // Add content if there is any
-    idx = new FileSystemContentRepositoryIndex(site, idxRoot, resourceSerializer);
+    idx = new FileSystemContentRepositoryIndex(site, resourceSerializer);
 
     // Create the idx if there is nothing in place so far
     if (idx.getResourceCount() <= 0) {
@@ -1285,17 +1234,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       buildIndex(idx);
     }
 
-    // Is there an existing idx?
-    if (created) {
-      logger.info("Created site idx at {}", idxRoot);
-    } else {
-      long resourceCount = idx.getResourceCount();
-      long resourceVersionCount = idx.getRevisionCount();
-      logger.info("Loaded site idx with {} resources and {} revisions from {}", new Object[] {
-          resourceCount,
-          resourceVersionCount - resourceCount,
-          idxRoot });
-    }
+    // Is there an existing idex?
+    long resourceCount = idx.getResourceCount();
+    long resourceVersionCount = idx.getRevisionCount();
+    logger.info("Loaded site idx with {} resources and {} revisions", resourceCount, resourceVersionCount - resourceCount);
 
     return idx;
   }

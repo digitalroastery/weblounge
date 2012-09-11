@@ -39,7 +39,6 @@ import ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSelectorImpl;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
@@ -52,7 +51,6 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -100,9 +98,6 @@ public class BundleContentRepository extends AbstractContentRepository implement
   /** Path to the storage root directory */
   protected String rootDirPath = null;
 
-  /** The root directory for the temporary bundle index */
-  protected File idxRootDir = null;
-
   /** Flag to indicate whether temporary indices should be removed on shutdown */
   protected boolean cleanupTemporaryIndex = false;
 
@@ -121,13 +116,6 @@ public class BundleContentRepository extends AbstractContentRepository implement
    */
   @Override
   public void connect(Site site) throws ContentRepositoryException {
-    idxRootDir = new File(PathUtils.concat(rootDirPath, site.getIdentifier(), "index"));
-    try {
-      FileUtils.forceMkdir(idxRootDir);
-    } catch (IOException e) {
-      throw new ContentRepositoryException("Unable to create temporary site index at " + idxRootDir, e);
-    }
-
     // Find the site's bundle
     bundle = loadBundle(site);
     if (bundle == null)
@@ -144,10 +132,6 @@ public class BundleContentRepository extends AbstractContentRepository implement
   @Override
   public void disconnect() throws ContentRepositoryException {
     super.disconnect();
-    if (idxRootDir != null && idxRootDir.exists() && cleanupTemporaryIndex) {
-      logger.info("Removing temporary site index at {}", idxRootDir);
-      FileUtils.deleteQuietly(idxRootDir);
-    }
   }
 
   /**
@@ -304,32 +288,26 @@ public class BundleContentRepository extends AbstractContentRepository implement
   protected ContentRepositoryIndex loadIndex() throws IOException,
   ContentRepositoryException {
 
-    logger.debug("Creating temporary site index at {}", idxRootDir);
-    FileUtils.forceMkdir(idxRootDir);
-
     BundleContentRepositoryIndex index = null;
-    index = new BundleContentRepositoryIndex(site, idxRootDir, resourceSerializer);
+    index = new BundleContentRepositoryIndex(site, resourceSerializer);
     boolean success = false;
 
     // Make sure the version matches the implementation
     if (index.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
       logger.warn("Index version does not match implementation, triggering reindex");
-      FileUtils.deleteQuietly(idxRootDir);
-      FileUtils.forceMkdir(idxRootDir);
-      index = new BundleContentRepositoryIndex(site, idxRootDir, resourceSerializer);
+      index = new BundleContentRepositoryIndex(site, resourceSerializer);
     }
 
     // Is there an existing index?
     else if (index.getResourceCount() > 0) {
       long resourceCount = index.getResourceCount();
       long revisionCount = index.getRevisionCount();
-      logger.info("Loaded exising site index from {}", idxRootDir);
       logger.info("Index contains {} resources and {} revisions", resourceCount, revisionCount - resourceCount);
       return index;
     }
 
     try {
-      logger.info("Populating temporary site index '{}' at {}", site, idxRootDir);
+      logger.info("Populating temporary site index '{}'", site);
       long time = System.currentTimeMillis();
       long resourceCount = 0;
       long revisionCount = 0;

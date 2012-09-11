@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Site;
@@ -40,7 +41,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -59,8 +59,8 @@ public class ContentRepositoryIndex {
   /** The search index */
   protected SearchIndex searchIdx = null;
 
-  /** The index root directory */
-  protected File idxRootDir = null;
+  /** The site */
+  protected Site site = null;
 
   /**
    * Creates a new index that is located in the indicated folder.
@@ -76,11 +76,11 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if creating the indices fails
    */
-  public ContentRepositoryIndex(Site site, File rootDir,
+  public ContentRepositoryIndex(Site site,
       ResourceSerializerService serializer, boolean readOnly)
           throws IOException {
-    this.idxRootDir = rootDir;
-    this.searchIdx = new SearchIndex(site, rootDir, serializer, readOnly);
+    this.site = site;
+    this.searchIdx = new SearchIndex(site, serializer, readOnly);
   }
 
   /**

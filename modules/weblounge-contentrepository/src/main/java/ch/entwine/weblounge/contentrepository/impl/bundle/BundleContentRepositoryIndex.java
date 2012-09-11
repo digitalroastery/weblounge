@@ -24,7 +24,6 @@ import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -37,16 +36,14 @@ public class BundleContentRepositoryIndex extends ContentRepositoryIndex {
    * 
    * @param site
    *          the site
-   * @param rootDir
-   *          the index root directory
    * @param serializer
    *          the resource serializer
    * @throws IOException
    *           if the index cannot be created at the given location
    */
-  public BundleContentRepositoryIndex(Site site, File rootDir,
+  public BundleContentRepositoryIndex(Site site,
       ResourceSerializerService serializer) throws IOException {
-    super(site, rootDir, serializer, false);
+    super(site, serializer, false);
   }
 
 }
