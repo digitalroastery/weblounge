@@ -917,4 +917,32 @@ public interface SearchQuery {
    */
   long getPreferredVersion();
 
+  /**
+   * Returns the fields that should be returned by the query. If all fields
+   * should be returned, the method will return an empty array.
+   * 
+   * @return the names of the fields to return
+   */
+  String[] getFields();
+
+  /**
+   * Adds a field that needs to be returned by the query. If no fields are being
+   * set, all fields will be returned.
+   * 
+   * @param field
+   *          the field name
+   * @return the query
+   */
+  SearchQuery withField(String field);
+
+  /**
+   * Adds the fields that need to be returned by the query. If no fields are
+   * being set, all fields will be returned.
+   * 
+   * @param fields
+   *          the field names
+   * @return the query
+   */
+  SearchQuery withFields(String... fields);
+
 }

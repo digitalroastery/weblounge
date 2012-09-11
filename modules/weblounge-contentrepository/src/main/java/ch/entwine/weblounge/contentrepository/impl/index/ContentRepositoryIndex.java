@@ -122,9 +122,8 @@ public class ContentRepositoryIndex {
    *           if querying for the resource count fails
    */
   public long getResourceCount() throws ContentRepositoryException {
-    SearchQuery q = new IndexQueryImpl().withPreferredVersion(Resource.LIVE);
-    // TODO: Set fields to none
-    return searchIdx.getByQuery(q).getDocumentCount();
+    SearchQuery q = new SearchQueryImpl(site).withPreferredVersion(Resource.LIVE).withField(RESOURCE_ID);
+    return searchIdx.getByQuery(q).getHitCount();
   }
 
   /**
@@ -135,9 +134,8 @@ public class ContentRepositoryIndex {
    *           if querying for the resource count fails
    */
   public long getRevisionCount() throws ContentRepositoryException {
-    SearchQuery q = new IndexQueryImpl();
-    // TODO: Set fields to none
-    return searchIdx.getByQuery(q).getDocumentCount();
+    SearchQuery q = new SearchQueryImpl(site).withField(RESOURCE_ID);
+    return searchIdx.getByQuery(q).getHitCount();
   }
 
   /**
@@ -163,8 +161,7 @@ public class ContentRepositoryIndex {
     // Make sure we are not asked to add a resource to the index that has the
     // same id as an existing one
     if (id != null) {
-      // TODO: Limit to path field
-      SearchQuery q = new IndexQueryImpl().withIdentifier(id).withPreferredVersion(version).withLimit(1);
+      SearchQuery q = new SearchQueryImpl(site).withIdentifier(id).withPreferredVersion(version).withLimit(1).withField(PATH);
       SearchResultItem[] items = searchIdx.getByQuery(q).getItems();
       if (items.length > 0) {
         long versionInIndex = (Long) ((ResourceSearchResultItem) items[0]).getMetadataByKey(VERSION).getValue();
@@ -180,8 +177,7 @@ public class ContentRepositoryIndex {
     // Make sure we are not asked to add a resource to the index that has the
     // same path as an existing one
     if (path != null) {
-      // TODO: Limit to id field
-      SearchQuery q = new IndexQueryImpl().withPath(path).withPreferredVersion(version).withLimit(1);
+      SearchQuery q = new SearchQueryImpl(site).withPath(path).withPreferredVersion(version).withLimit(1).withField(RESOURCE_ID);
       SearchResultItem[] items = searchIdx.getByQuery(q).getItems();
       if (items.length > 0) {
         long versionInIndex = (Long) ((ResourceSearchResultItem) items[0]).getMetadataByKey(VERSION).getValue();
@@ -245,12 +241,14 @@ public class ContentRepositoryIndex {
    * @return the revisions
    */
   public long[] getRevisions(ResourceURI uri) throws ContentRepositoryException {
-    // TODO: Limit to version field
-    SearchQuery q = new IndexQueryImpl().withIdentifier(uri.getIdentifier());
+    String id = getIdentifier(uri);
+    if (id == null)
+      return new long[] {};
+    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id).withField(VERSION);
     SearchResultItem[] items = searchIdx.getByQuery(q).getItems();
     long[] versions = new long[items.length];
     for (int i = 0; i < items.length; i++) {
-      versions[i] = (Long) ((ResourceSearchResultItem) items[0]).getMetadataByKey(VERSION).getValue();
+      versions[i] = (Long) ((ResourceSearchResultItem) items[i]).getMetadataByKey(VERSION).getValue();
     }
     return versions;
   }
@@ -278,7 +276,7 @@ public class ContentRepositoryIndex {
       throw new IllegalArgumentException("ResourceURI must contain a path");
 
     // Load the identifier from the index
-    SearchQuery q = new IndexQueryImpl().withPath(path);
+    SearchQuery q = new SearchQueryImpl(site).withPath(path);
     SearchResultItem[] items = searchIdx.getByQuery(q).getItems();
     if (items.length == 0) {
       logger.debug("Attempt to locate id for non-existing path {}", path);
@@ -313,7 +311,7 @@ public class ContentRepositoryIndex {
       throw new IllegalArgumentException("ResourceURI must contain an identifier");
 
     // Load the path from the index
-    SearchQuery q = new IndexQueryImpl().withIdentifier(id);
+    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
     SearchResultItem[] items = searchIdx.getByQuery(q).getItems();
     if (items.length == 0) {
       logger.debug("Attempt to locate path for non existing resource '{}'", id);
@@ -344,9 +342,9 @@ public class ContentRepositoryIndex {
     SearchQuery q = null;
 
     if (id != null)
-      q = new IndexQueryImpl().withIdentifier(id).withLimit(1);
+      q = new SearchQueryImpl(site).withIdentifier(id).withLimit(1);
     else if (path != null)
-      q = new IndexQueryImpl().withPath(path).withLimit(1);
+      q = new SearchQueryImpl(site).withPath(path).withLimit(1);
     else
       throw new IllegalArgumentException("URI must have either id or path");
 
@@ -428,8 +426,12 @@ public class ContentRepositoryIndex {
    *           if looking up the uri fails
    */
   public boolean exists(ResourceURI uri) throws ContentRepositoryException {
-    SearchQuery q = new IndexQueryImpl().withIdentifier(uri.getIdentifier()).withVersion(uri.getVersion());
-    // TODO: Set fields to null
+    String id = getIdentifier(uri);
+    if (id == null)
+      return false;
+    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id).withVersion(uri.getVersion()).withField(RESOURCE_ID);
+    if (uri.getType() != null)
+      q.withTypes(uri.getType());
     return searchIdx.getByQuery(q).getDocumentCount() > 0;
   }
 
@@ -444,13 +446,15 @@ public class ContentRepositoryIndex {
    */
   public boolean existsInAnyVersion(ResourceURI uri)
       throws ContentRepositoryException {
-    SearchQuery q = new IndexQueryImpl().withIdentifier(uri.getIdentifier()).withLimit(1);
-    // TODO: Set fields to null
+    String id = getIdentifier(uri);
+    if (id == null)
+      return false;
+    SearchQuery q = new SearchQueryImpl(site).withIdentifier(id).withLimit(1).withField(RESOURCE_ID);
     return searchIdx.getByQuery(q).getDocumentCount() > 0;
   }
 
   /**
-   * Returns all uris that share the common root <code>uri</code>, are no more
+   * Returns all URIs that share the common root <code>uri</code>, are no more
    * than <code>level</code> levels deep nested and feature the indicated
    * version.
    * <p>

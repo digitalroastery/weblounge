@@ -199,7 +199,14 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     logger.debug("Searching for {}", requestBuilder.toString());
 
     // Make sure all fields are being returned
-    requestBuilder.addField("*");
+    if (query.getFields().length > 0) {
+      requestBuilder.addFields(query.getFields());
+      requestBuilder.addField(IndexSchema.RESOURCE_ID);
+      requestBuilder.addField(IndexSchema.PATH);
+      requestBuilder.addField(IndexSchema.VERSION);
+    } else {
+      requestBuilder.addField("*");
+    }
 
     // Restrict the scope to the given type
     if (query.getTypes().length > 0) {

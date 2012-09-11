@@ -55,6 +55,9 @@ public class SearchQueryImpl implements SearchQuery {
   /** Id of the wild card user */
   public static final String ANY_USER = "#any#";
 
+  /** The list of fields to return */
+  protected List<String> fields = null;
+
   /** The site */
   protected Site site = null;
 
@@ -197,12 +200,6 @@ public class SearchQueryImpl implements SearchQuery {
   protected long preferredVersion = -1L;
 
   /**
-   * Creates a new search query for internal use.
-   */
-  protected SearchQueryImpl() {
-  }
-
-  /**
    * Creates a new search query that is operating on the given site.
    * 
    * @param site
@@ -223,6 +220,44 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQueryImpl(Site site, Language language) {
     this.site = site;
     this.language = language;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withField(java.lang.String)
+   */
+  @Override
+  public SearchQuery withField(String field) {
+    if (fields == null)
+      fields = new ArrayList<String>();
+    fields.add(field);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withFields(java.lang.String[])
+   */
+  @Override
+  public SearchQuery withFields(String... fields) {
+    for (String field : fields) {
+      withField(field);
+    }
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getFields()
+   */
+  @Override
+  public String[] getFields() {
+    if (fields == null)
+      return new String[] {};
+    return fields.toArray(new String[fields.size()]);
   }
 
   /**
