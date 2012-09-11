@@ -474,17 +474,6 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#isIndexed()
-   */
-  public boolean isIndexed() {
-    if (!isHeaderLoaded)
-      loadFileHeader();
-    return file.isIndexed();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.file.Page#isLocked()
    */
   public boolean isLocked() {
@@ -557,17 +546,6 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setIdentifier(String identifier) {
     uri.setIdentifier(identifier);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#setIndexed(boolean)
-   */
-  public void setIndexed(boolean index) {
-    if (!isHeaderLoaded)
-      loadFileHeader();
-    file.setIndexed(index);
   }
 
   /**

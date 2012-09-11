@@ -45,6 +45,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * @throws java.lang.Exception
    */
+  @Override
   @Before
   public void setUp() throws Exception {
     setupPrerequisites();
@@ -548,18 +549,6 @@ public class LazyPageImplTest extends PageImplTest {
   @Override
   public void testIsCreatedAfter() {
     super.testIsCreatedAfter();
-    assertTrue(((LazyPageImpl)page).isHeaderLoaded());
-    assertFalse(((LazyPageImpl)page).isBodyLoaded());
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.content.page.PageImplTest#testIsIndexed()
-   */
-  @Override
-  public void testIsIndexed() {
-    super.testIsIndexed();
     assertTrue(((LazyPageImpl)page).isHeaderLoaded());
     assertFalse(((LazyPageImpl)page).isBodyLoaded());
   }

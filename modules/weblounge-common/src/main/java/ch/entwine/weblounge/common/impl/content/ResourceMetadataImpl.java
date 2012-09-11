@@ -126,7 +126,7 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.ResourceMetadata#addValue(java.lang.Object)
    */
   public void addValue(T v) {
@@ -148,6 +148,18 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceMetadata#getValue()
+   */
+  @Override
+  public T getValue() {
+    if (values == null || values.size() == 0)
+      return null;
+    return values.get(0);
+  }
+
+  /**
    * Adds the metadata values to the fulltext index.
    * 
    * @param addToFulltext
@@ -165,7 +177,7 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
   public boolean addToFulltext() {
     return addToFulltext;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -187,22 +199,22 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
   public int hashCode() {
     return name.hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof ResourceMetadata<?>))
       return false;
-    return name.equals(((ResourceMetadata<?>)obj).getName());
+    return name.equals(((ResourceMetadata<?>) obj).getName());
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

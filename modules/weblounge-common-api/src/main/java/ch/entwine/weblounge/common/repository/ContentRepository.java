@@ -221,15 +221,19 @@ public interface ContentRepository {
    * Returns the number of resources in this index.
    * 
    * @return the number of resources
+   * @throws ContentRepositoryException
+   *           if the resource count cannot be determined
    */
-  long getResourceCount();
+  long getResourceCount() throws ContentRepositoryException;
 
   /**
    * Returns the number of versions in this index.
    * 
    * @return the number of versions
+   * @throws ContentRepositoryException
+   *           if the version count cannot be determined
    */
-  long getVersionCount();
+  long getVersionCount() throws ContentRepositoryException;
 
   /**
    * Creates previews for all resources in the content repository. Note that

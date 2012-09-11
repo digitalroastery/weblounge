@@ -197,6 +197,12 @@ public class SearchQueryImpl implements SearchQuery {
   protected long preferredVersion = -1L;
 
   /**
+   * Creates a new search query for internal use.
+   */
+  protected SearchQueryImpl() {
+  }
+
+  /**
    * Creates a new search query that is operating on the given site.
    * 
    * @param site
@@ -567,7 +573,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#andSubject(java.lang.String)
    */
   public SearchQuery andSubject(String subject) {
@@ -577,7 +583,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getANDSubjects()
    */
   public String[] getANDSubjects() {

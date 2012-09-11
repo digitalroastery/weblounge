@@ -139,24 +139,6 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
   boolean isPromoted();
 
   /**
-   * Sets this resource to be either included or excluded from the search index.
-   * Setting this property to <code>false</code> enables pages that can only be
-   * found by people who know the link.
-   * 
-   * @param index
-   *          <code>true</code> to have this resource indexed
-   */
-  void setIndexed(boolean index);
-
-  /**
-   * Returns <code>true</code> if the resource should be added to the search
-   * index.
-   * 
-   * @return <code>true</code> if the resource is indexed
-   */
-  boolean isIndexed();
-
-  /**
    * Returns <code>true</code> if the resource is locked. A resource is locked
    * if an editor is currently editing the resource and therefore holding the
    * lock.

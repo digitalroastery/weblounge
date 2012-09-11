@@ -175,7 +175,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *          the resource uri
    * @return the file
    */
-  protected File uriToFile(ResourceURI uri) throws IOException {
+  protected File uriToFile(ResourceURI uri) throws ContentRepositoryException,
+  IOException {
     StringBuffer path = new StringBuffer(repositorySiteRoot.getAbsolutePath());
     if (uri.getType() == null)
       throw new IllegalArgumentException("Resource uri has no type");
@@ -219,7 +220,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *           if the file cannot be accessed not exist
    */
   protected File uriToContentFile(ResourceURI uri, ResourceContent content)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
     File resourceDirectory = uriToDirectory(uri);
     File resourceRevisionDirectory = new File(resourceDirectory, Long.toString(uri.getVersion()));
 
@@ -241,7 +242,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *          the resource uri
    * @return the parent directory
    */
-  protected File uriToDirectory(ResourceURI uri) throws IOException {
+  protected File uriToDirectory(ResourceURI uri)
+      throws ContentRepositoryException, IOException {
     StringBuffer path = new StringBuffer(repositorySiteRoot.getAbsolutePath());
     if (uri.getType() == null)
       throw new IllegalArgumentException("Resource uri has no type");
@@ -308,7 +310,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadResource(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @Override
-  protected InputStream loadResource(ResourceURI uri) throws IOException {
+  protected InputStream loadResource(ResourceURI uri)
+      throws ContentRepositoryException, IOException {
     if (uri.getType() == null) {
       uri.setType(index.getType(uri));
     }
@@ -326,7 +329,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   protected InputStream loadResourceContent(ResourceURI uri, Language language)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
     File resourceFile = uriToFile(uri);
     if (resourceFile == null)
       return null;
@@ -358,7 +361,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   protected void deleteResource(ResourceURI uri, long[] revisions)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
 
     // Remove the resources
     File resourceDir = uriToDirectory(uri);
@@ -388,10 +391,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.entwine.weblounge.common.content.resource.Resource)
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.entwine.weblounge.common.content.Resource)
    */
   @Override
-  protected Resource<?> storeResource(Resource<?> resource) throws IOException {
+  protected Resource<?> storeResource(Resource<?> resource)
+      throws ContentRepositoryException, IOException {
     File resourceUrl = uriToFile(resource.getURI());
     InputStream is = null;
     OutputStream os = null;
@@ -418,7 +422,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   protected ResourceContent storeResourceContent(ResourceURI uri,
-      ResourceContent content, InputStream is) throws IOException {
+      ResourceContent content, InputStream is)
+          throws ContentRepositoryException, IOException {
 
     if (is == null)
       return content;
@@ -450,7 +455,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   protected void deleteResourceContent(ResourceURI uri, ResourceContent content)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
     File contentFile = uriToContentFile(uri, content);
     if (contentFile == null)
       throw new IOException("Resource content " + contentFile + " does not exist");

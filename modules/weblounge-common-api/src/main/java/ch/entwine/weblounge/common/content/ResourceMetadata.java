@@ -81,6 +81,15 @@ public interface ResourceMetadata<T> {
   List<T> getValues();
 
   /**
+   * Returns the first value of the available values or <code>null</code> if no
+   * value is available.
+   * 
+   * @return the first value
+   * @see #getValues()
+   */
+  T getValue();
+
+  /**
    * Removes all values currently in the metadata container.
    */
   void clear();

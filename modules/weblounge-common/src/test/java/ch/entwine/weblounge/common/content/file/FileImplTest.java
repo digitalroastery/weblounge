@@ -77,9 +77,6 @@ public class FileImplTest {
   /** The file type */
   protected String fileType = "File";
 
-  /** Indexed */
-  protected boolean isIndexed = true;
-
   /** Anchor file */
   protected boolean isPromoted = true;
 
@@ -162,7 +159,6 @@ public class FileImplTest {
   public void setUp() throws Exception {
     setupPrerequisites();
     file = new FileResourceImpl(fileURI);
-    file.setIndexed(isIndexed);
     file.setPromoted(isPromoted);
     file.setCoverage(germanCoverage, german);
     file.setCoverage(frenchCoverage, french);
@@ -293,16 +289,6 @@ public class FileImplTest {
   @Test
   public void testIsPromoted() {
     assertEquals(isPromoted, file.isPromoted());
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#isIndexed()}
-   * .
-   */
-  @Test
-  public void testIsIndexed() {
-    assertEquals(isIndexed, file.isIndexed());
   }
 
   /**

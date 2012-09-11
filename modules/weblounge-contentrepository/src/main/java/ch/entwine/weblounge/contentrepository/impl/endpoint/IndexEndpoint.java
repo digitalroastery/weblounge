@@ -95,10 +95,10 @@ public class IndexEndpoint extends ContentRepositoryEndpoint {
     result.append(" readonly=\"").append(repository.isReadOnly() ? "true" : "false").append("\"");
     result.append(">");
 
-    result.append("<resources>").append(repository.getResourceCount()).append("</resources>");
-    result.append("<revisions>").append(repository.getVersionCount() - repository.getResourceCount()).append("</revisions>");
-
     try {
+      result.append("<resources>").append(repository.getResourceCount()).append("</resources>");
+      result.append("<revisions>").append(repository.getVersionCount() - repository.getResourceCount()).append("</revisions>");
+
       q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPreferredVersion(Resource.LIVE);
       result.append("<pages>").append(repository.find(q).getDocumentCount()).append("</pages>");
       q = new SearchQueryImpl(site).withTypes(FileResource.TYPE).withPreferredVersion(Resource.LIVE);

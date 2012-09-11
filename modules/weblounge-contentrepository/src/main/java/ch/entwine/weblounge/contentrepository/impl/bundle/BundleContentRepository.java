@@ -222,16 +222,13 @@ public class BundleContentRepository extends AbstractContentRepository implement
       throws ContentRepositoryException {
     if (uri == null)
       throw new IllegalArgumentException("Page uri cannot be null");
-    try {
-      List<ResourceURI> uris = new ArrayList<ResourceURI>();
-      long[] versions = index.getRevisions(uri);
-      for (long version : versions) {
-        uris.add(new ResourceURIImpl(uri, version));
-      }
-      return uris.toArray(new ResourceURI[uris.size()]);
-    } catch (IOException e) {
-      throw new ContentRepositoryException(e);
+
+    List<ResourceURI> uris = new ArrayList<ResourceURI>();
+    long[] versions = index.getRevisions(uri);
+    for (long version : versions) {
+      uris.add(new ResourceURIImpl(uri, version));
     }
+    return uris.toArray(new ResourceURI[uris.size()]);
 
   }
 
@@ -397,10 +394,11 @@ public class BundleContentRepository extends AbstractContentRepository implement
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadPage()
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadResource(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @Override
-  protected InputStream loadResource(ResourceURI uri) throws IOException {
+  protected InputStream loadResource(ResourceURI uri)
+      throws ContentRepositoryException, IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path
@@ -433,7 +431,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
    */
   @Override
   protected InputStream loadResourceContent(ResourceURI uri, Language language)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path

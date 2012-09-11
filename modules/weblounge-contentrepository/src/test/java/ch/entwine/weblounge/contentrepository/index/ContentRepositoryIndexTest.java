@@ -43,9 +43,7 @@ import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
@@ -53,10 +51,6 @@ import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.IdIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.PathIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.URIIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.VersionIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -68,8 +62,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -174,17 +166,6 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Tests if all files have been created.
-   */
-  @Test
-  public void testFilesystem() {
-    assertTrue(new File(structuralIndexRootDirectory, IdIndex.ID_IDX_NAME).exists());
-    assertTrue(new File(structuralIndexRootDirectory, PathIndex.PATH_IDX_NAME).exists());
-    assertTrue(new File(structuralIndexRootDirectory, URIIndex.URI_IDX_NAME).exists());
-    assertTrue(new File(structuralIndexRootDirectory, VersionIndex.VERSION_IDX_NAME).exists());
-  }
-
-  /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#add(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
@@ -193,9 +174,9 @@ public class ContentRepositoryIndexTest {
   public void testAdd() {
     try {
       idx.add(page);
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
       idx.add(file);
-      assertEquals(2, idx.size());
+      assertEquals(2, idx.getResourceCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -243,9 +224,9 @@ public class ContentRepositoryIndexTest {
 
     try {
       idx.add(page);
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
       idx.update(page);
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -272,9 +253,9 @@ public class ContentRepositoryIndexTest {
       idx.add(page);
       idx.add(file);
       idx.delete(page.getURI());
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
       idx.delete(file.getURI());
-      assertEquals(0, idx.size());
+      assertEquals(0, idx.getResourceCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -329,7 +310,7 @@ public class ContentRepositoryIndexTest {
     try {
       String id = idx.add(page).getIdentifier();
       idx.move(page.getURI(), newPath);
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
       assertEquals(id, idx.getIdentifier(new PageURIImpl(site, newPath)));
     } catch (Throwable t) {
       t.printStackTrace();
@@ -347,7 +328,7 @@ public class ContentRepositoryIndexTest {
     try {
       idx.add(page);
       idx.clear();
-      assertEquals(0, idx.size());
+      assertEquals(0, idx.getResourceCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -406,9 +387,9 @@ public class ContentRepositoryIndexTest {
   @Test
   public void testSize() {
     try {
-      assertEquals(0, idx.size());
+      assertEquals(0, idx.getResourceCount());
       idx.add(page);
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -450,7 +431,7 @@ public class ContentRepositoryIndexTest {
         ResourceURI uri = idx.add(p);
         assertEquals(id, uri.getIdentifier());
         assertEquals(path, uri.getPath());
-        assertEquals(i + 1, idx.size());
+        assertEquals(i + 1, idx.getResourceCount());
       }
 
       // Test if everything can be found
@@ -463,33 +444,6 @@ public class ContentRepositoryIndexTest {
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
-    }
-
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getIndexVersion()}
-   * .
-   */
-  @Test
-  public void testIndexVersion() {
-    assertEquals(VersionedContentRepositoryIndex.INDEX_VERSION, idx.getIndexVersion());
-
-    // Overwrite the version number with 0, which is an invalid value
-    try {
-      idx.close();
-
-      File idIdxFile = new File(PathUtils.concat(idxRoot.getAbsolutePath(), "structure"), IdIndex.ID_IDX_NAME);
-      RandomAccessFile index = new RandomAccessFile(idIdxFile, "rwd");
-      index.seek(0);
-      index.writeInt(0);
-      index.close();
-
-      idx = new FileSystemContentRepositoryIndex(site, idxRoot, serializer);
-      assertEquals(-1, idx.getIndexVersion());
-    } catch (IOException e) {
-      fail("Error writing version to index");
     }
 
   }

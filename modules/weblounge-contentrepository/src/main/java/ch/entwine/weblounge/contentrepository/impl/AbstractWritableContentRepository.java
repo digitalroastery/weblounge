@@ -1305,11 +1305,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @param resource
    *          the resource content
+   * @throws ContentRepositoryException
+   *           if updating the index fails
    * @throws IOException
    *           if the resource can't be written to the storage
    */
   protected abstract Resource<?> storeResource(Resource<?> resource)
-      throws IOException;
+      throws ContentRepositoryException, IOException;
 
   /**
    * Writes the resource content to the repository storage.
@@ -1320,11 +1322,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *          the resource content
    * @param is
    *          the input stream
+   * @throws ContentRepositoryException
+   *           if updating the content repository index fails
    * @throws IOException
    *           if the resource can't be written to the storage
    */
   protected abstract ResourceContent storeResourceContent(ResourceURI uri,
-      ResourceContent content, InputStream is) throws IOException;
+      ResourceContent content, InputStream is)
+          throws ContentRepositoryException, IOException;
 
   /**
    * Deletes the indicated revisions of resource <code>uri</code> from the
@@ -1335,9 +1340,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *          the resource uri
    * @param revisions
    *          the revisions to remove
+   * @throws ContentRepositoryException
+   *           if deleting the resource from the index fails
+   * @throws IOException
+   *           if removing the resource from disk fails
    */
   protected abstract void deleteResource(ResourceURI uri, long[] revisions)
-      throws IOException;
+      throws ContentRepositoryException, IOException;
 
   /**
    * Deletes the resource content from the repository storage.
@@ -1346,11 +1355,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *          the resource uri
    * @param content
    *          the resource content
+   * @throws ContentRepositoryException
+   *           if deleting the resource content from the index fails
    * @throws IOException
    *           if the resource can't be written to the storage
    */
   protected abstract void deleteResourceContent(ResourceURI uri,
-      ResourceContent content) throws IOException;
+      ResourceContent content) throws ContentRepositoryException, IOException;
 
   /**
    * This class is used as a way to keep track of what has been added to the

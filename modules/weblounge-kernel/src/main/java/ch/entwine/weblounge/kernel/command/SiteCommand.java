@@ -217,11 +217,16 @@ public class SiteCommand {
     }
 
     // Pages and revisions
-    ContentRepository repository = site.getContentRepository();
-    long pages = repository != null ? repository.getResourceCount() : -1;
-    pad("pages", (pages >= 0 ? Long.toString(pages) : "n/a"));
-    long revisions = repository != null ? repository.getVersionCount() : -1;
-    pad("revisions", (revisions >= 0 ? Long.toString(revisions) : "n/a"));
+    try {
+      ContentRepository repository = site.getContentRepository();
+      long pages = repository != null ? repository.getResourceCount() : -1;
+      pad("pages", (pages >= 0 ? Long.toString(pages) : "n/a"));
+      long revisions = repository != null ? repository.getVersionCount() : -1;
+      pad("revisions", (revisions >= 0 ? Long.toString(revisions) : "n/a"));
+    } catch (ContentRepositoryException e) {
+      System.err.println("Error trying to access the content repository");
+      e.printStackTrace(System.err);
+    }
   }
 
   /**

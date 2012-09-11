@@ -250,11 +250,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   public boolean exists(ResourceURI uri) throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
-    try {
-      return index.exists(uri);
-    } catch (IOException e) {
-      throw new ContentRepositoryException(e);
-    }
+    return index.exists(uri);
   }
 
   /**
@@ -266,11 +262,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
-    try {
-      return index.existsInAnyVersion(uri);
-    } catch (IOException e) {
-      throw new ContentRepositoryException(e);
-    }
+    return index.existsInAnyVersion(uri);
   }
 
   /**
@@ -282,16 +274,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
-    try {
-      ResourceURI uri = new GeneralResourceURIImpl(getSite(), null, resourceId);
-      if (!index.exists(uri))
-        return null;
-      uri.setType(index.getType(uri));
-      uri.setPath(index.getPath(uri));
-      return uri;
-    } catch (IOException e) {
-      throw new ContentRepositoryException(e);
-    }
+    ResourceURI uri = new GeneralResourceURIImpl(getSite(), null, resourceId);
+    if (!index.exists(uri))
+      return null;
+    uri.setType(index.getType(uri));
+    uri.setPath(index.getPath(uri));
+    return uri;
   }
 
   /**
@@ -332,28 +320,17 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throw new IllegalStateException("Content repository is not connected");
 
     // Check if the resource is available
-    try {
-      if (!index.exists(uri)) {
-        return null;
-      }
-    } catch (IOException e) {
-      logger.error("Error looking up uri {}: {}", uri, e.getMessage());
-      throw new ContentRepositoryException(e);
-    }
+    if (!index.exists(uri))
+      return null;
 
     // Make sure we have the correct resource type
-    try {
-      if (uri.getType() == null) {
-        uri.setType(index.getType(uri));
-      } else if (!uri.getType().equals(index.getType(uri))) {
-        return null;
-      }
-      if (uri.getIdentifier() == null && StringUtils.isNotBlank(uri.getPath())) {
-        uri.setIdentifier(index.getIdentifier(uri));
-      }
-    } catch (IOException e) {
-      logger.error("Error looking up type for {}: {}", uri, e.getMessage());
-      throw new ContentRepositoryException(e);
+    if (uri.getType() == null) {
+      uri.setType(index.getType(uri));
+    } else if (!uri.getType().equals(index.getType(uri))) {
+      return null;
+    }
+    if (uri.getIdentifier() == null && StringUtils.isNotBlank(uri.getPath())) {
+      uri.setIdentifier(index.getIdentifier(uri));
     }
 
     // Load the resource
@@ -435,17 +412,13 @@ public abstract class AbstractContentRepository implements ContentRepository {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
-    try {
-      long[] revisions = index.getRevisions(uri);
-      ResourceURI[] uris = new ResourceURI[revisions.length];
-      int i = 0;
-      for (long r : revisions) {
-        uris[i++] = new ResourceURIImpl(uri, r);
-      }
-      return uris;
-    } catch (IOException e) {
-      throw new ContentRepositoryException(e);
+    long[] revisions = index.getRevisions(uri);
+    ResourceURI[] uris = new ResourceURI[revisions.length];
+    int i = 0;
+    for (long r : revisions) {
+      uris[i++] = new ResourceURIImpl(uri, r);
     }
+    return uris;
   }
 
   /**
@@ -453,7 +426,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @see ch.entwine.weblounge.common.repository.ContentRepository#getResourceCount()
    */
-  public long getResourceCount() {
+  public long getResourceCount() throws ContentRepositoryException {
     return index != null ? index.getResourceCount() : -1;
   }
 
@@ -462,7 +435,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @see ch.entwine.weblounge.common.repository.ContentRepository#getVersionCount()
    */
-  public long getVersionCount() {
+  public long getVersionCount() throws ContentRepositoryException {
     return index != null ? index.getRevisionCount() : -1;
   }
 
@@ -593,10 +566,13 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * Lists the resources in the content repository.
    * 
    * @return the list of resources
+   * @throws ContentRepositoryException
+   *           if loading metadata from the repository fails
    * @throws IOException
    *           if listing the resources fails
    */
-  protected abstract Collection<ResourceURI> listResources() throws IOException;
+  protected abstract Collection<ResourceURI> listResources()
+      throws ContentRepositoryException, IOException;
 
   /**
    * Loads and returns the resource from the repository.
@@ -604,11 +580,13 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @param uri
    *          the resource uri
    * @return the resource
+   * @throws ContentRepositoryException
+   *           if loading metadata from the repository fails
    * @throws IOException
    *           if the resource could not be loaded
    */
   protected abstract InputStream loadResource(ResourceURI uri)
-      throws IOException;
+      throws ContentRepositoryException, IOException;
 
   /**
    * Returns the input stream to the resource content identified by
@@ -620,11 +598,13 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @param language
    *          the content language
    * @return the resource contents
+   * @throws ContentRepositoryException
+   *           if loading metadata from the repository fails
    * @throws IOException
    *           if opening the stream to the resource failed
    */
   protected abstract InputStream loadResourceContent(ResourceURI uri,
-      Language language) throws IOException;
+      Language language) throws ContentRepositoryException, IOException;
 
   /**
    * Loads the repository index. Depending on the concrete implementation, the
