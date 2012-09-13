@@ -4,7 +4,8 @@ steal.plugins('jqueryui/dialog',
 		'jqueryui/droppable',
 		'jqueryui/resizable',
 		'jqueryui/mouse',
-        'scripts/bootstrap-tabs')
+        'scripts/bootstrap')
+.css('bootstrap')
 .models('../../models/workbench',
 		'../../models/pagelet')
 .resources('trimpath-template')
@@ -98,10 +99,8 @@ steal.plugins('jqueryui/dialog',
 				OK: $.proxy(function () {
 					this.editorDialog.find("form#wbl-validate").submit();
 					if(!this.editorDialog.find("form#wbl-validate").valid()) { // form is invalid
-                        $('.ui-dialog-buttonpane').prepend('<p>Bitte alle Pflichtfelder ausfuellen</p>');
+                        steal.dev.warn("The dialog contains missing fields!");
                         return;
-                    } else { // form is valid
-                        $('.ui-dialog-buttonpane').empty('p'); 
                     };
 					var newPagelet = this._updatePageletValues(pagelet);
 					
@@ -118,8 +117,7 @@ steal.plugins('jqueryui/dialog',
 					this._deletePagelet();
 				}
 				this.editorDialog.dialog('destroy');
-                steal.dev.log("close dialog");
-                $('.ui-dialog-buttonpane').emtpy('p');
+                //steal.dev.log("close dialog");
 			}, this),
 			open: $.proxy(function(event, ui) {
 				this.editorDialog.trigger('pageletEditorOpen', {
@@ -135,6 +133,7 @@ steal.plugins('jqueryui/dialog',
                     $(this).tab('show');
                 });
                 $('#tabs a:first').tab('show');
+                $('input.required').append('<a href="#" rel="tooltip" title="Pflichtfeld" class="star">*</a>');
 			}
 		});
         // Open the dialog
