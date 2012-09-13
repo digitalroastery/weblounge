@@ -1,5 +1,6 @@
 #wbl-pageleteditor input.error {
     border: 1px solid red;
+    background-color: rgba(255, 0, 0, 0.1)
  }
 
 #wbl-pageleteditor label.error {
@@ -7,9 +8,10 @@
     float: none;
     text-align: left;
     width: auto;
+    display: none !important
 }
 
 #wbl-pageleteditor input.error,
 #wbl-pageleteditor textarea.error {
-	border: 2px solid red;
+	border: 1px solid red;
 }

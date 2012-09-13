@@ -133,7 +133,6 @@ steal.plugins('jqueryui/dialog',
                     $(this).tab('show');
                 });
                 $('#tabs a:first').tab('show');
-                $('input.required').append('<a href="#" rel="tooltip" title="Pflichtfeld" class="star">*</a>');
 			}
 		});
         // Open the dialog
