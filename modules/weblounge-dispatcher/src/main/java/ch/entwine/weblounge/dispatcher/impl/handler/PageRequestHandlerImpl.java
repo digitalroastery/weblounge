@@ -295,11 +295,11 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         CacheTagSet cacheTags = createPrimaryCacheTags(request);
 
         if (action == null) {
-          long validTime = Renderer.DEFAULT_VALID_TIME;
-          long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+          long expirationTime = Renderer.DEFAULT_VALID_TIME;
+          long revalidationTime = Renderer.DEFAULT_RECHECK_TIME;
 
           // Check if the page is already part of the cache
-          if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
+          if (response.startResponse(cacheTags.getTags(), expirationTime, revalidationTime)) {
             logger.debug("Page handler answered request for {} from cache", request.getUrl());
             return true;
           }
