@@ -151,14 +151,14 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       // Check if the page is already part of the cache. If so, our task is
       // already done!
       if (!noCache && request.getVersion() == Resource.LIVE) {
-        long validTime = action.getValidTime();
-        long recheckTime = action.getRecheckTime();
+        long expirationTime = action.getValidTime();
+        long revalidationTime = action.getRecheckTime();
 
         // Create the set of tags that identify the request output
         CacheTagSet cacheTags = createCacheTags(request, action);
 
         // Check if the page is already part of the cache
-        if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
+        if (response.startResponse(cacheTags.getTags(), expirationTime, revalidationTime)) {
           logger.debug("Action answered request for {} from cache", request.getUrl());
           return true;
         }

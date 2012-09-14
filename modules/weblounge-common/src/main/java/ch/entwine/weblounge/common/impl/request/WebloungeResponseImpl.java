@@ -427,7 +427,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.entwine.weblounge.common.request.WebloungeResponse#startResponse(ch.entwine.weblounge.common.request.CacheTag[],
    *      long, long)
    */
-  public boolean startResponse(CacheTag[] tags, long validTime, long recheckTime)
+  public boolean startResponse(CacheTag[] tags, long expirationTime, long revalidationTime)
       throws IllegalStateException {
     if (!isValid || cache == null)
       return false;
@@ -438,7 +438,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
       throw new IllegalStateException("The response is already being cached");
 
     // Is the response in the cache?
-    CacheHandle hdl = cache.startResponse(tags, request.get(), this, validTime, recheckTime);
+    CacheHandle hdl = cache.startResponse(tags, request.get(), this, expirationTime, revalidationTime);
     if (hdl == null)
       return true;
 
@@ -529,13 +529,13 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * 
    * @see ch.entwine.weblounge.common.request.WebloungeResponse#setClientRevalidationTime(long)
    */
-  public void setClientRevalidationTime(long recheckTime) {
+  public void setClientRevalidationTime(long revalidationTime) {
     if (cacheHandle == null)
       return;
     CacheHandle hdl = cacheHandle.get();
     if (hdl == null)
       return;
-    hdl.setClientRevalidationTime(Math.min(recheckTime, hdl.getClientRevalidationTime()));
+    hdl.setClientRevalidationTime(Math.min(revalidationTime, hdl.getClientRevalidationTime()));
   }
 
   /**
@@ -557,16 +557,16 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * 
    * @see ch.entwine.weblounge.common.request.WebloungeResponse#setCacheExpirationTime(long)
    */
-  public void setCacheExpirationTime(long validTime) {
+  public void setCacheExpirationTime(long expirationTime) {
     if (cacheHandle == null)
       return;
     CacheHandle hdl = cacheHandle.get();
     if (hdl == null)
       return;
-    hdl.setCacheExpirationTime(Math.min(validTime, hdl.getCacheExpirationTime()));
+    hdl.setCacheExpirationTime(Math.min(expirationTime, hdl.getCacheExpirationTime()));
 
     // The recheck time can't be longer than the valid time
-    setClientRevalidationTime(validTime);
+    setClientRevalidationTime(expirationTime);
   }
 
   /**

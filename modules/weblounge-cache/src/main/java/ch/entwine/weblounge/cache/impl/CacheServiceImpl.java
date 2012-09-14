@@ -352,7 +352,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
@@ -534,9 +533,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *      ch.entwine.weblounge.common.request.WebloungeResponse, long, long)
    */
   public CacheHandle startResponse(CacheTag[] uniqueTags,
-      WebloungeRequest request, WebloungeResponse response, long validTime,
-      long recheckTime) {
-    CacheHandle hdl = new TaggedCacheHandle(uniqueTags, validTime, recheckTime);
+      WebloungeRequest request, WebloungeResponse response, long expirationTime,
+      long revalidationTime) {
+    CacheHandle hdl = new TaggedCacheHandle(uniqueTags, expirationTime, revalidationTime);
     return startResponse(hdl, request, response);
   }
 

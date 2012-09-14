@@ -220,14 +220,14 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     // Check if the page is already part of the cache. If so, our task is
     // already done!
     if (!noCache) {
-      long validTime = Renderer.DEFAULT_VALID_TIME;
-      long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+      long expirationTime = Renderer.DEFAULT_VALID_TIME;
+      long revalidationTime = Renderer.DEFAULT_RECHECK_TIME;
 
       // Create the set of tags that identify the request output
       CacheTagSet cacheTags = createPrimaryCacheTags(request);
 
       // Check if the page is already part of the cache
-      if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
+      if (response.startResponse(cacheTags.getTags(), expirationTime, revalidationTime)) {
         logger.debug("Feed handler answered request for {} from cache", request.getUrl());
         return true;
       }
