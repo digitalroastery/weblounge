@@ -655,7 +655,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     CacheEntryKey key = (CacheEntryKey) element.getKey();
 
     long clientCacheDate = request.getDateHeader("If-Modified-Since");
-    long expirationDate = element.getCreationTime() + entry.getClientRevalidationTime();
+    long expirationDate = System.currentTimeMillis() + entry.getClientRevalidationTime();
+
     long revalidationTimeInSeconds = entry.getClientRevalidationTime() / 1000;
     String eTag = request.getHeader("If-None-Match");
 
