@@ -24,6 +24,12 @@ steal.plugins(
 				$(elem).css('top', top + 45 + 'px');
 			}
 		});
+
+		// Override the global defaults of the validation plugin
+		$.validator.setDefaults({
+		    ignore: ""
+		});
+
 	});
 	
 });
