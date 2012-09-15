@@ -84,6 +84,7 @@ public class PageletTag extends WebloungeTag {
    * @param value
    *          the renderer to be used
    */
+  @Override
   public void setId(String value) {
     this.rendererId = value;
   }
@@ -93,6 +94,7 @@ public class PageletTag extends WebloungeTag {
    * 
    * @return either EVAL_PAGE or SKIP_PAGE
    */
+  @Override
   public int doEndTag() throws JspException {
     Language language = request.getLanguage();
 
@@ -116,10 +118,6 @@ public class PageletTag extends WebloungeTag {
             }
           }
         }
-
-        // Add cache support
-        response.addTag("webl:module", pagelet.getModule());
-        response.addTag("webl:renderer", pagelet.getIdentifier());
 
         // Finally, render the pagelet
         request.setAttribute(WebloungeRequest.PAGELET, pagelet);

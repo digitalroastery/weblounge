@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.page.Script;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
@@ -293,6 +294,15 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException {
+
+    // Adjust revalidation and expiration time
+    response.setClientRevalidationTime(getRecheckTime());
+    response.setCacheExpirationTime(getValidTime());
+
+    // Add cache support
+    response.addTag(CacheTag.Module, getModule().getIdentifier());
+    response.addTag(CacheTag.Renderer, getIdentifier());
+
     URL renderer = renderers.get(RendererType.Page.toString().toLowerCase());
     includeJSP(request, response, renderer);
   }

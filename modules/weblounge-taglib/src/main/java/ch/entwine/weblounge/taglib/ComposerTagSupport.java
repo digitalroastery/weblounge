@@ -739,11 +739,6 @@ public class ComposerTagSupport extends WebloungeTag {
       writer.flush();
 
       response.addTag(CacheTag.Position, Integer.toString(position));
-      response.addTag(CacheTag.Module, pagelet.getModule());
-      response.addTag(CacheTag.Renderer, pagelet.getIdentifier());
-
-      response.setClientRevalidationTime(renderer.getRecheckTime());
-      response.setCacheExpirationTime(renderer.getValidTime());
 
       // Pass control to callback
       int beforePageletResult = beforePagelet(pagelet, position, writer, isGhostContent);

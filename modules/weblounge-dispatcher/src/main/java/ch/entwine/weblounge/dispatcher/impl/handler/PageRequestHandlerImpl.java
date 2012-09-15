@@ -355,13 +355,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       else
         response.setContentType("text/html");
 
-      // Add additional cache tags
-      response.addTag(CacheTag.Renderer, template.getIdentifier());
-
-      // Configure valid and recheck time according to the template
-      response.setClientRevalidationTime(template.getRecheckTime());
-      response.setCacheExpirationTime(template.getValidTime());
-
       // Set the Expires header
       long expires = response.getCacheExpirationTime();
       if (expires > 0) {

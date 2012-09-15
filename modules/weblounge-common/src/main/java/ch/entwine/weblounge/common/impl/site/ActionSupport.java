@@ -35,7 +35,6 @@ import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
-import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
@@ -601,13 +600,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
 
     if (pagelet != null)
       request.setAttribute(WebloungeRequest.PAGELET, pagelet);
-
-    // Adjust the maximum valid and recheck time and add cache tags
-    response.setCacheExpirationTime(renderer.getValidTime());
-    response.setClientRevalidationTime(renderer.getRecheckTime());
-    if (renderer.getModule() != null)
-      response.addTag(CacheTag.Module, renderer.getModule().getIdentifier());
-    response.addTag(CacheTag.Renderer, renderer.getIdentifier());
 
     // Include renderer in response
     try {
