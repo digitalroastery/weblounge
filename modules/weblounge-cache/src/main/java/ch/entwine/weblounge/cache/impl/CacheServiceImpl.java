@@ -576,7 +576,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     Element element = cache.get(new CacheEntryKey(handle.getKey()));
 
     if (element != null) {
-      long expirationTime = element.getCreationTime() + element.getTimeToLive() * 1000;
+      long expirationTime = element.getExpirationTime();
       if (expirationTime < System.currentTimeMillis()) {
         logger.debug("Cache element {} of cache {} has expired", request, id);
         cache.remove(handle.getKey());
