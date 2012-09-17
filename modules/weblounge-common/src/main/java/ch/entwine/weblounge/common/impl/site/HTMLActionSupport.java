@@ -97,9 +97,6 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   /** The error messages */
   protected List<String> errorMessages = null;
 
-  /** The runtime head elements */
-  // protected Set<HTMLHeadElement> runtimeHeaders = null;
-
   /** Flag to indicate that output has been written to the client */
   protected boolean outputStarted = false;
 
@@ -122,7 +119,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    *          the renderer identifier
    */
   public HTMLActionSupport(String renderer) {
-    flavors.add(RequestFlavor.HTML);
+    addFlavor(RequestFlavor.HTML);
     stageRendererId = renderer;
   }
 
