@@ -86,7 +86,6 @@ steal.plugins('jqueryui/dialog',
 		.dialog({
 			title: 'Pagelet bearbeiten: ' + pageletName,
 			width: 500,
-			height: 400,
 			modal: true,
 			autoOpen: false,
 			closeOnEscape: false,
@@ -98,8 +97,10 @@ steal.plugins('jqueryui/dialog',
 				},
 				OK: $.proxy(function () {
 					this.editorDialog.find("form#wbl-validate").submit();
-					if(!this.editorDialog.find("form#wbl-validate").valid()) { // form is invalid
-                        steal.dev.warn("The dialog contains missing fields!");
+					if(!this.editorDialog.find("form#wbl-validate").valid()) {
+                        steal.dev.warn("The dialog contains invalid fields!");
+                        // Show error msg and prevent dialog from closing
+                        $('.ui-dialog-buttonpane p.error').removeClass('hidden');
                         return;
                     };
 					var newPagelet = this._updatePageletValues(pagelet);
@@ -116,18 +117,36 @@ steal.plugins('jqueryui/dialog',
 				if(isNew == true) {
 					this._deletePagelet();
 				}
+                //remove error msg
+                $('.ui-dialog-buttonpane p.error').remove();
 				this.editorDialog.dialog('destroy');
-                //steal.dev.log("close dialog");
 			}, this),
 			open: $.proxy(function(event, ui) {
 				this.editorDialog.trigger('pageletEditorOpen', {
 					language: this.options.composer.language,
 					runtime: this.options.composer.runtime
 				});
+                // Disable submit button and show error msg if form is not valid
+                $('form#wbl-validate').bind('change keyup', function() {
+                    if($(this).validate().checkForm()) {
+                        $('button.primary').button( "option", "disabled", false);
+                        $('.ui-dialog-buttonpane p.error').addClass('hidden');
+                    } else {
+                        $('button.primary').button( "option", "disabled", true);
+                        $('.ui-dialog-buttonpane p.error').removeClass('hidden');
+                    }
+                });
+                // Disable submit button on load
+                if($('form#wbl-validate').validate().checkForm()) {
+                    $('button.primary').button( "option", "disabled", false);
+                } else {
+                    $('button.primary').button( "option", "disabled", true);
+                }
+
 			}, this),
 			create: function(event, ui) {
 				$("body").css({ overflow: 'hidden' });
-                $('.ui-dialog-buttonpane').find('.ui-button:first').addClass('danger').end().find('.ui-button:last').addClass('primary');
+                $('.ui-dialog-buttonpane').append('<p class="error hidden">Invalid fields</p>').find('.ui-button:first').addClass('danger').end().find('.ui-button:last').addClass('primary');
                 $('#tabs a').click(function (e) {
                     e.preventDefault();
                     $(this).tab('show');
