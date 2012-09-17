@@ -198,10 +198,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
             serveXML(action, request, response);
           else if (action.supportsFlavor(RequestFlavor.JSON) || action instanceof JSONAction)
             serveJSON(action, request, response);
-          else {
-            logger.warn("Unable to serve {}: flavor mismatch");
-            DispatchUtils.sendError(HttpServletResponse.SC_NOT_FOUND, request, response);
-          }
+          else
+            serveGeneric(action, request, response);
       }
 
     } finally {
@@ -380,7 +378,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   }
 
   /**
-   * This method has the action serve the <code>XML</code> flavor.
+   * This method has the action serve the <code>JSON</code> flavor.
    * 
    * @param action
    *          the action
@@ -399,6 +397,41 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           ((JSONAction) action).startJSON(request, response);
         }
       }
+    } catch (EOFException e) {
+      logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
+    } catch (IOException e) {
+      logger.debug("Error writing action output to client: {}", e.getMessage());
+    } catch (ActionException e) {
+      logger.error("Error processing action '{}' for {}: {}", new Object[] {
+          action,
+          request.getUrl(),
+          e.getMessage() });
+      DispatchUtils.sendError(e.getStatusCode(), request, response);
+    } catch (Throwable e) {
+      logger.error("Error processing action '{}' for {}", action, request.getUrl());
+      logger.error(e.getMessage(), e);
+      DispatchUtils.sendInternalError(request, response);
+    }
+  }
+
+  /**
+   * This method will call
+   * {@link Action#configure(WebloungeRequest, WebloungeResponse, RequestFlavor)}
+   * , then {@link Action#startResponse(WebloungeRequest, WebloungeResponse)}
+   * and be done with it.
+   * 
+   * @param action
+   *          the action
+   * @param request
+   *          the http request
+   * @param response
+   *          the http response
+   */
+  private void serveGeneric(Action action, WebloungeRequest request,
+      WebloungeResponse response) {
+    try {
+      action.configure(request, response, RequestFlavor.ANY);
+      action.startResponse(request, response);
     } catch (EOFException e) {
       logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
     } catch (IOException e) {
