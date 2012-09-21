@@ -31,9 +31,9 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -94,7 +94,7 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
     // Get existing fulltext entries
     Collection<String> fulltext = (Collection<String>) get(fulltextFieldName);
     if (fulltext == null)
-      fulltext = new HashSet<String>();
+      fulltext = new ArrayList<String>();
 
     // Language neutral elements
     for (Object value : item.getValues()) {
@@ -116,8 +116,8 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
       String localizedFieldName = MessageFormat.format(localizedFulltextFieldName, language.getIdentifier());
       Collection<String> localizedFulltext = (Collection<String>) get(localizedFieldName);
       if (fulltext == null)
-        fulltext = new HashSet<String>();
-      List<?> values = item.getLocalizedValues().get(language);
+        fulltext = new ArrayList<String>();
+      Collection<?> values = item.getLocalizedValues().get(language);
       for (Object value : values) {
         if (value.getClass().isArray()) {
           Object[] fieldValues = (Object[]) value;
