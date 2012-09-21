@@ -354,7 +354,7 @@ public class SiteCommand {
     ContentRepository repository = site.getContentRepository();
     SearchQuery query = new SearchQueryImpl(site);
     query.withVersion(Resource.LIVE);
-    query.withText(text.toString());
+    query.withFulltext(text.toString());
 
     // Is it a page?
     Formatter formatter = null;
