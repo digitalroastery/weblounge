@@ -88,6 +88,21 @@ public interface SearchQuery {
   int getOffset();
 
   /**
+   * Enables boosting based on creation/modification date of resources so that
+   * recent documents are ranked higher than old ones.
+   * 
+   * @return the search query
+   */
+  SearchQuery withRececyPriority();
+
+  /**
+   * Returns whether priority boosting has been enabled.
+   * 
+   * @return <code>true</code> if recent documents are ranked higher
+   */
+  boolean getRecencyPriority();
+
+  /**
    * Return the resources with the given identifier.
    * 
    * @param resourceId

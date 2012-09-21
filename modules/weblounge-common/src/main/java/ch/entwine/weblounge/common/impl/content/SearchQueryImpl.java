@@ -184,6 +184,9 @@ public class SearchQueryImpl implements SearchQuery {
   /** The query limit */
   protected int limit = -1;
 
+  /** True to boost more recent documents */
+  protected boolean recencyBoost = false;
+
   /** True when using faceted search */
   protected boolean subjectFacetEnabled = false;
 
@@ -270,6 +273,27 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public Site getSite() {
     return site;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withRececyPriority()
+   */
+  @Override
+  public SearchQuery withRececyPriority() {
+    this.recencyBoost = true;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getRecencyPriority()
+   */
+  @Override
+  public boolean getRecencyPriority() {
+    return recencyBoost;
   }
 
   /**

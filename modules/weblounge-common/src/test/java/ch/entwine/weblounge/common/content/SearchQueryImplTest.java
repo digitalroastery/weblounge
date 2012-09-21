@@ -613,4 +613,17 @@ public class SearchQueryImplTest {
     assertEquals(propertyValue, query.getProperties().get(propertyName));
   }
 
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withRecencyPriority()
+   * .
+   */
+  @Test
+  public void testWithRecencyPriority() {
+    query = new SearchQueryImpl(site);
+    assertFalse(query.getRecencyPriority());
+    query.withRececyPriority();
+    assertTrue(query.getRecencyPriority());
+  }
+
 }
