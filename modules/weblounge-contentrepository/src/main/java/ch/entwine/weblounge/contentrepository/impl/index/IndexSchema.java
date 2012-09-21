@@ -202,8 +202,8 @@ public interface IndexSchema {
   /** Accumulative text field targeted for frontend use */
   String TEXT = "text";
 
-  /** The solr date format string tag. */
-  String SOLR_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+  /** The date format */
+  String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
   /** The solr highlighting tag to use. */
   String HIGHLIGHT_MATCH = "b";
