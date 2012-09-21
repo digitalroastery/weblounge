@@ -146,14 +146,14 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
 
     // Language dependent header fields
     for (Language l : resource.languages()) {
-      addField(DESCRIPTION, resource.getDescription(l, true), true, true);
-      addField(getLocalizedFieldName(DESCRIPTION_LOCALIZED, l), resource.getDescription(l, true), false, true);
+      addField(DESCRIPTION, resource.getDescription(l, true), true, false);
+      addField(getLocalizedFieldName(DESCRIPTION_LOCALIZED, l), resource.getDescription(l, true), false, false);
       addField(COVERAGE, resource.getCoverage(l, true), true, false);
       addField(getLocalizedFieldName(COVERAGE_LOCALIZED, l), resource.getCoverage(l, true), false, false);
       addField(RIGHTS, resource.getRights(l, true), true, false);
       addField(getLocalizedFieldName(RIGHTS_LOCALIZED, l), resource.getRights(l, true), false, false);
-      addField(TITLE, resource.getTitle(l, true), true, true);
-      addField(getLocalizedFieldName(TITLE_LOCALIZED, l), resource.getTitle(l, true), false, true);
+      addField(TITLE, resource.getTitle(l, true), true, false);
+      addField(getLocalizedFieldName(TITLE_LOCALIZED, l), resource.getTitle(l, true), false, false);
     }
 
     // The whole resource
