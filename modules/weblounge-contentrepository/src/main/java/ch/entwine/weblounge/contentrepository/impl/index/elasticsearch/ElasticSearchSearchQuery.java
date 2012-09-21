@@ -72,6 +72,7 @@ import org.elasticsearch.index.query.WildcardQueryBuilder;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -112,6 +113,9 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /** Wildcard fulltext query */
   private String wildcardFulltext = null;
+
+  /** True if more recent documents should be boosted */
+  private boolean recencyBoost = false;
 
   /** The boolean query */
   private QueryBuilder queryBuilder = null;
@@ -333,6 +337,10 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     if (query.getFilter() != null) {
       this.filter = query.getFilter();
     }
+
+    // Recency boost
+    this.recencyBoost = query.getRecencyPriority();
+
   }
 
   /**
@@ -404,6 +412,27 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
       WildcardQueryBuilder wcQueryBuilder = QueryBuilders.wildcardQuery(FULLTEXT, wildcardFulltext);
       booleanQuery.must(wcQueryBuilder);
       this.queryBuilder = booleanQuery;
+    }
+
+    // Recency boost. We differentiate between various (random) levels of
+    // recency
+    if (recencyBoost) {
+      Calendar date = Calendar.getInstance();
+      // Last week
+      RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(MODIFIED);
+      date.add(Calendar.WEEK_OF_YEAR, -1);
+      rangeQueryBuilder.gt(date.getTimeInMillis()).boost(10);
+      booleanQuery.should(rangeQueryBuilder);
+      // Last month
+      rangeQueryBuilder = QueryBuilders.rangeQuery(MODIFIED);
+      date.add(Calendar.WEEK_OF_YEAR, -3);
+      rangeQueryBuilder.gt(date.getTimeInMillis()).boost(5);
+      booleanQuery.should(rangeQueryBuilder);
+      // Last year
+      rangeQueryBuilder = QueryBuilders.rangeQuery(MODIFIED);
+      date.add(Calendar.MONTH, -5);
+      rangeQueryBuilder.gt(date.getTimeInMillis()).boost(2);
+      booleanQuery.should(rangeQueryBuilder);
     }
 
     // Non-Empty fields

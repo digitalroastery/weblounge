@@ -163,6 +163,7 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
     try {
       q.withText(URLDecoder.decode(query, "utf-8"));
       q.withVersion(Resource.LIVE);
+      q.withRececyPriority();
       q.withOffset(offset);
       q.withLimit(limit);
       // TODO Add support for other types
