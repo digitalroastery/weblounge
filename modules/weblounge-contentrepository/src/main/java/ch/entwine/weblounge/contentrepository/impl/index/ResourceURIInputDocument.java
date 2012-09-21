@@ -53,11 +53,11 @@ public class ResourceURIInputDocument extends ResourceMetadataCollection {
    *          the resource uri
    */
   private void init(ResourceURI uri) {
-    addField(UID, uri.getUID(), false);
-    addField(RESOURCE_ID, uri.getIdentifier(), false);
-    addField(PATH, uri.getPath(), true);
-    addField(TYPE, uri.getType(), false);
-    addField(VERSION, uri.getVersion(), false);
+    addField(UID, uri.getUID(), false, false);
+    addField(RESOURCE_ID, uri.getIdentifier(), false, false);
+    addField(PATH, uri.getPath(), true, true);
+    addField(TYPE, uri.getType(), false, false);
+    addField(VERSION, uri.getVersion(), false, false);
   }
 
 }

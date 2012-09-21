@@ -262,6 +262,40 @@ public interface SearchQuery {
   String getText();
 
   /**
+   * Return resources that contain the given text in the fulltext search field.
+   * <p>
+   * Note that this search field is not intended to serve frontend applications
+   * but rather backend purposes.
+   * 
+   * @param text
+   *          the text to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withFulltext(String text);
+
+  /**
+   * Return resources that contain the given text in the fulltext search field.
+   * <p>
+   * Note that this search field is not intended to serve frontend applications
+   * but rather backend purposes.
+   * 
+   * @param text
+   *          the text to look up
+   * @param wildcardSearch
+   *          <code>True</code> to perform a (much slower) wildcard search
+   * @return the query extended by this criterion
+   */
+  SearchQuery withFulltext(String text, boolean wildcardSearch);
+
+  /**
+   * Returns the fulltext search terms or <code>null</code> if no text was
+   * specified.
+   * 
+   * @return the text
+   */
+  String getFulltext();
+
+  /**
    * Returns <code>true</code> if the current search operation should be
    * performed using (slower) wildcard searching.
    * 

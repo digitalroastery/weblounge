@@ -166,6 +166,9 @@ public class SearchQueryImpl implements SearchQuery {
   /** The mime type */
   protected String mimetype = null;
 
+  /** Fulltext query terms */
+  protected String fulltext = null;
+
   /** Query terms */
   protected String text = null;
 
@@ -1002,6 +1005,40 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public String getText() {
     return text;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withFulltext(java.lang.String)
+   */
+  @Override
+  public SearchQuery withFulltext(String text) {
+    return withFulltext(text, false);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withFulltext(java.lang.String,
+   *      boolean)
+   */
+  @Override
+  public SearchQuery withFulltext(String text, boolean wildcardSearch) {
+    clearExpectations();
+    this.fulltext = text;
+    this.wildcardSearch = wildcardSearch;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getFulltext()
+   */
+  @Override
+  public String getFulltext() {
+    return fulltext;
   }
 
   /**

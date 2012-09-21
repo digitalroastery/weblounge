@@ -43,6 +43,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.SERI
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.STATIONARY;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.SUBJECT;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEMPLATE;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEXT;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TYPE;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
 
@@ -105,6 +106,12 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /** Wildcard text query */
   private String wildcardText = null;
+
+  /** Fulltext query */
+  private String fulltext = null;
+
+  /** Wildcard fulltext query */
+  private String wildcardFulltext = null;
 
   /** The boolean query */
   private QueryBuilder queryBuilder = null;
@@ -305,6 +312,15 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     }
 
     // Fulltext
+    if (query.getFulltext() != null) {
+      if (query.isWildcardSearch()) {
+        wildcardFulltext = query.getFulltext() + "*";
+      } else {
+        fulltext = query.getFulltext();
+      }
+    }
+
+    // Text
     if (query.getText() != null) {
       if (query.isWildcardSearch()) {
         wildcardText = query.getText() + "*";
@@ -364,14 +380,28 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // Text
     if (text != null) {
-      TextQueryBuilder textQueryBuilder = QueryBuilders.textQuery(FULLTEXT, text);
+      TextQueryBuilder textQueryBuilder = QueryBuilders.textQuery(TEXT, text);
       booleanQuery.must(textQueryBuilder);
       this.queryBuilder = booleanQuery;
     }
 
     // Wildcard text
     if (wildcardText != null) {
-      WildcardQueryBuilder wcQueryBuilder = QueryBuilders.wildcardQuery(FULLTEXT, wildcardText);
+      WildcardQueryBuilder wcQueryBuilder = QueryBuilders.wildcardQuery(TEXT, wildcardText);
+      booleanQuery.must(wcQueryBuilder);
+      this.queryBuilder = booleanQuery;
+    }
+
+    // Fulltext
+    if (fulltext != null) {
+      TextQueryBuilder textQueryBuilder = QueryBuilders.textQuery(FULLTEXT, fulltext);
+      booleanQuery.must(textQueryBuilder);
+      this.queryBuilder = booleanQuery;
+    }
+
+    // Wildcard fulltext
+    if (wildcardFulltext != null) {
+      WildcardQueryBuilder wcQueryBuilder = QueryBuilders.wildcardQuery(FULLTEXT, wildcardFulltext);
       booleanQuery.must(wcQueryBuilder);
       this.queryBuilder = booleanQuery;
     }

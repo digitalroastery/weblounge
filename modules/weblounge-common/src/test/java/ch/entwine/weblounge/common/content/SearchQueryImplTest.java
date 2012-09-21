@@ -137,7 +137,7 @@ public class SearchQueryImplTest {
         "4bb19980-8f98-4873-a813-71b6dfab22af",
         "5bb19980-8f98-4873-a813-71b6dfab22af",
         "6bb19980-8f98-4873-a813-71b6dfab22af",
-        "7bb19980-8f98-4873-a813-71b6dfab22af" };
+    "7bb19980-8f98-4873-a813-71b6dfab22af" };
 
     for (String i : id)
       query.withIdentifier(i);
@@ -568,6 +568,19 @@ public class SearchQueryImplTest {
     query = new SearchQueryImpl(site, german);
     query.withText(text);
     assertEquals(text, query.getText());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withFulltext(java.lang.String)}
+   * .
+   */
+  @Test
+  public void testWithFulltext() {
+    String text = "fulltext";
+    query = new SearchQueryImpl(site, german);
+    query.withFulltext(text);
+    assertEquals(text, query.getFulltext());
   }
 
   /**

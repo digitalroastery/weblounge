@@ -52,24 +52,27 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
    * @param fieldValue
    *          the value
    * @param addToFulltext
-   *          <code>true</code> to add the contents to the fulltext field as
-   *          well
+   *          <code>true</code> to add the contents to the backend facing
+   *          fulltext field as well
+   * @param addToText
+   *          <code>true</code> to add the contents to the user facing fulltext
+   *          field as well
    */
-  @SuppressWarnings("unchecked")
   public void addField(String fieldName, Object fieldValue,
-      boolean addToFulltext) {
+      boolean addToFulltext, boolean addToText) {
     if (fieldName == null)
       throw new IllegalArgumentException("Field name cannot be null");
     if (fieldValue == null)
       return;
 
-    ResourceMetadata<Object> m = (ResourceMetadata<Object>)metadata.get(fieldName);
+    ResourceMetadata<Object> m = (ResourceMetadata<Object>) metadata.get(fieldName);
     if (m == null) {
       m = new ResourceMetadataImpl<Object>(fieldName);
       metadata.put(fieldName, m);
     }
 
     m.setAddToFulltext(addToFulltext);
+    m.setAddToText(addToText);
 
     if (fieldValue.getClass().isArray()) {
       Object[] fieldValues = (Object[]) fieldValue;

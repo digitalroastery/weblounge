@@ -19,19 +19,20 @@
  */
 package ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;
 
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.FULLTEXT;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.LOCALIZED_FULLTEXT;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.LOCALIZED_TEXT;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEXT;
 
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.contentrepository.impl.index.IndexSchema;
-
-import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -56,55 +57,79 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
       List<ResourceMetadata<?>> resource) {
     this.uri = uri;
 
-    List<String> fulltext = new ArrayList<String>();
-
     for (ResourceMetadata<?> entry : resource) {
       String metadataKey = entry.getName();
 
       // Store the metadata element as is
       put(metadataKey, entry.getValues());
 
-      // Add to fulltext?
+      // Add to backend facing fulltext?
       if (entry.addToFulltext()) {
+        addToFulltext(entry, FULLTEXT, LOCALIZED_FULLTEXT);
+      }
 
-        // Language neutral elements
-        for (Object value : entry.getValues()) {
-          if (value.getClass().isArray()) {
-            Object[] fieldValues = (Object[]) value;
-            for (Object v : fieldValues) {
-              fulltext.add(v.toString());
-            }
-          } else {
-            fulltext.add(value.toString());
-          }
-        }
-
-        // Add localized metadata values
-        for (Language language : entry.getLocalizedValues().keySet()) {
-          List<?> values = entry.getLocalizedValues().get(language);
-          for (Object value : values) {
-            String localizedFieldName = MessageFormat.format(LOCALIZED_FULLTEXT, language.getIdentifier());
-            String localizedFulltext = StringUtils.trimToEmpty((String) get(localizedFieldName));
-            if (value.getClass().isArray()) {
-              Object[] fieldValues = (Object[]) value;
-              for (Object v : fieldValues) {
-                localizedFulltext = StringUtils.join(new Object[] {
-                    localizedFulltext,
-                    v.toString() }, " ");
-              }
-            } else {
-              localizedFulltext = StringUtils.join(new Object[] {
-                  localizedFulltext,
-                  value.toString() }, " ");
-            }
-            put(localizedFieldName, localizedFulltext);
-          }
-        }
+      // Add to frontend facing fulltext?
+      if (entry.addToText()) {
+        addToFulltext(entry, TEXT, LOCALIZED_TEXT);
       }
 
     }
 
-    put(IndexSchema.FULLTEXT, fulltext);
+  }
+
+  /**
+   * Adds the resource metadata to the designated fulltext fields.
+   * 
+   * @param item
+   *          the metadata item
+   * @param fulltextFieldName
+   *          the fulltext field name
+   * @param localizedFulltextFieldName
+   *          the localized fulltext field name
+   */
+  private void addToFulltext(ResourceMetadata<?> item,
+      String fulltextFieldName, String localizedFulltextFieldName) {
+
+    // Get existing fulltext entries
+    Collection<String> fulltext = (Collection<String>) get(fulltextFieldName);
+    if (fulltext == null)
+      fulltext = new HashSet<String>();
+
+    // Language neutral elements
+    for (Object value : item.getValues()) {
+      if (value.getClass().isArray()) {
+        Object[] fieldValues = (Object[]) value;
+        for (Object v : fieldValues) {
+          fulltext.add(v.toString());
+        }
+      } else {
+        fulltext.add(value.toString());
+      }
+    }
+
+    put(fulltextFieldName, fulltext);
+
+    // Add localized metadata values
+    for (Language language : item.getLocalizedValues().keySet()) {
+      // Get existing fulltext entries
+      String localizedFieldName = MessageFormat.format(localizedFulltextFieldName, language.getIdentifier());
+      Collection<String> localizedFulltext = (Collection<String>) get(localizedFieldName);
+      if (fulltext == null)
+        fulltext = new HashSet<String>();
+      List<?> values = item.getLocalizedValues().get(language);
+      for (Object value : values) {
+        if (value.getClass().isArray()) {
+          Object[] fieldValues = (Object[]) value;
+          for (Object v : fieldValues) {
+            localizedFulltext.add(v.toString());
+          }
+        } else {
+          localizedFulltext.add(value.toString());
+        }
+      }
+      put(localizedFieldName, localizedFulltext);
+    }
+
   }
 
   /**

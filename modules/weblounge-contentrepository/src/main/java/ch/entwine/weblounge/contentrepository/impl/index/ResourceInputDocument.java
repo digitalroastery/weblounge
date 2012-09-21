@@ -45,6 +45,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.MODI
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.OWNED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.OWNED_BY_NAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH_PREFIX;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY_NAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_FROM;
@@ -86,11 +87,11 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     if (uri.getIdentifier() == null)
       throw new IllegalArgumentException("Resource must have an identifier");
 
-    addField(UID, uri.getUID(), false);
-    addField(RESOURCE_ID, uri.getIdentifier(), true);
-    addField(PATH, uri.getPath(), true);
-    addField(TYPE, uri.getType(), true);
-    addField(VERSION, uri.getVersion(), false);
+    addField(UID, uri.getUID(), false, false);
+    addField(RESOURCE_ID, uri.getIdentifier(), true, false);
+    addField(PATH, uri.getPath(), true, true);
+    addField(TYPE, uri.getType(), true, false);
+    addField(VERSION, uri.getVersion(), false, false);
 
     // Path elements
     if (!StringUtils.isBlank(uri.getPath())) {
@@ -100,83 +101,83 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
       StringBuffer prefix = new StringBuffer();
       for (int i = 0; i < path.length(); i++) {
         prefix.append(path.charAt(i));
-        addField(IndexSchema.PATH_PREFIX, prefix.toString(), false);
+        addField(PATH_PREFIX, prefix.toString(), false, false);
       }
 
       // Index sub paths
       for (String s : path.split("/")) {
         if ("".equals(s))
           continue;
-        addField(IndexSchema.PATH_PREFIX, s, true);
+        addField(PATH_PREFIX, s, true, false);
         StringBuffer subprefix = new StringBuffer("/");
         for (int i = 0; i < s.length(); i++) {
           subprefix.append(s.charAt(i));
-          addField(IndexSchema.PATH_PREFIX, subprefix.toString(), false);
+          addField(PATH_PREFIX, subprefix.toString(), false, false);
         }
-        addField(IndexSchema.PATH_PREFIX, "/" + s + "/", false);
+        addField(PATH_PREFIX, "/" + s + "/", false, false);
       }
     }
 
     // Resource-level
     for (String subject : resource.getSubjects())
-      addField(SUBJECT, subject, true);
+      addField(SUBJECT, subject, true, false);
 
     for (String series : resource.getSeries())
-      addField(SERIES, series, true);
+      addField(SERIES, series, true, true);
 
     // Creation, modification and publishing information
-    addField(OWNED_BY, IndexUtils.serializeUserId(resource.getOwner()), false);
-    addField(OWNED_BY_NAME, IndexUtils.serializeUserName(resource.getOwner()), true);
-    addField(CREATED, resource.getCreationDate(), false);
-    addField(CREATED_BY, IndexUtils.serializeUserId(resource.getCreator()), false);
-    addField(CREATED_BY_NAME, IndexUtils.serializeUserName(resource.getCreator()), true);
-    addField(MODIFIED, resource.getModificationDate(), false);
-    addField(MODIFIED_BY, IndexUtils.serializeUserId(resource.getModifier()), false);
-    addField(MODIFIED_BY_NAME, IndexUtils.serializeUserName(resource.getModifier()), true);
-    addField(PUBLISHED_FROM, resource.getPublishFrom(), false);
-    addField(PUBLISHED_TO, resource.getPublishTo(), false);
-    addField(PUBLISHED_BY, IndexUtils.serializeUserId(resource.getPublisher()), false);
-    addField(PUBLISHED_BY_NAME, IndexUtils.serializeUserName(resource.getPublisher()), true);
+    addField(OWNED_BY, IndexUtils.serializeUserId(resource.getOwner()), false, false);
+    addField(OWNED_BY_NAME, IndexUtils.serializeUserName(resource.getOwner()), true, false);
+    addField(CREATED, resource.getCreationDate(), false, false);
+    addField(CREATED_BY, IndexUtils.serializeUserId(resource.getCreator()), false, false);
+    addField(CREATED_BY_NAME, IndexUtils.serializeUserName(resource.getCreator()), true, false);
+    addField(MODIFIED, resource.getModificationDate(), false, false);
+    addField(MODIFIED_BY, IndexUtils.serializeUserId(resource.getModifier()), false, false);
+    addField(MODIFIED_BY_NAME, IndexUtils.serializeUserName(resource.getModifier()), true, false);
+    addField(PUBLISHED_FROM, resource.getPublishFrom(), false, false);
+    addField(PUBLISHED_TO, resource.getPublishTo(), false, false);
+    addField(PUBLISHED_BY, IndexUtils.serializeUserId(resource.getPublisher()), false, false);
+    addField(PUBLISHED_BY_NAME, IndexUtils.serializeUserName(resource.getPublisher()), true, false);
 
     if (resource.isLocked()) {
-      addField(LOCKED_BY, IndexUtils.serializeUserId(resource.getLockOwner()), false);
-      addField(LOCKED_BY_NAME, IndexUtils.serializeUserName(resource.getLockOwner()), true);
+      addField(LOCKED_BY, IndexUtils.serializeUserId(resource.getLockOwner()), false, false);
+      addField(LOCKED_BY_NAME, IndexUtils.serializeUserName(resource.getLockOwner()), true, false);
     }
 
     // Language dependent header fields
     for (Language l : resource.languages()) {
-      addField(DESCRIPTION, resource.getDescription(l, true), true);
-      addField(getLocalizedFieldName(DESCRIPTION_LOCALIZED, l), resource.getDescription(l, true), false);
-      addField(COVERAGE, resource.getCoverage(l, true), true);
-      addField(getLocalizedFieldName(COVERAGE_LOCALIZED, l), resource.getCoverage(l, true), false);
-      addField(RIGHTS, resource.getRights(l, true), true);
-      addField(getLocalizedFieldName(RIGHTS_LOCALIZED, l), resource.getRights(l, true), false);
-      addField(TITLE, resource.getTitle(l, true), true);
-      addField(getLocalizedFieldName(TITLE_LOCALIZED, l), resource.getTitle(l, true), false);
+      addField(DESCRIPTION, resource.getDescription(l, true), true, true);
+      addField(getLocalizedFieldName(DESCRIPTION_LOCALIZED, l), resource.getDescription(l, true), false, true);
+      addField(COVERAGE, resource.getCoverage(l, true), true, false);
+      addField(getLocalizedFieldName(COVERAGE_LOCALIZED, l), resource.getCoverage(l, true), false, false);
+      addField(RIGHTS, resource.getRights(l, true), true, false);
+      addField(getLocalizedFieldName(RIGHTS_LOCALIZED, l), resource.getRights(l, true), false, false);
+      addField(TITLE, resource.getTitle(l, true), true, true);
+      addField(getLocalizedFieldName(TITLE_LOCALIZED, l), resource.getTitle(l, true), false, true);
     }
 
     // The whole resource
     String resourceXml = resource.toXml();
-    addField(XML, resourceXml, false);
+    addField(XML, resourceXml, false, false);
 
     // Resource header
     String headerXml = resourceXml.replaceAll("<body[^>]*>[\\s\\S]+?<\\/body>", "");
     if (!StringUtils.isBlank(headerXml)) {
-      addField(HEADER_XML, headerXml, false);
+      addField(HEADER_XML, headerXml, false, false);
     }
 
     // Resource contents
     for (ResourceContent content : resource.contents()) {
       Language l = content.getLanguage();
-      addField(getLocalizedFieldName(CONTENT_XML, l), content.toXml(), false);
-      addField(getLocalizedFieldName(CONTENT_CREATED, l), IndexUtils.serializeDate(content.getCreationDate()), false);
-      addField(getLocalizedFieldName(CONTENT_CREATED_BY, l), IndexUtils.serializeUserId(content.getCreator()), false);
-      addField(CONTENT_SOURCE, content.getSource(), true);
-      addField(CONTENT_EXTERNAL_REPRESENTATION, content.getExternalLocation(), true);
-      addField(CONTENT_FILENAME, content.getFilename(), true);
-      addField(getLocalizedFieldName(CONTENT_FILENAME_LOCALIZED, l), content.getFilename(), false);
-      addField(CONTENT_MIMETYPE, content.getMimetype(), true);
-      addField(getLocalizedFieldName(CONTENT_MIMETYPE_LOCALIZED, l), content.getMimetype(), false);
+      addField(getLocalizedFieldName(CONTENT_XML, l), content.toXml(), false, false);
+      addField(getLocalizedFieldName(CONTENT_CREATED, l), IndexUtils.serializeDate(content.getCreationDate()), false, false);
+      addField(getLocalizedFieldName(CONTENT_CREATED_BY, l), IndexUtils.serializeUserId(content.getCreator()), false, false);
+      addField(CONTENT_SOURCE, content.getSource(), true, false);
+      addField(CONTENT_EXTERNAL_REPRESENTATION, content.getExternalLocation(), true, false);
+      addField(CONTENT_FILENAME, content.getFilename(), true, true);
+      addField(getLocalizedFieldName(CONTENT_FILENAME_LOCALIZED, l), content.getFilename(), true, true);
+      addField(CONTENT_MIMETYPE, content.getMimetype(), true, false);
+      addField(getLocalizedFieldName(CONTENT_MIMETYPE_LOCALIZED, l), content.getMimetype(), true, false);
     }
 
   }

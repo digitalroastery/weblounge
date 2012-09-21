@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index;
 
+import static ch.entwine.weblounge.common.impl.content.SearchQueryImpl.STAGE_COMPOSER;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CREATED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CREATED_BY_NAME;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.MODIFIED_BY;
@@ -37,13 +38,13 @@ import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGE
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PREVIEW_XML;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY_NAME;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.STATIONARY;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEMPLATE;
 
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
-import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.language.Language;
 
 import java.text.MessageFormat;
@@ -76,8 +77,8 @@ public class PageInputDocument extends ResourceInputDocument {
     super.init(page);
 
     // Page-level
-    addField(TEMPLATE, page.getTemplate(), false);
-    addField(IndexSchema.STATIONARY, page.isStationary(), false);
+    addField(TEMPLATE, page.getTemplate(), false, false);
+    addField(STATIONARY, page.isStationary(), false, false);
 
     // Determine the stage composer
     String stage = null;
@@ -91,7 +92,7 @@ public class PageInputDocument extends ResourceInputDocument {
       String composerId = composer.getIdentifier();
       addComposerFields(composer, composerId);
       if (composerId.equals(stage)) {
-        addComposerFields(composer, SearchQueryImpl.STAGE_COMPOSER);
+        addComposerFields(composer, STAGE_COMPOSER);
       }
     }
 
@@ -102,7 +103,7 @@ public class PageInputDocument extends ResourceInputDocument {
       preview.append(p.toXml());
     }
     preview.append("</composer>");
-    addField(PREVIEW_XML, preview.toString(), false);
+    addField(PREVIEW_XML, preview.toString(), false, false);
   }
 
   /**
@@ -118,29 +119,29 @@ public class PageInputDocument extends ResourceInputDocument {
     int i = 0;
     for (Pagelet p : composer.getPagelets()) {
       for (Language l : p.languages()) {
-        addField(PAGELET_CONTENTS, serializeContent(p, l), true);
-        addField(getLocalizedFieldName(PAGELET_CONTENTS_LOCALIZED, l), serializeContent(p, l), true);
+        addField(PAGELET_CONTENTS, serializeContent(p, l), true, true);
+        addField(getLocalizedFieldName(PAGELET_CONTENTS_LOCALIZED, l), serializeContent(p, l), true, true);
       }
 
       for (String property : p.getPropertyNames()) {
-        addField(PAGELET_PROPERTY_VALUE, p.getProperty(property), true);
+        addField(PAGELET_PROPERTY_VALUE, p.getProperty(property), true, false);
       }
 
-      addField(PAGELET_PROPERTIES, serializeProperties(p), false);
-      addField(MessageFormat.format(PAGELET_XML_COMPOSER, composerId), p.toXml(), false);
-      addField(MessageFormat.format(PAGELET_XML_COMPOSER_POSITION, i), p.toXml(), false);
-      addField(MessageFormat.format(PAGELET_TYPE_COMPOSER, composerId), p.getModule() + "/" + p.getIdentifier(), false);
-      addField(MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, i), p.getModule() + "/" + p.getIdentifier(), false);
+      addField(PAGELET_PROPERTIES, serializeProperties(p), false, false);
+      addField(MessageFormat.format(PAGELET_XML_COMPOSER, composerId), p.toXml(), false, false);
+      addField(MessageFormat.format(PAGELET_XML_COMPOSER_POSITION, i), p.toXml(), false, false);
+      addField(MessageFormat.format(PAGELET_TYPE_COMPOSER, composerId), p.getModule() + "/" + p.getIdentifier(), false, false);
+      addField(MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, i), p.getModule() + "/" + p.getIdentifier(), false, false);
 
       // Workflow related
-      addField(OWNED_BY, IndexUtils.serializeUserId(p.getOwner()), false);
-      addField(OWNED_BY_NAME, IndexUtils.serializeUserName(p.getOwner()), true);
-      addField(CREATED_BY, IndexUtils.serializeUserId(p.getCreator()), false);
-      addField(CREATED_BY_NAME, IndexUtils.serializeUserName(p.getCreator()), true);
-      addField(MODIFIED_BY, IndexUtils.serializeUserId(p.getModifier()), false);
-      addField(MODIFIED_BY_NAME, IndexUtils.serializeUserName(p.getModifier()), true);
-      addField(PUBLISHED_BY, IndexUtils.serializeUserId(p.getPublisher()), false);
-      addField(PUBLISHED_BY_NAME, IndexUtils.serializeUserName(p.getPublisher()), true);
+      addField(OWNED_BY, IndexUtils.serializeUserId(p.getOwner()), false, false);
+      addField(OWNED_BY_NAME, IndexUtils.serializeUserName(p.getOwner()), true, false);
+      addField(CREATED_BY, IndexUtils.serializeUserId(p.getCreator()), false, false);
+      addField(CREATED_BY_NAME, IndexUtils.serializeUserName(p.getCreator()), true, false);
+      addField(MODIFIED_BY, IndexUtils.serializeUserId(p.getModifier()), false, false);
+      addField(MODIFIED_BY_NAME, IndexUtils.serializeUserName(p.getModifier()), true, false);
+      addField(PUBLISHED_BY, IndexUtils.serializeUserId(p.getPublisher()), false, false);
+      addField(PUBLISHED_BY_NAME, IndexUtils.serializeUserName(p.getPublisher()), true, false);
 
       i++;
     }

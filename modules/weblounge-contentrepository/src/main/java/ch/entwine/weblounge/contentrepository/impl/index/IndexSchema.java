@@ -190,11 +190,17 @@ public interface IndexSchema {
   /** Solr ranking score */
   String SCORE = "score";
 
-  /** Accumulative, language_sensitive fulltext field */
+  /** Accumulative, language_sensitive fulltext field designed for backend use */
   String LOCALIZED_FULLTEXT = "fulltext_{0}";
 
-  /** Accumulative fulltext field */
+  /** Accumulative fulltext field designed for backend use */
   String FULLTEXT = "fulltext";
+
+  /** Accumulative, language_sensitive text field targeted at frontend use */
+  String LOCALIZED_TEXT = "text_{0}";
+
+  /** Accumulative text field targeted for frontend use */
+  String TEXT = "text";
 
   /** The solr date format string tag. */
   String SOLR_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
