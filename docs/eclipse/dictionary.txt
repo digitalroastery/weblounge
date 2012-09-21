@@ -88,3 +88,4 @@ precompile
 jasper
 frontend
 backend
+elasticsearch
