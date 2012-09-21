@@ -24,6 +24,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.LOCA
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.LOCALIZED_TEXT;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEXT;
 
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.language.Language;
@@ -69,7 +70,7 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
       }
 
       // Add to frontend facing fulltext?
-      if (entry.addToText()) {
+      if (uri.getVersion() == Resource.LIVE && entry.addToText()) {
         addToFulltext(entry, TEXT, LOCALIZED_TEXT);
       }
 
