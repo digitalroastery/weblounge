@@ -47,6 +47,7 @@
             "pagelet_property_value": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
             "path_prefix": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
             "fulltext": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
             "content_source": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
@@ -127,17 +128,24 @@
                  }
              },
              {
+             "text" : {
+                 "match" : "text_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 }
+             },
+             {
              "fulltext" : {
                  "match" : "fulltext_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "content_mimetype" : {
                  "match" : "content_mimetype_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
