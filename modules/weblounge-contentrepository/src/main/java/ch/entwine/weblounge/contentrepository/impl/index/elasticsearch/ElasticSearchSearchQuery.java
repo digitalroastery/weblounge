@@ -59,7 +59,9 @@ import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.io.BytesStream;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.AndFilterBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -72,10 +74,12 @@ import org.elasticsearch.index.query.WildcardQueryBuilder;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -92,6 +96,9 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /** Fields that must be empty */
   private Set<String> emptyFields = null;
+
+  /** Fields that need to match all values */
+  private List<ValueGroup> groups = null;
 
   /** Fields that must not be empty */
   private Set<String> nonEmptyFields = null;
@@ -177,9 +184,9 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // Subjects (AND)
     if (query.getANDSubjects().length > 0) {
-      for (String subject : query.getANDSubjects()) {
-        and(SUBJECT, subject, true);
-      }
+      if (groups == null)
+        groups = new ArrayList<ValueGroup>();
+      groups.add(new ValueGroup(SUBJECT, (Object[]) query.getANDSubjects()));
     }
 
     // Series
@@ -353,6 +360,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // The boolean query builder
     BoolQueryBuilder booleanQuery = new BoolQueryBuilder();
+    List<FilterBuilder> filters = new ArrayList<FilterBuilder>();
 
     // Terms
     if (searchTerms != null) {
@@ -435,24 +443,32 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
       booleanQuery.should(rangeQueryBuilder);
     }
 
+    QueryBuilder unfilteredQuery = queryBuilder;
+
+    // Process filters found so far
+    for (FilterBuilder filter : filters) {
+      this.queryBuilder = QueryBuilders.filteredQuery(unfilteredQuery, filter);
+    }
+
     // Non-Empty fields
     if (nonEmptyFields != null) {
       for (String field : nonEmptyFields) {
-        this.queryBuilder = QueryBuilders.filteredQuery(queryBuilder, FilterBuilders.existsFilter(field));
+        this.queryBuilder = QueryBuilders.filteredQuery(unfilteredQuery, FilterBuilders.existsFilter(field));
       }
     }
 
     // Empty fields
     if (emptyFields != null) {
       for (String field : emptyFields) {
-        this.queryBuilder = QueryBuilders.filteredQuery(queryBuilder, FilterBuilders.missingFilter(field));
+        this.queryBuilder = QueryBuilders.filteredQuery(unfilteredQuery, FilterBuilders.missingFilter(field));
       }
     }
 
     // Filter expressions
     if (filter != null) {
-      this.queryBuilder = QueryBuilders.filteredQuery(queryBuilder, FilterBuilders.wrapperFilter(filter));
+      this.queryBuilder = QueryBuilders.filteredQuery(unfilteredQuery, FilterBuilders.wrapperFilter(filter));
     }
+
   }
 
   /**
@@ -679,6 +695,69 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
       if (endDate != null)
         rqb.to(endDate.getTime());
       return rqb;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof DateRange) {
+        return ((DateRange) obj).field.equals(field);
+      }
+      return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      return field.hashCode();
+    }
+
+  }
+
+  /**
+   * Stores a group of values which will later be added to the query using AND.
+   */
+  private static final class ValueGroup {
+
+    /** The field name */
+    private String field = null;
+
+    /** The values to store */
+    private Object[] values = null;
+
+    /**
+     * Creates a new value group for the given field and values.
+     * 
+     * @param field
+     *          the field name
+     * @param values
+     *          the values
+     */
+    ValueGroup(String field, Object... values) {
+      this.field = field;
+      this.values = values;
+    }
+
+    /**
+     * Returns the filter that will make sure only documents are returned that
+     * match all of the values at once.
+     * 
+     * @return the filter builder
+     */
+    FilterBuilder getQueryBuilder() {
+      AndFilterBuilder andFilter = FilterBuilders.andFilter();
+      for (Object v : values) {
+        andFilter.add(FilterBuilders.termFilter(field, v.toString()));
+      }
+      return andFilter;
     }
 
     /**
