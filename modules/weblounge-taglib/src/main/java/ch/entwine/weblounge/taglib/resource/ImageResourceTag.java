@@ -184,8 +184,7 @@ public class ImageResourceTag extends WebloungeTag {
       SearchQuery query = new SearchQueryImpl(site);
       query.withVersion(Resource.LIVE);
       query.withTypes(ImageResource.TYPE);
-      for (int i = 0; i < imageSubjects.size(); i++)
-        query.andSubject(imageSubjects.get(i));
+      query.withSubjects(SearchQuery.Quantifier.All, imageSubjects.toArray(new String[imageSubjects.size()]));
       SearchResult result;
       try {
         result = repository.find(query);
