@@ -20,8 +20,11 @@
 
 package ch.entwine.weblounge.common.impl.content;
 
+import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
+
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchTerms;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
@@ -38,6 +41,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -94,11 +98,8 @@ public class SearchQueryImpl implements SearchQuery {
   /** The list of required pagelets */
   protected List<Pagelet> pagelets = new ArrayList<Pagelet>();
 
-  /** The list of required subjects (ONE) */
-  protected List<String> subjects = new ArrayList<String>();
-
-  /** The list of required subjects (ALL) */
-  protected List<String> andSubjects = new ArrayList<String>();
+  /** The list of required subjects */
+  protected List<SearchTerms<String>> subjects = null;
 
   /** The list of required series */
   protected List<String> series = new ArrayList<String>();
@@ -620,7 +621,35 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withSubject(java.lang.String)
    */
   public SearchQuery withSubject(String subject) {
-    subjects.add(subject);
+    if (subjects == null) {
+      subjects = new ArrayList<SearchTerms<String>>();
+      SearchTerms<String> terms = new SearchTermsImpl<String>(Quantifier.Any, subject);
+      subjects.add(terms);
+      return this;
+    }
+    for (SearchTerms<String> terms : subjects) {
+      if (Quantifier.Any.equals(terms.getQuantifier())) {
+        terms.add(subject);
+        return this;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withSubjects(ch.entwine.weblounge.common.content.SearchQuery.Quantifier,
+   *      String...)
+   */
+  @Override
+  public SearchQuery withSubjects(Quantifier quantifier, String... subjects) {
+    if (All.equals(quantifier) && subjects.length < 2)
+      throw new IllegalArgumentException("More than one search term is required with quantifier 'all'");
+    if (this.subjects == null)
+      this.subjects = new ArrayList<SearchTerms<String>>();
+    SearchTerms<String> terms = new SearchTermsImpl<String>(quantifier, subjects);
+    this.subjects.add(terms);
     return this;
   }
 
@@ -629,27 +658,8 @@ public class SearchQueryImpl implements SearchQuery {
    * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getSubjects()
    */
-  public String[] getSubjects() {
-    return subjects.toArray(new String[subjects.size()]);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#andSubject(java.lang.String)
-   */
-  public SearchQuery andSubject(String subject) {
-    andSubjects.add(subject);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#getANDSubjects()
-   */
-  public String[] getANDSubjects() {
-    return andSubjects.toArray(new String[andSubjects.size()]);
+  public Collection<SearchTerms<String>> getSubjects() {
+    return subjects;
   }
 
   /**

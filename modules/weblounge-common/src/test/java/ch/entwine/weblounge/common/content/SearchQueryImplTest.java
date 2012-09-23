@@ -42,9 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -419,10 +417,11 @@ public class SearchQueryImplTest {
     String otherSubject = "other subject";
     query.withSubject(subject);
     query.withSubject(otherSubject);
-    assertEquals(2, query.getSubjects().length);
-    List<String> subjects = Arrays.asList(query.getSubjects());
-    assertTrue(subjects.contains(subject));
-    assertTrue(subjects.contains(otherSubject));
+    assertEquals(1, query.getSubjects().size());
+    SearchTerms<String> terms = query.getSubjects().iterator().next();
+    assertEquals(2, terms.getTerms().size());
+    assertTrue(terms.contains(subject));
+    assertTrue(terms.contains(otherSubject));
   }
 
   /**

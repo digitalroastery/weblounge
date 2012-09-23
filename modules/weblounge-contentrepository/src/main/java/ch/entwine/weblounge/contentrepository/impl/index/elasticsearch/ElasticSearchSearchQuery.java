@@ -48,6 +48,8 @@ import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TYPE
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchQuery.Quantifier;
+import ch.entwine.weblounge.common.content.SearchTerms;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
@@ -59,7 +61,6 @@ import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.io.BytesStream;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.AndFilterBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
@@ -177,16 +178,18 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
       andNot(TYPE, query.getWithoutTypes(), true);
     }
 
-    // Subjects (OR)
-    if (query.getSubjects().length > 0) {
-      and(SUBJECT, query.getSubjects(), true);
-    }
-
-    // Subjects (AND)
-    if (query.getANDSubjects().length > 0) {
-      if (groups == null)
-        groups = new ArrayList<ValueGroup>();
-      groups.add(new ValueGroup(SUBJECT, (Object[]) query.getANDSubjects()));
+    // Subjects
+    if (query.getSubjects() != null) {
+      for (SearchTerms<String> terms : query.getSubjects()) {
+        for (String subject : terms.getTerms()) {
+          and(SUBJECT, subject, true);
+        }
+        if (Quantifier.All.equals(terms.getQuantifier())) {
+          if (groups == null)
+            groups = new ArrayList<ValueGroup>();
+          groups.add(new ValueGroup(SUBJECT, (Object[]) terms.getTerms().toArray(new String[terms.size()])));
+        }
+      }
     }
 
     // Series
@@ -360,7 +363,6 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // The boolean query builder
     BoolQueryBuilder booleanQuery = new BoolQueryBuilder();
-    List<FilterBuilder> filters = new ArrayList<FilterBuilder>();
 
     // Terms
     if (searchTerms != null) {
@@ -444,29 +446,40 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     }
 
     QueryBuilder unfilteredQuery = queryBuilder;
+    List<FilterBuilder> filters = new ArrayList<FilterBuilder>();
 
-    // Process filters found so far
-    for (FilterBuilder filter : filters) {
-      this.queryBuilder = QueryBuilders.filteredQuery(unfilteredQuery, filter);
+    // Add filtering for AND terms
+    if (groups != null) {
+      for (ValueGroup group : groups) {
+        filters.addAll(group.getFilterBuilders());
+      }
     }
 
     // Non-Empty fields
     if (nonEmptyFields != null) {
       for (String field : nonEmptyFields) {
-        this.queryBuilder = QueryBuilders.filteredQuery(unfilteredQuery, FilterBuilders.existsFilter(field));
+        filters.add(FilterBuilders.existsFilter(field));
       }
     }
 
     // Empty fields
     if (emptyFields != null) {
       for (String field : emptyFields) {
-        this.queryBuilder = QueryBuilders.filteredQuery(unfilteredQuery, FilterBuilders.missingFilter(field));
+        filters.add(FilterBuilders.missingFilter(field));
       }
     }
 
     // Filter expressions
     if (filter != null) {
-      this.queryBuilder = QueryBuilders.filteredQuery(unfilteredQuery, FilterBuilders.wrapperFilter(filter));
+      filters.add(FilterBuilders.wrapperFilter(filter));
+    }
+
+    // Apply the filters
+    if (filters.size() == 1) {
+      this.queryBuilder = QueryBuilders.filteredQuery(unfilteredQuery, filters.get(0));
+    } else if (filters.size() > 1) {
+      FilterBuilder andFilter = FilterBuilders.andFilter(filters.toArray(new FilterBuilder[filters.size()]));
+      this.queryBuilder = QueryBuilders.filteredQuery(unfilteredQuery, andFilter);
     }
 
   }
@@ -752,12 +765,12 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
      * 
      * @return the filter builder
      */
-    FilterBuilder getQueryBuilder() {
-      AndFilterBuilder andFilter = FilterBuilders.andFilter();
+    List<FilterBuilder> getFilterBuilders() {
+      List<FilterBuilder> filters = new ArrayList<FilterBuilder>(values.length);
       for (Object v : values) {
-        andFilter.add(FilterBuilders.termFilter(field, v.toString()));
+        filters.add(FilterBuilders.termFilter(field, v.toString()));
       }
-      return andFilter;
+      return filters;
     }
 
     /**

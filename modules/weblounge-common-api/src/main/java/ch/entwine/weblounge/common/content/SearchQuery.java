@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -41,6 +42,11 @@ public interface SearchQuery {
   public enum Order {
     None, Ascending, Descending
   }
+
+  /** The search quantifier */
+  public enum Quantifier {
+    All, Any
+  };
 
   /**
    * Returns the contextual site for this query.
@@ -389,10 +395,7 @@ public interface SearchQuery {
   Language getLanguage();
 
   /**
-   * Only returns resources that contain the specified subject. Note that this
-   * method may be called multiple times in order to specify more than one
-   * subject combined with logical OR. To combine subjects with logical AND, see
-   * <code>andSubject(String)</code>
+   * Only returns resources that contain the specified subject.
    * 
    * @param subject
    *          the subject
@@ -401,31 +404,26 @@ public interface SearchQuery {
   SearchQuery withSubject(String subject);
 
   /**
-   * Returns the subjects or an empty array if no subjects have been specified.
+   * Returns only resources that match the given subjects. Depending on
+   * <code>quantifier</code>, either all or some of the terms need to be
+   * present.
    * 
-   * @return the subjects
-   */
-  String[] getSubjects();
-
-  /**
-   * Only returns resources that contain the specified subject. Note that this
-   * method may be called multiple times in order to specify more than one
-   * subject combined with logical AND. To combine subjects with logical OR, see
-   * <code>withSubject(String)</code>
+   * @param quantifier
+   *          the quantifier
+   * @param subjects
+   *          the list of subjects
    * 
-   * @param subject
-   *          the subject
    * @return the query extended by this criterion
    */
-  SearchQuery andSubject(String subject);
+  SearchQuery withSubjects(Quantifier quantifier, String... subjects);
 
   /**
-   * Returns the subjects which will be conjuncted in the search query or an
-   * empty array if no subjects to conjunct have been specified.
+   * Returns the subjects as a collection of search terms or <code>null</code>
+   * if no subjects have been specified.
    * 
    * @return the subjects
    */
-  String[] getANDSubjects();
+  Collection<SearchTerms<String>> getSubjects();
 
   /**
    * Only returns resources that contain the specified series. Note that this

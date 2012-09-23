@@ -26,6 +26,7 @@ import static org.junit.Assert.fail;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
+import ch.entwine.weblounge.common.content.SearchQuery.Quantifier;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.image.ImageResource;
@@ -462,6 +463,19 @@ public class SearchIndexTest {
     for (String subject : subjects)
       q.withSubject(subject);
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithAllSubjects() throws Exception {
+    populateIndex();
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    q.withSubjects(Quantifier.All, "Topic a", "This subject");
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
