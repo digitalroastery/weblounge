@@ -118,7 +118,7 @@ public class ImageResourceTag extends WebloungeTag {
       imageSubjects = new ArrayList<String>();
     StringTokenizer st = new StringTokenizer(subjects, ",;");
     while (st.hasMoreTokens()) {
-      imageSubjects.add(st.nextToken());
+      imageSubjects.add(st.nextToken().trim());
     }
   }
 
