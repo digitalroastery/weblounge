@@ -229,7 +229,7 @@ public class SiteActivator {
       Node doc = null;
       try {
         doc = docBuilder.parse(entry.openStream());
-        IntegrationTestGroup test = IntegrationTestParser.fromXml(doc);
+        IntegrationTestGroup test = IntegrationTestParser.fromXml(doc.getFirstChild());
         test.setSite(site);
         test.setGroup(site.getName());
         logger.debug("Registering integration test " + test.getClass());

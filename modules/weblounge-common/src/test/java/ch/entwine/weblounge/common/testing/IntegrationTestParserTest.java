@@ -25,6 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import ch.entwine.weblounge.common.impl.site.SiteImpl;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestCase;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestCase.EqualityAssertion;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestCase.ExistenceAssertion;
@@ -32,19 +33,21 @@ import ch.entwine.weblounge.common.impl.testing.IntegrationTestCase.StatusCodeAs
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestCaseAssertion;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestGroup;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestParser;
-import ch.entwine.weblounge.common.impl.util.TestUtils;
+import ch.entwine.weblounge.common.impl.util.xml.ValidationErrorHandler;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
+import org.w3c.dom.Document;
 
-import java.io.StringReader;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 /**
  * Test case for {@link IntegrationTestParserTest}.
@@ -68,13 +71,27 @@ public class IntegrationTestParserTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
-    String testXml = TestUtils.loadXmlFromResource(testFile);
+
+    // Schema validator setup
+    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    URL schemaUrl = SiteImpl.class.getResource("/xsd/test.xsd");
+    Schema siteSchema = schemaFactory.newSchema(schemaUrl);
+
+    // Module.xml document builder setup
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    docBuilderFactory.setSchema(siteSchema);
+    docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-    Node doc = docBuilder.parse(new InputSource(new StringReader(testXml)));
+
+    // Validate and read the module descriptor
+    URL testContext = IntegrationTestParserTest.class.getResource(testFile);
+    ValidationErrorHandler errorHandler = new ValidationErrorHandler(testContext);
+    docBuilder.setErrorHandler(errorHandler);
+    Document doc = docBuilder.parse(testContext.openStream());
+    assertFalse("Schema validation failed", errorHandler.hasErrors());
 
     // Finally, parse the test
-    testGroup = IntegrationTestParser.fromXml(doc);
+    testGroup = IntegrationTestParser.fromXml(doc.getFirstChild());
     testCases = testGroup.getTestCases();
   }
 

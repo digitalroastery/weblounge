@@ -1,12 +1,14 @@
-<test>
+<test xmlns="http://www.entwinemedia.com/weblounge/3.0/test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/test http://www.entwinemedia.com/xsd/weblounge/3.0/test.xsd">
   <name>Homepage Tests</name>
   <test-case>
     <name>Page title</name>
     <url method="get">/</url>
-    <assert-status>200,304</assert-status>
-    <assert-equals ignorewhitespace="true" ignorecase="false">
-      <path>/html/body/h1</path>
-      <value>Welcome to the Weblounge 3.0 testpage!</value>
-    </assert-equals>
+    <assertions>
+      <status>200 304</status>
+      <equals ignorewhitespace="true" ignorecase="false">
+        <path>/html/body/h1</path>
+        <value>Welcome to the Weblounge 3.0 testpage!</value>
+      </equals>
+    </assertions>
   </test-case>
 </test>
