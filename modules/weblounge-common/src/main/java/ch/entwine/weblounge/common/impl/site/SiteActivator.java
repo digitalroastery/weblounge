@@ -35,7 +35,6 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -215,21 +214,39 @@ public class SiteActivator {
   int loadIntegrationTests(BundleContext bundleContext, String dir) {
     Enumeration<?> entries = bundleContext.getBundle().findEntries(dir, "*.xml", true);
 
-    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder docBuilder = null;
+    // Schema validator setup
+    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    URL schemaUrl = SiteImpl.class.getResource("/xsd/test.xsd");
+    Schema testSchema = null;
     try {
-      docBuilder = docBuilderFactory.newDocumentBuilder();
-    } catch (ParserConfigurationException e) {
-      throw new IllegalStateException(e);
+      testSchema = schemaFactory.newSchema(schemaUrl);
+    } catch (SAXException e) {
+      logger.error("Error loading XML schema for test definitions: {}", e.getMessage());
+      return 0;
     }
+
+    // Module.xml document builder setup
+    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    docBuilderFactory.setSchema(testSchema);
+    docBuilderFactory.setNamespaceAware(true);
 
     int testCount = 0;
     while (entries != null && entries.hasMoreElements()) {
       URL entry = (URL) entries.nextElement();
-      Node doc = null;
+
+      // Validate and read the module descriptor
+      ValidationErrorHandler errorHandler = new ValidationErrorHandler(entry);
+      DocumentBuilder docBuilder;
+
       try {
-        doc = docBuilder.parse(entry.openStream());
-        IntegrationTestGroup test = IntegrationTestParser.fromXml(doc);
+        docBuilder = docBuilderFactory.newDocumentBuilder();
+        docBuilder.setErrorHandler(errorHandler);
+        Document doc = docBuilder.parse(entry.openStream());
+        if (errorHandler.hasErrors()) {
+          logger.warn("Error parsing integration test {}: XML validation failed", entry);
+          continue;
+        }
+        IntegrationTestGroup test = IntegrationTestParser.fromXml(doc.getFirstChild());
         test.setSite(site);
         test.setGroup(site.getName());
         logger.debug("Registering integration test " + test.getClass());
@@ -238,6 +255,8 @@ public class SiteActivator {
       } catch (SAXException e) {
         throw new IllegalStateException(e);
       } catch (IOException e) {
+        throw new IllegalStateException(e);
+      } catch (ParserConfigurationException e) {
         throw new IllegalStateException(e);
       }
     }

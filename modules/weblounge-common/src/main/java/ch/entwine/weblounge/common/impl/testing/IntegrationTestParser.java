@@ -94,13 +94,13 @@ public final class IntegrationTestParser {
 
     // Create the test group
     IntegrationTestGroup testGroup = null;
-    String name = XPathHelper.valueOf(config, "/test/name", xpathProcessor);
+    String name = XPathHelper.valueOf(config, "m:name", xpathProcessor);
     if (name == null)
-      throw new IllegalStateException("Unable to create test without identifier");
+      throw new IllegalStateException("Unable to create test without a name");
     testGroup = new IntegrationTestGroup(name);
 
     // Get the test cases
-    NodeList testCaseNodes = XPathHelper.selectList(config, "/test/test-case");
+    NodeList testCaseNodes = XPathHelper.selectList(config, "m:test-case", xpathProcessor);
     if (testCaseNodes == null || testCaseNodes.getLength() == 0) {
       logger.warn("Found test definition without test cases");
       return testGroup;
@@ -110,17 +110,17 @@ public final class IntegrationTestParser {
       Node testCaseNode = testCaseNodes.item(i);
 
       // Name, url and query
-      String testCaseName = XPathHelper.valueOf(testCaseNode, "name", xpathProcessor);
-      String url = XPathHelper.valueOf(testCaseNode, "url", xpathProcessor);
+      String testCaseName = XPathHelper.valueOf(testCaseNode, "m:name", xpathProcessor);
+      String url = XPathHelper.valueOf(testCaseNode, "m:url", xpathProcessor);
 
       // Parameters
       Map<String, String[]> parameters = new HashMap<String, String[]>();
-      NodeList parameterNodes = XPathHelper.selectList(testCaseNode, "parameter");
+      NodeList parameterNodes = XPathHelper.selectList(testCaseNode, "m:parameter", xpathProcessor);
       if (parameterNodes != null) {
         for (int j = 0; j < parameterNodes.getLength(); j++) {
           Node parameterNode = parameterNodes.item(j);
-          String parameterName = XPathHelper.valueOf(parameterNode, "@name");
-          String parameterValue = XPathHelper.valueOf(parameterNode, "text()");
+          String parameterName = XPathHelper.valueOf(parameterNode, "@name", xpathProcessor);
+          String parameterValue = XPathHelper.valueOf(parameterNode, "text()", xpathProcessor);
           String[] values = parameters.get(parameterName);
           if (values == null) {
             parameters.put(parameterName, new String[] { parameterValue });
@@ -136,9 +136,9 @@ public final class IntegrationTestParser {
       IntegrationTestCase testCase = new IntegrationTestCase(testCaseName, url, parameters);
 
       // Status codes
-      String expectedCodes = XPathHelper.valueOf(testCaseNode, "assert-status", xpathProcessor);
+      String expectedCodes = XPathHelper.valueOf(testCaseNode, "m:assertions/m:status", xpathProcessor);
       if (StringUtils.isNotBlank(expectedCodes)) {
-        String[] codeTexts = expectedCodes.split(",");
+        String[] codeTexts = expectedCodes.split("\\s");
         int[] codes = new int[codeTexts.length];
         int v = 0;
         for (String code : codeTexts) {
@@ -148,35 +148,35 @@ public final class IntegrationTestParser {
       }
 
       // Assert existence
-      NodeList existenceNodes = XPathHelper.selectList(testCaseNode, "assert-exists");
+      NodeList existenceNodes = XPathHelper.selectList(testCaseNode, "m:assertions/m:exists", xpathProcessor);
       if (existenceNodes != null) {
         for (int j = 0; j < existenceNodes.getLength(); j++) {
           Node node = existenceNodes.item(j);
-          String path = XPathHelper.valueOf(node, "path");
+          String path = XPathHelper.valueOf(node, "m:path", xpathProcessor);
           testCase.assertExists(path);
         }
       }
 
       // Assert non-existence
-      NodeList missingNodes = XPathHelper.selectList(testCaseNode, "assert-not-exists");
+      NodeList missingNodes = XPathHelper.selectList(testCaseNode, "m:assertions/m:not-exists", xpathProcessor);
       if (missingNodes != null) {
         for (int j = 0; j < missingNodes.getLength(); j++) {
           Node node = missingNodes.item(j);
-          String path = XPathHelper.valueOf(node, "path");
+          String path = XPathHelper.valueOf(node, "m:path", xpathProcessor);
           testCase.assertNotExists(path);
         }
       }
 
       // Assert equality
-      NodeList matchNodes = XPathHelper.selectList(testCaseNode, "assert-equals");
+      NodeList matchNodes = XPathHelper.selectList(testCaseNode, "m:assertions/m:equals", xpathProcessor);
       if (matchNodes != null) {
         for (int j = 0; j < matchNodes.getLength(); j++) {
           Node node = matchNodes.item(j);
-          String path = XPathHelper.valueOf(node, "path");
-          String value = XPathHelper.valueOf(node, "value");
-          String whitespace = XPathHelper.valueOf(node, "@ignorewhitespace");
-          String casesensitivity = XPathHelper.valueOf(node, "@ignorecase");
-          String regex = XPathHelper.valueOf(node, "@regularexpression");
+          String path = XPathHelper.valueOf(node, "m:path", xpathProcessor);
+          String value = XPathHelper.valueOf(node, "m:value", xpathProcessor);
+          String whitespace = XPathHelper.valueOf(node, "@ignorewhitespace", xpathProcessor);
+          String casesensitivity = XPathHelper.valueOf(node, "@ignorecase", xpathProcessor);
+          String regex = XPathHelper.valueOf(node, "@regularexpression", xpathProcessor);
           boolean ignoreWhitespace = ConfigurationUtils.isTrue(whitespace);
           boolean ignoreCase = ConfigurationUtils.isTrue(casesensitivity);
           boolean regularExpression = ConfigurationUtils.isTrue(regex);
@@ -185,15 +185,15 @@ public final class IntegrationTestParser {
       }
 
       // Assert non-equality
-      NodeList mismatchNodes = XPathHelper.selectList(testCaseNode, "assert-not-equals");
+      NodeList mismatchNodes = XPathHelper.selectList(testCaseNode, "m:assertions/m:not-equals", xpathProcessor);
       if (mismatchNodes != null) {
         for (int j = 0; j < mismatchNodes.getLength(); j++) {
           Node node = mismatchNodes.item(j);
-          String path = XPathHelper.valueOf(node, "path");
-          String value = XPathHelper.valueOf(node, "value");
-          String whitespace = XPathHelper.valueOf(node, "@ignorewhitespace");
-          String casesensitivity = XPathHelper.valueOf(node, "@ignorecase");
-          String regex = XPathHelper.valueOf(node, "@regularexpression");
+          String path = XPathHelper.valueOf(node, "m:path", xpathProcessor);
+          String value = XPathHelper.valueOf(node, "m:value", xpathProcessor);
+          String whitespace = XPathHelper.valueOf(node, "@ignorewhitespace", xpathProcessor);
+          String casesensitivity = XPathHelper.valueOf(node, "@ignorecase", xpathProcessor);
+          String regex = XPathHelper.valueOf(node, "@regularexpression", xpathProcessor);
           boolean ignoreWhitespace = ConfigurationUtils.isTrue(whitespace);
           boolean ignoreCase = ConfigurationUtils.isTrue(casesensitivity);
           boolean regularExpression = ConfigurationUtils.isTrue(regex);
