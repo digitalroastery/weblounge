@@ -1,23 +1,25 @@
-<test>
+<test xmlns="http://www.entwinemedia.com/weblounge/3.0/test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/test http://www.entwinemedia.com/xsd/weblounge/3.0/test.xsd">
   <name>Greeting Action Tests</name>
   <test-case>
     <name>English greeting test</name>
     <url method="get">/greeting</url>
     <parameter name="language">english</parameter>
-    <assert-status>200,304</assert-status>
-    <assert-exists>
-      <path>//div[@id='main']/h1</path>
-    </assert-exists>
-    <assert-not-exists>
-      <path>//div[@id='main']/h2</path>
-    </assert-not-exists>
-    <assert-equals ignorewhitespace="false" ignorecase="false">
-      <path>//div[@id='greeting']</path>
-      <value>&#1605;&#1585;&#1581;&#1576;&#1575; &#1571;&#1606;&#1575; &#1571;&#1588;&#1593;&#1585; &#1576;&#1575;&#1604;&#1587;&#1593;&#1575;&#1583;&#1577; &#1575;&#1604;&#1593;&#1575;&#1604;&#1605; &#1575;&#1604;&#1610;&#1608;&#1605;</value>
-    </assert-equals>
-    <assert-not-equals ignorewhitespace="true" ignorecase="false">
-      <path>//div[@id='greeting']</path>
-      <value>hello world i am happy today</value>
-    </assert-not-equals>
+    <assertions>
+      <status>200 304</status>
+      <exists>
+        <path>//div[@id='main']/h1</path>
+      </exists>
+      <not-exists>
+        <path>//div[@id='main']/h2</path>
+      </not-exists>
+      <equals ignorewhitespace="false" ignorecase="false">
+        <path>//div[@id='greeting']</path>
+        <value>&#1605;&#1585;&#1581;&#1576;&#1575; &#1571;&#1606;&#1575; &#1571;&#1588;&#1593;&#1585; &#1576;&#1575;&#1604;&#1587;&#1593;&#1575;&#1583;&#1577; &#1575;&#1604;&#1593;&#1575;&#1604;&#1605; &#1575;&#1604;&#1610;&#1608;&#1605;</value>
+      </equals>
+      <not-equals ignorewhitespace="true" ignorecase="false">
+        <path>//div[@id='greeting']</path>
+        <value>hello world i am happy today</value>
+      </not-equals>
+    </assertions>
   </test-case>
 </test>
