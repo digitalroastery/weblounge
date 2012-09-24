@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.entwinemedia.com/weblounge/3.0/test" xmlns="http://www.entwinemedia.com/weblounge/3.0/test"
+	elementFormDefault="qualified">
+
+  <xsd:element name="test">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="name" type="xsd:string" minOccurs="0" />
+        <xsd:element ref="test-case" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="test-case">
+  	<xsd:complexType>
+  	  <xsd:sequence>
+        <xsd:element name="name" type="xsd:string" minOccurs="0" />
+        <xsd:element ref="url" minOccurs="1"/>
+        <xsd:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+        <xsd:element ref="assertions" minOccurs="1" />
+      </xsd:sequence>
+  	</xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="assertions">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="status" minOccurs="0" />
+        <xsd:element ref="exists" minOccurs="0" maxOccurs="unbounded" />
+        <xsd:element ref="not-exists" minOccurs="0" maxOccurs="unbounded" />
+        <xsd:element ref="equals" minOccurs="0" maxOccurs="unbounded" />
+        <xsd:element ref="not-equals" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="url">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:anyURI">
+          <xsd:attribute name="method" type="methodType" use="required" />
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="parameter">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="name" type="xsd:string" use="required" />
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="status">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="integerListType" />
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="exists">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="path" type="xsd:string" minOccurs="1" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="not-exists">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="path" type="xsd:string" minOccurs="1" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="equals">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="path" type="xsd:string" minOccurs="1" />
+        <xsd:element name="value" type="xsd:string" minOccurs="1" />
+      </xsd:sequence>
+      <xsd:attribute name="ignorewhitespace" type="xsd:boolean" />
+      <xsd:attribute name="ignorecase" type="xsd:boolean" />
+      <xsd:attribute name="regularexpression" type="xsd:boolean" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="not-equals">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="path" type="xsd:string" minOccurs="1" />
+        <xsd:element name="value" type="xsd:string" minOccurs="1" />
+      </xsd:sequence>
+      <xsd:attribute name="ignorewhitespace" type="xsd:boolean" />
+      <xsd:attribute name="ignorecase" type="xsd:boolean" />
+      <xsd:attribute name="regularexpression" type="xsd:boolean" />
+    </xsd:complexType>
+  </xsd:element>
+  
+  <!-- Type definition for a list of integers separated by whitespace -->
+  <xsd:simpleType name="integerListType">
+    <xsd:list itemType="xsd:integer"/>
+  </xsd:simpleType>
+    
+  <!-- 
+  Type definition for method attributes in url elements.
+  -->
+  <xsd:simpleType name="methodType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="options"/>
+      <xsd:enumeration value="post"/>
+      <xsd:enumeration value="head"/>
+      <xsd:enumeration value="get"/>
+      <xsd:enumeration value="post"/>
+      <xsd:enumeration value="put"/>
+      <xsd:enumeration value="delete"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  
+</xsd:schema>
