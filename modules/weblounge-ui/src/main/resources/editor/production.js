@@ -1,5 +1,5 @@
 steal.plugins("jquery/view/tmpl","editor/app").css("editor","css/jquery-ui","css/token-input-facebook","css/token-input","css/validation","css/player/mediaelementplayer").resources("jquery.validate.min","jquery.cookie","jquery.ba-bbq.min","jquery.tools.min","mediaelement-and-player.min").then(function(a){a(document).ready(function(){a("a, form").querystring({_:(new Date).getTime()});a(document.body).prepend("//editor/views/app",{});a("#weblounge-editor").editor_app();a("body > *").each(function(b,
-c){if(a(c).css("position")=="absolute"){b=a(c).css("top");if(b!=""){b=parseFloat(b);a(c).css("top",b+45+"px")}}})})});
+c){if(a(c).css("position")=="absolute"){b=a(c).css("top");if(b!=""){b=parseFloat(b);a(c).css("top",b+45+"px")}}});a.validator.setDefaults({ignore:""})})});
 ;
 steal.end();
 steal.plugins("jquery/view").then(function(){function r(a,b,d,c){c={data:c||(b?b.data:{}),_wrap:b?b._wrap:null,tmpl:null,parent:b||null,nodes:[],calls:H,nest:I,wrap:J,html:K,update:L};a&&jQuery.extend(c,a,{nodes:[],parent:b});if(d){c.tmpl=d;c._ctnt=c._ctnt||c.tmpl(jQuery,c);c.key=++s;(x.length?t:l)[s]=c}return c}function u(a,b,d){var c;d=d?jQuery.map(d,function(f){return typeof f==="string"?a.key?f.replace(/(<\w+)(?=[\s>])(?![^>]*_tmplitem)([^>]*)/g,"$1 "+p+'="'+a.key+'" $2'):f:u(f,a,f._ctnt)}):a;
