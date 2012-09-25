@@ -157,8 +157,11 @@ public interface IndexSchema {
   /** Pagelet type field name (composer) */
   String PAGELET_TYPE_COMPOSER = "pagelet_type_composer_{0}";
 
+  /** Pagelet type field name (position) */
+  String PAGELET_TYPE_POSITION = "pagelet_type_position_{0}";
+
   /** Pagelet type field name (position within composer) */
-  String PAGELET_TYPE_COMPOSER_POSITION = "pagelet_type_position_{0}";
+  String PAGELET_TYPE_COMPOSER_POSITION = "pagelet_type_composer_{0}_position_{1}";
 
   /** Resource content source field name */
   String CONTENT_SOURCE = "content_source";

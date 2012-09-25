@@ -62,70 +62,70 @@
              "description_template" : {
                  "match" : "description_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "coverage_template" : {
                  "match" : "coverage_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "rights_template" : {
                  "match" : "rights_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "title_template" : {
                  "match" : "title_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "pagelet_type_composer" : {
                  "match" : "pagelet_type_composer_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "pagelet_type_position" : {
                  "match" : "pagelet_type_position_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "pagelet_contents_language" : {
                  "match" : "pagelet_contents_language_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "pagelet_contents_composer" : {
                  "match" : "pagelet_contents_composer_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "pagelet_contents_position" : {
                  "match" : "pagelet_contents_position_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "pagelet_xml" : {
                  "match" : "pagelet_xml_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
@@ -146,28 +146,28 @@
              "content_filename" : {
                  "match" : "content_filename_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "content_created" : {
                  "match" : "content_created_*",
                  "match_mapping_type" : "date",
-                 "mapping" : { "type" : "date", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "date", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "content_created_by" : {
                  "match" : "content_created_by_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
              "content_xml" : {
                  "match" : "content_xml_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
                  }
              },
              {
