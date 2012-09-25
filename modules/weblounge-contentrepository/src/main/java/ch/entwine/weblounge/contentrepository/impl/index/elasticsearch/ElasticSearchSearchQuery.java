@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;
 
+import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CONTENT_EXTERNAL_REPRESENTATION;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CONTENT_FILENAME;
@@ -35,6 +36,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGE
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_POSITION;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH_PREFIX;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY;
@@ -72,6 +74,8 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.index.query.TextQueryBuilder;
 import org.elasticsearch.index.query.WildcardQueryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -88,6 +92,9 @@ import java.util.Set;
  * Weblounge implementation of the elastic search query builder.
  */
 public class ElasticSearchSearchQuery implements QueryBuilder {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(ElasticSearchSearchQuery.class);
 
   /** Term queries on fields */
   private Map<String, Set<Object>> searchTerms = null;
@@ -285,23 +292,50 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     }
 
     // Pagelet types
-    for (Pagelet pagelet : query.getPagelets()) {
-      StringBuffer searchTerm = new StringBuffer();
-      searchTerm.append(pagelet.getModule()).append("/").append(pagelet.getIdentifier());
+    if (query.getPagelets() != null) {
+      for (SearchTerms<Pagelet> terms : query.getPagelets()) {
+        String field = null;
+        for (Pagelet pagelet : terms.getTerms()) {
+          String oldField = field;
 
-      // Are we looking for the pagelet in a certain composer or position?
-      PageletURI uri = pagelet.getURI();
-      if (uri != null && (StringUtils.isNotBlank(uri.getComposer()) || uri.getPosition() >= 0)) {
-        if (StringUtils.isNotBlank(uri.getComposer())) {
-          String field = MessageFormat.format(PAGELET_TYPE_COMPOSER, uri.getComposer());
-          and(field, searchTerm.toString(), true);
+          StringBuffer searchTerm = new StringBuffer();
+          searchTerm.append(pagelet.getModule()).append("/").append(pagelet.getIdentifier());
+
+          // Are we looking for the pagelet in a certain composer or position?
+          PageletURI uri = pagelet.getURI();
+          if (uri != null) {
+            if (StringUtils.isNotBlank(uri.getComposer()) && uri.getPosition() >= 0) {
+              field = MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, uri.getComposer(), uri.getPosition());
+              and(field, searchTerm.toString(), true);
+            } else if (StringUtils.isNotBlank(uri.getComposer())) {
+              field = MessageFormat.format(PAGELET_TYPE_COMPOSER, uri.getComposer());
+              and(field, searchTerm.toString(), true);
+            } else if (uri.getPosition() >= 0) {
+              field = MessageFormat.format(PAGELET_TYPE_POSITION, uri.getPosition());
+              and(field, searchTerm.toString(), true);
+            } else {
+              field = PAGELET_TYPE;
+              and(field, searchTerm.toString(), true);
+            }
+          } else {
+            field = PAGELET_TYPE;
+            and(field, searchTerm.toString(), true);
+          }
+
+          if (All.equals(terms.getQuantifier()) && oldField != null && !oldField.equals(field)) {
+            logger.warn("Queries based on pagelets and the 'all' quantifier need to use the same field");
+          }
         }
-        if (uri.getPosition() >= 0) {
-          String field = MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, uri.getPosition());
-          and(field, searchTerm.toString(), true);
+
+        // Add filters to support AND queries
+        if (All.equals(terms.getQuantifier())) {
+          if (groups == null)
+            groups = new ArrayList<ValueGroup>();
+          List<String> pagelets = new ArrayList<String>(terms.size());
+          for (Pagelet p : terms.getTerms())
+            pagelets.add(p.toString());
+          groups.add(new ValueGroup(field, (Object[]) pagelets.toArray(new String[pagelets.size()])));
         }
-      } else {
-        and(PAGELET_TYPE, searchTerm.toString(), true);
       }
     }
 
@@ -327,19 +361,59 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // Fulltext
     if (query.getFulltext() != null) {
-      if (query.isWildcardSearch()) {
-        wildcardFulltext = query.getFulltext() + "*";
-      } else {
-        fulltext = query.getFulltext();
+      for (SearchTerms<String> terms : query.getFulltext()) {
+        for (String text : terms.getTerms()) {
+          if (query.isWildcardSearch()) {
+            if (wildcardFulltext != null)
+              wildcardFulltext += " ";
+            else
+              wildcardFulltext = "";
+            wildcardFulltext += text + "*";
+          } else {
+            if (fulltext != null)
+              fulltext += " ";
+            else
+              fulltext = "";
+            fulltext += text;
+          }
+        }
+        if (All.equals(terms.getQuantifier())) {
+          if (groups == null)
+            groups = new ArrayList<ValueGroup>();
+          if (query.isWildcardSearch()) {
+            logger.warn("All quantifier not supported in conjunction with wildcard fulltext");
+          }
+          groups.add(new ValueGroup(FULLTEXT, (Object[]) terms.getTerms().toArray(new String[terms.size()])));
+        }
       }
     }
 
     // Text
     if (query.getText() != null) {
-      if (query.isWildcardSearch()) {
-        wildcardText = query.getText() + "*";
-      } else {
-        text = query.getText();
+      for (SearchTerms<String> terms : query.getText()) {
+        for (String text : terms.getTerms()) {
+          if (query.isWildcardSearch()) {
+            if (wildcardText != null)
+              wildcardText += " ";
+            else
+              wildcardText = "";
+            wildcardText += text + "*";
+          } else {
+            if (this.text != null)
+              this.text += " ";
+            else
+              this.text = "";
+            this.text += text;
+          }
+        }
+        if (All.equals(terms.getQuantifier())) {
+          if (groups == null)
+            groups = new ArrayList<ValueGroup>();
+          if (query.isWildcardSearch()) {
+            logger.warn("All quantifier not supported in conjunction with wildcard text");
+          }
+          groups.add(new ValueGroup(TEXT, (Object[]) terms.getTerms().toArray(new String[terms.size()])));
+        }
       }
     }
 

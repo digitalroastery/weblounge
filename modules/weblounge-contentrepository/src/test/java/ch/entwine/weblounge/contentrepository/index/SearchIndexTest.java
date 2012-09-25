@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository.index;
 
+import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -32,12 +33,14 @@ import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
+import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
@@ -299,6 +302,53 @@ public class SearchIndexTest {
    * .
    */
   @Test
+  public void testGetWithPagelet() throws Exception {
+    populateIndex();
+    Pagelet[] mainPagelets = pages[0].getPagelets("main");
+    Pagelet titlePagelet = new PageletImpl(mainPagelets[0].getModule(), mainPagelets[0].getIdentifier());
+    Pagelet imagePagelet = new PageletImpl(mainPagelets[1].getModule(), mainPagelets[1].getIdentifier());
+
+    // Search for pages containing a pagelet (pages 1 and 2)
+    SearchQuery q = new SearchQueryImpl(site).withPagelet(titlePagelet);
+    assertEquals(2, idx.getByQuery(q).getDocumentCount());
+
+    // Search for pages containing an image pagelet (only page 1)
+    q = new SearchQueryImpl(site).withPagelet(imagePagelet);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+
+    // Search for pages containing the title pagelet in the correct position
+    // (only page 1)
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("main");
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("main").atPosition(0);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).atPosition(0);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+
+    // Search for pages containing the title pagelet in the correct position
+    // (only page 1)
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("test");
+    assertEquals(0, idx.getByQuery(q).getDocumentCount());
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).atPosition(2);
+    assertEquals(0, idx.getByQuery(q).getDocumentCount());
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("main").atPosition(1);
+    assertEquals(0, idx.getByQuery(q).getDocumentCount());
+
+    // Find documents with both pagelets on one page
+    q = new SearchQueryImpl(site).withPagelets(All, titlePagelet, imagePagelet);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+
+    // Find documents with both pagelets on one page and in the same composer
+    q = new SearchQueryImpl(site).withPagelets(All, titlePagelet, imagePagelet).inComposer("main");
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
   public void testGetWithTemplate() throws Exception {
     populateIndex();
     SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withTemplate("default");
@@ -325,9 +375,9 @@ public class SearchIndexTest {
   @Test
   public void testGetWithWildcardText() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext("Tec", true);
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext(true, "Tec");
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
-    q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext("/a", true);
+    q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext(true, "/a");
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 

@@ -31,8 +31,10 @@ import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGE
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_CONTENTS_LOCALIZED;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_PROPERTIES;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_PROPERTY_VALUE;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_POSITION;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_XML_COMPOSER;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_XML_COMPOSER_POSITION;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PREVIEW_XML;
@@ -130,8 +132,11 @@ public class PageInputDocument extends ResourceInputDocument {
       addField(PAGELET_PROPERTIES, serializeProperties(p), false, false);
       addField(MessageFormat.format(PAGELET_XML_COMPOSER, composerId), p.toXml(), false, false);
       addField(MessageFormat.format(PAGELET_XML_COMPOSER_POSITION, i), p.toXml(), false, false);
+
+      addField(PAGELET_TYPE, p.getModule() + "/" + p.getIdentifier(), false, false);
       addField(MessageFormat.format(PAGELET_TYPE_COMPOSER, composerId), p.getModule() + "/" + p.getIdentifier(), false, false);
-      addField(MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, i), p.getModule() + "/" + p.getIdentifier(), false, false);
+      addField(MessageFormat.format(PAGELET_TYPE_POSITION, i), p.getModule() + "/" + p.getIdentifier(), false, false);
+      addField(MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, composerId, i), p.getModule() + "/" + p.getIdentifier(), false, false);
 
       // Workflow related
       addField(OWNED_BY, IndexUtils.serializeUserId(p.getOwner()), false, false);

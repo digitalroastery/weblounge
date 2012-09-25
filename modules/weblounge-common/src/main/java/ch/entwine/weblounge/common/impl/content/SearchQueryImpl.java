@@ -20,12 +20,11 @@
 
 package ch.entwine.weblounge.common.impl.content;
 
-import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
+import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.Any;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchTerms;
-import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
@@ -96,7 +95,7 @@ public class SearchQueryImpl implements SearchQuery {
   protected boolean stationary = false;
 
   /** The list of required pagelets */
-  protected List<Pagelet> pagelets = new ArrayList<Pagelet>();
+  protected List<SearchTerms<Pagelet>> pagelets = null;
 
   /** The list of required subjects */
   protected List<SearchTerms<String>> subjects = null;
@@ -168,10 +167,10 @@ public class SearchQueryImpl implements SearchQuery {
   protected String mimetype = null;
 
   /** Fulltext query terms */
-  protected String fulltext = null;
+  protected List<SearchTerms<String>> fulltext = null;
 
   /** Query terms */
-  protected String text = null;
+  protected List<SearchTerms<String>> text = null;
 
   /** True if the search text should be matched using wildcards */
   protected boolean wildcardSearch = true;
@@ -187,9 +186,6 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** True to boost more recent documents */
   protected boolean recencyBoost = false;
-
-  /** True when using faceted search */
-  protected boolean subjectFacetEnabled = false;
 
   /** Creation date order relation */
   protected Order creationDateSearchOrder = Order.None;
@@ -504,9 +500,11 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery andProperty(String propertyName, String propertyValue)
       throws IllegalStateException {
-    ensureConfigurationObject(Pagelet.class);
-    Pagelet pagelet = (Pagelet) stack.peek();
-    pagelet.addProperty(propertyName, propertyValue);
+    ensureConfigurationArray(Pagelet.class);
+    Pagelet[] pagelets = (Pagelet[]) stack.peek();
+    for (Pagelet pagelet : pagelets) {
+      pagelet.addProperty(propertyName, propertyValue);
+    }
     return this;
   }
 
@@ -520,9 +518,11 @@ public class SearchQueryImpl implements SearchQuery {
       throws IllegalStateException {
     if (language == null)
       throw new IllegalStateException("You need to specify the query language first");
-    ensureConfigurationObject(Pagelet.class);
-    Pagelet pagelet = (Pagelet) stack.peek();
-    pagelet.setContent(textName, text, language);
+    ensureConfigurationArray(Pagelet.class);
+    Pagelet[] pagelets = (Pagelet[]) stack.peek();
+    for (Pagelet pagelet : pagelets) {
+      pagelet.setContent(textName, text, language);
+    }
     return this;
   }
 
@@ -532,19 +532,17 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#atPosition(int)
    */
   public SearchQuery atPosition(int position) throws IllegalStateException {
-    ensureConfigurationObject(Pagelet.class);
-    Pagelet pagelet = (Pagelet) stack.peek();
-    PageletURI uri = pagelet.getURI();
-    if (uri == null) {
-      PageTemplate template = site.getDefaultTemplate();
-      String stage = null;
-      if (template != null)
-        stage = template.getStage();
-      uri = new PageletURIImpl(null, stage, position);
-    } else {
-      uri.setPosition(position);
+    ensureConfigurationArray(Pagelet.class);
+    Pagelet[] pagelets = (Pagelet[]) stack.peek();
+    for (Pagelet pagelet : pagelets) {
+      PageletURI uri = pagelet.getURI();
+      if (uri == null) {
+        uri = new PageletURIImpl(null, null, position);
+      } else {
+        uri.setPosition(position);
+      }
+      pagelet.setURI(uri);
     }
-    pagelet.setURI(uri);
     return this;
   }
 
@@ -554,15 +552,17 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#inComposer(java.lang.String)
    */
   public SearchQuery inComposer(String composer) throws IllegalStateException {
-    ensureConfigurationObject(Pagelet.class);
-    Pagelet pagelet = (Pagelet) stack.peek();
-    PageletURI uri = pagelet.getURI();
-    if (uri == null) {
-      uri = new PageletURIImpl(null, composer, -1);
-    } else {
-      uri.setComposer(composer);
+    ensureConfigurationArray(Pagelet.class);
+    Pagelet[] pagelets = (Pagelet[]) stack.peek();
+    for (Pagelet pagelet : pagelets) {
+      PageletURI uri = pagelet.getURI();
+      if (uri == null) {
+        uri = new PageletURIImpl(null, composer, -1);
+      } else {
+        uri.setComposer(composer);
+      }
+      pagelet.setURI(uri);
     }
-    pagelet.setURI(uri);
     return this;
   }
 
@@ -621,19 +621,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withSubject(java.lang.String)
    */
   public SearchQuery withSubject(String subject) {
-    if (subjects == null) {
-      subjects = new ArrayList<SearchTerms<String>>();
-      SearchTerms<String> terms = new SearchTermsImpl<String>(Quantifier.Any, subject);
-      subjects.add(terms);
-      return this;
-    }
-    for (SearchTerms<String> terms : subjects) {
-      if (Quantifier.Any.equals(terms.getQuantifier())) {
-        terms.add(subject);
-        return this;
-      }
-    }
-    return this;
+    return withSubjects(Any, subject);
   }
 
   /**
@@ -644,12 +632,18 @@ public class SearchQueryImpl implements SearchQuery {
    */
   @Override
   public SearchQuery withSubjects(Quantifier quantifier, String... subjects) {
-    if (All.equals(quantifier) && subjects.length < 2)
-      throw new IllegalArgumentException("More than one search term is required with quantifier 'all'");
+    if (quantifier == null)
+      throw new IllegalArgumentException("Quantifier must not be null");
+    if (subjects == null)
+      throw new IllegalArgumentException("Subjects must not be null");
+
+    // Make sure the collection is initialized
     if (this.subjects == null)
       this.subjects = new ArrayList<SearchTerms<String>>();
-    SearchTerms<String> terms = new SearchTermsImpl<String>(quantifier, subjects);
-    this.subjects.add(terms);
+
+    // Add the text to the search terms
+    clearExpectations();
+    with(this.subjects, quantifier, subjects);
     return this;
   }
 
@@ -779,15 +773,35 @@ public class SearchQueryImpl implements SearchQuery {
    * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withPagelet(ch.entwine.weblounge.common.content.page.Pagelet)
    */
-  public SearchQuery withPagelet(String module, String id) {
+  public SearchQuery withPagelet(Pagelet pagelet) {
+    return withPagelets(Any, pagelet);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withPagelets(ch.entwine.weblounge.common.content.SearchQuery.Quantifier,
+   *      ch.entwine.weblounge.common.content.page.Pagelet[])
+   */
+  @Override
+  public SearchQuery withPagelets(Quantifier quantifier, Pagelet... pagelets) {
+    if (pagelets == null)
+      throw new IllegalArgumentException("Pagelet must not be null");
+    if (quantifier == null)
+      throw new IllegalArgumentException("Quantifier must not be null");
+
+    // Make sure the collection is initialized
+    if (this.pagelets == null)
+      this.pagelets = new ArrayList<SearchTerms<Pagelet>>();
+
+    int i = 0;
+    for (Pagelet p : pagelets) {
+      pagelets[i++] = new PageletImpl(p.getModule(), p.getIdentifier());
+    }
+
     clearExpectations();
-    if (module == null)
-      throw new IllegalArgumentException("Module identifier must not be null");
-    if (id == null)
-      throw new IllegalArgumentException("Pagelet identifier must not be null");
-    Pagelet pagelet = new PageletImpl(module, id);
-    pagelets.add(pagelet);
-    configure(pagelet);
+    with(this.pagelets, quantifier, pagelets);
+    configure(pagelets);
     return this;
   }
 
@@ -796,8 +810,8 @@ public class SearchQueryImpl implements SearchQuery {
    * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getPagelets()
    */
-  public Pagelet[] getPagelets() {
-    return pagelets.toArray(new Pagelet[pagelets.size()]);
+  public Collection<SearchTerms<Pagelet>> getPagelets() {
+    return pagelets;
   }
 
   /**
@@ -1016,19 +1030,42 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withText(java.lang.String)
    */
   public SearchQuery withText(String text) {
-    return withText(text, false);
+    return withText(false, Any, text);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#withText(java.lang.String,
-   *      boolean)
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withText(boolean,
+   *      java.lang.String)
    */
-  public SearchQuery withText(String text, boolean wildcardSearch) {
+  public SearchQuery withText(boolean wildcardSearch, String text) {
+    return withText(wildcardSearch, Any, text);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withText(boolean,
+   *      ch.entwine.weblounge.common.content.SearchQuery.Quantifier,
+   *      java.lang.String[])
+   */
+  @Override
+  public SearchQuery withText(boolean wildcardSearch, Quantifier quantifier,
+      String... text) {
+    if (quantifier == null)
+      throw new IllegalArgumentException("Quantifier must not be null");
+    if (text == null)
+      throw new IllegalArgumentException("Text must not be null");
+
+    // Make sure the collection is initialized
+    if (this.text == null)
+      this.text = new ArrayList<SearchTerms<String>>();
+
+    // Add the text to the search terms
     clearExpectations();
-    this.text = text;
     this.wildcardSearch = wildcardSearch;
+    with(this.text, quantifier, text);
     return this;
   }
 
@@ -1037,7 +1074,7 @@ public class SearchQueryImpl implements SearchQuery {
    * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getText()
    */
-  public String getText() {
+  public Collection<SearchTerms<String>> getText() {
     return text;
   }
 
@@ -1048,20 +1085,42 @@ public class SearchQueryImpl implements SearchQuery {
    */
   @Override
   public SearchQuery withFulltext(String text) {
-    return withFulltext(text, false);
+    return withFulltext(false, Any, text);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#withFulltext(java.lang.String,
-   *      boolean)
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withFulltext(boolean,
+   *      java.lang.String)
    */
   @Override
-  public SearchQuery withFulltext(String text, boolean wildcardSearch) {
+  public SearchQuery withFulltext(boolean wildcardSearch, String text) {
+    return withFulltext(wildcardSearch, Any, text);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withFulltext(boolean,
+   *      ch.entwine.weblounge.common.content.SearchQuery.Quantifier,
+   *      java.lang.String[])
+   */
+  public SearchQuery withFulltext(boolean wildcardSearch,
+      Quantifier quantifier, String... text) {
+    if (quantifier == null)
+      throw new IllegalArgumentException("Quantifier must not be null");
+    if (text == null)
+      throw new IllegalArgumentException("Text must not be null");
+
+    // Make sure the collection is initialized
+    if (this.fulltext == null)
+      this.fulltext = new ArrayList<SearchTerms<String>>();
+
+    // Add the text to the search terms
     clearExpectations();
-    this.fulltext = text;
     this.wildcardSearch = wildcardSearch;
+    with(this.fulltext, quantifier, text);
     return this;
   }
 
@@ -1071,7 +1130,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#getFulltext()
    */
   @Override
-  public String getFulltext() {
+  public Collection<SearchTerms<String>> getFulltext() {
     return fulltext;
   }
 
@@ -1251,25 +1310,6 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#withSubjectFacet()
-   */
-  public SearchQuery withSubjectFacet() {
-    subjectFacetEnabled = true;
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#isSubjectFacetEnabled()
-   */
-  public boolean isSubjectFacetEnabled() {
-    return subjectFacetEnabled;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withVersion(long)
    */
   public SearchQuery withVersion(long version) {
@@ -1366,10 +1406,26 @@ public class SearchQueryImpl implements SearchQuery {
    * @throws IllegalStateException
    *           if no object of type <code>c</code> was found on the stack
    */
-  private void ensureConfigurationObject(Class<?> c)
+  protected void ensureConfigurationObject(Class<?> c)
       throws IllegalStateException {
     for (Object o : stack) {
       if (c.isAssignableFrom(o.getClass()))
+        return;
+    }
+    throw new IllegalStateException("Malformed query configuration. No " + c.getClass().getName() + " is expected at this time");
+  }
+
+  /**
+   * Make sure that an array of type <code>c</code> is on the stack, throw an
+   * <code>IllegalStateException</code> otherwise.
+   * 
+   * @throws IllegalStateException
+   *           if no array of type <code>c</code> was found on the stack
+   */
+  protected void ensureConfigurationArray(Class<?> c)
+      throws IllegalStateException {
+    for (Object o : stack) {
+      if (o.getClass().isArray() && c.isAssignableFrom(o.getClass().getComponentType()))
         return;
     }
     throw new IllegalStateException("Malformed query configuration. No " + c.getClass().getName() + " is expected at this time");
@@ -1411,6 +1467,54 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public String[] getSeries() {
     return series.toArray(new String[series.size()]);
+  }
+
+  /**
+   * Utility method to add the given values to the list of search terms using
+   * the specified quantifier.
+   * 
+   * @param searchTerms
+   *          the terms
+   * @param quantifier
+   *          the quantifier
+   * @param values
+   *          the values
+   * @return the extended search terms
+   */
+  private <T extends Object> SearchTerms<T> with(
+      List<SearchTerms<T>> searchTerms, Quantifier quantifier, T... values) {
+    SearchTerms<T> terms = null;
+
+    // Handle any quantifier
+    if (values.length == 1 || Any.equals(quantifier)) {
+
+      // Check if there is a default terms collection
+      for (SearchTerms<T> t : searchTerms) {
+        if (Quantifier.Any.equals(t.getQuantifier())) {
+          terms = t;
+          break;
+        }
+      }
+
+      // Has there been a default terms collection?
+      if (terms == null) {
+        terms = new SearchTermsImpl<T>(Quantifier.Any, values);
+        searchTerms.add(terms);
+      }
+
+      // Add the text
+      for (T v : values) {
+        terms.add(v);
+      }
+    }
+
+    // All quantifier
+    else {
+      terms = new SearchTermsImpl<T>(quantifier, values);
+      searchTerms.add(terms);
+    }
+
+    return terms;
   }
 
 }

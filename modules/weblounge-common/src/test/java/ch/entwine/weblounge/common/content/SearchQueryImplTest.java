@@ -42,6 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 
@@ -288,10 +289,12 @@ public class SearchQueryImplTest {
 
     // Test proper behavior
     query = new SearchQueryImpl(site);
-    query.withPagelet(pagelet.getModule(), pagelet.getIdentifier());
+    query.withPagelet(new PageletImpl(pagelet.getModule(), pagelet.getIdentifier()));
     query.andProperty(propertyName, propertyValue);
-    assertEquals(1, query.getPagelets().length);
-    assertEquals(propertyValue, query.getPagelets()[0].getProperty(propertyName));
+    assertEquals(1, query.getPagelets().size());
+    Collection<SearchTerms<Pagelet>> pagelets = query.getPagelets();
+    Pagelet firstPagelet = pagelets.iterator().next().getTerms().iterator().next();
+    assertEquals(propertyValue, firstPagelet.getProperty(propertyName));
   }
 
   /**
@@ -315,10 +318,12 @@ public class SearchQueryImplTest {
 
     // Test proper behavior
     query = new SearchQueryImpl(site, german);
-    query.withPagelet(pagelet.getModule(), pagelet.getIdentifier());
+    query.withPagelet(new PageletImpl(pagelet.getModule(), pagelet.getIdentifier()));
     query.andElement(textName, textValue);
-    assertEquals(1, query.getPagelets().length);
-    assertEquals(textValue, query.getPagelets()[0].getContent(textName));
+    assertEquals(1, query.getPagelets().size());
+    Collection<SearchTerms<Pagelet>> pagelets = query.getPagelets();
+    Pagelet firstPagelet = pagelets.iterator().next().getTerms().iterator().next();
+    assertEquals(textValue, firstPagelet.getContent(textName));
   }
 
   /**
@@ -342,19 +347,23 @@ public class SearchQueryImplTest {
 
     // Test proper behavior with pagelet only
     query = new SearchQueryImpl(site);
-    query.withPagelet(pagelet.getModule(), pagelet.getIdentifier());
+    query.withPagelet(new PageletImpl(pagelet.getModule(), pagelet.getIdentifier()));
     query.atPosition(position);
-    assertEquals(1, query.getPagelets().length);
-    assertEquals(position, query.getPagelets()[0].getURI().getPosition());
+    assertEquals(1, query.getPagelets().size());
+    Collection<SearchTerms<Pagelet>> pagelets = query.getPagelets();
+    Pagelet firstPagelet = pagelets.iterator().next().getTerms().iterator().next();
+    assertEquals(position, firstPagelet.getURI().getPosition());
 
     // Test proper behavior with pagelet only
     query = new SearchQueryImpl(site);
-    query.withPagelet(pagelet.getModule(), pagelet.getIdentifier());
+    query.withPagelet(new PageletImpl(pagelet.getModule(), pagelet.getIdentifier()));
     query.inComposer(composer);
     query.atPosition(position);
-    assertEquals(1, query.getPagelets().length);
-    assertEquals(composer, query.getPagelets()[0].getURI().getComposer());
-    assertEquals(position, query.getPagelets()[0].getURI().getPosition());
+    assertEquals(1, query.getPagelets().size());
+    pagelets = query.getPagelets();
+    firstPagelet = pagelets.iterator().next().getTerms().iterator().next();
+    assertEquals(composer, firstPagelet.getURI().getComposer());
+    assertEquals(position, firstPagelet.getURI().getPosition());
   }
 
   /**
@@ -377,10 +386,12 @@ public class SearchQueryImplTest {
 
     // Test proper behavior
     query = new SearchQueryImpl(site);
-    query.withPagelet(pagelet.getModule(), pagelet.getIdentifier());
+    query.withPagelet(new PageletImpl(pagelet.getModule(), pagelet.getIdentifier()));
     query.inComposer(composer);
-    assertEquals(1, query.getPagelets().length);
-    assertEquals(composer, query.getPagelets()[0].getURI().getComposer());
+    assertEquals(1, query.getPagelets().size());
+    Collection<SearchTerms<Pagelet>> pagelets = query.getPagelets();
+    Pagelet firstPagelet = pagelets.iterator().next().getTerms().iterator().next();
+    assertEquals(composer, firstPagelet.getURI().getComposer());
   }
 
   /**
@@ -479,9 +490,11 @@ public class SearchQueryImplTest {
    */
   @Test
   public void testWithPagelet() {
-    query.withPagelet(pagelet.getModule(), pagelet.getIdentifier());
-    assertEquals(1, query.getPagelets().length);
-    assertEquals(pagelet, query.getPagelets()[0]);
+    query.withPagelet(new PageletImpl(pagelet.getModule(), pagelet.getIdentifier()));
+    assertEquals(1, query.getPagelets().size());
+    Collection<SearchTerms<Pagelet>> pagelets = query.getPagelets();
+    Pagelet firstPagelet = pagelets.iterator().next().getTerms().iterator().next();
+    assertEquals(pagelet, firstPagelet);
   }
 
   /**
@@ -566,7 +579,8 @@ public class SearchQueryImplTest {
     String text = "text";
     query = new SearchQueryImpl(site, german);
     query.withText(text);
-    assertEquals(text, query.getText());
+    SearchTerms<String> terms = query.getText().iterator().next();
+    assertEquals(text, terms.getTerms().iterator().next());
   }
 
   /**
@@ -579,7 +593,8 @@ public class SearchQueryImplTest {
     String text = "fulltext";
     query = new SearchQueryImpl(site, german);
     query.withFulltext(text);
-    assertEquals(text, query.getFulltext());
+    SearchTerms<String> terms = query.getFulltext().iterator().next();
+    assertEquals(text, terms.getTerms().iterator().next());
   }
 
   /**
