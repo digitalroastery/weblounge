@@ -25,9 +25,9 @@ import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.Any;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchTerms;
-import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
+import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
@@ -537,11 +537,7 @@ public class SearchQueryImpl implements SearchQuery {
     for (Pagelet pagelet : pagelets) {
       PageletURI uri = pagelet.getURI();
       if (uri == null) {
-        PageTemplate template = site.getDefaultTemplate();
-        String stage = null;
-        if (template != null)
-          stage = template.getStage();
-        uri = new PageletURIImpl(null, stage, position);
+        uri = new PageletURIImpl(null, null, position);
       } else {
         uri.setPosition(position);
       }

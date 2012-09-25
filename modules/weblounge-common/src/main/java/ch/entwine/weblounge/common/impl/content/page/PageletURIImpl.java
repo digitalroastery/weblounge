@@ -43,11 +43,11 @@ public class PageletURIImpl implements PageletURI {
    * Creates a new <code>PageletLocationImpl</code> with the given url, composer
    * and position.
    * 
-   *@param pageURI
+   * @param pageURI
    *          the pagelet's url
-   *@param composer
+   * @param composer
    *          the pagelet's composer
-   *@param position
+   * @param position
    *          the position within the composer
    */
   public PageletURIImpl(ResourceURI pageURI, String composer, int position) {
@@ -124,11 +124,16 @@ public class PageletURIImpl implements PageletURI {
    * 
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
-    if (pageURI != null && composer != null)
-      return pageURI.hashCode() | (composer.hashCode() >> 8) | (position >> 8);
-    else
-      return super.hashCode();
+    int hashCode = 0;
+    if (pageURI != null)
+      hashCode |= pageURI.hashCode();
+    if (composer != null)
+      hashCode |= composer.hashCode();
+    if (position > 0)
+      hashCode |= (position >> 8);
+    return hashCode;
   }
 
   /**
@@ -136,6 +141,7 @@ public class PageletURIImpl implements PageletURI {
    * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(Object o) {
     if (o instanceof PageletURI) {
       PageletURI l = (PageletURI) o;
@@ -151,14 +157,20 @@ public class PageletURIImpl implements PageletURI {
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   public int compareTo(PageletURI l) {
-    if (!pageURI.equals(l.getPageURI()) || !composer.equals(l.getComposer()))
-      return 0;
+    if (pageURI != null) {
+      if (pageURI.equals(l.getPageURI()) && composer == null && position < 0)
+        return 0;
+    } else if (composer != null) {
+      if (composer.equals(l.getComposer()) && position < 0)
+        return 0;
+    }
     return Integer.valueOf(position).compareTo(Integer.valueOf(l.getPosition()));
   }
 
   /**
    * Returns the page uri along with the pagelet position on that page as in the
    * following example:
+   * 
    * <pre>
    *  /test/a/b [composer=main,position=7]
    * </pre>

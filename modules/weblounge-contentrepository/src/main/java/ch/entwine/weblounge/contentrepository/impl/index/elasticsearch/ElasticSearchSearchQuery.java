@@ -36,6 +36,7 @@ import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGE
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_POSITION;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH_PREFIX;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY;
@@ -293,31 +294,47 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     // Pagelet types
     if (query.getPagelets() != null) {
       for (SearchTerms<Pagelet> terms : query.getPagelets()) {
+        String field = null;
         for (Pagelet pagelet : terms.getTerms()) {
+          String oldField = field;
+
           StringBuffer searchTerm = new StringBuffer();
           searchTerm.append(pagelet.getModule()).append("/").append(pagelet.getIdentifier());
 
           // Are we looking for the pagelet in a certain composer or position?
           PageletURI uri = pagelet.getURI();
-          if (uri != null && (StringUtils.isNotBlank(uri.getComposer()) || uri.getPosition() >= 0)) {
-            if (StringUtils.isNotBlank(uri.getComposer())) {
-              String field = MessageFormat.format(PAGELET_TYPE_COMPOSER, uri.getComposer());
+          if (uri != null) {
+            if (StringUtils.isNotBlank(uri.getComposer()) && uri.getPosition() >= 0) {
+              field = MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, uri.getComposer(), uri.getPosition());
               and(field, searchTerm.toString(), true);
-            }
-            if (uri.getPosition() >= 0) {
-              String field = MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, uri.getPosition());
+            } else if (StringUtils.isNotBlank(uri.getComposer())) {
+              field = MessageFormat.format(PAGELET_TYPE_COMPOSER, uri.getComposer());
+              and(field, searchTerm.toString(), true);
+            } else if (uri.getPosition() >= 0) {
+              field = MessageFormat.format(PAGELET_TYPE_POSITION, uri.getPosition());
+              and(field, searchTerm.toString(), true);
+            } else {
+              field = PAGELET_TYPE;
               and(field, searchTerm.toString(), true);
             }
           } else {
-            and(PAGELET_TYPE, searchTerm.toString(), true);
+            field = PAGELET_TYPE;
+            and(field, searchTerm.toString(), true);
+          }
+
+          if (All.equals(terms.getQuantifier()) && oldField != null && !oldField.equals(field)) {
+            logger.warn("Queries based on pagelets and the 'all' quantifier need to use the same field");
           }
         }
 
-        // TODO
+        // Add filters to support AND queries
         if (All.equals(terms.getQuantifier())) {
           if (groups == null)
             groups = new ArrayList<ValueGroup>();
-          groups.add(new ValueGroup(FULLTEXT, (Object[]) terms.getTerms().toArray(new String[terms.size()])));
+          List<String> pagelets = new ArrayList<String>(terms.size());
+          for (Pagelet p : terms.getTerms())
+            pagelets.add(p.toString());
+          groups.add(new ValueGroup(field, (Object[]) pagelets.toArray(new String[pagelets.size()])));
         }
       }
     }
