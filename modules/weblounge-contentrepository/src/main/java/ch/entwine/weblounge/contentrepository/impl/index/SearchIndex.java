@@ -707,7 +707,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     GetRequestBuilder getRequestBuilder = nodeClient.prepareGet(site.getIdentifier(), VERSION_TYPE, ROOT_ID);
     try {
       GetResponse response = getRequestBuilder.execute().actionGet();
-      if (response.field(VERSION) != null) {
+      if (response.exists() && response.field(VERSION) != null) {
         indexVersion = Integer.parseInt((String) response.field(VERSION).getValue());
         versionIndexExists = true;
         logger.debug("Search index version is {}", indexVersion);
