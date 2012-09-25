@@ -30,7 +30,6 @@ import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -96,8 +95,10 @@ public class CacheTest extends IntegrationTestBase {
       throw new IllegalStateException();
 
     // Test the Cache header
-    Header[] cacheHeaders = response.getHeaders("X-Cache-Key");
-    responseCacheIsActivated = cacheHeaders != null && cacheHeaders.length > 0;
+    // FIXME Check if cache is enabled
+//    Header[] cacheHeaders = response.getHeaders("X-Cache-Key");
+//    responseCacheIsActivated = cacheHeaders != null && cacheHeaders.length > 0;
+    responseCacheIsActivated = true;
 
     // Is the cache active?
     if (!responseCacheIsActivated) {
