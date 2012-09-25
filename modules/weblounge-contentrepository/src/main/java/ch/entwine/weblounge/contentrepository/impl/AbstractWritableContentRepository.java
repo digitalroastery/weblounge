@@ -802,7 +802,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
-    if (cache != null && updatePreviews && uri.getVersion() == Resource.LIVE) {
+    if (cache != null && uri.getVersion() == Resource.LIVE) {
       List<CacheTag> tags = new ArrayList<CacheTag>();
 
       // resource id
