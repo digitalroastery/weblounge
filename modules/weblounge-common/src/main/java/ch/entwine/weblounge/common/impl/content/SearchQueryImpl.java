@@ -798,6 +798,11 @@ public class SearchQueryImpl implements SearchQuery {
     if (this.pagelets == null)
       this.pagelets = new ArrayList<SearchTerms<Pagelet>>();
 
+    int i = 0;
+    for (Pagelet p : pagelets) {
+      pagelets[i++] = new PageletImpl(p.getModule(), p.getIdentifier());
+    }
+
     clearExpectations();
     with(this.pagelets, quantifier, pagelets);
     configure(pagelets);
