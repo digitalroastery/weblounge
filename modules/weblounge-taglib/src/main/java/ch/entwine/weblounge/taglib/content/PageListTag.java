@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.taglib.content;
 
+import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
+
 import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
@@ -30,6 +32,7 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -273,16 +276,22 @@ public class PageListTag extends WebloungeTag {
       SearchQuery query = new SearchQueryImpl(site);
       query.withVersion(Resource.LIVE);
 
-      // Add the keywords
+      // Add the keywords (or)
       for (String subject : subjects) {
         query.withSubject(subject);
       }
 
-      // Add the pagelets required on state
-      for (String headline : requiredPagelets) {
-        String[] parts = headline.split("/");
-        if (parts.length > 1)
-          query.withPagelet(parts[0], parts[1]).inStage();
+      // Add the pagelets required on stage (and)
+      if (requiredPagelets.size() > 0) {
+        List<Pagelet> pagelets = new ArrayList<Pagelet>();
+        for (String headline : requiredPagelets) {
+          String[] parts = headline.split("/");
+          if (parts.length > 1) {
+            Pagelet pagelet = new PageletImpl(parts[0], parts[1]);
+            pagelets.add(pagelet);
+          }
+        }
+        query.withPagelets(All, pagelets.toArray(new Pagelet[pagelets.size()])).inStage();
       }
 
       // Order by date and limit the result set

@@ -209,9 +209,9 @@ public class SearchIndexFulltextTest {
   public void testGetWithPathPrefix() throws Exception {
     String path = livePage.getURI().getPath();
     String pathPrefix = path.substring(0, path.indexOf('/', 1));
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(pathPrefix, true);
+    SearchQuery q = new SearchQueryImpl(site).withFulltext(true, pathPrefix);
     assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(pathPrefix, true);
+    q.withText(true, pathPrefix);
     assertEquals(0, idx.getByQuery(q).getItems().length);
   }
 
@@ -434,9 +434,9 @@ public class SearchIndexFulltextTest {
   @Test
   public void testGetWithWildcardPageletContent() throws Exception {
     String textPrefix = pagelet.getContent("textid").substring(0, 2);
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(textPrefix, true);
+    SearchQuery q = new SearchQueryImpl(site).withFulltext(true, textPrefix);
     assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(pagelet.getContent("textid").substring(0, 2), true);
+    q.withText(true, pagelet.getContent("textid").substring(0, 2));
     assertEquals(1, idx.getByQuery(q).getItems().length);
   }
 

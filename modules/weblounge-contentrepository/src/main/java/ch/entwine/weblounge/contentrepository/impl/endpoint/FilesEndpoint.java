@@ -193,7 +193,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Search terms
     if (StringUtils.isNotBlank(searchterms))
-      q.withText(searchterms, true);
+      q.withText(true, searchterms);
 
     Calendar today = Calendar.getInstance();
     today.set(Calendar.HOUR_OF_DAY, 0);

@@ -267,20 +267,39 @@ public interface SearchQuery {
    * Return resources that contain the given text either in the page header or
    * in one of the pagelets.
    * 
+   * @param wildcardSearch
+   *          <code>True</code> to perform a (much slower) wildcard search
    * @param text
    *          the text to look up
+   * 
+   * @return the query extended by this criterion
+   */
+  SearchQuery withText(boolean wildcardSearch, String text);
+
+  /**
+   * Return resources that contain the given text either in the page header or
+   * in one of the pagelets.
+   * <p>
+   * Depending on the quantifier, either resources are returned that contain at
+   * least one of the terms are only resources containing all of the terms.
+   * 
+   * @param text
+   *          the text to look up
+   * @param quantifier
+   *          whether all or some of the terms need to be matched
    * @param wildcardSearch
    *          <code>True</code> to perform a (much slower) wildcard search
    * @return the query extended by this criterion
    */
-  SearchQuery withText(String text, boolean wildcardSearch);
+  SearchQuery withText(boolean wildcardSearch, Quantifier quantifier,
+      String... text);
 
   /**
    * Returns the search text or <code>null</code> if no text was specified.
    * 
    * @return the text
    */
-  String getText();
+  Collection<SearchTerms<String>> getText();
 
   /**
    * Return resources that contain the given text in the fulltext search field.
@@ -300,13 +319,32 @@ public interface SearchQuery {
    * Note that this search field is not intended to serve frontend applications
    * but rather backend purposes.
    * 
-   * @param text
-   *          the text to look up
    * @param wildcardSearch
    *          <code>True</code> to perform a (much slower) wildcard search
+   * @param text
+   *          the text to look up
+   * 
    * @return the query extended by this criterion
    */
-  SearchQuery withFulltext(String text, boolean wildcardSearch);
+  SearchQuery withFulltext(boolean wildcardSearch, String text);
+
+  /**
+   * Return resources that contain the given text in the fulltext search field.
+   * <p>
+   * Note that this search field is not intended to serve frontend applications
+   * but rather backend purposes.
+   * 
+   * @param wildcardSearch
+   *          <code>True</code> to perform a (much slower) wildcard search
+   * @param quantifier
+   *          whether documents need to match all or just one of the text
+   *          elements
+   * @param text
+   *          the text to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withFulltext(boolean wildcardSearch, Quantifier quantifier,
+      String... text);
 
   /**
    * Returns the fulltext search terms or <code>null</code> if no text was
@@ -314,7 +352,7 @@ public interface SearchQuery {
    * 
    * @return the text
    */
-  String getFulltext();
+  Collection<SearchTerms<String>> getFulltext();
 
   /**
    * Returns <code>true</code> if the current search operation should be
@@ -361,7 +399,7 @@ public interface SearchQuery {
   Map<String, String> getElements();
 
   /**
-   * Sets the search text.
+   * Sets the properties and their values to search for.
    * 
    * @param property
    *          the property name
@@ -372,9 +410,10 @@ public interface SearchQuery {
   SearchQuery withProperty(String property, String value);
 
   /**
-   * Returns the search text or <code>null</code> if no text was specified.
+   * Returns the properties and their values or <code>null</code> if no
+   * properties were specified.
    * 
-   * @return the text
+   * @return the properties
    */
   Map<String, String> getProperties();
 
@@ -731,21 +770,35 @@ public interface SearchQuery {
    * {@link #andElement(String, String)} and
    * {@link #andProperty(String, String)}.
    * 
-   * @param module
-   *          the module identifier
-   * @param id
-   *          the pagelet identifier
+   * @param pagelet
+   *          the pagelet
    * @return the query extended by this criterion
    */
-  SearchQuery withPagelet(String module, String id);
+  SearchQuery withPagelet(Pagelet pagelet);
+
+  /**
+   * Return resources that contain all or any of the specified pagelets.
+   * <p>
+   * Note that you can specify the location where the pagelet needs to be as
+   * additional elements or properties by a subsequent call to
+   * {@link #inComposer(String)} {@link #atPosition(int)},
+   * {@link #andElement(String, String)} and
+   * {@link #andProperty(String, String)}.
+   * 
+   * @param pagelets
+   *          the pagelets
+   * @return the query extended by this criterion
+   */
+  SearchQuery withPagelets(Quantifier quantifier, Pagelet... pagelets);
 
   /**
    * Returns the list of required pagelets, along with their elements,
-   * properties and location information.
+   * properties and location information as a collection of search terms or
+   * <code>null</code> if not pagelets have been specified.
    * 
    * @return the pagelets
    */
-  Pagelet[] getPagelets();
+  Collection<SearchTerms<Pagelet>> getPagelets();
 
   /**
    * This method may be called after a call to {@link #withPagelet(Pagelet)} in
@@ -916,20 +969,6 @@ public interface SearchQuery {
    * @return the sort order
    */
   Order getPublishingDateSortOrder();
-
-  /**
-   * Turns on faceting for subjects
-   * 
-   * @return the search query
-   */
-  SearchQuery withSubjectFacet();
-
-  /**
-   * Returns <code>true</code> if faceting on subjects is enabled.
-   * 
-   * @return <code>true</code> the subject facet is enabled
-   */
-  boolean isSubjectFacetEnabled();
 
   /**
    * Asks the search index to return only resources with the indicated version.
