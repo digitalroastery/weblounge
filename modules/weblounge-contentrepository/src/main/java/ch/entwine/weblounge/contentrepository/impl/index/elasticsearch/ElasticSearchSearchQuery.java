@@ -361,6 +361,20 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // Fulltext
     if (query.getFulltext() != null) {
+      boolean containsWildcardCharacters = false;
+
+      // Check if the user has set wildcards already
+      if (query.isWildcardSearch()) {
+        wildcardsearch: for (SearchTerms<String> terms : query.getFulltext()) {
+          for (String text : terms.getTerms()) {
+            if (text.contains("*")) {
+              containsWildcardCharacters = true;
+              break wildcardsearch;
+            }
+          }
+        }
+      }
+
       for (SearchTerms<String> terms : query.getFulltext()) {
         for (String text : terms.getTerms()) {
           if (query.isWildcardSearch()) {
@@ -368,7 +382,8 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
               wildcardFulltext += " ";
             else
               wildcardFulltext = "";
-            wildcardFulltext += text + "*";
+            if (!containsWildcardCharacters)
+              wildcardFulltext += text + "*";
           } else {
             if (fulltext != null)
               fulltext += " ";
@@ -390,6 +405,20 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // Text
     if (query.getText() != null) {
+      boolean containsWildcardCharacters = false;
+
+      // Check if the user has set wildcards already
+      if (query.isWildcardSearch()) {
+        wildcardsearch: for (SearchTerms<String> terms : query.getText()) {
+          for (String text : terms.getTerms()) {
+            if (text.contains("*")) {
+              containsWildcardCharacters = true;
+              break wildcardsearch;
+            }
+          }
+        }
+      }
+
       for (SearchTerms<String> terms : query.getText()) {
         for (String text : terms.getTerms()) {
           if (query.isWildcardSearch()) {
@@ -397,7 +426,8 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
               wildcardText += " ";
             else
               wildcardText = "";
-            wildcardText += text + "*";
+            if (!containsWildcardCharacters)
+              wildcardText += text + "*";
           } else {
             if (this.text != null)
               this.text += " ";

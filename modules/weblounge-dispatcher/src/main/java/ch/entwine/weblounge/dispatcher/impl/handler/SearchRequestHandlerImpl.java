@@ -138,13 +138,13 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
 
     int limit = 0;
     int offset = 0;
-    String query = null;
+    String queryString = null;
 
     // Read the parameters
     try {
       limit = RequestUtils.getIntegerParameterWithDefault(request, PARAM_LIMIT, 0);
       offset = RequestUtils.getIntegerParameterWithDefault(request, PARAM_OFFSET, 0);
-      query = RequestUtils.getRequiredParameter(request, PARAM_QUERY);
+      queryString = RequestUtils.getRequiredParameter(request, PARAM_QUERY);
     } catch (IllegalStateException e) {
       logger.debug("Search request handler processing failed: {}", e.getMessage());
       DispatchUtils.sendBadRequest(request, response);
@@ -160,17 +160,12 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
 
     // Create the search expression and the query
     SearchQuery q = new SearchQueryImpl(site);
-    try {
-      q.withText(URLDecoder.decode(query, "utf-8"));
-      q.withVersion(Resource.LIVE);
-      q.withRececyPriority();
-      q.withOffset(offset);
-      q.withLimit(limit);
-      // TODO Add support for other types
-      q.withTypes(Page.TYPE);
-    } catch (UnsupportedEncodingException e) {
-      throw new WebApplicationException(e);
-    }
+    q.withText(queryString.contains("*"), queryString);
+    q.withVersion(Resource.LIVE);
+    q.withRececyPriority();
+    q.withOffset(offset);
+    q.withLimit(limit);
+    q.withTypes(Page.TYPE);
 
     // Return the result
     SearchResult result = null;
