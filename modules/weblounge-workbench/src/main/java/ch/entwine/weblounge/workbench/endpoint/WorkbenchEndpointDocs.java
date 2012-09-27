@@ -51,7 +51,7 @@ public final class WorkbenchEndpointDocs {
     // GET /edit/{page}/{composer}/{pageletindex}
     Endpoint getPageletEditor = new Endpoint("/edit/{page}/{composer}/{pageletindex}", Method.GET, "getpageleteditor");
     getPageletEditor.setDescription("Returns the editor for the given pagelet");
-    getPageletEditor.addFormat(new Format("xml", null, null));
+    getPageletEditor.addFormat(Format.xml());
     getPageletEditor.addStatus(ok("the pagelet was found and it's editing information is returned"));
     getPageletEditor.addStatus(notFound("the page, the composer or the pagelet were not found"));
     getPageletEditor.addStatus(serviceUnavailable("the site is temporarily offline"));
@@ -61,7 +61,7 @@ public final class WorkbenchEndpointDocs {
     getPageletEditor.addOptionalParameter(new Parameter("language", Parameter.Type.String, "The language id"));
     getPageletEditor.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getPageletEditor);
-    
+
     Endpoint getRenderer = new Endpoint("/renderer/{page}/{composer}/{pageletindex}", Method.GET, "getrenderer");
     getRenderer.setDescription("Returns the renderer for the given pagelet");
     getRenderer.addFormat(new Format("html", null, null));
@@ -78,7 +78,7 @@ public final class WorkbenchEndpointDocs {
     // GET /suggest/subjects/{hint}
     Endpoint suggestSubjects = new Endpoint("/suggest/subjects/{seed}", Method.GET, "suggestsubjects");
     suggestSubjects.setDescription("Returns suggestions for subjects based on the given seed");
-    suggestSubjects.addFormat(new Format("xml", null, null));
+    suggestSubjects.addFormat(Format.xml());
     suggestSubjects.addStatus(ok("suggestions based on the seed are returned"));
     suggestSubjects.addStatus(serviceUnavailable("the site is temporarily offline"));
     suggestSubjects.addPathParameter(new Parameter("seed", Parameter.Type.String, "The seed on which suggestions are based"));
@@ -86,6 +86,17 @@ public final class WorkbenchEndpointDocs {
     suggestSubjects.addOptionalParameter(new Parameter("highlight", Parameter.Type.String, "The tag name used to highlight matches"));
     suggestSubjects.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, suggestSubjects);
+
+    // GET /timeline
+    Endpoint getTimeline = new Endpoint("/timeline", Method.GET, "timeline");
+    getTimeline.setDescription("Returns a resource's timeline suitable to be consumed by TimelineJS");
+    getTimeline.addFormat(Format.json());
+    getTimeline.addStatus(ok("the timeline was returned"));
+    getTimeline.addStatus(serviceUnavailable("the site is temporarily offline"));
+    getTimeline.addStatus(serviceUnavailable("the site's content repository is unavailable"));
+    getTimeline.addRequiredParameter(new Parameter("resource", Parameter.Type.String, "The resource identifier"));
+    getTimeline.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getTimeline);
 
     return EndpointDocumentationGenerator.generate(docs);
   }

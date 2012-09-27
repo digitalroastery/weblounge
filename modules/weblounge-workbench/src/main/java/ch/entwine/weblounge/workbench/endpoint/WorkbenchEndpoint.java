@@ -23,8 +23,10 @@ package ch.entwine.weblounge.workbench.endpoint;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.timeline.Timeline;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.site.SiteManager;
 import ch.entwine.weblounge.workbench.PageletEditor;
@@ -180,6 +182,42 @@ public class WorkbenchEndpoint {
     } catch (Exception e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  /**
+   * Returns the timeline data for the given resource.
+   * 
+   * @param request
+   *          the request
+   * @param resource
+   *          the resource identifier
+   * @return the timeline data
+   */
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/timeline")
+  public Response getTimeline(@Context HttpServletRequest request,
+      @QueryParam("resource") String resourceURI) {
+
+    // Load the site
+    Site site = getSite(request);
+    if (site == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    // Load the timeline
+    Timeline timeline = null;
+    try {
+      timeline = workbench.getTimeline(site, resourceURI, site.getDefaultLanguage());
+      if (timeline == null)
+        throw new WebApplicationException(Status.NOT_FOUND);
+    } catch (IllegalStateException e) {
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+    } catch (ContentRepositoryException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Return the timeline
+    return Response.ok(timeline.toString()).build();
   }
 
   /**

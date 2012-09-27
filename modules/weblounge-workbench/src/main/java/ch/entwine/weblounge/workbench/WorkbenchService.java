@@ -20,20 +20,29 @@
 
 package ch.entwine.weblounge.workbench;
 
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
+import ch.entwine.weblounge.common.impl.timeline.AssetImpl;
+import ch.entwine.weblounge.common.impl.timeline.PointInTimeImpl;
+import ch.entwine.weblounge.common.impl.timeline.TimelineJS;
+import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.timeline.Asset;
+import ch.entwine.weblounge.common.timeline.PointInTime;
+import ch.entwine.weblounge.common.timeline.Timeline;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.workbench.suggest.SimpleSuggestion;
 
@@ -50,6 +59,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -307,6 +317,33 @@ public class WorkbenchService {
     return rendererContent;
   }
 
+  /**
+   * Returns the renderer for the pagelet identified by <code>pageURI</code>,
+   * <code>composerId</code>, <code>pageletIndex</code> and using the provided
+   * XML data structure, language and environment to render it.
+   * 
+   * @param site
+   *          the site
+   * @param pageURI
+   *          the page uri
+   * @param composerId
+   *          the pagelet's composer
+   * @param pageletIndex
+   *          the pagelet's position inside the composer
+   * @param pageXml
+   *          the data used to render the pagelet
+   * @param language
+   *          the language to use for rendering
+   * @param environment
+   *          the environment to use for rendering
+   * @return the pagelet rendered to HTML.
+   * @throws IOException
+   *           if accessing the XML does not work
+   * @throws ParserConfigurationException
+   *           if setting up the XML parser fails
+   * @throws SAXException
+   *           if parsing the XML fails
+   */
   public String getRenderer(Site site, ResourceURI pageURI, String composerId,
       int pageletIndex, String pageXml, String language, Environment environment)
           throws IOException, ParserConfigurationException, SAXException {
@@ -427,6 +464,115 @@ public class WorkbenchService {
         IOUtils.closeQuietly(is);
       }
     }
+  }
+
+  /**
+   * Returns the timeline data for the given resource or <code>null</code> if
+   * the resource does not exist.
+   * 
+   * @param site
+   *          the site
+   * @param resourceURI
+   *          the resource identifier
+   * @param language
+   *          the language
+   * @return the timeline data
+   * @throws ContentRepositoryException
+   *           if loading the resource from the content repository fails
+   * @throws IllegalStateException
+   *           if the site or the content repository are not available
+   */
+  public Timeline getTimeline(Site site, String resourceURI, Language language)
+      throws ContentRepositoryException, IllegalStateException {
+
+    // Get hold of the content repository
+    ContentRepository repository = site.getContentRepository();
+    if (repository == null) {
+      logger.warn("No content repository found for site '{}'", site);
+      throw new IllegalStateException("Content repository not connected");
+    }
+
+    // Create the resource's base uri
+    ResourceURI uri = new PageURIImpl(site, null, resourceURI);
+
+    // Create the timeline
+    Timeline timeline = new TimelineJS();
+
+    if (!repository.existsInAnyVersion(uri))
+      return null;
+
+    // Load all versions of this page
+    ResourceURI[] versions = repository.getVersions(uri);
+    try {
+      for (ResourceURI version : versions) {
+        Resource<?> resource = repository.get(version);
+
+        // Timeline title and description
+        if (version.getVersion() == Resource.LIVE) {
+          timeline.setHeadline(resource.getTitle());
+          timeline.setDescription(resource.getDescription());
+        }
+
+        PointInTime creationDate = new PointInTimeImpl("Created by " + resource.getCreator().getName(), resource.getCreationDate());
+        Asset creationDateAsset = new AssetImpl(getResourceURL(resource));
+        creationDateAsset.setThumbnail(getPreviewURL(resource, language));
+        creationDate.setAsset(creationDateAsset);
+        timeline.addPointInTime(creationDate);
+
+        if (resource.getPublishFrom() != null) {
+          PointInTime date = new PointInTimeImpl("Published by " + resource.getPublisher().getName(), resource.getPublishFrom());
+          Asset asset = new AssetImpl(getResourceURL(resource));
+          asset.setThumbnail(getPreviewURL(resource, language));
+          date.setAsset(asset);
+          timeline.addPointInTime(date);
+        }
+
+        if (resource.getPublishTo() != null) {
+          PointInTime date = new PointInTimeImpl("Unpublished", resource.getPublishTo());
+          Asset asset = new AssetImpl(getResourceURL(resource));
+          asset.setThumbnail(getPreviewURL(resource, language));
+          date.setAsset(asset);
+          timeline.addPointInTime(date);
+        }
+
+      }
+    } catch (MalformedURLException e) {
+      logger.warn("Error creating url: {}", e.getMessage());
+      throw new IllegalStateException(e.getMessage());
+    }
+
+    return timeline;
+  }
+
+  /**
+   * Creates the URL to the resource's preview.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @return the URL to the preview
+   * @throws MalformedURLException
+   *           if creation of a well formed URL fails
+   */
+  private URL getPreviewURL(Resource<?> resource, Language language)
+      throws MalformedURLException {
+    String url = UrlUtils.concat(resource.getURI().getSite().getHostname().getURL().toExternalForm(), "/weblounge-previews/", "?resource=" + resource.getURI().getIdentifier(), "&language=" + language.getIdentifier(), "&version=" + resource.getURI().getVersion());
+    return new URL(url);
+  }
+
+  /**
+   * Creates the URL to the resource.
+   * 
+   * @param resource
+   *          the resource
+   * @return the URL to the resource
+   * @throws MalformedURLException
+   *           if creation of a well formed URL fails
+   */
+  private URL getResourceURL(Resource<?> resource) throws MalformedURLException {
+    String url = UrlUtils.concat(resource.getURI().getSite().getHostname().getURL().toExternalForm(), "/weblounge-" + resource.getType().toLowerCase().toString() + "s/", resource.getURI().getIdentifier());
+    return new URL(url);
   }
 
   /**
