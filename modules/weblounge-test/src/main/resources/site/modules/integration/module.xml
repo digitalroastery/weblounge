@@ -7,11 +7,24 @@
   <name>Integration</name>
 
   <pagelets>
+
+	  <pagelet id="timeline" composeable="true">
+	    <name>Timeline</name>
+	    <renderer>file://${module.root}/pagelets/timeline/timeline.jsp</renderer>
+	    <editor>file://${module.root}/pagelets/timeline/timeline_editor.jsp</editor>
+	    <includes>
+        <link use="renderer" href="file://${module.root}/css/timeline/timeline.css" rel="stylesheet" type="text/css"></link>
+        <script use="renderer" src="file://${module.root}/js/timeline/timeline.js" type="text/javascript"></script>
+        <script use="renderer" src="file://${module.root}/js/timeline/storyjs-embed.js" type="text/javascript"></script>
+      </includes>
+	  </pagelet>
+
     <pagelet id="youtube-movie" composeable="true">
       <name>YouTube Movie</name>
       <renderer>file://${module.root}/pagelets/youtube/movie.jsp</renderer>
       <editor>file://${module.root}/pagelets/youtube/movie_editor.jsp</editor>
     </pagelet>
+
   </pagelets>
 
 </module>
