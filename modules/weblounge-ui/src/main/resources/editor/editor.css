@@ -126,3 +126,6 @@ div.DataTables_sort_wrapper span {
   margin: 5px 0 15px;
   padding: 0;
 }
+#wbl-pageleteditor p.desc {
+  font-size: 10px;
+}
