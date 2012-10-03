@@ -264,17 +264,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         return true;
       }
 
-      // Check for explicit no cache instructions
-      boolean noCache = request.getParameter(ResponseCache.NOCACHE_PARAM) != null;
-
-      // Does the client already have up-to-date content?
-      boolean isCached = !noCache && response.isCached() && response.isValid();
-      if (action == null && !isCached && !ResourceUtils.hasChanged(request, page)) {
-        logger.debug("Page {} was not modified", pageURI);
-        DispatchUtils.sendNotModified(request, response);
-        return true;
-      }
-
       // Can the page be accessed by the current user?
       User user = request.getUser();
       try {
@@ -287,9 +276,12 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         return true;
       }
 
+      // Check for explicit no cache instructions
+      boolean ignoreCache = request.getParameter(ResponseCache.NOCACHE_PARAM) != null;
+
       // Check if the page is already part of the cache. If so, our task is
       // already done!
-      if (!noCache && request.getVersion() == Resource.LIVE && !isEditing) {
+      if (!ignoreCache && request.getVersion() == Resource.LIVE && !isEditing) {
 
         // Create the set of tags that identify the page
         CacheTagSet cacheTags = createPrimaryCacheTags(request);
