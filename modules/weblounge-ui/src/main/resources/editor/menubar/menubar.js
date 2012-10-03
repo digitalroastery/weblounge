@@ -44,8 +44,8 @@ steal.plugins(
             this._initPageLocking();
 
             // replace the icon with a gravatar
-            // TOTO: replace domain with variabel
-            $('.wbl-profileMenu img.wbl-user').attr('src', 'http://gravatar.com/avatar/' + md5(this.options.runtime.getUserLogin() + '@swissunihockey.ch') + '?d=mm');
+            $('.wbl-profileMenu img.wbl-user').attr('src', 'http://gravatar.com/avatar/' + md5(this.options.runtime.getUserEmail()) + '?d=mm');
+            console.log(this.options.runtime.getUserEmail())
         },
         
         update: function(options) {
