@@ -5,7 +5,6 @@ steal.plugins('jqueryui/dialog',
 		'jqueryui/resizable',
 		'jqueryui/mouse',
         'scripts/bootstrap')
-.css('bootstrap')
 .models('../../models/workbench',
 		'../../models/pagelet')
 .resources('trimpath-template')
