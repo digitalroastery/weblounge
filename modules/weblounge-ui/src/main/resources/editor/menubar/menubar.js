@@ -12,9 +12,9 @@ steal.plugins(
 	'jqueryui/droppable',
 	'jqueryui/resizable',
 	'jqueryui/mouse',
-	'jqueryui/button')
-.views(
-	'//editor/menubar/views/menubar.tmpl')
+	'jqueryui/button',
+	'scripts/md5')
+.views('//editor/menubar/views/menubar.tmpl')
 .css('menubar')
 .then(function($) {
 
@@ -42,6 +42,10 @@ steal.plugins(
             this._initDialogs();
             $('#wbl-pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
             this._initPageLocking();
+
+            // replace the icon with a gravatar
+            // TOTO: replace domain with variabel
+            $('.wbl-profileMenu img.wbl-user').attr('src', 'http://gravatar.com/avatar/' + md5(this.options.runtime.getUserLogin() + '@swissunihockey.ch') + '?d=mm');
         },
         
         update: function(options) {
