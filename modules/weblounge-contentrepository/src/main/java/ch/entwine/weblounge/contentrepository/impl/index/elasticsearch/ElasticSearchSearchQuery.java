@@ -575,7 +575,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // Filter expressions
     if (filter != null) {
-      filters.add(FilterBuilders.wrapperFilter(filter));
+      filters.add(FilterBuilders.termFilter(FULLTEXT, filter));
     }
 
     // Apply the filters

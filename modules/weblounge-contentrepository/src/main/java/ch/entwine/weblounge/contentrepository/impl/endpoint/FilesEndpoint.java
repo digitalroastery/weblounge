@@ -280,7 +280,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
       // simple filter
       else {
-        q.withFilter(filter);
+        q.withFulltext(filter);
       }
     }
 
