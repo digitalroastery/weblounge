@@ -43,9 +43,18 @@ steal.plugins(
             $('#wbl-pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
             this._initPageLocking();
 
-            // replace the icon with a gravatar
-            $('.wbl-profileMenu img.wbl-user').attr('src', 'http://gravatar.com/avatar/' + md5(this.options.runtime.getUserEmail()) + '?d=mm');
-            console.log(this.options.runtime.getUserEmail())
+            // replace the icon with a gravatar if weblounge is online otherwise load a default img
+            ImageUrl = 'http://gravatar.com/avatar/' + md5(this.options.runtime.getUserEmail());
+            UserEmail = this.options.runtime.getUserEmail();
+            //steal.dev.log('getUserEmail: ' + UserEmail);
+            function IsValidImageUrl(url) {
+			    $("<img>", {
+			        src: url,
+			        error: function() { steal.dev.log('weblounge is not online... loading default user img') },
+			        load: function() { $('.wbl-profileMenu img.wbl-user').attr('src', url + '?d=mm'); }
+			    });
+			}
+			IsValidImageUrl(ImageUrl);
         },
         
         update: function(options) {
