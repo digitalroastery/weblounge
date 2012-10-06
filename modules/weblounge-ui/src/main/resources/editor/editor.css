@@ -109,8 +109,10 @@ div.DataTables_sort_wrapper span {
 #wbl-pageleteditor .controls {
   margin-left: 175px;
 }
-#wbl-pageleteditor .controls input {
+#wbl-pageleteditor .controls input[type="text"],
+#wbl-pageleteditor .controls textarea {
   margin-bottom: 0;
+  width: 95%;
 }
 #wbl-pageleteditor .control-group-select .controls {
   padding-top: 2px;
