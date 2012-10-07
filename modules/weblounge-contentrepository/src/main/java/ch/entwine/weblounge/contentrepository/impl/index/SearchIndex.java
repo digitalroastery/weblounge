@@ -297,6 +297,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
         ResourceSerializer<?, ?> serializer = resourceSerializer.getSerializerByType(type);
         if (serializer == null) {
           logger.warn("Skipping search result due to missing serializer of type {}", type);
+          size--;
           continue;
         }
 
@@ -326,10 +327,12 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
           result.addResultItem(item);
         } catch (Throwable t) {
           logger.warn("Error during search result serialization: '{}'. Skipping this search result.", t.getMessage());
+          size--;
           continue;
         }
       }
 
+      result.setDocumentCount(size);
       return result;
 
     } catch (Throwable t) {
