@@ -97,7 +97,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *           if either one of <code>site</code> or <code>path</code> are
    *           <code>null</code> or the path is malformed
    */
-  public WebUrlImpl(Site site, String path) {
+  public WebUrlImpl(Site site, String path) throws IllegalArgumentException {
     super('/');
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
@@ -123,8 +123,11 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          the associated site
    * @param url
    *          the url
+   * @throws IllegalArgumentException
+   *           if either one of <code>site</code> or <code>path</code> are
+   *           <code>null</code> or the path is malformed
    */
-  public WebUrlImpl(Site site, Path url) {
+  public WebUrlImpl(Site site, Path url) throws IllegalArgumentException {
     this(site, url.getPath());
   }
 
@@ -146,8 +149,12 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          the url
    * @param path
    *          the path to append
+   * @throws IllegalArgumentException
+   *           if either one of <code>site</code> or <code>path</code> are
+   *           <code>null</code> or the path is malformed
    */
-  public WebUrlImpl(Site site, Path url, String path) {
+  public WebUrlImpl(Site site, Path url, String path)
+      throws IllegalArgumentException {
     this(site, concat(url.getPath(), path, '/'));
   }
 
@@ -171,8 +178,12 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          the url path
    * @param version
    *          the url version
+   * @throws IllegalArgumentException
+   *           if either one of <code>site</code> or <code>path</code> are
+   *           <code>null</code> or the path is malformed
    */
-  public WebUrlImpl(Site site, String path, long version) {
+  public WebUrlImpl(Site site, String path, long version)
+      throws IllegalArgumentException {
     this(site, path);
     this.version = version;
   }
@@ -188,8 +199,12 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          the required version
    * @param flavor
    *          the url flavor
+   * @throws IllegalArgumentException
+   *           if either one of <code>site</code> or <code>path</code> are
+   *           <code>null</code> or the path is malformed
    */
-  public WebUrlImpl(Site site, String path, long version, RequestFlavor flavor) {
+  public WebUrlImpl(Site site, String path, long version, RequestFlavor flavor)
+      throws IllegalArgumentException {
     this(site, path, version, flavor, null);
   }
 
@@ -206,9 +221,12 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          the url flavor
    * @param language
    *          the language
+   * @throws IllegalArgumentException
+   *           if either one of <code>site</code> or <code>path</code> are
+   *           <code>null</code> or the path is malformed
    */
   public WebUrlImpl(Site site, String path, long version, RequestFlavor flavor,
-      Language language) {
+      Language language) throws IllegalArgumentException {
     super(path, '/');
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
@@ -227,8 +245,11 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          the original url
    * @param path
    *          the new path
+   * @throws IllegalArgumentException
+   *           if either one of <code>site</code> or <code>path</code> are
+   *           <code>null</code> or the path is malformed
    */
-  public WebUrlImpl(WebUrlImpl url, String path) {
+  public WebUrlImpl(WebUrlImpl url, String path) throws IllegalArgumentException {
     super(path, url.getPathSeparator());
     this.site = url.getSite();
     this.version = url.getVersion();
