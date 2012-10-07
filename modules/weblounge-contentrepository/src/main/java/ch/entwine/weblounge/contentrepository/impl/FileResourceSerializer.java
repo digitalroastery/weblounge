@@ -203,15 +203,25 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
 
     // path
     String path = null;
-    if (metadataMap.get(PATH) != null)
-      path = (String) metadataMap.get(PATH).getValues().get(0);
-    else {
+    WebUrl url = null;
+    if (metadataMap.get(PATH) != null) {
+      try {
+        path = (String) metadataMap.get(PATH).getValues().get(0);
+        url = new WebUrlImpl(site, path);
+      } catch (IllegalArgumentException e) {
+        logger.warn("Path {}:/{} for file {} is invalid", new Object[] {
+            site.getIdentifier(),
+            path,
+            id });
+        path = URI_PREFIX + "/" + id;
+        url = new WebUrlImpl(site, path);
+      }
+    } else {
       path = URI_PREFIX + "/" + id;
+      url = new WebUrlImpl(site, path);
     }
 
     ResourceURI uri = new FileResourceURIImpl(site, path, id, version);
-    WebUrl url = new WebUrlImpl(site, path);
-
     FileResourceSearchResultItemImpl result = new FileResourceSearchResultItemImpl(uri, url, relevance, site, metadata);
 
     if (metadataMap.get(XML) != null)
