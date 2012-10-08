@@ -216,7 +216,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId>
+      <groupId>ch.entwine.org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.fop</artifactId>
       <version>1.0_2</version>
     </dependency>
