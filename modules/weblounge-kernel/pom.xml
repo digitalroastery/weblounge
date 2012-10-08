@@ -210,6 +210,13 @@
     </dependency>
 
     <dependency>
+	  <groupId>org.apache.xmlgraphics</groupId>
+	  <artifactId>fop</artifactId>
+	  <version>1.0</version>
+    </dependency>
+            
+
+    <dependency>
       <groupId>org.jboss.security</groupId>
       <artifactId>jboss-xacml</artifactId>
       <version>2.0.5.final</version>
@@ -415,6 +422,7 @@
               org.apache.felix.webconsole;version="3.1.2",
               org.apache.commons.lang;version="2.6",
               org.apache.commons.io;version="2.0",
+              org.apache.fop.apps;version="1.0.0",
               org.apache.tika;version="0.9",
               org.quartz;version="[1.6.0,2.0.0)",
               org.quartz.impl;version="[1.6.0,2.0.0)",
@@ -466,6 +474,7 @@
               ch.entwine.weblounge.kernel;version=${project.version},
               ch.entwine.weblounge.kernel.command;version=${project.version},
               ch.entwine.weblounge.kernel.endpoint;version=${project.version},
+              ch.entwine.weblounge.kernel.fop;version=${project.version},
               ch.entwine.weblounge.kernel.http;version=${project.version},
               ch.entwine.weblounge.kernel.mail;version=${project.version},
               ch.entwine.weblounge.kernel.publisher;version=${project.version},
@@ -483,10 +492,12 @@
             <Embed-Dependency>
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,
-              geronimo-javamail_1.4_provider;inline=true
+              geronimo-javamail_1.4_provider;inline=true,
             </Embed-Dependency>
             <Service-Component>
               OSGI-INF/directory-service.xml,
+              OSGI-INF/fop-rest-service.xml,
+              OSGI-INF/fop-service.xml,
               OSGI-INF/endpoint-publishing-service.xml,
               OSGI-INF/endpoint-runtime-information.xml,
               OSGI-INF/environment-service.xml,
