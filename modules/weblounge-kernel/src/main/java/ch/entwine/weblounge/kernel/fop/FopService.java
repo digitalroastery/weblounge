@@ -26,6 +26,7 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.w3c.dom.Document;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -64,13 +65,13 @@ public class FopService {
    * @param pdf
    *          the output stream
    */
-  public void xml2pdf(Document xml, Source xsl, String[][] params,
+  public void xml2pdf(Document xml, Document xsl, String[][] params,
       OutputStream pdf) throws TransformerConfigurationException,
       TransformerException, FOPException, IOException {
 
     FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
     Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdf);
-    xml2pdf(xml, xsl, params, fop, foUserAgent, pdf);
+    xml2pdf(xml, xsl, params, fop, pdf);
   }
 
   /**
@@ -86,23 +87,20 @@ public class FopService {
    *          parameter for the XSL transformation
    * @param fop
    *          the FOP processor
-   * @param foUserAgent
-   *          the FOP user agent
    * @param pdf
    *          the output stream
    */
-  public void xml2pdf(Document xml, Source xsl, String[][] params, Fop fop,
-      FOUserAgent foUserAgent, OutputStream pdf)
-          throws TransformerConfigurationException, TransformerException,
-          FOPException, IOException {
+  public void xml2pdf(Document xml, Document xsl, String[][] params, Fop fop,
+      OutputStream pdf) throws TransformerConfigurationException,
+      TransformerException, FOPException, IOException {
 
     // Setup output
-    OutputStream pdfOut = new java.io.BufferedOutputStream(pdf);
+    OutputStream pdfOut = new BufferedOutputStream(pdf);
 
     try {
       // Setup xsl transformer
       TransformerFactory factory = TransformerFactory.newInstance();
-      Transformer transformer = factory.newTransformer(xsl);
+      Transformer transformer = factory.newTransformer(new DOMSource(xsl));
 
       // Set the parameter values in the stylesheet
       if (params != null) {

@@ -56,10 +56,8 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * This class implements the <code>REST</code> endpoint for the FOP service.
@@ -105,7 +103,7 @@ public class FopEndpoint {
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
 
     final Document xml;
-    final Source xsl;
+    final Document xsl;
 
     // Load the xml document
     InputStream xmlInputStream = null;
@@ -114,10 +112,10 @@ public class FopEndpoint {
       xmlInputStream = new URL(xmlURL).openStream();
       xml = documentBuilder.parse(xmlInputStream);
     } catch (MalformedURLException e) {
-      logger.warn("Error creating xsl url from '{}'", xmlURL);
+      logger.warn("Error creating xml url from '{}'", xmlURL);
       throw new WebApplicationException(Status.BAD_REQUEST);
     } catch (IOException e) {
-      logger.warn("Error accessing xsl stylesheet at '{}': {}", xmlURL, e.getMessage());
+      logger.warn("Error accessing xml document at '{}': {}", xmlURL, e.getMessage());
       throw new WebApplicationException(Status.NOT_FOUND);
     } catch (ParserConfigurationException e) {
       logger.warn("Error setting up xml parser: {}", e.getMessage());
@@ -132,14 +130,21 @@ public class FopEndpoint {
     // Load the XLST stylesheet
     InputStream xslInputStream = null;
     try {
+      DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       xslInputStream = new URL(xslURL).openStream();
-      xsl = new StreamSource(xslInputStream);
+      xsl = documentBuilder.parse(xslInputStream);
     } catch (MalformedURLException e) {
       logger.warn("Error creating xsl url from '{}'", xslURL);
       throw new WebApplicationException(Status.BAD_REQUEST);
     } catch (IOException e) {
       logger.warn("Error accessing xsl stylesheet at '{}': {}", xslURL, e.getMessage());
       throw new WebApplicationException(Status.NOT_FOUND);
+    } catch (ParserConfigurationException e) {
+      logger.warn("Error setting up xml parser: {}", e.getMessage());
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    } catch (SAXException e) {
+      logger.warn("Error parsing xml document from {}: {}", xslURL, e.getMessage());
+      throw new WebApplicationException(Status.BAD_REQUEST);
     } finally {
       IOUtils.closeQuietly(xslInputStream);
     }
@@ -165,7 +170,7 @@ public class FopEndpoint {
     // Write the file contents back
     ResponseBuilder response = Response.ok(new StreamingOutput() {
       public void write(OutputStream os) throws IOException,
-      WebApplicationException {
+          WebApplicationException {
         try {
           fopService.xml2pdf(xml, xsl, parameters.toArray(new String[parameters.size()][2]), os);
         } catch (IOException e) {
@@ -193,7 +198,6 @@ public class FopEndpoint {
     response.lastModified(new Date());
 
     return response.build();
-
   }
 
   /**
