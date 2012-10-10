@@ -29,6 +29,9 @@ import ch.entwine.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
+import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
+import ch.entwine.weblounge.common.impl.testing.IntegrationTestGroup;
+import ch.entwine.weblounge.common.impl.testing.IntegrationTestParser;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
 import ch.entwine.weblounge.common.impl.util.xml.ValidationErrorHandler;
@@ -57,10 +60,12 @@ import ch.entwine.weblounge.common.site.SiteException;
 import ch.entwine.weblounge.common.site.SiteListener;
 import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
+import ch.entwine.weblounge.testing.IntegrationTest;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -73,10 +78,14 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -87,6 +96,7 @@ import java.util.regex.Pattern;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
@@ -198,6 +208,12 @@ public class SiteImpl implements Site {
 
   /** The current system environment */
   protected Environment environment = Environment.Production;
+
+  /** The list of integration tests */
+  private List<IntegrationTest> integrationTests = null;
+
+  /** The registered integration tests */
+  private final List<ServiceRegistration> integrationTestRegistrations = new ArrayList<ServiceRegistration>();
 
   /**
    * Creates a new site that is initially disabled. Use {@link #setEnabled()} to
@@ -831,6 +847,14 @@ public class SiteImpl implements Site {
       }
     }
 
+    // Register the integration tests
+    if (integrationTests != null && integrationTests.size() > 0) {
+      for (IntegrationTest test : integrationTests) {
+        logger.debug("Registering integration test {}", test.getName());
+        integrationTestRegistrations.add(getBundleContext().registerService(IntegrationTest.class.getName(), test, null));
+      }
+    }
+
     // Finally, mark this site as running
     isOnline = true;
     logger.info("Site '{}' started", this);
@@ -856,8 +880,6 @@ public class SiteImpl implements Site {
       }
     }
 
-    // actions are being unregistered automatically
-
     // Shutdown all of the modules
     synchronized (modules) {
       for (Module module : modules.values()) {
@@ -867,6 +889,18 @@ public class SiteImpl implements Site {
         } catch (Throwable t) {
           logger.error("Error stopping module '{}'", module, t);
         }
+      }
+    }
+
+    // Unregister integration tests
+    logger.debug("Unregistering integration tests");
+    for (ServiceRegistration registration : integrationTestRegistrations) {
+      try {
+        registration.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering integration test failed: {}", t.getMessage());
       }
     }
 
@@ -1131,6 +1165,7 @@ public class SiteImpl implements Site {
    * @throws Exception
    *           if the site activation fails
    */
+  @SuppressWarnings("unchecked")
   protected void activate(ComponentContext context) throws Exception {
 
     bundleContext = context.getBundleContext();
@@ -1211,6 +1246,9 @@ public class SiteImpl implements Site {
     logger.debug("Signing up for a job scheduling services");
     schedulingServiceTracker = new SchedulingServiceTracker(bundleContext, this);
     schedulingServiceTracker.open();
+
+    // Load the tests
+    integrationTests = loadIntegrationTests();
 
     logger.info("Site '{}' initialized", this);
   }
@@ -1402,6 +1440,169 @@ public class SiteImpl implements Site {
           e.getMessage(),
           e });
     }
+  }
+
+  /**
+   * Loads all integration tests.
+   * 
+   * @return the tests
+   */
+  @SuppressWarnings("unchecked")
+  private List<IntegrationTest> loadIntegrationTests() {
+    BundleContext ctx = getBundleContext();
+    
+    logger.info("Loading integration tests for '{}'", this);
+
+    // Load test classes
+    List<IntegrationTest> tests = loadIntegrationTestClasses("/", ctx.getBundle());
+    for (IntegrationTest test : tests) {
+      logger.debug("Registering integration test " + test.getClass());
+      integrationTestRegistrations.add(ctx.registerService(IntegrationTest.class.getName(), test, null));
+    }
+
+    // Find and register site-wide integration tests
+    logger.debug("Looking for integration tests in site '{}'", this);
+    Enumeration<URL> siteDirectories = bundleContext.getBundle().findEntries("site", "*", false);
+    while (siteDirectories != null && siteDirectories.hasMoreElements()) {
+      URL entry = siteDirectories.nextElement();
+      if (entry.getPath().endsWith("/tests/")) {
+        tests.addAll(loadIntegrationTestDefinitions(entry.getPath()));
+        break;
+      }
+    }
+
+    // Find and register module integration tests
+    Enumeration<URL> modules = bundleContext.getBundle().findEntries("site/modules", "*", false);
+    logger.debug("Looking for integration tests in site '{}' modules", this);
+    while (modules != null && modules.hasMoreElements()) {
+      URL module = modules.nextElement();
+      Enumeration<URL> moduleDirectories = bundleContext.getBundle().findEntries(module.getPath(), "*", false);
+      while (moduleDirectories != null && moduleDirectories.hasMoreElements()) {
+        URL entry = moduleDirectories.nextElement();
+        if (entry.getPath().endsWith("/tests/")) {
+          tests.addAll(loadIntegrationTestDefinitions(entry.getPath()));
+          break;
+        }
+      }
+    }
+
+    if (tests.size() > 0)
+      logger.info("Registered {} integration tests for site '{}'", tests.size(), this);
+
+    return tests;
+  }
+
+  /**
+   * Loads and registers the integration tests that are found in the bundle at
+   * the given location.
+   * 
+   * @param dir
+   *          the directory containing the test files
+   */
+  private List<IntegrationTest> loadIntegrationTestDefinitions(String dir) {
+    Enumeration<?> entries = bundleContext.getBundle().findEntries(dir, "*.xml", true);
+
+    // Schema validator setup
+    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    URL schemaUrl = SiteImpl.class.getResource("/xsd/test.xsd");
+    Schema testSchema = null;
+    try {
+      testSchema = schemaFactory.newSchema(schemaUrl);
+    } catch (SAXException e) {
+      logger.error("Error loading XML schema for test definitions: {}", e.getMessage());
+      return Collections.emptyList();
+    }
+
+    // Module.xml document builder setup
+    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    docBuilderFactory.setSchema(testSchema);
+    docBuilderFactory.setNamespaceAware(true);
+
+    // The list of tests
+    List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
+
+    while (entries != null && entries.hasMoreElements()) {
+      URL entry = (URL) entries.nextElement();
+
+      // Validate and read the module descriptor
+      ValidationErrorHandler errorHandler = new ValidationErrorHandler(entry);
+      DocumentBuilder docBuilder;
+
+      try {
+        docBuilder = docBuilderFactory.newDocumentBuilder();
+        docBuilder.setErrorHandler(errorHandler);
+        Document doc = docBuilder.parse(entry.openStream());
+        if (errorHandler.hasErrors()) {
+          logger.warn("Error parsing integration test {}: XML validation failed", entry);
+          continue;
+        }
+        IntegrationTestGroup test = IntegrationTestParser.fromXml(doc.getFirstChild());
+        test.setSite(this);
+        test.setGroup(getName());
+        tests.add(test);
+      } catch (SAXException e) {
+        throw new IllegalStateException(e);
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      } catch (ParserConfigurationException e) {
+        throw new IllegalStateException(e);
+      }
+    }
+
+    return tests;
+  }
+
+  /**
+   * Loads the integration test classes from the class path and publishes them
+   * to the OSGi registry.
+   * 
+   * @param path
+   *          the bundle path to load classes from
+   * @param bundle
+   *          the bundle
+   */
+  private List<IntegrationTest> loadIntegrationTestClasses(String path,
+      Bundle bundle) {
+    List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
+
+    // Load the classes in question
+    ClassLoader loader = this.getClass().getClassLoader();
+    Enumeration<?> entries = bundle.findEntries("/", "*.class", true);
+    if (entries == null) {
+      return tests;
+    }
+
+    // Look at the classes and instantiate those that implement the integration
+    // test interface.
+    while (entries.hasMoreElements()) {
+      URL url = (URL) entries.nextElement();
+      Class<?> c = null;
+      try {
+        String pathToClass = url.getPath();
+        pathToClass = pathToClass.substring(1, pathToClass.indexOf(".class"));
+        pathToClass = pathToClass.replace('/', '.');
+        c = loader.loadClass(pathToClass);
+        boolean implementsInterface = Arrays.asList(c.getInterfaces()).contains(IntegrationTest.class);
+        boolean extendsBaseClass = false;
+        if (c.getSuperclass() != null) {
+          extendsBaseClass = IntegrationTestBase.class.getName().equals(c.getSuperclass().getName());
+        }
+        if (!implementsInterface && !extendsBaseClass)
+          continue;
+        IntegrationTest test = (IntegrationTest) c.newInstance();
+        test.setSite(this);
+        tests.add(test);
+      } catch (InstantiationException e) {
+        logger.error("Error creating instance of integration test " + c);
+      } catch (IllegalAccessException e) {
+        logger.error("Access error creating integration test instance of " + c);
+      } catch (ClassNotFoundException e1) {
+        logger.error("Url " + url + " is not a class");
+      } catch (NoClassDefFoundError e) {
+        logger.debug("Class " + url + " cannot be instantiated, since a related class cannot be found: " + e.getMessage());
+      }
+    }
+    return tests;
   }
 
   /**

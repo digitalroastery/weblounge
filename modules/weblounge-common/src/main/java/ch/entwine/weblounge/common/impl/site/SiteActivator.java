@@ -20,14 +20,10 @@
 
 package ch.entwine.weblounge.common.impl.site;
 
-import ch.entwine.weblounge.common.impl.testing.IntegrationTestGroup;
-import ch.entwine.weblounge.common.impl.testing.IntegrationTestParser;
 import ch.entwine.weblounge.common.impl.util.classloader.BundleClassLoader;
 import ch.entwine.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
-import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.xml.ValidationErrorHandler;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.testing.IntegrationTest;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -35,9 +31,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.concurrent.Callable;
@@ -45,7 +39,6 @@ import java.util.concurrent.Callable;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -136,41 +129,6 @@ public class SiteActivator {
     } else {
       logger.warn("Site activator was unable to locate site.xml");
     }
-
-    // If integration tests are switched off explicitly, don't even bother
-    String testActivation = (String) context.getProperties().get(OPT_TESTS);
-    int testCount = 0;
-    if (ConfigurationUtils.isDisabled(testActivation)) {
-      logger.info("Integration tests are switched off for site '{}'", site);
-      return;
-    }
-
-    // Find and register site-wide integration tests
-    Enumeration<URL> siteDirectories = bundleContext.getBundle().findEntries("site", "*", false);
-    while (siteDirectories != null && siteDirectories.hasMoreElements()) {
-      URL entry = siteDirectories.nextElement();
-      if (entry.getPath().endsWith("/tests/")) {
-        testCount += loadIntegrationTests(bundleContext, entry.getPath());
-        break;
-      }
-    }
-
-    // Find and register module integration tests
-    Enumeration<URL> modules = bundleContext.getBundle().findEntries("site/modules", "*", false);
-    while (modules != null && modules.hasMoreElements()) {
-      URL module = modules.nextElement();
-      Enumeration<URL> moduleDirectories = bundleContext.getBundle().findEntries(module.getPath(), "*", false);
-      while (moduleDirectories != null && moduleDirectories.hasMoreElements()) {
-        URL entry = moduleDirectories.nextElement();
-        if (entry.getPath().endsWith("/tests/")) {
-          testCount += loadIntegrationTests(bundleContext, entry.getPath());
-          break;
-        }
-      }
-    }
-
-    if (testCount > 0)
-      logger.info("Registered {} integration tests for site '{}'", testCount, site);
   }
 
   /**
@@ -200,68 +158,6 @@ public class SiteActivator {
         logger.error("Unregistering site failed: {}", t.getMessage());
       }
     }
-  }
-
-  /**
-   * Loads and registers the integration tests that are found in the bundle at
-   * the given location.
-   * 
-   * @param bundleContext
-   *          the bundle context
-   * @param dir
-   *          the directory containing the test files
-   */
-  int loadIntegrationTests(BundleContext bundleContext, String dir) {
-    Enumeration<?> entries = bundleContext.getBundle().findEntries(dir, "*.xml", true);
-
-    // Schema validator setup
-    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    URL schemaUrl = SiteImpl.class.getResource("/xsd/test.xsd");
-    Schema testSchema = null;
-    try {
-      testSchema = schemaFactory.newSchema(schemaUrl);
-    } catch (SAXException e) {
-      logger.error("Error loading XML schema for test definitions: {}", e.getMessage());
-      return 0;
-    }
-
-    // Module.xml document builder setup
-    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-    docBuilderFactory.setSchema(testSchema);
-    docBuilderFactory.setNamespaceAware(true);
-
-    int testCount = 0;
-    while (entries != null && entries.hasMoreElements()) {
-      URL entry = (URL) entries.nextElement();
-
-      // Validate and read the module descriptor
-      ValidationErrorHandler errorHandler = new ValidationErrorHandler(entry);
-      DocumentBuilder docBuilder;
-
-      try {
-        docBuilder = docBuilderFactory.newDocumentBuilder();
-        docBuilder.setErrorHandler(errorHandler);
-        Document doc = docBuilder.parse(entry.openStream());
-        if (errorHandler.hasErrors()) {
-          logger.warn("Error parsing integration test {}: XML validation failed", entry);
-          continue;
-        }
-        IntegrationTestGroup test = IntegrationTestParser.fromXml(doc.getFirstChild());
-        test.setSite(site);
-        test.setGroup(site.getName());
-        logger.debug("Registering integration test " + test.getClass());
-        bundleContext.registerService(IntegrationTest.class.getName(), test, null);
-        testCount++;
-      } catch (SAXException e) {
-        throw new IllegalStateException(e);
-      } catch (IOException e) {
-        throw new IllegalStateException(e);
-      } catch (ParserConfigurationException e) {
-        throw new IllegalStateException(e);
-      }
-    }
-
-    return testCount;
   }
 
 }

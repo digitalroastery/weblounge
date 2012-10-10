@@ -75,10 +75,7 @@ public final class RequestUtils {
    */
   public static boolean containsAction(WebloungeRequest request) {
     Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
-    if (action == null)
-      return false;
-    else
-      return true;
+    return action != null;
   }
 
   /**
