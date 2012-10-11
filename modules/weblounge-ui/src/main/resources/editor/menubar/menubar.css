@@ -98,11 +98,14 @@ div.wbl-overlayIcons span.wbl-more {
 
 .editor_menubar img.wbl-user {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	position: relative;
 	top: 8px;
 	padding-right: 5px;
 	cursor: default;
 =======
+=======
+>>>>>>> 1b6cb81... normalized toolbar and pagelet-tabs
   padding: 2px 8px;
   width: 30px;
   height: 30px;
