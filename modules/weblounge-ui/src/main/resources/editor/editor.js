@@ -14,6 +14,7 @@ steal.plugins('jquery/view/tmpl', 'editor/app')
 		$('#weblounge-editor').editor_app();
 		
 		// Replace all body position absolute top + 45px
+		steal.dev.log('transition 45px');
 		$('body > *').each(function(index, elem) {
 			if($(elem).css('position') == 'absolute') {
 				var cssTop = $(elem).css('top');
