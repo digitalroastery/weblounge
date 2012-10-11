@@ -2,16 +2,13 @@
 	background-color: #242F37;
 	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37); 
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#4D585E), to(#242F37), color-stop(0.5, #242F37), color-stop(0.5, #242F37));
-	border: 1px solid #333333;
 	color: #FFFFFF;
-	height: 44px;
-	line-height: 44px;
+	height: 35px;
+	line-height: 35px;
 	position: fixed;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	text-align: left;
 	width: 100%;
+	padding-left: 20px;
+	overflow: hidden;
 	z-index: 400;
 }
 
@@ -100,10 +97,16 @@ div.wbl-overlayIcons span.wbl-more {
 }
 
 .editor_menubar img.wbl-user {
+<<<<<<< HEAD
 	position: relative;
 	top: 8px;
 	padding-right: 5px;
 	cursor: default;
+=======
+  padding: 2px 8px;
+  width: 30px;
+  height: 30px;
+>>>>>>> b3b32ad... normalized toolbar and pagelet-tabs
 }
 
 .editor_menubar img.wbl-add {
@@ -118,11 +121,7 @@ div.wbl-overlayIcons span.wbl-more {
 	padding: 0 30px;
 }
 
-.editor_menubar img.wbl-logout {
-    position: absolute;
-    right: 5px;
-    top: 5px;
-}
+.editor_menubar img.wbl-logout {}
 
 .editor_menubar img.wbl-more {
 	position: relative;
