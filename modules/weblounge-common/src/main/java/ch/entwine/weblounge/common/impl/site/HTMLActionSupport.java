@@ -20,7 +20,6 @@
 
 package ch.entwine.weblounge.common.impl.site;
 
-import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
@@ -32,7 +31,6 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.content.page.Script;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
-import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -99,9 +97,6 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   /** The error messages */
   protected List<String> errorMessages = null;
 
-  /** The runtime head elements */
-  // protected Set<HTMLHeadElement> runtimeHeaders = null;
-
   /** Flag to indicate that output has been written to the client */
   protected boolean outputStarted = false;
 
@@ -124,7 +119,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    *          the renderer identifier
    */
   public HTMLActionSupport(String renderer) {
-    flavors.add(RequestFlavor.HTML);
+    addFlavor(RequestFlavor.HTML);
     stageRendererId = renderer;
   }
 
@@ -415,7 +410,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   public int startStage(WebloungeRequest request, WebloungeResponse response,
       Composer composer) throws IOException, ActionException {
     if (stageRenderer != null) {
-      include(request, response, stageRenderer);
+      include(request, response, stageRenderer, null);
       return SKIP_COMPOSER;
     }
     return EVAL_COMPOSER;
@@ -474,9 +469,14 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    *          the response
    * @param renderer
    *          the renderer to include
+   * @param pagelet
+   *          the pagelet data
+   * @throws ActionException
+   *           if rendering the pagelet fails
    */
+  @Override
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      Renderer renderer) {
+      PageletRenderer renderer, Pagelet pagelet) throws ActionException {
     if (renderer == null) {
       String msg = "Renderer to be included in action '" + this + "' on " + request.getUrl() + " was not found!";
       logger.error(msg);
@@ -490,20 +490,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
         response.addHTMLHeader(header);
     }
 
-    try {
-      renderer.render(request, response);
-    } catch (Throwable t) {
-      String params = RequestUtils.dumpParameters(request);
-      String msg = "Error including '" + renderer + "' in action '" + this + "' on " + request.getUrl() + " " + params;
-      Throwable o = t.getCause();
-      if (o != null) {
-        msg += ": " + o.getMessage();
-        logger.error(msg, o);
-      } else {
-        logger.error(msg, t);
-      }
-      response.invalidate();
-    }
+    super.include(request, response, renderer, pagelet);
   }
 
   /**

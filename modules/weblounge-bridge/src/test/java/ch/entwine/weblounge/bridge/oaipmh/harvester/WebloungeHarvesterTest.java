@@ -6,21 +6,23 @@ import static org.junit.Assert.fail;
 import ch.entwine.weblounge.bridge.oaipmh.MatterhornRecordHandler;
 import ch.entwine.weblounge.bridge.oaipmh.WebloungeHarvester;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.site.SiteURLImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -34,6 +36,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -58,32 +61,24 @@ public class WebloungeHarvesterTest {
   private File repositoryRoot;
 
   /** The mock site */
-  private Site site;
+  private static Site site;
+
+  /** The resource serializer */
+  private static ResourceSerializerServiceImpl serializer = null;
 
   /**
-   * Sets up everything valid for all test runs.
+   * Sets up static test data.
    * 
-   * @throws Exception
-   *           if setup fails
+   * @throws MalformedURLException
    */
   @BeforeClass
-  public static void setUpClass() throws Exception {
-    // Resource serializers
-    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
-    ResourceSerializerFactory.setResourceSerializerService(serializerService);
-    serializerService.registerSerializer(new MovieResourceSerializer());
-    serializerService.registerSerializer(new PageSerializer());
-  }
-
-  /**
-   * Set up Mock site and content repository
-   * 
-   * @throws Exception
-   */
-  @Before
-  public void setUp() throws Exception {
-    String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-    repositoryRoot = new File(rootPath);
+  public static void setUpClass() throws MalformedURLException {
+    // Resource serializer
+    serializer = new ResourceSerializerServiceImpl();
+    serializer.addSerializer(new PageSerializer());
+    serializer.addSerializer(new FileResourceSerializer());
+    serializer.addSerializer(new ImageResourceSerializer());
+    serializer.addSerializer(new MovieResourceSerializer());
 
     // Template
     PageTemplate template = EasyMock.createNiceMock(PageTemplate.class);
@@ -105,9 +100,27 @@ public class WebloungeHarvesterTest {
     EasyMock.expect(site.getDefaultLanguage()).andReturn(LanguageUtils.getLanguage("de")).anyTimes();
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin")).anyTimes();
     EasyMock.replay(site);
+  }
+
+  /**
+   * Set up Mock site and content repository
+   * 
+   * @throws Exception
+   */
+  @Before
+  public void setUp() throws Exception {
+    String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
+    repositoryRoot = new File(rootPath);
+    FileUtils.deleteQuietly(repositoryRoot);
+
+    // Create the index configuration
+    System.setProperty("weblounge.home", rootPath);
+    ElasticSearchUtils.createIndexConfigurationAt(repositoryRoot);
 
     // Connect to the repository
     contentRepository = new FileSystemContentRepository();
+    contentRepository.setSerializer(serializer);
+    contentRepository.setEnvironment(Environment.Production);
     Dictionary<String, Object> repositoryProperties = new Hashtable<String, Object>();
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
     contentRepository.updated(repositoryProperties);
@@ -115,7 +128,20 @@ public class WebloungeHarvesterTest {
   }
 
   /**
-   * Test adding and deleting with the matterhorn record handler
+   * Does the cleanup after each test.
+   */
+  @After
+  public void tearDown() {
+    try {
+      contentRepository.disconnect();
+      FileUtils.deleteQuietly(repositoryRoot);
+    } catch (ContentRepositoryException e) {
+      fail("Error disconnecting content repository: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Test adding and deleting with the Matterhorn record handler
    * 
    * @throws Exception
    */
@@ -194,19 +220,6 @@ public class WebloungeHarvesterTest {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
     return factory.newDocumentBuilder().parse(this.getClass().getResourceAsStream(name));
-  }
-
-  /**
-   * Does the cleanup after each test.
-   */
-  @After
-  public void tearDown() {
-    try {
-      contentRepository.disconnect();
-      FileUtils.deleteQuietly(repositoryRoot);
-    } catch (ContentRepositoryException e) {
-      fail("Error disconnecting content repository: " + e.getMessage());
-    }
   }
 
 }

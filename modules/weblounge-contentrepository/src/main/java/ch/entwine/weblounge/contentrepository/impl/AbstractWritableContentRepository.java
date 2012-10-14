@@ -33,34 +33,33 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation;
-import ch.entwine.weblounge.common.content.repository.DeleteContentOperation;
-import ch.entwine.weblounge.common.content.repository.DeleteOperation;
-import ch.entwine.weblounge.common.content.repository.IndexOperation;
-import ch.entwine.weblounge.common.content.repository.LockOperation;
-import ch.entwine.weblounge.common.content.repository.MoveOperation;
-import ch.entwine.weblounge.common.content.repository.PutContentOperation;
-import ch.entwine.weblounge.common.content.repository.PutOperation;
-import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
-import ch.entwine.weblounge.common.content.repository.ResourceSelector;
-import ch.entwine.weblounge.common.content.repository.UnlockOperation;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ContentRepositoryOperation;
+import ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation;
+import ch.entwine.weblounge.common.repository.DeleteContentOperation;
+import ch.entwine.weblounge.common.repository.DeleteOperation;
+import ch.entwine.weblounge.common.repository.IndexOperation;
+import ch.entwine.weblounge.common.repository.LockOperation;
+import ch.entwine.weblounge.common.repository.MoveOperation;
+import ch.entwine.weblounge.common.repository.PutContentOperation;
+import ch.entwine.weblounge.common.repository.PutOperation;
+import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
+import ch.entwine.weblounge.common.repository.ResourceSelector;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.UnlockOperation;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
@@ -92,7 +91,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Abstract base implementation of a <code>WritableContentRepository</code>.
@@ -101,9 +99,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /** The logging facility */
   static final Logger logger = LoggerFactory.getLogger(AbstractWritableContentRepository.class);
-
-  /** Name of the index path element right below the repository root */
-  public static final String INDEX_PATH = "index";
 
   /** Holds pages while they are written to the index */
   protected OperationProcessor processor = null;
@@ -122,9 +117,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /** The repository root directory */
   protected File repositorySiteRoot = null;
-
-  /** The root directory for the temporary bundle index */
-  protected File idxRootDir = null;
 
   /** Flag to indicate off-site indexing */
   protected boolean indexingOffsite = false;
@@ -149,14 +141,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public void connect(Site site) throws ContentRepositoryException {
     repositorySiteRoot = new File(repositoryRoot, site.getIdentifier());
     logger.debug("Content repository root is located at {}", repositorySiteRoot);
-
-    // Make sure we can create a temporary index
-    idxRootDir = new File(repositorySiteRoot, INDEX_PATH);
-    try {
-      FileUtils.forceMkdir(idxRootDir);
-    } catch (IOException e) {
-      throw new ContentRepositoryException("Unable to create site index at " + idxRootDir, e);
-    }
 
     super.connect(site);
 
@@ -351,7 +335,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#lock(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#lock(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.security.User)
    */
   public Resource<?> lock(ResourceURI uri, User user)
@@ -397,7 +381,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#lockAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#lockAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.security.User)
    */
   public LockOperation lockAsynchronously(final ResourceURI uri, final User user)
@@ -414,7 +398,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#unlock(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#unlock(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.security.User)
    */
   public Resource<?> unlock(ResourceURI uri, User user)
@@ -457,7 +441,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#unlockAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#unlockAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.security.User)
    */
   public UnlockOperation unlockAsynchronously(final ResourceURI uri,
@@ -475,7 +459,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#isLocked(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#isLocked(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public boolean isLocked(ResourceURI uri) throws ContentRepositoryException {
 
@@ -495,7 +479,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public boolean delete(ResourceURI uri) throws ContentRepositoryException,
   IOException {
@@ -505,7 +489,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#deleteAsynchronously(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#deleteAsynchronously(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public DeleteOperation deleteAsynchronously(final ResourceURI uri)
       throws ContentRepositoryException, IOException {
@@ -515,7 +499,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI,
    *      boolean)
    */
   public boolean delete(ResourceURI uri, boolean allRevisions)
@@ -547,7 +531,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       SearchQuery searchByResource = new SearchQueryImpl(uri.getSite());
       searchByResource.withVersion(Resource.LIVE);
       searchByResource.withProperty("resourceid", uri.getIdentifier());
-      if (index.find(searchByResource).getItems().length > 0) {
+      if (index.find(searchByResource).getDocumentCount() > 0) {
         logger.debug("Resource '{}' is still being referenced", uri);
         throw new ReferentialIntegrityException(uri.getIdentifier());
       }
@@ -586,7 +570,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#deleteAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#deleteAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
    *      boolean)
    */
   public DeleteOperation deleteAsynchronously(ResourceURI uri,
@@ -607,7 +591,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#move(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#move(ch.entwine.weblounge.common.content.ResourceURI,
    *      String, boolean)
    */
   public void move(ResourceURI uri, String targetPath, boolean moveChildren)
@@ -720,7 +704,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#moveAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#moveAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
    *      java.lang.String, boolean)
    */
   public MoveOperation moveAsynchronously(final ResourceURI uri,
@@ -739,7 +723,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#put(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#put(ch.entwine.weblounge.common.content.Resource)
    */
   public Resource<?> put(Resource<?> resource)
       throws ContentRepositoryException, IOException, IllegalStateException {
@@ -750,7 +734,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#putAsynchronously(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#putAsynchronously(ch.entwine.weblounge.common.content.Resource)
    */
   public PutOperation putAsynchronously(Resource<?> resource)
       throws ContentRepositoryException, IOException, IllegalStateException {
@@ -767,7 +751,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#putAsynchronously(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#putAsynchronously(ch.entwine.weblounge.common.content.Resource)
    */
   public PutOperation putAsynchronously(Resource<?> resource,
       boolean updatePreviews) throws ContentRepositoryException, IOException,
@@ -785,7 +769,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#put(ch.entwine.weblounge.common.content.Resource,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#put(ch.entwine.weblounge.common.content.Resource,
    *      boolean)
    */
   public Resource<?> put(Resource<?> resource, boolean updatePreviews)
@@ -806,28 +790,19 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     ResourceURI uri = resource.getURI();
 
-    // Add entry to index
-    if (!index.existsInAnyVersion(uri)) {
-      if (resource.contents().size() > 0)
-        throw new IllegalStateException("Cannot add content metadata withouC content");
-      index.add(resource);
-    }
-
-    // The resource exists in some version
-    else if (index.exists(uri)) {
+    // If the document exists in the given version, update it otherwise add it
+    // to the index
+    if (index.exists(uri)) {
       index.update(resource);
-    }
-
-    // We are about to add a new version of a resource
-    else {
+    } else {
       if (resource.contents().size() > 0)
-        throw new IllegalStateException("Cannot modify content metadata withouC content");
+        throw new IllegalStateException("Cannot add content metadata without content");
       index.add(resource);
     }
 
     // Make sure related stuff gets thrown out of the cache
     ResponseCache cache = getCache();
-    if (cache != null && updatePreviews && uri.getVersion() == Resource.LIVE) {
+    if (cache != null && uri.getVersion() == Resource.LIVE) {
       List<CacheTag> tags = new ArrayList<CacheTag>();
 
       // resource id
@@ -853,7 +828,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#putContent(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#putContent(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.content.ResourceContent,
    *      java.io.InputStream)
    */
@@ -916,7 +891,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#putContentAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#putContentAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.content.ResourceContent,
    *      java.io.InputStream)
    */
@@ -936,7 +911,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#deleteContent(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#deleteContent(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.content.ResourceContent)
    */
   public Resource<?> deleteContent(ResourceURI uri, ResourceContent content)
@@ -990,9 +965,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#deleteContent(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#deleteContent(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.content.ResourceContent,
-   *      ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener)
+   *      ch.entwine.weblounge.common.repository.ContentRepositoryOperationListener)
    */
   public DeleteContentOperation deleteContentAsynchronously(
       final ResourceURI uri, final ResourceContent content)
@@ -1010,7 +985,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#index()
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#index()
    */
   public void index() throws ContentRepositoryException {
 
@@ -1022,24 +997,20 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     readOnly = true;
     logger.info("Switching site '{}' to read only mode", site);
 
-    String newIdxRootDirName = idxRootDir.getName() + "-new-" + UUID.randomUUID().toString();
-    File newIdxRootDir = new File(idxRootDir.getParentFile(), newIdxRootDirName);
     FileSystemContentRepositoryIndex newIndex = null;
+
+    // Clear previews directory
+    logger.info("Removing cached preview images");
+    File previewsDir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images"));
+    FileUtils.deleteQuietly(previewsDir);
 
     // Create the new index
     try {
-      logger.info("Creating new index at {}", newIdxRootDir);
-      FileUtils.forceMkdir(newIdxRootDir);
-      newIndex = new FileSystemContentRepositoryIndex(newIdxRootDir);
+      newIndex = new FileSystemContentRepositoryIndex(site, resourceSerializer);
       indexingOffsite = true;
       rebuildIndex(newIndex);
     } catch (IOException e) {
       indexingOffsite = false;
-      try {
-        FileUtils.forceDelete(newIdxRootDir);
-      } catch (IOException e1) {
-        logger.error("Error removing incomplete new index at {}: {}", newIdxRootDir, e.getMessage());
-      }
       throw new ContentRepositoryException("Error creating index " + site.getIdentifier(), e);
     } finally {
       try {
@@ -1050,20 +1021,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       }
     }
 
-    String oldIdxRootDirName = idxRootDir.getName() + "-old-" + UUID.randomUUID().toString();
-    File oldIdxRootDir = new File(idxRootDir.getParentFile(), oldIdxRootDirName);
-
     try {
       indexing = true;
       index.close();
-      logger.info("Moving new index into place {}", idxRootDir);
-      FileUtils.moveDirectory(idxRootDir, oldIdxRootDir);
-      FileUtils.moveDirectory(newIdxRootDir, idxRootDir);
-      index = new FileSystemContentRepositoryIndex(idxRootDir);
-      logger.info("Removing old index at {}", oldIdxRootDir);
-      FileUtils.forceDelete(oldIdxRootDir);
+      logger.info("Loading new index");
+      index = new FileSystemContentRepositoryIndex(site, resourceSerializer);
     } catch (IOException e) {
-      throw new ContentRepositoryException("Error clearing index " + site.getIdentifier(), e);
+      Throwable cause = e.getCause();
+      if (cause == null)
+        cause = e;
+      throw new ContentRepositoryException("Error during reindex of '" + site.getIdentifier() + "'", cause);
     } finally {
       indexing = false;
       indexingOffsite = false;
@@ -1076,7 +1043,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.WritableContentRepository#indexAsynchronously()
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#indexAsynchronously()
    */
   public IndexOperation indexAsynchronously() throws ContentRepositoryException {
     IndexOperation op = new IndexOperationImpl();
@@ -1127,19 +1094,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       // Clear the current index, which might be null if the site has not been
       // started yet.
       if (idx == null)
-        idx = loadIndex(idxRootDir);
+        idx = loadIndex();
 
       logger.info("Creating site index '{}'...", site.getIdentifier());
       long time = System.currentTimeMillis();
       long resourceCount = 0;
 
       // Index each and every known resource type
-      Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-      if (serializers == null) {
-        logger.warn("Unable to index {} while no resource serializers are registered", this);
-        return;
-      }
-      for (ResourceSerializer<?, ?> serializer : serializers) {
+      for (ResourceSerializer<?, ?> serializer : getSerializers()) {
         long added = index(idx, serializer.getType());
         if (added > 0)
           logger.info("Added {} {}s to index", added, serializer.getType().toLowerCase());
@@ -1184,28 +1146,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   protected long index(ContentRepositoryIndex idx, String resourceType)
       throws ContentRepositoryException, IOException {
 
-    // Temporary path for rebuilt site
-    String resourceDirectory = resourceType + "s";
-    String homePath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), resourceDirectory);
-    File resourcesRootDirectory = new File(homePath);
-    FileUtils.forceMkdir(resourcesRootDirectory);
-    if (resourcesRootDirectory.list().length == 0) {
-      logger.debug("No {}s found to index", resourceType);
-      return 0;
-    }
-
     logger.info("Populating site index '{}' with {}s...", site, resourceType);
 
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+    ResourceSerializer<?, ?> serializer = getSerializerByType(resourceType);
     if (serializer == null) {
       logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
       return 0;
     }
-
-    // Clear previews directory
-    logger.info("Removing cached preview images");
-    File previewsDir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images"));
-    FileUtils.deleteQuietly(previewsDir);
 
     long resourceCount = 0;
     long resourceVersionCount = 0;
@@ -1264,34 +1211,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   @Override
   protected ContentRepositoryIndex loadIndex() throws IOException,
   ContentRepositoryException {
-    logger.debug("Trying to load site index from {}", idxRootDir);
-    return loadIndex(idxRootDir);
-  }
-
-  /**
-   * Loads the index from a given directory on the filesystem.
-   * 
-   * @param idxRoot
-   *          the root directory
-   * @return the content repository
-   * @throws IOException
-   *           if reading from the filesystem fails
-   * @throws ContentRepositoryException
-   *           if creating the content repository index fails
-   */
-  protected ContentRepositoryIndex loadIndex(File idxRoot) throws IOException,
-  ContentRepositoryException {
+    logger.debug("Trying to load site index");
 
     ContentRepositoryIndex idx = null;
 
-    logger.debug("Trying to load site index from {}", idxRoot);
-
-    // Is this a new index?
-    boolean created = !idxRoot.exists() || idxRoot.list().length == 0;
-    FileUtils.forceMkdir(idxRoot);
+    logger.debug("Loading site index");
 
     // Add content if there is any
-    idx = new FileSystemContentRepositoryIndex(idxRoot);
+    idx = new FileSystemContentRepositoryIndex(site, resourceSerializer);
 
     // Create the idx if there is nothing in place so far
     if (idx.getResourceCount() <= 0) {
@@ -1307,17 +1234,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       buildIndex(idx);
     }
 
-    // Is there an existing idx?
-    if (created) {
-      logger.info("Created site idx at {}", idxRoot);
-    } else {
-      long resourceCount = idx.getResourceCount();
-      long resourceVersionCount = idx.getRevisionCount();
-      logger.info("Loaded site idx with {} resources and {} revisions from {}", new Object[] {
-          resourceCount,
-          resourceVersionCount - resourceCount,
-          idxRoot });
-    }
+    // Is there an existing idex?
+    long resourceCount = idx.getResourceCount();
+    long resourceVersionCount = idx.getRevisionCount();
+    logger.info("Loaded site idx with {} resources and {} revisions", resourceCount, resourceVersionCount - resourceCount);
 
     return idx;
   }
@@ -1327,11 +1247,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @param resource
    *          the resource content
+   * @throws ContentRepositoryException
+   *           if updating the index fails
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <C extends ResourceContent, R extends Resource<C>> R storeResource(
-      R resource) throws IOException;
+  protected abstract Resource<?> storeResource(Resource<?> resource)
+      throws ContentRepositoryException, IOException;
 
   /**
    * Writes the resource content to the repository storage.
@@ -1342,11 +1264,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *          the resource content
    * @param is
    *          the input stream
+   * @throws ContentRepositoryException
+   *           if updating the content repository index fails
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <C extends ResourceContent, R extends Resource<C>> C storeResourceContent(
-      ResourceURI uri, C content, InputStream is) throws IOException;
+  protected abstract ResourceContent storeResourceContent(ResourceURI uri,
+      ResourceContent content, InputStream is)
+          throws ContentRepositoryException, IOException;
 
   /**
    * Deletes the indicated revisions of resource <code>uri</code> from the
@@ -1357,9 +1282,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *          the resource uri
    * @param revisions
    *          the revisions to remove
+   * @throws ContentRepositoryException
+   *           if deleting the resource from the index fails
+   * @throws IOException
+   *           if removing the resource from disk fails
    */
   protected abstract void deleteResource(ResourceURI uri, long[] revisions)
-      throws IOException;
+      throws ContentRepositoryException, IOException;
 
   /**
    * Deletes the resource content from the repository storage.
@@ -1368,11 +1297,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *          the resource uri
    * @param content
    *          the resource content
+   * @throws ContentRepositoryException
+   *           if deleting the resource content from the index fails
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <C extends ResourceContent, R extends Resource<C>> void deleteResourceContent(
-      ResourceURI uri, C content) throws IOException;
+  protected abstract void deleteResourceContent(ResourceURI uri,
+      ResourceContent content) throws ContentRepositoryException, IOException;
 
   /**
    * This class is used as a way to keep track of what has been added to the

@@ -55,14 +55,14 @@ public class TaggedCacheHandle extends CacheHandleImpl {
    * 
    * @param primary
    *          the primary key set
-   * @param expires
+   * @param expirationTime
    *          number of milliseconds that it takes for the handle to expire
-   * @param recheck
+   * @param revalidationTime
    *          number of milliseconds that this handle is likely to need to be
    *          rechecked
    */
-  public TaggedCacheHandle(CacheTag[] primary, long expires, long recheck) {
-    super(expires, recheck);
+  public TaggedCacheHandle(CacheTag[] primary, long expirationTime, long revalidationTime) {
+    super(expirationTime, revalidationTime);
     setKey(createKey(primary));
     Set<Tag> s = new TreeSet<Tag>(new TagComparator());
     for (CacheTag t : primary) {

@@ -26,11 +26,11 @@ import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
@@ -95,10 +95,10 @@ public class IndexEndpoint extends ContentRepositoryEndpoint {
     result.append(" readonly=\"").append(repository.isReadOnly() ? "true" : "false").append("\"");
     result.append(">");
 
-    result.append("<resources>").append(repository.getResourceCount()).append("</resources>");
-    result.append("<revisions>").append(repository.getVersionCount() - repository.getResourceCount()).append("</revisions>");
-
     try {
+      result.append("<resources>").append(repository.getResourceCount()).append("</resources>");
+      result.append("<revisions>").append(repository.getVersionCount() - repository.getResourceCount()).append("</revisions>");
+
       q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPreferredVersion(Resource.LIVE);
       result.append("<pages>").append(repository.find(q).getDocumentCount()).append("</pages>");
       q = new SearchQueryImpl(site).withTypes(FileResource.TYPE).withPreferredVersion(Resource.LIVE);

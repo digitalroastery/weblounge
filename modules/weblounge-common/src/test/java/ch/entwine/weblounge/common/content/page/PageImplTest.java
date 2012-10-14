@@ -80,9 +80,6 @@ public class PageImplTest {
   /** The page layout */
   protected String layout = "news";
   
-  /** Indexed */
-  protected boolean isIndexed = true;
-
   /** Anchor page */
   protected boolean isPromoted = true;
   
@@ -153,7 +150,6 @@ public class PageImplTest {
   public void setUp() throws Exception {
     setupPrerequisites();
     page = new PageImpl(pageURI);
-    page.setIndexed(isIndexed);
     page.setPromoted(isPromoted);
     page.setCoverage(germanCoverage, german);
     page.setCoverage(frenchCoverage, french);
@@ -262,14 +258,6 @@ public class PageImplTest {
   @Test
   public void testIsPromoted() {
     assertEquals(isPromoted, page.isPromoted());
-  }
-
-  /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#isIndexed()}.
-   */
-  @Test
-  public void testIsIndexed() {
-    assertEquals(isIndexed, page.isIndexed());
   }
 
   /**

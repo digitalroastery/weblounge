@@ -470,17 +470,6 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Resource#isIndexed()
-   */
-  public boolean isIndexed() {
-    if (!isHeaderLoaded)
-      loadAudioVisualHeader();
-    return audioVisual.isIndexed();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.Resource#isLocked()
    */
   public boolean isLocked() {
@@ -553,17 +542,6 @@ public class LazyMovieResourceImpl implements MovieResource {
    */
   public void setIdentifier(String identifier) {
     uri.setIdentifier(identifier);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.Resource#setIndexed(boolean)
-   */
-  public void setIndexed(boolean index) {
-    if (!isHeaderLoaded)
-      loadAudioVisualHeader();
-    audioVisual.setIndexed(index);
   }
 
   /**

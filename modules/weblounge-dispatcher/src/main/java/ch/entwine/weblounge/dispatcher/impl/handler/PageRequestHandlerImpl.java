@@ -32,14 +32,14 @@ import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.request.Http11Constants;
 import ch.entwine.weblounge.common.impl.request.Http11Utils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.ResponseCache;
@@ -243,15 +243,15 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         }
       }
 
-      // Check the request method. This handler only supports GET
+      // Check the request method. This handler only supports GET, POST and OPTIONS
       String requestMethod = request.getMethod().toUpperCase();
       if ("OPTIONS".equals(requestMethod)) {
-        String verbs = "OPTIONS,GET";
+        String verbs = "OPTIONS, GET, POST";
         logger.trace("Answering options request to {} with {}", url, verbs);
         response.setHeader("Allow", verbs);
         response.setContentLength(0);
         return true;
-      } else if (!"GET".equals(requestMethod)) {
+      } else if (!"GET".equals(requestMethod) && !"POST".equals(requestMethod) && !RequestUtils.containsAction(request)) {
         logger.debug("Url {} does not handle {} requests", url, requestMethod);
         DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
         return true;
@@ -261,17 +261,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       if (!page.isPublished() && !(page.getVersion() == Resource.WORK)) {
         logger.debug("Access to unpublished page {}", pageURI);
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        return true;
-      }
-
-      // Check for explicit no cache instructions
-      boolean noCache = request.getParameter(ResponseCache.NOCACHE_PARAM) != null;
-
-      // Does the client already have up-to-date content?
-      boolean isCached = !noCache && response.isCached() && response.isValid();
-      if (action == null && !isCached && !ResourceUtils.hasChanged(request, page)) {
-        logger.debug("Page {} was not modified", pageURI);
-        DispatchUtils.sendNotModified(request, response);
         return true;
       }
 
@@ -287,19 +276,22 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         return true;
       }
 
+      // Check for explicit no cache instructions
+      boolean ignoreCache = request.getParameter(ResponseCache.NOCACHE_PARAM) != null;
+
       // Check if the page is already part of the cache. If so, our task is
       // already done!
-      if (!noCache && request.getVersion() == Resource.LIVE && !isEditing) {
+      if (!ignoreCache && request.getVersion() == Resource.LIVE && !isEditing) {
 
         // Create the set of tags that identify the page
         CacheTagSet cacheTags = createPrimaryCacheTags(request);
 
         if (action == null) {
-          long validTime = Renderer.DEFAULT_VALID_TIME;
-          long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+          long expirationTime = Renderer.DEFAULT_VALID_TIME;
+          long revalidationTime = Renderer.DEFAULT_RECHECK_TIME;
 
           // Check if the page is already part of the cache
-          if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
+          if (response.startResponse(cacheTags.getTags(), expirationTime, revalidationTime)) {
             logger.debug("Page handler answered request for {} from cache", request.getUrl());
             return true;
           }
@@ -354,13 +346,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         response.setContentType("text/html; charset=" + characterEncoding.toLowerCase());
       else
         response.setContentType("text/html");
-
-      // Add additional cache tags
-      response.addTag(CacheTag.Renderer, template.getIdentifier());
-
-      // Configure valid and recheck time according to the template
-      response.setClientRevalidationTime(template.getRecheckTime());
-      response.setCacheExpirationTime(template.getValidTime());
 
       // Set the Expires header
       long expires = response.getCacheExpirationTime();

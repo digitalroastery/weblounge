@@ -33,7 +33,6 @@ import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
@@ -42,32 +41,29 @@ import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
-import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.IdIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.PathIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.URIIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.VersionIndex;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -78,10 +74,10 @@ import java.util.UUID;
 public class ContentRepositoryIndexTest {
 
   /** The content repository index */
-  protected ContentRepositoryIndex idx = null;
+  protected static ContentRepositoryIndex idx = null;
 
   /** The index' root directory */
-  protected File indexRootDirectory = null;
+  protected static File idxRoot = null;
 
   /** The structural index' root directory */
   protected File structuralIndexRootDirectory = null;
@@ -96,10 +92,10 @@ public class ContentRepositoryIndexTest {
   protected FileResource file = null;
 
   /** The site */
-  protected Site site = null;
+  protected static Site site = null;
 
   /** Page template */
-  protected PageTemplate template = null;
+  protected static PageTemplate template = null;
 
   /** English */
   protected Language english = LanguageUtils.getLanguage("en");
@@ -110,17 +106,22 @@ public class ContentRepositoryIndexTest {
   /** Italian */
   protected Language french = LanguageUtils.getLanguage("fr");
 
+  /** The resource serializer */
+  private static ResourceSerializerServiceImpl serializer = null;
+
   /**
-   * Sets up data structures for each test case.
+   * Sets up static test data.
    * 
-   * @throws java.lang.Exception
+   * @throws IOException
    */
-  @Before
-  public void setUp() throws Exception {
-    indexRootDirectory = new File(new File(System.getProperty("java.io.tmpdir")), "index");
-    structuralIndexRootDirectory = new File(indexRootDirectory, "structure");
-    FileUtils.deleteDirectory(indexRootDirectory);
-    idx = new FileSystemContentRepositoryIndex(indexRootDirectory);
+  @BeforeClass
+  public static void setUpClass() throws IOException {
+    // Resource serializer
+    serializer = new ResourceSerializerServiceImpl();
+    serializer.addSerializer(new PageSerializer());
+    serializer.addSerializer(new FileResourceSerializer());
+    serializer.addSerializer(new ImageResourceSerializer());
+    serializer.addSerializer(new MovieResourceSerializer());
 
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
@@ -134,13 +135,32 @@ public class ContentRepositoryIndexTest {
     EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
     EasyMock.replay(site);
 
-    // Resource serializers
-    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
-    ResourceSerializerFactory.setResourceSerializerService(serializerService);
-    serializerService.registerSerializer(new PageSerializer());
-    serializerService.registerSerializer(new FileResourceSerializer());
-    serializerService.registerSerializer(new ImageResourceSerializer());
+    idxRoot = new File(new File(System.getProperty("java.io.tmpdir")), "index");
+    FileUtils.deleteDirectory(idxRoot);
 
+    ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
+    System.setProperty("weblounge.home", idxRoot.getAbsolutePath());
+    idx = new FileSystemContentRepositoryIndex(site, serializer);
+  }
+
+  /**
+   * Cleanup work after the last test.
+   * 
+   * @throws IOException
+   */
+  @AfterClass
+  public static void tearDownAfterClass() throws IOException {
+    idx.close();
+    FileUtils.deleteDirectory(idxRoot);
+  }
+
+  /**
+   * Sets up data structures for each test case.
+   * 
+   * @throws java.lang.Exception
+   */
+  @Before
+  public void setUp() throws Exception {
     page = new PageImpl(new PageURIImpl(site, "/weblounge"));
     page.setTemplate("home");
 
@@ -155,19 +175,7 @@ public class ContentRepositoryIndexTest {
    */
   @After
   public void tearDown() throws Exception {
-    idx.close();
-    FileUtils.deleteDirectory(indexRootDirectory);
-  }
-
-  /**
-   * Tests if all files have been created.
-   */
-  @Test
-  public void testFilesystem() {
-    assertTrue(new File(structuralIndexRootDirectory, IdIndex.ID_IDX_NAME).exists());
-    assertTrue(new File(structuralIndexRootDirectory, PathIndex.PATH_IDX_NAME).exists());
-    assertTrue(new File(structuralIndexRootDirectory, URIIndex.URI_IDX_NAME).exists());
-    assertTrue(new File(structuralIndexRootDirectory, VersionIndex.VERSION_IDX_NAME).exists());
+    idx.clear();
   }
 
   /**
@@ -179,9 +187,9 @@ public class ContentRepositoryIndexTest {
   public void testAdd() {
     try {
       idx.add(page);
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
       idx.add(file);
-      assertEquals(2, idx.size());
+      assertEquals(2, idx.getResourceCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -219,7 +227,7 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testUpdate() throws IllegalArgumentException,
-      ContentRepositoryException {
+  ContentRepositoryException {
 
     String propertyName = "testproperty";
     String propertyValue = "testvalue";
@@ -229,9 +237,9 @@ public class ContentRepositoryIndexTest {
 
     try {
       idx.add(page);
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
       idx.update(page);
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -258,9 +266,9 @@ public class ContentRepositoryIndexTest {
       idx.add(page);
       idx.add(file);
       idx.delete(page.getURI());
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
       idx.delete(file.getURI());
-      assertEquals(0, idx.size());
+      assertEquals(0, idx.getResourceCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -315,7 +323,7 @@ public class ContentRepositoryIndexTest {
     try {
       String id = idx.add(page).getIdentifier();
       idx.move(page.getURI(), newPath);
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
       assertEquals(id, idx.getIdentifier(new PageURIImpl(site, newPath)));
     } catch (Throwable t) {
       t.printStackTrace();
@@ -333,7 +341,7 @@ public class ContentRepositoryIndexTest {
     try {
       idx.add(page);
       idx.clear();
-      assertEquals(0, idx.size());
+      assertEquals(0, idx.getResourceCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -392,9 +400,9 @@ public class ContentRepositoryIndexTest {
   @Test
   public void testSize() {
     try {
-      assertEquals(0, idx.size());
+      assertEquals(0, idx.getResourceCount());
       idx.add(page);
-      assertEquals(1, idx.size());
+      assertEquals(1, idx.getResourceCount());
     } catch (Throwable t) {
       t.printStackTrace();
       fail(t.getMessage());
@@ -404,78 +412,49 @@ public class ContentRepositoryIndexTest {
   /**
    * Test method to add, delete, add and update a page to make sure indexing
    * structures are reused in a consistent way.
+   * 
+   * @throws ContentRepositoryException
+   * @throws IOException
    */
   @Test
-  public void testExercise() {
-    try {
-      idx.add(page);
-      idx.add(otherPage);
-      idx.update(page);
-      idx.update(otherPage);
-      idx.delete(otherPage.getURI());
-      idx.update(page);
-      assertTrue(idx.exists(page.getURI()));
+  public void testExercise() throws IOException, ContentRepositoryException {
+    idx.add(page);
+    idx.add(otherPage);
+    idx.update(page);
+    idx.update(otherPage);
+    idx.delete(otherPage.getURI());
+    idx.update(page);
+    assertTrue(idx.exists(page.getURI()));
 
-      // Clear the index
-      idx.clear();
+    // Clear the index
+    idx.clear();
 
-      // Add a number of random pages
-      List<Page> pages = new ArrayList<Page>();
-      for (int i = 0; i < 100; i++) {
-        StringBuffer b = new StringBuffer("/");
-        for (int j = 0; j < (i % 4) + 1; j++) {
-          b.append(UUID.randomUUID().toString());
-          b.append("/");
-        }
-        String path = b.toString();
-        String id = UUID.randomUUID().toString();
-        Page p = new PageImpl(new PageURIImpl(site, path, id));
-        p.setTemplate("home");
-        p.setTitle("title", english);
-        pages.add(p);
-        ResourceURI uri = idx.add(p);
-        assertEquals(id, uri.getIdentifier());
-        assertEquals(path, uri.getPath());
-        assertEquals(i + 1, idx.size());
+    // Add a number of random pages
+    List<Page> pages = new ArrayList<Page>();
+    for (int i = 0; i < 100; i++) {
+      StringBuffer b = new StringBuffer("/");
+      for (int j = 0; j < (i % 4) + 1; j++) {
+        b.append(UUID.randomUUID().toString());
+        b.append("/");
       }
-
-      // Test if everything can be found
-      for (Page p : pages) {
-        assertTrue(idx.exists(p.getURI()));
-        assertEquals(p.getURI().getIdentifier(), idx.getIdentifier(p.getURI()));
-        assertEquals(p.getURI().getPath(), idx.getPath(p.getURI()));
-        assertEquals(1, idx.getRevisions(p.getURI()).length);
-      }
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail(t.getMessage());
+      String path = b.toString();
+      String id = UUID.randomUUID().toString();
+      Page p = new PageImpl(new PageURIImpl(site, path, id));
+      p.setTemplate("home");
+      p.setTitle("title", english);
+      pages.add(p);
+      ResourceURI uri = idx.add(p);
+      assertEquals(id, uri.getIdentifier());
+      assertEquals(path, uri.getPath());
+      assertEquals(i + 1, idx.getResourceCount());
     }
 
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getIndexVersion()}
-   * .
-   */
-  @Test
-  public void testIndexVersion() {
-    assertEquals(VersionedContentRepositoryIndex.INDEX_VERSION, idx.getIndexVersion());
-
-    // Overwrite the version number with 0, which is an invalid value
-    try {
-      idx.close();
-
-      File idIdxFile = new File(PathUtils.concat(indexRootDirectory.getAbsolutePath(), "structure"), IdIndex.ID_IDX_NAME);
-      RandomAccessFile index = new RandomAccessFile(idIdxFile, "rwd");
-      index.seek(0);
-      index.writeInt(0);
-      index.close();
-
-      idx = new FileSystemContentRepositoryIndex(indexRootDirectory);
-      assertEquals(-1, idx.getIndexVersion());
-    } catch (IOException e) {
-      fail("Error writing version to index");
+    // Test if everything can be found
+    for (Page p : pages) {
+      assertTrue(idx.exists(p.getURI()));
+      assertEquals(p.getURI().getIdentifier(), idx.getIdentifier(p.getURI()));
+      assertEquals(p.getURI().getPath(), idx.getPath(p.getURI()));
+      assertEquals(1, idx.getRevisions(p.getURI()).length);
     }
 
   }

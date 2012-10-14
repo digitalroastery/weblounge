@@ -1,0 +1,190 @@
+{
+    "image" : {
+        "_source" : { "enabled" : false },
+        "_timestamp" : { "enabled" : true },
+        "properties" : {
+ 
+            "uid": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "id": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "path": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "type": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "version": { "type" : "long", "index" : "not_analyzed", "store" : "yes" },
+            "alternate_version": { "type" : "long", "index" : "not_analyzed", "store" : "yes" },
+
+            "subjects": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "template": { "type" : "string", "index" : "not_analyzed", "store" : "yes" }, 
+            "stationary": { "type" : "boolean", "index" : "not_analyzed", "store" : "yes" }, 
+            "series": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "page_xml": { "type" : "string", "index" : "no", "store" : "yes" },
+            "page_header_xml": { "type" : "string", "index" : "no", "store" : "yes" },
+            "preview_xml": { "type" : "string", "index" : "no", "store" : "yes" },
+
+            "owned_by": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "owned_by_name": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "created": { "type" : "date", "index" : "not_analyzed", "store" : "yes" },
+            "created_by": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "created_by_name": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "modified": { "type" : "date", "index" : "not_analyzed", "store" : "yes" },
+            "modified_by": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "modified_by_name": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "published_from": { "type" : "date", "index" : "not_analyzed", "store" : "yes" },
+            "published_to": { "type" : "date", "index" : "not_analyzed", "store" : "yes" },
+            "published_by": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "published_by_name": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "locked_by": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "locked_by_name": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "coverage": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "rights": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "title": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "pagelet_type": { "type" : "string", "index" : "analyzed", "store" : "no" },
+            "pagelet_contents": { "type" : "string", "index" : "analyzed", "store" : "no" },
+            "pagelet_properties": { "type" : "string", "index" : "analyzed", "store" : "no" },
+            "pagelet_property_value": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "path_prefix": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
+            "fulltext": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "content_source": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "content_external_representation": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "content_mimetype": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "content_filename": { "type" : "string", "index" : "not_analyzed", "store" : "yes" }
+
+        },
+        "dynamic_templates" : [           
+             {
+             "description_template" : {
+                 "match" : "description_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "coverage_template" : {
+                 "match" : "coverage_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "rights_template" : {
+                 "match" : "rights_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "title_template" : {
+                 "match" : "title_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "pagelet_type_composer" : {
+                 "match" : "pagelet_type_composer_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "pagelet_type_position" : {
+                 "match" : "pagelet_type_position_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "pagelet_contents_language" : {
+                 "match" : "pagelet_contents_language_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "pagelet_contents_composer" : {
+                 "match" : "pagelet_contents_composer_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "pagelet_contents_position" : {
+                 "match" : "pagelet_contents_position_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "pagelet_xml" : {
+                 "match" : "pagelet_xml_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "fulltext" : {
+                 "match" : "fulltext_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "content_mimetype" : {
+                 "match" : "content_mimetype_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "content_filename" : {
+                 "match" : "content_filename_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "content_created" : {
+                 "match" : "content_created_*",
+                 "match_mapping_type" : "date",
+                 "mapping" : { "type" : "date", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "content_created_by" : {
+                 "match" : "content_created_by_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "content_xml" : {
+                 "match" : "content_xml_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "text" : {
+                 "match" : "text_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "fulltext" : {
+                 "match" : "fulltext_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             }
+
+         ]
+    }
+}

@@ -6,7 +6,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.0.7</version>
+    <version>3.1.0</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   
@@ -82,6 +82,9 @@
             <Service-Component>
               OSGI-INF/sql-directory-service.xml
             </Service-Component>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

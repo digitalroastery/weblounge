@@ -28,8 +28,6 @@ import static ch.entwine.weblounge.common.impl.util.doc.Status.serviceUnavailabl
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.util.doc.Endpoint;
 import ch.entwine.weblounge.common.impl.util.doc.Endpoint.Method;
@@ -38,6 +36,8 @@ import ch.entwine.weblounge.common.impl.util.doc.EndpointDocumentationGenerator;
 import ch.entwine.weblounge.common.impl.util.doc.Format;
 import ch.entwine.weblounge.common.impl.util.doc.Parameter;
 import ch.entwine.weblounge.common.impl.util.doc.TestForm;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.site.SiteManager;
@@ -122,7 +122,7 @@ public class SearchEndpoint {
     // Create the search expression and the query
     SearchQuery query = new SearchQueryImpl(site);
     try {
-      query.withText(URLDecoder.decode(terms, "utf-8"));
+      query.withFulltext(URLDecoder.decode(terms, "utf-8"));
       query.withVersion(Resource.LIVE);
       query.withOffset(offset);
       query.withLimit(limit);

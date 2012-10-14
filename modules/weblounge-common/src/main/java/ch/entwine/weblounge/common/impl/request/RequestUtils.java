@@ -66,6 +66,19 @@ public final class RequestUtils {
   }
 
   /**
+   * Returns true if an action is set as request attribute
+   * <code>WebloungeRequest.ACTION</code>.
+   * 
+   * @param request
+   *          the request
+   * @return true if an action is found as request attribute
+   */
+  public static boolean containsAction(WebloungeRequest request) {
+    Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
+    return action != null;
+  }
+
+  /**
    * Returns a string representation of the request headers.
    * 
    * @param request
@@ -492,7 +505,7 @@ public final class RequestUtils {
    */
   public static short getShortParameterWithDefault(WebloungeRequest request,
       Action action, int index, short defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getShortParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -613,7 +626,7 @@ public final class RequestUtils {
    */
   private static short getShortParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-          throws IllegalArgumentException, IllegalStateException {
+      throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -691,7 +704,7 @@ public final class RequestUtils {
    */
   public static int getIntegerParameterWithDefault(WebloungeRequest request,
       Action action, int index, int defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getIntegerParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -764,7 +777,7 @@ public final class RequestUtils {
    */
   private static int getIntegerParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-          throws IllegalArgumentException, IllegalStateException {
+      throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -890,7 +903,7 @@ public final class RequestUtils {
    */
   public static long getLongParameterWithDefault(WebloungeRequest request,
       Action action, int index, long defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getLongParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1090,7 +1103,7 @@ public final class RequestUtils {
    */
   public static float getFloatParameterWithDefault(WebloungeRequest request,
       Action action, int index, float defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getFloatParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1163,7 +1176,7 @@ public final class RequestUtils {
    */
   private static float getFloatParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-          throws IllegalArgumentException, IllegalStateException {
+      throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -1296,7 +1309,7 @@ public final class RequestUtils {
    */
   public static boolean getBooleanParameterWithDefault(
       WebloungeRequest request, String parameterName, boolean defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     String p = getParameter(request, parameterName);
     if (p == null)
       return defaultValue;
@@ -1322,7 +1335,7 @@ public final class RequestUtils {
    */
   public static boolean getBooleanParameterWithDefault(
       WebloungeRequest request, Action action, int index, boolean defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getBooleanParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1442,7 +1455,7 @@ public final class RequestUtils {
    */
   private static boolean getBooleanParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-          throws IllegalArgumentException, IllegalStateException {
+      throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -1522,7 +1535,7 @@ public final class RequestUtils {
    */
   public static Date getDateParameterWithDefault(WebloungeRequest request,
       Action action, int index, Date defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getDateParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1692,7 +1705,7 @@ public final class RequestUtils {
         "yyyy-MM-ddTkk:mmZ",
         "yyyy-MM-ddTkk:mm:ssZ",
         // us date format
-    "MM/dd/yyyy" };
+        "MM/dd/yyyy" };
     return DateUtils.parseDate(datestring, parsePatterns);
   }
 

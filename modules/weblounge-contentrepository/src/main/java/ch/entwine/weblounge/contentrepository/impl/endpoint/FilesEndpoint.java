@@ -33,10 +33,6 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
@@ -48,14 +44,18 @@ import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -128,6 +128,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   /** The security service */
   protected SecurityService securityService = null;
 
+  /** The resource serializer service */
+  private ResourceSerializerService serializerService = null;
+
   /** The endpoint documentation */
   private String docs = null;
 
@@ -190,7 +193,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Search terms
     if (StringUtils.isNotBlank(searchterms))
-      q.withText(searchterms, true);
+      q.withText(true, searchterms);
 
     Calendar today = Calendar.getInstance();
     today.set(Calendar.HOUR_OF_DAY, 0);
@@ -277,7 +280,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
       // simple filter
       else {
-        q.withFilter(filter);
+        q.withFulltext(filter);
       }
     }
 
@@ -636,7 +639,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       InputStream is = null;
       ResourceContent content = null;
       ResourceContentReader<?> reader = null;
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resource.getURI().getType());
+      ResourceSerializer<?, ?> serializer = serializerService.getSerializerByType(resource.getURI().getType());
       try {
         reader = serializer.getContentReader();
         is = new FileInputStream(uploadedFile);
@@ -848,7 +851,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // TOOD: Extract resource type
     String resourceType = resourceURI.getType();
     try {
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+      ResourceSerializer<?, ?> serializer = serializerService.getSerializerByType(resourceType);
       ResourceReader<?, ?> resourceReader = serializer.getReader();
       resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       resource.setModified(user, new Date());
@@ -1187,10 +1190,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       Resource<?> resource = null;
       ResourceURI resourceURI = null;
       logger.debug("Adding resource to {}", resourceURI);
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
+      ResourceSerializer<?, ?> serializer = serializerService.getSerializerByMimeType(mimeType);
       if (serializer == null) {
         logger.debug("No specialized resource serializer found, using regular file serializer");
-        serializer = ResourceSerializerFactory.getSerializerByType(FileResource.TYPE);
+        serializer = serializerService.getSerializerByType(FileResource.TYPE);
       }
 
       // Create the resource
@@ -1384,6 +1387,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     try {
       result = repository.find(q);
     } catch (ContentRepositoryException e) {
+      logger.warn(e.getMessage());
       throw new WebApplicationException();
     }
 
@@ -1405,6 +1409,16 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
     buf.append("</files>");
     return buf.toString();
+  }
+
+  /**
+   * OSGi callback that is setting the resource serializer.
+   * 
+   * @param serializer
+   *          the resource serializer service
+   */
+  void setResourceSerializer(ResourceSerializerService serializer) {
+    this.serializerService = serializer;
   }
 
   /**

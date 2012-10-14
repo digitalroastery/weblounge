@@ -32,14 +32,14 @@ import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -220,14 +220,14 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     // Check if the page is already part of the cache. If so, our task is
     // already done!
     if (!noCache) {
-      long validTime = Renderer.DEFAULT_VALID_TIME;
-      long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+      long expirationTime = Renderer.DEFAULT_VALID_TIME;
+      long revalidationTime = Renderer.DEFAULT_RECHECK_TIME;
 
       // Create the set of tags that identify the request output
       CacheTagSet cacheTags = createPrimaryCacheTags(request);
 
       // Check if the page is already part of the cache
-      if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
+      if (response.startResponse(cacheTags.getTags(), expirationTime, revalidationTime)) {
         logger.debug("Feed handler answered request for {} from cache", request.getUrl());
         return true;
       }

@@ -24,9 +24,9 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public abstract class AbstractResourceSerializer<S extends ResourceContent, T ex
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getType()
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getType()
    */
   public String getType() {
     return type;
@@ -70,7 +70,7 @@ public abstract class AbstractResourceSerializer<S extends ResourceContent, T ex
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getReader()
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getReader()
    */
   public ResourceReader<S, T> getReader() throws ParserConfigurationException, SAXException {
     return createNewReader();
@@ -91,7 +91,7 @@ public abstract class AbstractResourceSerializer<S extends ResourceContent, T ex
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getSearchResultRenderer(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getSearchResultRenderer(ch.entwine.weblounge.common.content.Resource)
    */
   public PageletRenderer getSearchResultRenderer(Resource<?> resource) {
     if (resource == null)

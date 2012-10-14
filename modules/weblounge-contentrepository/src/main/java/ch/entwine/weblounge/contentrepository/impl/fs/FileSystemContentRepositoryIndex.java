@@ -20,9 +20,10 @@
 
 package ch.entwine.weblounge.contentrepository.impl.fs;
 
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -36,14 +37,17 @@ public class FileSystemContentRepositoryIndex extends ContentRepositoryIndex {
    * Creates a new content repository index that lives inside the given
    * directory.
    * 
-   * @param directory
-   *          the index root directory
+   * @param site
+   *          the site
+   * @param serializer
+   *          the resource serializer service
    * @throws IOException
    *           if an existing index cannot be read of if creating new index
    *           files fails
    */
-  public FileSystemContentRepositoryIndex(File directory) throws IOException {
-    super(directory, false);
+  public FileSystemContentRepositoryIndex(Site site,
+      ResourceSerializerService serializer) throws IOException {
+    super(site, serializer, false);
   }
 
 }

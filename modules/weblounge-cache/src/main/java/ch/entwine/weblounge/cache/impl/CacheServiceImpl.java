@@ -352,7 +352,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
@@ -534,9 +533,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *      ch.entwine.weblounge.common.request.WebloungeResponse, long, long)
    */
   public CacheHandle startResponse(CacheTag[] uniqueTags,
-      WebloungeRequest request, WebloungeResponse response, long validTime,
-      long recheckTime) {
-    CacheHandle hdl = new TaggedCacheHandle(uniqueTags, validTime, recheckTime);
+      WebloungeRequest request, WebloungeResponse response, long expirationTime,
+      long revalidationTime) {
+    CacheHandle hdl = new TaggedCacheHandle(uniqueTags, expirationTime, revalidationTime);
     return startResponse(hdl, request, response);
   }
 
@@ -575,6 +574,15 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Try to load the content from the cache
     Element element = cache.get(new CacheEntryKey(handle.getKey()));
+
+    if (element != null) {
+      long expirationTime = element.getExpirationTime();
+      if (expirationTime < System.currentTimeMillis()) {
+        logger.debug("Cache element {} of cache {} has expired", request, id);
+        cache.remove(handle.getKey());
+        element = null;
+      }
+    }
 
     // If it exists, write the contents back to the response
     if (element != null && element.getValue() != null) {
@@ -655,7 +663,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     CacheEntryKey key = (CacheEntryKey) element.getKey();
 
     long clientCacheDate = request.getDateHeader("If-Modified-Since");
-    long expirationDate = element.getCreationTime() + entry.getClientRevalidationTime();
+    long expirationDate = System.currentTimeMillis() + entry.getClientRevalidationTime();
+
     long revalidationTimeInSeconds = entry.getClientRevalidationTime() / 1000;
     String eTag = request.getHeader("If-None-Match");
 

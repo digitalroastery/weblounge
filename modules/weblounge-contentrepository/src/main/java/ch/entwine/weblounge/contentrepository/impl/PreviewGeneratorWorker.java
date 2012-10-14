@@ -27,14 +27,13 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -115,7 +114,7 @@ class PreviewGeneratorWorker implements Runnable {
     try {
 
       // Find the resource serializer
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+      ResourceSerializer<?, ?> serializer = contentRepository.getSerializerByType(resourceType);
       if (serializer == null) {
         logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
         return;
@@ -130,7 +129,7 @@ class PreviewGeneratorWorker implements Runnable {
 
       // Create the scaled images
       String mimeType = "image/" + format;
-      ResourceSerializer<?, ?> s = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
+      ResourceSerializer<?, ?> s = contentRepository.getSerializerByMimeType(mimeType);
       if (s == null) {
         logger.warn("No resource serializer is capable of dealing with resources of format '{}'", mimeType);
         return;
@@ -183,6 +182,15 @@ class PreviewGeneratorWorker implements Runnable {
               fis = new FileInputStream(originalPreview);
               fos = new FileOutputStream(scaledFile);
               imagePreviewGenerator.createPreview(originalPreview, environment, l, style, format, fis, fos);
+
+              // Store the style definition used while creating the preview
+              File baseDir = ImageStyleUtils.getScaledFileBase(resource.getURI().getSite(), style);
+              File definitionFile = new File(baseDir, "style.xml");
+              if (!definitionFile.isFile()) {
+                logger.debug("Storing style definition at {}", definitionFile);
+                definitionFile.createNewFile();
+                FileUtils.copyInputStreamToFile(IOUtils.toInputStream(style.toXml(), "UTF-8"), definitionFile);
+              }
             } else {
               logger.debug("Skipping creation of existing '{}' preview of {}", style, resource);
             }

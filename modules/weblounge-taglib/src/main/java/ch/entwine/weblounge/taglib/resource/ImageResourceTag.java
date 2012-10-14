@@ -27,14 +27,14 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -118,7 +118,7 @@ public class ImageResourceTag extends WebloungeTag {
       imageSubjects = new ArrayList<String>();
     StringTokenizer st = new StringTokenizer(subjects, ",;");
     while (st.hasMoreTokens()) {
-      imageSubjects.add(st.nextToken());
+      imageSubjects.add(st.nextToken().trim());
     }
   }
 
@@ -184,8 +184,7 @@ public class ImageResourceTag extends WebloungeTag {
       SearchQuery query = new SearchQueryImpl(site);
       query.withVersion(Resource.LIVE);
       query.withTypes(ImageResource.TYPE);
-      for (int i = 0; i < imageSubjects.size(); i++)
-        query.andSubject(imageSubjects.get(i));
+      query.withSubjects(SearchQuery.Quantifier.All, imageSubjects.toArray(new String[imageSubjects.size()]));
       SearchResult result;
       try {
         result = repository.find(query);

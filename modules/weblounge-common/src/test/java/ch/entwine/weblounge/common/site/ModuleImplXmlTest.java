@@ -53,6 +53,7 @@ public class ModuleImplXmlTest extends ModuleImplTest {
   /**
    * @throws java.lang.Exception
    */
+  @Override
   @Before
   public void setUp() throws Exception {
     setUpPreliminaries();
@@ -61,14 +62,14 @@ public class ModuleImplXmlTest extends ModuleImplTest {
     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     URL schemaUrl = SiteImpl.class.getResource("/xsd/module.xsd");
     Schema siteSchema = schemaFactory.newSchema(schemaUrl);
-    
-    // Site.xml document builder setup
+
+    // Module.xml document builder setup
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
     docBuilderFactory.setSchema(siteSchema);
     docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 
-    // Validate and read the site descriptor
+    // Validate and read the module descriptor
     URL testContext = this.getClass().getResource(testFile);
     ValidationErrorHandler errorHandler = new ValidationErrorHandler(testContext);
     docBuilder.setErrorHandler(errorHandler);
@@ -78,7 +79,7 @@ public class ModuleImplXmlTest extends ModuleImplTest {
     module = ModuleImpl.fromXml(doc.getFirstChild());
     module.setSite(site);
   }
-  
+
   /**
    * Test method for {@link ch.entwine.weblounge.common.impl.site.ActionSupport#toXml()}.
    */

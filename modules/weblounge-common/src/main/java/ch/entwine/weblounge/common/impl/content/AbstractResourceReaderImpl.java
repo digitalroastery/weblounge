@@ -112,7 +112,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    *           if reading the input stream fails
    */
   public T read(InputStream is, Site site) throws SAXException, IOException,
-      ParserConfigurationException {
+  ParserConfigurationException {
     reset();
     resource = createResource(site);
     readHeader = true;
@@ -150,7 +150,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    *           if an error occurs while parsing
    */
   public T readHeader(InputStream is, Site site) throws SAXException,
-      IOException, ParserConfigurationException {
+  IOException, ParserConfigurationException {
     if (resource == null) {
       resource = createResource(site);
     }
@@ -180,7 +180,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    *           if an error occurs while parsing
    */
   public T readBody(InputStream is, Site site) throws SAXException,
-      IOException, ParserConfigurationException {
+  IOException, ParserConfigurationException {
     if (resource == null) {
       resource = createResource(site);
     }
@@ -209,6 +209,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
   /**
    * Resets this parser instance.
    */
+  @Override
   public void reset() {
     this.resource = null;
     this.parserContext = ParserContext.Document;
@@ -284,6 +285,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    * @param attrs
    *          the element's attributes
    */
+  @Override
   public void startElement(String uri, String local, String raw,
       Attributes attrs) throws SAXException {
 
@@ -333,18 +335,14 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    * @see org.xml.sax.ContentHandler#endElement(java.lang.String,
    *      java.lang.String, java.lang.String)
    */
+  @Override
   public void endElement(String uri, String local, String raw)
       throws SAXException {
 
     if (readHeader && parserContext.equals(ParserContext.Head)) {
 
-      // Indexed
-      if ("index".equals(raw)) {
-        resource.setIndexed("true".equals(characters.toString()));
-      }
-
       // Promote
-      else if ("promote".equals(raw)) {
+      if ("promote".equals(raw)) {
         resource.setPromoted("true".equals(characters.toString()));
       }
 
@@ -420,6 +418,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    * @param e
    *          information about the warning
    */
+  @Override
   public void warning(SAXParseException e) {
     logger.warn("Warning while reading {}: {}", resource, e.getMessage());
   }
@@ -431,6 +430,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    * @param e
    *          information about the error
    */
+  @Override
   public void error(SAXParseException e) {
     logger.warn("Error while reading {}: {}", resource, e.getMessage());
   }
@@ -442,6 +442,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    * @param e
    *          information about the error
    */
+  @Override
   public void fatalError(SAXParseException e) {
     logger.warn("Fatal error while reading {}: {}", resource, e.getMessage());
   }

@@ -81,12 +81,21 @@ public interface ResourceMetadata<T> {
   List<T> getValues();
 
   /**
+   * Returns the first value of the available values or <code>null</code> if no
+   * value is available.
+   * 
+   * @return the first value
+   * @see #getValues()
+   */
+  T getValue();
+
+  /**
    * Removes all values currently in the metadata container.
    */
   void clear();
 
   /**
-   * Adds the metadata values to the fulltext index.
+   * Adds the metadata values to the user facing fulltext index.
    * 
    * @param addToFulltext
    *          <code>true</code> to add the values to the fulltext index
@@ -94,12 +103,29 @@ public interface ResourceMetadata<T> {
   void setAddToFulltext(boolean addToFulltext);
 
   /**
-   * Returns <code>true</code> if the values should be added to the fulltext
-   * search index.
+   * Returns <code>true</code> if the values should be added to the backend
+   * facing fulltext search index.
    * 
    * @return <code>true</code> if the metadata values should be added to the
    *         fulltext index
    */
   boolean addToFulltext();
+
+  /**
+   * Adds the metadata values to the user facing fulltext index.
+   * 
+   * @param addToFulltext
+   *          <code>true</code> to add the values to the fulltext index
+   */
+  void setAddToText(boolean addToFulltext);
+
+  /**
+   * Returns <code>true</code> if the values should be added to the user facing
+   * fulltext search index.
+   * 
+   * @return <code>true</code> if the metadata values should be added to the
+   *         fulltext index
+   */
+  boolean addToText();
 
 }

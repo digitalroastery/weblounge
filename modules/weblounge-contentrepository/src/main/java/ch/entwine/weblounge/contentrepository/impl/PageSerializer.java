@@ -20,12 +20,12 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.HEADER_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PREVIEW_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.HEADER_XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PREVIEW_XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.XML;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
@@ -46,7 +46,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.PageInputDocument;
+import ch.entwine.weblounge.contentrepository.impl.index.PageInputDocument;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
    */
   public String getMimeType(ResourceContent resourceContent) {
     return "text/html";
@@ -94,7 +94,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supports(java.lang.String)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#supports(java.lang.String)
    */
   public boolean supports(String mimeType) {
     return false;
@@ -103,7 +103,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
    */
   public Resource<ResourceContent> newResource(Site site) {
     return new PageImpl(new PageURIImpl(site));
@@ -112,7 +112,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
    *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
    *      ch.entwine.weblounge.common.language.Language)
    */
@@ -135,7 +135,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
    */
   public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
     return new PageInputDocument((Page) resource).getMetadata();
@@ -144,7 +144,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
    *      java.util.List)
    */
   public Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata) {
@@ -173,7 +173,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, List)
    */
   public SearchResultItem toSearchResultItem(Site site, double relevance,
@@ -211,7 +211,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getContentReader()
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getContentReader()
    */
   public ResourceContentReader<ResourceContent> getContentReader()
       throws ParserConfigurationException, SAXException {
@@ -221,7 +221,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator(Resource)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getPreviewGenerator(Resource)
    */
   public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
     for (PagePreviewGenerator generator : previewGenerators) {

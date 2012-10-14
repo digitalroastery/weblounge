@@ -26,10 +26,11 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository;
 
 import org.apache.commons.io.FileUtils;
@@ -53,7 +54,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -127,6 +127,46 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#connect(ch.entwine.weblounge.common.site.Site)
+   */
+  @Override
+  public void connect(Site site) throws ContentRepositoryException {
+    repositorySiteRoot = new File(repositoryRoot, site.getIdentifier());
+    logger.debug("Content repository root is located at {}", repositorySiteRoot);
+
+    // Tell the super implementation
+    super.connect(site);
+  }
+
+  /**
+   * Removes all content.
+   * 
+   * @throws ContentRepositoryException
+   *           if clearing the repository fails
+   */
+  public void clear() throws ContentRepositoryException {
+    logger.info("Clearing the content repository at {}", repositorySiteRoot);
+
+    // Clear the index
+    try {
+      index.clear();
+    } catch (IOException e) {
+      logger.error("");
+    }
+
+    // Clear those directories that aren't the home to the index
+    for (File f : repositorySiteRoot.listFiles()) {
+      logger.debug("Removing {}", f.getAbsolutePath());
+      FileUtils.deleteQuietly(f);
+    }
+
+    // The home page needs to come back
+    super.createHomepage();
+  }
+
+  /**
    * Returns the root directory for this repository.
    * <p>
    * The root is either equal to the repository's filesystem root or, in case
@@ -147,7 +187,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *          the resource uri
    * @return the file
    */
-  protected File uriToFile(ResourceURI uri) throws IOException {
+  protected File uriToFile(ResourceURI uri) throws ContentRepositoryException,
+  IOException {
     StringBuffer path = new StringBuffer(repositorySiteRoot.getAbsolutePath());
     if (uri.getType() == null)
       throw new IllegalArgumentException("Resource uri has no type");
@@ -191,7 +232,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *           if the file cannot be accessed not exist
    */
   protected File uriToContentFile(ResourceURI uri, ResourceContent content)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
     File resourceDirectory = uriToDirectory(uri);
     File resourceRevisionDirectory = new File(resourceDirectory, Long.toString(uri.getVersion()));
 
@@ -213,7 +254,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *          the resource uri
    * @return the parent directory
    */
-  protected File uriToDirectory(ResourceURI uri) throws IOException {
+  protected File uriToDirectory(ResourceURI uri)
+      throws ContentRepositoryException, IOException {
     StringBuffer path = new StringBuffer(repositorySiteRoot.getAbsolutePath());
     if (uri.getType() == null)
       throw new IllegalArgumentException("Resource uri has no type");
@@ -277,10 +319,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadResource()
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadResource(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @Override
-  protected InputStream loadResource(ResourceURI uri) throws IOException {
+  protected InputStream loadResource(ResourceURI uri)
+      throws ContentRepositoryException, IOException {
     if (uri.getType() == null) {
       uri.setType(index.getType(uri));
     }
@@ -298,7 +341,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   protected InputStream loadResourceContent(ResourceURI uri, Language language)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
     File resourceFile = uriToFile(uri);
     if (resourceFile == null)
       return null;
@@ -313,9 +356,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     });
 
     // Make sure everything looks consistent
-    if (localizedFiles.length == 0)
+    if (localizedFiles == null || localizedFiles.length == 0)
       return null;
-    else if (localizedFiles.length > 1)
+
+    if (localizedFiles != null && localizedFiles.length > 1)
       logger.warn("Inconsistencies found in resource {} content {}", language, uri);
 
     // Finally return the content
@@ -330,7 +374,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   protected void deleteResource(ResourceURI uri, long[] revisions)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
 
     // Remove the resources
     File resourceDir = uriToDirectory(uri);
@@ -360,11 +404,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.entwine.weblounge.common.content.resource.Resource)
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.entwine.weblounge.common.content.Resource)
    */
   @Override
-  protected <C extends ResourceContent, R extends Resource<C>> R storeResource(
-      R resource) throws IOException {
+  protected Resource<?> storeResource(Resource<?> resource)
+      throws ContentRepositoryException, IOException {
     File resourceUrl = uriToFile(resource.getURI());
     InputStream is = null;
     OutputStream os = null;
@@ -390,8 +434,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      java.io.InputStream)
    */
   @Override
-  protected <C extends ResourceContent, R extends Resource<C>> C storeResourceContent(
-      ResourceURI uri, C content, InputStream is) throws IOException {
+  protected ResourceContent storeResourceContent(ResourceURI uri,
+      ResourceContent content, InputStream is)
+          throws ContentRepositoryException, IOException {
 
     if (is == null)
       return content;
@@ -422,8 +467,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      ch.entwine.weblounge.common.content.ResourceContent)
    */
   @Override
-  protected <C extends ResourceContent, R extends Resource<C>> void deleteResourceContent(
-      ResourceURI uri, C content) throws IOException {
+  protected void deleteResourceContent(ResourceURI uri, ResourceContent content)
+      throws ContentRepositoryException, IOException {
     File contentFile = uriToContentFile(uri, content);
     if (contentFile == null)
       throw new IOException("Resource content " + contentFile + " does not exist");
@@ -441,16 +486,14 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     List<ResourceURI> uris = new ArrayList<ResourceURI>();
 
     // Add all known resource types to the index
-    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-
-    for (ResourceSerializer<?, ?> serializer : serializers) {
+    for (ResourceSerializer<?, ?> serializer : getSerializers()) {
 
       // Temporary path for rebuilt site
       String resourceType = serializer.getType().toLowerCase();
       String resourceDirectory = resourceType + "s";
       String homePath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), resourceDirectory);
       File resourcesRootDirectory = new File(homePath);
-      if (resourcesRootDirectory.list().length == 0) {
+      if (!resourcesRootDirectory.isDirectory() || resourcesRootDirectory.list().length == 0) {
         logger.debug("No {}s found to index", resourceType);
         continue;
       }

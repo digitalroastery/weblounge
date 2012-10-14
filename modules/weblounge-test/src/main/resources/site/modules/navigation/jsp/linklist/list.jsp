@@ -15,7 +15,7 @@
 --%>
 
 <%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
-<%@ taglib uri="/WEB-INF/weblounge-resource.tld" prefix="weblr" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/resources" prefix="weblr" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="ch.entwine.weblounge.common.content.page.Pagelet" %>
