@@ -393,6 +393,7 @@
             <addSchema>false</addSchema>
             <pushChanges>false</pushChanges>
             <updateWorkingCopyVersions>false</updateWorkingCopyVersions>
+            <localCheckout>true</localCheckout>
           </configuration>
         </plugin>
         
