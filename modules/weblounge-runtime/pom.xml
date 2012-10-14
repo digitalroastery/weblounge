@@ -1,5 +1,4 @@
-<project xmlns="maven.apache.org/POM/4.0.0" xmlns:xsi="www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="maven.apache.org/POM/4.0.0 maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="maven.apache.org/POM/4.0.0" xmlns:xsi="www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="maven.apache.org/POM/4.0.0 maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <packaging>pom</packaging>
   <artifactId>weblounge-runtime</artifactId>
@@ -7,7 +6,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.0.8-SNAPSHOT</version>
+    <version>3.1.0</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -632,10 +631,8 @@
             <phase>install</phase>
             <configuration>
               <target name="[INFO] Deploy runtime libraries" if="weblounge.home">
-                <copy todir="${weblounge.home}/lib/ext"
-                  failonerror="false">
-                  <fileset dir="${project.build.directory}/dependency"
-                    includes="**/*" />
+                <copy todir="${weblounge.home}/lib/ext" failonerror="false">
+                  <fileset dir="${project.build.directory}/dependency" includes="**/*" />
                 </copy>
               </target>
             </configuration>
