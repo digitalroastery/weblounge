@@ -61,7 +61,6 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
-import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.operation.CurrentOperation;
 import ch.entwine.weblounge.contentrepository.impl.operation.DeleteContentOperationImpl;
@@ -112,12 +111,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** True to create a homepage when an empty repository is started */
   protected boolean createHomepage = true;
 
-  /** The repository storage root directory */
-  protected File repositoryRoot = null;
-
-  /** The repository root directory */
-  protected File repositorySiteRoot = null;
-
   /** Flag to indicate off-site indexing */
   protected boolean indexingOffsite = false;
 
@@ -139,9 +132,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   @Override
   public void connect(Site site) throws ContentRepositoryException {
-    repositorySiteRoot = new File(repositoryRoot, site.getIdentifier());
-    logger.debug("Content repository root is located at {}", repositorySiteRoot);
-
     super.connect(site);
 
     if (createHomepage) {
@@ -994,10 +984,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       return;
     }
 
+    boolean oldReadOnly = readOnly;
     readOnly = true;
     logger.info("Switching site '{}' to read only mode", site);
 
-    FileSystemContentRepositoryIndex newIndex = null;
+    ContentRepositoryIndex newIndex = null;
 
     // Clear previews directory
     logger.info("Removing cached preview images");
@@ -1006,7 +997,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Create the new index
     try {
-      newIndex = new FileSystemContentRepositoryIndex(site, resourceSerializer);
+      newIndex = new ContentRepositoryIndex(site, resourceSerializer, false);
       indexingOffsite = true;
       rebuildIndex(newIndex);
     } catch (IOException e) {
@@ -1025,7 +1016,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       indexing = true;
       index.close();
       logger.info("Loading new index");
-      index = new FileSystemContentRepositoryIndex(site, resourceSerializer);
+      index = new ContentRepositoryIndex(site, resourceSerializer, oldReadOnly);
     } catch (IOException e) {
       Throwable cause = e.getCause();
       if (cause == null)
@@ -1035,7 +1026,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       indexing = false;
       indexingOffsite = false;
       logger.info("Switching site '{}' back to write mode", site);
-      readOnly = false;
+      readOnly = oldReadOnly;
     }
 
   }
@@ -1218,7 +1209,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     logger.debug("Loading site index");
 
     // Add content if there is any
-    idx = new FileSystemContentRepositoryIndex(site, resourceSerializer);
+    idx = new ContentRepositoryIndex(site, resourceSerializer, readOnly);
 
     // Create the idx if there is nothing in place so far
     if (idx.getResourceCount() <= 0) {
