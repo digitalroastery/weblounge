@@ -146,6 +146,7 @@ public class PageContentTest extends IntegrationTestBase {
 
       logger.info("Sending request to the {} version of {}", language.getLocale().getDisplayName(), requestUrl);
       HttpGet request = new HttpGet(requestUrl);
+      request.addHeader("X-Cache-Debug", "yes");
       String[][] params = new String[][] { {
         "language",
         language.getIdentifier() } };
@@ -225,12 +226,19 @@ public class PageContentTest extends IntegrationTestBase {
         assertNotNull(modifiedHeader);
         modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
 
+        // See if the cache is online
+        if (response.getHeaders("X-Cache-Key").length == 0) {
+          logger.warn("Cache is turned off, ETags are not tested");
+          return;
+        }
+
+        TestSiteUtils.testETagHeader(request, eTagValue, logger, params);
+        TestSiteUtils.testModifiedHeader(request, modificationDate, logger, params);
+
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
 
-      TestSiteUtils.testETagHeader(request, eTagValue, logger, params);
-      TestSiteUtils.testModifiedHeader(request, modificationDate, logger, params);
     }
   }
 
@@ -380,12 +388,19 @@ public class PageContentTest extends IntegrationTestBase {
       assertNotNull(modifiedHeader);
       modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
 
+      // See if the cache is online
+      if (response.getHeaders("X-Cache-Key").length == 0) {
+        logger.warn("Cache is turned off, ETags are not tested");
+        return;
+      }
+
+      TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
+      TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
+      
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
 
-    TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
-    TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);
   }
 
 }
