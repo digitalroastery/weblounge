@@ -141,7 +141,7 @@ public class TidyReport implements StreamFilter {
      */
     public void run() {
       if (tidy != null)
-        tidy.parse(tis, null);
+        tidy.parse(tis, los);
     }
 
     /**

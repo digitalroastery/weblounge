@@ -20,7 +20,9 @@
 
 package ch.entwine.weblounge.common.impl.util;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -36,6 +38,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.w3c.dom.Document;
+import org.w3c.tidy.Tidy;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -127,10 +130,24 @@ public final class TestUtils {
       throws Exception {
     String responseXml = EntityUtils.toString(response.getEntity(), "utf-8");
     responseXml = StringEscapeUtils.unescapeHtml(responseXml);
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    factory.setNamespaceAware(true);
-    DocumentBuilder builder = factory.newDocumentBuilder();
-    return builder.parse(new ByteArrayInputStream(responseXml.getBytes("utf-8")));
+
+    // Depending on whether it's an HTML page, let's make sure we end up with a valid DOM
+    Header contentTypeHeader = response.getFirstHeader("Content-Type");
+    String contentType = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
+
+    Document doc = null;
+    if ("text/html".equals(contentType)) {
+      Tidy tidy = new Tidy();
+      tidy.setOnlyErrors(true);
+      tidy.setOutputEncoding("utf-8");
+      doc = tidy.parseDOM(IOUtils.toInputStream(responseXml, "utf-8"), null);
+    } else {
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setNamespaceAware(true);
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      doc = builder.parse(new ByteArrayInputStream(responseXml.getBytes("utf-8")));      
+    }
+    return doc;
   }
 
   /**
