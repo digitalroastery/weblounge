@@ -202,7 +202,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
           super.onProcessFinished(exitCode);
           switch (exitCode) {
             case 0:
-              if (rendererdFile.length() == 0) {
+              if (rendererdFile.length() > 0) {
                 success.set(true);
                 logger.debug("Page preview of {} created at {}", finalPageURL, rendererdFile.getAbsolutePath());
               } else {
