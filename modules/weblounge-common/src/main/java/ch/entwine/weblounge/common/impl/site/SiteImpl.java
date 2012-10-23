@@ -1566,7 +1566,7 @@ public class SiteImpl implements Site {
     List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
 
     // Load the classes in question
-    ClassLoader loader = this.getClass().getClassLoader();
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();    
     Enumeration<?> entries = bundle.findEntries("/", "*.class", true);
     if (entries == null) {
       return tests;
@@ -1596,8 +1596,8 @@ public class SiteImpl implements Site {
         logger.error("Error creating instance of integration test " + c);
       } catch (IllegalAccessException e) {
         logger.error("Access error creating integration test instance of " + c);
-      } catch (ClassNotFoundException e1) {
-        logger.error("Url " + url + " is not a class");
+      } catch (ClassNotFoundException e) {
+        logger.error("Class not found while trying to instantiate " + url + ": " + e.getMessage());
       } catch (NoClassDefFoundError e) {
         logger.debug("Class " + url + " cannot be instantiated, since a related class cannot be found: " + e.getMessage());
       }
