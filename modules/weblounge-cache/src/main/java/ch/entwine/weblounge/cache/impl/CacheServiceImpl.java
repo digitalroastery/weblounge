@@ -697,14 +697,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       response.addHeader(CACHE_KEY_HEADER, cacheKeyHeader.toString());
     }
 
-    // Add the X-Cache-Tags header
-    if (request.getHeader(CACHE_DEBUG_HEADER) != null) {
-      key = (CacheEntryKey) element.getKey();
-      StringBuffer cacheTagsHeader = new StringBuffer(name);
-      cacheTagsHeader.append(" (").append(key.getTags()).append(")");
-      response.addHeader(CACHE_TAGS_HEADER, cacheTagsHeader.toString());
-    }
-
     // Check the headers first. Maybe we don't need to send anything but
     // a not-modified back
     if (isModified) {
