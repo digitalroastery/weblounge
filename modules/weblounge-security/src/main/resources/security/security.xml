@@ -40,14 +40,17 @@
     <!-- Secure the REST documentation -->
     <sec:intercept-url pattern="^/system/weblounge/.*/docs" access="weblounge:siteadministrator"/>
 
-    <!-- Secure the REST endpoints -->
-    <sec:intercept-url pattern="^/system/weblounge/.*" access="weblounge:editor"/>
+    <!-- Enable anonymous access to the runtime information -->
+    <sec:intercept-url pattern="^/system/weblounge/runtime(/.*)?" access="weblounge:guest"/>
 
     <!-- The login processing urls needs to be covered by the filter chain -->
-    <sec:intercept-url pattern="^/system/weblounge/login/.*" access="weblounge:guest"/>
+    <sec:intercept-url pattern="^/system/weblounge/login(/.*)?" access="weblounge:guest"/>
 
     <!--  Same is true for logout -->
-    <sec:intercept-url pattern="^/system/weblounge/logout" access="weblounge:guest"/>
+    <sec:intercept-url pattern="^/system/weblounge/logout(/)?" access="weblounge:guest"/>
+
+    <!-- Secure the REST endpoints -->
+    <sec:intercept-url pattern="^/system/weblounge/.*" access="weblounge:editor"/>
     
     <!-- Secure the management URLs -->
     <sec:intercept-url pattern="^/system/console/.*" access="weblounge:systemadministrator"/>
