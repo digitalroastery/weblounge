@@ -37,7 +37,7 @@
     <!-- The rest of the editor functionality needs to be protected -->
     <sec:intercept-url pattern="^/weblounge/.*" access="weblounge:editor"/>
 
-    <!-- Enable anonymous access to the REST documentation -->
+    <!-- Secure the REST documentation -->
     <sec:intercept-url pattern="^/system/weblounge/.*/docs" access="weblounge:siteadministrator"/>
 
     <!-- Secure the REST endpoints -->
