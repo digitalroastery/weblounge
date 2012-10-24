@@ -397,11 +397,13 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
         renderer = c.newInstance();
         renderer.setIdentifier(id);
       } catch (ClassNotFoundException e) {
-        throw new IllegalStateException("Pagelet renderer implementation " + className + " not found", e);
+        throw new IllegalStateException("Implementation " + className + " for pagelet renderer '" + id + "' not found", e);
       } catch (InstantiationException e) {
-        throw new IllegalStateException("Error instantiating pagelet renderer " + className, e);
+        throw new IllegalStateException("Error instantiating impelementation " + className + " for pagelet renderer '" + id + "'", e);
       } catch (IllegalAccessException e) {
-        throw new IllegalStateException("Access violation instantiating pagelet renderer " + className, e);
+        throw new IllegalStateException("Access violation instantiating implementation " + className + " for pagelet renderer '" + id + "'", e);
+      } catch (Throwable t) {
+        throw new IllegalStateException("Error loading implementation " + className + " for pagelet renderer '" + id + "'", t);
       }
     } else {
       renderer = new PageletRendererImpl();

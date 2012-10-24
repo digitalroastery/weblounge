@@ -376,12 +376,18 @@ public final class QuartzJob implements Job, Customizable {
 
     // Implementation class
     String className = XPathHelper.valueOf(config, "m:class", xPathProcessor);
-    Class<JobWorker> clazz;
+    Class<? extends JobWorker> c;
     try {
-      clazz = (Class<JobWorker>) classLoader.loadClass(className);
+      c = (Class<? extends JobWorker>) classLoader.loadClass(className);
+      c.newInstance(); // Create an instance just to make sure we catch any errors right here
     } catch (ClassNotFoundException e) {
-      logger.error("The implementation class {} for job '{}' could not be found", className, identifier);
-      throw new IllegalStateException(e);
+      throw new IllegalStateException("Implementation " + className + " for job '" + identifier + "' not found", e);
+    } catch (InstantiationException e) {
+      throw new IllegalStateException("Error instantiating impelementation " + className + " for job '" + identifier + "'", e);
+    } catch (IllegalAccessException e) {
+      throw new IllegalStateException("Access violation instantiating implementation " + className + " for job '" + identifier + "'", e);
+    } catch (Throwable t) {
+      throw new IllegalStateException("Error loading implementation " + className + " for job '" + identifier + "'", t);
     }
 
     // Read execution schedule
@@ -407,7 +413,7 @@ public final class QuartzJob implements Job, Customizable {
 
     // Did we find something?
 
-    QuartzJob job = new QuartzJob(identifier, clazz, ctx, jobTrigger);
+    QuartzJob job = new QuartzJob(identifier, c, ctx, jobTrigger);
     job.options = options;
 
     // name

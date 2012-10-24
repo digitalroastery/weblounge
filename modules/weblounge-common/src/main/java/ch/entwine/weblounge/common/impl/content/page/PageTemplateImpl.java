@@ -290,11 +290,13 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
         template.setIdentifier(id);
         template.setRenderer(rendererUrl);
       } catch (ClassNotFoundException e) {
-        throw new IllegalStateException("Pagelet renderer implementation " + className + " not found", e);
+        throw new IllegalStateException("Implementation " + className + " for page template '" + id + "' not found", e);
       } catch (InstantiationException e) {
-        throw new IllegalStateException("Error instantiating pagelet renderer " + className, e);
+        throw new IllegalStateException("Error instantiating impelementation " + className + " for page template '" + id + "'", e);
       } catch (IllegalAccessException e) {
-        throw new IllegalStateException("Access violation instantiating pagelet renderer " + className, e);
+        throw new IllegalStateException("Access violation instantiating implementation " + className + " for page template '" + id + "'", e);
+      } catch (Throwable t) {
+        throw new IllegalStateException("Error loading implementation " + className + " for page template '" + id + "'", t);
       }
     } else {
       template = new PageTemplateImpl(id, rendererUrl);

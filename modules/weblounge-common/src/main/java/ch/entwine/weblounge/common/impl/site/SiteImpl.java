@@ -1450,7 +1450,7 @@ public class SiteImpl implements Site {
   @SuppressWarnings("unchecked")
   private List<IntegrationTest> loadIntegrationTests() {
     BundleContext ctx = getBundleContext();
-    
+
     logger.info("Loading integration tests for '{}'", this);
 
     // Load test classes
@@ -1487,7 +1487,7 @@ public class SiteImpl implements Site {
     }
 
     if (tests.size() > 0)
-      logger.info("Registered {} integration tests for site '{}'", tests.size(), this);
+      logger.info("Registering {} integration tests for site '{}'", tests.size(), this);
 
     return tests;
   }
@@ -1566,7 +1566,7 @@ public class SiteImpl implements Site {
     List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
 
     // Load the classes in question
-    ClassLoader loader = Thread.currentThread().getContextClassLoader();    
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
     Enumeration<?> entries = bundle.findEntries("/", "*.class", true);
     if (entries == null) {
       return tests;
@@ -1577,11 +1577,11 @@ public class SiteImpl implements Site {
     while (entries.hasMoreElements()) {
       URL url = (URL) entries.nextElement();
       Class<?> c = null;
+      String className = url.getPath();
       try {
-        String pathToClass = url.getPath();
-        pathToClass = pathToClass.substring(1, pathToClass.indexOf(".class"));
-        pathToClass = pathToClass.replace('/', '.');
-        c = loader.loadClass(pathToClass);
+        className = className.substring(1, className.indexOf(".class"));
+        className = className.replace('/', '.');
+        c = loader.loadClass(className);
         boolean implementsInterface = Arrays.asList(c.getInterfaces()).contains(IntegrationTest.class);
         boolean extendsBaseClass = false;
         if (c.getSuperclass() != null) {
@@ -1592,15 +1592,19 @@ public class SiteImpl implements Site {
         IntegrationTest test = (IntegrationTest) c.newInstance();
         test.setSite(this);
         tests.add(test);
-      } catch (InstantiationException e) {
-        logger.error("Error creating instance of integration test " + c);
-      } catch (IllegalAccessException e) {
-        logger.error("Access error creating integration test instance of " + c);
       } catch (ClassNotFoundException e) {
-        logger.error("Class not found while trying to instantiate " + url + ": " + e.getMessage());
+        throw new IllegalStateException("Implementation " + className + " for integration test '" + identifier + "' not found", e);
       } catch (NoClassDefFoundError e) {
-        logger.debug("Class " + url + " cannot be instantiated, since a related class cannot be found: " + e.getMessage());
+        // We are trying to load each and every class here, so we may as well see classes that are not meant to be loaded
+        logger.debug("The related class " + e.getMessage() + " for potential test case implementation " + className + " could not be found");
+      } catch (InstantiationException e) {
+        throw new IllegalStateException("Error instantiating impelementation " + className + " for integration test '" + identifier + "'", e);
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("Access violation instantiating implementation " + className + " for integration test '" + identifier + "'", e);
+      } catch (Throwable t) {
+        throw new IllegalStateException("Error loading implementation " + className + " for integration test '" + identifier + "'", t);
       }
+
     }
     return tests;
   }
@@ -1659,9 +1663,16 @@ public class SiteImpl implements Site {
         Class<? extends Site> c = (Class<? extends Site>) classLoader.loadClass(className);
         site = c.newInstance();
         site.setIdentifier(identifier);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Implementation " + className + " for site '" + identifier + "' not found", e);
+      } catch (InstantiationException e) {
+        throw new IllegalStateException("Error instantiating impelementation " + className + " for site '" + identifier + "'", e);
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("Access violation instantiating implementation " + className + " for site '" + identifier + "'", e);
       } catch (Throwable t) {
-        throw new IllegalStateException("Unable to instantiate class " + className + " for site '" + identifier + ": " + t.getMessage(), t);
+        throw new IllegalStateException("Error loading implementation " + className + " for site '" + identifier + "'", t);
       }
+
     } else {
       site = new SiteImpl();
       site.setIdentifier(identifier);

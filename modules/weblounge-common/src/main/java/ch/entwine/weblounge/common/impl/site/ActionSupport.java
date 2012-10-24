@@ -881,8 +881,14 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
         Class<? extends Action> c = (Class<? extends Action>) classLoader.loadClass(className);
         action = c.newInstance();
         action.setIdentifier(identifier);
-      } catch (Throwable e) {
-        throw new IllegalStateException("Unable to instantiate class " + className + " for action '" + identifier + ": " + e.getMessage(), e);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Implementation " + className + " for action handler '" + identifier + "' not found", e);
+      } catch (InstantiationException e) {
+        throw new IllegalStateException("Error instantiating impelementation " + className + " for action handler '" + identifier + "'", e);
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("Access violation instantiating implementation " + className + " for action handler '" + identifier + "'", e);
+      } catch (Throwable t) {
+        throw new IllegalStateException("Error loading implementation " + className + " for action handler '" + identifier + "'", t);
       }
     } else {
       action = new HTMLActionSupport();
