@@ -25,6 +25,11 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.kernel.publisher.EndpointPublishingService;
+import ch.entwine.weblounge.kernel.publisher.JAXRSServlet;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.ComponentContext;
 
 import java.util.Map;
 
@@ -35,6 +40,19 @@ public class EndpointRuntimeInformation implements RuntimeInformationProvider {
 
   /** Endpoint publishing service */
   protected EndpointPublishingService publishingService = null;
+
+  /** The bundle context */
+  private BundleContext bundleCtx = null;
+
+  /**
+   * OSGi callback on component activation.
+   * 
+   * @param ctx
+   *          the component context
+   */
+  void activate(ComponentContext ctx) {
+    this.bundleCtx = ctx.getBundleContext();
+  }
 
   /**
    * {@inheritDoc}
@@ -52,13 +70,17 @@ public class EndpointRuntimeInformation implements RuntimeInformationProvider {
    *      ch.entwine.weblounge.common.security.User,
    *      ch.entwine.weblounge.common.language.Language, Environment)
    */
-  public String getRuntimeInformation(Site site, User user, Language language, Environment environment) {
+  public String getRuntimeInformation(Site site, User user, Language language,
+      Environment environment) {
     StringBuffer xml = new StringBuffer();
-    for (Map.Entry<String, Object> entry : publishingService.getEndpoints().entrySet()) {
+    for (Map.Entry<String, ServiceRegistration> entry : publishingService.getEndpoints().entrySet()) {
+      ServiceRegistration sr = entry.getValue();
+      JAXRSServlet servlet = (JAXRSServlet)bundleCtx.getService(sr.getReference());
+      Object service = servlet.getService();
       xml.append("<endpoint>");
-      xml.append("<name><![CDATA[").append(entry.getValue().toString()).append("]]></name>");
+      xml.append("<name><![CDATA[").append(service.toString()).append("]]></name>");
       xml.append("<path>").append(entry.getKey()).append("</path>");
-      xml.append("<service>").append(entry.getValue().getClass().getName()).append("</service>");
+      xml.append("<service>").append(service.getClass().getName()).append("</service>");
       xml.append("</endpoint>");
     }
     return xml.toString();
