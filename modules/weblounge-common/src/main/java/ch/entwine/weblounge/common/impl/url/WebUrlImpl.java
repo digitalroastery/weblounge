@@ -597,7 +597,6 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       return trim(url);
     }
 
-    logger.warn("Problem analyzing path '{}'", path);
     throw new IllegalArgumentException("Invalid path provided");
   }
 
