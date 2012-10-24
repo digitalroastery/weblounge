@@ -327,8 +327,8 @@ public class SiteImplTest {
     assertNotNull(d);
     assertEquals(defaultTemplateId, d.getIdentifier());
     assertEquals(new URL(defaultTemplateUrl), d.getRenderer());
-    assertEquals(defaultTemplateRecheckTime, d.getRecheckTime());
-    assertEquals(defaultTemplateValidTime, d.getValidTime());
+    assertEquals(defaultTemplateRecheckTime, d.getClientRevalidationTime());
+    assertEquals(defaultTemplateValidTime, d.getCacheExpirationTime());
     assertEquals(defaultTemplateStage, d.getStage());
     assertEquals(defaultTemplateName, d.getName());
 
@@ -336,8 +336,8 @@ public class SiteImplTest {
     assertNotNull(m);
     assertEquals(mobileTemplateId, m.getIdentifier());
     assertEquals(new URL(mobileTemplateUrl), m.getRenderer());
-    assertEquals(Renderer.DEFAULT_RECHECK_TIME, m.getRecheckTime());
-    assertEquals(Renderer.DEFAULT_VALID_TIME, m.getValidTime());
+    assertEquals(Renderer.DEFAULT_RECHECK_TIME, m.getClientRevalidationTime());
+    assertEquals(Renderer.DEFAULT_VALID_TIME, m.getCacheExpirationTime());
     assertEquals(PageTemplate.DEFAULT_STAGE, m.getStage());
     assertEquals(mobileTemplateName, m.getName());
 

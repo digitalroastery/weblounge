@@ -977,16 +977,16 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     b.append("<mountpoint>").append(mountpoint).append("</mountpoint>");
 
     // Recheck time
-    if (recheckTime >= 0) {
+    if (clientRevalidationTime >= 0) {
       b.append("<recheck>");
-      b.append(ConfigurationUtils.toDuration(recheckTime));
+      b.append(ConfigurationUtils.toDuration(clientRevalidationTime));
       b.append("</recheck>");
     }
 
     // Valid time
-    if (validTime >= 0) {
+    if (cacheExpirationTime >= 0) {
       b.append("<valid>");
-      b.append(ConfigurationUtils.toDuration(validTime));
+      b.append(ConfigurationUtils.toDuration(cacheExpirationTime));
       b.append("</valid>");
     }
 

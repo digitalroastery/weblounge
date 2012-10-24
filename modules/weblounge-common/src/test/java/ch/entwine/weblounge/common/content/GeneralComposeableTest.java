@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.content.page;
+package ch.entwine.weblounge.common.content;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -26,6 +26,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.Times;
+import ch.entwine.weblounge.common.content.page.Link;
+import ch.entwine.weblounge.common.content.page.Script;
 import ch.entwine.weblounge.common.impl.content.GeneralComposeable;
 import ch.entwine.weblounge.common.impl.content.page.LinkImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
@@ -142,22 +144,33 @@ public class GeneralComposeableTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.GeneralComposeable#getRecheckTime()}
+   * {@link ch.entwine.weblounge.common.impl.content.GeneralComposeable#getClientRevalidationTime()}
    * .
    */
   @Test
   public void testGetRecheckTime() {
-    assertEquals(recheckTime, composeable.getRecheckTime());
+    assertEquals(recheckTime, composeable.getClientRevalidationTime());
+  }
+  
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.GeneralComposeable#getClientRevalidationTime()}
+   * .
+   */
+  @Test
+  public void testRecheckLessOrEqualValidTime() {
+    composeable.setCacheExpirationTime(recheckTime - Times.MS_PER_DAY);
+    assertEquals(recheckTime - Times.MS_PER_DAY, composeable.getClientRevalidationTime());
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.GeneralComposeable#getValidTime()}
+   * {@link ch.entwine.weblounge.common.impl.content.GeneralComposeable#getCacheExpirationTime()}
    * .
    */
   @Test
   public void testGetValidTime() {
-    assertEquals(validTime, composeable.getValidTime());
+    assertEquals(validTime, composeable.getCacheExpirationTime());
   }
 
   /**

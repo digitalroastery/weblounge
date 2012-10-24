@@ -277,8 +277,8 @@ public class ActionSupportTest {
     assertNotNull(action.getModule());
     assertEquals(identifier, action.getIdentifier());
     assertEquals(actionUrl, action.getUrl());
-    assertEquals(recheckTime, action.getRecheckTime());
-    assertEquals(validTime, action.getValidTime());
+    assertEquals(recheckTime, action.getClientRevalidationTime());
+    assertEquals(validTime, action.getCacheExpirationTime());
     assertEquals(2, action.getHTMLHeaders().length);
     assertEquals(1, action.getOptions().size());
   }

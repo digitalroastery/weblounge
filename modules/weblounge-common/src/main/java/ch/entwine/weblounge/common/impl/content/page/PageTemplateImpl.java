@@ -177,8 +177,8 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       throws RenderException {
 
     // Adjust revalidation and expiration time
-    response.setClientRevalidationTime(getRecheckTime());
-    response.setCacheExpirationTime(getValidTime());
+    response.setClientRevalidationTime(getClientRevalidationTime());
+    response.setCacheExpirationTime(getCacheExpirationTime());
 
     // Add cache support
     response.addTag(CacheTag.Renderer, getIdentifier());
@@ -402,16 +402,16 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       buf.append("<layout>").append(layout).append("</layout>");
 
     // Recheck time
-    if (recheckTime >= 0) {
+    if (clientRevalidationTime >= 0) {
       buf.append("<recheck>");
-      buf.append(ConfigurationUtils.toDuration(recheckTime));
+      buf.append(ConfigurationUtils.toDuration(clientRevalidationTime));
       buf.append("</recheck>");
     }
 
     // Valid time
-    if (validTime >= 0) {
+    if (cacheExpirationTime >= 0) {
       buf.append("<valid>");
-      buf.append(ConfigurationUtils.toDuration(validTime));
+      buf.append(ConfigurationUtils.toDuration(cacheExpirationTime));
       buf.append("</valid>");
     }
 

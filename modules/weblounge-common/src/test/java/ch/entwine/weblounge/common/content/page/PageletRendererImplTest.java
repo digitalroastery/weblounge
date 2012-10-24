@@ -191,22 +191,22 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.GeneralComposeable#getRecheckTime()}
+   * {@link ch.entwine.weblounge.common.impl.content.GeneralComposeable#getClientRevalidationTime()}
    * .
    */
   @Test
   public void testGetRecheckTime() {
-    assertEquals(recheckTime, renderer.getRecheckTime());
+    assertEquals(recheckTime, renderer.getClientRevalidationTime());
   }
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.GeneralComposeable#getValidTime()}
+   * {@link ch.entwine.weblounge.common.impl.content.GeneralComposeable#getCacheExpirationTime()}
    * .
    */
   @Test
   public void testGetValidTime() {
-    assertEquals(validTime, renderer.getValidTime());
+    assertEquals(validTime, renderer.getCacheExpirationTime());
   }
   
   /**
