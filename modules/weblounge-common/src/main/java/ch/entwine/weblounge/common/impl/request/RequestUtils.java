@@ -232,8 +232,9 @@ public final class RequestUtils {
     String p = request.getParameter(parameter);
     if (p != null) {
       try {
-        p = URLDecoder.decode(p.trim(), "utf-8");
+        p = decode(p, "utf-8");
       } catch (UnsupportedEncodingException e) {
+        logger.error("Encoding 'utf-8' is not supported on this platform");
       }
     }
     return StringUtils.trimToNull(p);
@@ -262,11 +263,38 @@ public final class RequestUtils {
 
     String p = urlparams.get(index);
     try {
-      p = URLDecoder.decode(p.trim(), "utf-8");
+      p = decode(p, "utf-8");
     } catch (UnsupportedEncodingException e) {
       logger.error("Encoding 'utf-8' is not supported on this platform");
     }
     return StringUtils.trimToNull(p);
+  }
+
+  /**
+   * Ensures parameter values potentially containing the <code>%</code>
+   * character are decoded properly using the <code>utf-8</code> encoding.
+   * 
+   * @param s
+   *          the parameter value
+   * @param encoding
+   *          the character encoding to be used
+   * @return the properly decoded value
+   * @throws UnsupportedEncodingException
+   *           if <code>encoding</code> is not supported by the plattform
+   */
+  static String decode(String s, String encoding)
+      throws UnsupportedEncodingException {
+    s = StringUtils.trimToEmpty(s);
+    while (true) {
+      try {
+        return URLDecoder.decode(s, encoding);
+      } catch (IllegalArgumentException e) {
+        // Illegal hex characters in escape (%) pattern - For input string: "si"
+        String m = e.getMessage();
+        String illegalSequence = m.substring(m.length() - 3, m.length() - 1);
+        s = s.replaceAll("%" + illegalSequence, "%25" + illegalSequence);
+      }
+    }
   }
 
   /**
@@ -377,7 +405,7 @@ public final class RequestUtils {
       p = p.trim();
       if ("application/x-www-form-urlencoded".equalsIgnoreCase(request.getContentType())) {
         try {
-          p = URLDecoder.decode(p, decoding);
+          p = decode(p, decoding);
         } catch (UnsupportedEncodingException e) {
           throw new IllegalArgumentException("Encoding " + decoding + " is unsupported");
         } catch (IllegalArgumentException e) {

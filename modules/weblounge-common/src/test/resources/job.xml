@@ -1,6 +1,6 @@
 <job id="testjob">
   <name><![CDATA[Job title]]></name>
-  <class>ch.entwine.weblounge.common.scheduler.TestJob</class>
+  <class>ch.entwine.weblounge.common.impl.scheduler.TestJob</class>
   <schedule>0 0 * * 1</schedule>
   <options>
     <option>
