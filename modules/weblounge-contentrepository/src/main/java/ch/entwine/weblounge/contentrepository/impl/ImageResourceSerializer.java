@@ -235,7 +235,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
         path = (String) metadataMap.get(PATH).getValues().get(0);
         url = new WebUrlImpl(site, path);
       } catch (IllegalArgumentException e) {
-        logger.warn("Path {}:{} for image {} is invalid", new Object[] {
+        logger.debug("Path {}:{} for image {} is invalid", new Object[] {
             site.getIdentifier(),
             path,
             id });

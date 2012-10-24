@@ -217,7 +217,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
         path = (String) metadataMap.get(PATH).getValues().get(0);
         url = new WebUrlImpl(site, path);
       } catch (IllegalArgumentException e) {
-        logger.warn("Path {}:/{} for movie {} is invalid", new Object[] {
+        logger.debug("Path {}:/{} for movie {} is invalid", new Object[] {
             site.getIdentifier(),
             path,
             id });
