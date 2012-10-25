@@ -47,11 +47,14 @@ import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.SuggestRe
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.ElasticSearchException;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -66,6 +69,8 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.ClusterAdminClient;
+import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -624,7 +629,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    */
   public List<String> suggest(String dictionary, String seed,
       boolean onlyMorePopular, int count, boolean collate)
-          throws ContentRepositoryException {
+      throws ContentRepositoryException {
     if (StringUtils.isBlank(seed))
       throw new IllegalArgumentException("Seed must not be blank");
     if (StringUtils.isBlank(dictionary))
@@ -660,6 +665,19 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     elasticSearch = nodeBuilder.build();
     elasticSearch.start();
 
+    // Create the client
+    nodeClient = elasticSearch.client();
+
+    // Wait for the cluster to be up and running, at least the main shard needs to be read (yellow)
+    // TODO: Skip this for unit test or set the timeout to 0
+    logger.debug("Checking elasticsearch's cluster status for '{}'", site.getIdentifier());
+    ClusterHealthRequest healthRequest = new ClusterHealthRequest(site.getIdentifier());
+    ClusterAdminClient clusterAdmin = nodeClient.admin().cluster();
+    ClusterHealthResponse health = clusterAdmin.health(healthRequest.waitForYellowStatus()).actionGet();
+    if (health.timedOut()) {
+      logger.warn("Request to determine cluster health status for '{}' timed out", site.getIdentifier());
+    }
+
     // Create indices and type definitions
     createIndices();
   }
@@ -673,9 +691,6 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    *           if loading of the type definitions fails
    */
   private void createIndices() throws ContentRepositoryException, IOException {
-
-    // Create the client
-    nodeClient = elasticSearch.client();
 
     // Make sure the site index exists
     if (!indexExists(site.getIdentifier())) {
@@ -694,7 +709,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
         "page",
         "file",
         "image",
-    "movie" }) {
+        "movie" }) {
       PutMappingRequest siteMappingRequest = new PutMappingRequest(site.getIdentifier());
       siteMappingRequest.source(loadMapping(type));
       siteMappingRequest.type(type);
@@ -831,8 +846,16 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    * @return <code>true</code> if the index exists
    */
   private boolean indexExists(String indexName) {
+    logger.info("Search cluster for '{}' is up and running", indexName);
     IndicesExistsRequest indexExistsRequest = new IndicesExistsRequest(indexName);
-    return nodeClient.admin().indices().exists(indexExistsRequest).actionGet().exists();
+    IndicesAdminClient indexAdmin = nodeClient.admin().indices();
+    IndicesExistsResponse existsResponse = indexAdmin.exists(indexExistsRequest).actionGet();
+    boolean indexExists = existsResponse.exists();
+    if (indexExists)
+      logger.debug("Found existing index '{}', checking index version", indexName);
+    else
+      logger.debug("Index '{}' does not exist and needs to be created", indexName);
+    return indexExists;
   }
 
 }
