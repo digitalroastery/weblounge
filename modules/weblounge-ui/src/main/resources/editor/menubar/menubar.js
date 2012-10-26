@@ -12,7 +12,8 @@ steal.plugins(
 	'jqueryui/droppable',
 	'jqueryui/resizable',
 	'jqueryui/mouse',
-	'jqueryui/button')
+	'jqueryui/button',
+	'editor/scripts/md5')
 .views(
 	'//editor/menubar/views/menubar.tmpl')
 .css('menubar')
@@ -43,15 +44,30 @@ steal.plugins(
             $('#wbl-pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
             this._initPageLocking();
 
+            // remove padding/margin, if set in <body> (e.g. default broser-stylesheet)
+            var bodyMarginTop = $('body').css('marginTop');
+            var bodyMarginRight = $('body').css('marginRight');
+            var bodyMarginLeft = $('body').css('marginLeft');
+            var bodyPaddingTop = $('body').css('paddingTop');
+            var bodyPaddingRight = $('body').css('paddingRight');
+            var bodyPaddingLeft = $('body').css('paddingLeft');
+            $('#weblounge-editor')
+            	.css('marginTop', '-' + bodyMarginTop)
+            	.css('marginLeft', '-' + bodyMarginLeft)
+            	.css('marginRight', '-' + bodyMarginRight);
+            $('#weblounge-editor')
+            	.css('paddingTop', '-' + bodyPaddingTop)
+            	.css('paddingLeft', '-' + bodyPaddingLeft)
+            	.css('paddingRight', '-' + bodyPaddingRight);	
+
             // replace the icon with a gravatar if weblounge is online otherwise load a default img
             ImageUrl = 'http://gravatar.com/avatar/' + md5(this.options.runtime.getUserEmail());
             UserEmail = this.options.runtime.getUserEmail();
-            //steal.dev.log('getUserEmail: ' + UserEmail);
             function IsValidImageUrl(url) {
 			    $("<img>", {
 			        src: url,
 			        error: function() { steal.dev.log('Weblounge is not connected to the internet. Loading default user imgage.') },
-			        load: function() { steal.dev.log('Weblounge is connected to the internet. Loading gravatar.'); $('.wbl-profileMenu img.wbl-user').attr('src', url + '?d=mm'); }
+			        load: function() { $('.wbl-profileMenu img.wbl-user').attr('src', url + '?d=mm'); }
 			    });
 			}
 			IsValidImageUrl(ImageUrl);
