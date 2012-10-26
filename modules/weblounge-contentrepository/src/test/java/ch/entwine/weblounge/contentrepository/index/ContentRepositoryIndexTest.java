@@ -40,6 +40,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
@@ -139,6 +140,7 @@ public class ContentRepositoryIndexTest {
 
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
     System.setProperty("weblounge.home", idxRoot.getAbsolutePath());
+    TestUtils.startTesting();
     idx = new ContentRepositoryIndex(site, serializer, false);
   }
 
