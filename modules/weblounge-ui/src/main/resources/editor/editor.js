@@ -16,15 +16,15 @@ steal.plugins(
 		$('#weblounge-editor').editor_app();
 		
 		// Replace all body position absolute top + 45px
-		steal.dev.log('transition 45px');
-		$('body > *').each(function(index, elem) {
-			if($(elem).css('position') == 'absolute') {
-				var cssTop = $(elem).css('top');
-				if(cssTop == '') return;
-				var top = parseFloat(cssTop);
-				$(elem).css('top', top + 45 + 'px');
-			}
-		});
+		// steal.dev.log('transition 45px');
+		// $('body > *').each(function(index, elem) {
+		// 	if($(elem).css('position') == 'absolute') {
+		// 		var cssTop = $(elem).css('top');
+		// 		if(cssTop == '') return;
+		// 		var top = parseFloat(cssTop);
+		// 		$(elem).css('top', top + 45 + 'px');
+		// 	}
+		// });
 	});
 	
 });
