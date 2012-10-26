@@ -42,6 +42,19 @@ steal.plugins(
             this._initDialogs();
             $('#wbl-pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
             this._initPageLocking();
+
+            // replace the icon with a gravatar if weblounge is online otherwise load a default img
+            ImageUrl = 'http://gravatar.com/avatar/' + md5(this.options.runtime.getUserEmail());
+            UserEmail = this.options.runtime.getUserEmail();
+            //steal.dev.log('getUserEmail: ' + UserEmail);
+            function IsValidImageUrl(url) {
+			    $("<img>", {
+			        src: url,
+			        error: function() { steal.dev.log('Weblounge is not connected to the internet. Loading default user imgage.') },
+			        load: function() { steal.dev.log('Weblounge is connected to the internet. Loading gravatar.'); $('.wbl-profileMenu img.wbl-user').attr('src', url + '?d=mm'); }
+			    });
+			}
+			IsValidImageUrl(ImageUrl);
         },
         
         update: function(options) {
