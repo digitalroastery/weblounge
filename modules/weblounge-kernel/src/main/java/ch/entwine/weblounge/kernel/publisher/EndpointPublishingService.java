@@ -195,8 +195,8 @@ public class EndpointPublishingService implements ManagedService {
    * 
    * @return the service paths
    */
-  public Map<String, Object> getEndpoints() {
-    Map<String, Object> services = new HashMap<String, Object>(endpointRegistrations.size());
+  public Map<String, ServiceRegistration> getEndpoints() {
+    Map<String, ServiceRegistration> services = new HashMap<String, ServiceRegistration>(endpointRegistrations.size());
     services.putAll(endpointRegistrations);
     return services;
   }

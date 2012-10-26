@@ -42,10 +42,10 @@ public class GeneralComposeable implements Composeable {
   protected boolean composeable = true;
 
   /** Milliseconds until validity check is recommended */
-  protected long recheckTime = Times.MS_PER_HOUR;
+  protected long clientRevalidationTime = Times.MS_PER_HOUR;
 
   /** Milliseconds until content using this object becomes invalid */
-  protected long validTime = Times.MS_PER_WEEK;
+  protected long cacheExpirationTime = Times.MS_PER_WEEK;
 
   /** Name of this composeable */
   protected String name = null;
@@ -107,8 +107,8 @@ public class GeneralComposeable implements Composeable {
       throw new IllegalArgumentException("Recheck time must be greater than or equal to zero");
     if (validTime < 0)
       throw new IllegalArgumentException("Valid time must be greater than or equal to zero");
-    this.recheckTime = recheckTime;
-    this.validTime = validTime;
+    this.clientRevalidationTime = recheckTime;
+    this.cacheExpirationTime = validTime;
     this.identifier = identifier;
     this.headers = new ArrayList<HTMLHeadElement>();
   }
@@ -177,16 +177,16 @@ public class GeneralComposeable implements Composeable {
   public void setClientRevalidationTime(long time) {
     if (time < 0)
       throw new IllegalArgumentException("Recheck time must be greater than or equal to zero");
-    this.recheckTime = time;
+    this.clientRevalidationTime = time;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Composeable#getRecheckTime()
+   * @see ch.entwine.weblounge.common.content.Composeable#getClientRevalidationTime()
    */
-  public long getRecheckTime() {
-    return recheckTime;
+  public long getClientRevalidationTime() {
+    return Math.min(clientRevalidationTime, cacheExpirationTime);
   }
 
   /**
@@ -197,16 +197,16 @@ public class GeneralComposeable implements Composeable {
   public void setCacheExpirationTime(long time) {
     if (time < 0)
       throw new IllegalArgumentException("Valid time must be greater than or equal to zero");
-    this.validTime = time;
+    this.cacheExpirationTime = time;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Composeable#getValidTime()
+   * @see ch.entwine.weblounge.common.content.Composeable#getCacheExpirationTime()
    */
-  public long getValidTime() {
-    return validTime;
+  public long getCacheExpirationTime() {
+    return cacheExpirationTime;
   }
 
   /**

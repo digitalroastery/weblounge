@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.taglib.content;
 
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.Module;
@@ -132,6 +133,9 @@ public class ActionTag extends WebloungeTag {
    * @return either a EVAL_BODY_INCLUDE or a SKIP_BODY
    */
   public int doStartTag() throws JspException {
+    if (RequestUtils.isPrecompileRequest(request))
+      return SKIP_BODY;
+    
     action = module.getAction(actionId);
     if (action == null) {
       logger.warn("Action handler '" + actionId + "' not found for module '" + module + "' and site '" + request.getSite() + "'");

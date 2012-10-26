@@ -158,7 +158,7 @@ steal.plugins('jquery',
 	    		this._bodyAbsoluteTop(185);
 	    	} else {
 	    		this.element.find('div.wbl-panes').css('height', '120px');
-	    		$("div#weblounge-editor").css("height","225px");
+	    		$("div#weblounge-editor").css("height","160px");
 	    		this._bodyAbsoluteTop(225);
 	    	}
 	    }

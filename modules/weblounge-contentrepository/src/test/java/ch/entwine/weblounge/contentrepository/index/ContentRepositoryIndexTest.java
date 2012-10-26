@@ -40,6 +40,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
@@ -49,7 +50,6 @@ import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
-import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
@@ -140,7 +140,8 @@ public class ContentRepositoryIndexTest {
 
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
     System.setProperty("weblounge.home", idxRoot.getAbsolutePath());
-    idx = new FileSystemContentRepositoryIndex(site, serializer);
+    TestUtils.startTesting();
+    idx = new ContentRepositoryIndex(site, serializer, false);
   }
 
   /**

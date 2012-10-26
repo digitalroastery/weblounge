@@ -296,8 +296,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       throws RenderException {
 
     // Adjust revalidation and expiration time
-    response.setClientRevalidationTime(getRecheckTime());
-    response.setCacheExpirationTime(getValidTime());
+    response.setClientRevalidationTime(getClientRevalidationTime());
+    response.setCacheExpirationTime(getCacheExpirationTime());
 
     // Add cache support
     response.addTag(CacheTag.Module, getModule().getIdentifier());
@@ -397,11 +397,13 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
         renderer = c.newInstance();
         renderer.setIdentifier(id);
       } catch (ClassNotFoundException e) {
-        throw new IllegalStateException("Pagelet renderer implementation " + className + " not found", e);
+        throw new IllegalStateException("Implementation " + className + " for pagelet renderer '" + id + "' not found", e);
       } catch (InstantiationException e) {
-        throw new IllegalStateException("Error instantiating pagelet renderer " + className, e);
+        throw new IllegalStateException("Error instantiating impelementation " + className + " for pagelet renderer '" + id + "'", e);
       } catch (IllegalAccessException e) {
-        throw new IllegalStateException("Access violation instantiating pagelet renderer " + className, e);
+        throw new IllegalStateException("Access violation instantiating implementation " + className + " for pagelet renderer '" + id + "'", e);
+      } catch (Throwable t) {
+        throw new IllegalStateException("Error loading implementation " + className + " for pagelet renderer '" + id + "'", t);
       }
     } else {
       renderer = new PageletRendererImpl();
@@ -524,16 +526,16 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       buf.append("<editor>").append(editor.toExternalForm()).append("</editor>");
 
     // Recheck time
-    if (recheckTime >= 0) {
+    if (clientRevalidationTime >= 0) {
       buf.append("<recheck>");
-      buf.append(ConfigurationUtils.toDuration(recheckTime));
+      buf.append(ConfigurationUtils.toDuration(clientRevalidationTime));
       buf.append("</recheck>");
     }
 
     // Valid time
-    if (validTime >= 0) {
+    if (cacheExpirationTime >= 0) {
       buf.append("<valid>");
-      buf.append(ConfigurationUtils.toDuration(validTime));
+      buf.append(ConfigurationUtils.toDuration(cacheExpirationTime));
       buf.append("</valid>");
     }
 
