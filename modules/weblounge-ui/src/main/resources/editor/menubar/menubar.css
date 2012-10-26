@@ -5,35 +5,31 @@
 	color: #FFFFFF;
 	height: 35px;
 	line-height: 35px;
-	position: fixed;
+	position: fixed; /* needed for tabs 'pages' and 'media' */
 	width: 100%;
 	padding-left: 20px;
 	overflow: hidden;
 	z-index: 400;
 }
 
+.editor_menubar img {
+    vertical-align: inherit; /* needed to override user-sites-styles */
+}
+
+.editor_menubar img.wbl-pageSettings {
+ 	height: 21px;
+    margin-right: 10px;
+    position: relative;
+    top: 6px;
+ }
+
 .editor_menubar a.wbl-tab {
    border-left: 1px solid transparent;
    border-right: 1px solid transparent;
    color: #FFFFFF;
-   margin: 0 1px;
    padding: 15px 15px;
    font-size: 12px;
    text-decoration: none;
-}
-
-.editor_menubar span.wbl-editmode {
-	display: inline-block;
-	position: relative;
-}
-
-.editor_menubar span.wbl-editmode input#wbl-editmode { 
-	vertical-align: middle;
-	margin-right: 5px;
-}
-
-.editor_menubar span.wbl-editmode span.wbl-editmodeText { 
-	vertical-align: middle;
 }
 
 .editor_menubar button.wbl-editorSelectionCancel, .editor_menubar button.wbl-editorSelectionOK {
@@ -67,27 +63,8 @@
     margin-right: 10px;
 }
 
-.editor_menubar .wbl-triangleDown {
-	position: relative;
-	top: 10px;
-	margin: 0 5px;
-	border-color: #fff transparent transparent transparent;
-	border-style: solid;
-	border-width: 5px;
-	height: 2px;
-	width: 10px;
-}
-
-.editor_menubar .wbl-triangleUp {
-	border-color: transparent transparent #fff transparent;
-	border-style: solid;
-	border-width: 5px;
-	height: 0px;
-	width: 0px;
-	position: relative;
-	top: -42px;
-	margin: 0 5px;
-	left: 90px;
+.editor_menubar .wbl-profileMenu {
+	margin-right: 40px;
 }
 
 .editor_menubar img,
@@ -103,74 +80,9 @@ div.wbl-overlayIcons span.wbl-more {
 	height: 30px;
 }
 
-.editor_menubar img.wbl-add {
+.editor_menubar #wbl-user {
 	position: relative;
-	top: 8px;
-	padding: 0 30px;
-}
-
-.editor_menubar img.wbl-pageSettings {
-	position: relative;
-	top: 8px;
-	padding: 0 30px;
-}
-
-.editor_menubar img.wbl-logout {}
-
-.editor_menubar img.wbl-more {
-	position: relative;
-	top: 8px;
-	padding: 0 30px;
-}
-
-/* menu */
-.editor_menubar .wbl-menu {
-	display: none;
-	background-color: #242F37;
-	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
-    border: 1px solid #FFFFFF;
-    -moz-border-radius: 5px;
-    line-height: 20px;
-    padding: 20px 0;
-    width: 200px;
-    z-index: 400;
-}
-
-.editor_menubar .wbl-menu ul {
-	list-style: none;
-	margin-top: -2em;
-	color: #fff;
-}
-.editor_menubar .wbl-menu ul li:hover {
-	color: red;
-	cursor: pointer;
-}
-.editor_menubar .wbl-menu ul li.inactive,
-.editor_menubar .wbl-menu ul li.inactive:hover {
-	color: #999;
-	cursor: default;
-}
-
-.editor_menubar #wbl-addMenu {
-	position: absolute;
-	top: 55px;
-    left: 220px;
-}
-
-.editor_menubar #wbl-moreMenu {
-	position: absolute;
-	top: 55px;
-    left: 310px;
-}
-
-.editor_menubar .wbl-profileMenu {
-	margin-right: 40px;
-}
-
-.editor_menubar #wbl-profileMenu {
-	position: absolute;
-	top: 55px;
-	right: 10px;
+    top: -10px;
 }
 
 .editor_menubar .wbl-language {
@@ -183,67 +95,6 @@ div.wbl-overlayIcons span.wbl-more {
 	position: absolute;
 	right: 400px;
 	display: none;
-}
-
-.editor_menubar #wbl-profileMenu span.wbl-triangleUp {
-	left: 180px;
-}
-
-.editor_menubar div#wbl-searchResult {
-	display: none;
-	width: 500px;
-	height: 400px;
-	border: 1px solid #666;
-	background-color: #242F37;
-	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
-	position: absolute;
-	right: 150px;
-	color: #fff;
-	z-index: 400;
-}
-
-.editor_menubar div#wbl-searchResult span {
-	display: block;
-	float: right;
-	width: 300px;
-	padding-left: 25px;
-}
-
-.editor_menubar div#wbl-searchResult p {
-	line-height: 20px;
-	padding: 5px 10px;
-}
-
-.editor_menubar div#wbl-searchResult p:hover {
-	background-color: #000;	
-}
-
-.editor_menubar div#wbl-searchResult p.wbl-section {
-	border-top: 1px solid #999;
-}
-
-.editor_menubar div#wbl-searchResult p.wbl-section:first-child {
-	border: 0 !important;
-}
-
-.editor_menubar div#wbl-searchResult span.wbl-pdf {
-	background: url('images/search_result_pdf.png') no-repeat;
-}
-
-.editor_menubar div#wbl-searchResult span.wbl-website {
-	background: url('images/search_result_page.png') no-repeat;
-}
-
-.editor_menubar div#wbl-searchResult p.wbl-footer {
-	border-top: 1px solid #999;
-	color: #999;
-	clear: both;
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	text-align: center;
-	padding: 5px 0;
-	cursor: pointer;
 }
 
 .editor_menubar .wbl-alignLeft {

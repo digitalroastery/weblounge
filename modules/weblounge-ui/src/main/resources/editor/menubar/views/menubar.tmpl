@@ -2,9 +2,7 @@
 <a name="pages" class="wbl-tab wbl-pages" href="#wbl-pages">Pages</a>
 <a name="media" class="wbl-tab wbl-media" href="#wbl-media">Media</a>
 
-<!-- <img src="${runtime.getRootPath()}/editor/menubar/images/menu_add.png" class="wbl-add" title="Pagelet Toolbar" alt="Pagelet Toolbar" /> -->
-<!-- <img src="${runtime.getRootPath()}/editor/menubar/images/menu_more.png" class="wbl-more" title="Weitere Befehle..." alt="Weitere Befehle..." /> -->
-<img src="${runtime.getRootPath()}/editor/menubar/images/page-settings.png" class="wbl-pageSettings wbl-icon" title="Seiten-Eigenschaften" alt="Seiten-Eigenschaften" />
+<img src="${runtime.getRootPath()}/editor/menubar/images/page-settings.png" class="wbl-pageSettings" alt="Pageproperties" />
 
 <span class="wbl-editmode">
 	<input type="checkbox" value="editmode" id="wbl-editmode" />
@@ -12,35 +10,33 @@
 </span>
 
 <button class="wbl-editorSelectionOK" type="button">Ausw&auml;hlen</button>
-
 <button class="wbl-editorSelectionCancel" type="button">Abbrechen</button>
 
-<span class="wbl-language wbl-icon">
+<span class="wbl-language">
 	<img src='${runtime.getRootPath()}/editor/resources/flags/${current}.png' title='${current}'/>
 </span> 
 
-<span class="wbl-languageMenu wbl-icon">
+<span class="wbl-languageMenu">
 	{{each runtime.getLanguages()}}
 		<img src="${runtime.getRootPath()}/editor/resources/flags/${$value.language}.png" alt="${$value.language}" title="${$value.language}" />
     {{/each}}
 </span>
 
 <span class="wbl-right">
-	<!-- <input type="search" name="search" placeholder="Suchen..." /> -->
 	<span class="wbl-profileMenu">
-		<img src="${runtime.getRootPath()}/editor/menubar/images/user.png" class="wbl-user" alt="User" />
+		<img src="${runtime.getRootPath()}/editor/menubar/images/user.png" class="wbl-user" alt="" />
 		<span id="wbl-user">${runtime.getFirstName()}</span>
-		<!-- <span>&#x25BC;</span> -->
-		<img src="${runtime.getRootPath()}/editor/menubar/images/logout.png" class="wbl-logout wbl-icon" title="Logout" alt="Logout" />
+		<img src="${runtime.getRootPath()}/editor/menubar/images/logout.png" class="wbl-logout" alt="Logout" />
 	</span>
 </span>
 
+<!--
 <div id="wbl-addMenu" class="wbl-menu">
 	<span class="wbl-triangleUp"></span>
 	<ul>
-		<!-- <li class="wbl-newPage">Neue Seite erstellen</li> -->
-		<!-- <li class="wbl-newUpload">Neues Medium hochladen</li> -->
-		<!-- <li class="wbl-newNote">Neue Notiz erstellen</li> -->
+		<li class="wbl-newPage">Neue Seite erstellen</li>
+		<li class="wbl-newUpload">Neues Medium hochladen</li>
+		<li class="wbl-newNote">Neue Notiz erstellen</li>
 		<li class="wbl-newPagelet">Pagelet Toolbar</li>
 	</ul>
 </div>
@@ -48,27 +44,21 @@
 <div id="wbl-moreMenu" class="wbl-menu">
 	<span class="wbl-triangleUp"></span>
 	<ul>
-		<!-- <li class="wbl-pageSettings">Seiten-Eigenschaften</li> -->
-		<!-- <li>Als Favorit kennzeichnen</li> -->
-		<!-- <li>Seite duplizieren</li> -->
-		<!-- <li class="wbl-publish">Publizieren...</li> -->
-		<!-- <li>Zugriff einschr&auml;nken</li> -->
-		<!-- <li>Verherige Versionen...</li> -->
+		<li class="wbl-pageSettings">Seiten-Eigenschaften</li>
+		<li>Als Favorit kennzeichnen</li>
+		<li>Seite duplizieren</li>
+		<li class="wbl-publish">Publizieren...</li>
+		<li>Zugriff einschr&auml;nken</li>
+		<li>Verherige Versionen...</li>
 	</ul>
 </div>
 
 <div id="wbl-profileMenu" class="wbl-menu">
 	<span class="wbl-triangleUp"></span>
 	<ul>
-		<!-- <li class="wbl-userSettings">Einstellungen</li> -->
-		<!-- <li class="wbl-notification">Nachrichten</li> -->
+		<li class="wbl-userSettings">Einstellungen</li>
+		<li class="wbl-notification">Nachrichten</li>
 		<li class="wbl-logout">Logout</li>
 	</ul>
-</div>
-
-<!-- <div id="wbl-searchResult"> -->
-	<!-- <p class="wbl-section">Webseiten <span class="wbl-website">\home\schiedsrichter\</span></p> -->
-	<!-- <p class="wbl-section">Dokumente <span class="wbl-documents pdf">Kursaufgebot R1</span></p> -->
-	<!-- <p>&nbsp;<span class="wbl-documents wbl-pdf">Kursaufgebot R2</span></p> -->
-	<!-- <p class="wbl-footer">Weitere Resultate...</p> -->
-<!-- </div> -->
+</div> 
+-->

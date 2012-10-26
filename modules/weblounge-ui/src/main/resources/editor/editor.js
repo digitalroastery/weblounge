@@ -1,5 +1,7 @@
-steal.plugins('jquery/view/tmpl', 'editor/app')
-.css('editor', 'css/jquery-ui', 'css/token-input-facebook', 'css/token-input', 'css/validation', 'css/player/mediaelementplayer', 'css/buttons') 
+steal.plugins(
+'jquery/view/tmpl', 
+'editor/app')
+.css('editor', 'css/jquery-ui', 'css/token-input-facebook', 'css/token-input', 'css/validation', 'css/player/mediaelementplayer')
 .resources('jquery.validate.min', 'jquery.cookie', 'jquery.ba-bbq.min', 'jquery.tools.min', 'mediaelement-and-player.min')
 .then(function($) {
 
@@ -14,21 +16,15 @@ steal.plugins('jquery/view/tmpl', 'editor/app')
 		$('#weblounge-editor').editor_app();
 		
 		// Replace all body position absolute top + 45px
-		steal.dev.log('transition 45px');
-		$('body > *').each(function(index, elem) {
-			if($(elem).css('position') == 'absolute') {
-				var cssTop = $(elem).css('top');
-				if(cssTop == '') return;
-				var top = parseFloat(cssTop);
-				$(elem).css('top', top + 45 + 'px');
-			}
-		});
-
-		// Override the global defaults of the validation plugin
-		$.validator.setDefaults({
-		    ignore: ""
-		});
-
+		// steal.dev.log('transition 45px');
+		// $('body > *').each(function(index, elem) {
+		// 	if($(elem).css('position') == 'absolute') {
+		// 		var cssTop = $(elem).css('top');
+		// 		if(cssTop == '') return;
+		// 		var top = parseFloat(cssTop);
+		// 		$(elem).css('top', top + 45 + 'px');
+		// 	}
+		// });
 	});
 	
 });
