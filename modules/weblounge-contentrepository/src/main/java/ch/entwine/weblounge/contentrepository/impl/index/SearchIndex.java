@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
+import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
@@ -47,11 +48,12 @@ import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.SuggestRe
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.ElasticSearchException;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -66,9 +68,12 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.ClusterAdminClient;
+import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -624,7 +629,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    */
   public List<String> suggest(String dictionary, String seed,
       boolean onlyMorePopular, int count, boolean collate)
-          throws ContentRepositoryException {
+      throws ContentRepositoryException {
     if (StringUtils.isBlank(seed))
       throw new IllegalArgumentException("Seed must not be blank");
     if (StringUtils.isBlank(dictionary))
@@ -642,9 +647,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   }
 
   /**
-   * Tries to load solr from the specified directory. If that directory is not
-   * there, or in the case where either one of solr configuration or data
-   * directory is missing, a preceding call to <code>initSolr()</code> is made.
+   * Initializes an Elasticsearch node for the site.
    * 
    * @throws Exception
    *           if loading or creating solr fails
@@ -655,10 +658,37 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     // Prepare the configuration of the elastic search node
     Settings settings = loadSettings();
 
-    // Configure and start the elastic search node
+    // Configure and start the elastic search node. In a testing scenario, the
+    // node is being created locally.
     NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().settings(settings);
-    elasticSearch = nodeBuilder.build();
+    elasticSearch = nodeBuilder.local(TestUtils.isTest()).build();
     elasticSearch.start();
+
+    // Create the client
+    nodeClient = elasticSearch.client();
+
+    // Wait for the cluster to be up and running, at least the main shard needs
+    // to be read (yellow). The problem with this call is that during unit test
+    // execution, it is timing out.
+
+    // From online discussions, it seems that just recreating the indices yields
+    // the same behavior (Elasticsearch waits for the yellow status before
+    // actually
+    // creating the index).
+
+    logger.debug("Checking elasticsearch's cluster status for '{}'", site.getIdentifier());
+    if (!TestUtils.isTest()) {
+      long startupTime = System.currentTimeMillis();
+      ClusterHealthRequest healthRequest = new ClusterHealthRequest(site.getIdentifier());
+      ClusterAdminClient clusterAdmin = nodeClient.admin().cluster();
+      ClusterHealthResponse health = clusterAdmin.health(healthRequest.waitForYellowStatus()).actionGet();
+      if (health.timedOut()) {
+        logger.warn("Request to determine cluster health status for '{}' timed out", site.getIdentifier());
+      } else {
+        startupTime = System.currentTimeMillis() - startupTime;
+        logger.debug("Startup of index '{}' took {} ms", site.getIdentifier(), startupTime);
+      }
+    }
 
     // Create indices and type definitions
     createIndices();
@@ -674,17 +704,17 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    */
   private void createIndices() throws ContentRepositoryException, IOException {
 
-    // Create the client
-    nodeClient = elasticSearch.client();
-
     // Make sure the site index exists
-    if (!indexExists(site.getIdentifier())) {
-      CreateIndexRequestBuilder siteIdxRequest = nodeClient.admin().indices().prepareCreate(site.getIdentifier());
-      logger.info("Creating site index for '{}'", site.getIdentifier());
+    try {
+      IndicesAdminClient indexAdmin = nodeClient.admin().indices();
+      CreateIndexRequestBuilder siteIdxRequest = indexAdmin.prepareCreate(site.getIdentifier());
+      logger.debug("Trying to create site index for '{}'", site.getIdentifier());
       CreateIndexResponse siteidxResponse = siteIdxRequest.execute().actionGet();
       if (!siteidxResponse.acknowledged()) {
         throw new ContentRepositoryException("Unable to create site index for '" + site.getIdentifier() + "'");
       }
+    } catch (IndexAlreadyExistsException e) {
+      logger.info("Detected existing index '{}'", site.getIdentifier());
     }
 
     // Store the correct mapping
@@ -694,7 +724,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
         "page",
         "file",
         "image",
-    "movie" }) {
+        "movie" }) {
       PutMappingRequest siteMappingRequest = new PutMappingRequest(site.getIdentifier());
       siteMappingRequest.source(loadMapping(type));
       siteMappingRequest.type(type);
@@ -821,18 +851,6 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     }
 
     return mapping;
-  }
-
-  /**
-   * Returns <code>true</code> if the given index exists.
-   * 
-   * @param indexName
-   *          the index name
-   * @return <code>true</code> if the index exists
-   */
-  private boolean indexExists(String indexName) {
-    IndicesExistsRequest indexExistsRequest = new IndicesExistsRequest(indexName);
-    return nodeClient.admin().indices().exists(indexExistsRequest).actionGet().exists();
   }
 
 }

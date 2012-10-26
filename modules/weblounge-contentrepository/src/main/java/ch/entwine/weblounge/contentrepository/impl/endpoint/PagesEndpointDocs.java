@@ -117,6 +117,8 @@ public final class PagesEndpointDocs {
     // POST /{page}
     Endpoint createPageEndpoint = new Endpoint("/", Method.POST, "createpage");
     createPageEndpoint.setDescription("Creates a new page, either at the given path or at a random location and returns the REST url of the created resource.");
+    createPageEndpoint.addNote("If a page body is provided, existing identifiers will be overwritten");
+    createPageEndpoint.addNote("The inital version is set to 'work'");
     createPageEndpoint.addFormat(Format.xml());
     createPageEndpoint.addStatus(ok("the page was created and the response body contains it's resource url"));
     createPageEndpoint.addStatus(badRequest("the path was not specified"));

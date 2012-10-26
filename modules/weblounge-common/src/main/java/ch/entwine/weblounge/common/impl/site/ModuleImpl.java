@@ -685,8 +685,14 @@ public class ModuleImpl implements Module {
         Class<? extends Module> c = (Class<? extends Module>) classLoader.loadClass(className);
         module = c.newInstance();
         module.setIdentifier(identifier);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Implementation " + className + " for module '" + identifier + "' not found", e);
+      } catch (InstantiationException e) {
+        throw new IllegalStateException("Error instantiating impelementation " + className + " for module '" + identifier + "'", e);
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("Access violation instantiating implementation " + className + " for module '" + identifier + "'", e);
       } catch (Throwable t) {
-        throw new IllegalStateException("Unable to instantiate class " + className + " for module '" + identifier + ": " + t.getMessage(), t);
+        throw new IllegalStateException("Error loading implementation " + className + " for module '" + identifier + "'", t);
       }
     } else {
       module = new ModuleImpl();

@@ -110,15 +110,15 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
     if (flavor == null || flavor.equals(ANY))
       flavor = RequestFlavor.HTML;
 
-    // Check the request flavor
-    if (!HTML.equals(flavor)) {
-      logger.debug("Skipping request for {}, flavor {} is not supported", path, request.getFlavor());
-      return false;
-    }
-
     // Is this request intended for the search handler?
     if (!path.startsWith(URI_PREFIX)) {
       logger.debug("Skipping request for {}, request path does not start with {}", URI_PREFIX);
+      return false;
+    }
+
+    // Check the request flavor
+    if (!HTML.equals(flavor)) {
+      logger.debug("Skipping request for {}, flavor {} is not supported", path, request.getFlavor());
       return false;
     }
 

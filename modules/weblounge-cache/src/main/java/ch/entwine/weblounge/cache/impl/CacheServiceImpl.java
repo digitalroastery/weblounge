@@ -79,6 +79,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** Path to cache configuration */
   private static final String CACHE_MANAGER_CONFIG = "/ehcache/config.xml";
 
+  /** Name of the weblounge cache debug header */
+  private static final String CACHE_DEBUG_HEADER = "X-Cache-Debug";
+
   /** Name of the weblounge cache header */
   private static final String CACHE_KEY_HEADER = "X-Cache-Key";
 
@@ -688,18 +691,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     response.setHeader("ETag", entry.getETag());
 
     // Add the X-Cache-Key header
-    if (debug) {
+    if (debug || request.getHeader(CACHE_DEBUG_HEADER) != null) {
       StringBuffer cacheKeyHeader = new StringBuffer(name);
       cacheKeyHeader.append(" (").append(handle.getKey()).append(")");
       response.addHeader(CACHE_KEY_HEADER, cacheKeyHeader.toString());
-    }
-
-    // Add the X-Cache-Tags header
-    if (debug) {
-      key = (CacheEntryKey) element.getKey();
-      StringBuffer cacheTagsHeader = new StringBuffer(name);
-      cacheTagsHeader.append(" (").append(key.getTags()).append(")");
-      response.addHeader(CACHE_TAGS_HEADER, cacheTagsHeader.toString());
     }
 
     // Check the headers first. Maybe we don't need to send anything but

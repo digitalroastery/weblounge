@@ -199,7 +199,7 @@ public class SiteManager {
         alias = alias.replace("*", ".*");
         if (hostName.matches(alias)) {
           site = e.getValue();
-          logger.info("Registering {} for site ", url, site);
+          logger.info("Registering {} to site '{}', matching url {}", new Object[] { url, site.getIdentifier(), siteUrl });
           sitesByServerName.put(hostName, site);
           return site;
         }
@@ -262,9 +262,36 @@ public class SiteManager {
       String hostName = url.getURL().getHost();
       Site registeredFirst = sitesByServerName.get(hostName);
       if (registeredFirst != null && !site.equals(registeredFirst)) {
-        logger.error("Another site is already registered to {}. Site is not registered", url);
-        continue;
+
+        // Maybe a wildcard site has taken too many urls. Make sure concrete
+        // sites are able to take over
+        boolean replace = false;
+        for (SiteURL siteUrl : registeredFirst.getHostnames()) {
+          if (siteUrl.toExternalForm().contains("*")) {
+            try {
+              // convert the host wildcard (ex. *.domain.tld) to a valid regex
+              // (ex.
+              // .*\.domain\.tld)
+              String registeredAlias = siteUrl.getURL().getHost().replace(".", "\\.");
+              registeredAlias = registeredAlias.replace("*", ".*");
+              if (hostName.matches(registeredAlias)) {
+                logger.info("Replacing wildcard registration for {} with exact match '{}'", url, site);
+                replace = true;
+                break;
+              }
+            } catch (PatternSyntaxException ex) {
+              logger.warn("Error while trying to find a host wildcard match: ".concat(ex.getMessage()));
+            }
+          }
+        }
+
+        // This is a real conflict
+        if (!replace) {
+          logger.error("Another site is already registered to {}. Site is not registered", url);
+          continue;
+        }
       }
+
       sitesByServerName.put(hostName, site);
     }
 

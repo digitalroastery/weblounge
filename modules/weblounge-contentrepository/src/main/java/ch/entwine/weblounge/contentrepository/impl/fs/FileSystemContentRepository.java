@@ -82,6 +82,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /** Default directory root directory name */
   public static final String ROOT_DIR_DEFAULT = "sites-data";
 
+  /** The repository storage root directory */
+  protected File repositoryRoot = null;
+
+  /** The repository root directory */
+  protected File repositorySiteRoot = null;
+
   /** The document builder factory */
   protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 

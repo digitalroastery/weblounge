@@ -122,6 +122,7 @@ public class CacheTest extends IntegrationTestBase {
 
     logger.info("Sending request to the {} version of {}", language.getLocale().getDisplayName(), requestUrl);
     HttpGet request = new HttpGet(requestUrl);
+    request.addHeader("X-Cache-Debug", "yes");
     String[][] params = new String[][] { { "language", language.getIdentifier() } };
 
     // Send and the request and examine the response. The first request might
@@ -147,6 +148,12 @@ public class CacheTest extends IntegrationTestBase {
       // Prepare the second request
       response.getEntity().consumeContent();
       httpClient.getConnectionManager().shutdown();
+      
+      // See if the cache is online
+      if (response.getHeaders("X-Cache-Key").length == 0) {
+        logger.warn("Cache is turned off and is not tested");
+        return;
+      }
 
       // Give the cache time to persist the entry
       Thread.sleep(1000);
@@ -174,8 +181,6 @@ public class CacheTest extends IntegrationTestBase {
       // Test the Cache header
       assertNotNull(response.getHeaders("X-Cache-Key"));
       assertEquals(1, response.getHeaders("X-Cache-Key").length);
-      String cacheKey = response.getHeaders("X-Cache-Key")[0].getValue();
-      assertNotNull(cacheKey);
 
       // Test the expires header
       Date newExpires = df.parse(response.getHeaders("Expires")[0].getValue());
