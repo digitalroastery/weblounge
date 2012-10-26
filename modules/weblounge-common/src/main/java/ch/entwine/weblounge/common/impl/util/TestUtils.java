@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.util;
 
+import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.Header;
@@ -55,7 +57,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * Utility class containing a few helper methods.
  */
 public final class TestUtils {
-  
+
+  /** Name of the property to indicate an ongoing unit or integration test */
+  private static final String TEST_PROPERTY = "weblounge.test";
+
   /**
    * This utility class is not intended to be instantiated.
    */
@@ -131,7 +136,8 @@ public final class TestUtils {
     String responseXml = EntityUtils.toString(response.getEntity(), "utf-8");
     responseXml = StringEscapeUtils.unescapeHtml(responseXml);
 
-    // Depending on whether it's an HTML page, let's make sure we end up with a valid DOM
+    // Depending on whether it's an HTML page, let's make sure we end up with a
+    // valid DOM
     Header contentTypeHeader = response.getFirstHeader("Content-Type");
     String contentType = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
 
@@ -145,7 +151,7 @@ public final class TestUtils {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
       DocumentBuilder builder = factory.newDocumentBuilder();
-      doc = builder.parse(new ByteArrayInputStream(responseXml.getBytes("utf-8")));      
+      doc = builder.parse(new ByteArrayInputStream(responseXml.getBytes("utf-8")));
     }
     return doc;
   }
@@ -225,6 +231,26 @@ public final class TestUtils {
       }
     }
     return httpClient.execute(request);
+  }
+
+  /**
+   * Enables testing by setting a system property. This method is used to add
+   * test specific code to production implementations while using a consistent
+   * methodology to determine testing status.
+   * <p>
+   * Use {@link #isTest()} to determine whether testing has been turned on.
+   */
+  public static void startTesting() {
+    System.setProperty(TEST_PROPERTY, Boolean.TRUE.toString());
+  }
+
+  /**
+   * Returns <code>true</code> if a test is currently going on.
+   * 
+   * @return <code>true</code> if the current code is being executed as a test
+   */
+  public static boolean isTest() {
+    return ConfigurationUtils.isTrue(System.getProperty(TEST_PROPERTY));
   }
 
 }

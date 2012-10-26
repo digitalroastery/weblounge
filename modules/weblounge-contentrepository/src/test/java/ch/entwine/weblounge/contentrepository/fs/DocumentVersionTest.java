@@ -38,6 +38,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
+import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Environment;
@@ -110,6 +111,7 @@ public class DocumentVersionTest {
 
     // Create the index configuration
     System.setProperty("weblounge.home", rootPath);
+    TestUtils.startTesting();
     ElasticSearchUtils.createIndexConfigurationAt(repositoryRoot);
 
     // Template

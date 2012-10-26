@@ -53,6 +53,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
+import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
@@ -218,6 +219,7 @@ public class FileSystemContentRepositoryTest {
 
     // Set weblounge.home so that search index can properly be created
     System.setProperty("weblounge.home", testRoot.getAbsolutePath());
+    TestUtils.startTesting();
     ElasticSearchUtils.createIndexConfigurationAt(testRoot);
 
     // Template
