@@ -108,12 +108,21 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
     String parameter = request.getParameter("json");
     String accepts = request.getHeader("Accept");
     if (uri.endsWith(".json") || uri.endsWith("/json"))
-        return true;
+      return true;
     if (parameter != null)
       return true;
     if (accepts != null && ("application/json".equals(accepts) || "text/json".equals(accepts)))
       return true;
     return false;
+  }
+
+  /**
+   * Returns the service that is being wrapped by this servlet.
+   * 
+   * @return the service implementation
+   */
+  public Object getService() {
+    return service;
   }
 
   /**

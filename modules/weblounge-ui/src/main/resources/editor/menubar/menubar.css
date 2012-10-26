@@ -90,14 +90,17 @@
 	left: 90px;
 }
 
-.wbl-icon {
-  cursor: pointer;
+.editor_menubar img,
+.editor_menubar .wbl-language,
+div.wbl-overlayIcons span.wbl-more {
+	cursor: pointer;
 }
 
 .editor_menubar img.wbl-user {
-  padding: 2px 8px;
-  width: 30px;
-  height: 30px;
+	cursor: default;
+	padding: 2px 8px;
+	width: 30px;
+	height: 30px;
 }
 
 .editor_menubar img.wbl-add {
@@ -107,6 +110,8 @@
 }
 
 .editor_menubar img.wbl-pageSettings {
+	position: relative;
+	top: 8px;
 	padding: 0 30px;
 }
 

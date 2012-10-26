@@ -37,7 +37,7 @@ import ch.entwine.weblounge.common.site.Environment;
  * Composeables are usually used to display content to the user. Often, this
  * content might become invalid and needs to be recalculated in some way. The
  * composeable can indicate this to the system by returning proper values in
- * {@link #getValidTime()} and {@link #getRecheckTime()}.
+ * {@link #getCacheExpirationTime()} and {@link #getClientRevalidationTime()}.
  */
 public interface Composeable {
 
@@ -97,19 +97,22 @@ public interface Composeable {
   void setCacheExpirationTime(long time);
 
   /**
-   * Returns the amount of time in milliseconds that output using this
+   * Returns the maximum amount of time in milliseconds that output using this
    * composeable will be valid. When this time has been exceeded, content
    * generated using this composeable should be removed from any cache systems
    * and be regenerated.
    * 
    * @return the valid time
    */
-  long getValidTime();
+  long getCacheExpirationTime();
 
   /**
    * Sets the number of milliseconds that clients may assume that content
    * represented by this composeable will be valid. After that time, clients
    * need to check back and make sure it is still unmodified and valid.
+   * <p>
+   * This time corresponds to the <code>Expires</code> header of the
+   * <code>HTTP</code> protocol.
    * 
    * @param time
    *          the recheck time
@@ -118,12 +121,16 @@ public interface Composeable {
 
   /**
    * Returns the amount of time in milliseconds that output using this
-   * composeable is likely to still be valid. However, clients should check to
-   * make sure that this actually is the case.
+   * composeable is likely to still be valid. The client revalidation
+   * time may be less than the actual validity of he content, but never
+   * longer than what {@link #getCacheExpirationTime()} returns.
+   * <p>
+   * This time corresponds to the <code>Expires</code> header of the
+   * <code>HTTP</code> protocol.
    * 
    * @return the recheck time
    */
-  long getRecheckTime();
+  long getClientRevalidationTime();
 
   /**
    * Adds a link or script to the list of includes.

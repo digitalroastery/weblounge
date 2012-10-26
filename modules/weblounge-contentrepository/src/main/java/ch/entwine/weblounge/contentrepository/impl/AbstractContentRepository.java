@@ -219,12 +219,20 @@ public abstract class AbstractContentRepository implements ContentRepository {
     if (!connected)
       throw new IllegalStateException("Cannot stop a disconnected content repository");
 
+    // Stop ongoing image preview generation
+    synchronized (currentPreviewOperations) {
+      logger.info("Stopping preview generation");
+      previewOperations.clear();
+      previews.clear();
+    }
+    
     // Close the image style tracker
     if (imageStyleTracker != null) {
       imageStyleTracker.close();
       imageStyleTracker = null;
     }
 
+    // Close the index and mark the content repository as offline
     try {
       connected = false;
       index.close();

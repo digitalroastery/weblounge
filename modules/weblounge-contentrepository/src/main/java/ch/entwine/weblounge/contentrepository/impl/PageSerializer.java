@@ -193,6 +193,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
     // resource version
     long version = (Long) metadataMap.get(VERSION).getValues().get(0);
 
+    // FIXME Add exception handling 
     ResourceURI uri = new PageURIImpl(site, path, id, version);
     WebUrl url = new WebUrlImpl(site, path);
 

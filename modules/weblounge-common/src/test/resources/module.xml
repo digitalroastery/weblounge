@@ -17,7 +17,7 @@
   <actions>
     <action id="myaction">
       <name><![CDATA[Test]]></name>
-      <class>ch.entwine.weblounge.common.site.TestAction</class>
+      <class>ch.entwine.weblounge.common.impl.site.TestAction</class>
       <mountpoint>/test/</mountpoint>
       <page>/testpage/</page>
       <template>testtemplate</template>
@@ -38,7 +38,7 @@
   <jobs>
     <job id="testjob">
       <name><![CDATA[Job title]]></name>
-      <class>ch.entwine.weblounge.common.scheduler.TestJob</class>
+      <class>ch.entwine.weblounge.common.impl.scheduler.TestJob</class>
       <schedule>0 0 * * 1</schedule>
       <options>
         <option>

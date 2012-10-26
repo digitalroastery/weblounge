@@ -209,7 +209,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
         path = (String) metadataMap.get(PATH).getValues().get(0);
         url = new WebUrlImpl(site, path);
       } catch (IllegalArgumentException e) {
-        logger.warn("Path {}:/{} for file {} is invalid", new Object[] {
+        logger.debug("Path {}:/{} for file {} is invalid", new Object[] {
             site.getIdentifier(),
             path,
             id });

@@ -107,8 +107,9 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
       if (bundle == null)
         throw new ContentRepositoryException("Unable to locate bundle for site '" + site + "'");
 
-      // Add the bundle contents to the index
-      if (getResourceCount() == 0)
+      // Add the bundle contents to the index if needed
+      File rootDirecotry = getRootDirectory();
+      if (getResourceCount() == 0 || !rootDirecotry.exists() || rootDirecotry.list().length == 0)
         indexBundleContents();
 
       // If there was no homepage as part of the bundle, create it
@@ -144,6 +145,14 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
    * and adding it to the repository index.
    */
   protected void indexBundleContents() throws ContentRepositoryException {
+    logger.info("Indexing bundle content repository {}", this);
+
+    try {
+      logger.info("Clearing index of bundle content repository {}", this);
+      index.clear();
+    } catch (IOException e) {
+      logger.error("Error indexing bundle content repository: {}", e.getMessage());
+    }
 
     // See if there are any resources. If that's the case, then we don't need to
     // do anything. If not, we need to copy everything that's currently in the

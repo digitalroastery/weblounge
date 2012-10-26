@@ -637,6 +637,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   /**
    * Creates a page at the site's content repository and returns the location to
    * post updates to.
+   * <p>
+   * Note that any of identifier, path and version that may be contained in an
+   * initial <code>pageXml</code> will be overwritten.
    * 
    * @param request
    *          the http request
@@ -666,14 +669,16 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         if (!path.startsWith("/"))
           path = "/" + path;
         WebUrl url = new WebUrlImpl(site, path);
-        pageURI = new PageURIImpl(site, url.getPath(), uuid, Resource.WORK);
+        path = url.getPath();
       } catch (IllegalArgumentException e) {
         logger.warn("Tried to create a page with an invalid path '{}': {}", path, e.getMessage());
         throw new WebApplicationException(Status.BAD_REQUEST);
       }
     } else {
-      pageURI = new PageURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid, Resource.WORK);
+      path = "/" + uuid.replaceAll("-", "");
     }
+
+    pageURI = new PageURIImpl(site, path, uuid, Resource.WORK);
 
     // Make sure the page doesn't exist
     try {
@@ -706,6 +711,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       try {
         PageReader pageReader = new PageReader();
         page = pageReader.read(IOUtils.toInputStream(pageXml, "utf-8"), site);
+        page.setIdentifier(pageURI.getIdentifier());
+        page.setPath(pageURI.getPath());
+        page.setVersion(pageURI.getVersion());
       } catch (IOException e) {
         logger.warn("Error reading page {} from request", pageURI);
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
