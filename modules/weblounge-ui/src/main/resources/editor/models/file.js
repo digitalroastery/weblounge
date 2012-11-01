@@ -77,7 +77,7 @@ steal.then('jsonix')
 		findPending: function(params, success, error) {
 			var url = "/system/weblounge/files/pending?limit=8";
 			if ('filter' in params) {
-				url += "?filter=" + params.filter;
+				url += "&filter=" + params.filter;
 			}
 			if ('type' in params) {
 				url += "&type=" + params.type;
