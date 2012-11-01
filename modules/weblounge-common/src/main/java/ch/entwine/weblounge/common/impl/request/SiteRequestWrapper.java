@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,9 +74,6 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
   /** the attributes of this request */
   private Map<String, Object> attrs;
 
-  /** the additional query parameters */
-  private Map<String, String> params;
-
   /** indicates an include request */
   private boolean include = false;
 
@@ -116,7 +112,6 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
    *          whether to include the path elements of the original request in
    *          the attributes of the new request
    */
-  @SuppressWarnings("unchecked")
   public SiteRequestWrapper(WebloungeRequest request, String url,
       boolean include) {
     super(request);
@@ -126,7 +121,6 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
     this.environment = request.getEnvironment();
 
     int index = url.indexOf('?');
-    params = request.getParameterMap();
     if (index > -1) {
       url = url.substring(0, index);
     }
@@ -171,111 +165,10 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public Enumeration getAttributeNames() {
     final Set s = new HashSet();
-    for (Enumeration e = super.getAttributeNames(); e.hasMoreElements();)
+    for (Enumeration e = getRequest().getAttributeNames(); e.hasMoreElements();)
       s.add(e.nextElement());
     s.addAll(attrs.keySet());
     return Collections.enumeration(s);
-  }
-
-  /**
-   * @see javax.servlet.ServletRequest#getParameter(java.lang.String)
-   */
-  public String getParameter(String name) {
-    if (params != null) {
-      Object o = params.get(name);
-      if (o != null) {
-        if (o instanceof String[])
-          return ((String[]) o)[0];
-        return (String) o;
-      }
-    }
-    return super.getParameter(name);
-  }
-
-  /**
-   * @see javax.servlet.ServletRequest#getParameterMap()
-   */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public Map getParameterMap() {
-    if (params == null)
-      return super.getParameterMap();
-    Map m = new HashMap();
-    m.putAll(super.getParameterMap());
-    for (Iterator pi = params.keySet().iterator(); pi.hasNext();) {
-      Object name = pi.next();
-      Object value = params.get(name);
-      if (m.containsKey(name)) {
-        String[] s2 = (String[]) m.get(name);
-        int len = s2.length;
-        if (value instanceof String[])
-          len += ((String[]) value).length;
-        else
-          len += 1;
-        String[] s = new String[len];
-        len = 0;
-        if (value instanceof String[]) {
-          String[] s1 = (String[]) value;
-          for (int i = 0; i < s1.length; i++)
-            s[len++] = s1[i];
-        } else {
-          s[len++] = (String) value;
-        }
-        for (int i = 0; i < s2.length; i++)
-          s[len++] = s2[i];
-        m.put(name, s);
-      } else if (value instanceof String[]) {
-        m.put(name, value);
-      } else {
-        String[] s = new String[1];
-        s[0] = (String) value;
-        m.put(name, s);
-      }
-    }
-    return m;
-  }
-
-  /**
-   * @see javax.servlet.ServletRequest#getParameterNames()
-   */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public Enumeration getParameterNames() {
-    if (params == null)
-      return super.getParameterNames();
-    Set<String> s = new HashSet<String>();
-    for (Enumeration<String> e = super.getParameterNames(); e.hasMoreElements();)
-      s.add(e.nextElement());
-    s.addAll(params.keySet());
-    return Collections.enumeration(s);
-  }
-
-  /**
-   * @see javax.servlet.ServletRequest#getParameterValues(java.lang.String)
-   */
-  public String[] getParameterValues(String name) {
-    if (params != null) {
-      Object o1 = params.get(name);
-      if (o1 != null) {
-        String[] s1;
-        if (o1 instanceof String[])
-          s1 = (String[]) o1;
-        else {
-          s1 = new String[1];
-          s1[0] = (String) o1;
-        }
-        String[] s2 = super.getParameterValues(name);
-        if (s2 == null)
-          return s1;
-        String[] s = new String[s1.length + s2.length];
-        int len = 0;
-        for (int i = 0; i < s1.length; i++)
-          s[len++] = s1[i];
-        for (int i = 0; i < s2.length; i++)
-          s[len++] = s2[i];
-        return s;
-      }
-    }
-
-    return super.getParameterValues(name);
   }
 
   /**
@@ -286,7 +179,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
     if (includeAttrs.contains(name))
       attrs.put(name, o);
     else
-      super.setAttribute(name, o);
+      ((WebloungeRequest) getRequest()).setAttribute(name, o);
   }
 
   /**
@@ -296,7 +189,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
     if (includeAttrs.contains(name))
       attrs.remove(name);
     else
-      super.removeAttribute(name);
+      ((WebloungeRequest) getRequest()).removeAttribute(name);
   }
 
   /**
@@ -304,7 +197,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
    */
   public String getContextPath() {
     if (include)
-      return super.getContextPath();
+      return ((WebloungeRequest) getRequest()).getContextPath();
     return contextPath;
   }
 
@@ -322,7 +215,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
    */
   public String getPathInfo() {
     if (include)
-      return super.getPathInfo();
+      return ((WebloungeRequest) getRequest()).getPathInfo();
     return pathInfo;
   }
 
@@ -331,7 +224,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
    */
   public String getQueryString() {
     if (include)
-      return super.getQueryString();
+      return ((WebloungeRequest) getRequest()).getQueryString();
     return queryString;
   }
 
@@ -340,7 +233,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
    */
   public String getRequestURI() {
     if (include)
-      return super.getRequestURI();
+      return ((WebloungeRequest) getRequest()).getRequestURI();
     return requestURI;
   }
 
@@ -349,7 +242,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
    */
   public String getServletPath() {
     if (include)
-      return super.getServletPath();
+      return ((WebloungeRequest) getRequest()).getServletPath();
     return servletPath;
   }
 
