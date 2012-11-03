@@ -12,6 +12,10 @@
 	z-index: 400;
 }
 
+#wbl-pageletcreator {
+	z-index: 400;
+}
+
 .editor_menubar img {
     vertical-align: inherit; /* needed to override user-sites-styles */
 }
