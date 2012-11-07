@@ -86,7 +86,7 @@ public class ActionTag extends WebloungeTag {
   public void setModule(String module) throws JspTagException {
     Site site = request.getSite();
     this.module = site.getModule(module);
-    if (module == null) {
+    if (this.module == null) {
       String msg = "Module '" + module + "' not found!";
       throw new JspTagException(msg);
     }
