@@ -378,6 +378,9 @@ public class PagePreviewTag extends WebloungeTag {
     // Add included page url to tags
     response.addTag(CacheTag.Url, pageUrl.getLink());
 
+    // Adjust modification date
+    response.setModificationDate(page.getLastModified());
+
     // Handle the first pagelet, we'll do the others
     pageletIndex = 0;
     handlePagelet(pageletIndex);

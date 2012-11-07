@@ -654,7 +654,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    */
   private void init() throws Exception {
     logger.debug("Setting up elastic search index");
-
+    
     // Prepare the configuration of the elastic search node
     Settings settings = loadSettings();
 
@@ -673,8 +673,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
     // From online discussions, it seems that just recreating the indices yields
     // the same behavior (Elasticsearch waits for the yellow status before
-    // actually
-    // creating the index).
+    // actually creating the index).
 
     logger.debug("Checking elasticsearch's cluster status for '{}'", site.getIdentifier());
     if (!TestUtils.isTest()) {

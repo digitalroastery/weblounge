@@ -1082,7 +1082,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Create the response
     ResponseBuilder response = Response.ok();
     response.tag(ResourceUtils.getETagValue(workPage));
-    response.lastModified(workPage.getModificationDate());
+    response.lastModified(workPage.getLastModified());
     return response.build();
   }
 
@@ -1363,7 +1363,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Create the response
     ResponseBuilder response = Response.ok();
     response.tag(ResourceUtils.getETagValue(workPage));
-    response.lastModified(workPage.getModificationDate());
+    response.lastModified(workPage.getLastModified());
     return response.build();
   }
 
