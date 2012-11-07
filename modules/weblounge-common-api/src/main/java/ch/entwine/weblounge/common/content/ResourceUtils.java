@@ -383,13 +383,9 @@ public final class ResourceUtils {
         return content.getCreationDate();
     }
 
-    // The resource's modified date is the last resort
-    Date modificationDate = resource.getModificationDate();
-    if (modificationDate != null)
-      return modificationDate;
-
-    // If nothing else helps, return the creation date
-    return resource.getCreationDate();
+    // The resource's modified date is the last resort. If nothing else helps,
+    // return the creation date.
+    return resource.getLastModified();
   }
 
   /**
