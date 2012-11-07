@@ -37,6 +37,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -81,6 +82,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
   /** A buffer that can hold the output stream prior to writing it back */
   private CachedOutputStream os = null;
+
+  /** The response's content modification date */
+  private Date modificationDate = new Date(0);
 
   /** Default encoding */
   private static final String DEFAULT_ENCODING = "utf-8";
@@ -427,8 +431,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.entwine.weblounge.common.request.WebloungeResponse#startResponse(ch.entwine.weblounge.common.request.CacheTag[],
    *      long, long)
    */
-  public boolean startResponse(CacheTag[] tags, long expirationTime, long revalidationTime)
-      throws IllegalStateException {
+  public boolean startResponse(CacheTag[] tags, long expirationTime,
+      long revalidationTime) throws IllegalStateException {
     if (!isValid || cache == null)
       return false;
     ResponseCache cache = this.cache.get();
@@ -522,6 +526,40 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
     os = null;
     submitted = true;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#setModificationDate(Date)
+   */
+  @Override
+  public Date setModificationDate(Date modificationDate) {
+    if (modificationDate == null)
+      this.modificationDate = new Date(0);
+    else
+      this.modificationDate = modificationDate.after(this.modificationDate) ? modificationDate : this.modificationDate;
+    if (cacheHandle == null)
+      return this.modificationDate;
+    CacheHandle hdl = cacheHandle.get();
+    if (hdl == null)
+      return this.modificationDate;
+    return hdl.setModificationDate(modificationDate);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#getModificationDate()
+   */
+  @Override
+  public Date getModificationDate() {
+    if (cacheHandle == null)
+      return modificationDate.getTime() > 0 ? modificationDate : new Date();
+    CacheHandle hdl = cacheHandle.get();
+    if (hdl == null)
+      return modificationDate.getTime() > 0 ? modificationDate : new Date();
+    return hdl.getModificationDate();
   }
 
   /**

@@ -184,7 +184,7 @@ public final class ResourceUtils {
    */
   public static boolean hasChanged(HttpServletRequest request,
       Resource<?> resource, ImageStyle style, Language language)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
       return isModified(request, resource, language);
     } else if (request.getHeader("If-None-Match") != null) {
