@@ -19,6 +19,8 @@
  */
 package ch.entwine.weblounge.taglib.security;
 
+import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -45,10 +47,10 @@ public class RoleCheckTag extends WebloungeTag {
   private static final long serialVersionUID = 8899627757239254637L;
 
   /** the roles to be checked */
-  private List<String> oneOf_;
+  private List<Role> oneOf_;
 
   /** the roles to be checked */
-  private List<String> allOf_;
+  private List<Role> allOf_;
 
   /** the role context */
   private String context_;
@@ -60,8 +62,8 @@ public class RoleCheckTag extends WebloungeTag {
    * Constructor for class RoleCheckTag.
    */
   public RoleCheckTag() {
-    oneOf_ = new ArrayList<String>();
-    allOf_ = new ArrayList<String>();
+    oneOf_ = new ArrayList<Role>();
+    allOf_ = new ArrayList<Role>();
   }
 
   /**
@@ -94,11 +96,12 @@ public class RoleCheckTag extends WebloungeTag {
    *          the role
    */
   public void setRole(String value) throws JspTagException {
-    if (value.split(":").length != 2) {
-      throw new JspTagException("The role must be of the form 'context:id'!");
+    try {
+      oneOf_.add(new RoleImpl(value));
+      allOf_.add(new RoleImpl(value));
+    } catch (IllegalArgumentException e) {
+      throw new JspTagException(e);
     }
-    oneOf_.add(value);
-    allOf_.add(value);
   }
 
   /**
@@ -114,10 +117,11 @@ public class RoleCheckTag extends WebloungeTag {
     String role;
     while (tok.hasMoreTokens()) {
       role = tok.nextToken();
-      if (role.split(":").length != 2) {
-        throw new JspTagException("The role must be of the form 'context:id'!");
+      try {
+        oneOf_.add(new RoleImpl(role));
+      } catch (IllegalArgumentException e) {
+        throw new JspTagException(e);
       }
-      oneOf_.add(role);
     }
   }
 
@@ -134,10 +138,11 @@ public class RoleCheckTag extends WebloungeTag {
     String role;
     while (tok.hasMoreTokens()) {
       role = tok.nextToken();
-      if (role.split(":").length != 2) {
-        throw new JspTagException("The role must be of the form 'context:id'!");
+      try {
+        allOf_.add(new RoleImpl(role));
+      } catch (IllegalArgumentException e) {
+        throw new JspTagException(e);
       }
-      allOf_.add(role);
     }
   }
 
@@ -147,8 +152,14 @@ public class RoleCheckTag extends WebloungeTag {
   @Override
   public int doStartTag() throws JspException {
     if (context_ != null && id_ != null) {
-      allOf_.add(context_ + ":" + id_);
-      oneOf_.add(context_ + ":" + id_);
+      Role role;
+      try {
+        role = new RoleImpl(context_ + ":" + id_);
+      } catch (IllegalArgumentException e) {
+        throw new JspTagException(e);
+      }
+      allOf_.add(role);
+      oneOf_.add(role);
     }
     return super.doStartTag();
   }
@@ -163,12 +174,15 @@ public class RoleCheckTag extends WebloungeTag {
   }
 
   /**
-   * Called when this tag instance is released.
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.taglib.WebloungeTag#reset()
    */
+  @Override
   public void reset() {
-    allOf_ = new ArrayList<String>();
-    oneOf_ = new ArrayList<String>();
-    super.release();
+    allOf_ = new ArrayList<Role>();
+    oneOf_ = new ArrayList<Role>();
+    super.reset();
   }
 
   /**
@@ -181,10 +195,13 @@ public class RoleCheckTag extends WebloungeTag {
    * @return <code>true</code> if the user has one of the roles
    */
   protected boolean hasOneOf(User user, Site site) {
-    for(String role : oneOf_) {
-      String roleId = role.substring(role.indexOf(":") + 1);
-      if(SecurityUtils.userHasRole(user, roleId)) 
-        return true;
+    for(Role role : oneOf_) {
+      try {
+        if(SecurityUtils.userHasRole(user, role)) 
+          return true;
+      } catch (IllegalArgumentException e) {
+        
+      }
     }
     return false;
   }
@@ -199,9 +216,8 @@ public class RoleCheckTag extends WebloungeTag {
    * @return <code>true</code> if the user has all of the roles
    */
   protected boolean hasAllOf(User user, Site site) {
-    for(String role : allOf_) {
-      String roleId = role.substring(role.indexOf(":") + 1);
-      if(!SecurityUtils.userHasRole(user, roleId)) 
+    for(Role role : allOf_) {
+      if(!SecurityUtils.userHasRole(user, role)) 
         return false;
     }
     return true;
