@@ -48,8 +48,6 @@ import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.SuggestRe
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.ElasticSearchException;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -68,7 +66,6 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.ClusterAdminClient;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
@@ -107,7 +104,10 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   private static final String VERSION_TYPE = "version";
 
   /** The local elastic search node */
-  private Node elasticSearch = null;
+  private static Node elasticSearch = null;
+  
+  /** List of clients to the local node */
+  private static List<Client> elasticSearchClients = new ArrayList<Client>(); 
 
   /** Client for talking to elastic search */
   private Client nodeClient = null;
@@ -157,11 +157,20 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    */
   public void close() throws IOException {
     try {
-      if (nodeClient != null)
+      if (nodeClient != null) {
         nodeClient.close();
-      if (elasticSearch != null) {
-        elasticSearch.stop();
-        elasticSearch.close();
+        synchronized (elasticSearch) {
+          elasticSearchClients.remove(nodeClient);
+        }
+        
+        synchronized (this) {
+          if (elasticSearchClients.isEmpty()) {
+            logger.info("Stopping local Elasticsearch node");
+            elasticSearch.stop();
+            elasticSearch.close();
+            elasticSearch = null;
+          }
+        }
       }
     } catch (Throwable t) {
       throw new IOException("Error stopping the elastic search node", t);
@@ -653,42 +662,28 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    *           if loading or creating solr fails
    */
   private void init() throws Exception {
-    logger.debug("Setting up elastic search index");
-    
-    // Prepare the configuration of the elastic search node
-    Settings settings = loadSettings();
+    synchronized (this) {
+      if (elasticSearch == null) {
+        logger.info("Starting local Elasticsearch node");
 
-    // Configure and start the elastic search node. In a testing scenario, the
-    // node is being created locally.
-    NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().settings(settings);
-    elasticSearch = nodeBuilder.local(TestUtils.isTest()).build();
-    elasticSearch.start();
+        // Prepare the configuration of the elastic search node
+        Settings settings = loadSettings();
 
-    // Create the client
-    nodeClient = elasticSearch.client();
-
-    // Wait for the cluster to be up and running, at least the main shard needs
-    // to be read (yellow). The problem with this call is that during unit test
-    // execution, it is timing out.
-
-    // From online discussions, it seems that just recreating the indices yields
-    // the same behavior (Elasticsearch waits for the yellow status before
-    // actually creating the index).
-
-    logger.debug("Checking elasticsearch's cluster status for '{}'", site.getIdentifier());
-    if (!TestUtils.isTest()) {
-      long startupTime = System.currentTimeMillis();
-      ClusterHealthRequest healthRequest = new ClusterHealthRequest(site.getIdentifier());
-      ClusterAdminClient clusterAdmin = nodeClient.admin().cluster();
-      ClusterHealthResponse health = clusterAdmin.health(healthRequest.waitForYellowStatus()).actionGet();
-      if (health.timedOut()) {
-        logger.warn("Request to determine cluster health status for '{}' timed out", site.getIdentifier());
-      } else {
-        startupTime = System.currentTimeMillis() - startupTime;
-        logger.debug("Startup of index '{}' took {} ms", site.getIdentifier(), startupTime);
+        // Configure and start the elastic search node. In a testing scenario,
+        // the
+        // node is being created locally.
+        NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().settings(settings);
+        elasticSearch = nodeBuilder.local(TestUtils.isTest()).build();
+        elasticSearch.start();
       }
     }
-
+    
+    // Create the client
+    synchronized (elasticSearch) {
+      nodeClient = elasticSearch.client();
+      elasticSearchClients.add(nodeClient);
+    }
+    
     // Create indices and type definitions
     createIndices();
   }
