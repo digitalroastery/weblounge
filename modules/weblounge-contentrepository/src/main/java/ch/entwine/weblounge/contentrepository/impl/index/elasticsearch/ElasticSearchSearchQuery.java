@@ -60,19 +60,19 @@ import ch.entwine.weblounge.contentrepository.impl.index.IndexSchema;
 import ch.entwine.weblounge.contentrepository.impl.index.IndexUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.common.io.BytesStream;
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilderException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
-import org.elasticsearch.index.query.TextQueryBuilder;
 import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -502,7 +502,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // Text
     if (text != null) {
-      TextQueryBuilder textQueryBuilder = QueryBuilders.textQuery(TEXT, text);
+      MatchQueryBuilder textQueryBuilder = QueryBuilders.matchQuery(TEXT, text);
       booleanQuery.must(textQueryBuilder);
       this.queryBuilder = booleanQuery;
     }
@@ -516,7 +516,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // Fulltext
     if (fulltext != null) {
-      TextQueryBuilder textQueryBuilder = QueryBuilders.textQuery(FULLTEXT, fulltext);
+      MatchQueryBuilder textQueryBuilder = QueryBuilders.matchQuery(FULLTEXT, fulltext);
       booleanQuery.must(textQueryBuilder);
       this.queryBuilder = booleanQuery;
     }
@@ -753,7 +753,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
    * @see org.elasticsearch.index.query.QueryBuilder#buildAsBytes()
    */
   @Override
-  public BytesStream buildAsBytes() throws QueryBuilderException {
+  public BytesReference buildAsBytes() throws QueryBuilderException {
     return queryBuilder.buildAsBytes();
   }
 
@@ -763,7 +763,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
    * @see org.elasticsearch.index.query.QueryBuilder#buildAsBytes(org.elasticsearch.common.xcontent.XContentType)
    */
   @Override
-  public BytesStream buildAsBytes(XContentType contentType) {
+  public BytesReference buildAsBytes(XContentType contentType) {
     return queryBuilder.buildAsBytes(contentType);
   }
 
