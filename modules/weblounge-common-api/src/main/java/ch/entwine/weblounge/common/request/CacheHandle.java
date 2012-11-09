@@ -23,6 +23,7 @@ package ch.entwine.weblounge.common.request;
 import ch.entwine.weblounge.common.content.Taggable;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -53,6 +54,29 @@ public interface CacheHandle extends Serializable, Taggable<CacheTag> {
    * @return the creation date
    */
   long getCreationDate();
+
+  /**
+   * Sets the handle's modification date to be maximum of what has been set as
+   * the modification date already and <code>modificationDate</code>.
+   * <p>
+   * Using this method over the course of a request allows everyone to add their
+   * 2 cents to what the modification date should really be and at the end,
+   * {@link #getModificationDate()} will return the most recent date as the
+   * result.
+   * 
+   * @param modificationDate
+   *          the modification date
+   * @return the current modification date
+   */
+  Date setModificationDate(Date modifcationDate);
+
+  /**
+   * Returns the date when the content identified by this handle was last
+   * modified.
+   * 
+   * @return the content's modification date
+   */
+  Date getModificationDate();
 
   /**
    * Returns the time the cached object expires in milliseconds. When that time

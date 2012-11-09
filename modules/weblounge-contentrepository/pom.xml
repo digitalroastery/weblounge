@@ -6,7 +6,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -107,7 +107,25 @@
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>0.19.8</version>
+      <version>0.19.9</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.0.6</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-smile</artifactId>
+      <version>2.0.6</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xerial.snappy</groupId>
+      <artifactId>snappy-java</artifactId>
+      <version>1.0.4.1</version>
     </dependency>
 
     <dependency>
@@ -273,7 +291,6 @@
               !org.mvel2.*,
               !org.yaml.snakeyaml.*,
               !org.jboss.netty.*,
-              !org.codehaus.jackson.*,
               !jsr166e.*,
               !jsr166y,
               !gnu.trove.*,
@@ -298,7 +315,10 @@
               lucene-memory;inline=true,
               lucene-queries;inline=true,
               elasticsearch;inline=true,
-              jna;inline=true  
+              jna;inline=true,
+              jackson-core;inline=true,
+              jackson-dataformat-smile;inline=true,
+              snappy-java;inline=true
             </Embed-Dependency>
             <Private-Package>
               ch.entwine.weblounge.contentrepository.impl.util

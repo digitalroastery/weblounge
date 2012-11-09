@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<page id="4bb19980-8f98-4873-a813-a00000000001" path="/test/host" version="live">
+  <head>
+    <template>default</template>
+    <promote>true</promote>
+    <index>true</index>
+    <metadata>
+      <title language="de"><![CDATA[Seitentitel]]></title>
+      <description language="de"><![CDATA[Beschreibung]]></description>
+      <type><![CDATA[Text]]></type>
+      <coverage language="de"><![CDATA[Zürich]]></coverage>
+      <rights language="de"><![CDATA[Copyright 2009 by T. Wunden]]></rights>
+    </metadata>
+    <created>
+      <user id="hans" realm="testland">Hans Muster</user>
+      <date>2009-01-07T19:05:41Z</date>
+    </created>
+    <published>
+      <user id="hans" realm="testland">Hans Muster</user>
+      <from>2006-05-05T16:58:21Z</from>
+      <to>292278994-08-17T07:12:55Z</to>
+    </published>
+  </head>
+  <body>
+    <composer id="main">
+      <pagelet module="navigation" id="link">
+        <security>
+          <owner>
+            <user id="hans" realm="testland">Hans Muster</user>
+          </owner>
+        </security>
+        <created>
+          <user id="hans" realm="testland">Hans Muster</user>
+          <date>2009-01-07T19:05:41Z</date>
+        </created>
+        <published>
+          <user id="hans" realm="testland">Hans Muster</user>
+          <from>2009-01-07T19:05:41Z</from>
+          <to>292278994-08-17T07:12:55Z</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="hans" realm="testland">Hans Muster</user>
+            <date>2009-01-07T19:05:41Z</date>
+          </modified>
+          <text id="title"><![CDATA[Link]]></text>
+          <text id="description"><![CDATA[Link auf eine andere Seite]]></text>
+        </locale>
+        <properties>
+          <property id="type"><![CDATA[internal]]></property>
+          <property id="resourceid"><![CDATA[4bb19980-8f98-4873-a813-a00000000002]]></property>
+        </properties>
+      </pagelet>
+    </composer>
+  </body>
+</page>

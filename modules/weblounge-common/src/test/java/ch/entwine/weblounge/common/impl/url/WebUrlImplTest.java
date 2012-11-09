@@ -93,6 +93,9 @@ public class WebUrlImplTest {
 
   /** Site url with port */
   protected String siteAddressWithPort = "https://www.test.com:8080";
+  
+  /** Path with all chars allowed in a URL according to RFC2396 - see also http://stackoverflow.com/questions/4669692 */
+  protected String allAllowedCharsPath = "/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789/-_.~!$&*'()+,;=:@%20";
 
   /** Default url path */
   protected String livePath = "/test/";
@@ -184,6 +187,11 @@ public class WebUrlImplTest {
     flavoredVersionedUrl = new WebUrlImpl(siteMock, flavoredVersionedPath);
     localizedVersionedUrl = new WebUrlImpl(siteMock, localizedVersionedPath);
     flavoredLocalizedVersionedUrl = new WebUrlImpl(siteMock, flavoredLocalizedVersionedPath);
+  }
+  
+  @Test
+  public void testAllAllowedChars() {
+    new WebUrlImpl(siteMock, allAllowedCharsPath);
   }
 
   /**

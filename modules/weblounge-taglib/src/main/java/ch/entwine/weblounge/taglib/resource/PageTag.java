@@ -140,6 +140,9 @@ public class PageTag extends WebloungeTag {
     // Add the cache tags to the response
     response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
     response.addTag(CacheTag.Url, page.getURI().getPath());
+    
+    // Adjust the modification time
+    response.setModificationDate(page.getLastModified());
 
     return EVAL_BODY_INCLUDE;
   }

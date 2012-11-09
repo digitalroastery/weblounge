@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -86,7 +87,7 @@ public class ActionTag extends WebloungeTag {
   public void setModule(String module) throws JspTagException {
     Site site = request.getSite();
     this.module = site.getModule(module);
-    if (module == null) {
+    if (this.module == null) {
       String msg = "Module '" + module + "' not found!";
       throw new JspTagException(msg);
     }
@@ -183,7 +184,7 @@ public class ActionTag extends WebloungeTag {
       Iterator<String> pi = parameters.keySet().iterator();
       while (pi.hasNext()) {
         String param = pi.next();
-        String value = StringEscapeUtils.escapeXml(parameters.get(param));
+        String value = URLEncoder.encode(parameters.get(param), "utf-8");
         params.append((params.length() == 0 ? "?" : "&") + param + "=" + value);
       }
 

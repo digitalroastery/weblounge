@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.Taggable;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -112,6 +113,29 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
    * @return <code>true</code> if
    */
   boolean isCached();
+
+  /**
+   * Returns the date when the content returned by this response was last
+   * modified.
+   * 
+   * @return the modification date
+   */
+  Date getModificationDate();
+
+  /**
+   * Sets the handle's modification date to be maximum of what has been set as
+   * the modification date already and <code>modificationDate</code>.
+   * <p>
+   * Using this method over the course of a request allows everyone to add their
+   * 2 cents to what the modification date should really be and at the end,
+   * {@link #getModificationDate()} will return the most recent date as the
+   * result.
+   * 
+   * @param modificationDate
+   *          the modification date
+   * @return the current modification date
+   */
+  Date setModificationDate(Date modificationDate);
 
   /**
    * Returns the maximum valid time.

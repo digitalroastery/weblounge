@@ -11,7 +11,7 @@
 		<webl:element define="title, description">
 			<weblr:page uuid="<%= resourceid %>">
 				<%
-				  String link = pagecontent.getResourceURI().getPath();
+				  String link = pagecontent.getURI().getPath();
 				%>
       			<% anchor = StringUtils.isNotBlank(anchor) ? "#" + anchor : ""; %>
       			<% title = StringUtils.isNotBlank(title) ? title : pagecontent.getTitle(language); %>
@@ -21,7 +21,6 @@
         			<br /><span class="text"><%= description %></span>
         		<% } %>
 				</p>
-				<webl:cachetag name="webl:url" value="<%= link %>"/>
 			</weblr:page>
 		</webl:element>
 	</webl:property>		
