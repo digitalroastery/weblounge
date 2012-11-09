@@ -119,6 +119,9 @@ public class LinkTag extends WebloungeTag {
       // Add cache tag
       response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
       response.addTag(CacheTag.Url, page.getURI().getPath());
+      
+      // Adjust modification date
+      response.setModificationDate(page.getLastModified());
 
       String link = page.getURI().getPath();
 

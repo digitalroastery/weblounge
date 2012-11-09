@@ -202,8 +202,13 @@ public final class TestUtils {
     if (params != null) {
       if (request instanceof HttpGet) {
         List<NameValuePair> qparams = new ArrayList<NameValuePair>();
-        for (String[] param : params)
-          qparams.add(new BasicNameValuePair(param[0], param[1]));
+        if (params.length > 0) {
+          for (String[] param : params) {
+            if (param.length < 2)
+              continue;
+            qparams.add(new BasicNameValuePair(param[0], param[1]));
+          }
+        }
         URI requestURI = request.getURI();
         URI uri = URIUtils.createURI(requestURI.getScheme(), requestURI.getHost(), requestURI.getPort(), requestURI.getPath(), URLEncodedUtils.format(qparams, "utf-8"), null);
         HeaderIterator headerIterator = request.headerIterator();

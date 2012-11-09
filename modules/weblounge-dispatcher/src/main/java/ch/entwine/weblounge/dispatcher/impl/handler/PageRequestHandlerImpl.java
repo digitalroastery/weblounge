@@ -23,11 +23,9 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 import static ch.entwine.weblounge.common.request.RequestFlavor.ANY;
 import static ch.entwine.weblounge.common.request.RequestFlavor.HTML;
 
-import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
@@ -243,7 +241,8 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         }
       }
 
-      // Check the request method. This handler only supports GET, POST and OPTIONS
+      // Check the request method. This handler only supports GET, POST and
+      // OPTIONS
       String requestMethod = request.getMethod().toUpperCase();
       if ("OPTIONS".equals(requestMethod)) {
         String verbs = "OPTIONS, GET, POST";
@@ -334,11 +333,10 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         return true;
       }
 
-      // Add last modified header
-      response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(page).getTime());
-      // Add ETag header
-      String eTag = ResourceUtils.getETagValue(page);
-      response.setHeader("ETag", eTag);
+      // Suggest a last modified data. Note that this may not be the final date
+      // as the page may contain content embedded from other pages that feature
+      // more recent modification dates
+      response.setModificationDate(page.getLastModified());
 
       // Set the content type
       String characterEncoding = response.getCharacterEncoding();
@@ -346,15 +344,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         response.setContentType("text/html; charset=" + characterEncoding.toLowerCase());
       else
         response.setContentType("text/html");
-
-      // Set the Expires header
-      long expires = response.getCacheExpirationTime();
-      if (expires > 0) {
-        expires = System.currentTimeMillis() + expires;
-      } else {
-        expires = System.currentTimeMillis() + Times.MS_PER_MIN;
-      }
-      response.setDateHeader("Expires", expires);
 
       // Add the template's HTML header elements to the response if it's not
       // only used in editing mode

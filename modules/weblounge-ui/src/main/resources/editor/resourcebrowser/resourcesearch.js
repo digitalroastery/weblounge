@@ -34,12 +34,12 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key', 'jquery/controller', 'jque
 						// Save the uploaded file for Tagging not used now
 						this.map[id] = {resourceId: response.url.substring(response.url.lastIndexOf('/') + 1), eTag: response.eTag};
 						
-						var pendingCircle = this.element.parent().parent().find("div#wbl-pendingCircle");
+						var pendingCircle = this.element.parent().parent().find("#pending-batch");
 						var count = parseInt(pendingCircle.html());
 						if(isNaN(count)) count = 0;
 						pendingCircle.html(++count).fadeIn();
 						var listItem = $(this.element.find('ul.qq-upload-list li#' + id));
-						listItem.effect("transfer", { to: this.element.parent().parent().find("div#wbl-pendingCircle") }, 1000);
+						listItem.effect("transfer", { to: this.element.parent().parent().find("#pending-batch") }, 1000);
 						listItem.delay(5000).fadeOut(400, function() {
 						    $(this).remove();
 						});

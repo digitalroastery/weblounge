@@ -1,10 +1,12 @@
 /* mini-rest & general declarations */
 #weblounge-editor {
-   	font-family: arial,verdana,tahoma;
+  font-family: arial,verdana,tahoma;
 	font-size: 12px;
 	display: block;
 	height: 35px;
 }
+
+.hidden { display: none }
 
 /* global */
 div.DataTables_sort_wrapper span {
@@ -12,17 +14,15 @@ div.DataTables_sort_wrapper span {
 }
 
 .ui-effects-transfer {  /* style the transfer element */
-    border: red 2px solid;
-    border-radius: 999px;
-    z-index: 9999;
+  border: red 2px solid;
+  border-radius: 999px;
+  z-index: 9999;
 }
 
 /* general dialog declarations */
 #wbl-pageleteditor input[type=text],
 #wbl-pageleteditor textarea {
-    width: 100%;
-    border: 1px solid #999;
-    padding: 2px;
+  border: 1px solid #999;
 }
 
 #wbl-pageleteditor h2 {
@@ -46,10 +46,10 @@ div.DataTables_sort_wrapper span {
 	margin-left: 30px;
 }
 
-#wbl-pageleteditor span.editor-sample {
-	font-style: italic;
+#wbl-pageleteditor span.editor-sample { 
 	font-size: 10px;
-	color: blue;
+	color: #666;
+	display: block;
 }
 
 #wbl-pageleteditor p {
@@ -75,4 +75,61 @@ div.DataTables_sort_wrapper span {
 
 #wbl-pageleteditor form ul li {
 	margin-left: 0;
+}
+
+
+
+/* Horizontal form in pagelet-dialogs */
+#wbl-pageleteditor .ui-dialog-content {
+  padding: 1em;
+  cursor: auto;
+}
+#wbl-pageleteditor .control-group:after {
+    clear: both;
+}
+#wbl-pageleteditor .control-group:before, 
+#wbl-pageleteditor .control-group:after {
+    content: "";
+    display: table;
+    line-height: 0;
+}
+#wbl-pageleteditor .control-group {
+    margin-bottom: 15px;
+}
+#wbl-pageleteditor .control-group label {
+  float: left;
+  padding-top: 2px;
+  text-align: right;
+  width: 160px;
+}
+#wbl-pageleteditor .control-grou.select label {
+  padding-top: 0;
+}
+#wbl-pageleteditor .control-group.select {
+  margin-bottom: 10px;
+}
+#wbl-pageleteditor .controls {
+  margin-left: 175px;
+}
+#wbl-pageleteditor .controls input[type="text"],
+#wbl-pageleteditor .controls textarea {
+  margin-bottom: 0;
+  width: 95%;
+}
+#wbl-pageleteditor .control-group-select .controls {
+  padding-top: 2px;
+}
+#wbl-pageleteditor legend + .control-group {
+    margin-top: 15px;
+}
+#wbl-pageleteditor label select {
+  width: auto;
+}
+
+#wbl-pageleteditor ul.nav-tabs {
+  margin: 5px 0 15px;
+  padding: 0;
+}
+#wbl-pageleteditor p.desc {
+  font-size: 10px;
 }

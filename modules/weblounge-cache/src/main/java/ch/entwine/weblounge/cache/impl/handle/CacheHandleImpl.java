@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -47,6 +48,9 @@ public class CacheHandleImpl implements CacheHandle {
 
   /** Date where the handle was created */
   private long creationDate = System.currentTimeMillis();
+
+  /** Date where the content associated with this handle was last modified */
+  private Date modificationDate = new Date(0);
 
   /** The expiration time of the cached object. */
   protected long expirationTime = Times.MS_PER_SECOND;
@@ -114,6 +118,27 @@ public class CacheHandleImpl implements CacheHandle {
    */
   public long getCreationDate() {
     return creationDate;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.CacheHandle#setModificationDate(Date)
+   */
+  @Override
+  public Date setModificationDate(Date modificationDate) {
+    this.modificationDate = modificationDate.after(this.modificationDate) ? modificationDate : this.modificationDate;
+    return this.modificationDate;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.CacheHandle#getModificationDate()
+   */
+  @Override
+  public Date getModificationDate() {
+    return modificationDate.getTime() > 0 ? modificationDate : new Date();
   }
 
   /**

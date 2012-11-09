@@ -1082,7 +1082,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Create the response
     ResponseBuilder response = Response.ok();
     response.tag(ResourceUtils.getETagValue(workPage));
-    response.lastModified(workPage.getModificationDate());
+    response.lastModified(workPage.getLastModified());
     return response.build();
   }
 
@@ -1205,6 +1205,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the optional publishing start date
    * @param endDateText
    *          the optional publishing end date
+   * @param modified
+   *          <code>true</code> to update the page's modified date
    * @param asynchronous
    *          <code>true</code> to prevent blocking while the page is being
    *          published
@@ -1217,6 +1219,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       @FormParam("startdate") String startDateText,
       @FormParam("enddate") String endDateText,
       @HeaderParam("If-Match") String ifMatchHeader,
+      @FormParam("modified") boolean setModified,
       @FormParam("asynchronous") boolean asynchronous) {
 
     // Check the parameters
@@ -1335,6 +1338,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       PageReader reader = new PageReader();
       Page livePage = reader.read(IOUtils.toInputStream(workPage.toXml(), "utf-8"), site);
       livePage.setVersion(Resource.LIVE);
+      if (setModified)
+        livePage.setModified(user, new Date());
       if (!livePage.isPublished())
         livePage.setPublished(user, startDate, endDate);
       contentRepository.putAsynchronously(livePage);
@@ -1363,7 +1368,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Create the response
     ResponseBuilder response = Response.ok();
     response.tag(ResourceUtils.getETagValue(workPage));
-    response.lastModified(workPage.getModificationDate());
+    response.lastModified(workPage.getLastModified());
     return response.build();
   }
 

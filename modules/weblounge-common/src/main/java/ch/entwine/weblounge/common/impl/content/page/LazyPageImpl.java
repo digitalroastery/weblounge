@@ -1076,6 +1076,22 @@ public class LazyPageImpl implements Page {
       loadPageHeader();
     return page.getModificationDate();
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.Modifiable#getLastModified()
+   */
+  @Override
+  public Date getLastModified() {
+    Date date = getModificationDate();
+    if (date != null)
+      return date;
+    date = getPublishFrom();
+    if (date != null)
+      return date;
+    return getCreationDate();
+  }
 
   /**
    * {@inheritDoc}
@@ -1088,6 +1104,22 @@ public class LazyPageImpl implements Page {
     return page.getModifier();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.Modifiable#getLastModifier()
+   */
+  @Override
+  public User getLastModifier() {
+    User user = getModifier();
+    if (user != null)
+      return user;
+    user = getPublisher();
+    if (user != null)
+      return user;
+    return getCreator();
+  }
+  
   /**
    * {@inheritDoc}
    * 

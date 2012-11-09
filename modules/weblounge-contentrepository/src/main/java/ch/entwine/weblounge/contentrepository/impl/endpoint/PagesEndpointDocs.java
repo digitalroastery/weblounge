@@ -264,6 +264,7 @@ public final class PagesEndpointDocs {
     publishPageEndpoint.addOptionalParameter(new Parameter("startdate", Parameter.Type.String, "The start of the publishing period"));
     publishPageEndpoint.addOptionalParameter(new Parameter("enddate", Parameter.Type.String, "The end of the publishing period"));
     publishPageEndpoint.addOptionalParameter(new Parameter("asynchronous", Parameter.Type.Boolean, "Whether the call is non-blocking", "false"));
+    publishPageEndpoint.addOptionalParameter(new Parameter("modified", Parameter.Type.Boolean, "Whether the modification date should be set to match the publishing date", "false"));
     publishPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, publishPageEndpoint);
 

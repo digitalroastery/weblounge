@@ -85,9 +85,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** Name of the weblounge cache header */
   private static final String CACHE_KEY_HEADER = "X-Cache-Key";
 
-  /** Name of the weblounge cache tags header */
-  private static final String CACHE_TAGS_HEADER = "X-Cache-Tags";
-
   /** Configuration key prefix for content repository configuration */
   public static final String OPT_PREFIX = "cache";
 
@@ -355,6 +352,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
+  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
@@ -536,8 +534,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *      ch.entwine.weblounge.common.request.WebloungeResponse, long, long)
    */
   public CacheHandle startResponse(CacheTag[] uniqueTags,
-      WebloungeRequest request, WebloungeResponse response, long expirationTime,
-      long revalidationTime) {
+      WebloungeRequest request, WebloungeResponse response,
+      long expirationTime, long revalidationTime) {
     CacheHandle hdl = new TaggedCacheHandle(uniqueTags, expirationTime, revalidationTime);
     return startResponse(hdl, request, response);
   }
@@ -578,6 +576,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // Try to load the content from the cache
     Element element = cache.get(new CacheEntryKey(handle.getKey()));
 
+    // Is the element already beyond its lifetime?
     if (element != null) {
       long expirationTime = element.getExpirationTime();
       if (expirationTime < System.currentTimeMillis()) {
@@ -663,32 +662,21 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   private void writeCacheEntry(Element element, CacheHandle handle,
       WebloungeRequest request, WebloungeResponse response) throws IOException {
     CacheEntry entry = (CacheEntry) element.getValue();
-    CacheEntryKey key = (CacheEntryKey) element.getKey();
 
+    // Check what the client has available locally
     long clientCacheDate = request.getDateHeader("If-Modified-Since");
-    long expirationDate = System.currentTimeMillis() + entry.getClientRevalidationTime();
-
-    long revalidationTimeInSeconds = entry.getClientRevalidationTime() / 1000;
     String eTag = request.getHeader("If-None-Match");
-
+    
+    // Do we have a more recent version?
     boolean isModified = !entry.notModified(clientCacheDate) && !entry.matches(eTag);
 
     // Write the response headers
     if (isModified) {
       entry.getHeaders().apply(response);
-      response.setHeader("Cache-Control", "private, max-age=" + revalidationTimeInSeconds + ", must-revalidate");
-      response.setContentType(entry.getContentType());
-      response.setCharacterEncoding(entry.getEncoding());
-      response.setContentLength(entry.getContent().length);
+      writeContentHeaders(response, entry);
     }
 
-    // Set the current date
-    response.setDateHeader("Date", System.currentTimeMillis());
-
-    // This header must be set, otherwise it defaults to
-    // "Thu, 01-Jan-1970 00:00:00 GMT"
-    response.setDateHeader("Expires", expirationDate);
-    response.setHeader("ETag", entry.getETag());
+    writeCacheHeaders(response, entry, isModified);
 
     // Add the X-Cache-Key header
     if (debug || request.getHeader(CACHE_DEBUG_HEADER) != null) {
@@ -706,6 +694,56 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     }
 
     response.flushBuffer();
+  }
+
+  /**
+   * Writes the headers that are relevant for proper content handling based on
+   * the cache entry.
+   * 
+   * @param response
+   *          the response
+   * @param entry
+   *          the cache entry
+   */
+  private void writeContentHeaders(WebloungeResponse response, CacheEntry entry) {
+    response.setContentType(entry.getContentType());
+    response.setCharacterEncoding(entry.getEncoding());
+    response.setContentLength(entry.getContent().length);
+  }
+
+  /**
+   * Writes the headers that are relevant for proper caching based on the cache
+   * entry.
+   * 
+   * @param response
+   *          the response
+   * @param entry
+   *          the cache entry
+   * @param isModified
+   *          <code>true</code> if the client asked for the content only if the
+   *          content is more recent that what was cached locally
+   */
+  private void writeCacheHeaders(WebloungeResponse response, CacheEntry entry,
+      boolean isModified) {
+    long expirationDate = System.currentTimeMillis() + entry.getClientRevalidationTime();
+    long revalidationTimeInSeconds = entry.getClientRevalidationTime() / 1000;
+
+    // Send the cache directive
+    if (isModified)
+      response.setHeader("Cache-Control", "private, max-age=" + revalidationTimeInSeconds + ", must-revalidate");
+
+    // Set the current date
+    response.setDateHeader("Date", System.currentTimeMillis());
+
+    // This header must be set, otherwise it defaults to
+    // "Thu, 01-Jan-1970 00:00:00 GMT"
+    response.setDateHeader("Expires", expirationDate);
+
+    // ETag and Last-Modified
+    response.setHeader("ETag", entry.getETag());
+    
+    if (isModified)
+      response.setDateHeader("Last-Modified", entry.getModificationDate());
   }
 
   /**
@@ -758,27 +796,16 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         element.setTimeToLive((int) (cacheHdl.getCacheExpirationTime() / 1000));
         cache.put(element);
 
-        // Write cache relevant headers
-        long expirationDate = System.currentTimeMillis() + entry.getClientRevalidationTime();
-        long revalidationTimeInSeconds = entry.getClientRevalidationTime() / 1000;
-
-        // Send the cache directive
-        response.setHeader("Cache-Control", "private, max-age=" + revalidationTimeInSeconds + ", must-revalidate");
-
-        // Set the current date
-        response.setDateHeader("Date", System.currentTimeMillis());
-
-        // This header must be set, otherwise it defaults to
-        // "Thu, 01-Jan-1970 00:00:00 GMT"
-        response.setDateHeader("Expires", expirationDate);
-        response.setHeader("ETag", entry.getETag());
+        // Write cache and content relevant headers
+        writeCacheHeaders(response, entry, true);
+        writeContentHeaders(response, entry);
 
         // Inform listeners
         for (CacheListener listener : cacheListeners) {
           listener.cacheEntryAdded(cacheHdl);
         }
       } else if (tx.isValid() && response.isValid()) {
-        logger.trace("Skip caching of response for {} to the cache: {}", response, response.getStatus());
+        logger.trace("Skip caching of response for {}: {}", response, response.getStatus());
         response.setDateHeader("Expires", System.currentTimeMillis() + tx.getHandle().getCacheExpirationTime());
       } else {
         logger.debug("Response to {} was invalid and is not being cached", response);

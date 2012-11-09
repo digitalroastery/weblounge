@@ -184,7 +184,7 @@ public final class ResourceUtils {
    */
   public static boolean hasChanged(HttpServletRequest request,
       Resource<?> resource, ImageStyle style, Language language)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
       return isModified(request, resource, language);
     } else if (request.getHeader("If-None-Match") != null) {
@@ -383,13 +383,9 @@ public final class ResourceUtils {
         return content.getCreationDate();
     }
 
-    // The resource's modified date is the last resort
-    Date modificationDate = resource.getModificationDate();
-    if (modificationDate != null)
-      return modificationDate;
-
-    // If nothing else helps, return the creation date
-    return resource.getCreationDate();
+    // The resource's modified date is the last resort. If nothing else helps,
+    // return the creation date.
+    return resource.getLastModified();
   }
 
   /**
