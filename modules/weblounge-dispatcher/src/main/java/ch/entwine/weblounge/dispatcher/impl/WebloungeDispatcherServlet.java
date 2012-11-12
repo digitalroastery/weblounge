@@ -334,7 +334,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     response.setResponseCache(cache);
     response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
     response.setHeader("X-Powered-By", POWERED_BY);
-    response.setHeader("Cache-Control", "private");
     response.setDateHeader("Date", Calendar.getInstance().getTimeInMillis());
 
     // Notify listeners about starting request
