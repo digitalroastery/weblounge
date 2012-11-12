@@ -20,7 +20,8 @@
 
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
-import ch.entwine.weblounge.common.Times;
+import static ch.entwine.weblounge.common.Times.MS_PER_DAY;
+
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
@@ -267,8 +268,11 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     }
 
     // Check the modified headers
+    long revalidationTime = MS_PER_DAY;
+    long expirationDate = System.currentTimeMillis() + revalidationTime;
     if (!ResourceUtils.hasChanged(request, imageResource, style, language)) {
       logger.debug("Image {} was not modified", imageURI);
+      response.setDateHeader("Expires", expirationDate);
       DispatchUtils.sendNotModified(request, response);
       return true;
     }
@@ -288,12 +292,15 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       response.setContentType(contentType + "; charset=" + characterEncoding.toLowerCase());
     else
       response.setContentType(contentType);
+    
+    // Browser caches and proxies are allowed to keep a copy
+    response.setHeader("Cache-Control", "public, max-age=" + revalidationTime);
 
     // Add last modified header
     response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource, language).getTime());
 
     // Set Expires header
-    response.setDateHeader("Expires", System.currentTimeMillis() + Times.MS_PER_HOUR);
+    response.setDateHeader("Expires", expirationDate);
 
     // Add ETag header
     response.setHeader("ETag", ResourceUtils.getETagValue(imageResource, style));
