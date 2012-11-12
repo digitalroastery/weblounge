@@ -110,7 +110,8 @@ public class ResourceTag extends WebloungeTag {
     } else if (StringUtils.isNotBlank(resourcePath)) {
       uri = new GeneralResourceURIImpl(site, resourcePath);
     } else {
-      throw new JspException("Neither uuid nor path were specified for resource");
+      logger.warn("Neither uuid nor path were specified for resource");
+      return SKIP_BODY;
     }
 
     // Try to load the resource from the content repository
