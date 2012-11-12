@@ -67,7 +67,7 @@ steal.plugins(
 			    $("<img>", {
 			        src: url,
 			        error: function() { steal.dev.log('Weblounge is not connected to the internet. Loading default user imgage.') },
-			        load: function() { $('.wbl-profileMenu img.wbl-user').attr('src', url + '?d=mm'); }
+			        load: function() { steal.dev.log('User ' + UserEmail + ' is loading'); $('.wbl-profileMenu img.wbl-user').attr('src', url + '?d=mm'); }
 			    });
 			}
 			IsValidImageUrl(ImageUrl);
