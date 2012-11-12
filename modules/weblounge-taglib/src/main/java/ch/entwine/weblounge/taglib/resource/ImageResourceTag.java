@@ -189,11 +189,11 @@ public class ImageResourceTag extends WebloungeTag {
       try {
         result = repository.find(query);
       } catch (ContentRepositoryException e) {
-        logger.warn("Error searching for image with given subjects.");
+        logger.warn("Error searching for image with given subjects: {}", e.getMessage());
         return SKIP_BODY;
       }
       if (result.getHitCount() > 1)
-        logger.debug("Search returned {} images for subjects '{}'. Will take no. 1 for further processing.", result.getHitCount(), StringUtils.join(imageSubjects, ", "));
+        logger.warn("Search returned {} images for subjects '{}'. Will take no. 1 for further processing.", result.getHitCount(), StringUtils.join(imageSubjects, ", "));
       if (result.getHitCount() > 0)
         uri = new ImageResourceURIImpl(site, null, result.getItems()[0].getId());
     }
@@ -201,8 +201,10 @@ public class ImageResourceTag extends WebloungeTag {
       uri = new ImageResourceURIImpl(site, null, altImageId);
     if (uri == null && StringUtils.isNotBlank(altImagePath))
       uri = new ImageResourceURIImpl(site, altImagePath, null);
-    if (uri == null)
-      throw new JspException("None of the several possibilities returned a valid image");
+    if (uri == null) {
+      logger.debug("None of the several possibilities returned a valid image");
+      return SKIP_BODY;
+    }
 
     // Try to load the image from the content repository
     try {
