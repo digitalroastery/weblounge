@@ -341,7 +341,7 @@ public final class ResourceUtils {
     if (style != null)
       etag += style.getIdentifier().hashCode();
     etag += getModificationDate(resource, null).getTime();
-    return new StringBuffer().append("\"").append(etag).append("\"").toString();
+    return new StringBuffer().append("\"").append("WL-" + etag).append("\"").toString();
   }
 
   /**
