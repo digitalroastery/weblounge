@@ -1013,7 +1013,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       t.setPriority(Thread.MIN_PRIORITY);
       t.setDaemon(true);
 
-      logger.info("Creating preview of {}", uri);
+      logger.debug("Creating preview of {}", uri);
       t.start();
     }
   }
