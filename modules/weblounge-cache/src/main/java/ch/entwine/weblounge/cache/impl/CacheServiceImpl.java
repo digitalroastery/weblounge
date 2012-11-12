@@ -728,9 +728,12 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     long expirationDate = System.currentTimeMillis() + entry.getClientRevalidationTime();
     long revalidationTimeInSeconds = entry.getClientRevalidationTime() / 1000;
 
-    // Send the cache directive
-    if (isModified)
+    // Send Cache directives, ETag and Last-Modified
+    if (isModified) {
       response.setHeader("Cache-Control", "private, max-age=" + revalidationTimeInSeconds + ", must-revalidate");
+      response.setHeader("ETag", entry.getETag());
+      response.setDateHeader("Last-Modified", entry.getModificationDate());
+    }
 
     // Set the current date
     response.setDateHeader("Date", System.currentTimeMillis());
@@ -738,12 +741,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // This header must be set, otherwise it defaults to
     // "Thu, 01-Jan-1970 00:00:00 GMT"
     response.setDateHeader("Expires", expirationDate);
-
-    // ETag and Last-Modified
-    response.setHeader("ETag", entry.getETag());
-    
-    if (isModified)
-      response.setDateHeader("Last-Modified", entry.getModificationDate());
   }
 
   /**
