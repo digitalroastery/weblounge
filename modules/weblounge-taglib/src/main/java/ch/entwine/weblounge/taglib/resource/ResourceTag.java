@@ -110,7 +110,7 @@ public class ResourceTag extends WebloungeTag {
     } else if (StringUtils.isNotBlank(resourcePath)) {
       uri = new GeneralResourceURIImpl(site, resourcePath);
     } else {
-      logger.warn("Neither uuid nor path were specified for resource");
+      logger.warn("Neither uuid nor path were specified for resource on {}", request.getUrl());
       return SKIP_BODY;
     }
 
