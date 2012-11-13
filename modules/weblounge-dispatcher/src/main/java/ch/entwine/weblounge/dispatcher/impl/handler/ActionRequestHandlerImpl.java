@@ -172,13 +172,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       } else if (request.getVersion() == Resource.WORK) {
         response.setCacheExpirationTime(0);
       }
-      
-      // This is not the nicest solution ever, but there needs to be someone who decides
-      // what the output created by an action should be using as its modification date
-      // Doing it this way will result in If-Modified-Since queries being answered 
-      // inaccurately, but at least content is being served from the cache as long as
-      // it is within its lifetime (valid time).
-      response.setModificationDate(new Date());
 
       logger.debug("Action {} will handle {}", action, url);
 
@@ -294,9 +287,20 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         ((HTMLAction) action).setTemplate(template);
       }
 
-      // Have the action validate the request
+      // Store the response's current modification date
+      Date initialModificationDate = response.getModificationDate();
+      
+      // Set an appropriate content type
       response.setContentType("text/html");
+      
+      // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.HTML);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly.
+      if (initialModificationDate.equals(response.getModificationDate())) {
+        response.setModificationDate(new Date());
+      }
 
       // Store values that may have been updated by the action during
       // configure()
@@ -361,8 +365,23 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   private void serveXML(Action action, WebloungeRequest request,
       WebloungeResponse response) {
     try {
+      
+      // Store the response's current modification date
+      Date initialModificationDate = response.getModificationDate();
+      
+      // Set an appropriate content type
       response.setContentType("text/xml");
+      
+      // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.XML);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly.
+      if (initialModificationDate.equals(response.getModificationDate())) {
+        response.setModificationDate(new Date());
+      }
+
+      // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         if (action instanceof XMLAction) {
           ((XMLAction) action).startXML(request, response);
@@ -398,8 +417,23 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   private void serveJSON(Action action, WebloungeRequest request,
       WebloungeResponse response) {
     try {
+
+      // Store the response's current modification date
+      Date initialModificationDate = response.getModificationDate();
+      
+      // Set an appropriate content type
       response.setContentType("text/json");
+      
+      // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.JSON);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly.
+      if (initialModificationDate.equals(response.getModificationDate())) {
+        response.setModificationDate(new Date());
+      }
+
+      // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         if (action instanceof JSONAction) {
           ((JSONAction) action).startJSON(request, response);
