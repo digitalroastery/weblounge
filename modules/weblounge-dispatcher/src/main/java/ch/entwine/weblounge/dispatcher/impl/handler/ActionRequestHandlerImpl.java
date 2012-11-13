@@ -60,7 +60,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -287,9 +286,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         ((HTMLAction) action).setTemplate(template);
       }
 
-      // Store the response's current modification date
-      Date initialModificationDate = response.getModificationDate();
-      
       // Set an appropriate content type
       response.setContentType("text/html");
       
@@ -297,10 +293,10 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       action.configure(request, response, RequestFlavor.HTML);
       
       // See if the action cares about the response's modification date. If not,
-      // we do, even though we don't know exactly.
-      if (initialModificationDate.equals(response.getModificationDate())) {
-        response.setModificationDate(new Date());
-      }
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
 
       // Store values that may have been updated by the action during
       // configure()
@@ -366,9 +362,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       WebloungeResponse response) {
     try {
       
-      // Store the response's current modification date
-      Date initialModificationDate = response.getModificationDate();
-      
       // Set an appropriate content type
       response.setContentType("text/xml");
       
@@ -376,10 +369,10 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       action.configure(request, response, RequestFlavor.XML);
       
       // See if the action cares about the response's modification date. If not,
-      // we do, even though we don't know exactly.
-      if (initialModificationDate.equals(response.getModificationDate())) {
-        response.setModificationDate(new Date());
-      }
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
 
       // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
@@ -418,9 +411,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       WebloungeResponse response) {
     try {
 
-      // Store the response's current modification date
-      Date initialModificationDate = response.getModificationDate();
-      
       // Set an appropriate content type
       response.setContentType("text/json");
       
@@ -428,10 +418,10 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       action.configure(request, response, RequestFlavor.JSON);
       
       // See if the action cares about the response's modification date. If not,
-      // we do, even though we don't know exactly.
-      if (initialModificationDate.equals(response.getModificationDate())) {
-        response.setModificationDate(new Date());
-      }
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
 
       // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
@@ -473,6 +463,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       WebloungeResponse response) {
     try {
       action.configure(request, response, RequestFlavor.ANY);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
+
       action.startResponse(request, response);
     } catch (EOFException e) {
       logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
