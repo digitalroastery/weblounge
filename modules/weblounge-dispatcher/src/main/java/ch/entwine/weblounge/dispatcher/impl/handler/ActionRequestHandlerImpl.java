@@ -60,6 +60,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -171,6 +172,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       } else if (request.getVersion() == Resource.WORK) {
         response.setCacheExpirationTime(0);
       }
+      
+      // This is not the nicest solution ever, but there needs to be someone who decides
+      // what the output created by an action should be using as its modification date
+      // Doing it this way will result in If-Modified-Since queries being answered 
+      // inaccurately, but at least content is being served from the cache as long as
+      // it is within its lifetime (valid time).
+      response.setModificationDate(new Date());
 
       logger.debug("Action {} will handle {}", action, url);
 
