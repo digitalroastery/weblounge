@@ -230,6 +230,10 @@ public class ImageResourceTag extends WebloungeTag {
     // Load the content
     try {
       image = (ImageResource) repository.get(uri);
+      if (image == null) {
+        logger.warn("Non existing image {} requested on {}", uri, request.getUrl());
+        return SKIP_BODY;
+      }
       image.switchTo(language);
 
       Language contentLanguage = null;
