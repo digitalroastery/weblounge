@@ -3,7 +3,7 @@
   xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
 
   <enable>true</enable>
-  <name>Testmodul</name>
+  <name>Testmodule</name>
 
   <pagelets>
     <pagelet id="content" composeable="false">

@@ -286,9 +286,17 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         ((HTMLAction) action).setTemplate(template);
       }
 
-      // Have the action validate the request
+      // Set an appropriate content type
       response.setContentType("text/html");
+      
+      // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.HTML);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
 
       // Store values that may have been updated by the action during
       // configure()
@@ -353,8 +361,20 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   private void serveXML(Action action, WebloungeRequest request,
       WebloungeResponse response) {
     try {
+      
+      // Set an appropriate content type
       response.setContentType("text/xml");
+      
+      // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.XML);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
+
+      // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         if (action instanceof XMLAction) {
           ((XMLAction) action).startXML(request, response);
@@ -390,8 +410,20 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   private void serveJSON(Action action, WebloungeRequest request,
       WebloungeResponse response) {
     try {
+
+      // Set an appropriate content type
       response.setContentType("text/json");
+      
+      // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.JSON);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
+
+      // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         if (action instanceof JSONAction) {
           ((JSONAction) action).startJSON(request, response);
@@ -431,6 +463,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       WebloungeResponse response) {
     try {
       action.configure(request, response, RequestFlavor.ANY);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
+
       action.startResponse(request, response);
     } catch (EOFException e) {
       logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());

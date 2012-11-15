@@ -31,7 +31,6 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -278,10 +277,9 @@ public final class CacheEntry implements Serializable {
    * @return the date without the milliseconds
    */
   private long getTimeWithoutMilliseconds(Date date) {
-    Calendar c = Calendar.getInstance();
-    c.setTime(date);
-    c.set(Calendar.MILLISECOND, 0);
-    return c.getTimeInMillis();
+    long millis = date.getTime() / 1000;
+    millis *= 1000;
+    return millis;
   }
 
   /**
