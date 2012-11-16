@@ -20,7 +20,6 @@
 
 package ch.entwine.weblounge.common.content;
 
-import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;
@@ -138,7 +137,7 @@ public final class ResourceUtils {
    */
   public static boolean hasChanged(HttpServletRequest request,
       Resource<?> resource) throws IllegalArgumentException {
-    return hasChanged(request, resource, null, null);
+    return hasChanged(request, resource, null);
   }
 
   /**
@@ -160,7 +159,37 @@ public final class ResourceUtils {
    */
   public static boolean hasChanged(HttpServletRequest request,
       Resource<?> resource, Language language) throws IllegalArgumentException {
-    return hasChanged(request, resource, null, language);
+    if (request.getHeader("If-Modified-Since") != null) {
+      return isModified(request, resource, language);
+    } else if (request.getHeader("If-None-Match") != null) {
+      return isMismatch(request, getETagValue(resource));
+    }
+    return true;
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * 
+   * @param request
+   *          the client request
+   * @param date
+   *          the date
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean hasChanged(HttpServletRequest request, long date)
+      throws IllegalArgumentException {
+    if (request.getHeader("If-Modified-Since") != null) {
+      return isModified(request, date);
+    } else if (request.getHeader("If-None-Match") != null) {
+      return isMismatch(request, getETagValue(date));
+    }
+    return true;
   }
 
   /**
@@ -182,16 +211,16 @@ public final class ResourceUtils {
    *           if the <code>If-Modified-Since</code> header cannot be converted
    *           to a date.
    */
-  public static boolean hasChanged(HttpServletRequest request,
-      Resource<?> resource, ImageStyle style, Language language)
-      throws IllegalArgumentException {
-    if (request.getHeader("If-Modified-Since") != null) {
-      return isModified(request, resource, language);
-    } else if (request.getHeader("If-None-Match") != null) {
-      return isMismatch(request, resource, style);
-    }
-    return true;
-  }
+  // public static boolean hasChanged(HttpServletRequest request,
+  // Resource<?> resource, ImageStyle style, Language language)
+  // throws IllegalArgumentException {
+  // if (request.getHeader("If-Modified-Since") != null) {
+  // return isModified(request, resource, language);
+  // } else if (request.getHeader("If-None-Match") != null) {
+  // return isMismatch(request, resource, style);
+  // }
+  // return true;
+  // }
 
   /**
    * Returns <code>true</code> if the resource either is more recent than the
@@ -210,16 +239,7 @@ public final class ResourceUtils {
    */
   public static boolean isModified(HttpServletRequest request,
       Resource<?> resource) throws IllegalArgumentException {
-    if (request.getHeader("If-Modified-Since") != null) {
-      try {
-        long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-        long resourceModificationDate = getModificationDate(resource, null).getTime();
-        return cachedModificationDate < resourceModificationDate;
-      } catch (IllegalArgumentException e) {
-        logger.debug("Client sent malformed 'If-Modified-Since' header: {}");
-      }
-    }
-    return true;
+    return isModified(request, getModificationDate(resource, null).getTime());
   }
 
   /**
@@ -241,11 +261,30 @@ public final class ResourceUtils {
    */
   public static boolean isModified(HttpServletRequest request,
       Resource<?> resource, Language language) throws IllegalArgumentException {
+    return isModified(request, getModificationDate(resource, language).getTime());
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * 
+   * @param request
+   *          the client request
+   * @param date
+   *          the date
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean isModified(HttpServletRequest request, long date)
+      throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
       try {
         long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-        long resourceModificationDate = getModificationDate(resource, language).getTime();
-        return cachedModificationDate < resourceModificationDate;
+        return cachedModificationDate < date;
       } catch (IllegalArgumentException e) {
         logger.debug("Client sent malformed 'If-Modified-Since' header: {}");
       }
@@ -274,14 +313,14 @@ public final class ResourceUtils {
    *           if the <code>If-Modified-Since</code> cannot be converted to a
    *           date.
    */
-  public static boolean isMismatch(HttpServletRequest request,
-      Resource<?> resource, ImageStyle style) throws IllegalArgumentException {
-    String eTagHeader = request.getHeader("If-None-Match");
-    if (StringUtils.isBlank(eTagHeader))
-      return true;
-    String eTag = getETagValue(resource, style);
-    return !eTagHeader.equals(eTag);
-  }
+  // public static boolean isMismatch(HttpServletRequest request,
+  // Resource<?> resource, ImageStyle style) throws IllegalArgumentException {
+  // String eTagHeader = request.getHeader("If-None-Match");
+  // if (StringUtils.isBlank(eTagHeader))
+  // return true;
+  // String eTag = getETagValue(resource, style);
+  // return !eTagHeader.equals(eTag);
+  // }
 
   /**
    * Returns <code>true</code> if the resource has not been modified according
@@ -322,26 +361,35 @@ public final class ResourceUtils {
    * @return the <code>ETag</code> value
    */
   public static String getETagValue(Resource<?> resource) {
-    return getETagValue(resource, null);
+    long etag = resource.getIdentifier().hashCode();
+    etag += getModificationDate(resource, null).getTime();
+    return new StringBuffer().append("\"").append("WL-" + etag).append("\"").toString();
   }
 
   /**
    * Returns the value for the <code>ETag</code> header field, which is
-   * calculated from the resource identifier and the resource's modification
-   * date.
+   * calculated from the given modification date.
    * 
-   * @param resource
-   *          the resource
-   * @param style
-   *          the image style
+   * @param date
+   *          the modification date
    * @return the <code>ETag</code> value
    */
-  public static String getETagValue(Resource<?> resource, ImageStyle style) {
-    long etag = resource.getIdentifier().hashCode();
-    if (style != null)
-      etag += style.getIdentifier().hashCode();
-    etag += getModificationDate(resource, null).getTime();
-    return new StringBuffer().append("\"").append("WL-" + etag).append("\"").toString();
+  public static String getETagValue(Date date) {
+    if (date == null)
+      throw new IllegalArgumentException("Date must not be null");
+    return getETagValue(date.getTime());
+  }
+
+  /**
+   * Returns the value for the <code>ETag</code> header field, which is
+   * calculated from the given modification date.
+   * 
+   * @param date
+   *          the date in milliseconds
+   * @return the <code>ETag</code> value
+   */
+  public static String getETagValue(long date) {
+    return new StringBuffer().append("\"").append("WL-" + date).append("\"").toString();
   }
 
   /**
