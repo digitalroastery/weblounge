@@ -147,7 +147,7 @@ public class ResourceTag extends WebloungeTag {
       if (resourceContent == null)
         resourceContent = resource.getOriginalContent();
     } catch (ContentRepositoryException e) {
-      logger.warn("Error trying to load resource " + uri + ": " + e.getMessage(), e);
+      logger.warn("Error trying to load resource {}: {}", uri, e.getMessage());
       return SKIP_BODY;
     }
 

@@ -189,7 +189,7 @@ public class ImageResourceTag extends WebloungeTag {
       try {
         result = repository.find(query);
       } catch (ContentRepositoryException e) {
-        logger.warn("Error searching for image with given subjects: {}", e.getMessage());
+        logger.warn("Error searching for image with given subjects ({}): {}", StringUtils.join(imageSubjects, ", "), e.getMessage());
         return SKIP_BODY;
       }
       if (result.getHitCount() > 1)
@@ -230,6 +230,10 @@ public class ImageResourceTag extends WebloungeTag {
     // Load the content
     try {
       image = (ImageResource) repository.get(uri);
+      if (image == null) {
+        logger.warn("Non existing image {} requested on {}", uri, request.getUrl());
+        return SKIP_BODY;
+      }
       image.switchTo(language);
 
       Language contentLanguage = null;

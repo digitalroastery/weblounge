@@ -721,7 +721,7 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
       return;
     }
     
-    logger.warn("Error executing jsp tag {}", this.getClass().getName(), t);
+    logger.warn("Error executing jsp tag {} on {}: {}", new Object[] {this.getClass().getName(), request.getUrl(), t});
   }
 
   /**
