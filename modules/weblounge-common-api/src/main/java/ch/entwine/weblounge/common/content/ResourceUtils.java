@@ -27,6 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +42,9 @@ public final class ResourceUtils {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ResourceUtils.class);
+
+  /** File size units */
+  private static final String[] SIZE_UNITS = { "B", "kB", "MB", "GB", "TB" };
 
   /**
    * This class is not intended to be instantiated.
@@ -487,6 +493,64 @@ public final class ResourceUtils {
       return "work";
     else
       return Long.toString(version);
+  }
+
+  /**
+   * Returns the file size formatted in <tt>bytes</tt>, <tt>kilobytes</tt>,
+   * <tt>megabytes</tt>, <tt>gigabytes</tt> and <tt>terabytes</tt>, where 1 KB
+   * is equal to 1'024 bytes.
+   * <p>
+   * The number in front of the size unit will be formatted with one decimal
+   * place, e. g. <tt>12.4KB</tt>.
+   * 
+   * @param sizeInBytes
+   *          the file size in bytes
+   * @return the file size formatted using appropriate units
+   * @throws IllegalArgumentException
+   *           if the file size is negative
+   */
+  public static String formatFileSize(long sizeInBytes)
+      throws IllegalArgumentException {
+    return formatFileSize(sizeInBytes, null);
+  }
+
+  /**
+   * Returns the file size formatted in <tt>bytes</tt>, <tt>kilobytes</tt>,
+   * <tt>megabytes</tt>, <tt>gigabytes</tt> and <tt>terabytes</tt>, where 1 kB
+   * is equal to 1'000 bytes.
+   * <p>
+   * If no {@link NumberFormat} was provided,
+   * <code>new DecimalFormat("0.#)</code> is used.
+   * 
+   * @param sizeInBytes
+   *          the file size in bytes
+   * @param format
+   *          the number format
+   * @return the file size formatted using appropriate units
+   * @throws IllegalArgumentException
+   *           if the file size is negative
+   */
+  public static String formatFileSize(long sizeInBytes, NumberFormat format)
+      throws IllegalArgumentException {
+    if (sizeInBytes < 0)
+      throw new IllegalArgumentException("File size cannot be negative");
+    int unitSelector = 0;
+    double size = sizeInBytes;
+
+    // Calculate the size to display
+    while (size >= 1000 && unitSelector < SIZE_UNITS.length) {
+      size /= 1000.0d;
+      unitSelector++;
+    }
+
+    // Create a number formatter, if none was provided
+    if (format == null) {
+      DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
+      formatSymbols.setDecimalSeparator('.');
+      format = new DecimalFormat("0.#", formatSymbols);
+    }
+
+    return format.format(size) + SIZE_UNITS[unitSelector];
   }
 
 }
