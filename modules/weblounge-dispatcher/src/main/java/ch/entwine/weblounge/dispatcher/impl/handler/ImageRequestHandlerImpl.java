@@ -372,7 +372,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
         imagePreviewGenerator.createPreview(imageResource, environment, language, style, format, is, fos);
         IOUtils.closeQuietly(is);
         IOUtils.closeQuietly(fos);
-        scaledImageFile.setLastModified(lastModified);
       }
     } catch (ContentRepositoryException e) {
       logger.error("Unable to load image {}: {}", new Object[] {

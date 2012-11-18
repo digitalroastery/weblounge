@@ -225,9 +225,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
         logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
 
         previewGenerator.createPreview(resource, environment, language, style, DEFAULT_PREVIEW_FORMAT, contentRepositoryIs, fos);
-        if (scaledResourceFile.length() > 1) {
-          scaledResourceFile.setLastModified(lastModified);
-        } else {
+        if (scaledResourceFile.length() == 0) {
           logger.debug("Error scaling '{}': file size is 0", resourceURI);
           IOUtils.closeQuietly(resourceInputStream);
           FileUtils.deleteQuietly(scaledResourceFile);
