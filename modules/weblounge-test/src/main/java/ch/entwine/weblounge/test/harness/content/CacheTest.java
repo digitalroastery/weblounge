@@ -167,14 +167,13 @@ public class CacheTest extends IntegrationTestBase {
       // Get the Expires header
       assertNotNull(response.getHeaders("Expires"));
       assertEquals(1, response.getHeaders("Expires").length);
+
       // We are explicitly not checking for equality with the previously
-      // received
-      // value, since on first request, that value is not yet correct
+      // received value, since on first request, that value is not yet correct
 
       // Get the ETag header
       assertNotNull(response.getHeaders("ETag"));
-      assertEquals(1, response.getHeaders("ETag").length);
-      assertEquals(eTag, response.getHeaders("ETag")[0].getValue());
+      assertEquals(0, response.getHeaders("ETag").length);
 
       // Test the Cache header
       assertNotNull(response.getHeaders("X-Cache-Key"));

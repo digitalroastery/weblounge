@@ -273,10 +273,6 @@ class PreviewGeneratorWorker implements Runnable {
         fos = new FileOutputStream(scaledResourceFile);
         AbstractContentRepository.logger.debug("Creating preview of '{}' at {}", resource, scaledResourceFile);
         previewGenerator.createPreview(resource, environment, language, style, format, contentRepositoryIs, fos);
-
-        // Adjust the last modified date so the preview doesn't need to be
-        // regenerated
-        scaledResourceFile.setLastModified(lastModified);
       }
 
     } catch (ContentRepositoryException e) {

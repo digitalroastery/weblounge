@@ -20,16 +20,13 @@
 
 package ch.entwine.weblounge.common.content;
 
-import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
+import java.io.File;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,9 +39,6 @@ public final class ResourceUtils {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ResourceUtils.class);
-
-  /** File size units */
-  private static final String[] SIZE_UNITS = { "B", "kB", "MB", "GB", "TB" };
 
   /**
    * This class is not intended to be instantiated.
@@ -125,6 +119,10 @@ public final class ResourceUtils {
    * Returns <code>true</code> if the resource either is more recent than the
    * cached version on the client side or the request does not contain caching
    * information.
+   * <p>
+   * The calculation is made based on the availability of either the
+   * <code>If-None-Match</code> or the <code>If-Modified-Since</code> header (in
+   * this order).
    * 
    * @param request
    *          the client request
@@ -138,13 +136,17 @@ public final class ResourceUtils {
    */
   public static boolean hasChanged(HttpServletRequest request,
       Resource<?> resource) throws IllegalArgumentException {
-    return hasChanged(request, resource, null, null);
+    return hasChanged(request, resource, null);
   }
 
   /**
    * Returns <code>true</code> if the resource either is more recent than the
    * cached version on the client side or the request does not contain caching
    * information.
+   * <p>
+   * The calculation is made based on the availability of either the
+   * <code>If-None-Match</code> or the <code>If-Modified-Since</code> header (in
+   * this order).
    * 
    * @param request
    *          the client request
@@ -160,21 +162,109 @@ public final class ResourceUtils {
    */
   public static boolean hasChanged(HttpServletRequest request,
       Resource<?> resource, Language language) throws IllegalArgumentException {
-    return hasChanged(request, resource, null, language);
+    if (request.getHeader("If-None-Match") != null) {
+      return isMismatch(request, getETagValue(resource));
+    } else if (request.getHeader("If-Modified-Since") != null) {
+      return isModified(request, resource, language);
+    }
+    return true;
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side with respect to the file's modification
+   * date or the request does not contain caching information.
+   * <p>
+   * The calculation is made based on the availability of either the
+   * <code>If-None-Match</code> or the <code>If-Modified-Since</code> header (in
+   * this order).
+   * 
+   * @param request
+   *          the client request
+   * @param file
+   *          the file
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean hasChanged(HttpServletRequest request, File file)
+      throws IllegalArgumentException {
+    if (file == null || !file.isFile())
+      return true;
+    return hasChanged(request, file.lastModified());
   }
 
   /**
    * Returns <code>true</code> if the resource either is more recent than the
    * cached version on the client side or the request does not contain caching
    * information.
+   * <p>
+   * The calculation is made based on the availability of either the
+   * <code>If-None-Match</code> or the <code>If-Modified-Since</code> header (in
+   * this order).
+   * 
+   * @param request
+   *          the client request
+   * @param date
+   *          the date
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean hasChanged(HttpServletRequest request, long date)
+      throws IllegalArgumentException {
+    if (request.getHeader("If-None-Match") != null) {
+      return isMismatch(request, getETagValue(date));
+    } else if (request.getHeader("If-Modified-Since") != null) {
+      return isModified(request, date);
+    }
+    return true;
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * <p>
+   * The calculation is made based on the availability of the
+   * <code>If-Modified-Since</code> header. Use
+   * {@link #hasChanged(HttpServletRequest, Resource))} to also take the
+   * <code>If-None-Match</code> header into account.
    * 
    * @param request
    *          the client request
    * @param resource
    *          the resource
-   * @param style
-   *          the imageStle
-   * @param langauge
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean isModified(HttpServletRequest request,
+      Resource<?> resource) throws IllegalArgumentException {
+    return isModified(request, getModificationDate(resource, null).getTime());
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * <p>
+   * The calculation is made based on the availability of the
+   * <code>If-Modified-Since</code> header. Use
+   * {@link #hasChanged(HttpServletRequest, Resource, Language))} to also take
+   * the <code>If-None-Match</code> header into account.
+   * 
+   * @param request
+   *          the client request
+   * @param resource
+   *          the resource
+   * @param language
    *          the language
    * @return <code>true</code> if the resource is more recent than the version
    *         that is cached at the client.
@@ -182,105 +272,42 @@ public final class ResourceUtils {
    *           if the <code>If-Modified-Since</code> header cannot be converted
    *           to a date.
    */
-  public static boolean hasChanged(HttpServletRequest request,
-      Resource<?> resource, ImageStyle style, Language language)
+  public static boolean isModified(HttpServletRequest request,
+      Resource<?> resource, Language language) throws IllegalArgumentException {
+    return isModified(request, getModificationDate(resource, language).getTime());
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * <p>
+   * The calculation is made based on the availability of the
+   * <code>If-Modified-Since</code> header. Use
+   * {@link #hasChanged(HttpServletRequest, long)} to also take the
+   * <code>If-None-Match</code> header into account.
+   * 
+   * @param request
+   *          the client request
+   * @param date
+   *          the date
+   * @return <code>true</code> if the resource is more recent than the version
+   *         that is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean isModified(HttpServletRequest request, long date)
       throws IllegalArgumentException {
     if (request.getHeader("If-Modified-Since") != null) {
-      return isModified(request, resource, language);
-    } else if (request.getHeader("If-None-Match") != null) {
-      return isMismatch(request, resource, style);
-    }
-    return true;
-  }
-
-  /**
-   * Returns <code>true</code> if the resource either is more recent than the
-   * cached version on the client side or the request does not contain caching
-   * information.
-   * 
-   * @param request
-   *          the client request
-   * @param resource
-   *          the resource
-   * @return <code>true</code> if the resource is more recent than the version
-   *         that is cached at the client.
-   * @throws IllegalArgumentException
-   *           if the <code>If-Modified-Since</code> header cannot be converted
-   *           to a date.
-   */
-  public static boolean isModified(HttpServletRequest request,
-      Resource<?> resource) throws IllegalArgumentException {
-    if (request.getHeader("If-Modified-Since") != null) {
       try {
         long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-        long resourceModificationDate = getModificationDate(resource, null).getTime();
-        return cachedModificationDate < resourceModificationDate;
+        return cachedModificationDate < date;
       } catch (IllegalArgumentException e) {
         logger.debug("Client sent malformed 'If-Modified-Since' header: {}");
       }
     }
     return true;
-  }
-
-  /**
-   * Returns <code>true</code> if the resource either is more recent than the
-   * cached version on the client side or the request does not contain caching
-   * information.
-   * 
-   * @param request
-   *          the client request
-   * @param resource
-   *          the resource
-   * @param language
-   *          the language
-   * @return <code>true</code> if the resource is more recent than the version
-   *         that is cached at the client.
-   * @throws IllegalArgumentException
-   *           if the <code>If-Modified-Since</code> header cannot be converted
-   *           to a date.
-   */
-  public static boolean isModified(HttpServletRequest request,
-      Resource<?> resource, Language language) throws IllegalArgumentException {
-    if (request.getHeader("If-Modified-Since") != null) {
-      try {
-        long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-        long resourceModificationDate = getModificationDate(resource, language).getTime();
-        return cachedModificationDate < resourceModificationDate;
-      } catch (IllegalArgumentException e) {
-        logger.debug("Client sent malformed 'If-Modified-Since' header: {}");
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Returns <code>true</code> if the resource has not been modified,
-   * <code>false</code> if the cached version on the client side is out dated or
-   * if the request did not contain caching information.
-   * <p>
-   * The decision is based on the availability and value of the
-   * <code>If-None-Match</code> header (called <code>ETag</code>).
-   * <p>
-   * 
-   * @param request
-   *          the client request
-   * @param resource
-   *          the resource
-   * @param style
-   *          the imagestyle
-   * @return <code>true</code> if the resource's calculated eTag matches the one
-   *         specified
-   * @throws IllegalArgumentException
-   *           if the <code>If-Modified-Since</code> cannot be converted to a
-   *           date.
-   */
-  public static boolean isMismatch(HttpServletRequest request,
-      Resource<?> resource, ImageStyle style) throws IllegalArgumentException {
-    String eTagHeader = request.getHeader("If-None-Match");
-    if (StringUtils.isBlank(eTagHeader))
-      return true;
-    String eTag = getETagValue(resource, style);
-    return !eTagHeader.equals(eTag);
   }
 
   /**
@@ -322,26 +349,35 @@ public final class ResourceUtils {
    * @return the <code>ETag</code> value
    */
   public static String getETagValue(Resource<?> resource) {
-    return getETagValue(resource, null);
+    return getETagValue(getModificationDate(resource, null).getTime());
   }
 
   /**
    * Returns the value for the <code>ETag</code> header field, which is
-   * calculated from the resource identifier and the resource's modification
-   * date.
+   * calculated from the file's modification date.
    * 
-   * @param resource
-   *          the resource
-   * @param style
-   *          the image style
+   * @param file
+   *          the file
+   * @return the <code>ETag</code> value
+   * @throws IllegalArgumentException
+   *           if <code>file</code> is <code>null</code>
+   */
+  public static String getETagValue(File file) {
+    if (file == null)
+      throw new IllegalArgumentException("File must not be null");
+    return getETagValue(file.lastModified());
+  }
+
+  /**
+   * Returns the value for the <code>ETag</code> header field, which is
+   * calculated from the given modification date.
+   * 
+   * @param date
+   *          the date in milliseconds
    * @return the <code>ETag</code> value
    */
-  public static String getETagValue(Resource<?> resource, ImageStyle style) {
-    long etag = resource.getIdentifier().hashCode();
-    if (style != null)
-      etag += style.getIdentifier().hashCode();
-    etag += getModificationDate(resource, null).getTime();
-    return new StringBuffer().append("\"").append("WL-" + etag).append("\"").toString();
+  public static String getETagValue(long date) {
+    return new StringBuffer().append("\"").append("WL-" + date).append("\"").toString();
   }
 
   /**
@@ -451,64 +487,6 @@ public final class ResourceUtils {
       return "work";
     else
       return Long.toString(version);
-  }
-
-  /**
-   * Returns the file size formatted in <tt>bytes</tt>, <tt>kilobytes</tt>,
-   * <tt>megabytes</tt>, <tt>gigabytes</tt> and <tt>terabytes</tt>, where 1 KB
-   * is equal to 1'024 bytes.
-   * <p>
-   * The number in front of the size unit will be formatted with one decimal
-   * place, e. g. <tt>12.4KB</tt>.
-   * 
-   * @param sizeInBytes
-   *          the file size in bytes
-   * @return the file size formatted using appropriate units
-   * @throws IllegalArgumentException
-   *           if the file size is negative
-   */
-  public static String formatFileSize(long sizeInBytes)
-      throws IllegalArgumentException {
-    return formatFileSize(sizeInBytes, null);
-  }
-
-  /**
-   * Returns the file size formatted in <tt>bytes</tt>, <tt>kilobytes</tt>,
-   * <tt>megabytes</tt>, <tt>gigabytes</tt> and <tt>terabytes</tt>, where 1 kB
-   * is equal to 1'000 bytes.
-   * <p>
-   * If no {@link NumberFormat} was provided,
-   * <code>new DecimalFormat("0.#)</code> is used.
-   * 
-   * @param sizeInBytes
-   *          the file size in bytes
-   * @param format
-   *          the number format
-   * @return the file size formatted using appropriate units
-   * @throws IllegalArgumentException
-   *           if the file size is negative
-   */
-  public static String formatFileSize(long sizeInBytes, NumberFormat format)
-      throws IllegalArgumentException {
-    if (sizeInBytes < 0)
-      throw new IllegalArgumentException("File size cannot be negative");
-    int unitSelector = 0;
-    double size = sizeInBytes;
-
-    // Calculate the size to display
-    while (size >= 1000 && unitSelector < SIZE_UNITS.length) {
-      size /= 1000.0d;
-      unitSelector++;
-    }
-
-    // Create a number formatter, if none was provided
-    if (format == null) {
-      DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
-      formatSymbols.setDecimalSeparator('.');
-      format = new DecimalFormat("0.#", formatSymbols);
-    }
-
-    return format.format(size) + SIZE_UNITS[unitSelector];
   }
 
 }

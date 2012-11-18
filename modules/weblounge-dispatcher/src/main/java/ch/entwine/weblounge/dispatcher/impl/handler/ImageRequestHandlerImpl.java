@@ -267,14 +267,29 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       }
     }
 
+    File scaledImageFile = null;
+    long lastModified = ResourceUtils.getModificationDate(imageResource, language).getTime();
+
     // Check the modified headers
     long revalidationTime = MS_PER_DAY;
     long expirationDate = System.currentTimeMillis() + revalidationTime;
-    if (!ResourceUtils.hasChanged(request, imageResource, style, language)) {
-      logger.debug("Image {} was not modified", imageURI);
-      response.setDateHeader("Expires", expirationDate);
-      DispatchUtils.sendNotModified(request, response);
-      return true;
+    if (style == null || ImageScalingMode.None.equals(style.getScalingMode())) {
+      if (!ResourceUtils.hasChanged(request, imageResource, language)) {
+        logger.debug("Image {} was not modified", imageURI);
+        response.setDateHeader("Expires", expirationDate);
+        DispatchUtils.sendNotModified(request, response);
+        return true;
+      }
+    } else {
+      scaledImageFile = ImageStyleUtils.getScaledFile(imageResource, language, style);
+      if (scaledImageFile.isFile() && scaledImageFile.length() > 0) {
+        if (!ResourceUtils.hasChanged(request, scaledImageFile)) {
+          logger.debug("Scaled image {} was not modified", imageURI);
+          response.setDateHeader("Expires", expirationDate);
+          DispatchUtils.sendNotModified(request, response);
+          return true;
+        }
+      }
     }
 
     // Load the image contents from the repository
@@ -292,18 +307,12 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       response.setContentType(contentType + "; charset=" + characterEncoding.toLowerCase());
     else
       response.setContentType(contentType);
-    
+
     // Browser caches and proxies are allowed to keep a copy
     response.setHeader("Cache-Control", "public, max-age=" + revalidationTime);
 
-    // Add last modified header
-    response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource, language).getTime());
-
     // Set Expires header
     response.setDateHeader("Expires", expirationDate);
-
-    // Add ETag header
-    response.setHeader("ETag", ResourceUtils.getETagValue(imageResource, style));
 
     // Get the mime type
     final String mimetype = imageContents.getMimetype();
@@ -311,6 +320,12 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // When there is no scaling required, just return the original
     if (style == null || ImageScalingMode.None.equals(style.getScalingMode())) {
+
+      // Add last modified header
+      response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(imageResource, language).getTime());
+
+      // Add ETag header
+      response.setHeader("ETag", ResourceUtils.getETagValue(imageResource));
 
       // Load the input stream from the repository
       try {
@@ -347,11 +362,9 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     }
 
     // Write the scaled file back to the response
-    File scaledImageFile = null;
     boolean scalingFailed = false;
     try {
       scaledImageFile = ImageStyleUtils.createScaledFile(imageResource, language, style);
-      long lastModified = ResourceUtils.getModificationDate(imageResource, language).getTime();
       if (!scaledImageFile.isFile() || scaledImageFile.lastModified() < lastModified) {
         InputStream is = contentRepository.getContent(imageURI, language);
         FileOutputStream fos = new FileOutputStream(scaledImageFile);
@@ -359,7 +372,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
         imagePreviewGenerator.createPreview(imageResource, environment, language, style, format, is, fos);
         IOUtils.closeQuietly(is);
         IOUtils.closeQuietly(fos);
-        scaledImageFile.setLastModified(lastModified);
       }
     } catch (ContentRepositoryException e) {
       logger.error("Unable to load image {}: {}", new Object[] {
@@ -407,6 +419,9 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // Write the image back to the client
     try {
+      // Add last modified header
+      response.setDateHeader("Last-Modified", scaledImageFile.lastModified());
+      response.setHeader("ETag", ResourceUtils.getETagValue(scaledImageFile.lastModified()));
       response.setHeader("Content-Disposition", "inline; filename=" + scaledImageFile.getName());
       response.setHeader("Content-Length", Long.toString(scaledImageFile.length()));
       imageInputStream = new FileInputStream(scaledImageFile);
