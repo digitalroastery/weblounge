@@ -283,7 +283,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     } else {
       scaledImageFile = ImageStyleUtils.getScaledFile(imageResource, language, style);
       if (scaledImageFile.isFile() && scaledImageFile.length() > 0) {
-        if (!ResourceUtils.hasChanged(request, scaledImageFile.lastModified())) {
+        if (!ResourceUtils.hasChanged(request, scaledImageFile)) {
           logger.debug("Scaled image {} was not modified", imageURI);
           response.setDateHeader("Expires", expirationDate);
           DispatchUtils.sendNotModified(request, response);

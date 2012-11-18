@@ -179,8 +179,11 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     if (style == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
+    // Load the input stream from the scaled image
+    File scaledResourceFile = ImageStyleUtils.getScaledFile(resource, language, style);
+
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.hasChanged(request, resource, style, language)) {
+    if (!ResourceUtils.hasChanged(request, scaledResourceFile)) {
       return Response.notModified().build();
     }
 
@@ -207,7 +210,6 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     long contentLength = -1;
 
     // Load the input stream from the scaled image
-    File scaledResourceFile = null;
     InputStream contentRepositoryIs = null;
     FileOutputStream fos = null;
     try {
@@ -255,23 +257,27 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       logger.error(e.getMessage(), e);
       IOUtils.closeQuietly(resourceInputStream);
       FileUtils.deleteQuietly(scaledResourceFile);
-      deleteIfEmpty(scaledResourceFile.getParentFile());
+      if (scaledResourceFile != null)
+        deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
     } catch (IOException e) {
       logger.error("Error scaling image '{}': {}", resourceURI, e.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
       if (scaledResourceFile != null)
         deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
     } catch (IllegalArgumentException e) {
       logger.error("Image '{}' is of unsupported format: {}", resourceURI, e.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
       if (scaledResourceFile != null)
         deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
     } catch (Throwable t) {
       logger.error("Error scaling image '{}': {}", resourceURI, t.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
       if (scaledResourceFile != null)
         deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
@@ -284,7 +290,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     final InputStream is = resourceInputStream;
     ResponseBuilder response = Response.ok(new StreamingOutput() {
       public void write(OutputStream os) throws IOException,
-      WebApplicationException {
+          WebApplicationException {
         try {
           IOUtils.copy(is, os);
           os.flush();
@@ -304,7 +310,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     response.lastModified(ResourceUtils.getModificationDate(resource, language));
 
     // Add ETag header
-    String eTag = ResourceUtils.getETagValue(resource, style);
+    String eTag = ResourceUtils.getETagValue(scaledResourceFile);
     response.tag(eTag);
 
     // Add filename header
@@ -714,7 +720,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
    *          the resource serializer service
    */
   void setResourceSerializer(ResourceSerializerService serializer) {
-    this.serializerService  = serializer;
+    this.serializerService = serializer;
   }
 
   /**
