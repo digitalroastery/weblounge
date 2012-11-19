@@ -56,7 +56,7 @@ steal.then('jsonix')
 		 * Get Recent Files
 		 */
 		findRecent: function(params, success, error) {
-			var url = "/system/weblounge/files/?sort=modified-desc&limit=8&offset=0";
+			var url = "/system/weblounge/files/?sort=modified-desc&limit=50&offset=0";
 			if ('filter' in params) {
 				url += "&filter=" + params.filter;
 			}
@@ -75,7 +75,7 @@ steal.then('jsonix')
 		 * Get Pending Files
 		 */
 		findPending: function(params, success, error) {
-			var url = "/system/weblounge/files/pending?limit=8";
+			var url = "/system/weblounge/files/pending?limit=50";
 			if ('filter' in params) {
 				url += "?filter=" + params.filter;
 			}
@@ -94,7 +94,7 @@ steal.then('jsonix')
 		 * Get files searched by string
 		 */
 		findBySearch: function(params, success, error) {
-			var url = '/system/weblounge/files/?searchterms=' + params.search + '&sort=modified-desc&limit=8&offset=0';
+			var url = '/system/weblounge/files/?searchterms=' + params.search + '&sort=modified-desc&limit=50&offset=0';
 			if ('filter' in params) {
 				url += "&filter=" + params.filter;
 			}

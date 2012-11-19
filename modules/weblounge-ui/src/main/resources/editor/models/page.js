@@ -68,7 +68,7 @@ steal.then('jsonix')
 		 * Get Recent Pages
 		 */
 		findRecent: function(params, success, error) {
-			var url = "/system/weblounge/pages/?sort=modified-desc&limit=8&offset=0";
+			var url = "/system/weblounge/pages/?sort=modified-desc&limit=50&offset=0";
 			if ('version' in params) {
 				url += "&version=" + params.version;
 			}
@@ -91,7 +91,7 @@ steal.then('jsonix')
 		 * Get Pending Pages
 		 */
 		findPending: function(params, success, error) {
-			var url = "/system/weblounge/pages/pending?limit=8";
+			var url = "/system/weblounge/pages/pending?limit=50";
 			if ('filter' in params) {
 				url += "?filter=" + params.filter;
 			}
@@ -108,7 +108,7 @@ steal.then('jsonix')
 		 * Get pages searched by string
 		 */
 		findBySearch: function(params, success, error) {
-			var url = '/system/weblounge/pages/?searchterms=' + params.search + '&sort=modified-desc&limit=8&offset=0';
+			var url = '/system/weblounge/pages/?searchterms=' + params.search + '&sort=modified-desc&limit=50&offset=0';
 			if ('version' in params) {
 				url += "&version=" + params.version;
 			}
