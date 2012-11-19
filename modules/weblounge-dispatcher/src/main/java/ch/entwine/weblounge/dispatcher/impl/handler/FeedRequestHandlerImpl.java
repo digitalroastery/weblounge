@@ -277,6 +277,14 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       logger.error("Error sending {} feed to the client: {}", feedType, e.getMessage());
       DispatchUtils.sendInternalError(request, response);
       return true;
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to create feed of type '{}': {}", feedType, e.getMessage());
+      DispatchUtils.sendNotFound(e.getMessage(), request, response);
+      return true;
+    } catch (Throwable t) {
+      logger.error("Error creating feed of type '{}': {}", feedType, t.getMessage());
+      DispatchUtils.sendInternalError(request, response);
+      return true;
     } finally {
       response.endResponse();
     }
