@@ -430,8 +430,10 @@ public class FeedRequestHandlerImpl implements RequestHandler {
             rendererContent = loadContents(rendererURL, site, page, composer, pagelet, environment);
           } catch (ServletException e) {
             logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
+            DispatchUtils.sendInternalError(request, response);
           } catch (IOException e) {
             logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
+            DispatchUtils.sendInternalError(request, response);
           }
           SyndContent content = new SyndContentImpl();
           content.setType("text/html");
