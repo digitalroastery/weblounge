@@ -1175,7 +1175,7 @@ public class SiteImpl implements Site {
     if (getIdentifier() == null) {
       String identifier = (String) context.getProperties().get(PROP_IDENTIFIER);
       if (identifier == null)
-        throw new IllegalStateException("Site needs an identifier");
+        throw new IllegalStateException("Property'" + PROP_IDENTIFIER + "' missing from site bundle");
       setIdentifier(identifier);
     }
 
@@ -1593,7 +1593,7 @@ public class SiteImpl implements Site {
         test.setSite(this);
         tests.add(test);
       } catch (ClassNotFoundException e) {
-        throw new IllegalStateException("Implementation " + className + " for integration test '" + identifier + "' not found", e);
+        throw new IllegalStateException("Implementation " + className + " for integration test of class '" + identifier + "' not found", e);
       } catch (NoClassDefFoundError e) {
         // We are trying to load each and every class here, so we may as well see classes that are not meant to be loaded
         logger.debug("The related class " + e.getMessage() + " for potential test case implementation " + className + " could not be found");
