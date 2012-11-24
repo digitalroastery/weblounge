@@ -54,6 +54,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -213,7 +214,6 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     InputStream contentRepositoryIs = null;
     FileOutputStream fos = null;
     try {
-      scaledResourceFile = ImageStyleUtils.getScaledFile(resource, language, style);
       long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
       if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
         if (!force)
@@ -221,6 +221,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
 
         contentRepositoryIs = contentRepository.getContent(resourceURI, language);
         scaledResourceFile = ImageStyleUtils.createScaledFile(resource, language, style);
+        scaledResourceFile.setLastModified(new Date().getTime());
         fos = new FileOutputStream(scaledResourceFile);
         logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
 
@@ -305,7 +306,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     response.type(mimetype);
 
     // Add last modified header
-    response.lastModified(ResourceUtils.getModificationDate(resource, language));
+    response.lastModified(new Date(scaledResourceFile.lastModified()));
 
     // Add ETag header
     String eTag = ResourceUtils.getETagValue(scaledResourceFile);
