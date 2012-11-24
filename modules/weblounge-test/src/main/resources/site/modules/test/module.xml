@@ -41,6 +41,10 @@
       <renderer>file://${module.root}/pagelets/editing.jsp</renderer>
       <editor>file://${module.root}/pagelets/editing_editor.jsp</editor>
     </pagelet>
+    <pagelet id="modificationdate" composeable="true">
+      <name>Modification date</name>
+      <renderer>file://${module.root}/pagelets/modificationdate.jsp</renderer>
+    </pagelet>
   </pagelets>
 
   <actions>

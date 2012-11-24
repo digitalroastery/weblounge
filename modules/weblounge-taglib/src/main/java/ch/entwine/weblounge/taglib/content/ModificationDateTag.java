@@ -22,8 +22,6 @@ package ch.entwine.weblounge.taglib.content;
 
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.Date;
 
 import javax.servlet.jsp.JspException;
@@ -45,13 +43,13 @@ public class ModificationDateTag extends WebloungeTag {
    * 
    * @param date
    *          the modification date
+   * @throws IllegalArgumentException
+   *           if <code>date</code> is <code>null</code>
    */
-  public void setDate(String date) {
-    if (StringUtils.isBlank(date) || "now".equalsIgnoreCase("now"))
-      this.date = new Date();
-    else
-      // TODO implement proper date parsing
-      this.date = new Date();
+  public void setDate(Date date) throws IllegalArgumentException {
+    if (date == null)
+      throw new IllegalArgumentException("Modification date must not be null");
+    this.date = date;
   }
 
   /**
@@ -61,8 +59,21 @@ public class ModificationDateTag extends WebloungeTag {
    * @return either EVAL_PAGE or SKIP_PAGE
    */
   public int doEndTag() throws JspException {
+    if (date == null)
+      date = new Date();
     super.response.setModificationDate(date);
     return super.doEndTag();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.taglib.WebloungeTag#reset()
+   */
+  @Override
+  protected void reset() {
+    date = null;
+    super.reset();
   }
 
 }
