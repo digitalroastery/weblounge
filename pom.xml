@@ -20,7 +20,7 @@
     <weblounge.home>${env.WEBLOUNGE_HOME}</weblounge.home>
     <weblounge.basedir>${basedir}</weblounge.basedir>
     <checkstyle.skip>true</checkstyle.skip>
-    <jmeter.version>2.5</jmeter.version>
+    <jmeter.version>2.8</jmeter.version>
   </properties>
 
   <organization>
@@ -190,8 +190,8 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>chronos-maven-plugin</artifactId>
             <configuration>
-              <jMeterRemoteLocation>http://www.eu.apache.org/dist/jakarta/jmeter/binaries/jakarta-jmeter-${jmeter.version}.zip</jMeterRemoteLocation>
-              <jmeterhome>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeterhome>
+              <jMeterRemoteLocation>http://www.us.apache.org/dist//jmeter/binaries/apache-jmeter-${jmeter.version}.zip</jMeterRemoteLocation>
+              <jmeterhome>${project.build.directory}/jakarta-jmeter-${jmeter.version}/apache-jmeter-${jmeter.version}</jmeterhome>
               <input>${weblounge.basedir}/docs/jmeter/general.jmx</input>
             </configuration>
           </plugin>
