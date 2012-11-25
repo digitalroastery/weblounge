@@ -5,12 +5,12 @@
     <promote>true</promote>
     <index>true</index>
     <metadata>
-      <title language="de"><![CDATA[Seitentitel]]></title>
+      <title language="de"><![CDATA[Kurzer Seitentitel]]></title>
       <title language="fr"><![CDATA[Il titre de la page]]></title>
-      <description language="de"><![CDATA[Beschreibung]]></description>
-      <description language="fr"><![CDATA[Déscription]]></description>
-      <subject><![CDATA[Other topic]]></subject>
-      <subject><![CDATA[This subject]]></subject>
+      <description language="de"><![CDATA[Lange Beschreibung]]></description>
+      <description language="fr"><![CDATA[Déscription longue]]></description>
+      <subject><![CDATA[Search Topic A]]></subject>
+      <subject><![CDATA[Search Topic B]]></subject>
       <type><![CDATA[Text]]></type>
       <coverage language="de"><![CDATA[Zürich]]></coverage>
       <coverage language="fr"><![CDATA[Zurich]]></coverage>

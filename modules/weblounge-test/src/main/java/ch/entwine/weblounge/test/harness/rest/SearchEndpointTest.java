@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -133,6 +134,101 @@ public class SearchEndpointTest extends IntegrationTestBase {
       assertEquals("4bb19980-8f98-4873-a813-000000000006", XPathHelper.valueOf(xml, "/searchresult/result/id"));
     } finally {
       httpClient.getConnectionManager().shutdown();
+    }
+
+    // Check for exact matches on subjects
+    String[] exactMatches = { "Search Topic A", "Search Topic B" };
+    for (String searchTerm : exactMatches) {
+
+      // Full match
+      httpClient = new DefaultHttpClient();
+      searchRequest = new HttpGet(UrlUtils.concat(requestUrl, URLEncoder.encode(searchTerms, "utf-8")));
+      params = new String[][] { { "limit", "5" } };
+      logger.info("Sending search request for exact match of '{}' to {}", searchTerm, requestUrl);
+      try {
+        HttpResponse response = TestUtils.request(httpClient, searchRequest, params);
+        Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        Document xml = TestUtils.parseXMLResponse(response);
+        int documentCount = Integer.parseInt(XPathHelper.valueOf(xml, "/searchresult/@documents"));
+        int hitCount = Integer.parseInt(XPathHelper.valueOf(xml, "/searchresult/@hits"));
+        Assert.assertTrue(documentCount == 1);
+        Assert.assertTrue(hitCount == 1);
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
+    }
+
+    // Check for partial matches in fields that should be supporting partial
+    // matches
+    String[] partialSearchTerms = { "Kurzer Seitentitel", // German title
+        "Il titre de la page", // French title
+        "Lange Beschreibung", // German description
+        "Déscription longue", // French description
+        "Hans Muster", // creator, publisher
+        "Amélie Poulard", // modifier
+        "Friedrich Nietzsche Suchresultat", // element text
+        "Ein amüsanter Titel", // German element text
+        "Un titre joyeux" // French element text
+    };
+
+    for (String searchTerm : partialSearchTerms) {
+      int fullMatchDocumentCount = 0;
+      int fullMatchHitCount = 0;
+
+      // Full match
+      httpClient = new DefaultHttpClient();
+      searchRequest = new HttpGet(UrlUtils.concat(requestUrl, URLEncoder.encode(searchTerms, "utf-8")));
+      params = new String[][] { { "limit", "5" } };
+      logger.info("Sending search request for full match of '{}' to {}", searchTerm, requestUrl);
+      try {
+        HttpResponse response = TestUtils.request(httpClient, searchRequest, params);
+        Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        Document xml = TestUtils.parseXMLResponse(response);
+        fullMatchDocumentCount = Integer.parseInt(XPathHelper.valueOf(xml, "/searchresult/@documents"));
+        fullMatchHitCount = Integer.parseInt(XPathHelper.valueOf(xml, "/searchresult/@hits"));
+        Assert.assertTrue(fullMatchDocumentCount >= 1);
+        Assert.assertTrue(fullMatchHitCount >= fullMatchDocumentCount);
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
+      // Full match lowercase
+      httpClient = new DefaultHttpClient();
+      String lowerCaseSearchTerm = searchTerm.toLowerCase();
+      searchRequest = new HttpGet(UrlUtils.concat(requestUrl, URLEncoder.encode(lowerCaseSearchTerm, "utf-8")));
+      params = new String[][] { { "limit", "5" } };
+      logger.info("Sending search request for lowercase match of '{}' to {}", searchTerm, requestUrl);
+      try {
+        HttpResponse response = TestUtils.request(httpClient, searchRequest, params);
+        Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        Document xml = TestUtils.parseXMLResponse(response);
+        int documentCount = Integer.parseInt(XPathHelper.valueOf(xml, "/searchresult/@documents"));
+        int hitCount = Integer.parseInt(XPathHelper.valueOf(xml, "/searchresult/@hits"));
+        Assert.assertTrue(documentCount >= fullMatchDocumentCount);
+        Assert.assertTrue(hitCount >= fullMatchHitCount);
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
+      // Partial match
+      for (String partialSearchTerm : StringUtils.split(searchTerm)) {
+        httpClient = new DefaultHttpClient();
+        searchRequest = new HttpGet(UrlUtils.concat(requestUrl, URLEncoder.encode(partialSearchTerm, "utf-8")));
+        params = new String[][] { { "limit", "5" } };
+        logger.info("Sending search request for partial match of '{}' to {}", searchTerm, requestUrl);
+        try {
+          HttpResponse response = TestUtils.request(httpClient, searchRequest, params);
+          Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+          Document xml = TestUtils.parseXMLResponse(response);
+          int documentCount = Integer.parseInt(XPathHelper.valueOf(xml, "/searchresult/@documents"));
+          int hitCount = Integer.parseInt(XPathHelper.valueOf(xml, "/searchresult/@hits"));
+          Assert.assertTrue(documentCount >= fullMatchDocumentCount);
+          Assert.assertTrue(hitCount >= fullMatchHitCount);
+        } finally {
+          httpClient.getConnectionManager().shutdown();
+        }
+      }
     }
 
   }

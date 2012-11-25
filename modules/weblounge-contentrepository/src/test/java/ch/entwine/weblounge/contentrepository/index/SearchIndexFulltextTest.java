@@ -44,10 +44,9 @@ import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSe
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -79,16 +78,16 @@ public class SearchIndexFulltextTest {
   protected static Site site = null;
 
   /** The sample page */
-  protected String pageFile = "/page.xml";
+  protected static String pageFile = "/page.xml";
 
   /** The sample live page */
-  protected Page livePage = null;
+  protected static Page livePage = null;
 
   /** The sample work page */
-  protected Page workPage = null;
+  protected static Page workPage = null;
 
   /** The sample pagelet */
-  protected Pagelet pagelet = null;
+  protected static Pagelet pagelet = null;
 
   /** The resource serializer */
   private static ResourceSerializerServiceImpl serializer = null;
@@ -131,6 +130,30 @@ public class SearchIndexFulltextTest {
     System.setProperty("weblounge.home", rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
     idx = new SearchIndex(site, serializer, isReadOnly);
+
+    // Prepare the pages
+    PageReader pageReader = new PageReader();
+    InputStream is = null;
+
+    // Add the live page
+    try {
+      is = SearchIndexFulltextTest.class.getResourceAsStream(pageFile);
+      livePage = pageReader.read(is, site);
+      pagelet = livePage.getPagelets()[0];
+      idx.add(livePage);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
+
+    // Add the work page
+    try {
+      is = SearchIndexFulltextTest.class.getResourceAsStream(pageFile);
+      workPage = pageReader.read(is, site);
+      workPage.setVersion(Resource.WORK);
+      idx.add(workPage);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
   }
 
   /**
@@ -147,56 +170,16 @@ public class SearchIndexFulltextTest {
   }
 
   /**
-   * Creates the test setup.
-   * 
-   * @throws java.lang.Exception
-   *           if setup of the index fails
-   */
-  @Before
-  public void setUp() throws Exception {
-    // Prepare the pages
-    PageReader pageReader = new PageReader();
-    InputStream is = null;
-
-    // Add the live page
-    try {
-      is = this.getClass().getResourceAsStream(pageFile);
-      livePage = pageReader.read(is, site);
-      pagelet = livePage.getPagelets()[0];
-      idx.add(livePage);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-
-    // Add the work page
-    try {
-      is = this.getClass().getResourceAsStream(pageFile);
-      workPage = pageReader.read(is, site);
-      workPage.setVersion(Resource.WORK);
-      idx.add(workPage);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-  }
-
-  /**
-   * Does the cleanup after each test.
-   */
-  @After
-  public void tearDown() throws Exception {
-    idx.clear();
-  }
-
-  /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
   public void testGetWithPath() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(livePage.getURI().getPath());
+    String path = livePage.getURI().getPath();
+    SearchQuery q = new SearchQueryImpl(site).withPathPrefix(path);
     assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(livePage.getURI().getPath());
+    q.withText(path);
     assertEquals(1, idx.getByQuery(q).getItems().length);
   }
 
@@ -208,11 +191,22 @@ public class SearchIndexFulltextTest {
   @Test
   public void testGetWithPathPrefix() throws Exception {
     String path = livePage.getURI().getPath();
+    
+    // Check the full path
     String pathPrefix = path.substring(0, path.indexOf('/', 1));
     SearchQuery q = new SearchQueryImpl(site).withFulltext(true, pathPrefix);
     assertEquals(2, idx.getByQuery(q).getItems().length);
     q.withText(true, pathPrefix);
     assertEquals(0, idx.getByQuery(q).getItems().length);
+    
+    // Check path elements
+//    for (String pathElement : StringUtils.split(path, "/")) {
+//      q = new SearchQueryImpl(site).withFulltext(true, pathElement);
+//      assertEquals(2, idx.getByQuery(q).getItems().length);
+//      q.withText(true, pathElement);
+//      assertEquals(0, idx.getByQuery(q).getItems().length);
+//    }
+    
   }
 
   /**
@@ -226,6 +220,18 @@ public class SearchIndexFulltextTest {
     assertEquals(2, idx.getByQuery(q).getItems().length);
     q.withText(livePage.getTitle());
     assertEquals(0, idx.getByQuery(q).getItems().length);
+
+    // Lowercase match
+    q = new SearchQueryImpl(site).withFulltext(livePage.getTitle().toLowerCase());
+    assertEquals(2, idx.getByQuery(q).getItems().length);
+
+    // Partial matches
+    for (String part : StringUtils.split(livePage.getTitle())) {
+      q = new SearchQueryImpl(site).withFulltext(part);
+      assertEquals(2, idx.getByQuery(q).getItems().length);
+      q.withText(part);
+      assertEquals(0, idx.getByQuery(q).getItems().length);
+    }
   }
 
   /**
