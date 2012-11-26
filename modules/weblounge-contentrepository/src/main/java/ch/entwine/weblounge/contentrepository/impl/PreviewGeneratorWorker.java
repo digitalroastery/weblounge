@@ -179,6 +179,9 @@ class PreviewGeneratorWorker implements Runnable {
             // Create the file if it doesn't exist or if it is out dated. Note
             // that the last modified date of a file has a precision of seconds
             if (!scaledFile.isFile() || FileUtils.isFileOlder(scaledFile, new Date(lastModified))) {
+
+              logger.info("Creating preview at {}", scaledFile.getAbsolutePath());
+
               fis = new FileInputStream(originalPreview);
               fos = new FileOutputStream(scaledFile);
               imagePreviewGenerator.createPreview(originalPreview, environment, l, style, format, fis, fos);
