@@ -380,7 +380,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       // Make sure the preview is not already being generated
       synchronized (previews) {
         while (previews.contains(scaledImageFile)) {
-          logger.debug("Someone alreay asked for a preview of {}, waiting for it to be generated", scaledImageFile);
+          logger.debug("Preview at {} is being created, waiting for it to be generated", scaledImageFile);
           firstOne = false;
           try {
             previews.wait();
