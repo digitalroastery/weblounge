@@ -170,7 +170,7 @@ public class ImageResourceTag extends WebloungeTag {
     if (repository == null) {
       logger.debug("Unable to load content repository for site '{}'", site);
       response.invalidate();
-      return SKIP_BODY;
+      throw new JspException();
     }
 
     // Create the image uri, either from the id or the path. If none is
