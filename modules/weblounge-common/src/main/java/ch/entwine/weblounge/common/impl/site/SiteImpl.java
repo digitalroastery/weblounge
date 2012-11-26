@@ -692,8 +692,6 @@ public class SiteImpl implements Site {
    * @see ch.entwine.weblounge.common.site.Site#getContentRepository()
    */
   public ContentRepository getContentRepository() {
-    if (!isOnline)
-      return null;
     return contentRepository;
   }
 
