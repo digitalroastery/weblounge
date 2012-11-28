@@ -27,6 +27,7 @@ import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.SharedHttpContext;
 import ch.entwine.weblounge.dispatcher.SiteDispatcherService;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
@@ -54,6 +55,9 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   /** Logging instance */
   private static final Logger logger = LoggerFactory.getLogger(DispatcherServiceImpl.class);
 
+  /** Property name of the weblounge instance */
+  private static final String OPT_INSTANCE_NAME = "ch.entwine.weblounge.name";
+  
   /** The main dispatcher servlet */
   private WebloungeDispatcherServlet dispatcher = null;
 
@@ -63,6 +67,9 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   /** The environment */
   private Environment environment = Environment.Production;
 
+  /** Name of this Weblounge instance */
+  private String instanceName = null;
+  
   /**
    * Creates a new instance of the dispatcher service.
    */
@@ -99,6 +106,13 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     initParams.put("pattern", ".*");
     dispatcherServiceRegistration = bundleContext.registerService(Servlet.class.getName(), dispatcher, initParams);
 
+    instanceName = StringUtils.trimToNull(context.getBundleContext().getProperty(OPT_INSTANCE_NAME));
+    if (instanceName != null)
+      logger.info("Instance name is '{}'", instanceName);
+    else
+      logger.debug("No explicit instance name has been set");
+    dispatcher.setName(instanceName);
+    
     logger.debug("Weblounge dispatcher activated");
   }
 

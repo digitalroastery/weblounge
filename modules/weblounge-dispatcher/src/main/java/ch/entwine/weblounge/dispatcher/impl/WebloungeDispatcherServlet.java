@@ -112,6 +112,9 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   /** The response caches */
   private Map<String, ResponseCache> caches = null;
 
+  /** Name of this Weblounge instance */
+  private String instanceName = null;
+
   static {
     wellknownFiles.add("/favicon.ico");
     wellknownFiles.add("/robots.txt");
@@ -140,33 +143,14 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   }
 
   /**
-   * Sets the site locator.
+   * Sets the name of this Weblounge instance or <code>null</code> if no
+   * instance name was configured.
    * 
-   * @param siteDispatcher
-   *          the site locator
+   * @param instanceName
+   *          name of the instance
    */
-  void setSiteDispatcher(SiteDispatcherService siteDispatcher) {
-    this.sites = siteDispatcher;
-  }
-
-  /**
-   * Removes the site locator.
-   * 
-   * @param siteDispatcher
-   *          the site locator
-   */
-  void removeSiteDispatcher(SiteDispatcherService siteDispatcher) {
-    this.sites = null;
-  }
-
-  /**
-   * Sets the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
+  public void setName(String instanceName) {
+    this.instanceName = instanceName;
   }
 
   /**
@@ -272,6 +256,13 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   @Override
   protected void service(HttpServletRequest httpRequest,
       HttpServletResponse httpResponse) throws ServletException, IOException {
+
+    // Return the instance information
+    if (instanceName == null) {
+      instanceName = httpRequest.getServerName();
+      logger.info("Instance name defaults to '{}'", instanceName);
+    }
+    httpResponse.addHeader("X-Weblounge-Instance", instanceName);
 
     if (sites == null) {
       httpResponse.sendError(SC_SERVICE_UNAVAILABLE);
@@ -573,6 +564,36 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    */
   public void setEnvironment(Environment environment) {
     this.environment = environment;
+  }
+
+  /**
+   * Sets the site locator.
+   * 
+   * @param siteDispatcher
+   *          the site locator
+   */
+  void setSiteDispatcher(SiteDispatcherService siteDispatcher) {
+    this.sites = siteDispatcher;
+  }
+
+  /**
+   * Removes the site locator.
+   * 
+   * @param siteDispatcher
+   *          the site locator
+   */
+  void removeSiteDispatcher(SiteDispatcherService siteDispatcher) {
+    this.sites = null;
+  }
+
+  /**
+   * Sets the security service.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**
