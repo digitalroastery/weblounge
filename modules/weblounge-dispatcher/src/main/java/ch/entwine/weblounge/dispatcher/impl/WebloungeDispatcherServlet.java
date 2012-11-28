@@ -257,12 +257,10 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   protected void service(HttpServletRequest httpRequest,
       HttpServletResponse httpResponse) throws ServletException, IOException {
 
-    // Return the instance information
-    if (instanceName == null) {
-      instanceName = httpRequest.getServerName();
-      logger.info("Instance name defaults to '{}'", instanceName);
+    // Return the instance name if available
+    if (instanceName != null) {
+      httpResponse.addHeader("X-Weblounge-Instance", instanceName);
     }
-    httpResponse.addHeader("X-Weblounge-Instance", instanceName);
 
     if (sites == null) {
       httpResponse.sendError(SC_SERVICE_UNAVAILABLE);
