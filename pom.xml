@@ -837,8 +837,8 @@
       
       <dependency>
       	<groupId>org.springframework</groupId>
-     	<artifactId>org.springframework.core</artifactId>
-     	<version>3.0.2.RELEASE</version>
+     	  <artifactId>org.springframework.core</artifactId>
+     	  <version>3.1.0.RELEASE</version>
    	  </dependency>
     
       <!-- Testing -->
