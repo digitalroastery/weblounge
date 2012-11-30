@@ -428,8 +428,8 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
           } catch (IOException e) {
             logger.warn("Concurrent creation of preview {} resolved by copy instead of rename", scaledImageFile.getAbsolutePath());
             FileUtils.copyFile(workImageFile, scaledImageFile);
-          } finally {
             FileUtils.deleteQuietly(workImageFile);
+          } finally {
             scaledImageFile.setLastModified(new Date().getTime());
           }
 
