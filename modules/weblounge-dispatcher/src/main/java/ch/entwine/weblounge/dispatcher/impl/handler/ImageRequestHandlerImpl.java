@@ -381,10 +381,18 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       // Make sure the preview is not already being generated
       synchronized (previews) {
         while (previews.contains(pathToImageFile)) {
-          logger.debug("Preview at {} is being created, waiting for it to be generated", scaledImageFile);
+          logger.debug("Preview at {} is being created, waiting for it to be generated", pathToImageFile);
           firstOne = false;
           try {
-            previews.wait();
+            previews.wait(1000);
+            
+            // Was this a notify or a timeout?
+            if (previews.contains(pathToImageFile)) {
+              logger.debug("After waiting 1s, preview at {} is still being worked on", pathToImageFile);
+              DispatchUtils.sendServiceUnavailable(request, response);
+              return true;
+            }
+            
           } catch (InterruptedException e) {
             DispatchUtils.sendServiceUnavailable(request, response);
             return true;

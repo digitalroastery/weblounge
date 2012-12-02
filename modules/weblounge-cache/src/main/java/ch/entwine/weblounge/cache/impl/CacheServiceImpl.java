@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.cache.impl;
 
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+
 import ch.entwine.weblounge.cache.CacheListener;
 import ch.entwine.weblounge.cache.CacheService;
 import ch.entwine.weblounge.cache.StreamFilter;
@@ -607,7 +609,15 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         try {
           logger.debug("Waiting for cache transaction {} to be finished", request);
           while (transactions.containsKey(handle.getKey())) {
-            transactions.wait();
+            transactions.wait(1000);
+            
+            // Was this a notify or a timeout?
+            if (transactions.get(handle.getKey()) != null) {
+              logger.debug("After waiting 1s, cache entry {} is still being worked on", handle.getKey());
+              response.setStatus(SC_SERVICE_UNAVAILABLE);
+              return null;
+            }
+
           }
         } catch (InterruptedException e) {
           // Done sleeping!
