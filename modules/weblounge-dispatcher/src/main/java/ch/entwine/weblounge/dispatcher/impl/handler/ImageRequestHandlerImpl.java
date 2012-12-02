@@ -95,7 +95,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
   private final List<ImagePreviewGenerator> previewGenerators = new ArrayList<ImagePreviewGenerator>();
 
   /** The list of previews that are being created at the moment */
-  private final List<File> previews = new ArrayList<File>();
+  private final List<String> previews = new ArrayList<String>();
 
   /**
    * Handles the request for an image resource that is believed to be in the
@@ -369,6 +369,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Write the scaled file back to the response (and create it, if needed)
     boolean scalingFailed = false;
 
+    String pathToImageFile = scaledImageFile.getAbsolutePath();
     boolean scaledImageExists = scaledImageFile.isFile();
     boolean scaledImageIsOutdated = scaledImageFile.lastModified() < resourceLastModified;
 
@@ -379,7 +380,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
       // Make sure the preview is not already being generated
       synchronized (previews) {
-        while (previews.contains(scaledImageFile)) {
+        while (previews.contains(pathToImageFile)) {
           logger.debug("Preview at {} is being created, waiting for it to be generated", scaledImageFile);
           firstOne = false;
           try {
@@ -392,7 +393,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
         // Make sure others are waiting until we are done
         if (firstOne) {
-          previews.add(scaledImageFile);
+          previews.add(pathToImageFile);
         }
       }
 
@@ -401,7 +402,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
         logger.info("Creating preview of {} with style '{}' at {}", new String[] {
             imageResource.getIdentifier(),
             style.getIdentifier(),
-            scaledImageFile.getAbsolutePath() });
+            pathToImageFile });
 
         InputStream imageInputStream = null;
         FileOutputStream fos = null;
@@ -433,8 +434,15 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
             scaledImageFile.setLastModified(new Date().getTime());
           }
 
-          // Make sure preview generation was successful
-          scalingFailed = !scaledImageFile.isFile() || scaledImageFile.length() == 0;
+          // Make sure preview generation was successful          
+          if (!scaledImageFile.isFile()) {
+            logger.warn("The file at {} is not a regular file", pathToImageFile);
+            scalingFailed = true;
+          } else if (scaledImageFile.length() == 0) {
+            logger.warn("The scaled file at {} has zero length", pathToImageFile);
+            scalingFailed = true;
+          }
+
         } catch (ContentRepositoryException e) {
           logger.error("Unable to load image {}: {}", new Object[] {
               imageURI,
@@ -457,20 +465,26 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
           IOUtils.closeQuietly(imageInputStream);
           IOUtils.closeQuietly(fos);
 
-          if (scalingFailed && scaledImageFile != null) {
-            File f = scaledImageFile;
-            FileUtils.deleteQuietly(scaledImageFile);
-            f = scaledImageFile.getParentFile();
-            while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-              FileUtils.deleteQuietly(f);
-              f = f.getParentFile();
+          try {
+            if (scalingFailed && scaledImageFile != null) {
+              logger.info("Cleaning up after failed scaling of {}", pathToImageFile);
+              File f = scaledImageFile;
+              FileUtils.deleteQuietly(scaledImageFile);
+              f = scaledImageFile.getParentFile();
+              while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+                FileUtils.deleteQuietly(f);
+                f = f.getParentFile();
+              }
             }
+          } catch (Throwable t) {
+            logger.warn("Error cleaning up after failed scaling of {}", pathToImageFile);
           }
 
           synchronized (previews) {
-            previews.remove(scaledImageFile);
+            previews.remove(pathToImageFile);
             previews.notifyAll();
           }
+
         }
       }
 
