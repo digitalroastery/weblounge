@@ -139,6 +139,7 @@ public class PageletRendererImplTest {
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getIdentifier()).andReturn("testsite").anyTimes();
     EasyMock.expect(site.getHostname((Environment) EasyMock.anyObject())).andReturn(hostname).anyTimes();
+    EasyMock.expect(site.getOptionNames()).andReturn(new String[] {}).anyTimes();
     EasyMock.replay(site);
 
     module = EasyMock.createMock(Module.class);
