@@ -1030,11 +1030,15 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
       // Do the cleanup
       for (Iterator<PreviewOperation> i = currentPreviewOperations.iterator(); i.hasNext();) {
-        Resource<?> r = i.next().getResource();
+        PreviewOperation op = i.next();
+        Resource<?> r = op.getResource();
         if (r.equals(resource)) {
           logger.debug("Preview creation of {} finished", r.getURI());
           i.remove();
-          previews.remove(r.getURI());
+          PreviewOperation o = previews.get(r.getURI());
+          // In the meantime, someone may have canceled this operation and created a new one
+          if (op == o)
+            previews.remove(r.getURI());
           break;
         }
       }
