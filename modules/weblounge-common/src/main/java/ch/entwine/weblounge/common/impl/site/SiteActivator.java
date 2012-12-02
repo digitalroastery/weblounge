@@ -135,7 +135,7 @@ public class SiteActivator {
                 return null;
               }
             });
-          } catch (Exception e) {
+          } catch (Throwable e) {
             logger.error("Error loading site from bundle '{}': {}", bundleName, e.getMessage());
           }
         }
