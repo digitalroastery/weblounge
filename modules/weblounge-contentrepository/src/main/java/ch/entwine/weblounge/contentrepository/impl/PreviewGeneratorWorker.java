@@ -73,6 +73,9 @@ class PreviewGeneratorWorker implements Runnable {
 
   /** The format */
   private String format = null;
+  
+  /** Flag to indicate a canceled preview generation */
+  private boolean canceled = false;
 
   /**
    * Creates a new preview worker who will create the corresponding previews for
@@ -100,6 +103,13 @@ class PreviewGeneratorWorker implements Runnable {
     this.languages = languages;
     this.styles = styles;
     this.format = format;
+  }
+  
+  /**
+   * Indicates to this preview generation worker to cancel the current operation.
+   */
+  public void cancel() {
+    this.canceled = true;
   }
 
   /**
@@ -151,6 +161,10 @@ class PreviewGeneratorWorker implements Runnable {
         if (!resource.supportsContentLanguage(l))
           continue;
 
+        // Have we been told to stop doing work in the meantime?
+        if (canceled)
+          return;
+        
         // Create the original preview image for every language
         ImageStyle originalStyle = new ImageStyleImpl("original", ImageScalingMode.None);
         File originalPreview = null;
@@ -166,6 +180,10 @@ class PreviewGeneratorWorker implements Runnable {
 
         // Create the remaining styles
         for (ImageStyle style : styles) {
+
+          // Have we been told to stop doing work in the meantime?
+          if (canceled)
+            return;
 
           // The original has been produced already
           if (ImageScalingMode.None.equals(style.getScalingMode()))
@@ -209,6 +227,8 @@ class PreviewGeneratorWorker implements Runnable {
       }
 
     } finally {
+      if (canceled)
+        logger.debug("Preview operation for {} has been canceled", resource.getIdentifier());
       contentRepository.previewCreated(resource);
     }
   }
