@@ -855,7 +855,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       ResourceReader<?, ?> resourceReader = serializer.getReader();
       resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       resource.setModified(user, new Date());
-      contentRepository.put(resource);
+      contentRepository.put(resource, false);
 
       // Check if the resource has been moved
       String currentPath = currentResource.getURI().getPath();
