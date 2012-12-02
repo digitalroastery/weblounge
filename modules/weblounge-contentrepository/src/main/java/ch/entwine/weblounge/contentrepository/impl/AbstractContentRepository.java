@@ -225,7 +225,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       previewOperations.clear();
       previews.clear();
     }
-    
+
     // Close the image style tracker
     if (imageStyleTracker != null) {
       imageStyleTracker.close();
@@ -627,7 +627,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    *           if populating the index fails
    */
   protected abstract ContentRepositoryIndex loadIndex() throws IOException,
-  ContentRepositoryException;
+      ContentRepositoryException;
 
   /**
    * {@inheritDoc}
@@ -978,10 +978,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
       // is there an existing operation for this resource? If so, simply update
       // it and be done.
       previewOp = previews.get(uri);
-      PreviewGeneratorWorker worker = previewOp.getWorker();
-      if (worker != null) {
-        logger.info("Canceling current preview generation for {} in favor of more recent data", uri);
-        worker.cancel();
+      if (previewOp != null) {
+        PreviewGeneratorWorker worker = previewOp.getWorker();
+        if (worker != null) {
+          logger.info("Canceling current preview generation for {} in favor of more recent data", uri);
+          worker.cancel();
+        }
       }
 
       // Otherwise, a new preview generator needs to be started.
@@ -1036,7 +1038,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
           logger.debug("Preview creation of {} finished", r.getURI());
           i.remove();
           PreviewOperation o = previews.get(r.getURI());
-          // In the meantime, someone may have canceled this operation and created a new one
+          // In the meantime, someone may have canceled this operation and
+          // created a new one
           if (op == o)
             previews.remove(r.getURI());
           break;
@@ -1233,7 +1236,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
     /** Name of the preview image format */
     private String format = null;
-    
+
     /** Worker that is in charge of conducting this operation */
     private PreviewGeneratorWorker worker = null;
 
@@ -1251,12 +1254,13 @@ public abstract class AbstractContentRepository implements ContentRepository {
     /**
      * Sets the worker that is in charge of conducting this operation.
      * 
-     * @param worker the worker
+     * @param worker
+     *          the worker
      */
     void setWorker(PreviewGeneratorWorker worker) {
       this.worker = worker;
     }
-    
+
     /**
      * Returns the worker that is in charge of this operation.
      * 
@@ -1265,7 +1269,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     PreviewGeneratorWorker getWorker() {
       return this.worker;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
