@@ -214,14 +214,14 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     InputStream contentRepositoryIs = null;
     FileOutputStream fos = null;
     try {
-      long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
-      if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
+      long resourceLastModified = ResourceUtils.getModificationDate(resource, language).getTime();
+      if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < resourceLastModified) {
         if (!force)
           throw new WebApplicationException(Response.Status.NOT_FOUND);
 
         contentRepositoryIs = contentRepository.getContent(resourceURI, language);
         scaledResourceFile = ImageStyleUtils.createScaledFile(resource, language, style);
-        scaledResourceFile.setLastModified(new Date().getTime());
+        scaledResourceFile.setLastModified(Math.max(new Date().getTime(), resourceLastModified));
         fos = new FileOutputStream(scaledResourceFile);
         logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
 

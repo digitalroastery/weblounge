@@ -176,7 +176,7 @@ class PreviewGeneratorWorker implements Runnable {
           return;
         }
 
-        long lastModified = ResourceUtils.getModificationDate(resource, l).getTime();
+        long resourceLastModified = ResourceUtils.getModificationDate(resource, l).getTime();
 
         // Create the remaining styles
         for (ImageStyle style : styles) {
@@ -196,13 +196,14 @@ class PreviewGeneratorWorker implements Runnable {
 
             // Create the file if it doesn't exist or if it is out dated. Note
             // that the last modified date of a file has a precision of seconds
-            if (!scaledFile.isFile() || FileUtils.isFileOlder(scaledFile, new Date(lastModified))) {
+            if (!scaledFile.isFile() || FileUtils.isFileOlder(scaledFile, new Date(resourceLastModified))) {
 
               logger.info("Creating preview at {}", scaledFile.getAbsolutePath());
 
               fis = new FileInputStream(originalPreview);
               fos = new FileOutputStream(scaledFile);
               imagePreviewGenerator.createPreview(originalPreview, environment, l, style, format, fis, fos);
+              scaledFile.setLastModified(Math.max(new Date().getTime(), resourceLastModified));
 
               // Store the style definition used while creating the preview
               File baseDir = ImageStyleUtils.getScaledFileBase(resource.getURI().getSite(), style);

@@ -439,7 +439,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
             FileUtils.copyFile(workImageFile, scaledImageFile);
             FileUtils.deleteQuietly(workImageFile);
           } finally {
-            scaledImageFile.setLastModified(new Date().getTime());
+            scaledImageFile.setLastModified(Math.max(new Date().getTime(), resourceLastModified));
           }
 
           // Make sure preview generation was successful          
