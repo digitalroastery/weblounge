@@ -120,7 +120,7 @@ public class RobotsRequestHandlerImpl implements RequestHandler {
     String path = url.getPath();
 
     // Is the request intended for this handler?
-    if (!path.equals(URI_PREFIX)) {
+    if (!URI_PREFIX.equals(path)) {
       logger.debug("Skipping request for {}, request path does not start with {}", URI_PREFIX);
       return false;
     }
