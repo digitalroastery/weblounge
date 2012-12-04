@@ -224,7 +224,7 @@ public class SearchIndexRecencyPriorityTest {
    */
   @Test
   public void testGetWithRecencyPriority() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withText(content);
+    SearchQuery q = new SearchQueryImpl(site).withText(true, content);
 
     // Search without recency boosting
     SearchResultItem[] items = idx.getByQuery(q).getItems();

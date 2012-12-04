@@ -161,7 +161,7 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
 
     // Create the search expression and the query
     SearchQuery q = new SearchQueryImpl(site);
-    q.withText(queryString.contains("*"), queryString);
+    q.withText(true, queryString);
     q.withVersion(Resource.LIVE);
     q.withRececyPriority();
     q.withOffset(offset);

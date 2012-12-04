@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.contentrepository.index;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.Resource;
@@ -32,6 +33,7 @@ import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
@@ -44,10 +46,9 @@ import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSe
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -79,16 +80,16 @@ public class SearchIndexFulltextTest {
   protected static Site site = null;
 
   /** The sample page */
-  protected String pageFile = "/page.xml";
+  protected static String pageFile = "/page.xml";
 
   /** The sample live page */
-  protected Page livePage = null;
+  protected static Page livePage = null;
 
   /** The sample work page */
-  protected Page workPage = null;
+  protected static Page workPage = null;
 
   /** The sample pagelet */
-  protected Pagelet pagelet = null;
+  protected static Pagelet pagelet = null;
 
   /** The resource serializer */
   private static ResourceSerializerServiceImpl serializer = null;
@@ -131,6 +132,30 @@ public class SearchIndexFulltextTest {
     System.setProperty("weblounge.home", rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
     idx = new SearchIndex(site, serializer, isReadOnly);
+
+    // Prepare the pages
+    PageReader pageReader = new PageReader();
+    InputStream is = null;
+
+    // Add the live page
+    try {
+      is = SearchIndexFulltextTest.class.getResourceAsStream(pageFile);
+      livePage = pageReader.read(is, site);
+      pagelet = livePage.getPagelets()[0];
+      idx.add(livePage);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
+
+    // Add the work page
+    try {
+      is = SearchIndexFulltextTest.class.getResourceAsStream(pageFile);
+      workPage = pageReader.read(is, site);
+      workPage.setVersion(Resource.WORK);
+      idx.add(workPage);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
   }
 
   /**
@@ -147,56 +172,16 @@ public class SearchIndexFulltextTest {
   }
 
   /**
-   * Creates the test setup.
-   * 
-   * @throws java.lang.Exception
-   *           if setup of the index fails
-   */
-  @Before
-  public void setUp() throws Exception {
-    // Prepare the pages
-    PageReader pageReader = new PageReader();
-    InputStream is = null;
-
-    // Add the live page
-    try {
-      is = this.getClass().getResourceAsStream(pageFile);
-      livePage = pageReader.read(is, site);
-      pagelet = livePage.getPagelets()[0];
-      idx.add(livePage);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-
-    // Add the work page
-    try {
-      is = this.getClass().getResourceAsStream(pageFile);
-      workPage = pageReader.read(is, site);
-      workPage.setVersion(Resource.WORK);
-      idx.add(workPage);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-  }
-
-  /**
-   * Does the cleanup after each test.
-   */
-  @After
-  public void tearDown() throws Exception {
-    idx.clear();
-  }
-
-  /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
   public void testGetWithPath() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(livePage.getURI().getPath());
+    String path = livePage.getURI().getPath();
+    SearchQuery q = new SearchQueryImpl(site).withPathPrefix(path);
     assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(livePage.getURI().getPath());
+    q.withText(path);
     assertEquals(1, idx.getByQuery(q).getItems().length);
   }
 
@@ -208,11 +193,18 @@ public class SearchIndexFulltextTest {
   @Test
   public void testGetWithPathPrefix() throws Exception {
     String path = livePage.getURI().getPath();
+
+    // Check the full path
     String pathPrefix = path.substring(0, path.indexOf('/', 1));
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(true, pathPrefix);
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(true, pathPrefix);
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+
+    assertSearchResult(pathPrefix, true, 2, 1);
+
+    // Check path elements
+    for (String pathElement : StringUtils.split(path, "/")) {
+      if (pathElement.length() > 2)
+        assertSearchResult(pathElement, true, 2, 1);
+    }
+
   }
 
   /**
@@ -222,10 +214,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithTitle() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(livePage.getTitle());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(livePage.getTitle());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(livePage.getTitle(), false, 2, 0);
   }
 
   /**
@@ -235,10 +224,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithDescription() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(livePage.getDescription());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(livePage.getDescription());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(livePage.getDescription(), false, 2, 0);
   }
 
   /**
@@ -274,10 +260,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithOwner() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(livePage.getOwner().getName());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(livePage.getOwner().getName());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(livePage.getOwner().getName(), false, 2, 0);
   }
 
   /**
@@ -287,10 +270,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithCreator() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(livePage.getCreator().getName());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(livePage.getCreator().getName());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(livePage.getCreator().getName(), false, 2, 0);
   }
 
   /**
@@ -300,10 +280,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithModifier() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(livePage.getModifier().getName());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(livePage.getModifier().getName());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(livePage.getModifier().getName(), false, 2, 0);
   }
 
   /**
@@ -313,10 +290,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithPublisher() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(livePage.getPublisher().getName());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(livePage.getPublisher().getName());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(livePage.getPublisher().getName(), false, 2, 0);
   }
 
   /**
@@ -326,10 +300,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithLockOwner() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(livePage.getLockOwner().getName());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(livePage.getLockOwner().getName());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(livePage.getLockOwner().getName(), false, 2, 0);
   }
 
   /**
@@ -353,11 +324,8 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithContent() throws Exception {
-    String text = "text";
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(text);
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(text);
-    assertEquals(1, idx.getByQuery(q).getItems().length);
+    assertSearchResult("text", true, 2, 1);
+    assertSearchResult("titre", true, 2, 0);
   }
 
   /**
@@ -367,10 +335,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithPageletOwner() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(pagelet.getOwner().getName());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(pagelet.getOwner().getName());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(pagelet.getOwner().getName(), false, 2, 0);
   }
 
   /**
@@ -380,10 +345,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithPageletCreator() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(pagelet.getCreator().getName());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(pagelet.getCreator().getName());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(pagelet.getCreator().getName(), false, 2, 0);
   }
 
   /**
@@ -393,10 +355,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithPageletModifier() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(pagelet.getModifier().getName());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(pagelet.getModifier().getName());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(pagelet.getModifier().getName(), false, 2, 0);
   }
 
   /**
@@ -406,10 +365,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithPageletPublisher() throws Exception {
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(pagelet.getPublisher().getName());
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(pagelet.getPublisher().getName());
-    assertEquals(0, idx.getByQuery(q).getItems().length);
+    assertSearchResult(pagelet.getPublisher().getName(), false, 2, 0);
   }
 
   /**
@@ -419,11 +375,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithPageletContent() throws Exception {
-    String pageletContentId = "textid";
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(pagelet.getContent(pageletContentId));
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(pagelet.getContent(pageletContentId));
-    assertEquals(1, idx.getByQuery(q).getItems().length);
+    assertSearchResult(pagelet.getContent("textid"), false, 2, 1);
   }
 
   /**
@@ -433,11 +385,7 @@ public class SearchIndexFulltextTest {
    */
   @Test
   public void testGetWithWildcardPageletContent() throws Exception {
-    String textPrefix = pagelet.getContent("textid").substring(0, 2);
-    SearchQuery q = new SearchQueryImpl(site).withFulltext(true, textPrefix);
-    assertEquals(2, idx.getByQuery(q).getItems().length);
-    q.withText(true, pagelet.getContent("textid").substring(0, 2));
-    assertEquals(1, idx.getByQuery(q).getItems().length);
+    assertSearchResult(pagelet.getContent("textid").substring(0, 5), true, 2, 1);
   }
 
   /**
@@ -451,6 +399,42 @@ public class SearchIndexFulltextTest {
     assertEquals(2, idx.getByQuery(q).getItems().length);
     q.withText(pagelet.getProperty("propertyid"));
     assertEquals(0, idx.getByQuery(q).getItems().length);
+  }
+
+  /**
+   * Helper method to test existence of search text and parts thereof in the
+   * fulltext and in the text index.
+   * 
+   * @param searchText
+   *          the text to search for
+   * @param fuzzy
+   *          whether to do a fuzzy search only
+   * @param expectedInFulltext
+   *          expected number of hits in the fulltext index
+   * @param expectedInText
+   *          expected number of hits in the text index
+   * @throws ContentRepositoryException
+   *           if searching fails
+   */
+  private void assertSearchResult(String searchText, boolean fuzzy,
+      int expectedInFulltext, int expectedInText)
+      throws ContentRepositoryException {
+    SearchQuery q = new SearchQueryImpl(site).withFulltext(fuzzy, searchText);
+    assertEquals(expectedInFulltext, idx.getByQuery(q).getItems().length);
+    q = new SearchQueryImpl(site).withText(fuzzy, searchText);
+    assertEquals(expectedInText, idx.getByQuery(q).getItems().length);
+
+    // Lowercase match
+    q = new SearchQueryImpl(site).withFulltext(true, searchText.toLowerCase());
+    assertEquals(2, idx.getByQuery(q).getItems().length);
+
+    // Partial matches
+    for (String part : StringUtils.split(searchText)) {
+      q = new SearchQueryImpl(site).withFulltext(true, part);
+      assertTrue(idx.getByQuery(q).getItems().length >= expectedInFulltext);
+      q.withText(true, part);
+      assertTrue(idx.getByQuery(q).getItems().length >= expectedInText);
+    }
   }
 
 }

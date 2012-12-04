@@ -20,6 +20,10 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;
 
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.FULLTEXT_FUZZY;
+
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEXT_FUZZY;
+
 import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CONTENT_EXTERNAL_REPRESENTATION;
@@ -66,6 +70,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.FuzzyLikeThisQueryBuilder;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -73,7 +78,6 @@ import org.elasticsearch.index.query.QueryBuilderException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
-import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,14 +124,14 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /** Text query */
   private String text = null;
 
-  /** Wildcard text query */
-  private String wildcardText = null;
+  /** Fuzzy text query */
+  private String fuzzyText = null;
 
   /** Fulltext query */
   private String fulltext = null;
 
-  /** Wildcard fulltext query */
-  private String wildcardFulltext = null;
+  /** Fuzzy fulltext query */
+  private String fuzzyFulltext = null;
 
   /** True if more recent documents should be boosted */
   private boolean recencyBoost = false;
@@ -361,41 +365,21 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     // Fulltext
     if (query.getFulltext() != null) {
-      boolean containsWildcardCharacters = false;
-
-      // Check if the user has set wildcards already
-      if (query.isWildcardSearch()) {
-        wildcardsearch: for (SearchTerms<String> terms : query.getFulltext()) {
-          for (String text : terms.getTerms()) {
-            if (text.contains("*")) {
-              containsWildcardCharacters = true;
-              break wildcardsearch;
-            }
-          }
-        }
-      }
-
       for (SearchTerms<String> terms : query.getFulltext()) {
-        for (String text : terms.getTerms()) {
-          if (query.isWildcardSearch()) {
-            if (wildcardFulltext != null)
-              wildcardFulltext += " ";
-            else
-              wildcardFulltext = "";
-            if (!containsWildcardCharacters)
-              wildcardFulltext += text + "*";
-          } else {
-            if (fulltext != null)
-              fulltext += " ";
-            else
-              fulltext = "";
-            fulltext += text;
-          }
+        StringBuffer queryText = new StringBuffer();
+        for (String term : terms.getTerms()) {
+          if (queryText.length() > 0)
+            queryText.append(" ");
+          queryText.append(term);
         }
+        if (query.isFuzzySearch())
+          fuzzyFulltext = queryText.toString();
+        else
+          fulltext = queryText.toString();
         if (All.equals(terms.getQuantifier())) {
           if (groups == null)
             groups = new ArrayList<ValueGroup>();
-          if (query.isWildcardSearch()) {
+          if (query.isFuzzySearch()) {
             logger.warn("All quantifier not supported in conjunction with wildcard fulltext");
           }
           groups.add(new ValueGroup(FULLTEXT, (Object[]) terms.getTerms().toArray(new String[terms.size()])));
@@ -404,42 +388,22 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     }
 
     // Text
-    if (query.getText() != null) {
-      boolean containsWildcardCharacters = false;
-
-      // Check if the user has set wildcards already
-      if (query.isWildcardSearch()) {
-        wildcardsearch: for (SearchTerms<String> terms : query.getText()) {
-          for (String text : terms.getTerms()) {
-            if (text.contains("*")) {
-              containsWildcardCharacters = true;
-              break wildcardsearch;
-            }
-          }
+    if (query.getTerms() != null) {
+      for (SearchTerms<String> terms : query.getTerms()) {
+        StringBuffer queryText = new StringBuffer();
+        for (String term : terms.getTerms()) {
+          if (queryText.length() > 0)
+            queryText.append(" ");
+          queryText.append(term);
         }
-      }
-
-      for (SearchTerms<String> terms : query.getText()) {
-        for (String text : terms.getTerms()) {
-          if (query.isWildcardSearch()) {
-            if (wildcardText != null)
-              wildcardText += " ";
-            else
-              wildcardText = "";
-            if (!containsWildcardCharacters)
-              wildcardText += text + "*";
-          } else {
-            if (this.text != null)
-              this.text += " ";
-            else
-              this.text = "";
-            this.text += text;
-          }
-        }
+        if (query.isFuzzySearch())
+          fuzzyText = queryText.toString();
+        else
+          this.text = queryText.toString();
         if (All.equals(terms.getQuantifier())) {
           if (groups == null)
             groups = new ArrayList<ValueGroup>();
-          if (query.isWildcardSearch()) {
+          if (query.isFuzzySearch()) {
             logger.warn("All quantifier not supported in conjunction with wildcard text");
           }
           groups.add(new ValueGroup(TEXT, (Object[]) terms.getTerms().toArray(new String[terms.size()])));
@@ -507,10 +471,10 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
       this.queryBuilder = booleanQuery;
     }
 
-    // Wildcard text
-    if (wildcardText != null) {
-      WildcardQueryBuilder wcQueryBuilder = QueryBuilders.wildcardQuery(TEXT, wildcardText);
-      booleanQuery.must(wcQueryBuilder);
+    // Fuzzy text
+    if (fuzzyText != null) {
+      FuzzyLikeThisQueryBuilder fuzzyQueryBuilder = QueryBuilders.fuzzyLikeThisQuery(TEXT_FUZZY).likeText(fuzzyText);
+      booleanQuery.must(fuzzyQueryBuilder);
       this.queryBuilder = booleanQuery;
     }
 
@@ -521,10 +485,10 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
       this.queryBuilder = booleanQuery;
     }
 
-    // Wildcard fulltext
-    if (wildcardFulltext != null) {
-      WildcardQueryBuilder wcQueryBuilder = QueryBuilders.wildcardQuery(FULLTEXT, wildcardFulltext);
-      booleanQuery.must(wcQueryBuilder);
+    // Fuzzy fulltext
+    if (fuzzyFulltext != null) {
+      FuzzyLikeThisQueryBuilder fuzzyQueryBuilder = QueryBuilders.fuzzyLikeThisQuery(FULLTEXT_FUZZY).likeText(fuzzyFulltext);
+      booleanQuery.must(fuzzyQueryBuilder);
       this.queryBuilder = booleanQuery;
     }
 

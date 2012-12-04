@@ -270,7 +270,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       else if (filter.contains("/")) {
         q.withPathPrefix(filter);
       } else {
-        q.withText(true, filter);
+        q.withFulltext(true, filter);
       }
 
     }
