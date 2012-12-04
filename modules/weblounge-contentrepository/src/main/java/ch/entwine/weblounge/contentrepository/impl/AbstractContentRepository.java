@@ -963,7 +963,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     // Add the site's preview image styles as well as
     for (Module m : getSite().getModules()) {
       for (ImageStyle s : m.getImageStyles()) {
-        if (s.createPreview(resource.getType())) {
+        if (s.createPreview(resource.getURI().getType())) {
           previewStyles.add(s);
           logger.debug("Preview images will be generated for {}", s);
         } else {
