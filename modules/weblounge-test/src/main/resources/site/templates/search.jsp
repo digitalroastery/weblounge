@@ -17,7 +17,7 @@
 			<input type="hidden" name="limit" value="15"/>
 			<input type="hidden" name="target-template" value="search"/>
 			<% if (result != null) { %>
-			<input type="text" name="query" value="<%=result.getQuery().getQueryString() %>"/><input type="submit" name="Search"/>
+			<input type="text" name="query" value="<%= result.getQuery().getQueryString() %>"/><input type="submit" name="Search"/>
 			<% } else { %>
 			<input type="text" name="query"/><input type="submit" name="Search"/>
 			<% } %>

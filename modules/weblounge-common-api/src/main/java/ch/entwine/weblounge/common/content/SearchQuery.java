@@ -325,14 +325,14 @@ public interface SearchQuery {
    * Note that this search field is not intended to serve frontend applications
    * but rather backend purposes.
    * 
-   * @param wildcardSearch
-   *          <code>True</code> to perform a (much slower) wildcard search
+   * @param fuzzy
+   *          <code>true</code> to perform a fuzzy search
    * @param text
    *          the text to look up
    * 
    * @return the query extended by this criterion
    */
-  SearchQuery withFulltext(boolean wildcardSearch, String text);
+  SearchQuery withFulltext(boolean fuzzy, String text);
 
   /**
    * Return resources that contain the given text in the fulltext search field.
@@ -340,8 +340,8 @@ public interface SearchQuery {
    * Note that this search field is not intended to serve frontend applications
    * but rather backend purposes.
    * 
-   * @param wildcardSearch
-   *          <code>True</code> to perform a (much slower) wildcard search
+   * @param fuzzy
+   *          <code>true</code> to perform a fuzzy search
    * @param quantifier
    *          whether documents need to match all or just one of the text
    *          elements
@@ -349,8 +349,7 @@ public interface SearchQuery {
    *          the text to look up
    * @return the query extended by this criterion
    */
-  SearchQuery withFulltext(boolean wildcardSearch, Quantifier quantifier,
-      String... text);
+  SearchQuery withFulltext(boolean fuzzy, Quantifier quantifier, String... text);
 
   /**
    * Returns the fulltext search terms or <code>null</code> if no text was
@@ -362,11 +361,11 @@ public interface SearchQuery {
 
   /**
    * Returns <code>true</code> if the current search operation should be
-   * performed using (slower) wildcard searching.
+   * performed using fuzzy searching.
    * 
-   * @return <code>true</code> if wildcard search should be used
+   * @return <code>true</code> if fzzy search should be used
    */
-  boolean isWildcardSearch();
+  boolean isFuzzySearch();
 
   /**
    * Returns resources that match the search query <i>and</i> and the text

@@ -42,6 +42,9 @@ import java.util.List;
  */
 public final class ElasticSearchDocument extends HashMap<String, Object> {
 
+  /** Extension for fuzzy field names */
+  public static final String FUZZY_FIELDNAME_EXTENSION = "_fuzzy";
+  
   /** Serial version uid */
   private static final long serialVersionUID = 2687550418831284487L;
 
@@ -93,8 +96,11 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
 
     // Get existing fulltext entries
     Collection<String> fulltext = (Collection<String>) get(fulltextFieldName);
-    if (fulltext == null)
+    if (fulltext == null) {
       fulltext = new ArrayList<String>();
+      put(fulltextFieldName, fulltext);
+      put(fulltextFieldName + FUZZY_FIELDNAME_EXTENSION, fulltext);
+    }
 
     // Language neutral elements
     for (Object value : item.getValues()) {
@@ -108,15 +114,15 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
       }
     }
 
-    put(fulltextFieldName, fulltext);
-
     // Add localized metadata values
     for (Language language : item.getLocalizedValues().keySet()) {
       // Get existing fulltext entries
       String localizedFieldName = MessageFormat.format(localizedFulltextFieldName, language.getIdentifier());
       Collection<String> localizedFulltext = (Collection<String>) get(localizedFieldName);
-      if (fulltext == null)
+      if (fulltext == null) {
         fulltext = new ArrayList<String>();
+        put(localizedFieldName, fulltext);
+      }
       Collection<?> values = item.getLocalizedValues().get(language);
       for (Object value : values) {
         if (value.getClass().isArray()) {
@@ -128,7 +134,6 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
           localizedFulltext.add(value.toString());
         }
       }
-      put(localizedFieldName, localizedFulltext);
     }
 
   }

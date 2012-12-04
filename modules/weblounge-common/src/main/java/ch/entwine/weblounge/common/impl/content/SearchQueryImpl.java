@@ -41,6 +41,7 @@ import org.apache.commons.lang.StringUtils;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -173,7 +174,7 @@ public class SearchQueryImpl implements SearchQuery {
   protected List<SearchTerms<String>> text = null;
 
   /** True if the search text should be matched using wildcards */
-  protected boolean wildcardSearch = true;
+  protected boolean fuzzySearch = true;
 
   /** Filter terms */
   protected String filter = null;
@@ -1064,7 +1065,7 @@ public class SearchQueryImpl implements SearchQuery {
 
     // Add the text to the search terms
     clearExpectations();
-    this.wildcardSearch = wildcardSearch;
+    this.fuzzySearch = wildcardSearch;
     with(this.text, quantifier, text);
     return this;
   }
@@ -1117,8 +1118,8 @@ public class SearchQueryImpl implements SearchQuery {
    *      java.lang.String)
    */
   @Override
-  public SearchQuery withFulltext(boolean wildcardSearch, String text) {
-    return withFulltext(wildcardSearch, Any, text);
+  public SearchQuery withFulltext(boolean fuzzy, String text) {
+    return withFulltext(fuzzy, Any, text);
   }
 
   /**
@@ -1128,8 +1129,8 @@ public class SearchQueryImpl implements SearchQuery {
    *      ch.entwine.weblounge.common.content.SearchQuery.Quantifier,
    *      java.lang.String[])
    */
-  public SearchQuery withFulltext(boolean wildcardSearch,
-      Quantifier quantifier, String... text) {
+  public SearchQuery withFulltext(boolean fuzzy, Quantifier quantifier,
+      String... text) {
     if (quantifier == null)
       throw new IllegalArgumentException("Quantifier must not be null");
     if (text == null)
@@ -1141,7 +1142,7 @@ public class SearchQueryImpl implements SearchQuery {
 
     // Add the text to the search terms
     clearExpectations();
-    this.wildcardSearch = wildcardSearch;
+    this.fuzzySearch = fuzzy;
     with(this.fulltext, quantifier, text);
     return this;
   }
@@ -1159,10 +1160,10 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#isWildcardSearch()
+   * @see ch.entwine.weblounge.common.content.SearchQuery#isFuzzySearch()
    */
-  public boolean isWildcardSearch() {
-    return wildcardSearch;
+  public boolean isFuzzySearch() {
+    return fuzzySearch;
   }
 
   /**
