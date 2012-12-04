@@ -54,8 +54,17 @@ public class ImageStyleImplTest {
   /** Is the style composeable? */
   protected boolean composeable = false;
 
+  /** The image context */
+  protected String pageContext = "page";
+
   /** Is this style automatically created? */
-  protected boolean preview = true;
+  protected boolean createPreviewsForPages = false;
+
+  /** The image context */
+  protected String imageContext = "image";
+
+  /** Is this style automatically created? */
+  protected boolean createPreviewsForImages = true;
 
   /** The German language */
   protected Language german = LanguageUtils.getLanguage("de");
@@ -71,8 +80,10 @@ public class ImageStyleImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    imageStyle = new ImageStyleImpl(id, width, height, scalingMode, composeable, preview);
+    imageStyle = new ImageStyleImpl(id, width, height, scalingMode, composeable, createPreviewsForImages);
     imageStyle.setName(name);
+    imageStyle.addContext(imageContext, createPreviewsForImages);
+    imageStyle.addContext(pageContext, createPreviewsForPages);
   }
 
   /**
@@ -132,7 +143,8 @@ public class ImageStyleImplTest {
    */
   @Test
   public void testIsPreview() {
-    assertEquals(preview, imageStyle.isPreview());
+    assertEquals(createPreviewsForPages, imageStyle.createPreview(pageContext));
+    assertEquals(createPreviewsForImages, imageStyle.createPreview(imageContext));
   }
 
   /**
@@ -143,7 +155,7 @@ public class ImageStyleImplTest {
   @Test
   public void testEqualsObject() {
     assertTrue(imageStyle.equals(new ImageStyleImpl(id, 1, 1)));
-    assertFalse(imageStyle.equals(new ImageStyleImpl("test", width, height, scalingMode, composeable, preview)));
+    assertFalse(imageStyle.equals(new ImageStyleImpl("test", width, height, scalingMode, composeable, createPreviewsForImages)));
   }
 
 }

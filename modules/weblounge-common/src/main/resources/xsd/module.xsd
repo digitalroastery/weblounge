@@ -126,10 +126,10 @@
         <xsd:element ref="scalingmode" />
         <xsd:element name="width" type="xsd:int" minOccurs="0" />
         <xsd:element name="height" type="xsd:int" minOccurs="0" />
+        <xsd:element ref="context"/>
       </xsd:sequence>
       <xsd:attribute name="id" type="idType" use="required" />
       <xsd:attribute name="composeable" type="xsd:boolean" />
-      <xsd:attribute name="preview" type="xsd:boolean" />
     </xsd:complexType>
   </xsd:element>
 
@@ -144,6 +144,29 @@
         <xsd:enumeration value="none" />
       </xsd:restriction>
     </xsd:simpleType>
+  </xsd:element>
+
+  <xsd:element name="context">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="resource" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="resource">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="all" />
+          <xsd:enumeration value="file" />
+          <xsd:enumeration value="image" />
+          <xsd:enumeration value="movie" />
+          <xsd:enumeration value="page" />
+        </xsd:restriction>
+      </xsd:simpleContent>
+      <xsd:attribute name="preview" type="xsd:boolean" />
+    </xsd:complexType>
   </xsd:element>
   
   <xsd:element name="includes">

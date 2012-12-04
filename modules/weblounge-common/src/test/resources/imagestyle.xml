@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<imagestyle id="default" composeable="false" preview="true">
+<imagestyle id="default" composeable="false">
   <name><![CDATA[Default]]></name>
   <scalingmode>cover</scalingmode>
   <width>250</width>
   <height>300</height>
+  <context>
+  	<resource preview="true">image</resource>
+  	<resource>page</resource>
+  </context>
 </imagestyle>
