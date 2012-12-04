@@ -42,11 +42,14 @@
   </pagelets>
   
   <imagestyles>
-    <imagestyle id="editorpreview" composeable="true" preview="true">
+    <imagestyle id="editorpreview" composeable="true">
       <name><![CDATA[Editor Preview]]></name>
       <scalingmode>cover</scalingmode>
       <width>200</width>
       <height>150</height>
+      <context>
+      	<resource preview="true">all</resource>
+      </context>
     </imagestyle>
   </imagestyles>
   

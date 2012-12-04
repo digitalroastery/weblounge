@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <imagestyles>
-  <imagestyle id="weblounge-ui-preview" composeable="false" preview="true">
+  <imagestyle id="weblounge-ui-preview" composeable="false">
     <name><![CDATA[Resource Preview]]></name>
     <scalingmode>fill</scalingmode>
     <width>300</width>
     <height>200</height>
+    <context>
+      <resource preview="true">all</resource>
+    </context>
   </imagestyle>
 </imagestyles>
