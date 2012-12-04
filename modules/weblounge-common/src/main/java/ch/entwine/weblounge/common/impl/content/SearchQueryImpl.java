@@ -1072,10 +1072,32 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#getText()
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getTerms()
    */
-  public Collection<SearchTerms<String>> getText() {
+  public Collection<SearchTerms<String>> getTerms() {
+    if (text == null)
+      return Collections.emptyList();
     return text;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getQueryString()
+   */
+  @Override
+  public String getQueryString() {
+    if (text == null)
+      return null;
+    StringBuffer query = new StringBuffer();
+    for (SearchTerms<String> s : text) {
+      for (String t : s.getTerms()) {
+        if (query.length() == 0)
+          query.append(" ");
+        query.append(t);
+      }
+    }
+    return query.toString();
   }
 
   /**

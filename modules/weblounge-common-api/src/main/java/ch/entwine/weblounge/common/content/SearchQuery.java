@@ -287,19 +287,25 @@ public interface SearchQuery {
    *          the text to look up
    * @param quantifier
    *          whether all or some of the terms need to be matched
-   * @param wildcardSearch
-   *          <code>True</code> to perform a (much slower) wildcard search
+   * @param fuzzy
+   *          <code>true</code> to perform a fuzzy search
    * @return the query extended by this criterion
    */
-  SearchQuery withText(boolean wildcardSearch, Quantifier quantifier,
-      String... text);
+  SearchQuery withText(boolean fuzzy, Quantifier quantifier, String... text);
+
+  /**
+   * Returns the search terms or an empty collection if no terms were specified.
+   * 
+   * @return the terms
+   */
+  Collection<SearchTerms<String>> getTerms();
 
   /**
    * Returns the search text or <code>null</code> if no text was specified.
    * 
    * @return the text
    */
-  Collection<SearchTerms<String>> getText();
+  String getQueryString();
 
   /**
    * Return resources that contain the given text in the fulltext search field.
