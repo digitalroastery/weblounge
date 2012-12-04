@@ -699,6 +699,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // a not-modified back
     if (isModified) {
       response.getOutputStream().write(entry.getContent());
+      response.setStatus(entry.getStatus());
     } else {
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
     }
@@ -794,11 +795,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     try {
 
       // Is the response ready to be cached?
-      if (tx.isValid() && response.isValid() && response.getStatus() == HttpServletResponse.SC_OK) {
+      if (tx.isValid() && response.isValid() && response.getStatus() < HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
         logger.trace("Writing response for {} to the cache", response);
         CacheHandle cacheHdl = tx.getHandle();
         String encoding = cacheableResponse.getCharacterEncoding();
-        CacheEntry entry = new CacheEntry(cacheHdl, tx.getContent(), encoding, tx.getHeaders());
+        CacheEntry entry = new CacheEntry(cacheHdl, tx.getContent(), encoding, tx.getHeaders(), response.getStatus());
         Element element = new Element(new CacheEntryKey(cacheHdl), entry);
         element.setTimeToLive((int) (cacheHdl.getCacheExpirationTime() / 1000));
         cache.put(element);

@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.request.CacheHandle;
 import ch.entwine.weblounge.common.request.CacheTag;
 
+import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -96,7 +97,7 @@ public class CacheEntryTest {
     headers.setHeader(testHeaderName, testHeaderValue);
     headers.setHeader("Content-Type", contentType);
     handle = new TaggedCacheHandle(tags.getTags(), expirationTime, recheckTime);
-    entry = new CacheEntry(handle, content.getBytes(), encoding, headers);
+    entry = new CacheEntry(handle, content.getBytes(), encoding, headers, HttpStatus.SC_OK);
   }
 
   /**
@@ -119,7 +120,7 @@ public class CacheEntryTest {
     assertNotNull(eTag);
     Thread.sleep(1000);
     CacheHandle newHandle = new TaggedCacheHandle(tags.getTags(), expirationTime, recheckTime);
-    String newETag = new CacheEntry(newHandle, content.getBytes(), encoding, headers).getETag();
+    String newETag = new CacheEntry(newHandle, content.getBytes(), encoding, headers, HttpStatus.SC_OK).getETag();
     assertFalse(eTag.equals(newETag));
   }
 

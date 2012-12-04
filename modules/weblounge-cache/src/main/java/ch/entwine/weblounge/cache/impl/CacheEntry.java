@@ -69,6 +69,9 @@ public final class CacheEntry implements Serializable {
   /** The etag */
   private String eTag = null;
 
+  /** The response status */
+  private int status;
+
   /**
    * Creates a new cache entry for the given handle, content and metadata.
    * <p>
@@ -83,11 +86,13 @@ public final class CacheEntry implements Serializable {
    *          the content encoding
    * @param headers
    *          the metadata
+   * @param status
+   *          the HTTP response status
    * @throws IllegalArgumentException
    *           if the content or the headers collection is <code>null</code>
    */
   protected CacheEntry(CacheHandle handle, byte[] content, String encoding,
-      CacheableHttpServletResponseHeaders headers) {
+      CacheableHttpServletResponseHeaders headers, int status) {
     if (handle == null)
       throw new IllegalArgumentException("Handle cannot be null");
     if (content == null)
@@ -101,7 +106,17 @@ public final class CacheEntry implements Serializable {
     this.modificationDate = getTimeWithoutMilliseconds(handle.getModificationDate());
     this.clientRevalidationTime = handle.getClientRevalidationTime();
     this.eTag = createETag(modificationDate);
+    this.status = status;
     setHeaders(headers);
+  }
+
+  /**
+   * Returns the <code>HTTP</code> response status.
+   * 
+   * @return the status
+   */
+  public int getStatus() {
+    return status;
   }
 
   /**
