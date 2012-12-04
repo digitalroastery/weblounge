@@ -117,7 +117,7 @@ public class SiteImpl implements Site {
   public static final String PROP_IDENTIFIER = "site.identifier";
 
   /** Xml namespace for the site */
-  public static final String SITE_XMLNS = "http://www.entwinemedia.com/weblounge/3.0/site";
+  public static final String SITE_XMLNS = "http://www.entwinemedia.com/weblounge/3.2/site";
 
   /** Regular expression to test the validity of a site identifier */
   private static final String SITE_IDENTIFIER_REGEX = "^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*$";
@@ -1794,7 +1794,7 @@ public class SiteImpl implements Site {
     b.append("\" ");
 
     // schema reference
-    b.append("xmlns=\"http://www.entwinemedia.com/weblounge/3.0/site\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.entwinemedia.com/weblounge/3.0/site http://www.entwinemedia.com/xsd/weblounge/3.0/site.xsd\"");
+    b.append("xmlns=\"http://www.entwinemedia.com/weblounge/3.2/site\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.entwinemedia.com/weblounge/3.2/site http://www.entwinemedia.com/xsd/weblounge/3.2/site.xsd\"");
     b.append(">");
 
     // autostart

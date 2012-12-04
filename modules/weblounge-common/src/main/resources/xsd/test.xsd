@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www.entwinemedia.com/weblounge/3.0/test" xmlns="http://www.entwinemedia.com/weblounge/3.0/test"
+	targetNamespace="http://www.entwinemedia.com/weblounge/3.2/test" xmlns="http://www.entwinemedia.com/weblounge/3.2/test"
 	elementFormDefault="qualified">
 
   <xsd:element name="test">

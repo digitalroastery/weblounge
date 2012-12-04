@@ -69,7 +69,7 @@ public class ModuleImpl implements Module {
   private static final String MODULE_IDENTIFIER_REGEX = "^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*$";
 
   /** Xml namespace for the module */
-  public static final String MODULE_XMLNS = "http://www.entwinemedia.com/weblounge/3.0/module";
+  public static final String MODULE_XMLNS = "http://www.entwinemedia.com/weblounge/3.2/module";
 
   /** The module identifier */
   protected String identifier = null;
@@ -747,7 +747,7 @@ public class ModuleImpl implements Module {
     b.append("\" ");
 
     // namespace and schema
-    b.append("xmlns=\"http://www.entwinemedia.com/weblounge/3.0/module\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd\"");
+    b.append("xmlns=\"http://www.entwinemedia.com/weblounge/3.2/module\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.entwinemedia.com/weblounge/3.2/module http://www.entwinemedia.com/xsd/weblounge/3.2/module.xsd\"");
 
     b.append(">");
 

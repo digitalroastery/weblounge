@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module id="testmodule" xmlns="http://www.entwinemedia.com/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
+<module id="testmodule" xmlns="http://www.entwinemedia.com/weblounge/3.2/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.2/module http://www.entwinemedia.com/xsd/weblounge/3.2/module.xsd">
   <enable>true</enable>
   <name><![CDATA[Test module]]></name>
   <pagelets>
@@ -49,7 +49,7 @@
     </job>
   </jobs>
   <imagestyles>
-    <imagestyle id="modulestyle" composeable="true" preview="false">
+    <imagestyle id="modulestyle" composeable="true">
       <name><![CDATA[Module image]]></name>
       <scalingmode>box</scalingmode>
       <width>150</width>

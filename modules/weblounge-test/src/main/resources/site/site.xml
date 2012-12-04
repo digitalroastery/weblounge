@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<site id="weblounge-test" xmlns="http://www.entwinemedia.com/weblounge/3.0/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/site http://www.entwinemedia.com/xsd/weblounge/3.0/site.xsd">
+<site id="weblounge-test" xmlns="http://www.entwinemedia.com/weblounge/3.2/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.2/site http://www.entwinemedia.com/xsd/weblounge/3.2/site.xsd">
   <autostart>true</autostart>
   <class>ch.entwine.weblounge.test.site.TestSite</class>
   <name>Weblounge Test Site</name>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<image xmlns="http://www.entwinemedia.com/weblounge/3.0/image"
+<image xmlns="http://www.entwinemedia.com/weblounge/3.2/image"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/image http://www.entwinemedia.com/xsd/weblounge/3.0/image.xsd"
+       xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.2/image http://www.entwinemedia.com/xsd/weblounge/3.2/image.xsd"
        id="123456789"
        path="/portrait/spieler/damen/b/1009/club/"
        version="live">
