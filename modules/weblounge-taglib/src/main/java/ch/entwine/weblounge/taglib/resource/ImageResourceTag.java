@@ -170,7 +170,7 @@ public class ImageResourceTag extends WebloungeTag {
     if (repository == null) {
       logger.debug("Unable to load content repository for site '{}'", site);
       response.invalidate();
-      return SKIP_BODY;
+      throw new JspException();
     }
 
     // Create the image uri, either from the id or the path. If none is
@@ -189,11 +189,11 @@ public class ImageResourceTag extends WebloungeTag {
       try {
         result = repository.find(query);
       } catch (ContentRepositoryException e) {
-        logger.warn("Error searching for image with given subjects.");
+        logger.warn("Error searching for image with given subjects ({}): {}", StringUtils.join(imageSubjects, ", "), e.getMessage());
         return SKIP_BODY;
       }
       if (result.getHitCount() > 1)
-        logger.debug("Search returned {} images for subjects '{}'. Will take no. 1 for further processing.", result.getHitCount(), StringUtils.join(imageSubjects, ", "));
+        logger.warn("Search returned {} images for subjects '{}' on {}", new Object[] { result.getHitCount(), StringUtils.join(imageSubjects, ", "), request.getUrl() });
       if (result.getHitCount() > 0)
         uri = new ImageResourceURIImpl(site, null, result.getItems()[0].getId());
     }
@@ -201,8 +201,10 @@ public class ImageResourceTag extends WebloungeTag {
       uri = new ImageResourceURIImpl(site, null, altImageId);
     if (uri == null && StringUtils.isNotBlank(altImagePath))
       uri = new ImageResourceURIImpl(site, altImagePath, null);
-    if (uri == null)
-      throw new JspException("None of the several possibilities returned a valid image");
+    if (uri == null) {
+      logger.debug("None of the several possibilities returned a valid image on {}", request.getUrl());
+      return SKIP_BODY;
+    }
 
     // Try to load the image from the content repository
     try {
@@ -228,6 +230,10 @@ public class ImageResourceTag extends WebloungeTag {
     // Load the content
     try {
       image = (ImageResource) repository.get(uri);
+      if (image == null) {
+        logger.warn("Non existing image {} requested on {}", uri, request.getUrl());
+        return SKIP_BODY;
+      }
       image.switchTo(language);
 
       Language contentLanguage = null;
@@ -245,7 +251,7 @@ public class ImageResourceTag extends WebloungeTag {
       // TODO: Make this a reference rather than a hard coded string
       linkToImage = UrlUtils.concat("/weblounge-images", image.getIdentifier(), language.getIdentifier());
     } catch (ContentRepositoryException e) {
-      logger.warn("Error trying to load image " + uri + ": " + e.getMessage(), e);
+      logger.warn("Error trying to load image " + uri + " on " + request.getUrl() + ": " + e.getMessage(), e);
       return SKIP_BODY;
     }
 
@@ -258,7 +264,7 @@ public class ImageResourceTag extends WebloungeTag {
         imageHeight = ImageStyleUtils.getStyledHeight(imageContent, style);
         stashAndSetAttribute(ImageResourceTagExtraInfo.STYLE, style);
       } else {
-        logger.warn("Image style '{}' not found", imageStyle);
+        logger.warn("Image style '{}' not found to render on {}", imageStyle, request.getUrl());
       }
     }
 

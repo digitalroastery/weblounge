@@ -238,7 +238,7 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    */
   public void switchedTo(Language language, Language requestedLanguage) {
     if (language == null)
-      throw new IllegalArgumentException("Language must not be null");
+      return;
     switchTo(language);
   }
 

@@ -30,6 +30,10 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
+import ch.entwine.weblounge.common.content.file.FileResource;
+import ch.entwine.weblounge.common.content.image.ImageResource;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
+import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.SearchResultImpl;
@@ -226,7 +230,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
     if (query.getTypes().length > 0) {
       requestBuilder.setTypes(query.getTypes());
     } else {
-      requestBuilder.setTypes("file", "image", "movie", "page");
+      requestBuilder.setTypes(FileResource.TYPE, ImageResource.TYPE, MovieResource.TYPE, Page.TYPE);
     }
 
     // Pagination

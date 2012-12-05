@@ -78,7 +78,7 @@ public class SiteActivator {
    *           if the site activation fails
    */
   void activate(final ComponentContext context) throws Exception {
-    BundleContext bundleContext = context.getBundleContext();
+    final BundleContext bundleContext = context.getBundleContext();
 
     logger.debug("Scanning bundle '{}' for site.xml", bundleContext.getBundle().getSymbolicName());
 
@@ -96,10 +96,10 @@ public class SiteActivator {
     // Load the site
     Enumeration<URL> e = bundleContext.getBundle().findEntries("site", "site.xml", false);
     if (e != null && e.hasMoreElements()) {
-      String bundleName = bundleContext.getBundle().getSymbolicName();
+      final String bundleName = bundleContext.getBundle().getSymbolicName();
       URL siteUrl = e.nextElement();
 
-      logger.info("Loading site from bundle '{}'", bundleName);
+      logger.debug("Parsing site definition from bundle '{}'", bundleName);
 
       // Load and validate the site descriptor
       ValidationErrorHandler errorHandler = new ValidationErrorHandler(siteUrl);
@@ -110,22 +110,39 @@ public class SiteActivator {
         return;
       }
 
-      final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
-      ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
-        public Void call() throws Exception {
-          site = SiteImpl.fromXml(siteXml.getFirstChild());
-          if (site instanceof SiteImpl) {
-            ((SiteImpl) site).activate(context);
+      // Start loading the site in a new thread in order to enable parallel
+      // loading of sites
+      Thread siteLoader = new Thread() {
+        public void run() {
+          final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
+          try {
+            ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
+              public Void call() throws Exception {
+
+                logger.info("Loading site from bundle '{}'", bundleName);
+
+                site = SiteImpl.fromXml(siteXml.getFirstChild());
+                if (site instanceof SiteImpl) {
+                  ((SiteImpl) site).activate(context);
+                }
+
+                // Register it as a service
+                logger.debug("Registering site '{}' in the service registry", site);
+                siteService = bundleContext.registerService(Site.class.getName(), site, context.getProperties());
+
+                logger.debug("Site '{}' loaded", site);
+
+                return null;
+              }
+            });
+          } catch (Throwable e) {
+            logger.error("Error loading site from bundle '{}': {}", bundleName, e.getMessage());
           }
-          return null;
         }
-      });
+      };
 
-      // Register it as a service
-      logger.debug("Registering site '{}' in the service registry", site);
-      siteService = bundleContext.registerService(Site.class.getName(), site, context.getProperties());
+      siteLoader.start();
 
-      logger.debug("Site '{}' loaded", site);
     } else {
       logger.warn("Site activator was unable to locate site.xml");
     }

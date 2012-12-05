@@ -3,7 +3,7 @@
   xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
 
   <enable>true</enable>
-  <name>Testmodul</name>
+  <name>Testmodule</name>
 
   <pagelets>
     <pagelet id="content" composeable="false">
@@ -40,6 +40,10 @@
       <name>Page editing showcase</name>
       <renderer>file://${module.root}/pagelets/editing.jsp</renderer>
       <editor>file://${module.root}/pagelets/editing_editor.jsp</editor>
+    </pagelet>
+    <pagelet id="modificationdate" composeable="true">
+      <name>Modification date</name>
+      <renderer>file://${module.root}/pagelets/modificationdate.jsp</renderer>
     </pagelet>
   </pagelets>
 

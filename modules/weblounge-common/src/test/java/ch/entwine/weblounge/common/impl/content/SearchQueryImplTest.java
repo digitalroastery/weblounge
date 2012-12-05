@@ -579,7 +579,7 @@ public class SearchQueryImplTest {
     String text = "text";
     query = new SearchQueryImpl(site, german);
     query.withText(text);
-    SearchTerms<String> terms = query.getText().iterator().next();
+    SearchTerms<String> terms = query.getTerms().iterator().next();
     assertEquals(text, terms.getTerms().iterator().next());
   }
 

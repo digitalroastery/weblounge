@@ -122,7 +122,7 @@ public class SearchEndpoint {
     // Create the search expression and the query
     SearchQuery query = new SearchQueryImpl(site);
     try {
-      query.withFulltext(URLDecoder.decode(terms, "utf-8"));
+      query.withFulltext(true, URLDecoder.decode(terms, "utf-8"));
       query.withVersion(Resource.LIVE);
       query.withOffset(offset);
       query.withLimit(limit);

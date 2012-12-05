@@ -166,7 +166,7 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
         return;
       }
       String mimetype = resource.getContent(language).getMimetype();
-      logger.trace("Image preview is generated using the resource's mimetype '{}'", mimetype);
+      logger.debug("Image preview of {} is generated using the resource's mimetype '{}'", resource.getIdentifier(), mimetype);
       format = mimetype.substring(mimetype.indexOf("/") + 1);
     }
     style(is, os, format, style);
@@ -189,7 +189,7 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       if (imageFile == null)
         throw new IllegalArgumentException("Image file cannot be null");
       format = FilenameUtils.getExtension(imageFile.getName());
-      logger.trace("Image preview is generated as '{}'", format);
+      logger.debug("Image preview of {} is generated as '{}'", imageFile.getAbsolutePath(), format);
     }
 
     style(is, os, format, style);

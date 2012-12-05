@@ -25,6 +25,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
@@ -57,7 +59,13 @@ public class CacheTest extends IntegrationTestBase {
   private static final Logger logger = LoggerFactory.getLogger(CacheTest.class);
 
   /** The paths to test */
-  private static final String requestPath = "/test/pagecontent";
+  private static final String contentTestPage = "/test/pagecontent";
+
+  /** The paths to test */
+  private static final String modificationTestPage = "/test/modificationDate";
+
+  /** The id of the page that is hosting the modification date pagelet */
+  private static final String modificationTestPageId = "4bb19980-8f98-4873-a813-000000000015";
 
   /** The paths to host page */
   private static final String hostPage = "/test/host";
@@ -111,8 +119,19 @@ public class CacheTest extends IntegrationTestBase {
     logger.warn("Response cache is active");
     testCacheHeaders(serverUrl);
     testInheritedModifcation(serverUrl);
+    testPageletModifcationDate(serverUrl);
   }
 
+  /**
+   * Test if the cache is returning proper header to enable caching on the
+   * client side, such as <code>Last-Modified</code>, <code>Expires</code> or
+   * <code>ETag</code>.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @throws Exception
+   *           if the test fails
+   */
   private void testCacheHeaders(String serverUrl) throws Exception {
     logger.info("Preparing test of response caching");
 
@@ -122,7 +141,7 @@ public class CacheTest extends IntegrationTestBase {
     // Prepare the request
     logger.info("Testing response cache");
 
-    String requestUrl = UrlUtils.concat(serverUrl, requestPath, language.getIdentifier());
+    String requestUrl = UrlUtils.concat(serverUrl, contentTestPage, language.getIdentifier());
 
     logger.info("Sending request to the {} version of {}", language.getLocale().getDisplayName(), requestUrl);
     HttpGet request = new HttpGet(requestUrl);
@@ -167,14 +186,13 @@ public class CacheTest extends IntegrationTestBase {
       // Get the Expires header
       assertNotNull(response.getHeaders("Expires"));
       assertEquals(1, response.getHeaders("Expires").length);
+
       // We are explicitly not checking for equality with the previously
-      // received
-      // value, since on first request, that value is not yet correct
+      // received value, since on first request, that value is not yet correct
 
       // Get the ETag header
       assertNotNull(response.getHeaders("ETag"));
-      assertEquals(1, response.getHeaders("ETag").length);
-      assertEquals(eTag, response.getHeaders("ETag")[0].getValue());
+      assertEquals(0, response.getHeaders("ETag").length);
 
       // Test the Cache header
       assertNotNull(response.getHeaders("X-Cache-Key"));
@@ -189,6 +207,15 @@ public class CacheTest extends IntegrationTestBase {
     }
   }
 
+  /**
+   * Tests if the modification date matches that of the most recent element on a
+   * page rather than the page's modification date.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @throws Exception
+   *           if the test fails
+   */
   private void testInheritedModifcation(String serverUrl) throws Exception {
     logger.info("Preparing test of cache headers influenced by inherited updated content");
 
@@ -258,6 +285,71 @@ public class CacheTest extends IntegrationTestBase {
       assertEquals(1, response.getHeaders("Last-Modified").length);
       Date newModified = df.parse(response.getHeaders("Last-Modified")[0].getValue());
       assertTrue(hostModified.before(newModified));
+
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+  }
+
+  /**
+   * Tests if the modification date of a page can properly be adjusted by a
+   * pagelet that is using the <code>&lt;modified&gt;</code> tag.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @throws Exception
+   *           if the test fails
+   */
+  private void testPageletModifcationDate(String serverUrl) throws Exception {
+    logger.info("Preparing test of cache headers influenced by the 'modified' tag");
+
+    // Load the page's modification date
+
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages", modificationTestPageId);
+    HttpGet getPageRequest = new HttpGet(requestUrl);
+    HttpClient httpClient = new DefaultHttpClient();
+    Page page = null;
+    logger.info("Requesting the page's modification date at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      PageReader reader = new PageReader();
+      page = reader.read(response.getEntity().getContent(), site);
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
+    df.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+    // Regularly load the page
+
+    requestUrl = UrlUtils.concat(serverUrl, modificationTestPage);
+
+    logger.info("Sending request to {}", requestUrl);
+    HttpGet request = new HttpGet(requestUrl);
+    request.addHeader("X-Cache-Debug", "yes");
+    String[][] params = new String[][] { {} };
+
+    // Send and the request and examine the response. Keep the modification
+    // date.
+    httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, request, params);
+
+      int statusCode = response.getStatusLine().getStatusCode();
+      boolean okOrNotModified = statusCode == HttpServletResponse.SC_OK || statusCode == HttpServletResponse.SC_NOT_MODIFIED;
+      assertTrue(okOrNotModified);
+
+      // Get the Modified header
+      assertNotNull(response.getHeaders("Last-Modified"));
+      assertEquals(1, response.getHeaders("Last-Modified").length);
+      Date hostModified = df.parse(response.getHeaders("Last-Modified")[0].getValue());
+      response.getEntity().consumeContent();
+
+      // Make sure the page is advertised as being more recent than the page's
+      // modification date
+      assertTrue(hostModified.after(page.getModificationDate()));
 
     } finally {
       httpClient.getConnectionManager().shutdown();

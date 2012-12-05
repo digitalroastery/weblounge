@@ -6,8 +6,8 @@
     <promote>true</promote>
     <index>true</index>
     <metadata>
-      <title language="de"><![CDATA[title]]></title>
-      <description language="de"><![CDATA[description]]></description>
+      <title language="de"><![CDATA[Short Title]]></title>
+      <description language="de"><![CDATA[Long Description]]></description>
       <subject><![CDATA[subject]]></subject>
       <type><![CDATA[type]]></type>
       <coverage language="de"><![CDATA[coverage]]></coverage>
@@ -57,7 +57,7 @@
             <user id="pagletmodifierid" realm="testland">pagelet modifier</user>
             <date>2009-01-07T20:05:41Z</date>
           </modified>
-          <text id="textid"><![CDATA[text]]></text>
+          <text id="textid"><![CDATA[Pagelet Element Text]]></text>
         </locale>
         <properties>
           <property id="propertyid"><![CDATA[property]]></property>

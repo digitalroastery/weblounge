@@ -246,6 +246,10 @@ public class LocalizableObject implements Localizable {
     if (language == null)
       throw new IllegalArgumentException("Language must not be null");
 
+    // If this object does not care about language switching, we don't care either
+    if (languages.size() == 0) 
+      return language;
+    
     // Remember the current language
     Language original = currentLanguage;
 

@@ -270,7 +270,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       else if (filter.contains("/")) {
         q.withPathPrefix(filter);
       } else {
-        q.withText(true, filter);
+        q.withFulltext(true, filter);
       }
 
     }
@@ -599,7 +599,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       page.setModified(user, new Date());
       page.setVersion(Resource.WORK);
 
-      contentRepository.putAsynchronously(page, true);
+      // TODO: Preview generation disabled due to performance problems
+      contentRepository.putAsynchronously(page, false);
 
       // Check if the page has been moved
       String currentPath = currentPage.getURI().getPath();

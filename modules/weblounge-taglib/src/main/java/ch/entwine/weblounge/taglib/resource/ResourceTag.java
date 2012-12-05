@@ -99,7 +99,7 @@ public class ResourceTag extends WebloungeTag {
     if (repository == null) {
       logger.debug("Unable to load content repository for site '{}'", site);
       response.invalidate();
-      return SKIP_BODY;
+      throw new JspException();
     }
 
     // Create the resource uri, either from the id or the path. If none is
@@ -110,7 +110,8 @@ public class ResourceTag extends WebloungeTag {
     } else if (StringUtils.isNotBlank(resourcePath)) {
       uri = new GeneralResourceURIImpl(site, resourcePath);
     } else {
-      throw new JspException("Neither uuid nor path were specified for resource");
+      logger.warn("Neither uuid nor path were specified for resource on {}", request.getUrl());
+      return SKIP_BODY;
     }
 
     // Try to load the resource from the content repository
@@ -146,7 +147,7 @@ public class ResourceTag extends WebloungeTag {
       if (resourceContent == null)
         resourceContent = resource.getOriginalContent();
     } catch (ContentRepositoryException e) {
-      logger.warn("Error trying to load resource " + uri + ": " + e.getMessage(), e);
+      logger.warn("Error trying to load resource {}: {}", uri, e.getMessage());
       return SKIP_BODY;
     }
 
