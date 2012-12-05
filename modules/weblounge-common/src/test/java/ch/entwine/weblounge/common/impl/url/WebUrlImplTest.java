@@ -405,4 +405,9 @@ public class WebUrlImplTest {
     assertTrue(url.normalize(true, true, false).indexOf(url.getFlavor().toString().toLowerCase()) == -1);
   }
 
+  @Test
+  public void testFullUrl() {
+    new WebUrlImpl(siteMock, "/http://www.wfc2012.ch/index.php");
+  }
+
 }

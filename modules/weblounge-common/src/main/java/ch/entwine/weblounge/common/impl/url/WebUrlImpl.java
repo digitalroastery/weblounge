@@ -505,7 +505,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    */
   protected String analyzePath(String path, char separator)
       throws IllegalArgumentException {
-    if (path.contains(":/")) {
+    if (!path.startsWith(Character.toString(separator)) && path.contains("://")) {
       try {
         URL u = new URL(path);
         path = u.getPath();
