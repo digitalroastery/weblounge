@@ -363,7 +363,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithText() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext("Technik");
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext(true, "Technik");
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
   }
 
@@ -375,10 +375,8 @@ public class SearchIndexTest {
   @Test
   public void testGetWithWildcardText() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext(true, "Tec");
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext(true, "Techn");
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
-    q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext(true, "/a");
-    assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
   /**

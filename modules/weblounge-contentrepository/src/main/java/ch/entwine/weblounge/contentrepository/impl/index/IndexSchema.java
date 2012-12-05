@@ -199,11 +199,17 @@ public interface IndexSchema {
   /** Accumulative fulltext field designed for backend use */
   String FULLTEXT = "fulltext";
 
+  /** Accumulative fulltext field with analysis designed for fuzzy search backend use */
+  String FULLTEXT_FUZZY = "fulltext_fuzzy";
+
   /** Accumulative, language_sensitive text field targeted at frontend use */
   String LOCALIZED_TEXT = "text_{0}";
 
   /** Accumulative text field targeted for frontend use */
   String TEXT = "text";
+
+  /** Accumulative text field with analysis targeted for fuzzy search frontend use */
+  String TEXT_FUZZY = "text_fuzzy";
 
   /** The date format */
   String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";

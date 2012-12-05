@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.cache.impl;
 
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+
 import ch.entwine.weblounge.cache.CacheListener;
 import ch.entwine.weblounge.cache.CacheService;
 import ch.entwine.weblounge.cache.StreamFilter;
@@ -607,7 +609,15 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         try {
           logger.debug("Waiting for cache transaction {} to be finished", request);
           while (transactions.containsKey(handle.getKey())) {
-            transactions.wait();
+            transactions.wait(1000);
+            
+            // Was this a notify or a timeout?
+            if (transactions.get(handle.getKey()) != null) {
+              logger.debug("After waiting 1s, cache entry {} is still being worked on", handle.getKey());
+              response.setStatus(SC_SERVICE_UNAVAILABLE);
+              return null;
+            }
+
           }
         } catch (InterruptedException e) {
           // Done sleeping!
@@ -728,9 +738,12 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     long expirationDate = System.currentTimeMillis() + entry.getClientRevalidationTime();
     long revalidationTimeInSeconds = entry.getClientRevalidationTime() / 1000;
 
-    // Send the cache directive
-    if (isModified)
+    // Send Cache directives, ETag and Last-Modified
+    if (isModified) {
       response.setHeader("Cache-Control", "private, max-age=" + revalidationTimeInSeconds + ", must-revalidate");
+      response.setHeader("ETag", entry.getETag());
+      response.setDateHeader("Last-Modified", entry.getModificationDate());
+    }
 
     // Set the current date
     response.setDateHeader("Date", System.currentTimeMillis());
@@ -738,12 +751,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // This header must be set, otherwise it defaults to
     // "Thu, 01-Jan-1970 00:00:00 GMT"
     response.setDateHeader("Expires", expirationDate);
-
-    // ETag and Last-Modified
-    response.setHeader("ETag", entry.getETag());
-    
-    if (isModified)
-      response.setDateHeader("Last-Modified", entry.getModificationDate());
   }
 
   /**

@@ -535,7 +535,7 @@ public class ComposerTagSupport extends WebloungeTag {
 
     // Skip loading of data if this is a precompile request
     if (RequestUtils.isPrecompileRequest(request)) {
-      return EVAL_BODY_INCLUDE;
+      return SKIP_BODY;
     }
 
     // Initiate loading the page content
@@ -543,8 +543,10 @@ public class ComposerTagSupport extends WebloungeTag {
       loadContent(contentInheritanceEnabled);
     } catch (ContentRepositoryUnavailableException e) {
       logger.warn("Content repository '{}' unavailable while processing jsp", request.getSite().getIdentifier());
+      throw new JspException(e);
     } catch (ContentRepositoryException e) {
       logger.warn("Error accessing content repository '{}': {}", request.getSite().getIdentifier(), e.getMessage());
+      throw new JspException(e);
     }
 
     return EVAL_BODY_INCLUDE;

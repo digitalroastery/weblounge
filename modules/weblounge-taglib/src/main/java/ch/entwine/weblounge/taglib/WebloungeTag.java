@@ -720,8 +720,9 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
     if (RequestUtils.isPrecompileRequest(request)) {
       return;
     }
-    
-    logger.warn("Error executing jsp tag {}", this.getClass().getName(), t);
+
+    logger.warn("Error executing jsp tag {} on {}", getClass().getName(), request.getUrl());
+    logger.warn(t.getMessage(), t);
   }
 
   /**

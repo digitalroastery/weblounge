@@ -54,6 +54,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -179,8 +180,11 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     if (style == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
+    // Load the input stream from the scaled image
+    File scaledResourceFile = ImageStyleUtils.getScaledFile(resource, language, style);
+
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.hasChanged(request, resource, style, language)) {
+    if (!ResourceUtils.hasChanged(request, scaledResourceFile)) {
       return Response.notModified().build();
     }
 
@@ -207,25 +211,22 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     long contentLength = -1;
 
     // Load the input stream from the scaled image
-    File scaledResourceFile = null;
     InputStream contentRepositoryIs = null;
     FileOutputStream fos = null;
     try {
-      scaledResourceFile = ImageStyleUtils.getScaledFile(resource, language, style);
-      long lastModified = ResourceUtils.getModificationDate(resource, language).getTime();
-      if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
+      long resourceLastModified = ResourceUtils.getModificationDate(resource, language).getTime();
+      if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < resourceLastModified) {
         if (!force)
           throw new WebApplicationException(Response.Status.NOT_FOUND);
 
         contentRepositoryIs = contentRepository.getContent(resourceURI, language);
         scaledResourceFile = ImageStyleUtils.createScaledFile(resource, language, style);
+        scaledResourceFile.setLastModified(Math.max(new Date().getTime(), resourceLastModified));
         fos = new FileOutputStream(scaledResourceFile);
         logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
 
         previewGenerator.createPreview(resource, environment, language, style, DEFAULT_PREVIEW_FORMAT, contentRepositoryIs, fos);
-        if (scaledResourceFile.length() > 1) {
-          scaledResourceFile.setLastModified(lastModified);
-        } else {
+        if (scaledResourceFile.length() == 0) {
           logger.debug("Error scaling '{}': file size is 0", resourceURI);
           IOUtils.closeQuietly(resourceInputStream);
           FileUtils.deleteQuietly(scaledResourceFile);
@@ -255,23 +256,27 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       logger.error(e.getMessage(), e);
       IOUtils.closeQuietly(resourceInputStream);
       FileUtils.deleteQuietly(scaledResourceFile);
-      deleteIfEmpty(scaledResourceFile.getParentFile());
+      if (scaledResourceFile != null)
+        deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
     } catch (IOException e) {
       logger.error("Error scaling image '{}': {}", resourceURI, e.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
       if (scaledResourceFile != null)
         deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
     } catch (IllegalArgumentException e) {
       logger.error("Image '{}' is of unsupported format: {}", resourceURI, e.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
       if (scaledResourceFile != null)
         deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
     } catch (Throwable t) {
       logger.error("Error scaling image '{}': {}", resourceURI, t.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
       if (scaledResourceFile != null)
         deleteIfEmpty(scaledResourceFile.getParentFile());
       throw new WebApplicationException();
@@ -284,7 +289,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     final InputStream is = resourceInputStream;
     ResponseBuilder response = Response.ok(new StreamingOutput() {
       public void write(OutputStream os) throws IOException,
-      WebApplicationException {
+          WebApplicationException {
         try {
           IOUtils.copy(is, os);
           os.flush();
@@ -301,10 +306,10 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     response.type(mimetype);
 
     // Add last modified header
-    response.lastModified(ResourceUtils.getModificationDate(resource, language));
+    response.lastModified(new Date(scaledResourceFile.lastModified()));
 
     // Add ETag header
-    String eTag = ResourceUtils.getETagValue(resource, style);
+    String eTag = ResourceUtils.getETagValue(scaledResourceFile);
     response.tag(eTag);
 
     // Add filename header
@@ -714,7 +719,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
    *          the resource serializer service
    */
   void setResourceSerializer(ResourceSerializerService serializer) {
-    this.serializerService  = serializer;
+    this.serializerService = serializer;
   }
 
   /**

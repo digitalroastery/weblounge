@@ -216,8 +216,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.entwine.weblounge.common.repository.ContentRepository#disconnect()
    */
   public void disconnect() throws ContentRepositoryException {
-    if (!connected)
-      throw new IllegalStateException("Cannot stop a disconnected content repository");
 
     // Stop ongoing image preview generation
     synchronized (currentPreviewOperations) {
@@ -225,7 +223,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       previewOperations.clear();
       previews.clear();
     }
-    
+
     // Close the image style tracker
     if (imageStyleTracker != null) {
       imageStyleTracker.close();
@@ -235,7 +233,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
     // Close the index and mark the content repository as offline
     try {
       connected = false;
-      index.close();
+      if (index != null)
+        index.close();
     } catch (IOException e) {
       throw new ContentRepositoryException("Error closing repository index", e);
     }
@@ -627,7 +626,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    *           if populating the index fails
    */
   protected abstract ContentRepositoryIndex loadIndex() throws IOException,
-  ContentRepositoryException;
+      ContentRepositoryException;
 
   /**
    * {@inheritDoc}
@@ -979,10 +978,11 @@ public abstract class AbstractContentRepository implements ContentRepository {
       // it and be done.
       previewOp = previews.get(uri);
       if (previewOp != null) {
-        logger.debug("Adding languages and styles to {} for preview generation", uri);
-        previewOp.addLanguages(Arrays.asList(languages));
-        previewOp.addStyles(previewStyles);
-        return;
+        PreviewGeneratorWorker worker = previewOp.getWorker();
+        if (worker != null) {
+          logger.info("Canceling current preview generation for {} in favor of more recent data", uri);
+          worker.cancel();
+        }
       }
 
       // Otherwise, a new preview generator needs to be started.
@@ -1009,11 +1009,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
       // It seems like it is safe to start the preview generation
       currentPreviewOperations.add(previewOp);
       PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, previewOp.getResource(), environment, previewOp.getLanguages(), previewOp.getStyles(), previewOp.getFormat());
+      previewOp.setWorker(previewWorker);
       Thread t = new Thread(previewWorker);
       t.setPriority(Thread.MIN_PRIORITY);
       t.setDaemon(true);
 
-      logger.info("Creating preview of {}", uri);
+      logger.debug("Creating preview of {}", uri);
       t.start();
     }
   }
@@ -1030,10 +1031,16 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
       // Do the cleanup
       for (Iterator<PreviewOperation> i = currentPreviewOperations.iterator(); i.hasNext();) {
-        Resource<?> r = i.next().getResource();
+        PreviewOperation op = i.next();
+        Resource<?> r = op.getResource();
         if (r.equals(resource)) {
           logger.debug("Preview creation of {} finished", r.getURI());
           i.remove();
+          PreviewOperation o = previews.get(r.getURI());
+          // In the meantime, someone may have canceled this operation and
+          // created a new one
+          if (op == o)
+            previews.remove(r.getURI());
           break;
         }
       }
@@ -1045,15 +1052,15 @@ public abstract class AbstractContentRepository implements ContentRepository {
         PreviewOperation op = previewOperations.remove();
         Resource<?> r = op.getResource();
         currentPreviewOperations.add(op);
-        previews.remove(r.getURI());
 
         // Finally start the generation
         PreviewGeneratorWorker previewWorker = new PreviewGeneratorWorker(this, r, environment, op.getLanguages(), op.getStyles(), op.getFormat());
+        op.setWorker(previewWorker);
         Thread t = new Thread(previewWorker);
         t.setPriority(Thread.MIN_PRIORITY);
         t.setDaemon(true);
 
-        logger.info("Creating preview of {}", r.getURI());
+        logger.debug("Starting creation of preview of {}", r.getURI());
         logger.trace("There are {} more preview operations waiting", previewOperations.size());
         logger.trace("Currently using {} out of {} preview creation slots", currentPreviewOperations.size(), maxPreviewOperations);
         t.start();
@@ -1229,6 +1236,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
     /** Name of the preview image format */
     private String format = null;
 
+    /** Worker that is in charge of conducting this operation */
+    private PreviewGeneratorWorker worker = null;
+
     /**
      * Creates a new representation of a preview generation.
      */
@@ -1238,6 +1248,25 @@ public abstract class AbstractContentRepository implements ContentRepository {
       this.languages.addAll(languages);
       this.styles.addAll(styles);
       this.format = format;
+    }
+
+    /**
+     * Sets the worker that is in charge of conducting this operation.
+     * 
+     * @param worker
+     *          the worker
+     */
+    void setWorker(PreviewGeneratorWorker worker) {
+      this.worker = worker;
+    }
+
+    /**
+     * Returns the worker that is in charge of this operation.
+     * 
+     * @return the worker
+     */
+    PreviewGeneratorWorker getWorker() {
+      return this.worker;
     }
 
     /**

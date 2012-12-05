@@ -450,6 +450,8 @@ public class ContentRepositoryIndex {
     if (id == null)
       return false;
     SearchQuery q = new SearchQueryImpl(site).withIdentifier(id).withLimit(1).withField(RESOURCE_ID);
+    if (uri.getType() != null)
+      q.withTypes(uri.getType());
     return searchIdx.getByQuery(q).getDocumentCount() > 0;
   }
 

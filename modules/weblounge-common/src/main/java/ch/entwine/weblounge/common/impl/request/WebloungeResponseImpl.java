@@ -536,9 +536,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   @Override
   public Date setModificationDate(Date modificationDate) {
     if (modificationDate == null)
-      this.modificationDate = new Date(0);
-    else
-      this.modificationDate = modificationDate.after(this.modificationDate) ? modificationDate : this.modificationDate;
+      return this.modificationDate;
+    this.modificationDate = modificationDate.after(this.modificationDate) ? modificationDate : this.modificationDate;
     if (cacheHandle == null)
       return this.modificationDate;
     CacheHandle hdl = cacheHandle.get();

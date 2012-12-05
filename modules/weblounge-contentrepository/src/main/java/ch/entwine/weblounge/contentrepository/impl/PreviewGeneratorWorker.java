@@ -73,6 +73,9 @@ class PreviewGeneratorWorker implements Runnable {
 
   /** The format */
   private String format = null;
+  
+  /** Flag to indicate a canceled preview generation */
+  private boolean canceled = false;
 
   /**
    * Creates a new preview worker who will create the corresponding previews for
@@ -100,6 +103,13 @@ class PreviewGeneratorWorker implements Runnable {
     this.languages = languages;
     this.styles = styles;
     this.format = format;
+  }
+  
+  /**
+   * Indicates to this preview generation worker to cancel the current operation.
+   */
+  public void cancel() {
+    this.canceled = true;
   }
 
   /**
@@ -151,6 +161,10 @@ class PreviewGeneratorWorker implements Runnable {
         if (!resource.supportsContentLanguage(l))
           continue;
 
+        // Have we been told to stop doing work in the meantime?
+        if (canceled)
+          return;
+        
         // Create the original preview image for every language
         ImageStyle originalStyle = new ImageStyleImpl("original", ImageScalingMode.None);
         File originalPreview = null;
@@ -162,10 +176,14 @@ class PreviewGeneratorWorker implements Runnable {
           return;
         }
 
-        long lastModified = ResourceUtils.getModificationDate(resource, l).getTime();
+        long resourceLastModified = ResourceUtils.getModificationDate(resource, l).getTime();
 
         // Create the remaining styles
         for (ImageStyle style : styles) {
+
+          // Have we been told to stop doing work in the meantime?
+          if (canceled)
+            return;
 
           // The original has been produced already
           if (ImageScalingMode.None.equals(style.getScalingMode()))
@@ -178,10 +196,14 @@ class PreviewGeneratorWorker implements Runnable {
 
             // Create the file if it doesn't exist or if it is out dated. Note
             // that the last modified date of a file has a precision of seconds
-            if (!scaledFile.isFile() || FileUtils.isFileOlder(scaledFile, new Date(lastModified))) {
+            if (!scaledFile.isFile() || FileUtils.isFileOlder(scaledFile, new Date(resourceLastModified))) {
+
+              logger.info("Creating preview at {}", scaledFile.getAbsolutePath());
+
               fis = new FileInputStream(originalPreview);
               fos = new FileOutputStream(scaledFile);
               imagePreviewGenerator.createPreview(originalPreview, environment, l, style, format, fis, fos);
+              scaledFile.setLastModified(Math.max(new Date().getTime(), resourceLastModified));
 
               // Store the style definition used while creating the preview
               File baseDir = ImageStyleUtils.getScaledFileBase(resource.getURI().getSite(), style);
@@ -206,6 +228,8 @@ class PreviewGeneratorWorker implements Runnable {
       }
 
     } finally {
+      if (canceled)
+        logger.debug("Preview operation for {} has been canceled", resource.getIdentifier());
       contentRepository.previewCreated(resource);
     }
   }
@@ -273,10 +297,6 @@ class PreviewGeneratorWorker implements Runnable {
         fos = new FileOutputStream(scaledResourceFile);
         AbstractContentRepository.logger.debug("Creating preview of '{}' at {}", resource, scaledResourceFile);
         previewGenerator.createPreview(resource, environment, language, style, format, contentRepositoryIs, fos);
-
-        // Adjust the last modified date so the preview doesn't need to be
-        // regenerated
-        scaledResourceFile.setLastModified(lastModified);
       }
 
     } catch (ContentRepositoryException e) {

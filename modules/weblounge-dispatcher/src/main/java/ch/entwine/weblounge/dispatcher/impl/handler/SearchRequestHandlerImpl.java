@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map.Entry;
@@ -160,7 +161,7 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
 
     // Create the search expression and the query
     SearchQuery q = new SearchQueryImpl(site);
-    q.withText(queryString.contains("*"), queryString);
+    q.withText(true, queryString);
     q.withVersion(Resource.LIVE);
     q.withRececyPriority();
     q.withOffset(offset);
@@ -285,6 +286,7 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
     // TODO: Implement caching strategy
     response.setCacheExpirationTime(0);
     response.setClientRevalidationTime(0);
+    response.setModificationDate(new Date());
 
     // Finally, let's get some work done!
     try {

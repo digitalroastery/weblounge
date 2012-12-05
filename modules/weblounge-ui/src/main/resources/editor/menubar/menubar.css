@@ -9,7 +9,7 @@
 	width: 100%;
 	padding-left: 20px;
 	overflow: hidden;
-	z-index: 400;
+	z-index: 420;
 }
 
 #wbl-pageletcreator {
@@ -60,6 +60,11 @@
     color: #999999;
     margin-right: 50px;
     padding: 5px;
+}
+
+.editor_menubar input[type="checkbox"] {
+	margin: 5px;
+    vertical-align: inherit;
 }
 
 .editor_menubar .wbl-right {
