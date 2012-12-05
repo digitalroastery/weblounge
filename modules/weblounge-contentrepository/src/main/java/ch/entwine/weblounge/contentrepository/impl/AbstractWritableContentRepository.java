@@ -125,7 +125,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   public AbstractWritableContentRepository(String type) {
     super(type);
-    processor = new OperationProcessor(this);
   }
 
   /**
@@ -135,6 +134,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   @Override
   public void connect(Site site) throws ContentRepositoryException {
+    processor = new OperationProcessor(this);
+
     super.connect(site);
 
     if (createHomepage) {
@@ -159,7 +160,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   public void disconnect() throws ContentRepositoryException {
 
     // Finalize running operations
-    processor.stop();
+    if (processor != null)
+      processor.stop();
 
     super.disconnect();
 
@@ -1228,7 +1230,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     ContentRepositoryIndex idx = null;
 
-    logger.debug("Loading site index");
+    logger.info("Loading site index '{}'", site.getIdentifier());
 
     // Add content if there is any
     idx = new ContentRepositoryIndex(site, resourceSerializer, readOnly);

@@ -216,8 +216,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.entwine.weblounge.common.repository.ContentRepository#disconnect()
    */
   public void disconnect() throws ContentRepositoryException {
-    if (!connected)
-      throw new IllegalStateException("Cannot stop a disconnected content repository");
 
     // Stop ongoing image preview generation
     synchronized (currentPreviewOperations) {
@@ -235,7 +233,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
     // Close the index and mark the content repository as offline
     try {
       connected = false;
-      index.close();
+      if (index != null)
+        index.close();
     } catch (IOException e) {
       throw new ContentRepositoryException("Error closing repository index", e);
     }
