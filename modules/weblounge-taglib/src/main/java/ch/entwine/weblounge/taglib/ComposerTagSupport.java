@@ -367,7 +367,7 @@ public class ComposerTagSupport extends WebloungeTag {
       // If composer is empty and ghost content is enabled, go up the page
       // hierarchy and try to find content for this composer
       Page contentPage = contentProvider;
-      if (inheritFromParent) {
+      if (content.length == 0 && inheritFromParent) {
         String pageUrl = contentPage.getURI().getPath();
         while (ghostContent.length == 0 && pageUrl.length() > 1) {
           if (pageUrl.endsWith("/") && !"/".equals(pageUrl))
