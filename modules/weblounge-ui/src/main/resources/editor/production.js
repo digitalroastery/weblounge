@@ -1048,11 +1048,11 @@ function anonymous(jQuery, $item) {
             }
             _.push(" </span> ");
         }
-        _.push("  <span class=\"wbl-right\">  <span class=\"wbl-profileMenu\">   <img src=\"");
+        _.push("  <span class=\"wbl-right\">  <span class=\"wbl-profileMenu\">      <!--   <img src=\"");
         if (typeof (runtime.getRootPath) !== "undefined" && (runtime.getRootPath) != null) {
             _.push($.encode(runtime.getRootPath()));
         }
-        _.push("/editor/menubar/images/user.png\" class=\"wbl-user\" alt=\"\" />   <!-- <span id=\"wbl-user\">");
+        _.push("/editor/menubar/images/user.png\" class=\"wbl-user\" alt=\"\" />   -->   <!-- <span id=\"wbl-user\">");
         if (typeof (runtime.getFirstName) !== "undefined" && (runtime.getFirstName) != null) {
             _.push($.encode(runtime.getFirstName()));
         }
