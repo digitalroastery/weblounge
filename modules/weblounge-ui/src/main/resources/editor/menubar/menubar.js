@@ -61,12 +61,12 @@ steal.plugins(
             	.css('paddingRight', '-' + bodyPaddingRight);	
 
             // replace the icon with a gravatar if weblounge is online otherwise load a default img
-            ImageUrl = 'http://gravatar.com/avatar/' + md5(this.options.runtime.getUserEmail());
+            ImageUrl = 'http://gravatar.com/avatar/' + md5(this.options.runtime.getUserEmail()) + '?default=404';
             UserEmail = this.options.runtime.getUserEmail();
             function IsValidImageUrl(url) {
 			    $("<img>", {
 			        src: url,
-			        error: function() { steal.dev.log('Weblounge is not connected to the internet. Loading default user imgage.') },
+			        error: function() { $(this).unbind("error"); steal.dev.log('Weblounge is not connected to the internet. Loading default user imgage.') },
 			        load: function() { steal.dev.log('User ' + UserEmail + ' is loading'); $('.wbl-profileMenu img.wbl-user').attr('src', url + '?d=mm'); }
 			    });
 			}
