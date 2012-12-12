@@ -12,15 +12,16 @@
 <button class="wbl-editorSelectionOK" type="button">Ausw&auml;hlen</button>
 <button class="wbl-editorSelectionCancel" type="button">Abbrechen</button>
 
+{{if runtime.getLanguages().length>1}}
 <span class="wbl-language">
 	<img src='${runtime.getRootPath()}/editor/resources/flags/${current}.png' title='${current}'/>
-</span> 
-
+</span>
 <span class="wbl-languageMenu">
 	{{each runtime.getLanguages()}}
 		<img src="${runtime.getRootPath()}/editor/resources/flags/${$value.language}.png" alt="${$value.language}" title="${$value.language}" />
     {{/each}}
 </span>
+{{/if}}
 
 <span class="wbl-right">
 	<span class="wbl-profileMenu">
