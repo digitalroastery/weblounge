@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.dispatcher.SharedHttpContext;
+import ch.entwine.weblounge.kernel.site.SiteManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.felix.webconsole.WebConsoleSecurityProvider;
@@ -80,7 +81,7 @@ public class SpringSecurityConfigurationService implements ManagedService {
   protected BundleContext bundleCtx = null;
 
   /** The spring security filter */
-  protected Filter securityFilter = null;
+  protected SecurityFilter securityFilter = null;
 
   /** The web console security */
   protected WebConsoleSecurityProvider webConsoleProvider = null;
@@ -99,6 +100,9 @@ public class SpringSecurityConfigurationService implements ManagedService {
 
   /** The registration for the web console security provider */
   protected ServiceRegistration webConsoleSecurityRegistration = null;
+
+  /** The sites that are online */
+  protected SiteManager sites = null;
 
   /**
    * Callback from the OSGi environment on service activation.
@@ -136,7 +140,8 @@ public class SpringSecurityConfigurationService implements ManagedService {
     springContext.refresh();
 
     // Get the security filter chain from the spring context
-    securityFilter = (Filter) springContext.getBean("springSecurityFilterChain");
+    Filter defaultSecurityFilter = (Filter) springContext.getBean("springSecurityFilterChain");
+    securityFilter = new SecurityFilter(securityService, sites, defaultSecurityFilter);
 
     // Create the web console security provider
     webConsoleProvider = new WebloungeWebConsoleSecurityProvider(securityService);
@@ -312,6 +317,26 @@ public class SpringSecurityConfigurationService implements ManagedService {
    */
   void setSecurityService(SpringSecurityServiceImpl securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Callback for OSGi to set the site manager.
+   * 
+   * @param siteManager
+   *          the site manager
+   */
+  void setSiteManager(SiteManager siteManager) {
+    this.sites = siteManager;
+  }
+
+  /**
+   * Callback for OSGi to remove the site manager.
+   * 
+   * @param siteManager
+   *          the site manager
+   */
+  void removeSiteManager(SiteManager siteManager) {
+    this.sites = null;
   }
 
 }

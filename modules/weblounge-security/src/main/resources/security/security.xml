@@ -66,9 +66,6 @@
     <!-- Add the health check filter -->
     <sec:custom-filter before="FIRST" ref="healthCheckFilter"/>
 
-    <!-- Add the site filter to make sure it's available during user lookup -->
-    <sec:custom-filter after="FIRST" ref="siteContextFilter"/>
-
     <!-- Add the user filter to get everything set up for proper request processing -->
     <sec:custom-filter after="LAST" ref="userContextFilter"/>
 
@@ -100,11 +97,6 @@
 
   <!-- Instantiates the weblounge health check filter -->
   <bean id="healthCheckFilter" class="ch.entwine.weblounge.kernel.security.HealthCheckFilter"/>
-
-  <!-- Instantiates the weblounge site filter that will map requests to their site -->
-  <bean id="siteContextFilter" class="ch.entwine.weblounge.kernel.security.SiteContextFilter">
-    <constructor-arg ref="securityService"/>
-  </bean>
 
   <!-- Instantiates the weblounge user filter that will map requests to users -->
   <bean id="userContextFilter" class="ch.entwine.weblounge.kernel.security.UserContextFilter">
