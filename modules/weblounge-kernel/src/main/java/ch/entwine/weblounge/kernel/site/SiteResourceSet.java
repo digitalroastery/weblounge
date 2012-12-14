@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.kernel.site;
 
+import ch.entwine.weblounge.common.site.Site;
+
 /**
  * This resource set defines which parts of a site can be accessed from the
  * outside and which parts are protected.
@@ -28,11 +30,22 @@ public class SiteResourceSet extends ResourceSet {
 
   /**
    * Creates a new site resource set.
+   * 
+   * @param site
+   *          the site
    */
-  public SiteResourceSet() {
+  public SiteResourceSet(Site site) {
     super("^/");
     exclude("^/(?:classes|conf|doc|i18n|lib)/");
     exclude("^/site.xml");
+    if (site.getSecurity() != null) {
+      String configPath = site.getSecurity().toExternalForm();
+      if (configPath.startsWith("file://${site.root}")) {
+        exclude(configPath.substring(19));
+      } else if (configPath.startsWith("file://${bundle.root}/site")) {
+        exclude(configPath.substring(26));
+      }
+    }
   }
 
 }

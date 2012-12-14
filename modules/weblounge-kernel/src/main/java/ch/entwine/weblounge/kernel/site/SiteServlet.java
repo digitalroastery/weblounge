@@ -88,7 +88,7 @@ public class SiteServlet extends HttpServlet {
   protected final Servlet jasperServlet;
 
   /** Path rules */
-  private List<ResourceSet> resourceSets = null;
+  private List<ResourceSet> resources = null;
 
   /** The security service */
   private SecurityService securityService = null;
@@ -120,9 +120,9 @@ public class SiteServlet extends HttpServlet {
     this.bundle = bundle;
     this.environment = environment;
     this.jasperServlet = new JspServletWrapper(bundle);
-    this.resourceSets = new ArrayList<ResourceSet>();
-    this.resourceSets.add(new SiteResourceSet());
-    this.resourceSets.add(new ModuleResourceSet());
+    this.resources = new ArrayList<ResourceSet>();
+    this.resources.add(new SiteResourceSet(site));
+    this.resources.add(new ModuleResourceSet());
     this.tika = new Tika();
   }
 
@@ -376,7 +376,7 @@ public class SiteServlet extends HttpServlet {
    * @return <code>true</code> if the resource needs to be protected
    */
   public boolean isProtected(String path) {
-    for (ResourceSet resourceSet : resourceSets) {
+    for (ResourceSet resourceSet : resources) {
       if (resourceSet.includes(path) && resourceSet.excludes(path))
         return true;
     }

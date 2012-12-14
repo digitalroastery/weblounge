@@ -222,10 +222,20 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
       InputStream is = null;
       try {
         String configPath = securityConfiguration.toExternalForm();
-        if (configPath.startsWith("file://${site.root}")) {
+        if (configPath.startsWith("file://${bundle.root}")) {
+          String bundlePath = configPath.substring(21);
+          securityConfiguration = bundle.getResource(bundlePath);
+        } else if (configPath.startsWith("file://${site.root}")) {
           String bundlePath = UrlUtils.concat("/site", configPath.substring(19));
           securityConfiguration = bundle.getResource(bundlePath);
         }
+
+        // Is the configuration available?
+        if (securityConfiguration == null) {
+          throw new IllegalStateException("The security configuration of site '" + site.getIdentifier() + "' cannot be found at " + securityConfiguration);
+        }
+
+        // Start reading the configuration
         is = securityConfiguration.openStream();
 
         // Turn the stream into a Spring Security filter chain
