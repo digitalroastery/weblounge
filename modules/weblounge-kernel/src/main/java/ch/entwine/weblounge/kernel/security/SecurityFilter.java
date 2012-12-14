@@ -23,13 +23,21 @@ import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.site.SiteManager;
+import ch.entwine.weblounge.kernel.site.SiteServiceListener;
 
+import org.apache.commons.io.IOUtils;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -46,7 +54,7 @@ import javax.servlet.http.HttpServletResponse;
  * enforcing either the default security configuration or site specific security
  * rules.
  */
-public final class SecurityFilter implements Filter {
+public final class SecurityFilter implements Filter, SiteServiceListener {
 
   /** The logging facility */
   public static final Logger logger = LoggerFactory.getLogger(SecurityFilter.class);
@@ -79,6 +87,14 @@ public final class SecurityFilter implements Filter {
     this.securityService = securityService;
     this.sites = sites;
     this.defaultSecurityFilter = filter;
+
+    this.sites.addSiteListener(this);
+    Iterator<Site> si = sites.sites();
+    while (si.hasNext()) {
+      Site site = si.next();
+      Bundle siteBundle = sites.getSiteBundle(site);
+      registerSecurity(site, siteBundle);
+    }
   }
 
   /**
@@ -171,23 +187,65 @@ public final class SecurityFilter implements Filter {
   }
 
   /**
-   * Callback for OSGi to set the site manager.
+   * {@inheritDoc}
    * 
-   * @param siteManager
-   *          the site manager
+   * @see ch.entwine.weblounge.kernel.site.SiteServiceListener#siteAppeared(ch.entwine.weblounge.common.site.Site,
+   *      org.osgi.framework.ServiceReference)
    */
-  void setSiteManager(SiteManager siteManager) {
-    this.sites = siteManager;
+  @Override
+  public void siteAppeared(Site site, ServiceReference reference) {
+    registerSecurity(site, reference.getBundle());
   }
 
   /**
-   * Callback for OSGi to remove the site manager.
+   * {@inheritDoc}
    * 
-   * @param siteManager
-   *          the site manager
+   * @see ch.entwine.weblounge.kernel.site.SiteServiceListener#siteDisappeared(ch.entwine.weblounge.common.site.Site)
    */
-  void removeSiteManager(SiteManager siteManager) {
-    this.sites = null;
+  @Override
+  public void siteDisappeared(Site site) {
+    siteFilters.remove(site);
+  }
+
+  /**
+   * Registers a security filter for the given site.
+   * 
+   * @param site
+   *          the site
+   * @param bundle
+   *          the site's bundle
+   */
+  private void registerSecurity(Site site, Bundle bundle) {
+    URL securityConfiguration = site.getSecurity();
+    if (securityConfiguration != null) {
+      // Test availability of the security configuration
+      InputStream is = null;
+      try {
+        String configPath = securityConfiguration.toExternalForm();
+        if (configPath.startsWith("file://${site.root}")) {
+          String bundlePath = UrlUtils.concat("/site", configPath.substring(19));
+          securityConfiguration = bundle.getResource(bundlePath);
+        }
+        is = securityConfiguration.openStream();
+
+        // Turn the stream into a Spring Security filter chain
+        ConfigurableOsgiBundleApplicationContext springContext = null;
+        springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfiguration.toExternalForm() });
+        springContext.setBundleContext(bundle.getBundleContext());
+        springContext.refresh();
+
+        // Register the security filter chain
+        Filter siteSecurityFilter = (Filter) springContext.getBean("springSecurityFilterChain");
+        logger.info("Registering custom security filter for site '{}'", site.getIdentifier());
+        siteFilters.put(site, siteSecurityFilter);
+      } catch (IOException e) {
+        throw new IllegalStateException("Security configuration " + securityConfiguration + " of site '" + site.getIdentifier() + "' cannot be read: " + e.getMessage(), e);
+      } catch (Throwable t) {
+        throw new IllegalStateException("Error registering security configuration " + securityConfiguration + " of site '" + site.getIdentifier() + "': " + t.getMessage(), t);
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+    }
   }
 
 }
