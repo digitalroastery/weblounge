@@ -12,6 +12,7 @@
     <url environment="development">http://localhost:8080</url>
   </domains>
   <security>
+    <configuration>file://security.xml</configuration>
     <administrator>
       <login>blogadmin</login>
       <password type="plain"><![CDATA[secret]]></password>

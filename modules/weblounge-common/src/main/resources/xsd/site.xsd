@@ -23,6 +23,7 @@
   <xsd:element name="security">
     <xsd:complexType>
       <xsd:all>
+        <xsd:element name="configuration" type="xsd:anyURI" minOccurs="0" />
         <xsd:element ref="administrator" />
         <xsd:element ref="roles" minOccurs="0" maxOccurs="1" />
       </xsd:all>

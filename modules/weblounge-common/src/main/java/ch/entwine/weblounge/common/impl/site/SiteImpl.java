@@ -182,6 +182,9 @@ public class SiteImpl implements Site {
   /** Option handling support */
   protected OptionsHelper options = null;
 
+  /** URL to the security configuration */
+  protected URL security = null;
+
   /** Request listeners */
   private List<RequestListener> requestListeners = null;
 
@@ -684,6 +687,26 @@ public class SiteImpl implements Site {
       logger.debug("Content repository {} disconnected from site '{}'", oldRepository, this);
       fireRepositoryDisconnected(oldRepository);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#setSecurity(java.net.URL)
+   */
+  @Override
+  public void setSecurity(URL url) {
+    this.security = url;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#getSecurity()
+   */
+  @Override
+  public URL getSecurity() {
+    return security;
   }
 
   /**
@@ -1593,7 +1616,8 @@ public class SiteImpl implements Site {
       } catch (ClassNotFoundException e) {
         throw new IllegalStateException("Implementation " + className + " for integration test of class '" + identifier + "' not found", e);
       } catch (NoClassDefFoundError e) {
-        // We are trying to load each and every class here, so we may as well see classes that are not meant to be loaded
+        // We are trying to load each and every class here, so we may as well
+        // see classes that are not meant to be loaded
         logger.debug("The related class " + e.getMessage() + " for potential test case implementation " + className + " could not be found");
       } catch (InstantiationException e) {
         throw new IllegalStateException("Error instantiating impelementation " + className + " for integration test '" + identifier + "'", e);
@@ -1753,6 +1777,25 @@ public class SiteImpl implements Site {
       site.setDefaultTemplate(firstTemplate);
     }
 
+    // security
+    String securityConfiguration = XPathHelper.valueOf(config, "ns:security/ns:configuration", xpathProcessor);
+    if (securityConfiguration != null) {
+      URL securityConfig = null;
+
+      // If converting the path into a URL fails, we are assuming that the
+      // configuration is part of the bundle
+      try {
+        securityConfig = new URL(securityConfiguration);
+      } catch (MalformedURLException e) {
+        logger.debug("Security configuration {} is pointing to the bundle", securityConfiguration);
+        securityConfig = SiteImpl.class.getResource(securityConfiguration);
+        if (securityConfig == null) {
+          throw new IllegalStateException("Security configuration " + securityConfig + " of site '" + site.getIdentifier() + "' cannot be located inside of bundle", e);
+        }
+      }
+      site.setSecurity(securityConfig);
+    }
+
     // administrator
     Node adminNode = XPathHelper.select(config, "ns:security/ns:administrator", xpathProcessor);
     if (adminNode != null) {
@@ -1839,6 +1882,9 @@ public class SiteImpl implements Site {
     // security
     if (administrator != null || localRoles.size() > 0) {
       b.append("<security>");
+      if (security != null) {
+        b.append("<configuration>").append(security.toExternalForm()).append("</configuration>");
+      }
       if (administrator != null)
         b.append(administrator.toXml());
 

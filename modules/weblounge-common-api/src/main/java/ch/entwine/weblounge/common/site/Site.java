@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.security.UserListener;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -393,6 +394,22 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * @return the site default language
    */
   Language getLanguage(String languageId);
+
+  /**
+   * Returns the URL to the security configuration or <code>null</code> if this
+   * site doesn't define its own security rules.
+   * 
+   * @return the security
+   */
+  URL getSecurity();
+
+  /**
+   * Sets the site's security configuration.
+   * 
+   * @param url
+   *          URL pointing to the security configuration
+   */
+  void setSecurity(URL url);
 
   /**
    * Starts this site.
