@@ -243,7 +243,7 @@ public class ResourceIteratorTag extends WebloungeTag {
         return SKIP_BODY;
       }
       index = 0;
-      iterations = searchResult.getHitCount();
+      iterations = searchResult.getDocumentCount();
     }
 
     if (iterations < 1)
