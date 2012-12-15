@@ -87,6 +87,12 @@ public class ResourceIteratorTag extends WebloungeTag {
   /** The result order */
   private Order order = null;
 
+  /** The maximum number of resources to return */
+  private int limit = 10;
+
+  /** Index of the first document to return */
+  private int offset = 0;
+
   /**
    * Sets the subjects for the search.
    * 
@@ -191,6 +197,26 @@ public class ResourceIteratorTag extends WebloungeTag {
   }
 
   /**
+   * Sets the maximum number of resources to iterate over.
+   * 
+   * @param limit
+   *          the maximum number of resources
+   */
+  public void setLimit(int limit) {
+    this.limit = limit;
+  }
+
+  /**
+   * Sets the index of the first document to return.
+   * 
+   * @param offset
+   *          index of the first document to return
+   */
+  public void setOffset(int offset) {
+    this.offset = offset;
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
@@ -235,6 +261,9 @@ public class ResourceIteratorTag extends WebloungeTag {
         if (creatorStartDate != null)
           q.withCreationDateBetween(creatorStartDate);
       }
+      
+      q.withLimit(limit);
+      q.withOffset(offset);
 
       try {
         searchResult = repository.find(q);
@@ -356,6 +385,8 @@ public class ResourceIteratorTag extends WebloungeTag {
     resourceSeries = null;
     excludeTypes = null;
     includeTypes = null;
+    limit = 10;
+    offset = 0;
   }
 
 }
