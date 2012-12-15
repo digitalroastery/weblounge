@@ -179,6 +179,9 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    * @see #getLanguageResolution()
    */
   public T get() {
+    Language language = getLanguage();
+    if (language == null)
+      return null;
     return get(getLanguage(), false);
   }
 
