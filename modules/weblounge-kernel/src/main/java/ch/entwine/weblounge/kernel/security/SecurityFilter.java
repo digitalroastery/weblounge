@@ -87,14 +87,7 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
     this.securityService = securityService;
     this.sites = sites;
     this.defaultSecurityFilter = filter;
-
-    this.sites.addSiteListener(this);
-    Iterator<Site> si = sites.sites();
-    while (si.hasNext()) {
-      Site site = si.next();
-      Bundle siteBundle = sites.getSiteBundle(site);
-      registerSecurity(site, siteBundle);
-    }
+    this.siteFilters = new HashMap<Site, Filter>();
   }
 
   /**
@@ -104,7 +97,13 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
    */
   @Override
   public void init(FilterConfig config) throws ServletException {
-    siteFilters = new HashMap<Site, Filter>();
+    this.sites.addSiteListener(this);
+    Iterator<Site> si = sites.sites();
+    while (si.hasNext()) {
+      Site site = si.next();
+      Bundle siteBundle = sites.getSiteBundle(site);
+      registerSecurity(site, siteBundle);
+    }
   }
 
   /**
