@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <packaging>bundle</packaging>
   <artifactId>weblounge-kernel</artifactId>
@@ -16,6 +17,7 @@
     <checkstyle.skip>false</checkstyle.skip>
     <springframework.version>3.1.0</springframework.version>
     <cxf.version>2.3.0</cxf.version>
+    <batik.version>1.7</batik.version>
   </properties>
 
   <dependencies>
@@ -59,22 +61,22 @@
     </dependency>
 
     <!-- thirdparty -->
-    
+
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.activation</groupId>
       <artifactId>activation</artifactId>
@@ -84,17 +86,17 @@
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-bundle</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.geronimo.javamail</groupId>
       <artifactId>geronimo-javamail_1.4_provider</artifactId>
@@ -162,7 +164,7 @@
       <artifactId>json</artifactId>
       <version>20090211</version>
     </dependency>
- 
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -178,7 +180,7 @@
       <artifactId>org.apache.felix.webconsole</artifactId>
       <version>3.1.8</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
@@ -210,11 +212,101 @@
     </dependency>
 
     <dependency>
-	  <groupId>org.apache.xmlgraphics</groupId>
-	  <artifactId>fop</artifactId>
-	  <version>1.0</version>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>fop</artifactId>
+      <version>0.95</version>
     </dependency>
-            
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>xmlgraphics-commons</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-codec</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-svg-dom</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-util</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-parser</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-dom</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-css</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-xml</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-anim</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-bridge</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-gvt</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-script</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis-ext</artifactId>
+      <version>1.3.04</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-ext</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-awt-util</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
 
     <dependency>
       <groupId>org.jboss.security</groupId>
@@ -253,7 +345,7 @@
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
@@ -422,7 +514,6 @@
               org.apache.felix.webconsole;version="3.1.2",
               org.apache.commons.lang;version="2.6",
               org.apache.commons.io;version="2.0",
-              org.apache.fop.apps;version="1.0.0",
               org.apache.tika;version="0.9",
               org.quartz;version="[1.6.0,2.0.0)",
               org.quartz.impl;version="[1.6.0,2.0.0)",
@@ -493,6 +584,22 @@
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,
               geronimo-javamail_1.4_provider;inline=true,
+              xml-apis-ext;inline=true,
+              fop;inline=true,
+              xmlgraphics-commons;inline=true,
+              batik-codec;inline=true,
+              batik-svg-dom;inline=true,
+              batik-util;inline=true,
+              batik-parser;inline=true,
+              batik-dom;inline=true,
+              batik-css;inline=true,
+              batik-xml;inline=true,
+              batik-anim;inline=true,
+              batik-bridge;inline=true,
+              batik-gvt;inline=true,
+              batik-script;inline=true,
+              batik-ext;inline=true,
+              batik-awt-util;inline=true
             </Embed-Dependency>
             <Service-Component>
               OSGI-INF/directory-service.xml,
