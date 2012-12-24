@@ -342,20 +342,25 @@ steal.plugins('jqueryui/dialog',
 	'hoverenter': function(el, ev) {
 		if(!this.showHover) return;
 		if(!el.hasClass('wbl-noEditor')) {
-			this.element.append('<img class="wbl-iconEditing" src="' + this.options.composer.runtime.getRootPath() + 
-			'/editor/composer/resources/icon_editing.png" />');
+			//this.element.append('<img class="wbl-iconEditing" src="' + this.options.composer.runtime.getRootPath() + 
+			//'/editor/composer/resources/icon_editing.png" />');
+            this.element.prepend('<i class="wbl icon-pencil"></i>');
 		}
-		this.element.append('<img class="wbl-iconRemove" src="' + this.options.composer.runtime.getRootPath() + 
-			'/editor/composer/resources/icon_trash.png" />');
+		//this.element.append('<img class="wbl-iconRemove" src="' + this.options.composer.runtime.getRootPath() + 
+		//	'/editor/composer/resources/icon_trash.png" />');
+        this.element.prepend('<i class="wbl icon-trash"></i>');
     },
     
 	'hoverleave': function(el, ev) {
 		if(!this.showHover) return;
-		this.element.find('img.wbl-iconEditing').remove();
-		this.element.find('img.wbl-iconRemove').remove();
+		//this.element.find('img.wbl-iconEditing').remove();
+		//this.element.find('img.wbl-iconRemove').remove();
+        this.element.closest('.pagelet').find('i.icon-pencil').remove();
+        this.element.closest('.pagelet').find('i.icon-trash').remove();
     },
 
-	'img.wbl-iconEditing click': function(el, ev) {
+	//'img.wbl-iconEditing click': function(el, ev) {
+    'i.icon-pencil click': function(el, ev) {
 		Workbench.getPageletEditor({
 			id: this.options.composer.page.value.id, 
 			composer: this.options.composer.id, 
@@ -364,7 +369,8 @@ steal.plugins('jqueryui/dialog',
 		}, this.callback('_openPageEditor'));
 	},
 	
-    'img.wbl-iconRemove click': function(el, ev) {
+    //'img.wbl-iconRemove click': function(el, ev) {
+    'i.icon-trash click': function(el, ev) {    
     	this._deletePagelet();
     }
 
