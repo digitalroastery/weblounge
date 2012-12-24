@@ -36,8 +36,7 @@ steal.plugins('jquery/controller',
         cursorAt: { top: -8, left: -10 },
         revert: true,
         start: $.proxy(function(event, ui) {
-        	this.element.find('img.wbl-iconEditing').remove();
-        	this.element.find('img.wbl-iconRemove').remove();
+        	this.element.find('i.wbl').remove(); // remove all editing-icons
         	//this._disablePagelets(); // why should all composer set 'disabled' while drag and drop? --> remove function completely
         	if(ui.item.hasClass('wbl-draggable')) return;
         	
