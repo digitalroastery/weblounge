@@ -133,3 +133,8 @@ div.DataTables_sort_wrapper span {
 #wbl-pageleteditor p.desc {
   font-size: 10px;
 }
+
+/* preview img in the dialogs */
+img.dialog-preview {
+  width: 150px !important;
+}
