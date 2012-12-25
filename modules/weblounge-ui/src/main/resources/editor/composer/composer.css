@@ -13,18 +13,19 @@
 	height:24px;
 }
 
-/* edit-icons: pencil and trash */
-.editor_composer i.wbl {
-	padding: 0 !important;
+/* edit-icons */
+.editor_composer .wbl-editing-palet {
+	padding: 8px !important;
 	margin: 5px !important;
 	cursor: pointer;
-	z-index: 1000;
+	z-index: 399; /* 1 below 400 of #wbl-pageletcreator */
 	position: absolute;
 	background-color: #fff;
+	border-radius: 10px;
 }
 
-.editor_composer i.wbl.icon-pencil {
-	left: 20px;
+.editor_composer .wbl-editing-palet .wbl-icon-pencil {
+	margin-left: 15px; /* Does not affect ?!?!? */
 }
 
 .editor_composer .wbl-pageletPlaceholder {

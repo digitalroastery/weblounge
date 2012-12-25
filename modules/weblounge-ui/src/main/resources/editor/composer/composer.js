@@ -36,8 +36,8 @@ steal.plugins('jquery/controller',
         cursorAt: { top: -8, left: -10 },
         revert: true,
         start: $.proxy(function(event, ui) {
-        	this.element.find('i.wbl').remove(); // remove all editing-icons
-        	//this._disablePagelets(); // why should all composer set 'disabled' while drag and drop? --> remove function completely
+        	this.element.find('div.wbl-editing-icons').remove(); // remove all editing-icons
+        	this._disablePagelets();
         	if(ui.item.hasClass('wbl-draggable')) return;
         	
         	// add pageletData to draggable helper
@@ -48,7 +48,7 @@ steal.plugins('jquery/controller',
         	ui.helper.data('pagelet', copyPagelet);
         }, this),
         stop: $.proxy(function(event, ui) {
-        	//this._enablePagelets(); // why should all composer set 'disabled' while drag and drop?  --> remove function completely
+        	this._enablePagelets();
         }, this),
         update: $.proxy(function(event, ui) {
         	var page = this.options.page;
