@@ -8,7 +8,8 @@
  * Nur ausgewählte Module, welche mit dem prefix 'wbl-' versehen/abgeändert wurden
  */
 
- /* TOTO: Batch hinzufügen (mit wbl-präfix), wird z.Z. von style.css geladen */
+ /* TODO: Batch hinzufügen (mit wbl-präfix), wird z.Z. von style.css geladen */
+ /* TODO: Button-Styles hinzufügen */
 
 .wbl-message {
   padding: 8px 35px 8px 14px;
