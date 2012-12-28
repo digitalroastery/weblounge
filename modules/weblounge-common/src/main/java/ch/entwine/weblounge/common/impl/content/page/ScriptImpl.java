@@ -350,13 +350,6 @@ public class ScriptImpl implements Script {
   private String toXml(boolean includeNonHtmlAttributes) {
     StringBuilder sb = new StringBuilder("<script");
 
-    // use
-    if (includeNonHtmlAttributes && use != null) {
-      sb.append(" use=\"");
-      sb.append(use.toString().toLowerCase());
-      sb.append("\"");
-    }
-
     // jquery
     if (jquery != null) {
       sb.append(" jquery=\"");
@@ -365,7 +358,7 @@ public class ScriptImpl implements Script {
     }
 
     // use
-    if (use != null) {
+    if (includeNonHtmlAttributes && use != null) {
       sb.append(" use=\"");
       sb.append(use.toString().toLowerCase());
       sb.append("\"");
