@@ -133,5 +133,18 @@ public class ActionException extends Exception {
   public int getStatusCode() {
     return statusCode;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Throwable#getMessage()
+   */
+  @Override
+  public String getMessage() {
+    String message = super.getMessage();
+    if (message == null && statusCode != -1)
+      message = Integer.toString(statusCode);
+    return message;
+  }
 
 }
