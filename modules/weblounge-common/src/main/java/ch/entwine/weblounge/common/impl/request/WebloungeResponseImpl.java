@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.impl.request;
 
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.request.CacheHandle;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
@@ -514,12 +515,20 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     StringBuffer headersHTML = new StringBuffer();
     if (htmlHeaders != null) {
       for (HTMLHeadElement e : htmlHeaders) {
-        headersHTML.append(e.toHtml()).append('\n');
+        String header = ConfigurationUtils.processTemplate(e.toHtml(), request.get().getSite(), request.get().getEnvironment());
+        headersHTML.append(header).append('\n');
       }
     }
 
     // Replace the marker with the actual headers
-    response = response.replaceAll(HTML_HEADER_MARKER, headersHTML.toString());
+    int headersPlaceholderLocation = response.indexOf(HTML_HEADER_MARKER);
+    if (headersPlaceholderLocation >= 1) {
+      StringBuffer updatedResponse = new StringBuffer(response.substring(0, headersPlaceholderLocation));
+      updatedResponse.append(headersHTML.toString());
+      updatedResponse.append(response.substring(headersPlaceholderLocation + HTML_HEADER_MARKER.length()));
+      response = updatedResponse.toString();
+    }
+
     setContentLength(response.getBytes().length);
     IOUtils.write(response, clientOS, DEFAULT_ENCODING);
     clientOS.flush();
