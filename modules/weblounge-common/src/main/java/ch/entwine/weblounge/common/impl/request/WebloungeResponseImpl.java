@@ -514,7 +514,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     StringBuffer headersHTML = new StringBuffer();
     if (htmlHeaders != null) {
       for (HTMLHeadElement e : htmlHeaders) {
-        headersHTML.append(e.toXml()).append('\n');
+        headersHTML.append(e.toHtml()).append('\n');
       }
     }
 
