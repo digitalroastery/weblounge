@@ -36,7 +36,7 @@ steal.plugins('jquery/controller',
         cursorAt: { top: -8, left: -10 },
         revert: true,
         start: $.proxy(function(event, ui) {
-        	this.element.find('div.wbl-editing-icons').remove(); // remove all editing-icons
+        	this.element.find('i.wbl').remove(); // remove all editing-icons
         	this._disablePagelets();
         	if(ui.item.hasClass('wbl-draggable')) return;
         	
@@ -169,6 +169,17 @@ steal.plugins('jquery/controller',
     
     _disablePagelets: function() {
     	$('.composer:not(.locked)').editor_composer('disable');
+    },
+
+	'hoverenter': function(el, ev) {
+		if(!$(this.element).hasClass('wbl-nojQuery')) return;
+		$(this.element).addClass('wbl-composerBorder');
+    },
+    
+	'hoverleave': function(el, ev) {
+		if(!$(this.element).hasClass('wbl-nojQuery')) return;
+    	if($(this.element).hasClass('empty')) return;
+    	$(this.element).removeClass('wbl-composerBorder');
     }
     
   });

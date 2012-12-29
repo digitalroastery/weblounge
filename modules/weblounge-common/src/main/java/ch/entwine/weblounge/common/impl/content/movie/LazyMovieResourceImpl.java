@@ -1064,7 +1064,9 @@ public class LazyMovieResourceImpl implements MovieResource {
    * @see ch.entwine.weblounge.common.content.Resource#getContent(ch.entwine.weblounge.common.language.Language)
    */
   public MovieContent getContent(Language language) {
-    return null;
+    if (!isBodyLoaded)
+      loadAudioVisual();
+    return audioVisual.getContent(language);
   }
 
   /**
@@ -1073,7 +1075,20 @@ public class LazyMovieResourceImpl implements MovieResource {
    * @see ch.entwine.weblounge.common.content.Resource#getOriginalContent()
    */
   public MovieContent getOriginalContent() {
-    return null;
+    if (!isBodyLoaded)
+      loadAudioVisual();
+    return audioVisual.getOriginalContent();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  public void addContent(MovieContent content) {
+    if (!isBodyLoaded)
+      loadAudioVisual();
+    audioVisual.addContent(content);
   }
 
   /**
@@ -1082,7 +1097,9 @@ public class LazyMovieResourceImpl implements MovieResource {
    * @see ch.entwine.weblounge.common.content.Resource#removeContent(ch.entwine.weblounge.common.language.Language)
    */
   public MovieContent removeContent(Language language) {
-    return null;
+    if (!isBodyLoaded)
+      loadAudioVisual();
+    return audioVisual.removeContent(language);
   }
 
   /**
@@ -1091,7 +1108,9 @@ public class LazyMovieResourceImpl implements MovieResource {
    * @see ch.entwine.weblounge.common.content.Resource#contents()
    */
   public Set<MovieContent> contents() {
-    return null;
+    if (!isBodyLoaded)
+      loadAudioVisual();
+    return audioVisual.contents();
   }
 
   /**
@@ -1125,16 +1144,6 @@ public class LazyMovieResourceImpl implements MovieResource {
   @Override
   public String toString() {
     return uri.toString();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
-   */
-  public void addContent(MovieContent content) {
-    // TODO Auto-generated method stub
-
   }
 
 }

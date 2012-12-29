@@ -686,14 +686,23 @@ public final class ConfigurationUtils {
 
     Map<String, String> replacements = new HashMap<String, String>();
 
+    // ${site.root}
     StringBuffer siteRootReplacement = new StringBuffer();
     siteRootReplacement.append(site.getHostname(environment).toExternalForm());
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
     replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
 
+    // Site options
+    for (String option : site.getOptionNames()) {
+      String value = site.getOptionValue(option);
+      replacements.put("\\$\\{" + option + "\\}", value);
+    }
+
+    // Replace with whatever is available
     for (Map.Entry<String, String> entry : replacements.entrySet()) {
       text = text.replaceAll(entry.getKey(), entry.getValue());
     }
+
     return text;
   }
 

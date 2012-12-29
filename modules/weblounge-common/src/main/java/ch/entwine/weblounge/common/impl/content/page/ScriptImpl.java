@@ -323,9 +323,31 @@ public class ScriptImpl implements Script {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.Script#toXml()
+   * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#toHtml()
+   */
+  @Override
+  public String toHtml() {
+    return toXml(false);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#toXml()
    */
   public String toXml() {
+    return toXml(true);
+  }
+
+  /**
+   * Returns the <code>XML</code> representation of this script, optionally
+   * skipping attributes that are not part of the <code>HTML</code> standard.
+   * 
+   * @param includeNonHtmlAttributes
+   *          <code>true</code> to include non <code>HTML</code> attributes
+   * @return the xml representation
+   */
+  private String toXml(boolean includeNonHtmlAttributes) {
     StringBuilder sb = new StringBuilder("<script");
 
     // jquery
@@ -336,7 +358,7 @@ public class ScriptImpl implements Script {
     }
 
     // use
-    if (use != null) {
+    if (includeNonHtmlAttributes && use != null) {
       sb.append(" use=\"");
       sb.append(use.toString().toLowerCase());
       sb.append("\"");
