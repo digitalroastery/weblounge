@@ -37,7 +37,7 @@ steal.plugins('jquery/controller',
         revert: true,
         start: $.proxy(function(event, ui) {
         	this.element.find('i.wbl').remove(); // remove all editing-icons
-        	//this._disablePagelets(); // why should all composer set 'disabled' while drag and drop? --> remove function completely
+        	this._disablePagelets();
         	if(ui.item.hasClass('wbl-draggable')) return;
         	
         	// add pageletData to draggable helper
@@ -48,7 +48,7 @@ steal.plugins('jquery/controller',
         	ui.helper.data('pagelet', copyPagelet);
         }, this),
         stop: $.proxy(function(event, ui) {
-        	//this._enablePagelets(); // why should all composer set 'disabled' while drag and drop?  --> remove function completely
+        	this._enablePagelets();
         }, this),
         update: $.proxy(function(event, ui) {
         	var page = this.options.page;
@@ -169,6 +169,17 @@ steal.plugins('jquery/controller',
     
     _disablePagelets: function() {
     	$('.composer:not(.locked)').editor_composer('disable');
+    },
+
+	'hoverenter': function(el, ev) {
+		if(!$(this.element).hasClass('wbl-nojQuery')) return;
+		$(this.element).addClass('wbl-composerBorder');
+    },
+    
+	'hoverleave': function(el, ev) {
+		if(!$(this.element).hasClass('wbl-nojQuery')) return;
+    	if($(this.element).hasClass('empty')) return;
+    	$(this.element).removeClass('wbl-composerBorder');
     }
     
   });
