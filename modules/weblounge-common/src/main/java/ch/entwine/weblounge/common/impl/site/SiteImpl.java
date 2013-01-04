@@ -66,7 +66,6 @@ import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.ComponentContext;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -1182,19 +1181,22 @@ public class SiteImpl implements Site {
    * of your bundle.
    * 
    * @param context
-   *          the component context
+   *          the bundle context
+   * @param properties
+   *          the component properties
    * @throws Exception
    *           if the site activation fails
    */
   @SuppressWarnings("unchecked")
-  protected void activate(ComponentContext context) throws Exception {
+  protected void activate(BundleContext ctx, Map<String, String> properties)
+      throws Exception {
 
-    bundleContext = context.getBundleContext();
+    bundleContext = ctx;
     final Bundle bundle = bundleContext.getBundle();
 
     // Fix the site identifier
     if (getIdentifier() == null) {
-      String identifier = (String) context.getProperties().get(PROP_IDENTIFIER);
+      String identifier = properties.get(PROP_IDENTIFIER);
       if (identifier == null)
         throw new IllegalStateException("Property'" + PROP_IDENTIFIER + "' missing from site bundle");
       setIdentifier(identifier);
@@ -1283,11 +1285,13 @@ public class SiteImpl implements Site {
    * of your bundle.
    * 
    * @param context
-   *          the component context
+   *          the bundle context
+   * @param properties
+   *          the component properties
    * @throws Exception
    *           if the site deactivation fails
    */
-  protected void deactivate(ComponentContext context) throws Exception {
+  protected void deactivate(BundleContext context, Map<String, String> properties) throws Exception {
     try {
       isShutdownInProgress = true;
       logger.debug("Taking down site '{}'", this);
@@ -1668,6 +1672,7 @@ public class SiteImpl implements Site {
    *           if the site cannot be parsed
    * @see #toXml()
    */
+  @SuppressWarnings("unchecked")
   public static Site fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();

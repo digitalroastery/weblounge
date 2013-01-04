@@ -166,14 +166,15 @@ public class UserContextFilter implements Filter {
       } else if (principal instanceof UserDetails) {
         UserDetails userDetails = (UserDetails) principal;
         user = new UserImpl(userDetails.getUsername());
+        logger.debug("Principal was identified as '{}'", user.getLogin());
 
-        Collection<GrantedAuthority> authorities = auth.getAuthorities();
+        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
         if (authorities != null && authorities.size() > 0) {
           for (GrantedAuthority ga : authorities) {
+            logger.debug("Principal '{}' gained role '{}'", user.getLogin(), ga.getAuthority());
             roles.add(new RoleImpl(ga.getAuthority()));
           }
         }
-        logger.debug("Principal was identified as '{}'", user.getLogin());
 
       } else if (Security.ANONYMOUS_USER.equals(principal)) {
         user = new Guest(site.getIdentifier());

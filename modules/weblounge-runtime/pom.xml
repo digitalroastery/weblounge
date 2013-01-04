@@ -13,9 +13,8 @@
   <properties>
     <weblounge.basedir>${project.basedir}/../..</weblounge.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <springsecurity.version>3.1.0.RELEASE</springsecurity.version>
-    <eclipselink.version>2.3.0</eclipselink.version>
-    <servicemix-specs.version>2.2.0</servicemix-specs.version>
+    <springsecurity.version>3.1.2.RELEASE</springsecurity.version>
+    <servicemix-specs.version>2.1.0</servicemix-specs.version>
   </properties>
 
   <dependencies>
@@ -129,15 +128,15 @@
 
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
-      <artifactId>org.apache.servicemix.specs.jaxb-api-2.1</artifactId>
+      <artifactId>org.apache.servicemix.specs.jaxb-api-2.2</artifactId>
       <version>${servicemix-specs.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.servicemix.specs</groupId>
-      <artifactId>org.apache.servicemix.specs.stax-api-1.0</artifactId>
-      <version>${servicemix-specs.version}</version>
-    </dependency>
+		<dependency>
+			<groupId>org.apache.servicemix.specs</groupId>
+			<artifactId>org.apache.servicemix.specs.stax-api-1.2</artifactId>
+			<version>${servicemix-specs.version}</version>
+		</dependency>
 
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
@@ -199,7 +198,7 @@
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.jaxb-impl</artifactId>
-      <version>2.1.6_1</version>
+      <version>2.2.4_2</version>
     </dependency>
 
     <dependency>
@@ -223,7 +222,7 @@
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.woodstox</artifactId>
-      <version>3.2.7_1</version>
+      <version>3.2.9_3</version>
     </dependency>
 
     <dependency>
@@ -247,37 +246,49 @@
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.xmlresolver</artifactId>
-      <version>1.2_1</version>
+      <version>1.2_5</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.asm</artifactId>
-      <version>2.2.3_1</version>
+      <version>3.3_2</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.xerces</artifactId>
-      <version>2.9.1_3</version>
+      <version>2.10.0_1</version>
     </dependency>
 
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xalan</artifactId>
+			<version>2.7.1_5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xalan-serializer</artifactId>
+			<version>2.7.1_4</version>
+		</dependency>
+		
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.javax.mail</artifactId>
-      <version>1.4.1_3</version>
+      <version>1.4.1_5</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.rome</artifactId>
-      <version>1.0_2</version>
+      <version>1.0_3</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle-jaxrs</artifactId>
-      <version>${eclipselink.version}</version>
+      <version>2.3.0</version>
     </dependency>
 
     <dependency>
@@ -311,11 +322,11 @@
       <version>1.0.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>com.springsource.org.jdom</artifactId>
-      <version>1.0.0</version>
-    </dependency>
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.jdom</artifactId>
+			<version>2.0.2_1</version>
+		</dependency>
 
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
@@ -462,6 +473,12 @@
       <version>1.1</version>
     </dependency>
 
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jta_1.1_spec</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
     <dependency>
       <groupId>org.apache.geronimo.javamail</groupId>
       <artifactId>geronimo-javamail_1.4_mail</artifactId>
@@ -479,62 +496,74 @@
     <dependency>
       <groupId>org.apache.aries</groupId>
       <artifactId>org.apache.aries.util</artifactId>
-      <version>0.4</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.aries.blueprint</groupId>
       <artifactId>org.apache.aries.blueprint</artifactId>
-      <version>0.4</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.aries.jndi</groupId>
       <artifactId>org.apache.aries.jndi</artifactId>
-      <version>0.3.1</version>
+      <version>1.0.0</version>
     </dependency>
+
+		<dependency>
+			<groupId>org.apache.aries.jpa</groupId>
+			<artifactId>org.apache.aries.jpa.api</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
     <dependency>
       <groupId>org.apache.aries.jpa</groupId>
       <artifactId>org.apache.aries.jpa.blueprint.aries</artifactId>
-      <version>0.3</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.aries.jpa</groupId>
       <artifactId>org.apache.aries.jpa.container</artifactId>
-      <version>0.3</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.aries.jpa</groupId>
       <artifactId>org.apache.aries.jpa.container.context</artifactId>
-      <version>0.3</version>
+      <version>1.0.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.aries.proxy</groupId>
       <artifactId>org.apache.aries.proxy</artifactId>
-      <version>0.4</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.aries.transaction</groupId>
       <artifactId>org.apache.aries.transaction.blueprint</artifactId>
-      <version>0.3</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.aries.transaction</groupId>
       <artifactId>org.apache.aries.transaction.manager</artifactId>
-      <version>0.3</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.aries.transaction</groupId>
       <artifactId>org.apache.aries.transaction.wrappers</artifactId>
-      <version>0.3</version>
+      <version>1.0.0</version>
     </dependency>
+
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm-all</artifactId>
+			<version>4.0</version>
+		</dependency>
 
     <dependency>
       <groupId>org.apache.felix.karaf.deployer</groupId>
