@@ -115,7 +115,6 @@
     <property name="welcomePages">
       <map>
         <entry key="weblounge:editor" value="/weblounge/login/success.html" />
-        <entry key="*" value="/index.html" />
       </map>
     </property>
   </bean>
