@@ -915,7 +915,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       logger.info("Triggering creation of missing and outdated previews");
       createPreviews();
     } else {
-      logger.info("Preview images for {} are still up to date", site.getIdentifier());
+      logger.debug("Preview images for {} are still up to date", site.getIdentifier());
     }
   }
 

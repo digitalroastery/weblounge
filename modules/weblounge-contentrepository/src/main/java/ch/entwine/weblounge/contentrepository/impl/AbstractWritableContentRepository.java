@@ -1230,7 +1230,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     ContentRepositoryIndex idx = null;
 
-    logger.info("Loading site index '{}'", site.getIdentifier());
+    logger.debug("Loading site index '{}'", site.getIdentifier());
 
     // Add content if there is any
     idx = new ContentRepositoryIndex(site, resourceSerializer, readOnly);
