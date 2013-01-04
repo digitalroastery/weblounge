@@ -3,7 +3,6 @@ index/data/
 lib/ext/
 lib/libexec/
 lib/weblounge/
-lib/weblounge_es/
 logs/
 sites/
 sites-data/
@@ -21,4 +20,3 @@ target
 
 # Mac OS X
 .DS_Store
-sites-disabled/

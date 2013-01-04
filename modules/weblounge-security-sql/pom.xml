@@ -67,7 +67,7 @@
               ch.entwine.weblounge.common.impl.security;version=${project.version},
               ch.entwine.weblounge.common.security;version=${project.version},
               ch.entwine.weblounge.common.site;version=${project.version},
-              javax.persistence;version="2.0.3",
+              javax.persistence,
               org.apache.commons.lang;version="2.6",
               org.osgi.framework;version="1.4.0",
               org.osgi.service.component;version="1.1.0",
