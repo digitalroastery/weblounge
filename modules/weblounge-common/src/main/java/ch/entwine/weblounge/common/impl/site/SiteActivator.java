@@ -73,11 +73,11 @@ public class SiteActivator {
    * of your bundle.
    * 
    * @param context
-   *          the component context
+   *          the OSGi component context
    * @throws Exception
    *           if the site activation fails
    */
-  void activate(final ComponentContext context) throws Exception {
+  protected void activate(final ComponentContext context) throws Exception {
     final BundleContext bundleContext = context.getBundleContext();
 
     logger.debug("Scanning bundle '{}' for site.xml", bundleContext.getBundle().getSymbolicName());
@@ -124,6 +124,7 @@ public class SiteActivator {
                 site = SiteImpl.fromXml(siteXml.getFirstChild());
                 if (site instanceof SiteImpl) {
                   ((SiteImpl) site).activate(context);
+                  afterActivation(site, context);
                 }
 
                 // Register it as a service
@@ -157,12 +158,17 @@ public class SiteActivator {
    * of your bundle.
    * 
    * @param context
-   *          the component context
+   *          the OSGi component context
    * @throws Exception
    *           if the site deactivation fails
    */
-  void deactivate(ComponentContext context) throws Exception {
+  protected void deactivate(ComponentContext context) throws Exception {
     if (site != null && site instanceof SiteImpl) {
+      try {
+	      beforeInactivation(site, context);
+      } catch (Throwable t) {
+	      logger.error("Error during site activator cleanup: {}", t.getMessage());
+      }
       ((SiteImpl) site).deactivate(context);
     }
 
@@ -175,6 +181,41 @@ public class SiteActivator {
         logger.error("Unregistering site failed: {}", t.getMessage());
       }
     }
+  }
+
+  /**
+   * This method is called after the site has been successfullly initialized and
+   * before it is registered in the OSGi service registry.
+   *
+   * Subclasses that need to do additional initialization work should override
+   * this method.
+   *
+   * @param site
+   *          the site
+   * @param context
+   *          the OSGi component context
+   * @throws Exception
+   *          if initialization fails
+   */
+  protected void afterActivation(Site site, ComponentContext context) throws Exception {
+	
+  }
+
+  /**
+   * This method is called right before the site will be inactivated and pulled
+   * from the OSGi the service registry.
+   *
+   * Subclasses that need to do cleanup work should override this method.
+   *
+   * @param site
+   *          the site
+   * @param context
+   *          the OSGi component context
+   * @throws Exception
+   *          if cleanup fails
+   */
+  protected void beforeInactivation(Site site, ComponentContext context) {
+	
   }
 
 }
