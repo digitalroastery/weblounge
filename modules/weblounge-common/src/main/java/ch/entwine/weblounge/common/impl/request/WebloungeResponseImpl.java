@@ -39,9 +39,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -73,7 +72,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /** The response's cache handle */
   private WeakReference<CacheHandle> cacheHandle = null;
 
-  private Set<HTMLHeadElement> htmlHeaders = null;
+  private List<HTMLHeadElement> htmlHeaders = null;
 
   /** Whether the getOuputStream has already been called */
   private boolean osCalled = false;
@@ -670,8 +669,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   @Override
   public void addHTMLHeader(HTMLHeadElement header) {
     if (htmlHeaders == null)
-      htmlHeaders = new HashSet<HTMLHeadElement>();
-    htmlHeaders.add(header);
+      htmlHeaders = new ArrayList<HTMLHeadElement>();
+    if (!htmlHeaders.contains(header))
+      htmlHeaders.add(header);
   }
 
   /**
