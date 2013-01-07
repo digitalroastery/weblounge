@@ -749,55 +749,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
   }
 
   /**
-   * Returns an identifier pointing at an object in the current module.
-   * <p>
-   * This method is helpful for using <code>enum</code> constants such as
-   * <code>SearchForm</code> and turn them into <code>search.form</code>, which
-   * is used as the corresponding <code>module.xml</code>'s pagelet definition.
-   * 
-   * @param e
-   *          the enumeration constant
-   * @return the object identifier
-   */
-  protected static final String getIdentifier(Enum<?> e) {
-    return getIdentifier(null, e);
-  }
-
-  /**
-   * Returns an identifier pointing at an object in the current module.
-   * <p>
-   * This method is helpful for using <code>enum</code> constants such as
-   * <code>SearchForm</code> and turn them into <code>search.form</code>, which
-   * is used as the corresponding <code>module.xml</code>'s pagelet definition.
-   * <p>
-   * If <code>prefix</code> is not <code>null</code>, it will be prepended to
-   * the identifier, separated by a dot, i. e. <code>prefix.search.form</code>.
-   * 
-   * @param prefix
-   *          the object namespace
-   * @param e
-   *          the enumeration constant
-   * @return the object identifier
-   */
-  protected static final String getIdentifier(String prefix, Enum<?> e) {
-    String s = e.toString();
-    StringBuffer b = new StringBuffer();
-    if (prefix != null) {
-      b.append(prefix);
-      if (!prefix.endsWith("."))
-        b.append(".");
-    }
-    for (int i = 0; i < s.length(); i++) {
-      Character c = s.charAt(i);
-      if (i != 0 && Character.isUpperCase(c)) {
-        b.append(".");
-      }
-      b.append(Character.toLowerCase(c));
-    }
-    return b.toString();
-  }
-
-  /**
    * Finds the first service in the service registry and returns it. If not such
    * service is available, <code>null</code> is returned.
    * 
