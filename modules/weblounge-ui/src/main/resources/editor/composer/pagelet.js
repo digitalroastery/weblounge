@@ -342,25 +342,25 @@ steal.plugins('jqueryui/dialog',
 	'hoverenter': function(el, ev) {
 		if(!this.showHover) return;
 		//if(!el.hasClass('wbl-noEditor')) {
-        //    this.element.prepend('<i class="wbl-icon-pencil" title="Edit pagelet"></i>');
+        //    this.element.prepend('<i class="icon-pencil" title="Edit pagelet"></i>');
 		//}
-        //this.element.prepend('<i class="wbl-icon-trash" title="Delete pagelet"></i>');
+        //this.element.prepend('<i class="icon-trash" title="Delete pagelet"></i>');
         if(!el.hasClass('wbl-noEditor')) {
-            this.element.prepend('<div class="wbl-editing-palet"><i class="wbl-icon-trash" title="Delete pagelet"></i><i class="wbl-icon-pencil" title="Edit pagelet"></i></div>');
+            this.element.prepend('<div class="wbl-editing-palet"><i class="icon-trash" title="Delete pagelet"></i><i class="icon-pencil" title="Edit pagelet"></i></div>');
         } else {
-            this.element.prepend('<div class="wbl-editing-palet"><i class="wbl-icon-trash" title="Delete pagelet"></i></div>');
+            this.element.prepend('<div class="wbl-editing-palet"><i class="icon-trash" title="Delete pagelet"></i></div>');
         }
 
     },
     
 	'hoverleave': function(el, ev) {
 		if(!this.showHover) return;
-        //this.element.closest('.pagelet').find('i.wbl-icon-pencil').remove();
-        //this.element.closest('.pagelet').find('i.wbl-icon-trash').remove();
+        //this.element.closest('.pagelet').find('i.icon-pencil').remove();
+        //this.element.closest('.pagelet').find('i.icon-trash').remove();
         this.element.closest('.pagelet').find('div.wbl-editing-palet').remove();
     },
 
-    'i.wbl-icon-pencil click': function(el, ev) {
+    'i.icon-pencil click': function(el, ev) {
 		Workbench.getPageletEditor({
 			id: this.options.composer.page.value.id, 
 			composer: this.options.composer.id, 
@@ -369,7 +369,7 @@ steal.plugins('jqueryui/dialog',
 		}, this.callback('_openPageEditor'));
 	},
 	
-    'i.wbl-icon-trash click': function(el, ev) {    
+    'i.icon-trash click': function(el, ev) {    
     	this._deletePagelet();
     }
 
