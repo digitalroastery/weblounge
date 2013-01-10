@@ -152,8 +152,8 @@ public class CronJobTriggerTest {
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.DAY_OF_MONTH, 1);
-    expectedFireDate = rollUp(c, Calendar.MONTH, new int[] { 1 });
     expectedFireDate = rollUp(c, Calendar.DAY_OF_WEEK, daysOfWeek);
+    expectedFireDate = rollUp(c, Calendar.MONTH, new int[] { 1 });
     assertEquals(expectedFireDate, dayOfWeekTrigger.getNextExecutionAfter(now));
   }
 
@@ -176,7 +176,7 @@ public class CronJobTriggerTest {
     c.setFirstDayOfWeek(Calendar.SUNDAY);
     c.set(Calendar.MILLISECOND, 0);
     c.set(Calendar.SECOND, 0);
-    
+
     // Make sure we move past the current time
     Calendar now = Calendar.getInstance();
 
@@ -192,10 +192,11 @@ public class CronJobTriggerTest {
         offset = 0;
     }
 
-    while (!matches) {
+    while (!c.after(now)) {
       c.add(field, 1);
-      if (!c.after(now))
-        continue;
+    }
+    
+    while (!matches) {
       int calendarValue = c.get(field) + offset;
       for (int v : fieldValues) {
         if (calendarValue == v) {
@@ -203,8 +204,10 @@ public class CronJobTriggerTest {
           break;
         }
       }
+      if (!matches)
+        c.add(field, 1);
     }
-    
+
     return c.getTime();
 
     // c.setFirstDayOfWeek(Calendar.SUNDAY);
@@ -261,7 +264,8 @@ public class CronJobTriggerTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.scheduler.CronJobTrigger#getHours()}.
+   * {@link ch.entwine.weblounge.common.impl.scheduler.CronJobTrigger#getHours()}
+   * .
    */
   @Test
   public void testGetHours() {
@@ -296,7 +300,8 @@ public class CronJobTriggerTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.scheduler.CronJobTrigger#getMonths()}.
+   * {@link ch.entwine.weblounge.common.impl.scheduler.CronJobTrigger#getMonths()}
+   * .
    */
   @Test
   public void testGetMonths() {

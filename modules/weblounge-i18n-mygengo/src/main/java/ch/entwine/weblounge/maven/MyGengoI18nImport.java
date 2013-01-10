@@ -86,11 +86,11 @@ public class MyGengoI18nImport extends AbstractMojo {
   private String myGengoPassword;
 
   /**
-   * Password used to access the myGengo i18n files.
+   * Language to use as default
    * 
    * @parameter
    */
-  private boolean isWeblounge2 = false;
+  private String defaultLang;
 
   /** the logging facility */
   private Log log = getLog();
@@ -129,15 +129,15 @@ public class MyGengoI18nImport extends AbstractMojo {
     if (filename.startsWith(siteId)) {
       log.info("Importing i18n file " + name);
       if ((siteId + "_site.xml").equals(filename)) {
-        if (isWeblounge2)
-          path = "/conf/i18n/message_" + lang + ".xml";
+        if (StringUtils.equalsIgnoreCase(lang, defaultLang))
+          path = "/i18n/message.xml";
         else
           path = "/i18n/message_" + lang + ".xml";
       } else {
         String filenameNoSite = filename.substring(filename.indexOf("_") + 1);
         String module = filenameNoSite.substring(filenameNoSite.indexOf("_") + 1, filenameNoSite.indexOf("."));
-        if (isWeblounge2)
-          path = "/module/" + module + "/conf/i18n/message_" + lang + ".xml";
+        if (StringUtils.equalsIgnoreCase(lang, defaultLang))
+          path = "/modules/" + module + "/i18n/message.xml";
         else
           path = "/modules/" + module + "/i18n/message_" + lang + ".xml";
       }

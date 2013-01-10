@@ -667,6 +667,7 @@ public class ModuleImpl implements Module {
    *           if the module cannot be parsed
    * @see #toXml()
    */
+  @SuppressWarnings("unchecked")
   public static Module fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
 
