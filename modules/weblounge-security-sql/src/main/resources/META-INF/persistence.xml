@@ -6,8 +6,7 @@
 
   <persistence-unit name="weblounge.security" transaction-type="JTA">
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
-    <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/weblounge.security)</jta-data-source>
-    
+    <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/weblounge)</jta-data-source>    
     <class>ch.entwine.weblounge.security.sql.entities.Role</class>
     <class>ch.entwine.weblounge.security.sql.entities.Site</class>
     <class>ch.entwine.weblounge.security.sql.entities.User</class>
