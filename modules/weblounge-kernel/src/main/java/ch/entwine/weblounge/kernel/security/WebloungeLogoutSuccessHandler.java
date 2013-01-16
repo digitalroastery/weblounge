@@ -47,9 +47,9 @@ public class WebloungeLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler
       Object principal = authentication.getPrincipal();
       if (!(principal instanceof SpringSecurityUser)) {
         User user = ((SpringSecurityUser) principal).getUser();
-        logger.info("{} logged out", user);
+        logger.info("User '{}' logged out", user);
       } else {
-        logger.info("{} logged out", authentication.getName());
+        logger.info("User '{}' logged out", authentication.getName());
       }
     }
     setDefaultTargetUrl(addTimeStamp(targetUrl));
