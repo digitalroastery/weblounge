@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -17,14 +19,18 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "directory_site")
-@NamedQueries({ @NamedQuery(name = "getSite", query = "SELECT s FROM JpaSite s WHERE s.siteId = :site"), })
+@NamedQueries({ @NamedQuery(name = "getSiteByName", query = "SELECT s FROM JpaSite s WHERE s.name = :site"), })
 public class JpaSite implements Serializable {
 
   /** The serial version UID */
   private static final long serialVersionUID = 4773713282301469466L;
 
   @Id
-  protected String siteId = null;
+  @GeneratedValue
+  protected long siteId;
+  
+  @Column(unique = true, nullable = false)
+  protected String name = null;
 
   /** True if logins into this site are enabled */
   protected boolean enabled = true;
@@ -46,7 +52,7 @@ public class JpaSite implements Serializable {
    *          the site identifier
    */
   public JpaSite(String site) {
-    this.siteId = site;
+    this.name = site;
   }
 
   /**
@@ -54,8 +60,8 @@ public class JpaSite implements Serializable {
    * 
    * @return the site identifier
    */
-  public String getIdentifier() {
-    return siteId;
+  public String getName() {
+    return name;
   }
 
   /**
@@ -108,7 +114,7 @@ public class JpaSite implements Serializable {
    */
   @Override
   public int hashCode() {
-    return siteId.hashCode();
+    return name.hashCode();
   }
 
   /**
@@ -120,7 +126,7 @@ public class JpaSite implements Serializable {
   public boolean equals(Object obj) {
     if (!(obj instanceof JpaSite))
       return false;
-    return siteId.equals(((JpaSite) obj).siteId);
+    return name.equals(((JpaSite) obj).name);
   }
   
   /**
@@ -130,7 +136,7 @@ public class JpaSite implements Serializable {
    */
   @Override
   public String toString() {
-    return siteId;
+    return name;
   }
 
 }

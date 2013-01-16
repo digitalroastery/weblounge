@@ -166,6 +166,40 @@ public final class SQLDirectoryProviderEndpointDocs {
     disableAccount.addPathParameter(new Parameter("login", Parameter.Type.String, "Login name"));
     docs.addEndpoint(Endpoint.Type.WRITE, disableAccount);
 
+    // POST /account/{login}/roles/{context}
+    Endpoint addRole = new Endpoint("/account/{login}/roles/{context}", Method.POST, "addrole");
+    addRole.setDescription("Adds a role to the account");
+    addRole.addFormat(Format.xml());
+    addRole.addStatus(ok("the role has been added"));
+    addRole.addStatus(notModified("the role is already owned by the account"));
+    addRole.addStatus(badRequest("the role parameter is blank"));
+    addRole.addStatus(forbidden("insufficient rights to add the role"));
+    addRole.addStatus(notFound("the account does not exist"));
+    addRole.addStatus(notFound("the site does not exist"));
+    addRole.addStatus(serviceUnavailable("the site is temporarily offline"));
+    addRole.setTestForm(new TestForm());
+    addRole.addPathParameter(new Parameter("login", Parameter.Type.String, "Unique login name"));
+    addRole.addPathParameter(new Parameter("context", Parameter.Type.String, "Role context"));
+    addRole.addRequiredParameter(new Parameter("role", Parameter.Type.String, "Role name"));
+    docs.addEndpoint(Endpoint.Type.WRITE, addRole);
+
+    // DELETE /account/{login}/roles/{context}
+    Endpoint removeRole = new Endpoint("/account/{login}/roles/{context}", Method.DELETE, "removerole");
+    removeRole.setDescription("Removes a role from the account");
+    removeRole.addFormat(Format.xml());
+    removeRole.addStatus(ok("the role has been removed"));
+    removeRole.addStatus(notModified("the role had not been owned by the account"));
+    removeRole.addStatus(badRequest("the role parameter is blank"));
+    removeRole.addStatus(forbidden("insufficient rights to remove the role"));
+    removeRole.addStatus(notFound("the account does not exist"));
+    removeRole.addStatus(notFound("the site does not exist"));
+    removeRole.addStatus(serviceUnavailable("the site is temporarily offline"));
+    removeRole.setTestForm(new TestForm());
+    removeRole.addPathParameter(new Parameter("login", Parameter.Type.String, "Unique login name"));
+    removeRole.addPathParameter(new Parameter("context", Parameter.Type.String, "Role context"));
+    removeRole.addRequiredParameter(new Parameter("role", Parameter.Type.String, "Role name"));
+    docs.addEndpoint(Endpoint.Type.WRITE, removeRole);
+
     return EndpointDocumentationGenerator.generate(docs);
   }
 

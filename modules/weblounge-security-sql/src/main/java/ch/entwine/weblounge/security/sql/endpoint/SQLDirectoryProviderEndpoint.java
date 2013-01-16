@@ -301,6 +301,82 @@ public class SQLDirectoryProviderEndpoint {
     }
   }
 
+  @POST
+  @Path("/account/{id}/roles/{context}")
+  public Response addRole(@PathParam("id") String login,
+      @PathParam("context") String context, @FormParam("role") String role,
+      @Context HttpServletRequest request) {
+
+    // Make sure that the user owns the roles required for this operation
+    User user = securityService.getUser();
+    if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
+      return Response.status(Status.FORBIDDEN).build();
+
+    // Make sure a role has been provided as part of the request
+    if (StringUtils.isBlank(role))
+      return Response.status(Status.BAD_REQUEST).build();
+
+    JpaAccount account = null;
+    Site site = getSite(request);
+    try {
+      account = directory.getAccount(site, login);
+      if (account == null)
+        return Response.status(Status.NOT_FOUND).build();
+
+      if (account.hasRole(context, role))
+        return Response.status(Status.NOT_MODIFIED).build();
+
+      account.addRole(context, role);
+      directory.updateAccount(account);
+      return Response.ok().build();
+    } catch (Throwable t) {
+      logger.warn("Error adding role '{}:{}' to account {}: {}", new String[] {
+          context,
+          role,
+          login,
+          t.getMessage() });
+      return Response.serverError().build();
+    }
+  }
+
+  @DELETE
+  @Path("/account/{id}/roles/{context}")
+  public Response removeRole(@PathParam("id") String login,
+      @PathParam("context") String context, @FormParam("role") String role,
+      @Context HttpServletRequest request) {
+
+    // Make sure that the user owns the roles required for this operation
+    User user = securityService.getUser();
+    if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
+      return Response.status(Status.FORBIDDEN).build();
+
+    // Make sure a role has been provided as part of the request
+    if (StringUtils.isBlank(role))
+      return Response.status(Status.BAD_REQUEST).build();
+
+    JpaAccount account = null;
+    Site site = getSite(request);
+    try {
+      account = directory.getAccount(site, login);
+      if (account == null)
+        return Response.status(Status.NOT_FOUND).build();
+
+      if (!account.hasRole(context, role))
+        return Response.status(Status.NOT_MODIFIED).build();
+
+      account.removeRole(context, role);
+      directory.updateAccount(account);
+      return Response.ok().build();
+    } catch (Throwable t) {
+      logger.warn("Error adding role '{}:{}' to account: {}", new String[] {
+          context,
+          role,
+          login,
+          t.getMessage() });
+      return Response.serverError().build();
+    }
+  }
+
   /**
    * Returns the endpoint documentation.
    * 

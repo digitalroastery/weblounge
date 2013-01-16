@@ -1,13 +1,20 @@
 package ch.entwine.weblounge.security.sql.entities;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -21,20 +28,25 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "directory_account")
 @NamedQueries({
-    @NamedQuery(name = "getAccount", query = "SELECT a FROM JpaAccount a WHERE a.site.siteId = :siteId AND a.login = :userId"),
-    @NamedQuery(name = "getActiveAccount", query = "SELECT a FROM JpaAccount a WHERE a.site.siteId = :siteId AND a.login = :userId AND a.enabled = true and a.site.enabled = true"),
-    @NamedQuery(name = "getAccounts", query = "SELECT a FROM JpaAccount a WHERE a.site.siteId = :siteId") })
+    @NamedQuery(name = "getAccount", query = "SELECT a FROM JpaAccount a WHERE a.site.name = :siteId AND a.login = :userId"),
+    @NamedQuery(name = "getActiveAccount", query = "SELECT a FROM JpaAccount a WHERE a.site.name = :siteId AND a.login = :userId AND a.enabled = true and a.site.enabled = true"),
+    @NamedQuery(name = "getAccounts", query = "SELECT a FROM JpaAccount a WHERE a.site.name = :siteId") })
 public class JpaAccount implements Serializable {
 
   /** Serial version UID */
   private static final long serialVersionUID = -3709284981425807732L;
 
+  @Id
+  @GeneratedValue
+  protected long accountId; 
+
   /** The site that this user account belongs to */
   @ManyToOne
+  @JoinColumn(name = "siteId")
   protected JpaSite site = null;
 
   /** The user login */
-  @Id
+  @Column(unique = true, nullable = false)
   protected String login = null;
 
   /** The user's first name */
@@ -62,7 +74,7 @@ public class JpaAccount implements Serializable {
   protected String response = null;
 
   /** The user roles */
-  @OneToMany(mappedBy = "userAccount", fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   protected Collection<JpaRole> roles = null;
 
   /** True if this account is enabled */
@@ -340,26 +352,41 @@ public class JpaAccount implements Serializable {
   /**
    * Adds the role to the list of roles that are assigned to this account.
    * 
+   * @param context
+   *          the role context
    * @param role
-   *          the role
+   *          the role name
    */
-  public void addRole(JpaRole role) {
+  public void addRole(String context, String role) {
     if (roles == null)
       roles = new ArrayList<JpaRole>();
-    this.roles.add(role);
+    this.roles.add(new JpaRole(this, context, role));
   }
 
   /**
    * Removes the given role from the list of roles that are assigned to this
    * account.
    * 
+   * @param context
+   *          the role context
    * @param role
    *          the role
    */
-  public void removeRole(JpaRole role) {
+  public void removeRole(String context, String role) {
     if (roles == null)
       return;
-    this.roles.remove(role);
+    if (StringUtils.isBlank(context))
+      throw new IllegalArgumentException("Role context must not be blank");
+    if (StringUtils.isBlank(role))
+      throw new IllegalArgumentException("Role name must not be blank");
+    Iterator<JpaRole> ri = roles.iterator();
+    while (ri.hasNext()) {
+      JpaRole r = ri.next();
+      if (context.equals(r.getContext()) && role.equals(r.getRolename())) {
+        ri.remove();
+        return;
+      }
+    }
   }
 
   /**
@@ -369,6 +396,30 @@ public class JpaAccount implements Serializable {
    */
   public Collection<JpaRole> getRoles() {
     return roles;
+  }
+
+  /**
+   * Returns <code>true</code> if the user account has been given the role.
+   * 
+   * @param context
+   *          the role context
+   * @param role
+   *          the role name
+   * @return <code>true</code> if this account owns the role
+   * @throws IllegalArgumentException
+   *           if either one of <code>context</code> or <code>role</code> is
+   *           blank
+   */
+  public boolean hasRole(String context, String role) {
+    if (StringUtils.isBlank(context))
+      throw new IllegalArgumentException("Role context must not be null");
+    if (StringUtils.isBlank(role))
+      throw new IllegalArgumentException("Role name must not be null");
+    for (JpaRole r : roles) {
+      if (context.equals(r.getContext()) && role.equals(r.getRolename()))
+        return true;
+    }
+    return false;
   }
 
 }

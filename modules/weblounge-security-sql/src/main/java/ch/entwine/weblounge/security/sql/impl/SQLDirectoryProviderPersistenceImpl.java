@@ -66,6 +66,7 @@ public class SQLDirectoryProviderPersistenceImpl implements SQLDirectoryProvider
       JpaSite jpaSite = registerSite(site);
       jpaAccount = new JpaAccount(jpaSite, login, password);
       entityManager.persist(jpaAccount);
+      logger.info("User account '{}@{}' created", login, site);
     }
 
     return jpaAccount;
@@ -83,6 +84,7 @@ public class SQLDirectoryProviderPersistenceImpl implements SQLDirectoryProvider
     if (jpaAccount == null)
       return;
     entityManager.remove(jpaAccount);
+    logger.info("User account '{}@{}' removed", login, site);
   }
 
   /**
@@ -156,7 +158,7 @@ public class SQLDirectoryProviderPersistenceImpl implements SQLDirectoryProvider
   @Override
   public boolean isSiteEnabled(String site) throws Exception {
     TypedQuery<JpaSite> query = null;
-    query = entityManager.createNamedQuery("getSite", JpaSite.class);
+    query = entityManager.createNamedQuery("getSiteByName", JpaSite.class);
     query.setParameter("site", site);
 
     JpaSite jpaSite = null;
@@ -164,8 +166,8 @@ public class SQLDirectoryProviderPersistenceImpl implements SQLDirectoryProvider
       jpaSite = query.getSingleResult();
       return jpaSite.isEnabled();
     } catch (NoResultException e) {
-      logger.info("Site entry '{}' created in user database", site);
-      return false;
+      logger.debug("Site '{}' is not part of the user database (yet)", site);
+      return true;
     }
   }
 
@@ -179,12 +181,13 @@ public class SQLDirectoryProviderPersistenceImpl implements SQLDirectoryProvider
    */
   private void toggleSite(String site, boolean enable) throws Exception {
     TypedQuery<JpaSite> query = null;
-    query = entityManager.createNamedQuery("getSite", JpaSite.class);
+    query = entityManager.createNamedQuery("getSiteByName", JpaSite.class);
     query.setParameter("site", site);
-    JpaSite jpaSite = query.getSingleResult();
-    if (jpaSite == null) {
+    JpaSite jpaSite = null;
+    try {
+      jpaSite = query.getSingleResult();
+    } catch (NoResultException e) {
       jpaSite = registerSite(site);
-      logger.info("Site entry '{}' created in user database", site);
     }
     jpaSite.setEnabled(enable);
     entityManager.merge(jpaSite);
@@ -252,19 +255,18 @@ public class SQLDirectoryProviderPersistenceImpl implements SQLDirectoryProvider
    *          the site
    */
   protected JpaSite registerSite(String site) {
+    TypedQuery<JpaSite> query = null;
+    query = entityManager.createNamedQuery("getSiteByName", JpaSite.class);
+    query.setParameter("site", site);
     JpaSite jpaSite = null;
     try {
-      jpaSite = entityManager.find(JpaSite.class, site);
-      if (jpaSite == null) {
-        jpaSite = new JpaSite(site);
-        entityManager.persist(jpaSite);
-        logger.info("Site entry '{}' created in user database", site);
-      }
-      return jpaSite;
-    } catch (Throwable t) {
-      logger.error("Unable to create site representation in user database: {}", t.getMessage());
-      return null;
+      jpaSite = query.getSingleResult();
+    } catch (NoResultException e) {
+      jpaSite = new JpaSite(site);
+      entityManager.persist(jpaSite);
+      logger.info("Site '{}' created in user database", site);
     }
+    return jpaSite;
   }
 
   /**

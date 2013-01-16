@@ -167,7 +167,7 @@ public class SQLDirectoryProviderImpl implements SQLDirectoryProvider {
    */
   public void updateAccount(JpaAccount account) throws Exception {
     persistence.updateAccount(account);
-    logger.info("Account '{}@{}' has been updated", account.getLogin(), account.getSite().getIdentifier());
+    logger.info("Account '{}@{}' has been updated", account.getLogin(), account.getSite().getName());
   }
 
   /**
