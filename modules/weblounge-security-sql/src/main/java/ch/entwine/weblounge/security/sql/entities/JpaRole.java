@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -19,7 +18,6 @@ public class JpaRole implements Serializable {
   private static final long serialVersionUID = -5479197872071441914L;
 
   @OneToOne(orphanRemoval = true)
-  @JoinColumn(name = "accountId")
   private JpaAccount account = null;
 
   /** The role context */

@@ -14,7 +14,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -38,11 +37,10 @@ public class JpaAccount implements Serializable {
 
   @Id
   @GeneratedValue
-  protected long accountId; 
+  protected long id; 
 
   /** The site that this user account belongs to */
   @ManyToOne
-  @JoinColumn(name = "siteId")
   protected JpaSite site = null;
 
   /** The user login */

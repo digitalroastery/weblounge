@@ -27,7 +27,7 @@ public class JpaSite implements Serializable {
 
   @Id
   @GeneratedValue
-  protected long siteId;
+  protected long id;
   
   @Column(unique = true, nullable = false)
   protected String name = null;
