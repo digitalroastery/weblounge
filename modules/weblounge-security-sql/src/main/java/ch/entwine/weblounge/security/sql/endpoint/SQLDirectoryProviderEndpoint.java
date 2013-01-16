@@ -162,7 +162,7 @@ public class SQLDirectoryProviderEndpoint {
       account = directory.addAccount(site, login, password);
       account.setEmail(eMail);
       directory.updateAccount(account);
-      response = Response.created(new URI(UrlUtils.concat(request.getRequestURL().toString(), account.getLogin(), "activate"))).build();
+      response = Response.created(new URI(UrlUtils.concat(request.getRequestURL().toString(), account.getLogin()))).build();
     } catch (Throwable t) {
       logger.warn("Error creating account: {}", t.getMessage());
       response = Response.serverError().build();
