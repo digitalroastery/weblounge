@@ -52,16 +52,16 @@ public class ImageMetadataUtilsTest {
     assertNull(iptcMeta.getCaption());
     // assertEquals(legend, iptcMeta.getLegend());
     assertEquals(photographer, iptcMeta.getPhotographer());
-    assertEquals(2.8, iptcMeta.getFNumber());
+    assertEquals(2.8, iptcMeta.getFNumber(), 0.1f);
     assertEquals(200, iptcMeta.getFocalWidth());
     assertEquals(1250, iptcMeta.getFilmspeed());
-    assertEquals(0.002, iptcMeta.getExposureTime());
+    assertEquals(0.002, iptcMeta.getExposureTime(), 0.1f);
     
     // test GPS metadata
     File gpsImg = new File(ImageMetadataUtilsTest.class.getResource(gpsImage).getPath());
     ImageMetadata gpsMeta = ImageMetadataUtils.extractMetadata(gpsImg);
-    assertEquals(46.9338333333, gpsMeta.getGpsLat());
-    assertEquals(9.1316666667, gpsMeta.getGpsLong());
+    assertEquals(46.9338333333, gpsMeta.getGpsLat(), 0.1f);
+    assertEquals(9.1316666667, gpsMeta.getGpsLong(), 0.1f);
   }
 
 }
