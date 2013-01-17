@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.kernel.security;
 
+import ch.entwine.weblounge.common.impl.security.PasswordEncoder;
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
@@ -109,7 +110,10 @@ public class SystemAdminDirectoryProvider implements DirectoryProvider, ManagedS
     if (StringUtils.isNotBlank(email))
       administrator.setEmail(email);
     internalAccounts.put(login, administrator);
-    Password password = new PasswordImpl(StringUtils.trimToEmpty(pass), DigestType.plain);
+    if (StringUtils.isNotBlank(pass)) {
+      pass = PasswordEncoder.encode(pass);
+    }
+    Password password = new PasswordImpl(StringUtils.trimToEmpty(pass), DigestType.md5);
     administrator.addPrivateCredentials(password);
     for (Role role : SystemRole.SYSTEMADMIN.getClosure()) {
       administrator.addPublicCredentials(role);

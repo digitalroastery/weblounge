@@ -133,7 +133,7 @@ public class SearchResultItemImplTest {
    */
   @Test
   public void testGetRelevance() {
-    assertEquals(relevance, item.getRelevance());
+    assertEquals(relevance, item.getRelevance(), 0.0f);
   }
 
   /**

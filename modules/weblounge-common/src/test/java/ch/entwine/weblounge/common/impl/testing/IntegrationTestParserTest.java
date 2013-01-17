@@ -119,8 +119,8 @@ public class IntegrationTestParserTest {
     StatusCodeAssertion assertion = (StatusCodeAssertion) assertions.get(0);
     List<Integer> expectedCodes = assertion.getExpectedCodes();
     assertEquals(2, expectedCodes.size());
-    assertEquals(200, expectedCodes.get(0));
-    assertEquals(304, expectedCodes.get(1));
+    assertEquals(Integer.valueOf(200), expectedCodes.get(0));
+    assertEquals(Integer.valueOf(304), expectedCodes.get(1));
   }
 
   /**

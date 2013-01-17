@@ -181,7 +181,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
       String password = null;
       for (Object o : passwords) {
         Password p = (Password) o;
-        if (DigestType.plain.equals(p.getDigestType())) {
+        if (DigestType.md5.equals(p.getDigestType())) {
           password = p.getPassword();
           break;
         }

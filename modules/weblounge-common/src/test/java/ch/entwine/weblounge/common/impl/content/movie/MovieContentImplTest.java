@@ -190,11 +190,11 @@ public class MovieContentImplTest {
     Stream[] streams = movie.getStreams();
     for (Stream stream : streams) {
       if (stream instanceof AudioStream) {
-        assertEquals(audioBitdepth, ((AudioStream) stream).getBitDepth());
-        assertEquals(bitrate, ((AudioStream) stream).getBitRate());
+        assertEquals(Float.valueOf(audioBitdepth), ((AudioStream) stream).getBitDepth());
+        assertEquals(Float.valueOf(bitrate), ((AudioStream) stream).getBitRate());
         assertEquals(format, stream.getFormat());
-        assertEquals(audioChannels, ((AudioStream) stream).getChannels());
-        assertEquals(audioSamplingrate, ((AudioStream) stream).getSamplingRate());
+        assertEquals(Integer.valueOf(audioChannels), ((AudioStream) stream).getChannels());
+        assertEquals(Integer.valueOf(audioSamplingrate), ((AudioStream) stream).getSamplingRate());
       }
     }
   }
@@ -206,11 +206,11 @@ public class MovieContentImplTest {
     Stream[] streams = movie.getStreams();
     for (Stream stream : streams) {
       if (stream instanceof VideoStream) {
-        assertEquals(bitrate, ((VideoStream) stream).getBitRate());
+        assertEquals(Float.valueOf(bitrate), ((VideoStream) stream).getBitRate());
         assertEquals(format, stream.getFormat());
-        assertEquals(frameheight, ((VideoStream) stream).getFrameHeight());
-        assertEquals(framewidth, ((VideoStream) stream).getFrameWidth());
-        assertEquals(framerate, ((VideoStream) stream).getFrameRate());
+        assertEquals(Integer.valueOf(frameheight), ((VideoStream) stream).getFrameHeight());
+        assertEquals(Integer.valueOf(framewidth), ((VideoStream) stream).getFrameWidth());
+        assertEquals(Float.valueOf(framerate), ((VideoStream) stream).getFrameRate());
         assertEquals(scanType, ((VideoStream) stream).getScanType());
       }
     }

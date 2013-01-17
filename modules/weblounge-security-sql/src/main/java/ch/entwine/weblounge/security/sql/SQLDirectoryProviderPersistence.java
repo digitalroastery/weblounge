@@ -19,32 +19,30 @@
  */
 package ch.entwine.weblounge.security.sql;
 
-import ch.entwine.weblounge.common.security.DirectoryProvider;
-import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.security.sql.entities.JpaAccount;
 
 import java.util.List;
 
 /**
- * Definition of the directory provider that is backed by a SQL database engine.
+ * Persistence layer for the SQL server based directory provider implementation.
  */
-public interface SQLDirectoryProvider extends DirectoryProvider {
+public interface SQLDirectoryProviderPersistence {
 
   /**
    * Adds an account for the given user in the specified site.
    * 
    * @param site
    *          the site
+   * @param login
+   *          the login
    * @param password
-   *          TODO
-   * @param user
-   *          the user login
+   *          the password
    * @throws IllegalStateException
-   *           if no user account with the given login exists
+   *           if no user with that login exists
    * @throws Exception
    *           if creation of the user account fails
    */
-  JpaAccount addAccount(Site site, String login, String password)
+  JpaAccount addAccount(String site, String login, String password)
       throws Exception;
 
   /**
@@ -57,7 +55,7 @@ public interface SQLDirectoryProvider extends DirectoryProvider {
    * @throws Exception
    *           if removing the account from the database fails
    */
-  void removeAccount(Site site, String login) throws Exception;
+  void removeAccount(String site, String login) throws Exception;
 
   /**
    * Loads the account from the given site if and only if the user identified by
@@ -68,58 +66,12 @@ public interface SQLDirectoryProvider extends DirectoryProvider {
    *          the site
    * @param login
    *          the username
+   * @param activeOnly TODO
    * @return the account
    * @throws Exception
    *           if loading of the account fails
    */
-  JpaAccount getAccount(Site site, String login) throws Exception;
-
-  /**
-   * Loads the account from the given site. If <code>enabledOnly</code> is set
-   * to <code>true</code>, the account is returned if and only if the account is
-   * enabled for logins as is the site.
-   * 
-   * @param site
-   *          the site
-   * @param login
-   *          the username
-   * @param enabledOnly
-   *          only return accounts that are enabled for login
-   * @return the account
-   * @throws Exception
-   *           if loading of the account fails
-   */
-  JpaAccount getAccount(Site site, String login, boolean enabledOnly)
-      throws Exception;
-
-  /**
-   * Returns the site's accounts.
-   * 
-   * @param site
-   *          TODO
-   * 
-   * @return the accounts
-   * @throws Exception
-   *           if loading of the accounts fails
-   */
-  List<JpaAccount> getAccounts(Site site) throws Exception;
-
-  /**
-   * Activates the given account using the activation code that was generated
-   * when the account was created.
-   * 
-   * @param site
-   *          the site
-   * @param login
-   *          the login
-   * @param code
-   *          the activation code
-   * @return <code>true</code> if activation succeeded
-   * @throws Exception
-   *           if activation fails
-   */
-  boolean activateAccount(Site site, String login, String code)
-      throws Exception;
+  JpaAccount getAccount(String site, String login, boolean activeOnly) throws Exception;
 
   /**
    * Persists the updated account in the database.
@@ -138,7 +90,7 @@ public interface SQLDirectoryProvider extends DirectoryProvider {
    * @throws Exception
    *           if the site logins cannot be disabled
    */
-  void enableSite(Site site) throws Exception;
+  void enableSite(String site) throws Exception;
 
   /**
    * Disables all logins into the site, regardless of the account's enabled
@@ -149,7 +101,7 @@ public interface SQLDirectoryProvider extends DirectoryProvider {
    * @throws Exception
    *           if the site logins cannot be disabled
    */
-  void disableSite(Site site) throws Exception;
+  void disableSite(String site) throws Exception;
 
   /**
    * Returns <code>true</code> if login into the given site is enabled.
@@ -160,7 +112,7 @@ public interface SQLDirectoryProvider extends DirectoryProvider {
    * @throws Exception
    *           if the login status cannot be determined
    */
-  boolean isSiteEnabled(Site site) throws Exception;
+  boolean isSiteEnabled(String site) throws Exception;
 
   /**
    * Enables logins into the given account.
@@ -169,10 +121,13 @@ public interface SQLDirectoryProvider extends DirectoryProvider {
    *          the site
    * @param user
    *          the login name
+   * @throws IllegalStateException
+   *           if the account does not exist
    * @throws Exception
    *           if the account cannot be disabled
    */
-  void enableAccount(Site site, String user) throws Exception;
+  void enableAccount(String site, String user) throws IllegalStateException,
+      Exception;
 
   /**
    * Disables login into the given account.
@@ -181,10 +136,13 @@ public interface SQLDirectoryProvider extends DirectoryProvider {
    *          the site
    * @param user
    *          the login name
+   * @throws IllegalStateException
+   *           if the account does not exist
    * @throws Exception
    *           if the account cannot be disabled
    */
-  void disableAccount(Site site, String user) throws Exception;
+  void disableAccount(String site, String user) throws IllegalStateException,
+      Exception;
 
   /**
    * Returns <code>true</code> if login into the given user account is enabled.
@@ -197,6 +155,17 @@ public interface SQLDirectoryProvider extends DirectoryProvider {
    * @throws Exception
    *           if the login status cannot be determined
    */
-  boolean isAccountEnabled(Site site, String user) throws Exception;
+  boolean isAccountEnabled(String site, String user) throws Exception;
+
+  /**
+   * Returns this site's accounts.
+   * 
+   * @param site
+   *          the site
+   * @return the accounts
+   * @throws Exception
+   *           if the accounts cannot be loaded
+   */
+  List<JpaAccount> getAccounts(String site) throws Exception;
 
 }

@@ -130,13 +130,9 @@
   <!-- Spring Security Internals -->
 
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
-  <sec:authentication-manager alias="authenticationManager">
+  <sec:authentication-manager>
     <sec:authentication-provider user-service-ref="userDetailsService">
-      <!-- 
-      <sec:password-encoder hash="md5">
-        <sec:salt-source user-property="username"/>
-      </sec:password-encoder>
-       -->
+      <sec:password-encoder hash="md5"/>
     </sec:authentication-provider>
   </sec:authentication-manager>
 

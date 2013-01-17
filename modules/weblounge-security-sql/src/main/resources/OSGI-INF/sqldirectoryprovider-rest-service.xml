@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true" 
+  name="Weblounge SQL Directory Provider Endpoint">	
+  
+  <implementation class="ch.entwine.weblounge.security.sql.endpoint.SQLDirectoryProviderEndpoint" />
+  <property name="service.description" value="Weblounge SQL Directory Provider Endpoint" />
+  <property name="rest.path" value="users" />
+  <service>
+    <provide interface="ch.entwine.weblounge.security.sql.endpoint.SQLDirectoryProviderEndpoint" />
+  </service>
+
+  <reference name="sqldirectoryprovider" interface="ch.entwine.weblounge.security.sql.SQLDirectoryProvider" cardinality="1..1" policy="static" bind="setDiretoryProvider" />
+  <reference name="security" interface="ch.entwine.weblounge.common.security.SecurityService" cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" />
+
+</scr:component>
