@@ -21,12 +21,10 @@
 package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
-import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.dispatcher.SharedHttpContext;
 import ch.entwine.weblounge.kernel.site.SiteManager;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.felix.webconsole.WebConsoleSecurityProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -68,12 +66,6 @@ public class SpringSecurityConfigurationService implements ManagedService {
   /** Configuration key for the enabled/disabled configuration */
   public static final String OPT_ENABLED = "security.enabled";
 
-  /** Configuration key for the password encoding configuration */
-  public static final String OPT_ENCODING = "security.passwordencoding";
-
-  /** The default password encoding */
-  public static final DigestType DEFAULT_ENCODING = DigestType.md5;
-
   /** The related spring security service */
   protected SpringSecurityServiceImpl securityService = null;
 
@@ -85,9 +77,6 @@ public class SpringSecurityConfigurationService implements ManagedService {
 
   /** The web console security */
   protected WebConsoleSecurityProvider webConsoleProvider = null;
-
-  /** The system password encoding */
-  protected DigestType passwordEncoding = DEFAULT_ENCODING;
 
   /** Reference to the security marker */
   protected ServiceRegistration securityMarker = null;
@@ -216,31 +205,6 @@ public class SpringSecurityConfigurationService implements ManagedService {
 
     // Store the security enabled setting
     this.securityEnabled = isEnabled;
-
-    // Password encoding
-    String passwordEncodingProperty = StringUtils.trimToNull((String) properties.get(OPT_ENCODING));
-    DigestType digestType = DigestType.md5;
-    if (passwordEncodingProperty != null) {
-      try {
-        digestType = DigestType.valueOf(passwordEncodingProperty);
-      } catch (IllegalArgumentException e) {
-        throw new ConfigurationException(OPT_ENCODING, "'" + passwordEncodingProperty + "' is not a valid encoding");
-      }
-    }
-    if (!digestType.equals(passwordEncoding) && securityMarker != null) {
-      passwordEncoding = digestType;
-      try {
-        securityMarker.unregister();
-      } catch (IllegalStateException e) {
-        // Never mind, the service has been unregistered already
-      } catch (Throwable t) {
-        logger.error("Unregistering security marker failed: {}", t.getMessage());
-      }
-      publishSecurityMarker();
-    }
-
-    // Store the password encoding setting
-    this.passwordEncoding = digestType;
   }
 
   /**
@@ -274,7 +238,6 @@ public class SpringSecurityConfigurationService implements ManagedService {
    */
   private void publishSecurityMarker() {
     Dictionary<String, String> securityProperties = new Hashtable<String, String>();
-    securityProperties.put(OPT_ENCODING, passwordEncoding.toString().toLowerCase());
     bundleCtx.registerService(Security.class.getName(), new Security() {
     }, securityProperties);
   }
