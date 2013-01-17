@@ -122,6 +122,7 @@ public final class SQLDirectoryProviderEndpointDocs {
     updateAccount.addOptionalParameter(new Parameter("firstname", Parameter.Type.String, "First name"));
     updateAccount.addOptionalParameter(new Parameter("lastname", Parameter.Type.String, "Last name"));
     updateAccount.addOptionalParameter(new Parameter("initials", Parameter.Type.String, "Initials"));
+    updateAccount.addOptionalParameter(new Parameter("language", Parameter.Type.String, "Two letter ISO code for the preferred language"));
     updateAccount.addOptionalParameter(new Parameter("challenge", Parameter.Type.String, "Challenge"));
     updateAccount.addOptionalParameter(new Parameter("response", Parameter.Type.String, "Response"));
     docs.addEndpoint(Endpoint.Type.WRITE, updateAccount);

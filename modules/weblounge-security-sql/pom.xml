@@ -110,6 +110,8 @@
               ch.entwine.weblounge.common.security;version=${project.version},
               ch.entwine.weblounge.common.site;version=${project.version},
               ch.entwine.weblounge.common.impl.util.doc;version=${project.version},
+              ch.entwine.weblounge.common.impl.language;version=${project.version},
+              ch.entwine.weblounge.common.language;version=${project.version},
               ch.entwine.weblounge.common.url;version=${project.version},
               ch.entwine.weblounge.kernel.site;version=${project.version},
               javax.persistence,
