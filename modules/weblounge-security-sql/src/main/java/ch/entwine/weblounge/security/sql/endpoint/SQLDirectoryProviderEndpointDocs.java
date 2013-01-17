@@ -106,6 +106,19 @@ public final class SQLDirectoryProviderEndpointDocs {
     createAccount.addOptionalParameter(new Parameter("email", Parameter.Type.String, "E-mail address"));
     docs.addEndpoint(Endpoint.Type.WRITE, createAccount);
 
+    // GET /account/{login}
+    Endpoint getAccount = new Endpoint("/account/{login}", Method.GET, "getaccount");
+    getAccount.setDescription("Returns the account");
+    getAccount.addFormat(Format.xml());
+    getAccount.addStatus(ok("the account information has been sent back to the client"));
+    getAccount.addStatus(forbidden("insufficient rights to access the account"));
+    getAccount.addStatus(notFound("the account does not exist"));
+    getAccount.addStatus(notFound("the site does not exist"));
+    getAccount.addStatus(serviceUnavailable("the site is temporarily offline"));
+    getAccount.setTestForm(new TestForm());
+    getAccount.addPathParameter(new Parameter("login", Parameter.Type.String, "Login name"));
+    docs.addEndpoint(Endpoint.Type.READ, getAccount);
+
     // PUT /account/{login}/status
     Endpoint updateAccount = new Endpoint("/account/{login}", Method.PUT, "updateaccount");
     updateAccount.setDescription("Updates the account");
@@ -122,6 +135,7 @@ public final class SQLDirectoryProviderEndpointDocs {
     updateAccount.addOptionalParameter(new Parameter("firstname", Parameter.Type.String, "First name"));
     updateAccount.addOptionalParameter(new Parameter("lastname", Parameter.Type.String, "Last name"));
     updateAccount.addOptionalParameter(new Parameter("initials", Parameter.Type.String, "Initials"));
+    updateAccount.addOptionalParameter(new Parameter("language", Parameter.Type.String, "Two letter ISO code for the preferred language"));
     updateAccount.addOptionalParameter(new Parameter("challenge", Parameter.Type.String, "Challenge"));
     updateAccount.addOptionalParameter(new Parameter("response", Parameter.Type.String, "Response"));
     docs.addEndpoint(Endpoint.Type.WRITE, updateAccount);

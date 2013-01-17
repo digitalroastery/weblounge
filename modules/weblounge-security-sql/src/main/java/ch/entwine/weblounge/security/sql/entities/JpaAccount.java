@@ -1,5 +1,7 @@
 package ch.entwine.weblounge.security.sql.entities;
 
+import ch.entwine.weblounge.common.language.Language;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
@@ -37,7 +39,7 @@ public class JpaAccount implements Serializable {
 
   @Id
   @GeneratedValue
-  protected long id; 
+  protected long id;
 
   /** The site that this user account belongs to */
   @ManyToOne
@@ -70,6 +72,9 @@ public class JpaAccount implements Serializable {
 
   /** The response to the challenge */
   protected String response = null;
+
+  /** The preferred language */
+  protected String language = null;
 
   /** The user roles */
   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -223,6 +228,25 @@ public class JpaAccount implements Serializable {
    */
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  /**
+   * Returns the user's preferred language.
+   * 
+   * @return the language
+   */
+  public String getLanguage() {
+    return language;
+  }
+
+  /**
+   * Sets the user's preferred language.
+   * 
+   * @param language
+   *          the language
+   */
+  public void setLanguage(Language language) {
+    this.language = language.getIdentifier();
   }
 
   /**

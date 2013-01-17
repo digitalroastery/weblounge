@@ -1296,7 +1296,8 @@ public class SiteImpl implements Site {
       isShutdownInProgress = true;
       logger.debug("Taking down site '{}'", this);
       logger.debug("Stopped looking for a job scheduling services");
-      schedulingServiceTracker.close();
+      if (schedulingServiceTracker != null)
+        schedulingServiceTracker.close();
       logger.info("Site '{}' deactivated", this);
     } finally {
       isShutdownInProgress = false;

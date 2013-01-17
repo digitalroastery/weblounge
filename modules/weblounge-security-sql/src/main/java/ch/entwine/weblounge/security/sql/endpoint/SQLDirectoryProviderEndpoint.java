@@ -20,16 +20,23 @@
 
 package ch.entwine.weblounge.security.sql.endpoint;
 
+import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.PasswordEncoder;
+import ch.entwine.weblounge.common.impl.security.RoleImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
+import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
+import ch.entwine.weblounge.common.language.UnknownLanguageException;
+import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.security.WebloungeUser;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.site.SiteManager;
 import ch.entwine.weblounge.security.sql.SQLDirectoryProvider;
 import ch.entwine.weblounge.security.sql.entities.JpaAccount;
+import ch.entwine.weblounge.security.sql.entities.JpaRole;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -37,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -179,6 +187,41 @@ public class SQLDirectoryProviderEndpoint {
   }
 
   @GET
+  @Path("/account/{login}")
+  public Response getAccount(@PathParam("login") String login,
+      @Context HttpServletRequest request) {
+    Site site = getSite(request);
+    
+    JpaAccount account = null;
+    try {
+      account = directory.getAccount(site, login);
+    } catch (Throwable t) {
+      logger.warn("Error accessing account '{}': {}", login, t.getMessage());
+      throw new WebApplicationException();
+    }
+
+    if (account == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    WebloungeUser wu = new WebloungeUserImpl(login, directory.getIdentifier());
+    wu.setFirstName(account.getFirstname());
+    wu.setLastName(account.getLastname());
+    wu.setEmail(account.getEmail());
+    wu.setInitials(account.getInitials());
+    wu.setLastLogin(account.getLastLoginDate(), account.getLastLoginFrom());
+    wu.setChallenge(account.getChallenge());
+    if (account.getLanguage() != null)
+      wu.setLanguage(LanguageUtils.getLanguage(account.getLanguage()));
+    if (account.getResponse() != null)
+      wu.setResponse(account.getResponse().getBytes(Charset.forName("utf-8")), DigestType.plain);
+    for (JpaRole r : account.getRoles()) {
+      wu.addPublicCredentials(new RoleImpl(r.getContext(), r.getRolename()));
+    }
+
+    return Response.ok(wu.toXml()).build();
+  }
+
+  @GET
   @Path("/account/{login}/activate")
   public Response activateAccount(@PathParam("login") String login,
       @QueryParam("activation") String activation,
@@ -200,6 +243,7 @@ public class SQLDirectoryProviderEndpoint {
       @FormParam("firstname") String firstname,
       @FormParam("lastname") String lastname,
       @FormParam("initials") String initials, @FormParam("email") String email,
+      @FormParam("language") String language,
       @FormParam("challenge") String challenge,
       @FormParam("response") String response,
       @Context HttpServletRequest request) {
@@ -228,6 +272,13 @@ public class SQLDirectoryProviderEndpoint {
       account.setInitials(StringUtils.trimToNull(initials));
       account.setEmail(StringUtils.trimToNull(email));
       account.setChallenge(StringUtils.trimToNull(challenge));
+
+      // The language
+      try {
+        account.setLanguage(LanguageUtils.getLanguage(language));
+      } catch (UnknownLanguageException e) {
+        return Response.status(Status.BAD_REQUEST).build();
+      }
 
       // Hash the response
       if (StringUtils.isNotBlank(response)) {

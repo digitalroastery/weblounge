@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Password;
+import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -329,6 +330,47 @@ public class WebloungeUserImpl extends UserImpl implements WebloungeUser {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.security.WebloungeUser#getChallenge()
+   */
+  @Override
+  public String getChallenge() {
+    return challenge;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.security.WebloungeUser#setChallenge(java.lang.String)
+   */
+  @Override
+  public void setChallenge(String challenge) {
+    this.challenge = challenge;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.security.WebloungeUser#getResponse()
+   */
+  @Override
+  public byte[] getResponse() {
+    return response;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.security.WebloungeUser#setResponse(java.lang.String)
+   */
+  @Override
+  public void setResponse(byte[] response, DigestType digest) {
+    this.response = response;
+    this.responseDigestType = digest;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.security.WebloungeUser#getProperty(java.lang.String)
    */
   public Object getProperty(String name) {
@@ -538,7 +580,7 @@ public class WebloungeUserImpl extends UserImpl implements WebloungeUser {
     // Password
     Set<Object> passwords = getPrivateCredentials(Password.class);
     for (Object o : passwords) {
-      Password password = (Password)o;
+      Password password = (Password) o;
       b.append("<password type=\"");
       b.append(password.getDigestType().toString());
       b.append("\"><![CDATA[");
@@ -546,11 +588,25 @@ public class WebloungeUserImpl extends UserImpl implements WebloungeUser {
       b.append("]]></password>");
     }
 
+    // Roles
+    Set<Object> roles = getPublicCredentials(Role.class);
+    for (Object r : roles) {
+      Role role = (Role) r;
+      b.append("<role context=\"");
+      b.append(role.getContext());
+      b.append("\"><![CDATA[");
+      b.append(role.getName());
+      b.append("]]></password>");
+    }
+
     // challenge - response
-    if (challenge != null && response != null) {
+    if (challenge != null) {
       b.append("<challenge><![CDATA[");
       b.append(challenge);
       b.append("]]></challenge>");
+    }
+
+    if (response != null) {
       b.append("<response type=\"");
       b.append(responseDigestType.toString());
       b.append("\"><![CDATA[");

@@ -17,7 +17,7 @@ public class JpaRole implements Serializable {
   /** Serial version UID */
   private static final long serialVersionUID = -5479197872071441914L;
 
-  @OneToOne(orphanRemoval = true)
+  @OneToOne
   private JpaAccount account = null;
 
   /** The role context */
