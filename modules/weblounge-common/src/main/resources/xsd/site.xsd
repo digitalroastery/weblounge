@@ -24,6 +24,7 @@
     <xsd:complexType>
       <xsd:all>
         <xsd:element name="configuration" type="xsd:anyURI" minOccurs="0" />
+        <xsd:element name="digest" type="digestType" minOccurs="0" />
         <xsd:element ref="administrator" />
         <xsd:element ref="roles" minOccurs="0" maxOccurs="1" />
       </xsd:all>
@@ -41,18 +42,18 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:simpleType name="digestType">
+     <xsd:restriction base="xsd:string">
+       <xsd:enumeration value="plain" />
+       <xsd:enumeration value="md5" />
+     </xsd:restriction>
+  </xsd:simpleType>
+
   <xsd:element name="password">
     <xsd:complexType>
       <xsd:simpleContent>
         <xsd:extension base="xsd:string">
-          <xsd:attribute name="type" use="required">
-            <xsd:simpleType>
-              <xsd:restriction base="xsd:string">
-                <xsd:enumeration value="plain" />
-                <xsd:enumeration value="md5" />
-              </xsd:restriction>
-            </xsd:simpleType>
-          </xsd:attribute>
+          <xsd:attribute name="type" use="required" type="digestType"/>
         </xsd:extension>
       </xsd:simpleContent>
     </xsd:complexType>

@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.RequestListener;
+import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.UserListener;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 
@@ -410,6 +411,22 @@ public interface Site extends Customizable, RequestListener, Serializable {
    *          URL pointing to the security configuration
    */
   void setSecurity(URL url);
+
+  /**
+   * Returns this type's digest policy, which needs to match with what is
+   * configured in Spring Security.
+   * 
+   * @return the digest type
+   */
+  DigestType getDigestType();
+
+  /**
+   * Sets the digest type.
+   * 
+   * @param digest
+   *          the digest
+   */
+  void setDigestType(DigestType digest);
 
   /**
    * Starts this site.

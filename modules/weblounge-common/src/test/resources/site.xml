@@ -13,6 +13,7 @@
   </domains>
   <security>
     <configuration>file://security.xml</configuration>
+    <digest>md5</digest>
     <administrator>
       <login>blogadmin</login>
       <password type="plain"><![CDATA[secret]]></password>

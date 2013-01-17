@@ -47,6 +47,7 @@ import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.scheduler.Job;
 import ch.entwine.weblounge.common.scheduler.JobTrigger;
 import ch.entwine.weblounge.common.scheduler.JobWorker;
+import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.security.UserListener;
@@ -183,6 +184,9 @@ public class SiteImpl implements Site {
 
   /** URL to the security configuration */
   protected URL security = null;
+  
+  /** This site's digest policy */
+  protected DigestType digestType = DigestType.md5;
 
   /** Request listeners */
   private List<RequestListener> requestListeners = null;
@@ -708,6 +712,26 @@ public class SiteImpl implements Site {
     return security;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.site.Site#setDigestType(ch.entwine.weblounge.common.security.DigestType)
+   */
+  @Override
+  public void setDigestType(DigestType digest) {
+    this.digestType = digest;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.site.Site#getDigestType()
+   */
+  @Override
+  public DigestType getDigestType() {
+    return digestType;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -1807,6 +1831,12 @@ public class SiteImpl implements Site {
     if (adminNode != null) {
       site.setAdministrator(SiteAdminImpl.fromXml(adminNode, site, xpathProcessor));
     }
+    
+    // digest policy
+    Node digestNode = XPathHelper.select(config, "ns:security/ns:digest", xpathProcessor);
+    if (digestNode != null) {
+      site.setDigestType(DigestType.valueOf(digestNode.getFirstChild().getNodeValue()));
+    }
 
     // role definitions
     NodeList roleNodes = XPathHelper.selectList(config, "ns:security/ns:roles/ns:*", xpathProcessor);
@@ -1891,6 +1921,9 @@ public class SiteImpl implements Site {
       if (security != null) {
         b.append("<configuration>").append(security.toExternalForm()).append("</configuration>");
       }
+
+      b.append("<digest>").append(digestType.toString()).append("</digest>");
+
       if (administrator != null)
         b.append(administrator.toXml());
 
