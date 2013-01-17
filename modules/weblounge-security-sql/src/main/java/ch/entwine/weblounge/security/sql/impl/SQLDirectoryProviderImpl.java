@@ -92,7 +92,7 @@ public class SQLDirectoryProviderImpl implements SQLDirectoryProvider {
       user.setInitials(jpaAccount.getInitials());
 
     // Password
-    user.addPrivateCredentials(new PasswordImpl(jpaAccount.getPassword(), DigestType.plain));
+    user.addPrivateCredentials(new PasswordImpl(jpaAccount.getPassword(), DigestType.md5));
 
     // Roles
     user.addPublicCredentials(SystemRole.GUEST);

@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.security.sql.endpoint;
 
+import ch.entwine.weblounge.common.impl.security.PasswordEncoder;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.SecurityUtils;
@@ -159,8 +160,15 @@ public class SQLDirectoryProviderEndpoint {
       JpaAccount account = directory.getAccount(site, login);
       if (account != null)
         return Response.status(Status.CONFLICT).build();
+
+      // Hash the password
+      if (StringUtils.isNotBlank(password)) {
+        logger.debug("Hashing password for user '{}@{}' using md5", login, site.getIdentifier());
+        password = PasswordEncoder.encode(StringUtils.trim(password));
+      }
+
       account = directory.addAccount(site, login, password);
-      account.setEmail(eMail);
+      account.setEmail(StringUtils.trimToNull(eMail));
       directory.updateAccount(account);
       response = Response.created(new URI(UrlUtils.concat(request.getRequestURL().toString(), account.getLogin()))).build();
     } catch (Throwable t) {
@@ -208,14 +216,26 @@ public class SQLDirectoryProviderEndpoint {
       if (account == null)
         return Response.status(Status.NOT_FOUND).build();
 
-      if (StringUtils.isNotBlank(password))
-        account.setPassword(password);
+      // Hash the password
+      if (StringUtils.isNotBlank(password)) {
+        logger.debug("Hashing password for user '{}@{}' using md5", login, site.getIdentifier());
+        String digestPassword = PasswordEncoder.encode(StringUtils.trim(password));
+        account.setPassword(digestPassword);
+      }
+
       account.setFirstname(StringUtils.trimToNull(firstname));
       account.setLastname(StringUtils.trimToNull(lastname));
       account.setInitials(StringUtils.trimToNull(initials));
       account.setEmail(StringUtils.trimToNull(email));
       account.setChallenge(StringUtils.trimToNull(challenge));
-      account.setResponse(StringUtils.trimToNull(response));
+
+      // Hash the response
+      if (StringUtils.isNotBlank(response)) {
+        logger.debug("Hashing response for user '{}@{}' using md5", login, site.getIdentifier());
+        String digestResponse = PasswordEncoder.encode(StringUtils.trim(response));
+        account.setResponse(digestResponse);
+      }
+
       directory.updateAccount(account);
       return Response.ok().build();
     } catch (Throwable t) {

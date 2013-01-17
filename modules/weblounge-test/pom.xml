@@ -200,8 +200,6 @@
               !sun.awt.image.codec,
               !sun.security.action,
               !javax.swing,
-              !junit.samples.money, 
-              !junit.tests
             </Import-Package>
             <Private-Package>
               javax.media.jai;-split-package:=first,
