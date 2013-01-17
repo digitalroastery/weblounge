@@ -187,4 +187,38 @@ public interface WebloungeUser extends User {
    */
   String getLastLoginFrom();
 
+  /**
+   * Returns the challenge that can be used to recover a lost password.
+   * 
+   * @return the challenge
+   */
+  String getChallenge();
+
+  /**
+   * Defines the challenge that can be used to recover a lost password.
+   * 
+   * @param challenge
+   *          the challenge
+   */
+  void setChallenge(String challenge);
+
+  /**
+   * Returns the response to the challenge that can be used to recover a lost
+   * password.
+   * 
+   * @return the response
+   */
+  byte[] getResponse();
+
+  /**
+   * Defines the response to the challenge that can be used to recover a lost
+   * password.
+   * 
+   * @param response
+   *          the response
+   * @param digest
+   *          the digest type
+   */
+  void setResponse(byte[] response, DigestType digest);
+
 }
