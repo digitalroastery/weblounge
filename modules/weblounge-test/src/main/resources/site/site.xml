@@ -20,6 +20,7 @@
     <url environment="development">http://test:8080</url>
   </domains>
   <security>
+    <digest>md5</digest>
     <administrator>
       <login>testadmin</login>
       <password type="plain">secret</password>

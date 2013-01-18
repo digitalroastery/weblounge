@@ -333,7 +333,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     } catch (IOException e) {
       logger.error("Error writing action output to client: {}", e.getMessage());
     } catch (ActionException e) {
-      logger.error("Error processing action '{}' for {}: {}", new Object[] {
+      logger.warn("Error processing action '{}' for {}: {}", new Object[] {
           action,
           request.getUrl(),
           e.getMessage() });
@@ -578,7 +578,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     if (template == null && page != null) {
       template = site.getTemplate(page.getTemplate());
       if (template == null)
-        throw new IllegalStateException("Page template '" + templateId + "' for page '" + page + "' was not found");
+        throw new IllegalStateException("Page template '" + page.getTemplate() + "' for page '" + page + "' was not found");
     }
 
     // Did we end up finding a template?

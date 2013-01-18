@@ -1,18 +1,18 @@
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
-          http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
   version="2.0">
 
   <persistence-unit name="weblounge.security" transaction-type="JTA">
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
-    <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/weblounge.security)</jta-data-source>
-    
-    <class>ch.entwine.weblounge.security.sql.entities.Role</class>
-    <class>ch.entwine.weblounge.security.sql.entities.Site</class>
-    <class>ch.entwine.weblounge.security.sql.entities.User</class>
-    <class>ch.entwine.weblounge.security.sql.entities.UserAccount</class>
+    <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/weblounge)</jta-data-source>    
+    <class>ch.entwine.weblounge.security.sql.entities.JpaAccount</class>
+    <class>ch.entwine.weblounge.security.sql.entities.JpaRole</class>
+    <class>ch.entwine.weblounge.security.sql.entities.JpaSite</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <properties>
+      <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
+    </properties>
   </persistence-unit>
 
 </persistence>

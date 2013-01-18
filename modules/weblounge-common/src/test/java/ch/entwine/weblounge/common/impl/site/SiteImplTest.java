@@ -160,6 +160,12 @@ public class SiteImplTest {
 
   /** The guest role */
   protected String guestRole = "my-guest";
+  
+  /** Path to the security configuration */
+  protected final String securityConfigPath = "file://security.xml";
+
+  /** The security configuration */
+  protected URL securityConfig = null;
 
   /**
    * @throws java.lang.Exception
@@ -183,6 +189,7 @@ public class SiteImplTest {
     site.addLocalRole(Security.PUBLISHER_ROLE, publisherRole);
     site.addLocalRole(Security.EDITOR_ROLE, editorRole);
     site.addLocalRole(Security.GUEST_ROLE, guestRole);
+    site.setSecurity(new URL(securityConfigPath));
   }
 
   /**
@@ -527,6 +534,16 @@ public class SiteImplTest {
 
     String nonExistingRole = "test";
     assertEquals(nonExistingRole, site.getLocalRole(nonExistingRole));
+  }
+  
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getSecurity()}
+   * .
+   */
+  @Test
+  public void testGetSecurity() {
+    assertEquals(securityConfigPath, site.getSecurity().toExternalForm());
   }
 
 }

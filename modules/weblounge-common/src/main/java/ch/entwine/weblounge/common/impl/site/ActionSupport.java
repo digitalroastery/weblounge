@@ -529,6 +529,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @see ch.entwine.weblounge.common.site.Action.module.ActionHandler#configure(ch.entwine.weblounge.api.request.WebloungeRequest,
    *      ch.entwine.weblounge.api.request.WebloungeResponse, java.lang.String)
    */
+  @SuppressWarnings("unchecked")
   public void configure(WebloungeRequest request, WebloungeResponse response,
       RequestFlavor flavor) throws ActionException {
 
@@ -755,6 +756,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    *          the class of the service to look for
    * @return the service
    */
+  @SuppressWarnings("unchecked")
   protected <S extends Object> S getService(Class<S> c) {
     String className = c.getName();
     BundleContext ctx = getBundleContext();
@@ -766,8 +768,8 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
         logger.debug("No service for class {} found", className);
         return null;
       }
-      S smtpService = (S) ctx.getService(serviceRef);
-      return smtpService;
+      S service = (S) ctx.getService(serviceRef);
+      return service;
     } catch (IllegalStateException e) {
       logger.debug("Service of type {} cannot be received through deactivating bundle {}", className, ctx);
       return null;
@@ -863,6 +865,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    *           if the configuration cannot be parsed
    * @see #toXml()
    */
+  @SuppressWarnings("unchecked")
   public static Action fromXml(Node config, XPath xpath)
       throws IllegalStateException {
 

@@ -6,7 +6,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.1.3-SNAPSHOT</version>
+    <version>3.1.4</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -14,8 +14,9 @@
     <weblounge.basedir>${project.basedir}/../..</weblounge.basedir>
     <weblounge.deploymentdir>lib/weblounge</weblounge.deploymentdir>
     <checkstyle.skip>false</checkstyle.skip>
-    <springframework.version>3.1.0</springframework.version>
+    <springframework.version>3.1.2.RELEASE</springframework.version>
     <cxf.version>2.3.0</cxf.version>
+    <batik.version>1.7</batik.version>
   </properties>
 
   <dependencies>
@@ -59,22 +60,22 @@
     </dependency>
 
     <!-- thirdparty -->
-    
+
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.activation</groupId>
       <artifactId>activation</artifactId>
@@ -84,17 +85,17 @@
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-bundle</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.geronimo.javamail</groupId>
       <artifactId>geronimo-javamail_1.4_provider</artifactId>
@@ -162,7 +163,7 @@
       <artifactId>json</artifactId>
       <version>20090211</version>
     </dependency>
- 
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -178,17 +179,17 @@
       <artifactId>org.apache.felix.webconsole</artifactId>
       <version>3.1.8</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>3.0.6.RELEASE</version>
+      <version>${springframework.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
-      <version>3.0.6.RELEASE</version>
+      <version>${springframework.version}</version>
     </dependency>
 
     <dependency>
@@ -210,11 +211,101 @@
     </dependency>
 
     <dependency>
-	  <groupId>org.apache.xmlgraphics</groupId>
-	  <artifactId>fop</artifactId>
-	  <version>1.0</version>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>fop</artifactId>
+      <version>0.95</version>
     </dependency>
-            
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>xmlgraphics-commons</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-codec</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-svg-dom</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-util</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-parser</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-dom</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-css</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-xml</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-anim</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-bridge</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-gvt</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-script</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis-ext</artifactId>
+      <version>1.3.04</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-ext</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-awt-util</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+
 
     <dependency>
       <groupId>org.jboss.security</groupId>
@@ -253,7 +344,7 @@
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
@@ -270,159 +361,160 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.kernel</Bundle-SymbolicName>
             <Import-Package>
-              ch.entwine.weblounge.common.content;version=${project.version},
-              ch.entwine.weblounge.common.content.page;version=${project.version},
-              ch.entwine.weblounge.common.repository;version=${project.version},
-              ch.entwine.weblounge.common.language;version=${project.version},
-              ch.entwine.weblounge.common.security;version=${project.version},
-              ch.entwine.weblounge.common.site;version=${project.version},
-              ch.entwine.weblounge.common.url;version=${project.version},
-              ch.entwine.weblounge.common.impl.content;version=${project.version},
-              ch.entwine.weblounge.common.impl.content.page;version=${project.version},
-              ch.entwine.weblounge.common.impl.language;version=${project.version},
-              ch.entwine.weblounge.common.impl.security;version=${project.version},
-              ch.entwine.weblounge.common.impl.site;version=${project.version},
-              ch.entwine.weblounge.common.impl.request;version=${project.version},
-              ch.entwine.weblounge.common.impl.url;version=${project.version},
-              ch.entwine.weblounge.common.impl.util;version=${project.version},
-              ch.entwine.weblounge.common.impl.util.config;version=${project.version},
-              ch.entwine.weblounge.common.impl.util.doc;version=${project.version},
-              ch.entwine.weblounge.dispatcher;version=${project.version},
-              ch.entwine.weblounge.testing;version=${project.version},
+              ch.entwine.weblounge.common.content;version="${project.version}",
+              ch.entwine.weblounge.common.content.page;version="${project.version}",
+              ch.entwine.weblounge.common.repository;version="${project.version}",
+              ch.entwine.weblounge.common.language;version="${project.version}",
+              ch.entwine.weblounge.common.request;version="${project.version}",
+              ch.entwine.weblounge.common.security;version="${project.version}",
+              ch.entwine.weblounge.common.site;version="${project.version}",
+              ch.entwine.weblounge.common.url;version="${project.version}",
+              ch.entwine.weblounge.common.impl.content;version="${project.version}",
+              ch.entwine.weblounge.common.impl.content.page;version="${project.version}",
+              ch.entwine.weblounge.common.impl.language;version="${project.version}",
+              ch.entwine.weblounge.common.impl.request;version="${project.version}",
+              ch.entwine.weblounge.common.impl.security;version="${project.version}",
+              ch.entwine.weblounge.common.impl.site;version="${project.version}",
+              ch.entwine.weblounge.common.impl.testing;version="${project.version}",
+              ch.entwine.weblounge.common.impl.url;version="${project.version}",
+              ch.entwine.weblounge.common.impl.util;version="${project.version}",
+              ch.entwine.weblounge.common.impl.util.config;version="${project.version}",
+              ch.entwine.weblounge.common.impl.util.doc;version="${project.version}",
+              ch.entwine.weblounge.dispatcher;version="${project.version}",
+              ch.entwine.weblounge.testing;version="${project.version}",
               META-INF.cxf;version="0.0.0",
               META-INF.cxf.osgi;version="0.0.0",
-              org.apache.cxf;version=${cxf.version},
-              org.apache.cxf.aegis;version=${cxf.version},
-              org.apache.cxf.aegis.databinding;version=${cxf.version},
-              org.apache.cxf.aegis.type;version=${cxf.version},
-              org.apache.cxf.aegis.type.basic;version=${cxf.version},
-              org.apache.cxf.aegis.type.collection;version=${cxf.version},
-              org.apache.cxf.aegis.type.encoded;version=${cxf.version},
-              org.apache.cxf.aegis.type.java5;version=${cxf.version},
-              org.apache.cxf.aegis.type.mtom;version=${cxf.version},
-              org.apache.cxf.aegis.type.xml;version=${cxf.version},
-              org.apache.cxf.aegis.util;version=${cxf.version},
-              org.apache.cxf.aegis.util.date;version=${cxf.version},
-              org.apache.cxf.aegis.util.jdom;version=${cxf.version},
-              org.apache.cxf.aegis.util.stax;version=${cxf.version},
-              org.apache.cxf.aegis.xml;version=${cxf.version},
-              org.apache.cxf.aegis.xml.jdom;version=${cxf.version},
-              org.apache.cxf.aegis.xml.stax;version=${cxf.version},
-              org.apache.cxf.annotations;version=${cxf.version},
-              org.apache.cxf.attachment;version=${cxf.version},
-              org.apache.cxf.binding;version=${cxf.version},
-              org.apache.cxf.binding.xml;version=${cxf.version},
-              org.apache.cxf.binding.xml.interceptor;version=${cxf.version},
-              org.apache.cxf.binding.xml.wsdl11;version=${cxf.version},
-              org.apache.cxf.bindings.xformat;version=${cxf.version},
-              org.apache.cxf.bus;version=${cxf.version},
-              org.apache.cxf.bus.extension;version=${cxf.version},
-              org.apache.cxf.bus.resource;version=${cxf.version},
-              org.apache.cxf.bus.spring;version=${cxf.version},
-              org.apache.cxf.buslifecycle;version=${cxf.version},
-              org.apache.cxf.catalog;version=${cxf.version},
-              org.apache.cxf.clustering;version=${cxf.version},
-              org.apache.cxf.clustering.spring;version=${cxf.version},
-              org.apache.cxf.common;version=${cxf.version},
-              org.apache.cxf.common.annotation;version=${cxf.version},
-              org.apache.cxf.common.classloader;version=${cxf.version},
-              org.apache.cxf.common.commands;version=${cxf.version},
-              org.apache.cxf.common.i18n;version=${cxf.version},
-              org.apache.cxf.common.injection;version=${cxf.version},
-              org.apache.cxf.common.logging;version=${cxf.version},
-              org.apache.cxf.common.security;version=${cxf.version},
-              org.apache.cxf.common.util;version=${cxf.version},
-              org.apache.cxf.common.xmlschema;version=${cxf.version},
-              org.apache.cxf.configuration;version=${cxf.version},
-              org.apache.cxf.configuration.jsse;version=${cxf.version},
-              org.apache.cxf.configuration.jsse.spring;version=${cxf.version},
-              org.apache.cxf.configuration.security;version=${cxf.version},
-              org.apache.cxf.configuration.spring;version=${cxf.version},
-              org.apache.cxf.continuations;version=${cxf.version},
-              org.apache.cxf.databinding;version=${cxf.version},
-              org.apache.cxf.databinding.source;version=${cxf.version},
-              org.apache.cxf.databinding.source.mime;version=${cxf.version},
-              org.apache.cxf.databinding.stax;version=${cxf.version},
-              org.apache.cxf.endpoint;version=${cxf.version},
-              org.apache.cxf.extension;version=${cxf.version},
-              org.apache.cxf.feature;version=${cxf.version},
-              org.apache.cxf.frontend;version=${cxf.version},
-              org.apache.cxf.headers;version=${cxf.version},
-              org.apache.cxf.helpers;version=${cxf.version},
-              org.apache.cxf.interceptor;version=${cxf.version},
-              org.apache.cxf.interceptor.security;version=${cxf.version},
-              org.apache.cxf.io;version=${cxf.version},
-              org.apache.cxf.jaxb;version=${cxf.version},
-              org.apache.cxf.jaxrs;version=${cxf.version},
-              org.apache.cxf.jaxrs.client;version=${cxf.version},
-              org.apache.cxf.jaxrs.ext;version=${cxf.version},
-              org.apache.cxf.jaxrs.ext.atom;version=${cxf.version},
-              org.apache.cxf.jaxrs.ext.codegen;version=${cxf.version},
-              org.apache.cxf.jaxrs.ext.form;version=${cxf.version},
-              org.apache.cxf.jaxrs.ext.multipart;version=${cxf.version},
-              org.apache.cxf.jaxrs.ext.search;version=${cxf.version},
-              org.apache.cxf.jaxrs.ext.xml;version=${cxf.version},
-              org.apache.cxf.jaxrs.impl;version=${cxf.version},
-              org.apache.cxf.jaxrs.impl.tl;version=${cxf.version},
-              org.apache.cxf.jaxrs.interceptor;version=${cxf.version},
-              org.apache.cxf.jaxrs.lifecycle;version=${cxf.version},
-              org.apache.cxf.jaxrs.model;version=${cxf.version},
-              org.apache.cxf.jaxrs.model.wadl;version=${cxf.version},
-              org.apache.cxf.jaxrs.provider;version=${cxf.version},
-              org.apache.cxf.jaxrs.servlet;version=${cxf.version},
-              org.apache.cxf.jaxrs.spring;version=${cxf.version},
-              org.apache.cxf.jaxrs.utils;version=${cxf.version},
-              org.apache.cxf.jaxrs.utils.multipart;version=${cxf.version},
-              org.apache.cxf.jaxrs.utils.schemas;version=${cxf.version},
-              org.apache.cxf.jca.outbound;version=${cxf.version},
-              org.apache.cxf.logging;version=${cxf.version},
-              org.apache.cxf.management;version=${cxf.version},
-              org.apache.cxf.management.annotation;version=${cxf.version},
-              org.apache.cxf.message;version=${cxf.version},
-              org.apache.cxf.phase;version=${cxf.version},
-              org.apache.cxf.resource;version=${cxf.version},
-              org.apache.cxf.security;version=${cxf.version},
-              org.apache.cxf.security.transport;version=${cxf.version},
-              org.apache.cxf.service;version=${cxf.version},
-              org.apache.cxf.service.factory;version=${cxf.version},
-              org.apache.cxf.service.invoker;version=${cxf.version},
-              org.apache.cxf.service.model;version=${cxf.version},
-              org.apache.cxf.staxutils;version=${cxf.version},
-              org.apache.cxf.test;version=${cxf.version},
-              org.apache.cxf.tools.common;version=${cxf.version},
-              org.apache.cxf.tools.validator;version=${cxf.version},
-              org.apache.cxf.transport;version=${cxf.version},
-              org.apache.cxf.transport.http;version=${cxf.version},
-              org.apache.cxf.transport.http.gzip;version=${cxf.version},
-              org.apache.cxf.transport.http.policy;version=${cxf.version},
-              org.apache.cxf.transport.http.spring;version=${cxf.version},
-              org.apache.cxf.transport.http_jetty;version=${cxf.version},
-              org.apache.cxf.transport.http_jetty.continuations;version=${cxf.version},
-              org.apache.cxf.transport.http_jetty.spring;version=${cxf.version},
-              org.apache.cxf.transport.https;version=${cxf.version},
-              org.apache.cxf.transport.https_jetty;version=${cxf.version},
-              org.apache.cxf.transport.servlet;version=${cxf.version},
-              org.apache.cxf.transports.http;version=${cxf.version},
-              org.apache.cxf.transports.http.configuration;version=${cxf.version},
-              org.apache.cxf.transports.http_jetty.configuration;version=${cxf.version},
-              org.apache.cxf.version;version=${cxf.version},
-              org.apache.cxf.workqueue;version=${cxf.version},
-              org.apache.cxf.ws.addressing;version=${cxf.version},
-              org.apache.cxf.ws.addressing.v200403;version=${cxf.version},
-              org.apache.cxf.ws.addressing.v200408;version=${cxf.version},
-              org.apache.cxf.ws.addressing.wsdl;version=${cxf.version},
-              org.apache.cxf.ws.policy;version=${cxf.version},
-              org.apache.cxf.ws.policy.builder.jaxb;version=${cxf.version},
-              org.apache.cxf.ws.policy.builder.primitive;version=${cxf.version},
-              org.apache.cxf.ws.policy.builder.xml;version=${cxf.version},
-              org.apache.cxf.ws.policy.util;version=${cxf.version},
-              org.apache.cxf.wsdl;version=${cxf.version},
-              org.apache.cxf.wsdl.http;version=${cxf.version},
-              org.apache.cxf.wsdl11;version=${cxf.version},
+              org.apache.cxf;version="${cxf.version}",
+              org.apache.cxf.aegis;version="${cxf.version}",
+              org.apache.cxf.aegis.databinding;version="${cxf.version}",
+              org.apache.cxf.aegis.type;version="${cxf.version}",
+              org.apache.cxf.aegis.type.basic;version="${cxf.version}",
+              org.apache.cxf.aegis.type.collection;version="${cxf.version}",
+              org.apache.cxf.aegis.type.encoded;version="${cxf.version}",
+              org.apache.cxf.aegis.type.java5;version="${cxf.version}",
+              org.apache.cxf.aegis.type.mtom;version="${cxf.version}",
+              org.apache.cxf.aegis.type.xml;version="${cxf.version}",
+              org.apache.cxf.aegis.util;version="${cxf.version}",
+              org.apache.cxf.aegis.util.date;version="${cxf.version}",
+              org.apache.cxf.aegis.util.jdom;version="${cxf.version}",
+              org.apache.cxf.aegis.util.stax;version="${cxf.version}",
+              org.apache.cxf.aegis.xml;version="${cxf.version}",
+              org.apache.cxf.aegis.xml.jdom;version="${cxf.version}",
+              org.apache.cxf.aegis.xml.stax;version="${cxf.version}",
+              org.apache.cxf.annotations;version="${cxf.version}",
+              org.apache.cxf.attachment;version="${cxf.version}",
+              org.apache.cxf.binding;version="${cxf.version}",
+              org.apache.cxf.binding.xml;version="${cxf.version}",
+              org.apache.cxf.binding.xml.interceptor;version="${cxf.version}",
+              org.apache.cxf.binding.xml.wsdl11;version="${cxf.version}",
+              org.apache.cxf.bindings.xformat;version="${cxf.version}",
+              org.apache.cxf.bus;version="${cxf.version}",
+              org.apache.cxf.bus.extension;version="${cxf.version}",
+              org.apache.cxf.bus.resource;version="${cxf.version}",
+              org.apache.cxf.bus.spring;version="${cxf.version}",
+              org.apache.cxf.buslifecycle;version="${cxf.version}",
+              org.apache.cxf.catalog;version="${cxf.version}",
+              org.apache.cxf.clustering;version="${cxf.version}",
+              org.apache.cxf.clustering.spring;version="${cxf.version}",
+              org.apache.cxf.common;version="${cxf.version}",
+              org.apache.cxf.common.annotation;version="${cxf.version}",
+              org.apache.cxf.common.classloader;version="${cxf.version}",
+              org.apache.cxf.common.commands;version="${cxf.version}",
+              org.apache.cxf.common.i18n;version="${cxf.version}",
+              org.apache.cxf.common.injection;version="${cxf.version}",
+              org.apache.cxf.common.logging;version="${cxf.version}",
+              org.apache.cxf.common.security;version="${cxf.version}",
+              org.apache.cxf.common.util;version="${cxf.version}",
+              org.apache.cxf.common.xmlschema;version="${cxf.version}",
+              org.apache.cxf.configuration;version="${cxf.version}",
+              org.apache.cxf.configuration.jsse;version="${cxf.version}",
+              org.apache.cxf.configuration.jsse.spring;version="${cxf.version}",
+              org.apache.cxf.configuration.security;version="${cxf.version}",
+              org.apache.cxf.configuration.spring;version="${cxf.version}",
+              org.apache.cxf.continuations;version="${cxf.version}",
+              org.apache.cxf.databinding;version="${cxf.version}",
+              org.apache.cxf.databinding.source;version="${cxf.version}",
+              org.apache.cxf.databinding.source.mime;version="${cxf.version}",
+              org.apache.cxf.databinding.stax;version="${cxf.version}",
+              org.apache.cxf.endpoint;version="${cxf.version}",
+              org.apache.cxf.extension;version="${cxf.version}",
+              org.apache.cxf.feature;version="${cxf.version}",
+              org.apache.cxf.frontend;version="${cxf.version}",
+              org.apache.cxf.headers;version="${cxf.version}",
+              org.apache.cxf.helpers;version="${cxf.version}",
+              org.apache.cxf.interceptor;version="${cxf.version}",
+              org.apache.cxf.interceptor.security;version="${cxf.version}",
+              org.apache.cxf.io;version="${cxf.version}",
+              org.apache.cxf.jaxb;version="${cxf.version}",
+              org.apache.cxf.jaxrs;version="${cxf.version}",
+              org.apache.cxf.jaxrs.client;version="${cxf.version}",
+              org.apache.cxf.jaxrs.ext;version="${cxf.version}",
+              org.apache.cxf.jaxrs.ext.atom;version="${cxf.version}",
+              org.apache.cxf.jaxrs.ext.codegen;version="${cxf.version}",
+              org.apache.cxf.jaxrs.ext.form;version="${cxf.version}",
+              org.apache.cxf.jaxrs.ext.multipart;version="${cxf.version}",
+              org.apache.cxf.jaxrs.ext.search;version="${cxf.version}",
+              org.apache.cxf.jaxrs.ext.xml;version="${cxf.version}",
+              org.apache.cxf.jaxrs.impl;version="${cxf.version}",
+              org.apache.cxf.jaxrs.impl.tl;version="${cxf.version}",
+              org.apache.cxf.jaxrs.interceptor;version="${cxf.version}",
+              org.apache.cxf.jaxrs.lifecycle;version="${cxf.version}",
+              org.apache.cxf.jaxrs.model;version="${cxf.version}",
+              org.apache.cxf.jaxrs.model.wadl;version="${cxf.version}",
+              org.apache.cxf.jaxrs.provider;version="${cxf.version}",
+              org.apache.cxf.jaxrs.servlet;version="${cxf.version}",
+              org.apache.cxf.jaxrs.spring;version="${cxf.version}",
+              org.apache.cxf.jaxrs.utils;version="${cxf.version}",
+              org.apache.cxf.jaxrs.utils.multipart;version="${cxf.version}",
+              org.apache.cxf.jaxrs.utils.schemas;version="${cxf.version}",
+              org.apache.cxf.jca.outbound;version="${cxf.version}",
+              org.apache.cxf.logging;version="${cxf.version}",
+              org.apache.cxf.management;version="${cxf.version}",
+              org.apache.cxf.management.annotation;version="${cxf.version}",
+              org.apache.cxf.message;version="${cxf.version}",
+              org.apache.cxf.phase;version="${cxf.version}",
+              org.apache.cxf.resource;version="${cxf.version}",
+              org.apache.cxf.security;version="${cxf.version}",
+              org.apache.cxf.security.transport;version="${cxf.version}",
+              org.apache.cxf.service;version="${cxf.version}",
+              org.apache.cxf.service.factory;version="${cxf.version}",
+              org.apache.cxf.service.invoker;version="${cxf.version}",
+              org.apache.cxf.service.model;version="${cxf.version}",
+              org.apache.cxf.staxutils;version="${cxf.version}",
+              org.apache.cxf.test;version="${cxf.version}",
+              org.apache.cxf.tools.common;version="${cxf.version}",
+              org.apache.cxf.tools.validator;version="${cxf.version}",
+              org.apache.cxf.transport;version="${cxf.version}",
+              org.apache.cxf.transport.http;version="${cxf.version}",
+              org.apache.cxf.transport.http.gzip;version="${cxf.version}",
+              org.apache.cxf.transport.http.policy;version="${cxf.version}",
+              org.apache.cxf.transport.http.spring;version="${cxf.version}",
+              org.apache.cxf.transport.http_jetty;version="${cxf.version}",
+              org.apache.cxf.transport.http_jetty.continuations;version="${cxf.version}",
+              org.apache.cxf.transport.http_jetty.spring;version="${cxf.version}",
+              org.apache.cxf.transport.https;version="${cxf.version}",
+              org.apache.cxf.transport.https_jetty;version="${cxf.version}",
+              org.apache.cxf.transport.servlet;version="${cxf.version}",
+              org.apache.cxf.transports.http;version="${cxf.version}",
+              org.apache.cxf.transports.http.configuration;version="${cxf.version}",
+              org.apache.cxf.transports.http_jetty.configuration;version="${cxf.version}",
+              org.apache.cxf.version;version="${cxf.version}",
+              org.apache.cxf.workqueue;version="${cxf.version}",
+              org.apache.cxf.ws.addressing;version="${cxf.version}",
+              org.apache.cxf.ws.addressing.v200403;version="${cxf.version}",
+              org.apache.cxf.ws.addressing.v200408;version="${cxf.version}",
+              org.apache.cxf.ws.addressing.wsdl;version="${cxf.version}",
+              org.apache.cxf.ws.policy;version="${cxf.version}",
+              org.apache.cxf.ws.policy.builder.jaxb;version="${cxf.version}",
+              org.apache.cxf.ws.policy.builder.primitive;version="${cxf.version}",
+              org.apache.cxf.ws.policy.builder.xml;version="${cxf.version}",
+              org.apache.cxf.ws.policy.util;version="${cxf.version}",
+              org.apache.cxf.wsdl;version="${cxf.version}",
+              org.apache.cxf.wsdl.http;version="${cxf.version}",
+              org.apache.cxf.wsdl11;version="${cxf.version}",
               org.apache.felix.webconsole;version="3.1.2",
               org.apache.commons.lang;version="2.6",
               org.apache.commons.io;version="2.0",
-              org.apache.fop.apps;version="1.0.0",
               org.apache.tika;version="0.9",
               org.quartz;version="[1.6.0,2.0.0)",
               org.quartz.impl;version="[1.6.0,2.0.0)",
@@ -431,31 +523,38 @@
               org.osgi.service.http;version="1.1.0",
               org.osgi.service.cm;version="1.1.0",
               org.osgi.util.tracker;version="1.4.0",
-              org.springframework.beans;version=${springframework.version},
-              org.springframework.beans.factory;version=${springframework.version},
-              org.springframework.beans.factory.config;version=${springframework.version},
-              org.springframework.beans.factory.support;version=${springframework.version},
-              org.springframework.beans.factory.xml;version=${springframework.version},
-              org.springframework.context;version=${springframework.version},
-              org.springframework.context.annotation;version=${springframework.version},
-              org.springframework.dao;version=${springframework.version},
+              org.springframework.beans;version="[3.1.0,3.2.0)",
+              org.springframework.beans.factory;version="[3.1.0,3.2.0)",
+              org.springframework.beans.factory.config;version="[3.1.0,3.2.0)",
+              org.springframework.beans.factory.support;version="[3.1.0,3.2.0)",
+              org.springframework.beans.factory.xml;version="[3.1.0,3.2.0)",
+              org.springframework.context;version="[3.1.0,3.2.0)",
+              org.springframework.context.annotation;version="[3.1.0,3.2.0)",
+              org.springframework.dao;version="[3.1.0,3.2.0)",
               org.springframework.osgi.context;version="1.2.1",
               org.springframework.osgi.context.support;version="1.2.1",
-              org.springframework.security;version=${springframework.version},
-              org.springframework.security.access;version=${springframework.version},
-              org.springframework.security.access.event;version=${springframework.version},
-              org.springframework.security.access.vote;version=${springframework.version},
-              org.springframework.security.authentication;version=${springframework.version},
-              org.springframework.security.authentication.event;version=${springframework.version},
-              org.springframework.security.config;version=${springframework.version},
-              org.springframework.security.core;version=${springframework.version},
-              org.springframework.security.core.userdetails;version=${springframework.version},
-              org.springframework.security.core.userdetails.cache;version=${springframework.version},
-              org.springframework.security.core.userdetails.memory;version=${springframework.version},
-              org.springframework.security.web;version=${springframework.version},
-              org.springframework.security.web.authentication;version=${springframework.version},
-              org.springframework.security.web.authentication.www;version=${springframework.version},
-              org.springframework.util;version=${springframework.version},
+              org.springframework.security.access;version="[3.1.0,3.2.0)",
+              org.springframework.security.access.event;version="[3.1.0,3.2.0)",
+              org.springframework.security.access.method;version="[3.1.0,3.2.0)",
+              org.springframework.security.access.vote;version="[3.1.0,3.2.0)",
+              org.springframework.security.authentication;version="[3.1.0,3.2.0)",
+              org.springframework.security.authentication.event;version="[3.1.0,3.2.0)",
+              org.springframework.security.config;version="[3.1.0,3.2.0)",
+              org.springframework.security.core;version="[3.1.0,3.2.0)",
+              org.springframework.security.core.authority;version="[3.1.0,3.2.0)",
+              org.springframework.security.core.context;version="[3.1.0,3.2.0)",
+              org.springframework.security.core.userdetails;version="[3.1.0,3.2.0)",
+              org.springframework.security.core.userdetails.cache;version="[3.1.0,3.2.0)",
+              org.springframework.security.core.userdetails.memory;version="[3.1.0,3.2.0)",
+              org.springframework.security.web;version="[3.1.0,3.2.0)",
+              org.springframework.security.web.access;version="[3.1.0,3.2.0)",
+              org.springframework.security.web.access.intercept;version="[3.1.0,3.2.0)",
+              org.springframework.security.web.authentication;version="[3.1.0,3.2.0)",
+              org.springframework.security.web.authentication.logout;version="[3.1.0,3.2.0)",
+              org.springframework.security.web.savedrequest;version="[3.1.0,3.2.0)",
+              org.springframework.security.web.util;version="[3.1.0,3.2.0)",
+              org.springframework.security.web.authentication.www;version="[3.1.0,3.2.0)",
+              org.springframework.util;version="[3.1.0,3.2.0)",
               org.slf4j;version="[1.5.0,1.6.0)",
               org.w3c.dom,
               javax.activation,
@@ -471,18 +570,18 @@
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
-              ch.entwine.weblounge.kernel;version=${project.version},
-              ch.entwine.weblounge.kernel.command;version=${project.version},
-              ch.entwine.weblounge.kernel.endpoint;version=${project.version},
-              ch.entwine.weblounge.kernel.fop;version=${project.version},
-              ch.entwine.weblounge.kernel.http;version=${project.version},
-              ch.entwine.weblounge.kernel.mail;version=${project.version},
-              ch.entwine.weblounge.kernel.publisher;version=${project.version},
-              ch.entwine.weblounge.kernel.runtime;version=${project.version},
-              ch.entwine.weblounge.kernel.security;version=${project.version},
-              ch.entwine.weblounge.kernel.shared;version=${project.version},
-              ch.entwine.weblounge.kernel.site;version=${project.version},
-              ch.entwine.weblounge.kernel.webconsole;version=${project.version}
+              ch.entwine.weblounge.kernel;version="${project.version}",
+              ch.entwine.weblounge.kernel.command;version="${project.version}",
+              ch.entwine.weblounge.kernel.endpoint;version="${project.version}",
+              ch.entwine.weblounge.kernel.fop;version="${project.version}",
+              ch.entwine.weblounge.kernel.http;version="${project.version}",
+              ch.entwine.weblounge.kernel.mail;version="${project.version}",
+              ch.entwine.weblounge.kernel.publisher;version="${project.version}",
+              ch.entwine.weblounge.kernel.runtime;version="${project.version}",
+              ch.entwine.weblounge.kernel.security;version="${project.version}",
+              ch.entwine.weblounge.kernel.shared;version="${project.version}",
+              ch.entwine.weblounge.kernel.site;version="${project.version}",
+              ch.entwine.weblounge.kernel.webconsole;version="${project.version}"
             </Export-Package>
             <Private-Package>
               org.json,
@@ -493,6 +592,22 @@
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,
               geronimo-javamail_1.4_provider;inline=true,
+              xml-apis-ext;inline=true,
+              fop;inline=true,
+              xmlgraphics-commons;inline=true,
+              batik-codec;inline=true,
+              batik-svg-dom;inline=true,
+              batik-util;inline=true,
+              batik-parser;inline=true,
+              batik-dom;inline=true,
+              batik-css;inline=true,
+              batik-xml;inline=true,
+              batik-anim;inline=true,
+              batik-bridge;inline=true,
+              batik-gvt;inline=true,
+              batik-script;inline=true,
+              batik-ext;inline=true,
+              batik-awt-util;inline=true
             </Embed-Dependency>
             <Service-Component>
               OSGI-INF/directory-service.xml,

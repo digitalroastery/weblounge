@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.impl.request;
 
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.request.CacheHandle;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
@@ -38,9 +39,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -72,7 +72,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /** The response's cache handle */
   private WeakReference<CacheHandle> cacheHandle = null;
 
-  private Set<HTMLHeadElement> htmlHeaders = null;
+  private List<HTMLHeadElement> htmlHeaders = null;
 
   /** Whether the getOuputStream has already been called */
   private boolean osCalled = false;
@@ -514,12 +514,20 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     StringBuffer headersHTML = new StringBuffer();
     if (htmlHeaders != null) {
       for (HTMLHeadElement e : htmlHeaders) {
-        headersHTML.append(e.toXml()).append('\n');
+        String header = ConfigurationUtils.processTemplate(e.toHtml(), request.get().getSite(), request.get().getEnvironment());
+        headersHTML.append(header).append('\n');
       }
     }
 
     // Replace the marker with the actual headers
-    response = response.replaceAll(HTML_HEADER_MARKER, headersHTML.toString());
+    int headersPlaceholderLocation = response.indexOf(HTML_HEADER_MARKER);
+    if (headersPlaceholderLocation >= 1) {
+      StringBuffer updatedResponse = new StringBuffer(response.substring(0, headersPlaceholderLocation));
+      updatedResponse.append(headersHTML.toString());
+      updatedResponse.append(response.substring(headersPlaceholderLocation + HTML_HEADER_MARKER.length()));
+      response = updatedResponse.toString();
+    }
+
     setContentLength(response.getBytes().length);
     IOUtils.write(response, clientOS, DEFAULT_ENCODING);
     clientOS.flush();
@@ -661,8 +669,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   @Override
   public void addHTMLHeader(HTMLHeadElement header) {
     if (htmlHeaders == null)
-      htmlHeaders = new HashSet<HTMLHeadElement>();
-    htmlHeaders.add(header);
+      htmlHeaders = new ArrayList<HTMLHeadElement>();
+    if (!htmlHeaders.contains(header))
+      htmlHeaders.add(header);
   }
 
   /**

@@ -36,6 +36,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
@@ -71,7 +72,33 @@ public class FopService {
 
     FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
     Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdf);
-    xml2pdf(xml, xsl, params, fop, pdf);
+    xml2pdf(xml, xsl, params, fop, pdf, null);
+  }
+
+  /**
+   * Creates a PDF document from the given XLS FO DOM representation using the
+   * default FOP factory and FOP user agent and writes the resulting document to
+   * the the output stream.
+   * 
+   * @param xml
+   *          the XML document
+   * @param xsl
+   *          the XSL transformation document
+   * @param params
+   *          parameter for the XSL transformation
+   * @param pdf
+   *          the output stream
+   * @param resolver
+   *          the custom uri resolver
+   */
+  public void xml2pdf(Document xml, Document xsl, String[][] params,
+      OutputStream pdf, URIResolver resolver)
+      throws TransformerConfigurationException, TransformerException,
+      FOPException, IOException {
+
+    FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+    Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdf);
+    xml2pdf(xml, xsl, params, fop, pdf, resolver);
   }
 
   /**
@@ -89,10 +116,13 @@ public class FopService {
    *          the FOP processor
    * @param pdf
    *          the output stream
+   * @param resolver
+   *          the custom uri resolver
    */
   public void xml2pdf(Document xml, Document xsl, String[][] params, Fop fop,
-      OutputStream pdf) throws TransformerConfigurationException,
-      TransformerException, FOPException, IOException {
+      OutputStream pdf, URIResolver resolver)
+      throws TransformerConfigurationException, TransformerException,
+      FOPException, IOException {
 
     // Setup output
     OutputStream pdfOut = new BufferedOutputStream(pdf);
@@ -100,6 +130,8 @@ public class FopService {
     try {
       // Setup xsl transformer
       TransformerFactory factory = TransformerFactory.newInstance();
+      if (resolver != null)
+        factory.setURIResolver(resolver);
       Transformer transformer = factory.newTransformer(new DOMSource(xsl));
 
       // Set the parameter values in the stylesheet

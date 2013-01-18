@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0" xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0">
+ 
+  <!-- The H2 database root is located at <work directory>/work/db  --> 
+  <bean id="webloungeDatasource" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="URL" value="jdbc:h2:work/db/weblounge"/>
+    <property name="user" value="sa"/>
+    <property name="password" value=""/>
+  </bean>
+
+  <!-- PostgreSQL datasource -->
+  <!-- UNCOMMENT TO ACTIVATE
+  <bean id="webloungeDatasource" class="org.postgresql.ds.PGSimpleDataSource">
+    <property name="databaseName" value="weblounge" />
+    <property name="serverName" value="localhost"/>
+    <property name="portNumber" value="5432"/>
+    <property name="user" value="weblounge"/>
+    <property name="password" value="weblounge"/>
+  </bean>
+  -->
+
+  <!-- MySQL datasource using the Karaf datasource definition -->
+  <!-- UNCOMMENT TO ACTIVATE
+  <bean id="webloungeDatasource" class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource">
+    <property name="url" value="jdbc:mysql://localhost:3306/weblounge" />
+    <property name="user" value="weblounge"/>
+    <property name="password" value="weblounge"/>
+  </bean>
+  -->
+
+  <service ref="webloungeDatasource" interface="javax.sql.DataSource">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="jdbc/weblounge" />
+    </service-properties>
+  </service>
+  
+</blueprint>

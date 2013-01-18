@@ -1063,7 +1063,9 @@ public class LazyImageResourceImpl implements ImageResource {
    * @see ch.entwine.weblounge.common.content.Resource#getContent(ch.entwine.weblounge.common.language.Language)
    */
   public ImageContent getContent(Language language) {
-    return null;
+    if (!isBodyLoaded)
+      loadImage();
+    return image.getContent(language);
   }
 
   /**
@@ -1072,7 +1074,20 @@ public class LazyImageResourceImpl implements ImageResource {
    * @see ch.entwine.weblounge.common.content.Resource#getOriginalContent()
    */
   public ImageContent getOriginalContent() {
-    return null;
+    if (!isBodyLoaded)
+      loadImage();
+    return image.getOriginalContent();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  public void addContent(ImageContent content) {
+    if (!isBodyLoaded)
+      loadImage();
+    image.addContent(content);
   }
 
   /**
@@ -1081,7 +1096,9 @@ public class LazyImageResourceImpl implements ImageResource {
    * @see ch.entwine.weblounge.common.content.Resource#removeContent(ch.entwine.weblounge.common.language.Language)
    */
   public ImageContent removeContent(Language language) {
-    return null;
+    if (!isBodyLoaded)
+      loadImage();
+    return image.removeContent(language);
   }
 
   /**
@@ -1090,7 +1107,9 @@ public class LazyImageResourceImpl implements ImageResource {
    * @see ch.entwine.weblounge.common.content.Resource#contents()
    */
   public Set<ImageContent> contents() {
-    return null;
+    if (!isBodyLoaded)
+      loadImage();
+    return image.contents();
   }
 
   /**
@@ -1124,16 +1143,6 @@ public class LazyImageResourceImpl implements ImageResource {
   @Override
   public String toString() {
     return uri.toString();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
-   */
-  public void addContent(ImageContent content) {
-    // TODO Auto-generated method stub
-
   }
 
 }

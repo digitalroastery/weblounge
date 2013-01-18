@@ -3,7 +3,7 @@ steal.plugins('jquery/controller',
 		'jqueryui/draggable',
 		'jqueryui/resizable',
 		'jqueryui/mouse')
-.css('../css/bootstrap')
+.css('../css/wbl-bootstrap')
 .then(function($) {
 
 	/*

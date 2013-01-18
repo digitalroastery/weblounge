@@ -126,7 +126,8 @@ public class PageTag extends WebloungeTag {
     try {
       page = (Page) repository.get(uri);
       language = LanguageUtils.getPreferredLanguage(page, request, site);
-      page.switchTo(language);
+      if (language != null)
+        page.switchTo(language);
     } catch (ContentRepositoryException e) {
       logger.warn("Error trying to load page " + uri + ": " + e.getMessage(), e);
       return SKIP_BODY;

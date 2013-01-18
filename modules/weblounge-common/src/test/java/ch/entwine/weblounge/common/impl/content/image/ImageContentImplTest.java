@@ -223,7 +223,7 @@ public class ImageContentImplTest {
    */
   @Test
   public void testGetGpsLat() {
-    assertEquals(gpsLat, image.getGpsLat());
+    assertEquals(gpsLat, image.getGpsLat(), 0.0f);
   }
 
   /**
@@ -233,7 +233,7 @@ public class ImageContentImplTest {
    */
   @Test
   public void testGetGpsLong() {
-    assertEquals(gpsLong, image.getGpsLong());
+    assertEquals(gpsLong, image.getGpsLong(), 0.0f);
   }
 
   /**
@@ -253,7 +253,7 @@ public class ImageContentImplTest {
    */
   @Test
   public void testGetFNumber() {
-    assertEquals(fnumber, image.getFNumber());
+    assertEquals(fnumber, image.getFNumber(), 0.0f);
   }
 
   /**
@@ -273,7 +273,7 @@ public class ImageContentImplTest {
    */
   @Test
   public void testGetExposureTime() {
-    assertEquals(exposureTime, image.getExposureTime());
+    assertEquals(exposureTime, image.getExposureTime(), 0.0f);
   }
 
 }

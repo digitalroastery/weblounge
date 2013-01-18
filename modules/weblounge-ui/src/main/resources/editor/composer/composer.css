@@ -7,53 +7,43 @@
 	background: url("../menubar/images/menu_add.png") center center no-repeat ;
 	display: inline-block;
 	position: absolute;
-  	top: 25%;
-  	left: 50%;
+	top: 25%;
+	left: 50%;
 	width:24px;
-  	height:24px;
+	height:24px;
 }
 
-.editor_composer img.wbl-iconEditing {
+/* edit-icons */
+.editor_composer .wbl-editing-palet {
+	padding: 8px !important;
+	margin: 5px !important;
 	cursor: pointer;
-	display: inline-block;
-	position:absolute;
-  	top: 4px;
-  	left: 4px;
-	height: 24px;
-	width:24px;
-	z-index: 1000;
-	border: 1px solid black;
-	background-color: white;
+	z-index: 399; /* 1 below 400 of #wbl-pageletcreator */
+	position: absolute;
+	background-color: #fff;
+	border-radius: 10px;
 }
 
-.editor_composer img.wbl-iconRemove {
-	cursor: pointer;
-	display: inline-block;
-	position:absolute;
-  	top: 4px;
-  	left: 29px;
-	height: 24px;
-	width:24px;
-	z-index: 1000;
-	border: 1px solid black;
-	background-color: white;
+.editor_composer .wbl-editing-palet .icon-pencil {
+	margin-left: 15px; /* Does not affect ?!?!? */
 }
 
 .editor_composer .wbl-pageletPlaceholder {
- 	border-top: solid 2px #FF0000;
-    color: #363636;
+	border: dashed 1px #FF0000;
+	color: #363636;
+	padding: 10px;
+	margin: 2px;
 }
 
 .editor_composer.wbl-nojQuery div.pagelet:hover {
-    background-color: #CCCCCC;
-    opacity: 0.5;
+	background-color: rgba(204, 204, 204, 0.3)
 }
 
-div.composer.wbl-nojQuery.empty, div.composer.wbl-composerBorder {
-	position: relative;
-	border: 1px solid black;
+.composer.wbl-nojQuery {
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	margin: 2px 0;
 }
 
-div.pagelet {
+.pagelet {
 	position:relative;
 }

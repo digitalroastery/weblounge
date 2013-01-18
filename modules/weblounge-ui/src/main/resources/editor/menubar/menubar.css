@@ -70,10 +70,12 @@
 .editor_menubar .wbl-right {
     float: right;
     margin-right: 10px;
+    height: 35px;
+    line-height: 35px;
 }
 
 .editor_menubar .wbl-profileMenu {
-	margin-right: 40px;
+	margin-right: 30px;
 }
 
 .editor_menubar img,
@@ -85,18 +87,26 @@ div.wbl-overlayIcons span.wbl-more {
 .editor_menubar img.wbl-user {
 	cursor: default;
 	padding: 2px 8px;
-	width: 30px;
-	height: 30px;
+	width: 35px;
+	height: 35px;
+	position: relative;
+	top: -2px;
 }
+
+.editor_menubar img.wbl-logout {
+	cursor: pointer;
+	position: relative;
+}
+
 
 .editor_menubar #wbl-user {
 	position: relative;
-    top: -10px;
+    top: -16px;
 }
 
 .editor_menubar .wbl-language {
 	position: absolute;
-	top: 0px;
+	top: 10px;
 	right: 500px;
 }
 

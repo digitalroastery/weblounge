@@ -47,6 +47,7 @@ import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.scheduler.Job;
 import ch.entwine.weblounge.common.scheduler.JobTrigger;
 import ch.entwine.weblounge.common.scheduler.JobWorker;
+import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.security.UserListener;
@@ -66,7 +67,6 @@ import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.ComponentContext;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -181,6 +181,12 @@ public class SiteImpl implements Site {
 
   /** Option handling support */
   protected OptionsHelper options = null;
+
+  /** URL to the security configuration */
+  protected URL security = null;
+  
+  /** This site's digest policy */
+  protected DigestType digestType = DigestType.md5;
 
   /** Request listeners */
   private List<RequestListener> requestListeners = null;
@@ -689,6 +695,46 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.site.Site#setSecurity(java.net.URL)
+   */
+  @Override
+  public void setSecurity(URL url) {
+    this.security = url;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#getSecurity()
+   */
+  @Override
+  public URL getSecurity() {
+    return security;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.site.Site#setDigestType(ch.entwine.weblounge.common.security.DigestType)
+   */
+  @Override
+  public void setDigestType(DigestType digest) {
+    this.digestType = digest;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.site.Site#getDigestType()
+   */
+  @Override
+  public DigestType getDigestType() {
+    return digestType;
+  }
+  
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.site.Site#getContentRepository()
    */
   public ContentRepository getContentRepository() {
@@ -1159,19 +1205,22 @@ public class SiteImpl implements Site {
    * of your bundle.
    * 
    * @param context
-   *          the component context
+   *          the bundle context
+   * @param properties
+   *          the component properties
    * @throws Exception
    *           if the site activation fails
    */
   @SuppressWarnings("unchecked")
-  protected void activate(ComponentContext context) throws Exception {
+  protected void activate(BundleContext ctx, Map<String, String> properties)
+      throws Exception {
 
-    bundleContext = context.getBundleContext();
+    bundleContext = ctx;
     final Bundle bundle = bundleContext.getBundle();
 
     // Fix the site identifier
     if (getIdentifier() == null) {
-      String identifier = (String) context.getProperties().get(PROP_IDENTIFIER);
+      String identifier = properties.get(PROP_IDENTIFIER);
       if (identifier == null)
         throw new IllegalStateException("Property'" + PROP_IDENTIFIER + "' missing from site bundle");
       setIdentifier(identifier);
@@ -1260,16 +1309,19 @@ public class SiteImpl implements Site {
    * of your bundle.
    * 
    * @param context
-   *          the component context
+   *          the bundle context
+   * @param properties
+   *          the component properties
    * @throws Exception
    *           if the site deactivation fails
    */
-  protected void deactivate(ComponentContext context) throws Exception {
+  protected void deactivate(BundleContext context, Map<String, String> properties) throws Exception {
     try {
       isShutdownInProgress = true;
       logger.debug("Taking down site '{}'", this);
       logger.debug("Stopped looking for a job scheduling services");
-      schedulingServiceTracker.close();
+      if (schedulingServiceTracker != null)
+        schedulingServiceTracker.close();
       logger.info("Site '{}' deactivated", this);
     } finally {
       isShutdownInProgress = false;
@@ -1593,7 +1645,8 @@ public class SiteImpl implements Site {
       } catch (ClassNotFoundException e) {
         throw new IllegalStateException("Implementation " + className + " for integration test of class '" + identifier + "' not found", e);
       } catch (NoClassDefFoundError e) {
-        // We are trying to load each and every class here, so we may as well see classes that are not meant to be loaded
+        // We are trying to load each and every class here, so we may as well
+        // see classes that are not meant to be loaded
         logger.debug("The related class " + e.getMessage() + " for potential test case implementation " + className + " could not be found");
       } catch (InstantiationException e) {
         throw new IllegalStateException("Error instantiating impelementation " + className + " for integration test '" + identifier + "'", e);
@@ -1644,6 +1697,7 @@ public class SiteImpl implements Site {
    *           if the site cannot be parsed
    * @see #toXml()
    */
+  @SuppressWarnings("unchecked")
   public static Site fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -1753,10 +1807,35 @@ public class SiteImpl implements Site {
       site.setDefaultTemplate(firstTemplate);
     }
 
+    // security
+    String securityConfiguration = XPathHelper.valueOf(config, "ns:security/ns:configuration", xpathProcessor);
+    if (securityConfiguration != null) {
+      URL securityConfig = null;
+
+      // If converting the path into a URL fails, we are assuming that the
+      // configuration is part of the bundle
+      try {
+        securityConfig = new URL(securityConfiguration);
+      } catch (MalformedURLException e) {
+        logger.debug("Security configuration {} is pointing to the bundle", securityConfiguration);
+        securityConfig = SiteImpl.class.getResource(securityConfiguration);
+        if (securityConfig == null) {
+          throw new IllegalStateException("Security configuration " + securityConfig + " of site '" + site.getIdentifier() + "' cannot be located inside of bundle", e);
+        }
+      }
+      site.setSecurity(securityConfig);
+    }
+
     // administrator
     Node adminNode = XPathHelper.select(config, "ns:security/ns:administrator", xpathProcessor);
     if (adminNode != null) {
       site.setAdministrator(SiteAdminImpl.fromXml(adminNode, site, xpathProcessor));
+    }
+    
+    // digest policy
+    Node digestNode = XPathHelper.select(config, "ns:security/ns:digest", xpathProcessor);
+    if (digestNode != null) {
+      site.setDigestType(DigestType.valueOf(digestNode.getFirstChild().getNodeValue()));
     }
 
     // role definitions
@@ -1839,6 +1918,12 @@ public class SiteImpl implements Site {
     // security
     if (administrator != null || localRoles.size() > 0) {
       b.append("<security>");
+      if (security != null) {
+        b.append("<configuration>").append(security.toExternalForm()).append("</configuration>");
+      }
+
+      b.append("<digest>").append(digestType.toString()).append("</digest>");
+
       if (administrator != null)
         b.append(administrator.toXml());
 

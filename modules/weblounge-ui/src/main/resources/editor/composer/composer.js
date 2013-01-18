@@ -23,7 +23,7 @@ steal.plugins('jquery/controller',
      */
     init: function(el) {
       this.id = this.element.attr('id');
-      this.element.addClass('wbl-nojQuery');
+      this.element.addClass('wbl-nojQuery');  // class draws a border round all composers
       
       // init jQuery UI sortable plugin to support drag'n'drop of pagelets
       $(el).sortable({
@@ -36,8 +36,7 @@ steal.plugins('jquery/controller',
         cursorAt: { top: -8, left: -10 },
         revert: true,
         start: $.proxy(function(event, ui) {
-        	this.element.find('img.wbl-iconEditing').remove();
-        	this.element.find('img.wbl-iconRemove').remove();
+        	this.element.find('i.wbl').remove(); // remove all editing-icons
         	this._disablePagelets();
         	if(ui.item.hasClass('wbl-draggable')) return;
         	
@@ -137,12 +136,14 @@ steal.plugins('jquery/controller',
     },
     
 	disable: function() {
+        // fired for each composer on the page
 		$(this.element).removeClass('wbl-nojQuery');
 		$(this.element).sortable('disable');
 		$(this.element).find('div.pagelet').editor_pagelet('disable').css('min-height', '');
 	},
 	
 	enable: function() {
+        // fired for each composer on the page
 		$(this.element).addClass('wbl-nojQuery');
 		$(this.element).sortable('enable');
 		$(this.element).find('div.pagelet').editor_pagelet('enable').css('min-height', '35px');
@@ -169,7 +170,7 @@ steal.plugins('jquery/controller',
     _disablePagelets: function() {
     	$('.composer:not(.locked)').editor_composer('disable');
     },
-    
+
 	'hoverenter': function(el, ev) {
 		if(!$(this.element).hasClass('wbl-nojQuery')) return;
 		$(this.element).addClass('wbl-composerBorder');

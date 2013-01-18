@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.kernel.security;
 
+import ch.entwine.weblounge.common.impl.security.PasswordEncoder;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.DirectoryService;
@@ -175,24 +176,40 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
         }
       }
 
-      // Try to find the password
-      // TODO: Use a configuration value to decide on password format
+      // Make sure there is no ambiguous information with regards to passwords
       Set<Object> passwords = user.getPrivateCredentials(Password.class);
-      String password = null;
-      for (Object o : passwords) {
-        Password p = (Password) o;
-        if (DigestType.plain.equals(p.getDigestType())) {
-          password = p.getPassword();
-          break;
-        }
-      }
-
-      // Spring security requires a password to be sent
-      if (password == null) {
-        logger.warn("User '" + user.getLogin() + "' has no password");
+      if (passwords.size() > 1) {
+        logger.warn("User '{}@{}' has more than one password'", name, site.getIdentifier());
+        throw new DataRetrievalFailureException("User '" + user + "' has more than one password");
+      } else if (passwords.size() == 0) {
+        logger.warn("User '{}@{}' has no password", name, site.getIdentifier());
         throw new DataRetrievalFailureException("User '" + user + "' has no password");
       }
+     
+      // Create the password according to the site's and Spring Security's digest policy
+      Password p = (Password) passwords.iterator().next();
+      String password = null;
+      switch (site.getDigestType()) {
+        case md5:
+          if (!DigestType.md5.equals(p.getDigestType())) {
+            logger.debug("Creating digest password for '{}@{}'", name, site.getIdentifier());
+            password = PasswordEncoder.encode(p.getPassword());
+          } else {
+            password = p.getPassword();
+          }
+          break;
+        case plain:
+          if (!DigestType.plain.equals(p.getDigestType())) {
+            logger.warn("User '{}@{}' does not have a plain text password'", name, site.getIdentifier());
+            return null;
+          }
+          password = p.getPassword();
+          break;
+        default:
+          throw new IllegalStateException("Unknown digest type '" + site.getDigestType() + "'");
+      }
 
+      // Provide the user to Spring Security
       return new SpringSecurityUser(user, password, true, true, true, true, authorities);
     }
   }
