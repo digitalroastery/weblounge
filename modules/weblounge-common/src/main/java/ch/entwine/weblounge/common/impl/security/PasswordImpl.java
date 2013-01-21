@@ -128,5 +128,15 @@ public final class PasswordImpl implements Password {
   public String getPassword() {
     return password;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return passwordDigestType + " password";
+  }
 
 }
