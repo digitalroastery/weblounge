@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.impl.security.PasswordEncoder;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.DirectoryService;
+import ch.entwine.weblounge.common.security.LoginListener;
 import ch.entwine.weblounge.common.security.Password;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.SecurityService;
@@ -65,6 +66,9 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
 
   /** The list of system directories */
   protected List<DirectoryProvider> systemDirectories = new ArrayList<DirectoryProvider>();
+
+  /** The list of login listeners */
+  protected List<LoginListener> loginListeners = new ArrayList<LoginListener>();
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -185,8 +189,9 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
         logger.warn("User '{}@{}' has no password", name, site.getIdentifier());
         throw new DataRetrievalFailureException("User '" + user + "' has no password");
       }
-     
-      // Create the password according to the site's and Spring Security's digest policy
+
+      // Create the password according to the site's and Spring Security's
+      // digest policy
       Password p = (Password) passwords.iterator().next();
       String password = null;
       switch (site.getDigestType()) {
@@ -207,6 +212,15 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
           break;
         default:
           throw new IllegalStateException("Unknown digest type '" + site.getDigestType() + "'");
+      }
+
+      // Notifiy login listeners of the initiated login attempt
+      for (LoginListener listener : loginListeners) {
+        try {
+          listener.beforeLogin(site, user);
+        } catch (Throwable t) {
+          logger.warn("Login listener '{}' failed to preoprly process before login callback", listener, t);
+        }
       }
 
       // Provide the user to Spring Security
@@ -290,7 +304,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
    *          the site directory
    */
   void addDirectoryProvider(DirectoryProvider directory) {
-    logger.info("Registering directory provider '{}'", directory.getIdentifier());
+    logger.debug("Registering directory provider '{}'", directory.getIdentifier());
     if (directory instanceof SiteDirectory) {
       List<DirectoryProvider> directoryProviders = siteDirectories.get(directory.getIdentifier());
       if (directoryProviders == null) {
@@ -311,7 +325,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
    *          the directory service provider
    */
   void removeDirectoryProvider(DirectoryProvider directory) {
-    logger.info("Unregistering directory provider '{}'", directory.getIdentifier());
+    logger.debug("Unregistering directory provider '{}'", directory.getIdentifier());
     if (directory instanceof SiteDirectory) {
       List<DirectoryProvider> directoryProviders = this.siteDirectories.get(directory.getIdentifier());
       if (directoryProviders != null) {
@@ -323,6 +337,28 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     } else {
       systemDirectories.remove(directory);
     }
+  }
+
+  /**
+   * Adds the login listener to the list of login listeners.
+   * 
+   * @param loginListener
+   *          the login listener
+   */
+  void addLoginListener(LoginListener loginListener) {
+    logger.debug("Registering login listener '{}'", loginListener);
+    loginListeners.add(loginListener);
+  }
+
+  /**
+   * Removes the login listener from the list of login listeners.
+   * 
+   * @param loginListener
+   *          the login listener
+   */
+  void removeLoginListener(LoginListener loginListener) {
+    logger.debug("Removing login listener '{}'", loginListener);
+    loginListeners.remove(loginListener);
   }
 
 }
