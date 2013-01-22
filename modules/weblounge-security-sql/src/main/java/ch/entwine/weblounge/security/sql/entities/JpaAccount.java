@@ -21,13 +21,14 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * A user account that enables login of a Weblounge user into a specific sites
  * and at the same time ties in the roles that the user is being assigned.
  */
 @Entity
-@Table(name = "directory_account")
+@Table(name = "directory_account", uniqueConstraints = @UniqueConstraint(columnNames = {"login", "site_id"}))
 @NamedQueries({
     @NamedQuery(name = "getAccount", query = "SELECT a FROM JpaAccount a WHERE a.site.name = :siteId AND a.login = :userId"),
     @NamedQuery(name = "getActiveAccount", query = "SELECT a FROM JpaAccount a WHERE a.site.name = :siteId AND a.login = :userId AND a.enabled = true and a.site.enabled = true"),
@@ -43,10 +44,11 @@ public class JpaAccount implements Serializable {
 
   /** The site that this user account belongs to */
   @ManyToOne
+  @Column(name = "site_id", nullable = false)
   protected JpaSite site = null;
 
   /** The user login */
-  @Column(unique = true, nullable = false)
+  @Column(name = "login", nullable = false)
   protected String login = null;
 
   /** The user's first name */
