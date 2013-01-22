@@ -191,7 +191,7 @@ public class SQLDirectoryProviderEndpoint {
   public Response getAccount(@PathParam("login") String login,
       @Context HttpServletRequest request) {
     Site site = getSite(request);
-    
+
     JpaAccount account = null;
     try {
       account = directory.getAccount(site, login);
@@ -274,10 +274,14 @@ public class SQLDirectoryProviderEndpoint {
       account.setChallenge(StringUtils.trimToNull(challenge));
 
       // The language
-      try {
-        account.setLanguage(LanguageUtils.getLanguage(language));
-      } catch (UnknownLanguageException e) {
-        return Response.status(Status.BAD_REQUEST).build();
+      if (StringUtils.isNotBlank(language)) {
+        try {
+          account.setLanguage(LanguageUtils.getLanguage(language));
+        } catch (UnknownLanguageException e) {
+          return Response.status(Status.BAD_REQUEST).build();
+        }
+      } else {
+        account.setLanguage(null);
       }
 
       // Hash the response

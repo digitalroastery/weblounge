@@ -125,6 +125,7 @@ public final class SQLDirectoryProviderEndpointDocs {
     updateAccount.addFormat(Format.xml());
     updateAccount.addStatus(ok("the account has been updated"));
     updateAccount.addStatus(forbidden("insufficient rights to update the account"));
+    updateAccount.addStatus(badRequest("if a non-existing language identifier is provided"));
     updateAccount.addStatus(notFound("the account does not exist"));
     updateAccount.addStatus(notFound("the site does not exist"));
     updateAccount.addStatus(serviceUnavailable("the site is temporarily offline"));
