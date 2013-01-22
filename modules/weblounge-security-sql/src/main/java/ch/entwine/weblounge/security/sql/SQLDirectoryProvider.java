@@ -36,7 +36,7 @@ public interface SQLDirectoryProvider extends DirectoryProvider {
    * @param site
    *          the site
    * @param password
-   *          TODO
+   *          the password
    * @param user
    *          the user login
    * @throws IllegalStateException
