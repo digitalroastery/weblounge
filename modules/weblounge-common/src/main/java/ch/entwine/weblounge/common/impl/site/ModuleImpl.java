@@ -699,7 +699,11 @@ public class ModuleImpl implements Module {
       module = new ModuleImpl();
       module.setIdentifier(identifier);
     }
-
+    
+    // Check if module is enabled
+    Boolean enabled = Boolean.valueOf(XPathHelper.valueOf(config, "m:enable", xpathProcessor));
+    module.setEnabled(enabled);
+    
     // name
     String name = XPathHelper.valueOf(config, "m:name", xpathProcessor);
     module.setName(name);
