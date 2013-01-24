@@ -184,7 +184,7 @@ public class SiteImpl implements Site {
 
   /** URL to the security configuration */
   protected URL security = null;
-  
+
   /** This site's digest policy */
   protected DigestType digestType = DigestType.md5;
 
@@ -714,24 +714,24 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.site.Site#setDigestType(ch.entwine.weblounge.common.security.DigestType)
    */
   @Override
   public void setDigestType(DigestType digest) {
     this.digestType = digest;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.site.Site#getDigestType()
    */
   @Override
   public DigestType getDigestType() {
     return digestType;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -1264,25 +1264,36 @@ public class SiteImpl implements Site {
           throw new IllegalStateException("Errors found while validating module descriptor " + moduleXml);
         }
 
-        // Load i18n dictionaries
-        String i18nPath = UrlUtils.concat(moduleUrl.getPath(), "i18n");
-        i18nEnum = bundle.findEntries(i18nPath, "*.xml", true);
-        while (i18nEnum != null && i18nEnum.hasMoreElements()) {
-          i18n.addDictionary(i18nEnum.nextElement());
-        }
-
+        // We need the module id even if the module initialization fails to log
+        // a proper error message
         Node moduleNode = moduleXml.getFirstChild();
         String moduleId = moduleNode.getAttributes().getNamedItem("id").getNodeValue();
 
+        Module m;
         try {
-          Module m = ModuleImpl.fromXml(moduleNode);
+          m = ModuleImpl.fromXml(moduleNode);
           logger.debug("Module '{}' loaded for site '{}'", m, this);
-          addModule(m);
         } catch (Throwable t) {
           logger.error("Error loading module '{}' of site {}", moduleId, identifier);
           if (t instanceof Exception)
             throw (Exception) t;
           throw new Exception(t);
+        }
+
+        // If module is disabled, don't add it to the site
+        if (!m.isEnabled()) {
+          logger.info("Module '{}' for site '{}' is disabled and hence not added to the site", m, this);
+          continue;
+        }
+
+        addModule(m);
+
+        // Do this as last step since we don't want to have i18n dictionaries of
+        // an invalid or disabled module in the site
+        String i18nPath = UrlUtils.concat(moduleUrl.getPath(), "i18n");
+        i18nEnum = bundle.findEntries(i18nPath, "*.xml", true);
+        while (i18nEnum != null && i18nEnum.hasMoreElements()) {
+          i18n.addDictionary(i18nEnum.nextElement());
         }
       }
     } else {
@@ -1315,7 +1326,8 @@ public class SiteImpl implements Site {
    * @throws Exception
    *           if the site deactivation fails
    */
-  protected void deactivate(BundleContext context, Map<String, String> properties) throws Exception {
+  protected void deactivate(BundleContext context,
+      Map<String, String> properties) throws Exception {
     try {
       isShutdownInProgress = true;
       logger.debug("Taking down site '{}'", this);
@@ -1831,7 +1843,7 @@ public class SiteImpl implements Site {
     if (adminNode != null) {
       site.setAdministrator(SiteAdminImpl.fromXml(adminNode, site, xpathProcessor));
     }
-    
+
     // digest policy
     Node digestNode = XPathHelper.select(config, "ns:security/ns:digest", xpathProcessor);
     if (digestNode != null) {
