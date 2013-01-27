@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.impl.security.PasswordEncoder;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.DirectoryService;
@@ -117,29 +118,23 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
       providers.addAll(siteProviders);
     providers.addAll(systemDirectories);
 
-    // Collect all of the roles from each of the directories for this user
-    User user = null;
+    // Find a user principal to use for login
     for (DirectoryProvider directory : providers) {
       try {
-        User u = directory.loadUser(login, site);
-        if (u == null) {
-          continue;
-        } else if (user == null) {
-          user = u;
-        } else {
-          for (Object c : u.getPublicCredentials()) {
-            user.addPublicCredentials(c);
-          }
-          for (Object c : u.getPrivateCredentials()) {
-            user.addPrivateCredentials(c);
-          }
+        User user = directory.loadUser(login, site);
+        if (user != null) {
+          logger.debug("User directory '{}' returned a user to login '{}' into site '{}'", new String[] {
+              directory.getIdentifier(),
+              login,
+              site.getIdentifier() });
+          return user;
         }
       } catch (Throwable t) {
         logger.warn("Error looking up user from {}: {}", directory, t.getMessage());
       }
     }
 
-    return user;
+    return null;
   }
 
   /**
