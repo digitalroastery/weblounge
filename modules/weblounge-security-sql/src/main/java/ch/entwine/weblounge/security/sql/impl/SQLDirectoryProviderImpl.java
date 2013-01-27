@@ -19,19 +19,14 @@
  */
 package ch.entwine.weblounge.security.sql.impl;
 
-import static ch.entwine.weblounge.common.impl.security.SystemRole.GUEST;
-
 import static ch.entwine.weblounge.common.impl.security.SystemRole.EDITOR;
-
+import static ch.entwine.weblounge.common.impl.security.SystemRole.GUEST;
 import static ch.entwine.weblounge.common.impl.security.SystemRole.PUBLISHER;
-
 import static ch.entwine.weblounge.common.impl.security.SystemRole.SITEADMIN;
-
 import static ch.entwine.weblounge.common.impl.security.SystemRole.SYSTEMADMIN;
 
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
-import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Role;
@@ -106,7 +101,6 @@ public class SQLDirectoryProviderImpl implements SQLDirectoryProvider {
     user.addPrivateCredentials(new PasswordImpl(jpaAccount.getPassword(), DigestType.md5));
 
     // Roles
-    user.addPublicCredentials(SystemRole.GUEST);
     for (JpaRole r : jpaAccount.getRoles()) {
 
       // Make sure weblounge roles get special treatment in order

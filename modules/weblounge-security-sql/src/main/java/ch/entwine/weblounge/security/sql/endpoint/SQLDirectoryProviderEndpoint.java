@@ -165,8 +165,13 @@ public class SQLDirectoryProviderEndpoint {
     Site site = getSite(request);
     try {
       JpaAccount account = directory.getAccount(site, login);
-      if (account != null)
+      if (account != null) {
+        logger.debug("Tried to recreate an existing account '{}@{}'", login, site.getIdentifier());
         return Response.status(Status.CONFLICT).build();
+      } else if (login.equals(site.getAdministrator().getLogin())) {
+        logger.debug("Tried to create an account named like the site admin user '{}@{}'", login, site.getIdentifier());
+        return Response.status(Status.CONFLICT).build();
+      }
 
       // Hash the password
       if (StringUtils.isNotBlank(password)) {
