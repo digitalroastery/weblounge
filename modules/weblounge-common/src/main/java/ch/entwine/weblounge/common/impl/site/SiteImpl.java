@@ -20,8 +20,10 @@
 
 package ch.entwine.weblounge.common.impl.site;
 
+import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.PageLayout;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJob;
@@ -52,6 +54,7 @@ import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.security.UserListener;
 import ch.entwine.weblounge.common.security.WebloungeUser;
+import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.I18nDictionary;
 import ch.entwine.weblounge.common.site.Module;
@@ -1269,10 +1272,10 @@ public class SiteImpl implements Site {
         Node moduleNode = moduleXml.getFirstChild();
         String moduleId = moduleNode.getAttributes().getNamedItem("id").getNodeValue();
 
-        Module m;
+        Module module;
         try {
-          m = ModuleImpl.fromXml(moduleNode);
-          logger.debug("Module '{}' loaded for site '{}'", m, this);
+          module = ModuleImpl.fromXml(moduleNode);
+          logger.debug("Module '{}' loaded for site '{}'", module, this);
         } catch (Throwable t) {
           logger.error("Error loading module '{}' of site {}", moduleId, identifier);
           if (t instanceof Exception)
@@ -1281,12 +1284,64 @@ public class SiteImpl implements Site {
         }
 
         // If module is disabled, don't add it to the site
-        if (!m.isEnabled()) {
-          logger.info("Module '{}' for site '{}' is disabled and hence not added to the site", m, this);
+        if (!module.isEnabled()) {
+          logger.info("Module '{}' for site '{}' is disabled", module, this);
           continue;
         }
 
-        addModule(m);
+        // Make sure there is only one module with this identifier
+        if (modules.containsKey(module.getIdentifier())) {
+          logger.warn("A module with id '{}' is already registered in site '{}'", module.getIdentifier(), identifier);
+          logger.error("Module '{}' is not registered due to conflicting identifier", module.getIdentifier());
+          continue;
+        }
+
+        // Check inter-module compatibility
+        for (Module m : modules.values()) {
+
+          // Check actions
+          for (Action a : m.getActions()) {
+            for (Action action : module.getActions()) {
+              if (action.getIdentifier().equals(a.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines an action with id '{}'", new String[] { m.getIdentifier(), identifier, a.getIdentifier() });
+              } else if (action.getPath().equals(a.getPath())) {
+                logger.warn("Module '{}' of site '{}' already defines an action at '{}'", new String[] { m.getIdentifier(), identifier, a.getPath() });
+                logger.error("Module '{}' of site '{}' is not registered due to conflicting mountpoints", m.getIdentifier(), identifier);
+                continue;
+              }
+            }
+          }
+
+          // Check image styles
+          for (ImageStyle s : m.getImageStyles()) {
+            for (ImageStyle style : module.getImageStyles()) {
+              if (style.getIdentifier().equals(s.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines an image style with id '{}'", new String[] { m.getIdentifier(), identifier, s.getIdentifier() });
+              }
+            }
+          }
+
+          // Check jobs
+          for (Job j : m.getJobs()) {
+            for (Job job : module.getJobs()) {
+              if (job.getIdentifier().equals(j.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines a job with id '{}'", new String[] { m.getIdentifier(), identifier, j.getIdentifier() });
+              }
+            }
+          }
+
+          // Check renderers
+          for (PageletRenderer r : m.getRenderers()) {
+            for (PageletRenderer renderer : module.getRenderers()) {
+              if (renderer.getIdentifier().equals(r.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines a pagelet with id '{}'", new String[] { m.getIdentifier(), identifier, r.getIdentifier() });
+              }
+            }
+          }
+
+        }
+        
+        addModule(module);
 
         // Do this as last step since we don't want to have i18n dictionaries of
         // an invalid or disabled module in the site
@@ -1296,6 +1351,7 @@ public class SiteImpl implements Site {
           i18n.addDictionary(i18nEnum.nextElement());
         }
       }
+      
     } else {
       logger.debug("Site '{}' has no modules", this);
     }
