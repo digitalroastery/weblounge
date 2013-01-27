@@ -20,9 +20,9 @@
 
 package ch.entwine.weblounge.kernel.security;
 
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.security.SecurityService;
-import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 
 import org.apache.felix.webconsole.WebConsoleSecurityProvider2;
