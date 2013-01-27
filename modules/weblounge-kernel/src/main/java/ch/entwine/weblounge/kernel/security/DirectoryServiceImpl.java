@@ -161,6 +161,10 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
       throw new UsernameNotFoundException(name);
     } else {
 
+      // By default, add the anonymous role so the user is able to access
+      // publicly available resources
+      user.addPublicCredentials(SystemRole.GUEST);
+
       // Collect the set of roles (granted authorities) for this users
       Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
       for (Object o : user.getPublicCredentials(Role.class)) {
