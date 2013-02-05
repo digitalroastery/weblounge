@@ -23,10 +23,10 @@ package ch.entwine.weblounge.taglib.content;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.editor.EditingState;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
-import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
 import java.io.IOException;

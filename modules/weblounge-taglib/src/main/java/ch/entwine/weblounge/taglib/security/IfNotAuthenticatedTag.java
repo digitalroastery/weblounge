@@ -21,9 +21,9 @@
 package ch.entwine.weblounge.taglib.security;
 
 import ch.entwine.weblounge.common.impl.security.Guest;
-import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 

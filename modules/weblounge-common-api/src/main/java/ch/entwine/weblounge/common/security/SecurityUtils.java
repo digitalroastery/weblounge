@@ -18,15 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.security;
-
-import ch.entwine.weblounge.common.security.Role;
-import ch.entwine.weblounge.common.security.Security;
-import ch.entwine.weblounge.common.security.User;
+package ch.entwine.weblounge.common.security;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Utility methods around security.
@@ -38,27 +33,6 @@ public final class SecurityUtils {
    */
   private SecurityUtils() {
     // Nothing to do
-  }
-
-  /**
-   * Returns <code>true</code> if the user is authenticated. In other words,
-   * <code>true</code> is returned if the user is <b>not<b> an anonymous user.
-   * <p>
-   * Generally speaking, a user is considered an anonymous user if he owns the
-   * {@link SystemRole#GUEST} role.
-   * 
-   * @param user
-   *          the user
-   * @return <code>true</code> if the user is authenticated
-   */
-  public static boolean isAuthenticated(User user) {
-    if (user == null)
-      throw new IllegalArgumentException("User must not be null");
-    Set<Object> roles = user.getPublicCredentials(Role.class);
-
-    // Assuming that every user has the GUEST role, so everything in addition
-    // means authenticated
-    return roles.size() > 1;
   }
 
   /**

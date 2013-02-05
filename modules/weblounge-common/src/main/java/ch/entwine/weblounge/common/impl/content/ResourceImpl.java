@@ -30,7 +30,6 @@ import ch.entwine.weblounge.common.impl.content.page.PageSecurityContext;
 import ch.entwine.weblounge.common.impl.language.LocalizableContent;
 import ch.entwine.weblounge.common.impl.language.LocalizableObject;
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
-import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
@@ -38,6 +37,7 @@ import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Permission;
 import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
+import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
