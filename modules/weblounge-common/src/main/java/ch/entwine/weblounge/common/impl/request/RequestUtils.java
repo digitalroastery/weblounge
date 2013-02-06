@@ -27,11 +27,11 @@ import static ch.entwine.weblounge.common.impl.security.SystemRole.EDITOR;
 import static java.lang.Boolean.TRUE;
 
 import ch.entwine.weblounge.common.editor.EditingState;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.site.ActionSupport;
 import ch.entwine.weblounge.common.impl.site.PrecompileHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
-import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.site.Action;
 
 import org.apache.commons.lang.StringUtils;
