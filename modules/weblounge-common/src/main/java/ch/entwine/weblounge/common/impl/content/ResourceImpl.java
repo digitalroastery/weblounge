@@ -132,6 +132,9 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     this.description = new LocalizableContent<String>(this);
     this.coverage = new LocalizableContent<String>(this);
     this.rights = new LocalizableContent<String>(this);
+
+    this.creationCtx.setCreated(uri.getSite().getAdministrator(), new Date());
+    this.securityCtx.setOwner(uri.getSite().getAdministrator());
   }
 
   /**
@@ -535,6 +538,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @see ch.entwine.weblounge.common.security.Securable#setOwner(ch.entwine.weblounge.common.security.User)
    */
   public void setOwner(User owner) {
+    if (owner == null) {
+      logger.warn("Someone tried to set the owner of '{}' to null", this);
+      return;
+    }
     securityCtx.setOwner(owner);
   }
 
@@ -698,6 +705,13 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    *      java.util.Date)
    */
   public void setCreated(User creator, Date creationDate) {
+    if (creator == null) {
+      logger.warn("Someone tried to set the creator of '{}' to null", this);
+      return;
+    } else if (creationDate == null) {
+      logger.warn("Someone tried to set the creation date of '{}' to null", this);
+      return;
+    }
     creationCtx.setCreated(creator, creationDate);
   }
 
@@ -707,6 +721,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @see ch.entwine.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
    */
   public void setCreationDate(Date date) {
+    if (date == null) {
+      logger.warn("Someone tried to set creation date of '{}' to null", this);
+      return;
+    }
     creationCtx.setCreationDate(date);
   }
 
@@ -725,6 +743,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @see ch.entwine.weblounge.common.content.Creatable#setCreator(ch.entwine.weblounge.common.security.User)
    */
   public void setCreator(User user) {
+    if (user == null) {
+      logger.warn("Someone tried to set creator of '{}' to null", this);
+      return;
+    }
     creationCtx.setCreator(user);
   }
 
