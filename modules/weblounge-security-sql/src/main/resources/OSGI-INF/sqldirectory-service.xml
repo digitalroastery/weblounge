@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-	immediate="true"
+  immediate="true"
+  activate="activate"
   name="Weblounge SQL Directory Provider">
   
   <implementation class="ch.entwine.weblounge.security.sql.impl.SQLDirectoryProviderImpl" />
