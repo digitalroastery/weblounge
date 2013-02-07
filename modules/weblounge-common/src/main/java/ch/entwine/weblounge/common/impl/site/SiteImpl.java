@@ -857,7 +857,7 @@ public class SiteImpl implements Site {
   public String getLocalRole(String role) {
     if (localRoles.containsKey(role))
       return localRoles.get(role);
-    return role;
+    return null;
   }
 
   /**
