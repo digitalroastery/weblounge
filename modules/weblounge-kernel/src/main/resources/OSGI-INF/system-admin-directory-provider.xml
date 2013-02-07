@@ -7,6 +7,7 @@
   <property name="service.description" value="Weblounge System Admin Account Provider" />
   <property name="service.pid" value="ch.entwine.weblounge.systemdirectory" />
   <service>
+    <provide interface="ch.entwine.weblounge.common.security.SystemDirectory" />
     <provide interface="ch.entwine.weblounge.common.security.DirectoryProvider" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>

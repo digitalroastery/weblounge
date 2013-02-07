@@ -24,10 +24,10 @@ import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.security.DigestType;
-import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.Password;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.Security;
+import ch.entwine.weblounge.common.security.SystemDirectory;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -43,7 +43,7 @@ import java.util.Dictionary;
  * An in-memory user directory containing the users and roles used by the
  * system.
  */
-public class SystemAdminDirectoryProvider implements DirectoryProvider, ManagedService {
+public class SystemAdminDirectoryProvider implements SystemDirectory, ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SystemAdminDirectoryProvider.class);
