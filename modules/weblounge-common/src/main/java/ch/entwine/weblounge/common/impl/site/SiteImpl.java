@@ -1330,15 +1330,6 @@ public class SiteImpl implements Site {
             }
           }
 
-          // Check renderers
-          for (PageletRenderer r : m.getRenderers()) {
-            for (PageletRenderer renderer : module.getRenderers()) {
-              if (renderer.getIdentifier().equals(r.getIdentifier())) {
-                logger.warn("Module '{}' of site '{}' already defines a pagelet with id '{}'", new String[] { m.getIdentifier(), identifier, r.getIdentifier() });
-              }
-            }
-          }
-
         }
         
         addModule(module);
