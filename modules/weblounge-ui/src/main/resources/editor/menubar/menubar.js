@@ -58,7 +58,15 @@ steal.plugins(
             $('#weblounge-editor')
             	.css('paddingTop', '-' + bodyPaddingTop)
             	.css('paddingLeft', '-' + bodyPaddingLeft)
-            	.css('paddingRight', '-' + bodyPaddingRight);	
+            	.css('paddingRight', '-' + bodyPaddingRight);
+
+            // change all position:fixed to position:relative to not overlay the menubar
+            $('body > *').each(function(index, elem) {
+				if($(elem).css('position') == 'fixed') {
+					steal.dev.log('Element with position:fixed found and fixed.');
+					$(elem).css('position', 'relative');
+				}
+			});			
 
             // replace the icon with a gravatar if weblounge is online otherwise load a default img
             ImageUrl = 'http://gravatar.com/avatar/' + md5(this.options.runtime.getUserEmail()) + '?default=404';
