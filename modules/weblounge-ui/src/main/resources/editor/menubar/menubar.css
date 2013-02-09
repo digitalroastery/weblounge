@@ -9,7 +9,7 @@
 	width: 100%;
 	padding-left: 20px;
 	overflow: hidden;
-	z-index: 420;
+	z-index: 10001;
 }
 
 #wbl-pageletcreator {
