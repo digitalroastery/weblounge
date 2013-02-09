@@ -18,35 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.taglib.security;
-
-import ch.entwine.weblounge.common.impl.security.SecurityUtils;
-import ch.entwine.weblounge.common.security.User;
-import ch.entwine.weblounge.taglib.WebloungeTag;
-
-import javax.servlet.jsp.JspException;
+package ch.entwine.weblounge.common.security;
 
 /**
- * Checks if a user is authenticated. The body content is only evaluated, if the
- * user is logged in.
+ * Provides access to system user and roles.
  */
-public class IfAuthenticatedTag extends WebloungeTag {
-
-  /** serial version uid */
-  private static final long serialVersionUID = 5576649176077112454L;
-
-  /**
-   * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
-   */
-  @Override
-  public int doStartTag() throws JspException {
-    super.doStartTag();
-    User user = getRequest().getUser();
-
-    if (!SecurityUtils.isAuthenticated(user))
-      return SKIP_BODY;
-
-    return EVAL_BODY_INCLUDE;
-  }
+public interface SystemDirectory extends DirectoryProvider {
 
 }

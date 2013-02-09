@@ -23,13 +23,15 @@ package ch.entwine.weblounge.security.sql.endpoint;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.PasswordEncoder;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.SecurityService;
-import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.security.UserExistsException;
+import ch.entwine.weblounge.common.security.UserShadowedException;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -163,26 +165,25 @@ public class SQLDirectoryProviderEndpoint {
 
     Response response = null;
     Site site = getSite(request);
+
+    // Hash the password
+    if (StringUtils.isNotBlank(password)) {
+      logger.debug("Hashing password for user '{}@{}' using md5", login, site.getIdentifier());
+      password = PasswordEncoder.encode(StringUtils.trim(password));
+    }
+
+    // Create the user
     try {
-      JpaAccount account = directory.getAccount(site, login);
-      if (account != null) {
-        logger.debug("Tried to recreate an existing account '{}@{}'", login, site.getIdentifier());
-        return Response.status(Status.CONFLICT).build();
-      } else if (login.equals(site.getAdministrator().getLogin())) {
-        logger.debug("Tried to create an account named like the site admin user '{}@{}'", login, site.getIdentifier());
-        return Response.status(Status.CONFLICT).build();
-      }
-
-      // Hash the password
-      if (StringUtils.isNotBlank(password)) {
-        logger.debug("Hashing password for user '{}@{}' using md5", login, site.getIdentifier());
-        password = PasswordEncoder.encode(StringUtils.trim(password));
-      }
-
-      account = directory.addAccount(site, login, password);
+      JpaAccount account = directory.addAccount(site, login, password);
       account.setEmail(StringUtils.trimToNull(eMail));
       directory.updateAccount(account);
       response = Response.created(new URI(UrlUtils.concat(request.getRequestURL().toString(), account.getLogin()))).build();
+    } catch (UserExistsException e) {
+      logger.warn("Error creating account: {}", e.getMessage());
+      return Response.status(Status.CONFLICT).build();
+    } catch (UserShadowedException e) {
+      logger.warn("Error creating account: {}", e.getMessage());
+      return Response.status(Status.CONFLICT).build();
     } catch (Throwable t) {
       logger.warn("Error creating account: {}", t.getMessage());
       response = Response.serverError().build();

@@ -25,7 +25,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ch.entwine.weblounge.common.security.Security;
-import ch.entwine.weblounge.common.security.SecurityUtils;
 
 import org.junit.Before;
 import org.junit.Test;

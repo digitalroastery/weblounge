@@ -40,6 +40,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -133,6 +134,7 @@ public class ContentRepositoryIndexTest {
     EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
     EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
     EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
+    EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("testsite")).anyTimes();
     EasyMock.replay(site);
 
     idxRoot = new File(new File(System.getProperty("java.io.tmpdir")), "index");

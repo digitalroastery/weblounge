@@ -18,7 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.security;
+package ch.entwine.weblounge.common.impl.security;
+
+import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Security;
+import ch.entwine.weblounge.common.security.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +30,6 @@ import java.util.Set;
 
 /**
  * Utility methods around security.
- * 
- * @deprecated Use {@link ch.entwine.weblounge.common.impl.security.SecurityUtils}
  */
 public final class SecurityUtils {
 

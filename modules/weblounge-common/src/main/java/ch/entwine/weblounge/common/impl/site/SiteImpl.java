@@ -857,7 +857,7 @@ public class SiteImpl implements Site {
   public String getLocalRole(String role) {
     if (localRoles.containsKey(role))
       return localRoles.get(role);
-    return role;
+    return null;
   }
 
   /**
@@ -1326,15 +1326,6 @@ public class SiteImpl implements Site {
             for (Job job : module.getJobs()) {
               if (job.getIdentifier().equals(j.getIdentifier())) {
                 logger.warn("Module '{}' of site '{}' already defines a job with id '{}'", new String[] { m.getIdentifier(), identifier, j.getIdentifier() });
-              }
-            }
-          }
-
-          // Check renderers
-          for (PageletRenderer r : m.getRenderers()) {
-            for (PageletRenderer renderer : module.getRenderers()) {
-              if (renderer.getIdentifier().equals(r.getIdentifier())) {
-                logger.warn("Module '{}' of site '{}' already defines a pagelet with id '{}'", new String[] { m.getIdentifier(), identifier, r.getIdentifier() });
               }
             }
           }
