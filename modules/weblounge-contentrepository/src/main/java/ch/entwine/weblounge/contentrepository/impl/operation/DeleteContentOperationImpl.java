@@ -24,9 +24,9 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.DeleteContentOperation;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.DeleteContentOperation;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 
 import java.io.IOException;
 
@@ -60,7 +60,7 @@ public final class DeleteContentOperationImpl extends AbstractContentRepositoryO
    * This implementation removes the content from the resource if the resource's
    * uri matches this operation's uri.
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryResourceOperation#apply(ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation#apply(ResourceURI,
    *      Resource)
    */
   public <C extends ResourceContent, R extends Resource<C>> R apply(
@@ -79,7 +79,7 @@ public final class DeleteContentOperationImpl extends AbstractContentRepositoryO
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.PutContentOperation#getResourceURI()
+   * @see ch.entwine.weblounge.common.repository.PutContentOperation#getResourceURI()
    */
   public ResourceURI getResourceURI() {
     return uri;
@@ -88,7 +88,7 @@ public final class DeleteContentOperationImpl extends AbstractContentRepositoryO
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.PutContentOperation#getContent()
+   * @see ch.entwine.weblounge.common.repository.PutContentOperation#getContent()
    */
   public ResourceContent getContent() {
     return content;
@@ -97,7 +97,7 @@ public final class DeleteContentOperationImpl extends AbstractContentRepositoryO
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.content.repository.WritableContentRepository)
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperation#execute(ch.entwine.weblounge.common.repository.WritableContentRepository)
    */
   @Override
   protected Resource<? extends ResourceContent> run(

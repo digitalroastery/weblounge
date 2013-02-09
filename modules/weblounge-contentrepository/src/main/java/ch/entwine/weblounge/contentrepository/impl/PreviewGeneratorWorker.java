@@ -27,14 +27,13 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -74,6 +73,9 @@ class PreviewGeneratorWorker implements Runnable {
 
   /** The format */
   private String format = null;
+  
+  /** Flag to indicate a canceled preview generation */
+  private boolean canceled = false;
 
   /**
    * Creates a new preview worker who will create the corresponding previews for
@@ -102,6 +104,13 @@ class PreviewGeneratorWorker implements Runnable {
     this.styles = styles;
     this.format = format;
   }
+  
+  /**
+   * Indicates to this preview generation worker to cancel the current operation.
+   */
+  public void cancel() {
+    this.canceled = true;
+  }
 
   /**
    * {@inheritDoc}
@@ -115,7 +124,7 @@ class PreviewGeneratorWorker implements Runnable {
     try {
 
       // Find the resource serializer
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
+      ResourceSerializer<?, ?> serializer = contentRepository.getSerializerByType(resourceType);
       if (serializer == null) {
         logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
         return;
@@ -130,7 +139,7 @@ class PreviewGeneratorWorker implements Runnable {
 
       // Create the scaled images
       String mimeType = "image/" + format;
-      ResourceSerializer<?, ?> s = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
+      ResourceSerializer<?, ?> s = contentRepository.getSerializerByMimeType(mimeType);
       if (s == null) {
         logger.warn("No resource serializer is capable of dealing with resources of format '{}'", mimeType);
         return;
@@ -152,6 +161,10 @@ class PreviewGeneratorWorker implements Runnable {
         if (!resource.supportsContentLanguage(l))
           continue;
 
+        // Have we been told to stop doing work in the meantime?
+        if (canceled)
+          return;
+        
         // Create the original preview image for every language
         ImageStyle originalStyle = new ImageStyleImpl("original", ImageScalingMode.None);
         File originalPreview = null;
@@ -163,10 +176,14 @@ class PreviewGeneratorWorker implements Runnable {
           return;
         }
 
-        long lastModified = ResourceUtils.getModificationDate(resource, l).getTime();
+        long resourceLastModified = ResourceUtils.getModificationDate(resource, l).getTime();
 
         // Create the remaining styles
         for (ImageStyle style : styles) {
+
+          // Have we been told to stop doing work in the meantime?
+          if (canceled)
+            return;
 
           // The original has been produced already
           if (ImageScalingMode.None.equals(style.getScalingMode()))
@@ -179,10 +196,23 @@ class PreviewGeneratorWorker implements Runnable {
 
             // Create the file if it doesn't exist or if it is out dated. Note
             // that the last modified date of a file has a precision of seconds
-            if (!scaledFile.isFile() || FileUtils.isFileOlder(scaledFile, new Date(lastModified))) {
+            if (!scaledFile.isFile() || FileUtils.isFileOlder(scaledFile, new Date(resourceLastModified))) {
+
+              logger.info("Creating preview at {}", scaledFile.getAbsolutePath());
+
               fis = new FileInputStream(originalPreview);
               fos = new FileOutputStream(scaledFile);
               imagePreviewGenerator.createPreview(originalPreview, environment, l, style, format, fis, fos);
+              scaledFile.setLastModified(Math.max(new Date().getTime(), resourceLastModified));
+
+              // Store the style definition used while creating the preview
+              File baseDir = ImageStyleUtils.getScaledFileBase(resource.getURI().getSite(), style);
+              File definitionFile = new File(baseDir, "style.xml");
+              if (!definitionFile.isFile()) {
+                logger.debug("Storing style definition at {}", definitionFile);
+                definitionFile.createNewFile();
+                FileUtils.copyInputStreamToFile(IOUtils.toInputStream(style.toXml(), "UTF-8"), definitionFile);
+              }
             } else {
               logger.debug("Skipping creation of existing '{}' preview of {}", style, resource);
             }
@@ -198,6 +228,8 @@ class PreviewGeneratorWorker implements Runnable {
       }
 
     } finally {
+      if (canceled)
+        logger.debug("Preview operation for {} has been canceled", resource.getIdentifier());
       contentRepository.previewCreated(resource);
     }
   }
@@ -265,10 +297,6 @@ class PreviewGeneratorWorker implements Runnable {
         fos = new FileOutputStream(scaledResourceFile);
         AbstractContentRepository.logger.debug("Creating preview of '{}' at {}", resource, scaledResourceFile);
         previewGenerator.createPreview(resource, environment, language, style, format, contentRepositoryIs, fos);
-
-        // Adjust the last modified date so the preview doesn't need to be
-        // regenerated
-        scaledResourceFile.setLastModified(lastModified);
       }
 
     } catch (ContentRepositoryException e) {

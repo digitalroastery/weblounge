@@ -86,3 +86,7 @@ stash
 stashed
 precompile
 jasper
+frontend
+backend
+elasticsearch
+malformed

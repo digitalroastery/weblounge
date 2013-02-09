@@ -6,7 +6,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.0.7</version>
+    <version>3.1.5-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   
@@ -189,7 +189,7 @@
               ch.entwine.weblounge.common.content;version=${project.version},
               ch.entwine.weblounge.common.content.image;version=${project.version},
               ch.entwine.weblounge.common.content.page;version=${project.version},
-              ch.entwine.weblounge.common.content.repository;version=${project.version},
+              ch.entwine.weblounge.common.repository;version=${project.version},
               ch.entwine.weblounge.common.language;version=${project.version},
               ch.entwine.weblounge.common.scheduler;version=${project.version},
               ch.entwine.weblounge.common.site;version=${project.version},

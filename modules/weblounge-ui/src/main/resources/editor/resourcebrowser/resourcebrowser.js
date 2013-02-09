@@ -202,17 +202,17 @@ steal.plugins(
 			var query = {page: $.proxy(function(params) {
 				Page.findPending(params, $.proxy(function(pages) {
 					if($.isEmptyObject(pages)) {
-						this.element.find("div#wbl-pendingCircle").html('0').fadeOut();
+						this.element.find("#pending-batch").html('0').fadeOut();
 					} else {
-						this.element.find("div#wbl-pendingCircle").html(pages.length).fadeIn();
+						this.element.find("#pending-batch").html(pages.length).fadeIn();
 					}
 				}, this));
 			}, this), media: $.proxy(function(params) {
 				Editor.File.findPending(params, $.proxy(function(media) {
 					if($.isEmptyObject(media)) {
-						this.element.find("div#wbl-pendingCircle").html('0').fadeOut();
+						this.element.find("#pending-batch").html('0').fadeOut();
 					} else {
-						this.element.find("div#wbl-pendingCircle").html(media.length).fadeIn();
+						this.element.find("#pending-batch").html(media.length).fadeIn();
 					}
 				}, this));
 			}, this)};

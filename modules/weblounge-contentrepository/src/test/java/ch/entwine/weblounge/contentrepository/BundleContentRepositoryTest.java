@@ -25,8 +25,9 @@ import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.util.TestUtils;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.bundle.BundleContentRepository;
 
@@ -81,6 +82,7 @@ public class BundleContentRepositoryTest {
     workSubURI = new PageURIImpl(site, subPath, Resource.WORK);
     bundle = new StandaloneBundle(BundleContentRepositoryTest.class.getClassLoader());
     
+    TestUtils.startTesting();
     repository = new BundleContentRepository();
     Dictionary<String, Object> properties = new Hashtable<String, Object>();
     properties.put(Site.class.getName(), site);

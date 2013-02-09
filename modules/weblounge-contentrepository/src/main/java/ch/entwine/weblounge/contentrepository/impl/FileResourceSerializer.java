@@ -20,11 +20,11 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.HEADER_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.RESOURCE_ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.VERSION;
-import static ch.entwine.weblounge.contentrepository.impl.index.solr.SolrSchema.XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.HEADER_XML;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
+import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.XML;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
@@ -46,7 +46,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
-import ch.entwine.weblounge.contentrepository.impl.index.solr.FileInputDocument;
+import ch.entwine.weblounge.contentrepository.impl.index.FileInputDocument;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -89,7 +89,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
    */
   public String getMimeType(FileContent resourceContent) {
     return resourceContent.getMimetype();
@@ -98,7 +98,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supports(java.lang.String)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#supports(java.lang.String)
    */
   public boolean supports(String mimeType) {
     // This implementation always returns <code>false</code>, as it is the
@@ -110,7 +110,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
    */
   public Resource<FileContent> newResource(Site site) {
     return new FileResourceImpl(new FileResourceURIImpl(site));
@@ -119,7 +119,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
    *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
    *      ch.entwine.weblounge.common.language.Language)
    */
@@ -144,7 +144,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
    */
   public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
     if (resource != null)
@@ -155,7 +155,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
    *      java.util.List)
    */
   public Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata) {
@@ -184,7 +184,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
    *      double, List)
    */
   public SearchResultItem toSearchResultItem(Site site, double relevance,
@@ -203,15 +203,25 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
 
     // path
     String path = null;
-    if (metadataMap.get(PATH) != null)
-      path = (String) metadataMap.get(PATH).getValues().get(0);
-    else {
+    WebUrl url = null;
+    if (metadataMap.get(PATH) != null) {
+      try {
+        path = (String) metadataMap.get(PATH).getValues().get(0);
+        url = new WebUrlImpl(site, path);
+      } catch (IllegalArgumentException e) {
+        logger.debug("Path {}:/{} for file {} is invalid", new Object[] {
+            site.getIdentifier(),
+            path,
+            id });
+        path = URI_PREFIX + "/" + id;
+        url = new WebUrlImpl(site, path);
+      }
+    } else {
       path = URI_PREFIX + "/" + id;
+      url = new WebUrlImpl(site, path);
     }
 
     ResourceURI uri = new FileResourceURIImpl(site, path, id, version);
-    WebUrl url = new WebUrlImpl(site, path);
-
     FileResourceSearchResultItemImpl result = new FileResourceSearchResultItemImpl(uri, url, relevance, site, metadata);
 
     if (metadataMap.get(XML) != null)
@@ -226,7 +236,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getContentReader()
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getContentReader()
    */
   public ResourceContentReader<FileContent> getContentReader()
       throws ParserConfigurationException, SAXException {
@@ -236,7 +246,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator(Resource)
+   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getPreviewGenerator(Resource)
    */
   public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
     for (FilePreviewGenerator generator : previewGenerators) {

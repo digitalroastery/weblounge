@@ -23,12 +23,12 @@ package ch.entwine.weblounge.taglib.resource;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -99,7 +99,7 @@ public class ResourceTag extends WebloungeTag {
     if (repository == null) {
       logger.debug("Unable to load content repository for site '{}'", site);
       response.invalidate();
-      return SKIP_BODY;
+      throw new JspException();
     }
 
     // Create the resource uri, either from the id or the path. If none is
@@ -110,7 +110,8 @@ public class ResourceTag extends WebloungeTag {
     } else if (StringUtils.isNotBlank(resourcePath)) {
       uri = new GeneralResourceURIImpl(site, resourcePath);
     } else {
-      throw new JspException("Neither uuid nor path were specified for resource");
+      logger.warn("Neither uuid nor path were specified for resource on {}", request.getUrl());
+      return SKIP_BODY;
     }
 
     // Try to load the resource from the content repository
@@ -146,7 +147,7 @@ public class ResourceTag extends WebloungeTag {
       if (resourceContent == null)
         resourceContent = resource.getOriginalContent();
     } catch (ContentRepositoryException e) {
-      logger.warn("Error trying to load resource " + uri + ": " + e.getMessage(), e);
+      logger.warn("Error trying to load resource {}: {}", uri, e.getMessage());
       return SKIP_BODY;
     }
 

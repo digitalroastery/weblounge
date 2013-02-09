@@ -20,8 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener;
+import ch.entwine.weblounge.common.repository.ContentRepositoryOperation;
+import ch.entwine.weblounge.common.repository.ContentRepositoryOperationListener;
 
 /**
  * This listener implementation will, upon successful or failed operation
@@ -33,7 +33,7 @@ public final class NotifyingOperationListener implements ContentRepositoryOperat
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener#executionSucceeded(ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation)
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperationListener#executionSucceeded(ch.entwine.weblounge.common.repository.ContentRepositoryOperation)
    */
   public void executionSucceeded(ContentRepositoryOperation<?> operation) {
     synchronized (this) {
@@ -44,7 +44,7 @@ public final class NotifyingOperationListener implements ContentRepositoryOperat
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepositoryOperationListener#executionFailed(ch.entwine.weblounge.common.content.repository.ContentRepositoryOperation,
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryOperationListener#executionFailed(ch.entwine.weblounge.common.repository.ContentRepositoryOperation,
    *      java.lang.Throwable)
    */
   public void executionFailed(ContentRepositoryOperation<?> operation,

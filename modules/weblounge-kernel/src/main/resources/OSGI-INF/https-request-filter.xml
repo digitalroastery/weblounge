@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Https Request Filter">
+  
+  <implementation class="ch.entwine.weblounge.kernel.http.HttpsRequestFilter" />
+  <property name="contextId" value="weblounge" />
+  <property name="service.description" value="Https Request Filter" />
+  <property name="pattern" value=".*" />
+  <service>
+    <provide interface="javax.servlet.Filter" />
+  </service>
+
+</scr:component>

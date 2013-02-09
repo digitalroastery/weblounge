@@ -20,7 +20,11 @@
 
 package ch.entwine.weblounge.common.impl.util;
 
+import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -36,6 +40,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.w3c.dom.Document;
+import org.w3c.tidy.Tidy;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,7 +57,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * Utility class containing a few helper methods.
  */
 public final class TestUtils {
-  
+
+  /** Name of the property to indicate an ongoing unit or integration test */
+  private static final String TEST_PROPERTY = "weblounge.test";
+
   /**
    * This utility class is not intended to be instantiated.
    */
@@ -127,10 +135,25 @@ public final class TestUtils {
       throws Exception {
     String responseXml = EntityUtils.toString(response.getEntity(), "utf-8");
     responseXml = StringEscapeUtils.unescapeHtml(responseXml);
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    factory.setNamespaceAware(true);
-    DocumentBuilder builder = factory.newDocumentBuilder();
-    return builder.parse(new ByteArrayInputStream(responseXml.getBytes("utf-8")));
+
+    // Depending on whether it's an HTML page, let's make sure we end up with a
+    // valid DOM
+    Header contentTypeHeader = response.getFirstHeader("Content-Type");
+    String contentType = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
+
+    Document doc = null;
+    if ("text/html".equals(contentType)) {
+      Tidy tidy = new Tidy();
+      tidy.setOnlyErrors(true);
+      tidy.setOutputEncoding("utf-8");
+      doc = tidy.parseDOM(IOUtils.toInputStream(responseXml, "utf-8"), null);
+    } else {
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setNamespaceAware(true);
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      doc = builder.parse(new ByteArrayInputStream(responseXml.getBytes("utf-8")));
+    }
+    return doc;
   }
 
   /**
@@ -179,8 +202,13 @@ public final class TestUtils {
     if (params != null) {
       if (request instanceof HttpGet) {
         List<NameValuePair> qparams = new ArrayList<NameValuePair>();
-        for (String[] param : params)
-          qparams.add(new BasicNameValuePair(param[0], param[1]));
+        if (params.length > 0) {
+          for (String[] param : params) {
+            if (param.length < 2)
+              continue;
+            qparams.add(new BasicNameValuePair(param[0], param[1]));
+          }
+        }
         URI requestURI = request.getURI();
         URI uri = URIUtils.createURI(requestURI.getScheme(), requestURI.getHost(), requestURI.getPort(), requestURI.getPath(), URLEncodedUtils.format(qparams, "utf-8"), null);
         HeaderIterator headerIterator = request.headerIterator();
@@ -208,6 +236,26 @@ public final class TestUtils {
       }
     }
     return httpClient.execute(request);
+  }
+
+  /**
+   * Enables testing by setting a system property. This method is used to add
+   * test specific code to production implementations while using a consistent
+   * methodology to determine testing status.
+   * <p>
+   * Use {@link #isTest()} to determine whether testing has been turned on.
+   */
+  public static void startTesting() {
+    System.setProperty(TEST_PROPERTY, Boolean.TRUE.toString());
+  }
+
+  /**
+   * Returns <code>true</code> if a test is currently going on.
+   * 
+   * @return <code>true</code> if the current code is being executed as a test
+   */
+  public static boolean isTest() {
+    return ConfigurationUtils.isTrue(System.getProperty(TEST_PROPERTY));
   }
 
 }

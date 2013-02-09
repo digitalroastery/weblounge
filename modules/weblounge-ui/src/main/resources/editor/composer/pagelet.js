@@ -3,7 +3,8 @@ steal.plugins('jqueryui/dialog',
 		'jqueryui/draggable',
 		'jqueryui/droppable',
 		'jqueryui/resizable',
-		'jqueryui/mouse')
+		'jqueryui/mouse',
+        'scripts/bootstrap')
 .models('../../models/workbench',
 		'../../models/pagelet')
 .resources('trimpath-template')
@@ -82,9 +83,8 @@ steal.plugins('jqueryui/dialog',
     	
 		this.editorDialog = $('#wbl-pageleteditor').html('<form id="wbl-validate" onsubmit="return false;">' + resultDom.html() + '</form>')
 		.dialog({
-			title: 'Pagelet bearbeiten: ' + pageletName,
+			title: pageletName,
 			width: 500,
-			height: 400,
 			modal: true,
 			autoOpen: false,
 			closeOnEscape: false,
@@ -96,7 +96,12 @@ steal.plugins('jqueryui/dialog',
 				},
 				OK: $.proxy(function () {
 					this.editorDialog.find("form#wbl-validate").submit();
-					if(!this.editorDialog.find("form#wbl-validate").valid()) return;
+					if(!this.editorDialog.find("form#wbl-validate").valid()) {
+                        steal.dev.warn("The dialog contains invalid fields!");
+                        // Show error msg and prevent dialog from closing
+                        $('.ui-dialog-buttonpane p.error').removeClass('hidden');
+                        return;
+                    };
 					var newPagelet = this._updatePageletValues(pagelet);
 					
 					// Save New Pagelet and show Renderer
@@ -111,6 +116,8 @@ steal.plugins('jqueryui/dialog',
 				if(isNew == true) {
 					this._deletePagelet();
 				}
+                //remove error msg
+                $('.ui-dialog-buttonpane p.error').remove();
 				this.editorDialog.dialog('destroy');
 			}, this),
 			open: $.proxy(function(event, ui) {
@@ -118,11 +125,35 @@ steal.plugins('jqueryui/dialog',
 					language: this.options.composer.language,
 					runtime: this.options.composer.runtime
 				});
+                // Disable submit button and show error msg if form is not valid
+                $('form#wbl-validate').bind('change keyup', function() {
+                    if($(this).validate().checkForm()) {
+                        $('button.primary').button( "option", "disabled", false);
+                        $('.ui-dialog-buttonpane p.error').addClass('hidden');
+                    } else {
+                        $('button.primary').button( "option", "disabled", true);
+                        $('.ui-dialog-buttonpane p.error').removeClass('hidden');
+                    }
+                });
+                // Disable submit button on load
+                if($('form#wbl-validate').validate().checkForm()) {
+                    $('button.primary').button( "option", "disabled", false);
+                } else {
+                    $('button.primary').button( "option", "disabled", true);
+                }
+
 			}, this),
 			create: function(event, ui) {
 				$("body").css({ overflow: 'hidden' });
+                $('.ui-dialog-buttonpane').append('<p class="error hidden">Invalid fields</p>').find('.ui-button:first').addClass('danger').end().find('.ui-button:last').addClass('primary');
+                $('#tabs a').click(function (e) {
+                    e.preventDefault();
+                    $(this).tab('show');
+                });
+                $('#tabs a:first').tab('show');
 			}
 		});
+        // Open the dialog
 		this.editorDialog.find("form#wbl-validate").validate();
 		
 		if(scripts.length < 1) {
@@ -310,21 +341,26 @@ steal.plugins('jqueryui/dialog',
     
 	'hoverenter': function(el, ev) {
 		if(!this.showHover) return;
-		if(!el.hasClass('wbl-noEditor')) {
-			this.element.append('<img class="wbl-iconEditing" src="' + this.options.composer.runtime.getRootPath() + 
-			'/editor/composer/resources/icon_editing.png" />');
-		}
-		this.element.append('<img class="wbl-iconRemove" src="' + this.options.composer.runtime.getRootPath() + 
-			'/editor/composer/resources/icon_trash.png" />');
+		//if(!el.hasClass('wbl-noEditor')) {
+        //    this.element.prepend('<i class="icon-pencil" title="Edit pagelet"></i>');
+		//}
+        //this.element.prepend('<i class="icon-trash" title="Delete pagelet"></i>');
+        if(!el.hasClass('wbl-noEditor')) {
+            this.element.prepend('<div class="wbl-editing-palet"><i class="icon-trash" title="Delete pagelet"></i><i class="icon-pencil" title="Edit pagelet"></i></div>');
+        } else {
+            this.element.prepend('<div class="wbl-editing-palet"><i class="icon-trash" title="Delete pagelet"></i></div>');
+        }
+
     },
     
 	'hoverleave': function(el, ev) {
 		if(!this.showHover) return;
-		this.element.find('img.wbl-iconEditing').remove();
-		this.element.find('img.wbl-iconRemove').remove();
+        //this.element.closest('.pagelet').find('i.icon-pencil').remove();
+        //this.element.closest('.pagelet').find('i.icon-trash').remove();
+        this.element.closest('.pagelet').find('div.wbl-editing-palet').remove();
     },
 
-	'img.wbl-iconEditing click': function(el, ev) {
+    'i.icon-pencil click': function(el, ev) {
 		Workbench.getPageletEditor({
 			id: this.options.composer.page.value.id, 
 			composer: this.options.composer.id, 
@@ -333,7 +369,7 @@ steal.plugins('jqueryui/dialog',
 		}, this.callback('_openPageEditor'));
 	},
 	
-    'img.wbl-iconRemove click': function(el, ev) {
+    'i.icon-trash click': function(el, ev) {    
     	this._deletePagelet();
     }
 

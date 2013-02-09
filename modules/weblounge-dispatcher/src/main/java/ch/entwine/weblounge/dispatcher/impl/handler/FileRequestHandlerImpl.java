@@ -20,17 +20,18 @@
 
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
-import ch.entwine.weblounge.common.Times;
+import static ch.entwine.weblounge.common.Times.MS_PER_DAY;
+
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.file.FileContent;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.security.User;
@@ -221,8 +222,11 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     }
 
     // Check the modified headers
+    long revalidationTime = MS_PER_DAY;
+    long expirationDate = System.currentTimeMillis() + revalidationTime;
     if (!ResourceUtils.hasChanged(request, fileResource, language)) {
       logger.debug("File {} was not modified", fileURI);
+      response.setDateHeader("Expires", expirationDate);
       DispatchUtils.sendNotModified(request, response);
       return true;
     }
@@ -251,21 +255,24 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     else
       response.setContentType(contentType);
 
+    // Browser caches and proxies are allowed to keep a copy
+    response.setHeader("Cache-Control", "public, max-age=" + revalidationTime);
+
     // Add last modified header
     response.setDateHeader("Last-Modified", ResourceUtils.getModificationDate(fileResource, language).getTime());
-
-    // Add content size
-    response.setHeader("Content-Length", Long.toString(content.getSize()));
 
     // Add ETag header
     String eTag = ResourceUtils.getETagValue(fileResource);
     response.setHeader("ETag", eTag);
 
     // Set the Expires header
-    response.setDateHeader("Expires", System.currentTimeMillis() + Times.MS_PER_HOUR);
+    response.setDateHeader("Expires", expirationDate);
 
     // Add content disposition header
     response.setHeader("Content-Disposition", "inline; filename=" + content.getFilename());
+
+    // Add content size
+    response.setHeader("Content-Length", Long.toString(content.getSize()));
 
     // Write the file back to the response
     InputStream fileContents = null;

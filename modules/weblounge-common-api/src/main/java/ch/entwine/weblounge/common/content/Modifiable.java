@@ -32,6 +32,9 @@ public interface Modifiable {
 
   /**
    * Returns the object's modification date.
+   * <p>
+   * Note that this method may return <code>null</code> if the resource has been
+   * created but has never seen an update since then.
    * 
    * @return the modification date
    */
@@ -39,9 +42,35 @@ public interface Modifiable {
 
   /**
    * Returns the user that last modified the object.
+   * <p>
+   * Note that this method may return <code>null</code> if the resource has been
+   * created but has never seen an update since then.
    * 
    * @return the modifier
    */
   User getModifier();
+
+  /**
+   * Returns the date where the resource has last seen a change in state. This
+   * method is different from {@link #getModificationDate()} in that it will
+   * return the resource's creation date or whatever is reasonable if the
+   * resource has not seen an update yet.
+   * <p>
+   * In short, this method will <b>always</b> return a date and never be null.
+   * 
+   * @return the date of this resource's last modification
+   */
+  Date getLastModified();
+
+  /**
+   * Returns the user that last modified the object. This method is different
+   * from {@link #getModifier()} in that it will return the resource's creator
+   * or whatever is reasonable if the resource has not seen an update yet.
+   * <p>
+   * In short, this method will <b>always</b> return a user and never be null.
+   * 
+   * @return the user that last modified the resource
+   */
+  User getLastModifier();
 
 }

@@ -32,23 +32,26 @@ import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
+import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -81,19 +84,20 @@ public class DocumentVersionTest {
   /** Page template */
   protected PageTemplate template = null;
 
+  /** The resource serializer */
+  private static ResourceSerializerServiceImpl serializer = null;
+
   /**
-   * Sets up everything valid for all test runs.
-   * 
-   * @throws Exception
-   *           if setup fails
+   * Sets up static test data.
    */
   @BeforeClass
-  public static void setUpClass() throws Exception {
-    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
-    ResourceSerializerFactory.setResourceSerializerService(serializerService);
-    serializerService.registerSerializer(new PageSerializer());
-    serializerService.registerSerializer(new FileResourceSerializer());
-    serializerService.registerSerializer(new ImageResourceSerializer());
+  public static void setUpClass() {
+    // Resource serializer
+    serializer = new ResourceSerializerServiceImpl();
+    serializer.addSerializer(new PageSerializer());
+    serializer.addSerializer(new FileResourceSerializer());
+    serializer.addSerializer(new ImageResourceSerializer());
+    serializer.addSerializer(new MovieResourceSerializer());
   }
 
   /**
@@ -103,6 +107,12 @@ public class DocumentVersionTest {
   public void setUp() throws Exception {
     String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
     repositoryRoot = new File(rootPath);
+    FileUtils.deleteQuietly(repositoryRoot);
+
+    // Create the index configuration
+    System.setProperty("weblounge.home", rootPath);
+    TestUtils.startTesting();
+    ElasticSearchUtils.createIndexConfigurationAt(repositoryRoot);
 
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
@@ -127,6 +137,8 @@ public class DocumentVersionTest {
 
     // Connect to the repository
     repository = new FileSystemContentRepository();
+    repository.setSerializer(serializer);
+    repository.setEnvironment(Environment.Production);
     Dictionary<String, Object> repositoryProperties = new Hashtable<String, Object>();
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
     repository.updated(repositoryProperties);
@@ -154,14 +166,21 @@ public class DocumentVersionTest {
    */
   @Test
   public void testWithPreferredVersion() throws Exception {
-    SearchQuery q = null;
     SearchResult result = null;
 
+    // Make sure the homepage doesn't get into our way
+    repository.delete(new PageURIImpl(site, "/"), true);
+
+    SearchQuery workPreferredQuery = new SearchQueryImpl(site).withPreferredVersion(WORK).sortByCreationDate(Order.Ascending);
+    SearchQuery livePreferredQuery = new SearchQueryImpl(site).withPreferredVersion(LIVE).sortByCreationDate(Order.Ascending);
+    SearchQuery workOnlyQuery = new SearchQueryImpl(site).withVersion(WORK).sortByCreationDate(Order.Ascending);
+    SearchQuery liveOnlyQuery = new SearchQueryImpl(site).withVersion(LIVE).sortByCreationDate(Order.Ascending);
+
     // Test empty repository
-    q = new SearchQueryImpl(site).withPreferredVersion(WORK);
-    assertEquals(0, repository.find(q).getHitCount());
-    q = new SearchQueryImpl(site).withPreferredVersion(LIVE);
-    assertEquals(0, repository.find(q).getHitCount());
+    assertEquals(0, repository.find(workPreferredQuery).getDocumentCount());
+    assertEquals(0, repository.find(livePreferredQuery).getDocumentCount());
+    assertEquals(0, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(0, repository.find(liveOnlyQuery).getDocumentCount());
 
     // Create URI and pages and add them to the repository
     ResourceURI liveOnlyURI = new PageURIImpl(site, "/liveonly", LIVE);
@@ -178,77 +197,72 @@ public class DocumentVersionTest {
     Page workOnly = new PageImpl(workOnlyURI);
     workOnly.setTemplate(template.getIdentifier());
 
-    SearchQuery workPreferredQuery = new SearchQueryImpl(site).withPreferredVersion(WORK).sortByCreationDate(Order.Ascending);
-    SearchQuery livePreferredQuery = new SearchQueryImpl(site).withPreferredVersion(LIVE).sortByCreationDate(Order.Ascending);
-    SearchQuery workOnlyQuery = new SearchQueryImpl(site).withVersion(WORK).sortByCreationDate(Order.Ascending);
-    SearchQuery liveOnlyQuery = new SearchQueryImpl(site).withVersion(LIVE).sortByCreationDate(Order.Ascending);
-
     // Add the live only live page
     repository.put(liveOnly);
-    assertEquals(0, repository.find(workOnlyQuery).getHitCount());
-    assertEquals(1, repository.find(liveOnlyQuery).getHitCount());
+    assertEquals(0, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(1, repository.find(liveOnlyQuery).getDocumentCount());
     result = repository.find(workPreferredQuery);
-    assertEquals(1, result.getHitCount());
+    assertEquals(1, result.getDocumentCount());
     ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
     assertEquals(LIVE, searchResultItem.getResourceURI().getVersion());
     result = repository.find(livePreferredQuery);
-    assertEquals(1, result.getHitCount());
+    assertEquals(1, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
 
     // Add the work only work page
     repository.put(workOnly);
-    assertEquals(1, repository.find(workOnlyQuery).getHitCount());
-    assertEquals(1, repository.find(liveOnlyQuery).getHitCount());
+    assertEquals(1, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(1, repository.find(liveOnlyQuery).getDocumentCount());
     result = repository.find(workPreferredQuery);
-    assertEquals(2, result.getHitCount());
+    assertEquals(2, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     result = repository.find(livePreferredQuery);
-    assertEquals(2, result.getHitCount());
+    assertEquals(2, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
 
     // Add the live and work live page
     repository.put(liveAndWorkLive);
-    assertEquals(1, repository.find(workOnlyQuery).getHitCount());
-    assertEquals(2, repository.find(liveOnlyQuery).getHitCount());
+    assertEquals(1, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(2, repository.find(liveOnlyQuery).getDocumentCount());
     result = repository.find(workPreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
     result = repository.find(livePreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
 
     // Add the live and work work page
     repository.put(liveAndWorkWork);
-    assertEquals(2, repository.find(workOnlyQuery).getHitCount());
-    assertEquals(2, repository.find(liveOnlyQuery).getHitCount());
+    assertEquals(2, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(2, repository.find(liveOnlyQuery).getDocumentCount());
     result = repository.find(workPreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
     result = repository.find(livePreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
 
     // Lock the page, which will trigger a call to index.update()
     repository.lock(liveAndWorkWorkURI, new UserImpl("user"));
-    assertEquals(2, repository.find(workOnlyQuery).getHitCount());
-    assertEquals(2, repository.find(liveOnlyQuery).getHitCount());
+    assertEquals(2, repository.find(workOnlyQuery).getDocumentCount());
+    assertEquals(2, repository.find(liveOnlyQuery).getDocumentCount());
     result = repository.find(workPreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());
     result = repository.find(livePreferredQuery);
-    assertEquals(3, result.getHitCount());
+    assertEquals(3, result.getDocumentCount());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[0]).getResourceURI().getVersion());
     assertEquals(WORK, ((ResourceSearchResultItem) result.getItems()[1]).getResourceURI().getVersion());
     assertEquals(LIVE, ((ResourceSearchResultItem) result.getItems()[2]).getResourceURI().getVersion());

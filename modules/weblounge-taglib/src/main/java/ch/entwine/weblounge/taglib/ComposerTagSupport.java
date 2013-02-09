@@ -29,14 +29,14 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Action;
@@ -221,7 +221,7 @@ public class ComposerTagSupport extends WebloungeTag {
       ContentRepositoryUnavailableException {
     writer.println("</div>");
 
-    if (ghostPaglets.length > 0 && RequestUtils.isEditingState(request)) {
+    if (ghostPaglets != null && ghostPaglets.length > 0 && RequestUtils.isEditingState(request)) {
       writer.print("<div id=\"" + id + "-ghost\">");
 
       // Render the ghost pagelets
@@ -367,7 +367,7 @@ public class ComposerTagSupport extends WebloungeTag {
       // If composer is empty and ghost content is enabled, go up the page
       // hierarchy and try to find content for this composer
       Page contentPage = contentProvider;
-      if (inheritFromParent) {
+      if (content.length == 0 && inheritFromParent) {
         String pageUrl = contentPage.getURI().getPath();
         while (ghostContent.length == 0 && pageUrl.length() > 1) {
           if (pageUrl.endsWith("/") && !"/".equals(pageUrl))
@@ -533,13 +533,20 @@ public class ComposerTagSupport extends WebloungeTag {
       attributes.put(key, request.getAttribute(key));
     }
 
+    // Skip loading of data if this is a precompile request
+    if (RequestUtils.isPrecompileRequest(request)) {
+      return SKIP_BODY;
+    }
+
     // Initiate loading the page content
     try {
       loadContent(contentInheritanceEnabled);
     } catch (ContentRepositoryUnavailableException e) {
       logger.warn("Content repository '{}' unavailable while processing jsp", request.getSite().getIdentifier());
+      throw new JspException(e);
     } catch (ContentRepositoryException e) {
       logger.warn("Error accessing content repository '{}': {}", request.getSite().getIdentifier(), e.getMessage());
+      throw new JspException(e);
     }
 
     return EVAL_BODY_INCLUDE;
@@ -739,11 +746,6 @@ public class ComposerTagSupport extends WebloungeTag {
       writer.flush();
 
       response.addTag(CacheTag.Position, Integer.toString(position));
-      response.addTag(CacheTag.Module, pagelet.getModule());
-      response.addTag(CacheTag.Renderer, pagelet.getIdentifier());
-
-      response.setClientRevalidationTime(renderer.getRecheckTime());
-      response.setCacheExpirationTime(renderer.getValidTime());
 
       // Pass control to callback
       int beforePageletResult = beforePagelet(pagelet, position, writer, isGhostContent);
@@ -800,7 +802,7 @@ public class ComposerTagSupport extends WebloungeTag {
 
       } catch (Throwable e) {
         // String params = RequestUtils.getParameters(request);
-        String msg = "Error rendering " + renderer + " on " + url + "'";
+        String msg = "Error rendering '" + renderer + "' on " + site.getIdentifier() + "://" + url;
         String reason = "";
         Throwable o = e.getCause();
         if (o != null) {

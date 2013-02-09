@@ -474,17 +474,6 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#isIndexed()
-   */
-  public boolean isIndexed() {
-    if (!isHeaderLoaded)
-      loadFileHeader();
-    return file.isIndexed();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.file.Page#isLocked()
    */
   public boolean isLocked() {
@@ -557,17 +546,6 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setIdentifier(String identifier) {
     uri.setIdentifier(identifier);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.file.Page#setIndexed(boolean)
-   */
-  public void setIndexed(boolean index) {
-    if (!isHeaderLoaded)
-      loadFileHeader();
-    file.setIndexed(index);
   }
 
   /**
@@ -852,6 +830,22 @@ public class LazyFileResourceImpl implements FileResource {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.Modifiable#getLastModified()
+   */
+  @Override
+  public Date getLastModified() {
+    Date date = getModificationDate();
+    if (date != null)
+      return date;
+    date = getPublishFrom();
+    if (date != null)
+      return date;
+    return getCreationDate();
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.Modifiable#getModifier()
    */
@@ -859,6 +853,22 @@ public class LazyFileResourceImpl implements FileResource {
     if (!isHeaderLoaded)
       loadFileHeader();
     return file.getModifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.Modifiable#getLastModifier()
+   */
+  @Override
+  public User getLastModifier() {
+    User user = getModifier();
+    if (user != null)
+      return user;
+    user = getPublisher();
+    if (user != null)
+      return user;
+    return getCreator();
   }
 
   /**
@@ -1058,7 +1068,9 @@ public class LazyFileResourceImpl implements FileResource {
    * @see ch.entwine.weblounge.common.content.Resource#getContent(ch.entwine.weblounge.common.language.Language)
    */
   public FileContent getContent(Language language) {
-    return null;
+    if (!isBodyLoaded)
+      loadPage();
+    return file.getContent(language);
   }
 
   /**
@@ -1067,7 +1079,20 @@ public class LazyFileResourceImpl implements FileResource {
    * @see ch.entwine.weblounge.common.content.Resource#getOriginalContent()
    */
   public FileContent getOriginalContent() {
-    return null;
+    if (!isBodyLoaded)
+      loadPage();
+    return file.getOriginalContent();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  public void addContent(FileContent content) {
+    if (!isBodyLoaded)
+      loadPage();
+    file.addContent(content);
   }
 
   /**
@@ -1076,7 +1101,9 @@ public class LazyFileResourceImpl implements FileResource {
    * @see ch.entwine.weblounge.common.content.Resource#removeContent(ch.entwine.weblounge.common.language.Language)
    */
   public FileContent removeContent(Language language) {
-    return null;
+    if (!isBodyLoaded)
+      loadPage();
+    return file.removeContent(language);
   }
 
   /**
@@ -1085,7 +1112,9 @@ public class LazyFileResourceImpl implements FileResource {
    * @see ch.entwine.weblounge.common.content.Resource#contents()
    */
   public Set<FileContent> contents() {
-    return null;
+    if (!isBodyLoaded)
+      loadPage();
+    return file.contents();
   }
 
   /**
@@ -1119,15 +1148,6 @@ public class LazyFileResourceImpl implements FileResource {
   @Override
   public String toString() {
     return uri.toString();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
-   */
-  public void addContent(FileContent content) {
-    // TODO Auto-generated method stub
   }
 
 }

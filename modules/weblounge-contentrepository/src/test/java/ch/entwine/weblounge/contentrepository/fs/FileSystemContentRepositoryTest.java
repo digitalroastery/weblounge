@@ -39,9 +39,6 @@ import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ReferentialIntegrityException;
-import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
@@ -56,29 +53,37 @@ import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
+import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
+import ch.entwine.weblounge.common.repository.ResourceSelector;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSelectorImpl;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -96,16 +101,16 @@ import java.util.UUID;
 public class FileSystemContentRepositoryTest {
 
   /** The content repository */
-  protected FileSystemContentRepository repository = null;
+  protected static FileSystemContentRepository repository = null;
 
   /** The repository root directory */
-  protected File repositoryRoot = null;
+  protected static File repositoryRoot = null;
 
   /** The mock site */
-  protected Site site = null;
+  protected static Site site = null;
 
   /** Page template */
-  protected PageTemplate template = null;
+  protected static PageTemplate template = null;
 
   /** UUID of page 1 */
   protected String page1uuid = "4bb19980-8f98-4873-a813-71b6dfab22af";
@@ -185,6 +190,12 @@ public class FileSystemContentRepositoryTest {
   /** Italian */
   protected Language french = LanguageUtils.getLanguage("fr");
 
+  /** The resource serializer */
+  private static ResourceSerializerServiceImpl serializer = null;
+
+  /** Root directory for index configuration and test data */
+  private static File testRoot = null;
+
   /**
    * Sets up everything valid for all test runs.
    * 
@@ -196,21 +207,20 @@ public class FileSystemContentRepositoryTest {
     jpegContentURL = FileSystemContentRepositoryTest.class.getResource(jpegContentPath);
     pngContentURL = FileSystemContentRepositoryTest.class.getResource(pngContentPath);
 
-    // Resource serializers
-    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
-    ResourceSerializerFactory.setResourceSerializerService(serializerService);
-    serializerService.registerSerializer(new PageSerializer());
-    serializerService.registerSerializer(new FileResourceSerializer());
-    serializerService.registerSerializer(new ImageResourceSerializer());
-  }
+    // Resource serializer
+    serializer = new ResourceSerializerServiceImpl();
+    serializer.addSerializer(new PageSerializer());
+    serializer.addSerializer(new FileResourceSerializer());
+    serializer.addSerializer(new ImageResourceSerializer());
+    serializer.addSerializer(new MovieResourceSerializer());
 
-  /**
-   * @throws java.lang.Exception
-   */
-  @Before
-  public void setUp() throws Exception {
-    String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-    repositoryRoot = new File(rootPath);
+    testRoot = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
+    repositoryRoot = new File(testRoot, "repository");
+
+    // Set weblounge.home so that search index can properly be created
+    System.setProperty("weblounge.home", testRoot.getAbsolutePath());
+    TestUtils.startTesting();
+    ElasticSearchUtils.createIndexConfigurationAt(testRoot);
 
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
@@ -235,10 +245,19 @@ public class FileSystemContentRepositoryTest {
 
     // Connect to the repository
     repository = new FileSystemContentRepository();
+    repository.setSerializer(serializer);
+    repository.setEnvironment(Environment.Production);
     Dictionary<String, Object> repositoryProperties = new Hashtable<String, Object>();
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
     repository.updated(repositoryProperties);
     repository.connect(site);
+  }
+
+  /**
+   * @throws java.lang.Exception
+   */
+  @Before
+  public void setUp() throws Exception {
 
     // Setup uris
     page1URI = new PageURIImpl(site, page1path, page1uuid);
@@ -272,31 +291,41 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Does the cleanup after each test.
+   * 
+   * @throws ContentRepositoryException
+   *           if clearing the content repository fails
    */
   @After
-  public void tearDown() {
-    try {
-      repository.disconnect();
-      FileUtils.deleteQuietly(repositoryRoot);
-    } catch (ContentRepositoryException e) {
-      fail("Error disconnecting content repository: " + e.getMessage());
-    }
+  public void tearDown() throws ContentRepositoryException {
+    repository.clear();
+  }
+
+  /**
+   * Does the cleanup after all tests.
+   * 
+   * @throws ContentRepositoryException
+   */
+  @AfterClass
+  public static void tearDownAfterClass() throws ContentRepositoryException {
+    repository.disconnect();
+    FileUtils.deleteQuietly(testRoot);
   }
 
   /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository#index()}
    * .
+   * 
+   * @throws IOException
+   * @throws IllegalStateException
+   * @throws ContentRepositoryException
    */
   @Test
-  public void testIndex() {
-    try {
-      int resources = populateRepository();
-      repository.index();
-      assertEquals(resources, repository.getResourceCount() - 1);
-    } catch (ContentRepositoryException e) {
-      fail("Error while indexing repository");
-    }
+  public void testIndex() throws IllegalStateException, IOException,
+  ContentRepositoryException {
+    int resources = populateRepository();
+    repository.index();
+    assertEquals(resources, repository.getResourceCount() - 1);
   }
 
   /**
@@ -313,27 +342,32 @@ public class FileSystemContentRepositoryTest {
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testDeleteResourceURI() {
+  public void testDeleteResourceURI() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     int resources = populateRepository();
-    try {
-      repository.delete(documentURI);
-      assertNull(repository.get(documentURI));
-      assertEquals(resources - 1, repository.getResourceCount() - 1);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error deleting resource");
-    }
+    repository.delete(documentURI);
+    assertNull(repository.get(documentURI));
+    assertEquals(resources - 1, repository.getResourceCount() - 1);
   }
 
   /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI, boolean)}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testDeleteResourceURIBoolean() {
+  public void testDeleteResourceURIBoolean() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     ResourceURI workURI = new PageURIImpl(site, page1path, page1uuid, WORK);
     Page workPage = new PageImpl(workURI);
     workPage.setTemplate(template.getIdentifier());
@@ -341,25 +375,15 @@ public class FileSystemContentRepositoryTest {
     int revisions = resources;
 
     // Add resources and additional work resource
-    try {
-      repository.put(workPage);
-      revisions++;
-      assertEquals(resources, repository.getResourceCount() - 1);
-      assertEquals(revisions, repository.getVersionCount() - 1);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error adding documents to the repository");
-    }
+    repository.put(workPage);
+    revisions++;
+    assertEquals(resources, repository.getResourceCount() - 1);
+    assertEquals(revisions, repository.getVersionCount() - 1);
 
     // Remove all versions of the page
-    try {
-      repository.delete(workURI, true);
-      assertEquals(resources - 1, repository.getResourceCount() - 1);
-      assertEquals(revisions - 2, repository.getVersionCount() - 1);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error deleting document from the repository");
-    }
+    repository.delete(workURI, true);
+    assertEquals(resources - 1, repository.getResourceCount() - 1);
+    assertEquals(revisions - 2, repository.getVersionCount() - 1);
   }
 
   /**
@@ -458,24 +482,24 @@ public class FileSystemContentRepositoryTest {
 
     // Make sure everything is the way we set it up
     SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(root);
-    assertEquals(1, repository.find(q).getItems().length);
+    assertEquals(1, repository.find(q).getDocumentCount());
     q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPathPrefix(root);
-    assertEquals(pages, repository.find(q).getItems().length);
+    assertEquals(pages, repository.find(q).getDocumentCount());
 
     // Move the resources
     repository.move(rootURI, newRoot, true);
 
     // Make sure everything is gone from /root
     q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(root);
-    assertEquals(0, repository.find(q).getItems().length);
+    assertEquals(0, repository.find(q).getDocumentCount());
     q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPathPrefix(root);
-    assertEquals(0, repository.find(q).getItems().length);
+    assertEquals(0, repository.find(q).getDocumentCount());
 
     // Make sure everything can be found in the new place
     q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(newRoot);
-    assertEquals(1, repository.find(q).getItems().length);
+    assertEquals(1, repository.find(q).getDocumentCount());
     q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPathPrefix(newRoot);
-    assertEquals(pages, repository.find(q).getItems().length);
+    assertEquals(pages, repository.find(q).getDocumentCount());
 
   }
 
@@ -483,31 +507,26 @@ public class FileSystemContentRepositoryTest {
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#put(ch.entwine.weblounge.common.content.Resource)}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testPut() {
+  public void testPut() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     int resources = populateRepository();
     String newId = "4bb19980-8f98-4873-0000-71b6dfab22af";
 
     // Try to add a duplicate resource
-    try {
-      repository.put(file);
-      assertEquals(resources, repository.getResourceCount() - 1);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error moving resource");
-    }
+    repository.put(file);
+    assertEquals(resources, repository.getResourceCount() - 1);
 
     // Try to add a new resource
-    try {
-      file.getURI().setIdentifier(newId);
-      file.getURI().setPath(UrlUtils.concat(file.getURI().getPath(), "2"));
-      repository.put(file);
-      assertEquals(resources + 1, repository.getResourceCount() - 1);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error moving resource");
-    }
+    file.getURI().setIdentifier(newId);
+    file.getURI().setPath(UrlUtils.concat(file.getURI().getPath(), "2"));
+    repository.put(file);
+    assertEquals(resources + 1, repository.getResourceCount() - 1);
 
   }
 
@@ -515,38 +534,33 @@ public class FileSystemContentRepositoryTest {
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#putContent(ch.entwine.weblounge.common.content.ResourceURI, ch.entwine.weblounge.common.content.ResourceContent, java.io.InputStream)}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testPutContent() {
+  public void testPutContent() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     populateRepository();
 
     // Add content items
-    try {
-      Resource<?> r = repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
-      assertEquals(1, repository.get(imageURI).contents().size());
-      assertEquals(jpegFileSize, r.getContent(jpegContent.getLanguage()).getSize());
-      r = repository.putContent(imageURI, pngContent, pngContentURL.openStream());
-      assertEquals(2, repository.get(imageURI).contents().size());
-      assertEquals(pngFileSize, r.getContent(pngContent.getLanguage()).getSize());
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error adding content");
-    }
+    Resource<?> r = repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
+    assertEquals(1, repository.get(imageURI).contents().size());
+    assertEquals(jpegFileSize, r.getContent(jpegContent.getLanguage()).getSize());
+    r = repository.putContent(imageURI, pngContent, pngContentURL.openStream());
+    assertEquals(2, repository.get(imageURI).contents().size());
+    assertEquals(pngFileSize, r.getContent(pngContent.getLanguage()).getSize());
 
     // Try to add content items to non-existing resources
-    try {
-      String newfilename = "newimage.jpeg";
-      String mimetype = "image/png";
-      Language language = jpegContent.getLanguage();
-      ImageContent updatedContent = new ImageContentImpl(newfilename, language, mimetype, 1000, 600);
-      Resource<?> r = repository.putContent(imageURI, updatedContent, pngContentURL.openStream());
-      ResourceContent c = r.getContent(language);
-      assertEquals(pngFileSize, c.getSize());
-      assertEquals(mimetype, c.getMimetype());
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error replacing content");
-    }
+    String newfilename = "newimage.jpeg";
+    String mimetype = "image/png";
+    Language language = jpegContent.getLanguage();
+    ImageContent updatedContent = new ImageContentImpl(newfilename, language, mimetype, 1000, 600);
+    r = repository.putContent(imageURI, updatedContent, pngContentURL.openStream());
+    ResourceContent c = r.getContent(language);
+    assertEquals(pngFileSize, c.getSize());
+    assertEquals(mimetype, c.getMimetype());
 
     // Try to add content items to non-existing resources
     try {
@@ -563,136 +577,138 @@ public class FileSystemContentRepositoryTest {
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#deleteContent(ch.entwine.weblounge.common.content.ResourceURI, ch.entwine.weblounge.common.content.ResourceContent)}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testDeleteContent() {
+  public void testDeleteContent() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     populateRepository();
 
     // Add content items
-    try {
-      repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
-      repository.putContent(imageURI, pngContent, pngContentURL.openStream());
-      assertEquals(2, repository.get(imageURI).contents().size());
+    repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
+    repository.putContent(imageURI, pngContent, pngContentURL.openStream());
+    assertEquals(2, repository.get(imageURI).contents().size());
 
-      // Does not exist
-      assertEquals(0, repository.deleteContent(documentURI, jpegContent).contents().size());
+    // Does not exist
+    assertEquals(0, repository.deleteContent(documentURI, jpegContent).contents().size());
 
-      // Should exist
-      assertEquals(1, repository.deleteContent(imageURI, jpegContent).contents().size());
+    // Should exist
+    assertEquals(1, repository.deleteContent(imageURI, jpegContent).contents().size());
 
-      // Try that again, should not change anything
-      assertEquals(1, repository.deleteContent(imageURI, jpegContent).contents().size());
+    // Try that again, should not change anything
+    assertEquals(1, repository.deleteContent(imageURI, jpegContent).contents().size());
 
-      assertEquals(0, repository.deleteContent(imageURI, pngContent).contents().size());
-      assertEquals(0, repository.get(imageURI).contents().size());
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error deleting content");
-    }
+    assertEquals(0, repository.deleteContent(imageURI, pngContent).contents().size());
+    assertEquals(0, repository.get(imageURI).contents().size());
   }
 
   /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testExists() {
+  public void testExists() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     populateRepository();
 
     // Test for existing resources
-    try {
-      assertTrue(repository.exists(page1URI));
-      assertTrue(repository.exists(documentURI));
-      assertTrue(repository.exists(imageURI));
+    assertTrue(repository.exists(page1URI));
+    assertTrue(repository.exists(documentURI));
+    assertTrue(repository.exists(imageURI));
 
-      documentURI.setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
-      assertFalse(repository.exists(documentURI));
-    } catch (ContentRepositoryException e) {
-      fail("Error checking for resource existence");
-    }
+    documentURI.setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+    assertFalse(repository.exists(documentURI));
 
     // Test for non-existing resources
-    try {
-      documentURI.setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
-      assertFalse(repository.exists(documentURI));
-    } catch (ContentRepositoryException e) {
-      fail("Error checking for resource existence");
-    }
+    documentURI.setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+    assertFalse(repository.exists(documentURI));
   }
 
   /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#find(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testFind() {
+  public void testFind() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     populateRepository();
     SearchQuery q = null;
-    try {
-      q = new SearchQueryImpl(site).withTemplate("default");
-      assertEquals(1, repository.find(q).getDocumentCount());
-      assertEquals(1, repository.find(q).getHitCount());
-    } catch (ContentRepositoryException e) {
-      fail("Error searching");
-    }
+    q = new SearchQueryImpl(site).withTemplate("default");
+    assertEquals(1, repository.find(q).getDocumentCount());
+    assertEquals(1, repository.find(q).getHitCount());
   }
 
   /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testGet() {
+  public void testGet() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     populateRepository();
-    try {
-      Resource<?> r = repository.get(page1URI);
-      assertNotNull(r);
-      assertEquals(page1URI.getIdentifier(), r.getIdentifier());
-      assertNull(repository.get(new PageURIImpl(site, "/abc")));
-      assertNull(repository.get(new PageURIImpl(site, null, "a-b-c-d")));
-      assertNull(repository.get(new PageURIImpl(page1URI, WORK)));
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error trying to get resource");
-    }
-
+    Resource<?> r = repository.get(page1URI);
+    assertNotNull(r);
+    assertEquals(page1URI.getIdentifier(), r.getIdentifier());
+    assertNull(repository.get(new PageURIImpl(site, "/abc")));
+    assertNull(repository.get(new PageURIImpl(site, null, "a-b-c-d")));
+    assertNull(repository.get(new PageURIImpl(page1URI, WORK)));
   }
 
   /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#getContent(ch.entwine.weblounge.common.content.ResourceURI, ch.entwine.weblounge.common.language.Language)}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testGetContent() {
+  public void testGetContent() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     populateRepository();
 
     // Add content items
-    try {
-      repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
-      repository.putContent(imageURI, pngContent, pngContentURL.openStream());
+    repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
+    repository.putContent(imageURI, pngContent, pngContentURL.openStream());
 
-      assertEquals(2, repository.get(imageURI).contents().size());
-      assertNotNull(repository.getContent(imageURI, german));
-      assertNotNull(repository.getContent(imageURI, english));
-      assertNull(repository.getContent(imageURI, french));
-      assertNull(repository.getContent(documentURI, german));
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Error adding content");
-    }
+    assertEquals(2, repository.get(imageURI).contents().size());
+    assertNotNull(repository.getContent(imageURI, german));
+    assertNotNull(repository.getContent(imageURI, english));
+    assertNull(repository.getContent(imageURI, french));
+    assertNull(repository.getContent(documentURI, german));
   }
 
   /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#getVersions(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
+   * 
+   * @throws ContentRepositoryException
+   * @throws IOException
+   * @throws IllegalStateException
    */
   @Test
-  public void testGetVersions() {
+  public void testGetVersions() throws ContentRepositoryException,
+  IllegalStateException, IOException {
     ResourceURI live1URI = new PageURIImpl(site, "/weblounge");
     ResourceURI live2URI = new PageURIImpl(site, "/etc/weblounge");
     ResourceURI work2URI = new PageURIImpl(site, "/etc/weblounge", WORK);
@@ -705,75 +721,76 @@ public class FileSystemContentRepositoryTest {
     page2Live.setTemplate(template.getIdentifier());
     page2Work.setTemplate(template.getIdentifier());
 
-    try {
-      // Add the pages to the index
-      repository.put(page1Live);
-      repository.put(page2Live);
-      repository.put(page2Work);
+    // Add the pages to the index
+    repository.put(page1Live);
+    repository.put(page2Live);
+    repository.put(page2Work);
 
-      // Check the versions
-      assertEquals(1, repository.getVersions(live1URI).length);
-      assertEquals(2, repository.getVersions(live2URI).length);
-      assertEquals(2, repository.getVersions(work2URI).length);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail(t.getMessage());
-    }
+    // Check the versions
+    assertEquals(1, repository.getVersions(live1URI).length);
+    assertEquals(2, repository.getVersions(live2URI).length);
+    assertEquals(2, repository.getVersions(work2URI).length);
   }
 
   /**
    * Test method for {@link SearchQuery#withoutPublication()}.
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testWithoutPublication() {
+  public void testWithoutPublication() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     ResourceURI workURI = new PageURIImpl(site, "/etc/weblounge", WORK);
     Page work = new PageImpl(workURI);
     work.setTemplate(template.getIdentifier());
-    try {
-      repository.put(work);
 
-      SearchQuery q = new SearchQueryImpl(site);
-      q.withoutPublication();
+    repository.put(work);
 
-      SearchResult result = repository.find(q);
-      assertEquals(1, result.getHitCount());
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail(t.getMessage());
-    }
+    SearchQuery q = new SearchQueryImpl(site);
+    q.withoutPublication();
+
+    SearchResult result = repository.find(q);
+    assertEquals(1, result.getDocumentCount());
   }
 
   /**
    * Test method for {@link SearchQuery#withoutModification()}.
+   * 
+   * @throws ContentRepositoryException
+   * @throws IOException
+   * @throws IllegalStateException
    */
   @Test
-  public void testWithoutModification() {
+  public void testWithoutModification() throws ContentRepositoryException,
+  IllegalStateException, IOException {
     FileResource fileResource = new FileResourceImpl(documentURI);
-    try {
-      SearchQuery q = new SearchQueryImpl(site);
-      SearchResult result = repository.find(q);
-      assertEquals(1, result.getHitCount());
 
-      repository.put(fileResource);
+    SearchQuery q = new SearchQueryImpl(site);
+    SearchResult result = repository.find(q);
+    assertEquals(1, result.getDocumentCount());
 
-      q = new SearchQueryImpl(site);
-      q.withoutModification();
+    repository.put(fileResource);
 
-      result = repository.find(q);
-      assertEquals(2, result.getHitCount());
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail(t.getMessage());
-    }
+    q = new SearchQueryImpl(site);
+    q.withoutModification();
+
+    result = repository.find(q);
+    assertEquals(2, result.getDocumentCount());
   }
 
   /**
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#list(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
+   * 
+   * @throws IOException
+   * @throws IllegalStateException
    */
   @Test
-  public void testListResources() throws ContentRepositoryException {
+  public void testListResources() throws ContentRepositoryException,
+  IllegalStateException, IOException {
     ResourceSelector selector = new ResourceSelectorImpl(site);
     Collection<String> uris = new ArrayList<String>();
     for (Resource<?> r : pages) {
@@ -793,9 +810,14 @@ public class FileSystemContentRepositoryTest {
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#getResourceCount()}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
   @Test
-  public void testGetResourceCount() {
+  public void testGetResourceCount() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     int count = populateRepository();
     assertEquals(count, repository.getResourceCount() - 1);
   }
@@ -804,9 +826,13 @@ public class FileSystemContentRepositoryTest {
    * Test method for
    * {@link ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository#getVersionCount()}
    * .
+   * 
+   * @throws IOException
+   * @throws ContentRepositoryException
    */
   @Test
-  public void testGetRevisionCount() {
+  public void testGetRevisionCount() throws ContentRepositoryException,
+  IOException {
     int count = populateRepository();
     assertEquals(count, repository.getVersionCount() - 1);
 
@@ -814,17 +840,12 @@ public class FileSystemContentRepositoryTest {
     Page page2Work = new PageImpl(page1WorkURI);
     page2Work.setTemplate(template.getIdentifier());
 
-    try {
-      repository.put(page2Work);
-      assertEquals(count + 1, repository.getVersionCount() - 1);
-      repository.delete(page1URI, true);
-      assertEquals(count - 1, repository.getVersionCount() - 1);
-      repository.delete(page2URI);
-      assertEquals(count - 2, repository.getVersionCount() - 1);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail(t.getMessage());
-    }
+    repository.put(page2Work);
+    assertEquals(count + 1, repository.getVersionCount() - 1);
+    repository.delete(page1URI, true);
+    assertEquals(count - 1, repository.getVersionCount() - 1);
+    repository.delete(page2URI);
+    assertEquals(count - 2, repository.getVersionCount() - 1);
 
   }
 
@@ -929,48 +950,37 @@ public class FileSystemContentRepositoryTest {
    * added.
    * 
    * @return the number of pages added
+   * @throws IOException
+   * @throws ContentRepositoryException
+   * @throws IllegalStateException
    */
-  protected int populateRepository() {
+  protected int populateRepository() throws IllegalStateException,
+  ContentRepositoryException, IOException {
     int count = 0;
 
     // Add the pages
-    try {
-      for (Page page : pages) {
-        repository.put(page);
-        count++;
-      }
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Adding sample page to the repository failed");
+    for (Page page : pages) {
+      repository.put(page);
+      count++;
     }
 
     // Add the file
-    try {
-      List<ResourceContent> contents = new ArrayList<ResourceContent>();
-      for (ResourceContent content : file.contents()) {
-        contents.add(file.removeContent(content.getLanguage()));
-      }
-      repository.put(file);
-      // TODO: Add resource contents
-      count++;
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Adding sample file to the repository failed");
+    List<ResourceContent> contents = new ArrayList<ResourceContent>();
+    for (ResourceContent content : file.contents()) {
+      contents.add(file.removeContent(content.getLanguage()));
     }
+    repository.put(file);
+    // TODO: Add resource contents
+    count++;
 
     // Add the image
-    try {
-      List<ResourceContent> contents = new ArrayList<ResourceContent>();
-      for (ResourceContent content : jpeg.contents()) {
-        contents.add(jpeg.removeContent(content.getLanguage()));
-      }
-      repository.put(jpeg);
-      // TODO: Add resource contents
-      count++;
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Adding sample image to the repository failed");
+    contents = new ArrayList<ResourceContent>();
+    for (ResourceContent content : jpeg.contents()) {
+      contents.add(jpeg.removeContent(content.getLanguage()));
     }
+    repository.put(jpeg);
+    // TODO: Add resource contents
+    count++;
 
     return count;
   }

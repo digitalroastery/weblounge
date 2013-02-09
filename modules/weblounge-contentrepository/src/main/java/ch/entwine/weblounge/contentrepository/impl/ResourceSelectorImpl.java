@@ -20,8 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ResourceSelector;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;

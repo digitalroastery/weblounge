@@ -88,12 +88,12 @@ public class JAIPreviewGeneratorTest {
     imageURL = JAIPreviewGeneratorTest.class.getResource(imagePath).toURI().toURL();
 
     styles = new ArrayList<ImageStyle>();
-    styles.add(new ImageStyleImpl("box", (int) styleWidth, (int) styleHeight, ImageScalingMode.Box, false));
-    styles.add(new ImageStyleImpl("cover", (int) styleWidth, (int) styleHeight, ImageScalingMode.Cover, false));
-    styles.add(new ImageStyleImpl("fill", (int) styleWidth, (int) styleHeight, ImageScalingMode.Fill, false));
-    styles.add(new ImageStyleImpl("width", (int) styleWidth, (int) styleHeight, ImageScalingMode.Width, false));
-    styles.add(new ImageStyleImpl("height", (int) styleWidth, (int) styleHeight, ImageScalingMode.Height, false));
-    styles.add(new ImageStyleImpl("none", (int) styleWidth, (int) styleHeight, ImageScalingMode.None, false));
+    styles.add(new ImageStyleImpl("box", (int) styleWidth, (int) styleHeight, ImageScalingMode.Box, false, false));
+    styles.add(new ImageStyleImpl("cover", (int) styleWidth, (int) styleHeight, ImageScalingMode.Cover, false, false));
+    styles.add(new ImageStyleImpl("fill", (int) styleWidth, (int) styleHeight, ImageScalingMode.Fill, false, false));
+    styles.add(new ImageStyleImpl("width", (int) styleWidth, (int) styleHeight, ImageScalingMode.Width, false, false));
+    styles.add(new ImageStyleImpl("height", (int) styleWidth, (int) styleHeight, ImageScalingMode.Height, false, false));
+    styles.add(new ImageStyleImpl("none", (int) styleWidth, (int) styleHeight, ImageScalingMode.None, false, false));
 
     // Make sure it's working on headless systems
     System.setProperty("java.awt.headless", "true");

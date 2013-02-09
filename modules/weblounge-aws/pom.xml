@@ -6,7 +6,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.0.7-SNAPSHOT</version>
+    <version>3.1.5-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -58,7 +58,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk</artifactId>
-      <version>1.2.1</version>
+      <version>1.3.14</version>
     </dependency>
 
     <dependency>
@@ -140,6 +140,7 @@
               javax.crypto.spec,
               javax.mail,
               javax.mail.internet,
+              javax.net.ssl, 
               javax.xml.namespace,
               javax.xml.parsers,
               javax.xml.stream,
@@ -154,6 +155,7 @@
               org.apache.http.client.methods,
               org.apache.http.client.utils,
               org.apache.http.conn,
+              org.apache.http.conn.scheme, 
               org.apache.http.entity,
               org.apache.http.impl.client,
               org.apache.http.impl.conn.tsccm,
@@ -162,7 +164,11 @@
               org.codehaus.jackson,
               org.w3c.dom,
               org.xml.sax,
-              org.xml.sax.helpers
+              org.xml.sax.helpers,
+              !org.springframework.*,
+              !org.aspectj.lang.*,
+              !org.codehaus.jackson.*,
+              !org.junit.*
             </Import-Package>
             <Export-Package>
               ch.entwine.weblounge.aws;version=${project.version},

@@ -20,38 +20,43 @@
 
 package ch.entwine.weblounge.contentrepository.index;
 
+import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
+import ch.entwine.weblounge.common.content.SearchQuery.Quantifier;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.index.SearchIndex;
+import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -60,12 +65,12 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -87,10 +92,10 @@ public class SearchIndexTest {
   protected static boolean isReadOnly = false;
 
   /** Page template */
-  protected PageTemplate template = null;
+  protected static PageTemplate template = null;
 
   /** The mock site */
-  protected Site site = null;
+  protected static Site site = null;
 
   /** The sample pages */
   protected Page[] pages = null;
@@ -131,6 +136,9 @@ public class SearchIndexTest {
   /** Element value */
   protected String elementValue = "joyeux";
 
+  /** The resource serializer */
+  private static ResourceSerializerServiceImpl serializer = null;
+
   /**
    * Sets up the solr search index. Since solr sometimes has a hard time
    * shutting down cleanly, it's done only once for all the tests.
@@ -139,9 +147,38 @@ public class SearchIndexTest {
    */
   @BeforeClass
   public static void setupClass() throws Exception {
+    // Template
+    template = EasyMock.createNiceMock(PageTemplate.class);
+    EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
+    EasyMock.expect(template.getStage()).andReturn("non-existing").anyTimes();
+    EasyMock.replay(template);
+
+    Set<Language> languages = new HashSet<Language>();
+    languages.add(LanguageUtils.getLanguage("en"));
+    languages.add(LanguageUtils.getLanguage("de"));
+
+    // Site
+    site = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
+    EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
+    EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
+    EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
+    EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("testsite")).anyTimes();
+    EasyMock.replay(site);
+
+    // Resource serializer
+    serializer = new ResourceSerializerServiceImpl();
+    serializer.addSerializer(new PageSerializer());
+    serializer.addSerializer(new FileResourceSerializer());
+    serializer.addSerializer(new ImageResourceSerializer());
+    serializer.addSerializer(new MovieResourceSerializer());
+
+    // Index
     String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
+    System.setProperty("weblounge.home", rootPath);
     idxRoot = new File(rootPath);
-    idx = new SearchIndex(idxRoot, isReadOnly);
+    ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
+    idx = new SearchIndex(site, serializer, isReadOnly);
   }
 
   /**
@@ -165,31 +202,6 @@ public class SearchIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    // Template
-    template = EasyMock.createNiceMock(PageTemplate.class);
-    EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
-    EasyMock.expect(template.getStage()).andReturn("non-existing").anyTimes();
-    EasyMock.replay(template);
-
-    Set<Language> languages = new HashSet<Language>();
-    languages.add(LanguageUtils.getLanguage("en"));
-    languages.add(LanguageUtils.getLanguage("de"));
-
-    // Site
-    site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
-    EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
-    EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
-    EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
-    EasyMock.replay(site);
-
-    // Resource serializers
-    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
-    ResourceSerializerFactory.setResourceSerializerService(serializerService);
-    serializerService.registerSerializer(new PageSerializer());
-    serializerService.registerSerializer(new FileResourceSerializer());
-    serializerService.registerSerializer(new ImageResourceSerializer());
-
     // Prepare the pages
     PageReader pageReader = new PageReader();
     pages = new Page[2];
@@ -226,7 +238,7 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetIndexVersion() {
+  public void testGetIndexVersion() throws Exception {
     populateIndex();
     assertEquals(VersionedContentRepositoryIndex.INDEX_VERSION, idx.getIndexVersion());
   }
@@ -237,15 +249,10 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithId() {
+  public void testGetWithId() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withIdentifier(uuid1);
-      assertEquals(1, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by uuid");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withIdentifier(uuid1);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -254,15 +261,10 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithPath() {
+  public void testGetWithPath() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(path1);
-      assertEquals(1, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by path");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(path1);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -291,14 +293,9 @@ public class SearchIndexTest {
       idx.add(p);
     }
 
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPathPrefix(path1);
-      q.withLimit(100);
-      assertEquals(21, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by path");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPathPrefix(path1);
+    q.withLimit(100);
+    assertEquals(21, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -307,15 +304,45 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithTemplate() {
+  public void testGetWithPagelet() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withTemplate("default");
-      assertEquals(1, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by template");
-    }
+    Pagelet[] mainPagelets = pages[0].getPagelets("main");
+    Pagelet titlePagelet = new PageletImpl(mainPagelets[0].getModule(), mainPagelets[0].getIdentifier());
+    Pagelet imagePagelet = new PageletImpl(mainPagelets[1].getModule(), mainPagelets[1].getIdentifier());
+
+    // Search for pages containing a pagelet (pages 1 and 2)
+    SearchQuery q = new SearchQueryImpl(site).withPagelet(titlePagelet);
+    assertEquals(2, idx.getByQuery(q).getDocumentCount());
+
+    // Search for pages containing an image pagelet (only page 1)
+    q = new SearchQueryImpl(site).withPagelet(imagePagelet);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+
+    // Search for pages containing the title pagelet in the correct position
+    // (only page 1)
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("main");
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("main").atPosition(0);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).atPosition(0);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+
+    // Search for pages containing the title pagelet in the correct position
+    // (only page 1)
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("test");
+    assertEquals(0, idx.getByQuery(q).getDocumentCount());
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).atPosition(2);
+    assertEquals(0, idx.getByQuery(q).getDocumentCount());
+    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("main").atPosition(1);
+    assertEquals(0, idx.getByQuery(q).getDocumentCount());
+
+    // Find documents with both pagelets on one page
+    q = new SearchQueryImpl(site).withPagelets(All, titlePagelet, imagePagelet);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+
+    // Find documents with both pagelets on one page and in the same composer
+    q = new SearchQueryImpl(site).withPagelets(All, titlePagelet, imagePagelet).inComposer("main");
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -324,15 +351,10 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithText() {
+  public void testGetWithTemplate() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withText("Technik");
-      assertEquals(2, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by text");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withTemplate("default");
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -341,17 +363,10 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithWildcardText() {
+  public void testGetWithText() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withText("Tec", false);
-      assertEquals(2, idx.getByQuery(q).getItems().length);
-      q = new SearchQueryImpl(site).withTypes(Page.TYPE).withText("/a", false);
-      assertEquals(1, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by wildcard text");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext(true, "Technik");
+    assertEquals(2, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -360,18 +375,10 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithAuthor() {
+  public void testGetWithWildcardText() throws Exception {
     populateIndex();
-    try {
-      User amelie = new UserImpl("amelie");
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withAuthor(amelie);
-      SearchResult result = idx.getByQuery(q);
-      assertEquals(pages.length, result.getItems().length);
-      assertEquals(pages.length, result.getHitCount());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by author");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext(true, "Techn");
+    assertEquals(2, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -380,18 +387,13 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithCreator() {
+  public void testGetWithAuthor() throws Exception {
     populateIndex();
-    try {
-      User hans = new UserImpl("hans");
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withCreator(hans);
-      SearchResult result = idx.getByQuery(q);
-      assertEquals(pages.length, result.getItems().length);
-      assertEquals(pages.length, result.getHitCount());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by creator");
-    }
+    User amelie = new UserImpl("amelie");
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withAuthor(amelie);
+    SearchResult result = idx.getByQuery(q);
+    assertEquals(pages.length, result.getDocumentCount());
+    assertEquals(pages.length, result.getDocumentCount());
   }
 
   /**
@@ -400,21 +402,13 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithCreationDate() {
+  public void testGetWithCreator() throws Exception {
     populateIndex();
-    try {
-      Date date = WebloungeDateFormat.parseStatic("2009-01-07T20:05:41Z");
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withCreationDate(date);
-      SearchResult result = idx.getByQuery(q);
-      assertEquals(1, result.getItems().length);
-      assertEquals(1, result.getHitCount());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by creation date");
-    } catch (ParseException e) {
-      e.printStackTrace();
-      fail("Error parsing creation date");
-    }
+    User hans = new UserImpl("hans");
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withCreator(hans);
+    SearchResult result = idx.getByQuery(q);
+    assertEquals(pages.length, result.getDocumentCount());
+    assertEquals(pages.length, result.getDocumentCount());
   }
 
   /**
@@ -423,18 +417,13 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithModifier() {
+  public void testGetWithCreationDate() throws Exception {
     populateIndex();
-    try {
-      User amelie = new UserImpl("amelie");
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withModifier(amelie);
-      SearchResult result = idx.getByQuery(q);
-      assertEquals(pages.length, result.getItems().length);
-      assertEquals(pages.length, result.getHitCount());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by modifier");
-    }
+    Date date = WebloungeDateFormat.parseStatic("2009-01-07T20:05:41Z");
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withCreationDate(date);
+    SearchResult result = idx.getByQuery(q);
+    assertEquals(1, result.getDocumentCount());
+    assertEquals(1, result.getDocumentCount());
   }
 
   /**
@@ -443,21 +432,13 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithModificationDate() {
+  public void testGetWithModifier() throws Exception {
     populateIndex();
-    try {
-      Date date = WebloungeDateFormat.parseStatic("2009-02-18T22:06:40Z");
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withModificationDate(date);
-      SearchResult result = idx.getByQuery(q);
-      assertEquals(1, result.getItems().length);
-      assertEquals(1, result.getHitCount());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by modification date");
-    } catch (ParseException e) {
-      e.printStackTrace();
-      fail("Error parsing modification date");
-    }
+    User amelie = new UserImpl("amelie");
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withModifier(amelie);
+    SearchResult result = idx.getByQuery(q);
+    assertEquals(pages.length, result.getDocumentCount());
+    assertEquals(pages.length, result.getDocumentCount());
   }
 
   /**
@@ -466,17 +447,13 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetSortedByPublicationDate() {
+  public void testGetWithModificationDate() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).sortByPublishingDate(Order.Descending);
-      SearchResult result = idx.getByQuery(q);
-      assertEquals(pages.length, result.getItems().length);
-      assertEquals(pages.length, result.getHitCount());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying ordered by publishing date");
-    }
+    Date date = WebloungeDateFormat.parseStatic("2009-02-18T22:06:40Z");
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withModificationDate(date);
+    SearchResult result = idx.getByQuery(q);
+    assertEquals(1, result.getDocumentCount());
+    assertEquals(1, result.getDocumentCount());
   }
 
   /**
@@ -485,18 +462,12 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithPublisher() {
+  public void testGetSortedByPublicationDate() throws Exception {
     populateIndex();
-    try {
-      User amelie = new UserImpl("amelie");
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPublisher(amelie);
-      SearchResult result = idx.getByQuery(q);
-      assertEquals(1, result.getItems().length);
-      assertEquals(1, result.getHitCount());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by publisher");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).sortByPublishingDate(Order.Descending);
+    SearchResult result = idx.getByQuery(q);
+    assertEquals(pages.length, result.getDocumentCount());
+    assertEquals(pages.length, result.getDocumentCount());
   }
 
   /**
@@ -505,21 +476,13 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithPublishingDate() {
+  public void testGetWithPublisher() throws Exception {
     populateIndex();
-    try {
-      Date date = WebloungeDateFormat.parseStatic("2006-05-05T17:58:21Z");
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPublishingDate(date);
-      SearchResult result = idx.getByQuery(q);
-      assertEquals(1, result.getItems().length);
-      assertEquals(1, result.getHitCount());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by publishing date");
-    } catch (ParseException e) {
-      e.printStackTrace();
-      fail("Error parsing publishing date");
-    }
+    User amelie = new UserImpl("amelie");
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPublisher(amelie);
+    SearchResult result = idx.getByQuery(q);
+    assertEquals(1, result.getDocumentCount());
+    assertEquals(1, result.getDocumentCount());
   }
 
   /**
@@ -528,18 +491,13 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithSubjects() {
+  public void testGetWithPublishingDate() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
-      String[] subjects = new String[] { "Other topic", "Topic a" };
-      for (String subject : subjects)
-        q.withSubject(subject);
-      assertEquals(2, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by subject");
-    }
+    Date date = WebloungeDateFormat.parseStatic("2006-05-05T17:58:21Z");
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPublishingDate(date);
+    SearchResult result = idx.getByQuery(q);
+    assertEquals(1, result.getDocumentCount());
+    assertEquals(1, result.getDocumentCount());
   }
 
   /**
@@ -548,16 +506,13 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithContent() {
+  public void testGetWithSubjects() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
-      q.withElement(elementId, elementValue);
-      assertEquals(2, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by element");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    String[] subjects = new String[] { "Other topic", "Topic a" };
+    for (String subject : subjects)
+      q.withSubject(subject);
+    assertEquals(2, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -566,16 +521,11 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithProperty() {
+  public void testGetWithAllSubjects() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
-      q.withProperty("resourceid", imageid);
-      assertEquals(1, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by property");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    q.withSubjects(Quantifier.All, "Topic a", "This subject");
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -584,16 +534,11 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithFilename() {
+  public void testGetWithContent() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site);
-      q.withFilename(filename);
-      assertEquals(2, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by filename");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    q.withElement(elementId, elementValue);
+    assertEquals(2, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -602,16 +547,37 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testGetWithMimetype() {
+  public void testGetWithProperty() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site);
-      q.withMimetype(mimetype);
-      assertEquals(2, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying by mimetype");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    q.withProperty("resourceid", imageid);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithFilename() throws Exception {
+    populateIndex();
+    SearchQuery q = new SearchQueryImpl(site);
+    q.withFilename(filename);
+    assertEquals(2, idx.getByQuery(q).getDocumentCount());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithMimetype() throws Exception {
+    populateIndex();
+    SearchQuery q = new SearchQueryImpl(site);
+    q.withMimetype(mimetype);
+    assertEquals(2, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -620,24 +586,14 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testClear() {
+  public void testClear() throws Exception {
     populateIndex();
 
-    try {
-      idx.clear();
-    } catch (IOException e) {
-      e.printStackTrace();
-      fail("Clearing the index failed");
-    }
+    idx.clear();
 
     // Run a query and see if we get anything back
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
-      assertEquals(0, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying cleared index");
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    assertEquals(0, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -646,24 +602,15 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testDelete() {
+  public void testDelete() throws Exception {
     populateIndex();
 
     // Delete a page
-    try {
-      idx.delete(pages[0].getURI());
-    } catch (Throwable t) {
-      fail("Error adding page to the search index: " + t.getMessage());
-    }
+    idx.delete(pages[0].getURI());
 
     // Test if we can query for the added document
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
-      assertEquals(pages.length - 1, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying cleared index: " + e.getMessage());
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    assertEquals(pages.length - 1, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -672,15 +619,10 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testAdd() {
+  public void testAdd() throws Exception {
     populateIndex();
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
-      assertEquals(pages.length, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying for added documents: " + e.getMessage());
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    assertEquals(pages.length, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -689,28 +631,18 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testUpdate() {
+  public void testUpdate() throws Exception {
     populateIndex();
     String subject = "testsubject";
     Page page = pages[0];
     page.addSubject(subject);
 
     // Post the update
-    try {
-      idx.update(page);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error updating document in search index");
-    }
+    idx.update(page);
 
     // Check if the index actually reflects the updated data
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withSubject(subject);
-      assertEquals(1, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying for updated document: " + e.getMessage());
-    }
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withSubject(subject);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -719,30 +651,20 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testMove() {
+  public void testMove() throws Exception {
     populateIndex();
     String newPath = "/new/path/test";
 
     // Post the update
-    try {
-      idx.move(pages[0].getURI(), newPath);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error updating document in search index");
-    }
+    idx.move(pages[0].getURI(), newPath);
 
     // Make sure there is a page with the new path
-    try {
-      SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(newPath);
-      assertEquals(1, idx.getByQuery(q).getItems().length);
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(newPath);
+    assertEquals(1, idx.getByQuery(q).getDocumentCount());
 
-      // Make sure the number of pages remains the same
-      q = new SearchQueryImpl(site).withTypes(Page.TYPE);
-      assertEquals(pages.length, idx.getByQuery(q).getItems().length);
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying cleared index: " + e.getMessage());
-    }
+    // Make sure the number of pages remains the same
+    q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    assertEquals(pages.length, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -751,7 +673,8 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  public void testSuggest() {
+  @Ignore
+  public void testSuggest() throws Exception {
     populateIndex();
 
     String subject = "Topic a";
@@ -763,36 +686,21 @@ public class SearchIndexTest {
     String dictionary = "subject";
 
     // Make sure the matching topic is
-    try {
-      List<String> suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
-      assertEquals(1, suggestions.size());
-      // assertEquals(subject, suggestions.first());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying cleared index: " + e.getMessage());
-    }
+    List<String> suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
+    assertEquals(1, suggestions.size());
+    // assertEquals(subject, suggestions.first());
 
     // Prevent case sensitivity
     seed = seed.toLowerCase();
-    try {
-      List<String> suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
-      assertEquals(1, suggestions.size());
-      // assertEquals(subject, suggestions.first());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying cleared index: " + e.getMessage());
-    }
+    suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
+    assertEquals(1, suggestions.size());
+    // assertEquals(subject, suggestions.first());
 
     // Prevent case sensitivity
     seed = "Another";
-    try {
-      List<String> suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
-      assertEquals(2, suggestions.size());
-      // assertEquals(subject, suggestions.first());
-    } catch (ContentRepositoryException e) {
-      e.printStackTrace();
-      fail("Error querying cleared index: " + e.getMessage());
-    }
+    suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
+    assertEquals(2, suggestions.size());
+    // assertEquals(subject, suggestions.first());
   }
 
   /**
@@ -801,37 +709,23 @@ public class SearchIndexTest {
    * 
    * @return the number of pages added
    */
-  protected int populateIndex() {
+  protected int populateIndex() throws Exception {
     int count = 0;
 
     // Add the pages
-    try {
-      for (Page page : pages) {
-        idx.add(page);
-        count++;
-      }
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Adding sample page to the index failed: " + t.getMessage());
+    for (Page page : pages) {
+      idx.add(page);
+      count++;
     }
 
     // Add the file
-    try {
-      idx.add(file);
-      count++;
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Adding sample file to the index failed: " + t.getMessage());
-    }
+    idx.add(file);
+    count++;
 
     // Add the image
-    try {
-      idx.add(image);
-      count++;
-    } catch (Throwable t) {
-      t.printStackTrace();
-      fail("Adding sample image to the index failed: " + t.getMessage());
-    }
+    idx.add(image);
+    count++;
+
     return count;
   }
 

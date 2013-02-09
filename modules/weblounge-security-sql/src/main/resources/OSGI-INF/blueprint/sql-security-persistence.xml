@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0" xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0">
+
+  <bean id="directoryProviderPersistence" class="ch.entwine.weblounge.security.sql.impl.SQLDirectoryProviderPersistenceImpl">
+    <jpa:context property="entityManager" unitname="weblounge.security" />
+    <tx:transaction method="*" value="Required" />
+  </bean>
+
+  <service ref="directoryProviderPersistence" interface="ch.entwine.weblounge.security.sql.SQLDirectoryProviderPersistence" />
+  
+</blueprint>

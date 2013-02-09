@@ -90,13 +90,13 @@ public class PreviewsEndpointTest extends IntegrationTestBase {
   private static final SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
   static {
-    styles.add(new ImageStyleImpl("box", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Box, false));
-    styles.add(new ImageStyleImpl("cover", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Cover, false));
-    styles.add(new ImageStyleImpl("fill", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Fill, false));
-    styles.add(new ImageStyleImpl("width", BOX_WIDTH, -1, ImageScalingMode.Width, false));
-    styles.add(new ImageStyleImpl("height", -1, BOX_HEIGHT, ImageScalingMode.Height, false));
-    styles.add(new ImageStyleImpl("none", -1, -1, ImageScalingMode.None, false));
-    styles.add(new ImageStyleImpl("weblounge-ui-preview", PREVIEW_WIDTH, PREVIEW_HEIGHT, ImageScalingMode.Cover, false));
+    styles.add(new ImageStyleImpl("box", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Box, false, false));
+    styles.add(new ImageStyleImpl("cover", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Cover, false, false));
+    styles.add(new ImageStyleImpl("fill", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Fill, false, false));
+    styles.add(new ImageStyleImpl("width", BOX_WIDTH, -1, ImageScalingMode.Width, false, false));
+    styles.add(new ImageStyleImpl("height", -1, BOX_HEIGHT, ImageScalingMode.Height, false, false));
+    styles.add(new ImageStyleImpl("none", -1, -1, ImageScalingMode.None, false, false));
+    styles.add(new ImageStyleImpl("weblounge-ui-preview", PREVIEW_WIDTH, PREVIEW_HEIGHT, ImageScalingMode.Cover, false, false));
   }
 
   public PreviewsEndpointTest() {

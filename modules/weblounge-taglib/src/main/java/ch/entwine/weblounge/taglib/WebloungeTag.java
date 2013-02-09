@@ -716,7 +716,13 @@ public class WebloungeTag extends BodyTagSupport implements TryCatchFinally {
    * @see javax.servlet.jsp.tagext.TryCatchFinally#doCatch(java.lang.Throwable)
    */
   public void doCatch(Throwable t) throws Throwable {
-    logger.warn("Error executing jsp tag {}", this.getClass().getName(), t);
+    // Don't log errors during tag execution while precompiling
+    if (RequestUtils.isPrecompileRequest(request)) {
+      return;
+    }
+
+    logger.warn("Error executing jsp tag {} on {}", getClass().getName(), request.getUrl());
+    logger.warn(t.getMessage(), t);
   }
 
   /**

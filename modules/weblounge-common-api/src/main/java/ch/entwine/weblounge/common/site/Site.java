@@ -23,14 +23,16 @@ package ch.entwine.weblounge.common.site;
 import ch.entwine.weblounge.common.Customizable;
 import ch.entwine.weblounge.common.content.page.PageLayout;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.RequestListener;
+import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.UserListener;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -393,6 +395,38 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * @return the site default language
    */
   Language getLanguage(String languageId);
+
+  /**
+   * Returns the URL to the security configuration or <code>null</code> if this
+   * site doesn't define its own security rules.
+   * 
+   * @return the security
+   */
+  URL getSecurity();
+
+  /**
+   * Sets the site's security configuration.
+   * 
+   * @param url
+   *          URL pointing to the security configuration
+   */
+  void setSecurity(URL url);
+
+  /**
+   * Returns this type's digest policy, which needs to match with what is
+   * configured in Spring Security.
+   * 
+   * @return the digest type
+   */
+  DigestType getDigestType();
+
+  /**
+   * Sets the digest type.
+   * 
+   * @param digest
+   *          the digest
+   */
+  void setDigestType(DigestType digest);
 
   /**
    * Starts this site.

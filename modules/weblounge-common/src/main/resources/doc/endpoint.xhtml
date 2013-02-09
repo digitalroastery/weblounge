@@ -159,6 +159,15 @@
 		                    rows="${(item.attributes.rows)!'3'}" cols="${(item.attributes.cols)!'80'}">${item.defaultValue!}</textarea>
 		                  <div class="form_field_description">${item.description!}</div>
 		                </td>
+		                <#elseif item.type == "Password">
+		                <td class="form_label">
+		                  <#if item.required><span class="required">*</span>&nbsp;</#if><label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:
+		                </td>
+		                <td>
+		                  <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" 
+		                    type="password" value="${item.defaultValue!}" />
+		                </td>
+		                <td class="form_field_description">${item.description!}</td>
 		                <#elseif item.type == "Boolean">
 		                <td class="form_label">
 		                  <#if item.required><span class="required">*</span>&nbsp;</#if><label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:

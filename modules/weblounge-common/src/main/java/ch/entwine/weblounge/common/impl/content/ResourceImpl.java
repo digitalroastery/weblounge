@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageSecurityContext;
 import ch.entwine.weblounge.common.impl.language.LocalizableContent;
 import ch.entwine.weblounge.common.impl.language.LocalizableObject;
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
@@ -37,7 +38,6 @@ import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Permission;
 import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
-import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -132,6 +132,9 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     this.description = new LocalizableContent<String>(this);
     this.coverage = new LocalizableContent<String>(this);
     this.rights = new LocalizableContent<String>(this);
+
+    this.creationCtx.setCreated(uri.getSite().getAdministrator(), new Date());
+    this.securityCtx.setOwner(uri.getSite().getAdministrator());
   }
 
   /**
@@ -535,6 +538,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @see ch.entwine.weblounge.common.security.Securable#setOwner(ch.entwine.weblounge.common.security.User)
    */
   public void setOwner(User owner) {
+    if (owner == null) {
+      logger.warn("Someone tried to set the owner of '{}' to null", this);
+      return;
+    }
     securityCtx.setOwner(owner);
   }
 
@@ -698,6 +705,13 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    *      java.util.Date)
    */
   public void setCreated(User creator, Date creationDate) {
+    if (creator == null) {
+      logger.warn("Someone tried to set the creator of '{}' to null", this);
+      return;
+    } else if (creationDate == null) {
+      logger.warn("Someone tried to set the creation date of '{}' to null", this);
+      return;
+    }
     creationCtx.setCreated(creator, creationDate);
   }
 
@@ -707,6 +721,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @see ch.entwine.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
    */
   public void setCreationDate(Date date) {
+    if (date == null) {
+      logger.warn("Someone tried to set creation date of '{}' to null", this);
+      return;
+    }
     creationCtx.setCreationDate(date);
   }
 
@@ -725,6 +743,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @see ch.entwine.weblounge.common.content.Creatable#setCreator(ch.entwine.weblounge.common.security.User)
    */
   public void setCreator(User user) {
+    if (user == null) {
+      logger.warn("Someone tried to set creator of '{}' to null", this);
+      return;
+    }
     creationCtx.setCreator(user);
   }
 
@@ -757,11 +779,43 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.Modifiable#getLastModified()
+   */
+  @Override
+  public Date getLastModified() {
+    Date date = getModificationDate();
+    if (date != null)
+      return date;
+    date = getPublishFrom();
+    if (date != null)
+      return date;
+    return getCreationDate();
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.Modifiable#getModifier()
    */
   public User getModifier() {
     return modificationCtx.getModifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.Modifiable#getLastModifier()
+   */
+  @Override
+  public User getLastModifier() {
+    User user = getModifier();
+    if (user != null)
+      return user;
+    user = getPublisher();
+    if (user != null)
+      return user;
+    return getCreator();
   }
 
   /**

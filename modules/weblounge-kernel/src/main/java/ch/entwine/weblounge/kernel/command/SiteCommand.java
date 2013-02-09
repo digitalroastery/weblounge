@@ -26,12 +26,12 @@ import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteURL;
 
@@ -217,11 +217,16 @@ public class SiteCommand {
     }
 
     // Pages and revisions
-    ContentRepository repository = site.getContentRepository();
-    long pages = repository != null ? repository.getResourceCount() : -1;
-    pad("pages", (pages >= 0 ? Long.toString(pages) : "n/a"));
-    long revisions = repository != null ? repository.getVersionCount() : -1;
-    pad("revisions", (revisions >= 0 ? Long.toString(revisions) : "n/a"));
+    try {
+      ContentRepository repository = site.getContentRepository();
+      long pages = repository != null ? repository.getResourceCount() : -1;
+      pad("pages", (pages >= 0 ? Long.toString(pages) : "n/a"));
+      long revisions = repository != null ? repository.getVersionCount() : -1;
+      pad("revisions", (revisions >= 0 ? Long.toString(revisions) : "n/a"));
+    } catch (ContentRepositoryException e) {
+      System.err.println("Error trying to access the content repository");
+      e.printStackTrace(System.err);
+    }
   }
 
   /**
@@ -349,7 +354,7 @@ public class SiteCommand {
     ContentRepository repository = site.getContentRepository();
     SearchQuery query = new SearchQueryImpl(site);
     query.withVersion(Resource.LIVE);
-    query.withText(text.toString());
+    query.withFulltext(text.toString());
 
     // Is it a page?
     Formatter formatter = null;

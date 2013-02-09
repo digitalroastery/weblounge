@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge FOP Endpoint">
+  
+  <implementation class="ch.entwine.weblounge.kernel.fop.FopEndpoint" />
+  <property name="service.description" value="Weblounge FOP Endpoint" />
+  <property name="rest.path" value="fop" />
+  <service>
+    <provide interface="ch.entwine.weblounge.kernel.fop.FopEndpoint" />
+  </service>
+  <reference name="fop" interface="ch.entwine.weblounge.kernel.fop.FopService" cardinality="0..1" policy="dynamic" bind="setFopService" />
+
+</scr:component>

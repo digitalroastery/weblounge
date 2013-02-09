@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -56,8 +57,11 @@ public final class CacheEntry implements Serializable {
   /** The response metadata */
   private CacheableHttpServletResponseHeaders headers = null;
 
-  /** Date where the entry was added to the cache */
-  private long lastModified = 0L;
+  /** Date when the entry was added to the cache */
+  private long creationDate = 0L;
+
+  /** Date where the entry's contents were last modified */
+  private long modificationDate = 0L;
 
   /** Time in ms for the client to revalidate */
   private long clientRevalidationTime = 0L;
@@ -93,9 +97,10 @@ public final class CacheEntry implements Serializable {
     this.key = handle.getKey();
     this.encoding = encoding;
     this.content = content;
-    this.lastModified = handle.getCreationDate();
+    this.creationDate = handle.getCreationDate();
+    this.modificationDate = getTimeWithoutMilliseconds(handle.getModificationDate());
     this.clientRevalidationTime = handle.getClientRevalidationTime();
-    this.eTag = createETag(lastModified);
+    this.eTag = createETag(modificationDate);
     setHeaders(headers);
   }
 
@@ -127,12 +132,21 @@ public final class CacheEntry implements Serializable {
   }
 
   /**
-   * Returns the date where this entry was created.
+   * Returns the date when this entry was created.
    * 
    * @return the creation date
    */
-  public long getLastModified() {
-    return lastModified;
+  public long getCreationDate() {
+    return creationDate;
+  }
+
+  /**
+   * Returns the date when this entry's content was last modified.
+   * 
+   * @return the modification date
+   */
+  public long getModificationDate() {
+    return modificationDate;
   }
 
   /**
@@ -165,16 +179,25 @@ public final class CacheEntry implements Serializable {
    */
   public void setHeaders(CacheableHttpServletResponseHeaders headers) {
     this.headers = headers;
-    if (headers.containsHeader("ETag"))
-      eTag = (String) headers.getHeaders().get("ETag");
+
+    // Overwrite local Last-Modified?
     if (headers.containsHeader("Last-Modified")) {
       DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
       String lastModifiedHeader = (String) headers.getHeaders().get("Last-Modified");
       try {
-        lastModified = df.parse(lastModifiedHeader).getTime();
+        modificationDate = getTimeWithoutMilliseconds(new Date(Math.max(modificationDate, df.parse(lastModifiedHeader).getTime())));
+        logger.trace("Changing modification date to '{}' as provided by response headers", lastModifiedHeader);
+        eTag = createETag(modificationDate);
+        logger.trace("Changing eTag to '{}' as provided by response headers", eTag);
       } catch (ParseException e) {
         logger.error("Unexpected date format for 'Last-Modified' header: {}", lastModifiedHeader);
       }
+    }
+
+    // Overwrite local ETag?
+    if (headers.containsHeader("ETag")) {
+      eTag = (String) headers.getHeaders().get("ETag");
+      logger.trace("Changing eTag to '{}' as provided by response headers", eTag);
     }
   }
 
@@ -219,7 +242,7 @@ public final class CacheEntry implements Serializable {
    * @return <code>true</code> if this entry is older or equally old
    */
   public boolean notModified(long date) {
-    return date >= lastModified;
+    return date >= modificationDate;
   }
 
   /**
@@ -244,6 +267,19 @@ public final class CacheEntry implements Serializable {
    */
   public static String createETag(long value) {
     return "\"WL-" + Long.toHexString(value) + "\"";
+  }
+
+  /**
+   * Strips the milliseconds from the date and returns it.
+   * 
+   * @param date
+   *          the data
+   * @return the date without the milliseconds
+   */
+  private long getTimeWithoutMilliseconds(Date date) {
+    long millis = date.getTime() / 1000;
+    millis *= 1000;
+    return millis;
   }
 
   /**

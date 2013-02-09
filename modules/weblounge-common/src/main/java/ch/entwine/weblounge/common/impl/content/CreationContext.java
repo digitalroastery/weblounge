@@ -28,7 +28,6 @@ import ch.entwine.weblounge.common.security.User;
 import org.w3c.dom.Node;
 
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.xml.xpath.XPath;
@@ -162,10 +161,8 @@ public class CreationContext implements Cloneable {
   private Date cutOffMillis(Date date) {
     if (date == null)
       return null;
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(date);
-    calendar.set(Calendar.MILLISECOND, 0);
-    return calendar.getTime();
+    long time = date.getTime() / 1000L;
+    return new Date(time * 1000L);
   }
 
   /**

@@ -25,13 +25,12 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 
 import org.apache.commons.io.FileUtils;
@@ -108,8 +107,9 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
       if (bundle == null)
         throw new ContentRepositoryException("Unable to locate bundle for site '" + site + "'");
 
-      // Add the bundle contents to the index
-      if (getResourceCount() == 0)
+      // Add the bundle contents to the index if needed
+      File rootDirecotry = getRootDirectory();
+      if (getResourceCount() == 0 || !rootDirecotry.exists() || rootDirecotry.list().length == 0)
         indexBundleContents();
 
       // If there was no homepage as part of the bundle, create it
@@ -145,18 +145,19 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
    * and adding it to the repository index.
    */
   protected void indexBundleContents() throws ContentRepositoryException {
+    logger.info("Indexing bundle content repository {}", this);
 
-    // Are the serializers already up and running?
-    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-    if (serializers == null) {
-      logger.warn("Unable to index {} while no resource serializers are registered", this);
-      return;
+    try {
+      logger.info("Clearing index of bundle content repository {}", this);
+      index.clear();
+    } catch (IOException e) {
+      logger.error("Error indexing bundle content repository: {}", e.getMessage());
     }
 
     // See if there are any resources. If that's the case, then we don't need to
     // do anything. If not, we need to copy everything that's currently in the
     // bundle.
-    for (ResourceSerializer<?, ?> serializer : serializers) {
+    for (ResourceSerializer<?, ?> serializer : getSerializers()) {
       String resourceDirectoryPath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), serializer.getType() + "s");
       File resourceDirectory = new File(resourceDirectoryPath);
       if (resourceDirectory.isDirectory() && resourceDirectory.list().length > 0) {
@@ -257,8 +258,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     List<ResourceURI> resourceURIs = new ArrayList<ResourceURI>();
 
     // For every serializer, try to load the resources
-    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-    for (ResourceSerializer<?, ?> serializer : serializers) {
+    for (ResourceSerializer<?, ?> serializer : getSerializers()) {
       String resourceDirectory = serializer.getType() + "s";
       String resourcePathPrefix = UrlUtils.concat(bundlePathPrefix, resourceDirectory);
       Enumeration<URL> entries = bundle.findEntries(resourcePathPrefix, "*.xml", true);
@@ -301,7 +301,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     if (url == null)
       return null;
     try {
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
+      ResourceSerializer<?, ?> serializer = getSerializerByType(uri.getType());
       if (serializer == null) {
         logger.warn("Unable to read {} {}: no serializer found", uri.getType(), uri);
         return null;

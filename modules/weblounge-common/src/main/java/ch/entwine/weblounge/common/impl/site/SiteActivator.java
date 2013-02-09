@@ -20,40 +20,42 @@
 
 package ch.entwine.weblounge.common.impl.site;
 
-import ch.entwine.weblounge.common.impl.testing.IntegrationTestGroup;
-import ch.entwine.weblounge.common.impl.testing.IntegrationTestParser;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.util.classloader.BundleClassLoader;
 import ch.entwine.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
-import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.xml.ValidationErrorHandler;
+import ch.entwine.weblounge.common.security.SystemDirectory;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.testing.IntegrationTest;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
 import java.net.URL;
+import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 /**
  * The <code>SiteActivator</code> is used to load a site from the enclosing
- * bundle and is meant to be used with the
- * <code>OSGi Declarative Services</code> facility.
+ * bundle and is meant to be used with either the
+ * <code>OSGi Declarative Services</code> or
+ * <code>OSGi Blueprint Services</code> facility.
  * <p>
  * It will scan the bundle resources for a file called <code>site.xml</code>
  * located at <code>site</code> directory relative to the bundle root.
@@ -72,21 +74,136 @@ public class SiteActivator {
   /** The site */
   protected Site site = null;
 
+  /** The bundle context */
+  protected BundleContext bundleContext = null;
+
+  /** The component properties */
+  protected Map<String, String> properties = new HashMap<String, String>();
+
   /**
-   * Callback from the OSGi environment to activate a site. Subclasses should
-   * make sure to call this super implementation as it will assist in correctly
-   * setting up the site.
+   * Callback from the OSGi Blueprint Services to set the bundle context.
+   * <p>
+   * This method should be configured as the <code>bundleContext</code> property
+   * in the <tt>Blueprint Services</tt> section of your bundle using
+   * <code>blueprintBundleContext</code> as the value.
+   * 
+   * @param ctx
+   *          the bundle context
+   */
+  protected void setBundleContext(final BundleContext ctx) {
+    logger.debug("Bundle context reference received");
+    this.bundleContext = ctx;
+  }
+
+  /**
+   * Callback from the OSGi Declarative Services environment to activate a site.
    * <p>
    * This method should be configured in the <tt>Dynamic Services</tt> section
    * of your bundle.
    * 
    * @param context
-   *          the component context
+   *          the OSGi component context
    * @throws Exception
    *           if the site activation fails
    */
-  void activate(final ComponentContext context) throws Exception {
-    BundleContext bundleContext = context.getBundleContext();
+  protected void activate(final ComponentContext context) throws Exception {
+    bundleContext = context.getBundleContext();
+
+    // Extract the component properties
+    this.properties.clear();
+    if (context.getProperties() != null) {
+      Enumeration<?> ke = context.getProperties().keys();
+      while (ke.hasMoreElements()) {
+        Object key = ke.nextElement();
+        properties.put(ke.toString(), context.getProperties().get(key).toString());
+      }
+    }
+
+    // Call the one-in-all activator
+    activate(bundleContext, properties);
+  }
+
+  /**
+   * Callback from the OSGi Declarative Services environment to deactivate a
+   * site.
+   * <p>
+   * This method should be configured in the <tt>Dynamic Services</tt> section
+   * of your bundle.
+   * 
+   * @param context
+   *          the OSGi component context
+   * @throws Exception
+   *           if the site activation fails
+   */
+  protected void deactivate(final ComponentContext context) throws Exception {
+    if (bundleContext == null)
+      throw new IllegalStateException("Bundle context has not been set");
+    deactivate(bundleContext, properties);
+  }
+
+  /**
+   * Callback from the OSGi Blueprint Services environment to activate a site.
+   * <p>
+   * This method should be configured in the <tt>Blueprint Services</tt> section
+   * of your bundle.
+   * 
+   * @param service
+   *          the service object
+   * @param properties
+   *          the component properties
+   * @param throws Exception if component activation fails
+   */
+  protected void activate(Object service, Map<?, ?> properties)
+      throws Exception {
+    if (bundleContext == null)
+      throw new IllegalStateException("Bundle context has not been set");
+
+    // Extract the component properties
+    this.properties.clear();
+    if (properties != null) {
+      for (Map.Entry<?, ?> entry : properties.entrySet()) {
+        this.properties.put(entry.getKey().toString(), entry.getValue().toString());
+      }
+    }
+
+    activate(bundleContext, this.properties);
+  }
+
+  /**
+   * Callback from the OSGi Blueprint Services environment to deactivate a site.
+   * <p>
+   * This method should be configured in the <tt>Blueprint Services</tt> section
+   * of your bundle.
+   * 
+   * @param service
+   *          the service object
+   * @param properties
+   *          the component properties
+   * @param throws Exception if component activation fails
+   */
+  protected void deactivate(Object service, Map<?, ?> properties)
+      throws Exception {
+    if (bundleContext == null)
+      throw new IllegalStateException("Bundle context has not been set");
+    deactivate(bundleContext, this.properties);
+  }
+
+  /**
+   * Callback from the OSGi environment to activate a site.
+   * <p>
+   * Subclasses that are looking to modify the startup behavior of a site are
+   * advised to overwrite {@link #beforeInactivation(Site, BundleContext, Map)}.
+   * 
+   * @param context
+   *          the OSGi bundle context
+   * @param properties
+   *          the component properties
+   * @throws Exception
+   *           if the site activation fails
+   */
+  @SuppressWarnings("unchecked")
+  private void activate(final BundleContext bundleContext,
+      final Map<String, String> properties) throws Exception {
 
     logger.debug("Scanning bundle '{}' for site.xml", bundleContext.getBundle().getSymbolicName());
 
@@ -104,10 +221,10 @@ public class SiteActivator {
     // Load the site
     Enumeration<URL> e = bundleContext.getBundle().findEntries("site", "site.xml", false);
     if (e != null && e.hasMoreElements()) {
-      String bundleName = bundleContext.getBundle().getSymbolicName();
+      final String bundleName = bundleContext.getBundle().getSymbolicName();
       URL siteUrl = e.nextElement();
 
-      logger.info("Loading site from bundle '{}'", bundleName);
+      logger.debug("Parsing site definition from bundle '{}'", bundleName);
 
       // Load and validate the site descriptor
       ValidationErrorHandler errorHandler = new ValidationErrorHandler(siteUrl);
@@ -118,78 +235,98 @@ public class SiteActivator {
         return;
       }
 
-      final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
-      ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
-        public Void call() throws Exception {
-          site = SiteImpl.fromXml(siteXml.getFirstChild());
-          if (site instanceof SiteImpl) {
-            ((SiteImpl) site).activate(context);
+      // Start loading the site in a new thread in order to enable parallel
+      // loading of sites
+      Thread siteLoader = new Thread() {
+        public void run() {
+          final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
+          try {
+            ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
+              public Void call() throws Exception {
+
+                logger.info("Loading site from bundle '{}'", bundleName);
+
+                site = SiteImpl.fromXml(siteXml.getFirstChild());
+
+                // Make sure the system admin account is not shadowed
+                if (site.getAdministrator() != null) {
+                  ServiceReference userDirectoryRef = bundleContext.getServiceReference(SystemDirectory.class.getName());
+                  if (userDirectoryRef != null) {
+                    SystemDirectory systemDirectory = (SystemDirectory) bundleContext.getService(userDirectoryRef);
+                    User siteAdmin = site.getAdministrator();
+                    if (siteAdmin != null) {
+                      logger.debug("Checking site '{}' admin user '{}' for shadowing of system account");
+                      User shadowedUser = systemDirectory.loadUser(siteAdmin.getLogin(), site);
+                      if (shadowedUser != null && SecurityUtils.userHasRole(shadowedUser, SystemRole.SYSTEMADMIN)) {
+                        throw new IllegalStateException("Site '" + site.getIdentifier() + "' administrative account '" + siteAdmin.getLogin() + "' is shadowing the system account");
+                      }
+                    }
+                  } else {
+                    logger.warn("Directory service not found, site '{}' admin user cannot be checked for user shadowing", site.getIdentifier());
+                  }
+                } else {
+                  logger.info("Site '{}' does not specify an administrative account", site.getIdentifier());
+                }
+
+                if (site instanceof SiteImpl) {
+                  beforeActivation(site, bundleContext, properties);
+                  ((SiteImpl) site).activate(bundleContext, properties);
+                  afterActivation(site, bundleContext, properties);
+                }
+
+                // Register the site as a service
+                logger.debug("Registering site '{}' in the service registry", site);
+                Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
+                for (Map.Entry<String, String> entry : properties.entrySet()) {
+                  serviceProperties.put(entry.getKey(), entry.getValue());
+                }
+                siteService = bundleContext.registerService(Site.class.getName(), site, serviceProperties);
+
+                logger.debug("Site '{}' loaded", site);
+
+                return null;
+              }
+            });
+          } catch (Throwable e) {
+            logger.error("Error loading site from bundle '{}': {}", bundleName, e.getMessage());
           }
-          return null;
         }
-      });
+      };
 
-      // Register it as a service
-      logger.debug("Registering site '{}' in the service registry", site);
-      siteService = bundleContext.registerService(Site.class.getName(), site, context.getProperties());
+      siteLoader.start();
 
-      logger.debug("Site '{}' loaded", site);
     } else {
       logger.warn("Site activator was unable to locate site.xml");
     }
-
-    // If integration tests are switched off explicitly, don't even bother
-    String testActivation = (String) context.getProperties().get(OPT_TESTS);
-    int testCount = 0;
-    if (ConfigurationUtils.isDisabled(testActivation)) {
-      logger.info("Integration tests are switched off for site '{}'", site);
-      return;
-    }
-
-    // Find and register site-wide integration tests
-    Enumeration<URL> siteDirectories = bundleContext.getBundle().findEntries("site", "*", false);
-    while (siteDirectories != null && siteDirectories.hasMoreElements()) {
-      URL entry = siteDirectories.nextElement();
-      if (entry.getPath().endsWith("/tests/")) {
-        testCount += loadIntegrationTests(bundleContext, entry.getPath());
-        break;
-      }
-    }
-
-    // Find and register module integration tests
-    Enumeration<URL> modules = bundleContext.getBundle().findEntries("site/modules", "*", false);
-    while (modules != null && modules.hasMoreElements()) {
-      URL module = modules.nextElement();
-      Enumeration<URL> moduleDirectories = bundleContext.getBundle().findEntries(module.getPath(), "*", false);
-      while (moduleDirectories != null && moduleDirectories.hasMoreElements()) {
-        URL entry = moduleDirectories.nextElement();
-        if (entry.getPath().endsWith("/tests/")) {
-          testCount += loadIntegrationTests(bundleContext, entry.getPath());
-          break;
-        }
-      }
-    }
-
-    if (testCount > 0)
-      logger.info("Registered {} integration tests for site '{}'", testCount, site);
   }
 
   /**
-   * Callback from the OSGi environment to deactivate a site. Subclasses should
-   * make sure to call this super implementation as it will assist in correctly
-   * shutting down the site.
+   * Callback from the OSGi environment to deactivate a site.
    * <p>
-   * This method should be configured in the <tt>Dynamic Services</tt> section
-   * of your bundle.
+   * Subclasses that are looking to modify the shutdown behavior of a site are
+   * advised to overwrite {@link #beforeInactivation(Site, BundleContext, Map)}.
    * 
    * @param context
-   *          the component context
+   *          the OSGi bundle context
+   * @param properties
+   *          the component properties
    * @throws Exception
-   *           if the site deactivation fails
+   *           if the site inactivation fails
    */
-  void deactivate(ComponentContext context) throws Exception {
+  private void deactivate(BundleContext bundleContext,
+      Map<String, String> properties) throws Exception {
     if (site != null && site instanceof SiteImpl) {
-      ((SiteImpl) site).deactivate(context);
+      try {
+        beforeInactivation(site, bundleContext, properties);
+      } catch (Throwable t) {
+        logger.error("Error during site activator cleanup: {}", t.getMessage(), t);
+      }
+      ((SiteImpl) site).deactivate(bundleContext, properties);
+      try {
+        afterInactivation(site, bundleContext, properties);
+      } catch (Throwable t) {
+        logger.error("Error during site activator cleanup: {}", t.getMessage(), t);
+      }
     }
 
     if (siteService != null) {
@@ -204,45 +341,81 @@ public class SiteActivator {
   }
 
   /**
-   * Loads and registers the integration tests that are found in the bundle at
-   * the given location.
+   * This method is called right before the site is initialized and registered
+   * in the OSGi service registry.
+   * <p>
+   * Subclasses that need to do additional initialization work should override
+   * this method.
    * 
-   * @param bundleContext
-   *          the bundle context
-   * @param dir
-   *          the directory containing the test files
+   * @param site
+   *          the site
+   * @param context
+   *          the OSGi bundle context
+   * @param properties
+   *          the component properties
+   * @throws Exception
+   *           if initialization fails
    */
-  int loadIntegrationTests(BundleContext bundleContext, String dir) {
-    Enumeration<?> entries = bundleContext.getBundle().findEntries(dir, "*.xml", true);
+  protected void beforeActivation(Site site, BundleContext context,
+      Map<String, String> properties) throws Exception {
+  }
 
-    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder docBuilder = null;
-    try {
-      docBuilder = docBuilderFactory.newDocumentBuilder();
-    } catch (ParserConfigurationException e) {
-      throw new IllegalStateException(e);
-    }
+  /**
+   * This method is called after the site has been successfully initialized and
+   * before it is registered in the OSGi service registry.
+   * <p>
+   * Subclasses that need to do additional initialization work should override
+   * this method.
+   * 
+   * @param site
+   *          the site
+   * @param context
+   *          the OSGi bundle context
+   * @param properties
+   *          the component properties
+   * @throws Exception
+   *           if initialization fails
+   */
+  protected void afterActivation(Site site, BundleContext context,
+      Map<String, String> properties) throws Exception {
+  }
 
-    int testCount = 0;
-    while (entries != null && entries.hasMoreElements()) {
-      URL entry = (URL) entries.nextElement();
-      Node doc = null;
-      try {
-        doc = docBuilder.parse(entry.openStream());
-        IntegrationTestGroup test = IntegrationTestParser.fromXml(doc);
-        test.setSite(site);
-        test.setGroup(site.getName());
-        logger.debug("Registering integration test " + test.getClass());
-        bundleContext.registerService(IntegrationTest.class.getName(), test, null);
-        testCount++;
-      } catch (SAXException e) {
-        throw new IllegalStateException(e);
-      } catch (IOException e) {
-        throw new IllegalStateException(e);
-      }
-    }
+  /**
+   * This method is called right before the site will be deactivated and pulled
+   * from the OSGi the service registry.
+   * <p>
+   * Subclasses that need to do cleanup work should override this method.
+   * 
+   * @param site
+   *          the site
+   * @param context
+   *          the OSGi bundle context
+   * @param properties
+   *          the component properties
+   * @throws Exception
+   *           if cleanup fails
+   */
+  protected void beforeInactivation(Site site, BundleContext context,
+      Map<String, String> properties) {
+  }
 
-    return testCount;
+  /**
+   * This method is called right after the site has been deactivated and pulled
+   * from the OSGi the service registry.
+   * <p>
+   * Subclasses that need to do cleanup work should override this method.
+   * 
+   * @param site
+   *          the site
+   * @param context
+   *          the OSGi bundle context
+   * @param properties
+   *          the component properties
+   * @throws Exception
+   *           if cleanup fails
+   */
+  protected void afterInactivation(Site site, BundleContext context,
+      Map<String, String> properties) {
   }
 
 }

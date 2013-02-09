@@ -21,8 +21,13 @@
 package ch.entwine.weblounge.taglib.security;
 
 import ch.entwine.weblounge.common.impl.security.Guest;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
+import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.taglib.WebloungeTag;
+
+import java.util.Set;
 
 import javax.servlet.jsp.JspException;
 
@@ -42,8 +47,17 @@ public class IfNotAuthenticatedTag extends WebloungeTag {
   public int doStartTag() throws JspException {
     super.doStartTag();
     User user = getRequest().getUser();
-    if (!(user instanceof Guest))
+
+    // If the user object is Guest, no more questions will be asked
+    if (user instanceof Guest)
       return SKIP_BODY;
+
+    // If the user has more than one role, or that one role is not
+    // SystemRole.Guest, we are on the safe side
+    Set<Object> roles = user.getPublicCredentials(Role.class);
+    if (roles.size() > 1 || !SecurityUtils.userHasRole(user, SystemRole.GUEST))
+      return SKIP_BODY;
+
     return EVAL_BODY_INCLUDE;
   }
 

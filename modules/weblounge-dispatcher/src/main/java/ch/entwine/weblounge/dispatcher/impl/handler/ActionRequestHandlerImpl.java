@@ -27,8 +27,6 @@ import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.HTMLInclude;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagSet;
@@ -37,6 +35,8 @@ import ch.entwine.weblounge.common.impl.request.Http11Utils;
 import ch.entwine.weblounge.common.impl.site.ActionPool;
 import ch.entwine.weblounge.common.impl.url.UrlMatcherImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.ResponseCache;
@@ -90,79 +90,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   public ActionRequestHandlerImpl() {
     actions = new HashMap<UrlMatcher, ActionPool>();
     urlCache = new HashMap<String, ActionPool>();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.dispatcher.ActionRequestHandler#register(ch.entwine.weblounge.common.site.Action)
-   */
-  public void register(Action action) {
-    if (action == null)
-      throw new IllegalArgumentException("Action configuration cannot be null");
-
-    // Create a url matcher
-    UrlMatcher matcher = new UrlMatcherImpl(action);
-    ActionPool pool = new ActionPool(action);
-    StringBuffer registration = new StringBuffer(new WebUrlImpl(action.getSite(), action.getPath()).normalize());
-
-    // Register the action
-    synchronized (actions) {
-      actions.put(matcher, pool);
-    }
-
-    // Cache the action urls
-    StringBuffer flavors = new StringBuffer();
-    synchronized (urlCache) {
-      for (RequestFlavor flavor : action.getFlavors()) {
-        WebUrl actionUrl = new WebUrlImpl(action.getSite(), action.getPath(), Resource.LIVE, flavor);
-        String normalizedUrl = actionUrl.normalize(false, false, true);
-        urlCache.put(normalizedUrl, pool);
-        if (flavors.length() > 0)
-          flavors.append(",");
-        flavors.append(flavor.toString().toLowerCase());
-        logger.trace("Caching action '{}' for url {}", action, normalizedUrl);
-      }
-    }
-
-    logger.debug("Action '{}' ({}) registered for site://{}", new Object[] {
-        action,
-        flavors.toString(),
-        registration.toString() });
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.dispatcher.ActionRequestHandler#unregister(ch.entwine.weblounge.common.site.Action)
-   */
-  public boolean unregister(Action action) {
-    ActionPool pool = null;
-
-    // Remove the pool from the actions registry
-    synchronized (actions) {
-      UrlMatcher matcher = new UrlMatcherImpl(action);
-      pool = actions.remove(matcher);
-      if (pool == null) {
-        logger.warn("Tried to unregister unknown action '{}'", action);
-        return false;
-      }
-    }
-
-    // Remove entries from the url cache
-    synchronized (urlCache) {
-      Iterator<Entry<String, ActionPool>> cacheIterator = urlCache.entrySet().iterator();
-      while (cacheIterator.hasNext()) {
-        ActionPool candidate = cacheIterator.next().getValue();
-        if (candidate.equals(pool)) {
-          logger.trace("Removing '{}' from action url cache", action);
-          cacheIterator.remove();
-        }
-      }
-    }
-
-    logger.debug("Unregistering action '{}' from {}", action, new WebUrlImpl(action.getSite(), action.getPath()).normalize());
-    return true;
   }
 
   /**
@@ -224,14 +151,14 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       // Check if the page is already part of the cache. If so, our task is
       // already done!
       if (!noCache && request.getVersion() == Resource.LIVE) {
-        long validTime = action.getValidTime();
-        long recheckTime = action.getRecheckTime();
+        long expirationTime = action.getCacheExpirationTime();
+        long revalidationTime = action.getClientRevalidationTime();
 
         // Create the set of tags that identify the request output
         CacheTagSet cacheTags = createCacheTags(request, action);
 
         // Check if the page is already part of the cache
-        if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
+        if (response.startResponse(cacheTags.getTags(), expirationTime, revalidationTime)) {
           logger.debug("Action answered request for {} from cache", request.getUrl());
           return true;
         }
@@ -271,10 +198,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
             serveXML(action, request, response);
           else if (action.supportsFlavor(RequestFlavor.JSON) || action instanceof JSONAction)
             serveJSON(action, request, response);
-          else {
-            logger.warn("Unable to serve {}: flavor mismatch");
-            DispatchUtils.sendError(HttpServletResponse.SC_NOT_FOUND, request, response);
-          }
+          else
+            serveGeneric(action, request, response);
       }
 
     } finally {
@@ -361,9 +286,17 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         ((HTMLAction) action).setTemplate(template);
       }
 
-      // Have the action validate the request
+      // Set an appropriate content type
       response.setContentType("text/html");
+      
+      // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.HTML);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
 
       // Store values that may have been updated by the action during
       // configure()
@@ -400,7 +333,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     } catch (IOException e) {
       logger.error("Error writing action output to client: {}", e.getMessage());
     } catch (ActionException e) {
-      logger.error("Error processing action '{}' for {}: {}", new Object[] {
+      logger.warn("Error processing action '{}' for {}: {}", new Object[] {
           action,
           request.getUrl(),
           e.getMessage() });
@@ -428,8 +361,20 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   private void serveXML(Action action, WebloungeRequest request,
       WebloungeResponse response) {
     try {
+      
+      // Set an appropriate content type
       response.setContentType("text/xml");
+      
+      // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.XML);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
+
+      // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         if (action instanceof XMLAction) {
           ((XMLAction) action).startXML(request, response);
@@ -453,7 +398,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   }
 
   /**
-   * This method has the action serve the <code>XML</code> flavor.
+   * This method has the action serve the <code>JSON</code> flavor.
    * 
    * @param action
    *          the action
@@ -465,13 +410,67 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   private void serveJSON(Action action, WebloungeRequest request,
       WebloungeResponse response) {
     try {
+
+      // Set an appropriate content type
       response.setContentType("text/json");
+      
+      // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.JSON);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
+
+      // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         if (action instanceof JSONAction) {
           ((JSONAction) action).startJSON(request, response);
         }
       }
+    } catch (EOFException e) {
+      logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
+    } catch (IOException e) {
+      logger.debug("Error writing action output to client: {}", e.getMessage());
+    } catch (ActionException e) {
+      logger.error("Error processing action '{}' for {}: {}", new Object[] {
+          action,
+          request.getUrl(),
+          e.getMessage() });
+      DispatchUtils.sendError(e.getStatusCode(), request, response);
+    } catch (Throwable e) {
+      logger.error("Error processing action '{}' for {}", action, request.getUrl());
+      logger.error(e.getMessage(), e);
+      DispatchUtils.sendInternalError(request, response);
+    }
+  }
+
+  /**
+   * This method will call
+   * {@link Action#configure(WebloungeRequest, WebloungeResponse, RequestFlavor)}
+   * , then {@link Action#startResponse(WebloungeRequest, WebloungeResponse)}
+   * and be done with it.
+   * 
+   * @param action
+   *          the action
+   * @param request
+   *          the http request
+   * @param response
+   *          the http response
+   */
+  private void serveGeneric(Action action, WebloungeRequest request,
+      WebloungeResponse response) {
+    try {
+      action.configure(request, response, RequestFlavor.ANY);
+      
+      // See if the action cares about the response's modification date. If not,
+      // we do, even though we don't know exactly. response.getModificationDate()
+      // will return either the date that has been set or the current date, both
+      // of which is fine with us.
+      response.setModificationDate(response.getModificationDate());
+
+      action.startResponse(request, response);
     } catch (EOFException e) {
       logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
     } catch (IOException e) {
@@ -579,7 +578,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     if (template == null && page != null) {
       template = site.getTemplate(page.getTemplate());
       if (template == null)
-        throw new IllegalStateException("Page template '" + templateId + "' for page '" + page + "' was not found");
+        throw new IllegalStateException("Page template '" + page.getTemplate() + "' for page '" + page + "' was not found");
     }
 
     // Did we end up finding a template?
@@ -722,6 +721,79 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     // TODO: Instantiate the action
 
     return actionPool;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.dispatcher.ActionRequestHandler#register(ch.entwine.weblounge.common.site.Action)
+   */
+  public void register(Action action) {
+    if (action == null)
+      throw new IllegalArgumentException("Action configuration cannot be null");
+
+    // Create a url matcher
+    UrlMatcher matcher = new UrlMatcherImpl(action);
+    ActionPool pool = new ActionPool(action);
+    StringBuffer registration = new StringBuffer(new WebUrlImpl(action.getSite(), action.getPath()).normalize());
+
+    // Register the action
+    synchronized (actions) {
+      actions.put(matcher, pool);
+    }
+
+    // Cache the action urls
+    StringBuffer flavors = new StringBuffer();
+    synchronized (urlCache) {
+      for (RequestFlavor flavor : action.getFlavors()) {
+        WebUrl actionUrl = new WebUrlImpl(action.getSite(), action.getPath(), Resource.LIVE, flavor);
+        String normalizedUrl = actionUrl.normalize(false, false, true);
+        urlCache.put(normalizedUrl, pool);
+        if (flavors.length() > 0)
+          flavors.append(",");
+        flavors.append(flavor.toString().toLowerCase());
+        logger.trace("Caching action '{}' for url {}", action, normalizedUrl);
+      }
+    }
+
+    logger.debug("Action '{}' ({}) registered for site://{}", new Object[] {
+        action,
+        flavors.toString(),
+        registration.toString() });
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.dispatcher.ActionRequestHandler#unregister(ch.entwine.weblounge.common.site.Action)
+   */
+  public boolean unregister(Action action) {
+    ActionPool pool = null;
+
+    // Remove the pool from the actions registry
+    synchronized (actions) {
+      UrlMatcher matcher = new UrlMatcherImpl(action);
+      pool = actions.remove(matcher);
+      if (pool == null) {
+        logger.warn("Tried to unregister unknown action '{}'", action);
+        return false;
+      }
+    }
+
+    // Remove entries from the url cache
+    synchronized (urlCache) {
+      Iterator<Entry<String, ActionPool>> cacheIterator = urlCache.entrySet().iterator();
+      while (cacheIterator.hasNext()) {
+        ActionPool candidate = cacheIterator.next().getValue();
+        if (candidate.equals(pool)) {
+          logger.trace("Removing '{}' from action url cache", action);
+          cacheIterator.remove();
+        }
+      }
+    }
+
+    logger.debug("Unregistering action '{}' from {}", action, new WebUrlImpl(action.getSite(), action.getPath()).normalize());
+    return true;
   }
 
   /**

@@ -1,7 +1,5 @@
-steal.plugins(
-'jquery/view/tmpl', 
-'editor/app')
-.css('editor', 'css/jquery-ui', 'css/token-input-facebook', 'css/token-input', 'css/validation', 'css/player/mediaelementplayer')
+steal.plugins('jquery/view/tmpl', 'editor/app')
+.css('editor', 'css/bootstrap', 'css/font-awesome.min', 'css/jquery-ui', 'css/token-input-facebook', 'css/token-input', 'css/validation', 'css/player/mediaelementplayer')
 .resources('jquery.validate.min', 'jquery.cookie', 'jquery.ba-bbq.min', 'jquery.tools.min', 'mediaelement-and-player.min')
 .then(function($) {
 

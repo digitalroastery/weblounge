@@ -24,10 +24,12 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSelector;
+import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 
 import java.io.IOException;
@@ -47,7 +49,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#connect(ch.entwine.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#connect(ch.entwine.weblounge.common.site.Site)
    */
   public void connect(Site site) throws ContentRepositoryException {
   }
@@ -63,7 +65,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getType()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getType()
    */
   public String getType() {
     return null;
@@ -72,7 +74,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#isReadOnly()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#isReadOnly()
    */
   public boolean isReadOnly() {
     return false;
@@ -81,7 +83,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#isIndexing()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#isIndexing()
    */
   public boolean isIndexing() {
     return false;
@@ -99,7 +101,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#existsInAnyVersion(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#existsInAnyVersion(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public boolean existsInAnyVersion(ResourceURI uri)
       throws ContentRepositoryException {
@@ -109,7 +111,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getResourceURI(java.lang.String)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getResourceURI(java.lang.String)
    */
   public ResourceURI getResourceURI(String resourceId)
       throws ContentRepositoryException {
@@ -128,7 +130,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#suggest(java.lang.String,
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#suggest(java.lang.String,
    *      java.lang.String, int)
    */
   public List<String> suggest(String dictionary, String seed, int count)
@@ -139,7 +141,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @Override
   public <R extends Resource<?>> R get(ResourceURI uri)
@@ -150,7 +152,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getContent(ch.entwine.weblounge.common.content.ResourceURI,
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getContent(ch.entwine.weblounge.common.content.ResourceURI,
    *      ch.entwine.weblounge.common.language.Language)
    */
   public InputStream getContent(ResourceURI uri, Language language)
@@ -171,7 +173,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#list(ch.entwine.weblounge.common.content.repository.ResourceSelector)
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#list(ch.entwine.weblounge.common.repository.ResourceSelector)
    */
   @Override
   public Collection<ResourceURI> list(ResourceSelector selector)
@@ -182,7 +184,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getResourceCount()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getResourceCount()
    */
   public long getResourceCount() {
     return 0;
@@ -191,7 +193,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#getVersionCount()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#getVersionCount()
    */
   public long getVersionCount() {
     return 0;
@@ -200,11 +202,28 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.repository.ContentRepository#createPreviews()
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#createPreviews()
    */
-  @Override
   public void createPreviews() throws ContentRepositoryException {
     return;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#setEnvironment(ch.entwine.weblounge.common.site.Environment)
+   */
+  public void setEnvironment(Environment environment) {
+    // Nothing to do
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepository#setSerializer(ch.entwine.weblounge.common.repository.ResourceSerializerService)
+   */
+  public void setSerializer(ResourceSerializerService serializer) {
+    // Nothing to do
   }
 
 }

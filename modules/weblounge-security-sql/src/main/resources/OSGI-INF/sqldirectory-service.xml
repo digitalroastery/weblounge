@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  activate="activate"
+  name="Weblounge SQL Directory Provider">
+  
+  <implementation class="ch.entwine.weblounge.security.sql.impl.SQLDirectoryProviderImpl" />
+  <property name="service.description" value="Weblounge SQL Directory Provider" />
+  <service>
+    <provide interface="ch.entwine.weblounge.common.security.DirectoryProvider" />
+    <provide interface="ch.entwine.weblounge.security.sql.SQLDirectoryProvider" />
+  </service>
+
+  <reference name="persistence" interface="ch.entwine.weblounge.security.sql.SQLDirectoryProviderPersistence" cardinality="1..1" policy="static" bind="setPersistence" />
+
+</scr:component>

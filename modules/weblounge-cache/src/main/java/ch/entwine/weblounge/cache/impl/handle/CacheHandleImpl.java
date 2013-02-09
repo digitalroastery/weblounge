@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -48,11 +49,14 @@ public class CacheHandleImpl implements CacheHandle {
   /** Date where the handle was created */
   private long creationDate = System.currentTimeMillis();
 
+  /** Date where the content associated with this handle was last modified */
+  private Date modificationDate = new Date(0);
+
   /** The expiration time of the cached object. */
-  protected long expires;
+  protected long expirationTime = Times.MS_PER_SECOND;
 
   /** The recheck time of the cached object */
-  protected long revalidate;
+  protected long revalidationTime = Times.MS_PER_SECOND;
 
   /** the set of cache tags */
   protected CacheTagSet tags = new CacheTagSet();
@@ -62,13 +66,13 @@ public class CacheHandleImpl implements CacheHandle {
    * 
    * @param key
    *          the key into the cache
-   * @param expires
+   * @param expirationTime
    *          the relative expiration time of the cached object
-   * @param recheck
+   * @param revalidationTime
    *          the time the cached element has to be checked for modifications.
    */
-  public CacheHandleImpl(String key, long expires, long recheck) {
-    this(expires, recheck);
+  public CacheHandleImpl(String key, long expirationTime, long revalidationTime) {
+    this(expirationTime, revalidationTime);
     if (StringUtils.isBlank(key))
       throw new IllegalArgumentException("Key cannot be null");
     this.key = key;
@@ -78,14 +82,14 @@ public class CacheHandleImpl implements CacheHandle {
    * Creates a new CacheHandle that expires at the given time. Make sure to set
    * the key as soon as possible.
    * 
-   * @param expires
+   * @param expirationTime
    *          the relative expiration time of the cached object
-   * @param recheck
+   * @param revalidationTime
    *          the time the cached element has to be checked for modifications.
    */
-  protected CacheHandleImpl(long expires, long recheck) {
-    setClientRevalidationTime(recheck);
-    setCacheExpirationTime(expires);
+  protected CacheHandleImpl(long expirationTime, long revalidationTime) {
+    setCacheExpirationTime(expirationTime);
+    setClientRevalidationTime(revalidationTime);
   }
 
   /**
@@ -117,12 +121,33 @@ public class CacheHandleImpl implements CacheHandle {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.CacheHandle#setModificationDate(Date)
+   */
+  @Override
+  public Date setModificationDate(Date modificationDate) {
+    this.modificationDate = modificationDate.after(this.modificationDate) ? modificationDate : this.modificationDate;
+    return this.modificationDate;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.CacheHandle#getModificationDate()
+   */
+  @Override
+  public Date getModificationDate() {
+    return modificationDate.getTime() > 0 ? modificationDate : new Date();
+  }
+
+  /**
    * Returns the time the cached object expires
    * 
    * @return the expiration time
    */
   public final long getCacheExpirationTime() {
-    return expires;
+    return expirationTime;
   }
 
   /**
@@ -130,8 +155,8 @@ public class CacheHandleImpl implements CacheHandle {
    * 
    * @see ch.entwine.weblounge.common.request.CacheHandle#setCacheExpirationTime(long)
    */
-  public final void setCacheExpirationTime(long expires) {
-    this.expires = Math.max(expires, Times.MS_PER_SECOND);
+  public final void setCacheExpirationTime(long expirationTime) {
+    this.expirationTime = Math.max(expirationTime, Times.MS_PER_SECOND);
   }
 
   /**
@@ -140,7 +165,7 @@ public class CacheHandleImpl implements CacheHandle {
    * @return the recheck time
    */
   public final long getClientRevalidationTime() {
-    return revalidate;
+    return revalidationTime;
   }
 
   /**
@@ -148,8 +173,8 @@ public class CacheHandleImpl implements CacheHandle {
    * 
    * @see ch.entwine.weblounge.common.request.CacheHandle#setClientRevalidationTime(long)
    */
-  public final void setClientRevalidationTime(long recheck) {
-    this.revalidate = Math.max(recheck, Times.MS_PER_SECOND);
+  public final void setClientRevalidationTime(long revalidationTime) {
+    this.revalidationTime = Math.max(revalidationTime, Times.MS_PER_SECOND);
   }
 
   /**

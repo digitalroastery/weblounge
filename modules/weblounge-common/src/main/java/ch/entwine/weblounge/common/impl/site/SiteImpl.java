@@ -20,10 +20,10 @@
 
 package ch.entwine.weblounge.common.impl.site;
 
+import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.PageLayout;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJob;
@@ -31,6 +31,9 @@ import ch.entwine.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
+import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
+import ch.entwine.weblounge.common.impl.testing.IntegrationTestGroup;
+import ch.entwine.weblounge.common.impl.testing.IntegrationTestParser;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
 import ch.entwine.weblounge.common.impl.util.xml.ValidationErrorHandler;
@@ -38,16 +41,20 @@ import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.impl.util.xml.XPathNamespaceContext;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.RequestListener;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.scheduler.Job;
 import ch.entwine.weblounge.common.scheduler.JobTrigger;
 import ch.entwine.weblounge.common.scheduler.JobWorker;
+import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.security.UserListener;
 import ch.entwine.weblounge.common.security.WebloungeUser;
+import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.I18nDictionary;
 import ch.entwine.weblounge.common.site.Module;
@@ -57,11 +64,12 @@ import ch.entwine.weblounge.common.site.SiteException;
 import ch.entwine.weblounge.common.site.SiteListener;
 import ch.entwine.weblounge.common.site.SiteURL;
 import ch.entwine.weblounge.common.url.UrlUtils;
+import ch.entwine.weblounge.testing.IntegrationTest;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.ServiceRegistration;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -73,10 +81,14 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -87,6 +99,7 @@ import java.util.regex.Pattern;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
@@ -172,6 +185,12 @@ public class SiteImpl implements Site {
   /** Option handling support */
   protected OptionsHelper options = null;
 
+  /** URL to the security configuration */
+  protected URL security = null;
+
+  /** This site's digest policy */
+  protected DigestType digestType = DigestType.md5;
+
   /** Request listeners */
   private List<RequestListener> requestListeners = null;
 
@@ -198,6 +217,12 @@ public class SiteImpl implements Site {
 
   /** The current system environment */
   protected Environment environment = Environment.Production;
+
+  /** The list of integration tests */
+  private List<IntegrationTest> integrationTests = null;
+
+  /** The registered integration tests */
+  private final List<ServiceRegistration> integrationTestRegistrations = new ArrayList<ServiceRegistration>();
 
   /**
    * Creates a new site that is initially disabled. Use {@link #setEnabled()} to
@@ -656,7 +681,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#setContentRepository(ch.entwine.weblounge.common.content.repository.ContentRepository)
+   * @see ch.entwine.weblounge.common.site.Site#setContentRepository(ch.entwine.weblounge.common.repository.ContentRepository)
    */
   public void setContentRepository(ContentRepository repository) {
     ContentRepository oldRepository = contentRepository;
@@ -673,11 +698,49 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.site.Site#setSecurity(java.net.URL)
+   */
+  @Override
+  public void setSecurity(URL url) {
+    this.security = url;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#getSecurity()
+   */
+  @Override
+  public URL getSecurity() {
+    return security;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#setDigestType(ch.entwine.weblounge.common.security.DigestType)
+   */
+  @Override
+  public void setDigestType(DigestType digest) {
+    this.digestType = digest;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.site.Site#getDigestType()
+   */
+  @Override
+  public DigestType getDigestType() {
+    return digestType;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.site.Site#getContentRepository()
    */
   public ContentRepository getContentRepository() {
-    if (!isOnline)
-      return null;
     return contentRepository;
   }
 
@@ -794,7 +857,7 @@ public class SiteImpl implements Site {
   public String getLocalRole(String role) {
     if (localRoles.containsKey(role))
       return localRoles.get(role);
-    return role;
+    return null;
   }
 
   /**
@@ -831,6 +894,14 @@ public class SiteImpl implements Site {
       }
     }
 
+    // Register the integration tests
+    if (integrationTests != null && integrationTests.size() > 0) {
+      for (IntegrationTest test : integrationTests) {
+        logger.debug("Registering integration test {}", test.getName());
+        integrationTestRegistrations.add(getBundleContext().registerService(IntegrationTest.class.getName(), test, null));
+      }
+    }
+
     // Finally, mark this site as running
     isOnline = true;
     logger.info("Site '{}' started", this);
@@ -856,8 +927,6 @@ public class SiteImpl implements Site {
       }
     }
 
-    // actions are being unregistered automatically
-
     // Shutdown all of the modules
     synchronized (modules) {
       for (Module module : modules.values()) {
@@ -867,6 +936,18 @@ public class SiteImpl implements Site {
         } catch (Throwable t) {
           logger.error("Error stopping module '{}'", module, t);
         }
+      }
+    }
+
+    // Unregister integration tests
+    logger.debug("Unregistering integration tests");
+    for (ServiceRegistration registration : integrationTestRegistrations) {
+      try {
+        registration.unregister();
+      } catch (IllegalStateException e) {
+        // Never mind, the service has been unregistered already
+      } catch (Throwable t) {
+        logger.error("Unregistering integration test failed: {}", t.getMessage());
       }
     }
 
@@ -1127,20 +1208,24 @@ public class SiteImpl implements Site {
    * of your bundle.
    * 
    * @param context
-   *          the component context
+   *          the bundle context
+   * @param properties
+   *          the component properties
    * @throws Exception
    *           if the site activation fails
    */
-  protected void activate(ComponentContext context) throws Exception {
+  @SuppressWarnings("unchecked")
+  protected void activate(BundleContext ctx, Map<String, String> properties)
+      throws Exception {
 
-    bundleContext = context.getBundleContext();
+    bundleContext = ctx;
     final Bundle bundle = bundleContext.getBundle();
 
     // Fix the site identifier
     if (getIdentifier() == null) {
-      String identifier = (String) context.getProperties().get(PROP_IDENTIFIER);
+      String identifier = properties.get(PROP_IDENTIFIER);
       if (identifier == null)
-        throw new IllegalStateException("Site needs an identifier");
+        throw new IllegalStateException("Property'" + PROP_IDENTIFIER + "' missing from site bundle");
       setIdentifier(identifier);
     }
 
@@ -1182,27 +1267,82 @@ public class SiteImpl implements Site {
           throw new IllegalStateException("Errors found while validating module descriptor " + moduleXml);
         }
 
-        // Load i18n dictionaries
-        String i18nPath = UrlUtils.concat(moduleUrl.getPath(), "i18n");
-        i18nEnum = bundle.findEntries(i18nPath, "*.xml", true);
-        while (i18nEnum != null && i18nEnum.hasMoreElements()) {
-          i18n.addDictionary(i18nEnum.nextElement());
-        }
-
+        // We need the module id even if the module initialization fails to log
+        // a proper error message
         Node moduleNode = moduleXml.getFirstChild();
         String moduleId = moduleNode.getAttributes().getNamedItem("id").getNodeValue();
 
+        Module module;
         try {
-          Module m = ModuleImpl.fromXml(moduleNode);
-          logger.debug("Module '{}' loaded for site '{}'", m, this);
-          addModule(m);
+          module = ModuleImpl.fromXml(moduleNode);
+          logger.debug("Module '{}' loaded for site '{}'", module, this);
         } catch (Throwable t) {
           logger.error("Error loading module '{}' of site {}", moduleId, identifier);
           if (t instanceof Exception)
             throw (Exception) t;
           throw new Exception(t);
         }
+
+        // If module is disabled, don't add it to the site
+        if (!module.isEnabled()) {
+          logger.info("Module '{}' for site '{}' is disabled", module, this);
+          continue;
+        }
+
+        // Make sure there is only one module with this identifier
+        if (modules.containsKey(module.getIdentifier())) {
+          logger.warn("A module with id '{}' is already registered in site '{}'", module.getIdentifier(), identifier);
+          logger.error("Module '{}' is not registered due to conflicting identifier", module.getIdentifier());
+          continue;
+        }
+
+        // Check inter-module compatibility
+        for (Module m : modules.values()) {
+
+          // Check actions
+          for (Action a : m.getActions()) {
+            for (Action action : module.getActions()) {
+              if (action.getIdentifier().equals(a.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines an action with id '{}'", new String[] { m.getIdentifier(), identifier, a.getIdentifier() });
+              } else if (action.getPath().equals(a.getPath())) {
+                logger.warn("Module '{}' of site '{}' already defines an action at '{}'", new String[] { m.getIdentifier(), identifier, a.getPath() });
+                logger.error("Module '{}' of site '{}' is not registered due to conflicting mountpoints", m.getIdentifier(), identifier);
+                continue;
+              }
+            }
+          }
+
+          // Check image styles
+          for (ImageStyle s : m.getImageStyles()) {
+            for (ImageStyle style : module.getImageStyles()) {
+              if (style.getIdentifier().equals(s.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines an image style with id '{}'", new String[] { m.getIdentifier(), identifier, s.getIdentifier() });
+              }
+            }
+          }
+
+          // Check jobs
+          for (Job j : m.getJobs()) {
+            for (Job job : module.getJobs()) {
+              if (job.getIdentifier().equals(j.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines a job with id '{}'", new String[] { m.getIdentifier(), identifier, j.getIdentifier() });
+              }
+            }
+          }
+
+        }
+        
+        addModule(module);
+
+        // Do this as last step since we don't want to have i18n dictionaries of
+        // an invalid or disabled module in the site
+        String i18nPath = UrlUtils.concat(moduleUrl.getPath(), "i18n");
+        i18nEnum = bundle.findEntries(i18nPath, "*.xml", true);
+        while (i18nEnum != null && i18nEnum.hasMoreElements()) {
+          i18n.addDictionary(i18nEnum.nextElement());
+        }
       }
+      
     } else {
       logger.debug("Site '{}' has no modules", this);
     }
@@ -1211,6 +1351,9 @@ public class SiteImpl implements Site {
     logger.debug("Signing up for a job scheduling services");
     schedulingServiceTracker = new SchedulingServiceTracker(bundleContext, this);
     schedulingServiceTracker.open();
+
+    // Load the tests
+    integrationTests = loadIntegrationTests();
 
     logger.info("Site '{}' initialized", this);
   }
@@ -1224,16 +1367,20 @@ public class SiteImpl implements Site {
    * of your bundle.
    * 
    * @param context
-   *          the component context
+   *          the bundle context
+   * @param properties
+   *          the component properties
    * @throws Exception
    *           if the site deactivation fails
    */
-  protected void deactivate(ComponentContext context) throws Exception {
+  protected void deactivate(BundleContext context,
+      Map<String, String> properties) throws Exception {
     try {
       isShutdownInProgress = true;
       logger.debug("Taking down site '{}'", this);
       logger.debug("Stopped looking for a job scheduling services");
-      schedulingServiceTracker.close();
+      if (schedulingServiceTracker != null)
+        schedulingServiceTracker.close();
       logger.info("Site '{}' deactivated", this);
     } finally {
       isShutdownInProgress = false;
@@ -1405,6 +1552,174 @@ public class SiteImpl implements Site {
   }
 
   /**
+   * Loads all integration tests.
+   * 
+   * @return the tests
+   */
+  @SuppressWarnings("unchecked")
+  private List<IntegrationTest> loadIntegrationTests() {
+    BundleContext ctx = getBundleContext();
+
+    logger.info("Loading integration tests for '{}'", this);
+
+    // Load test classes
+    List<IntegrationTest> tests = loadIntegrationTestClasses("/", ctx.getBundle());
+    for (IntegrationTest test : tests) {
+      logger.debug("Registering integration test " + test.getClass());
+      integrationTestRegistrations.add(ctx.registerService(IntegrationTest.class.getName(), test, null));
+    }
+
+    // Find and register site-wide integration tests
+    logger.debug("Looking for integration tests in site '{}'", this);
+    Enumeration<URL> siteDirectories = bundleContext.getBundle().findEntries("site", "*", false);
+    while (siteDirectories != null && siteDirectories.hasMoreElements()) {
+      URL entry = siteDirectories.nextElement();
+      if (entry.getPath().endsWith("/tests/")) {
+        tests.addAll(loadIntegrationTestDefinitions(entry.getPath()));
+        break;
+      }
+    }
+
+    // Find and register module integration tests
+    Enumeration<URL> modules = bundleContext.getBundle().findEntries("site/modules", "*", false);
+    logger.debug("Looking for integration tests in site '{}' modules", this);
+    while (modules != null && modules.hasMoreElements()) {
+      URL module = modules.nextElement();
+      Enumeration<URL> moduleDirectories = bundleContext.getBundle().findEntries(module.getPath(), "*", false);
+      while (moduleDirectories != null && moduleDirectories.hasMoreElements()) {
+        URL entry = moduleDirectories.nextElement();
+        if (entry.getPath().endsWith("/tests/")) {
+          tests.addAll(loadIntegrationTestDefinitions(entry.getPath()));
+          break;
+        }
+      }
+    }
+
+    if (tests.size() > 0)
+      logger.info("Registering {} integration tests for site '{}'", tests.size(), this);
+
+    return tests;
+  }
+
+  /**
+   * Loads and registers the integration tests that are found in the bundle at
+   * the given location.
+   * 
+   * @param dir
+   *          the directory containing the test files
+   */
+  private List<IntegrationTest> loadIntegrationTestDefinitions(String dir) {
+    Enumeration<?> entries = bundleContext.getBundle().findEntries(dir, "*.xml", true);
+
+    // Schema validator setup
+    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    URL schemaUrl = SiteImpl.class.getResource("/xsd/test.xsd");
+    Schema testSchema = null;
+    try {
+      testSchema = schemaFactory.newSchema(schemaUrl);
+    } catch (SAXException e) {
+      logger.error("Error loading XML schema for test definitions: {}", e.getMessage());
+      return Collections.emptyList();
+    }
+
+    // Module.xml document builder setup
+    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    docBuilderFactory.setSchema(testSchema);
+    docBuilderFactory.setNamespaceAware(true);
+
+    // The list of tests
+    List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
+
+    while (entries != null && entries.hasMoreElements()) {
+      URL entry = (URL) entries.nextElement();
+
+      // Validate and read the module descriptor
+      ValidationErrorHandler errorHandler = new ValidationErrorHandler(entry);
+      DocumentBuilder docBuilder;
+
+      try {
+        docBuilder = docBuilderFactory.newDocumentBuilder();
+        docBuilder.setErrorHandler(errorHandler);
+        Document doc = docBuilder.parse(entry.openStream());
+        if (errorHandler.hasErrors()) {
+          logger.warn("Error parsing integration test {}: XML validation failed", entry);
+          continue;
+        }
+        IntegrationTestGroup test = IntegrationTestParser.fromXml(doc.getFirstChild());
+        test.setSite(this);
+        test.setGroup(getName());
+        tests.add(test);
+      } catch (SAXException e) {
+        throw new IllegalStateException(e);
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      } catch (ParserConfigurationException e) {
+        throw new IllegalStateException(e);
+      }
+    }
+
+    return tests;
+  }
+
+  /**
+   * Loads the integration test classes from the class path and publishes them
+   * to the OSGi registry.
+   * 
+   * @param path
+   *          the bundle path to load classes from
+   * @param bundle
+   *          the bundle
+   */
+  private List<IntegrationTest> loadIntegrationTestClasses(String path,
+      Bundle bundle) {
+    List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
+
+    // Load the classes in question
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    Enumeration<?> entries = bundle.findEntries("/", "*.class", true);
+    if (entries == null) {
+      return tests;
+    }
+
+    // Look at the classes and instantiate those that implement the integration
+    // test interface.
+    while (entries.hasMoreElements()) {
+      URL url = (URL) entries.nextElement();
+      Class<?> c = null;
+      String className = url.getPath();
+      try {
+        className = className.substring(1, className.indexOf(".class"));
+        className = className.replace('/', '.');
+        c = loader.loadClass(className);
+        boolean implementsInterface = Arrays.asList(c.getInterfaces()).contains(IntegrationTest.class);
+        boolean extendsBaseClass = false;
+        if (c.getSuperclass() != null) {
+          extendsBaseClass = IntegrationTestBase.class.getName().equals(c.getSuperclass().getName());
+        }
+        if (!implementsInterface && !extendsBaseClass)
+          continue;
+        IntegrationTest test = (IntegrationTest) c.newInstance();
+        test.setSite(this);
+        tests.add(test);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Implementation " + className + " for integration test of class '" + identifier + "' not found", e);
+      } catch (NoClassDefFoundError e) {
+        // We are trying to load each and every class here, so we may as well
+        // see classes that are not meant to be loaded
+        logger.debug("The related class " + e.getMessage() + " for potential test case implementation " + className + " could not be found");
+      } catch (InstantiationException e) {
+        throw new IllegalStateException("Error instantiating impelementation " + className + " for integration test '" + identifier + "'", e);
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("Access violation instantiating implementation " + className + " for integration test '" + identifier + "'", e);
+      } catch (Throwable t) {
+        throw new IllegalStateException("Error loading implementation " + className + " for integration test '" + identifier + "'", t);
+      }
+
+    }
+    return tests;
+  }
+
+  /**
    * Initializes this site from an XML node that was generated using
    * {@link #toXml()}.
    * <p>
@@ -1441,6 +1756,7 @@ public class SiteImpl implements Site {
    *           if the site cannot be parsed
    * @see #toXml()
    */
+  @SuppressWarnings("unchecked")
   public static Site fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -1458,9 +1774,16 @@ public class SiteImpl implements Site {
         Class<? extends Site> c = (Class<? extends Site>) classLoader.loadClass(className);
         site = c.newInstance();
         site.setIdentifier(identifier);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Implementation " + className + " for site '" + identifier + "' not found", e);
+      } catch (InstantiationException e) {
+        throw new IllegalStateException("Error instantiating impelementation " + className + " for site '" + identifier + "'", e);
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("Access violation instantiating implementation " + className + " for site '" + identifier + "'", e);
       } catch (Throwable t) {
-        throw new IllegalStateException("Unable to instantiate class " + className + " for site '" + identifier + ": " + t.getMessage(), t);
+        throw new IllegalStateException("Error loading implementation " + className + " for site '" + identifier + "'", t);
       }
+
     } else {
       site = new SiteImpl();
       site.setIdentifier(identifier);
@@ -1543,10 +1866,35 @@ public class SiteImpl implements Site {
       site.setDefaultTemplate(firstTemplate);
     }
 
+    // security
+    String securityConfiguration = XPathHelper.valueOf(config, "ns:security/ns:configuration", xpathProcessor);
+    if (securityConfiguration != null) {
+      URL securityConfig = null;
+
+      // If converting the path into a URL fails, we are assuming that the
+      // configuration is part of the bundle
+      try {
+        securityConfig = new URL(securityConfiguration);
+      } catch (MalformedURLException e) {
+        logger.debug("Security configuration {} is pointing to the bundle", securityConfiguration);
+        securityConfig = SiteImpl.class.getResource(securityConfiguration);
+        if (securityConfig == null) {
+          throw new IllegalStateException("Security configuration " + securityConfig + " of site '" + site.getIdentifier() + "' cannot be located inside of bundle", e);
+        }
+      }
+      site.setSecurity(securityConfig);
+    }
+
     // administrator
     Node adminNode = XPathHelper.select(config, "ns:security/ns:administrator", xpathProcessor);
     if (adminNode != null) {
       site.setAdministrator(SiteAdminImpl.fromXml(adminNode, site, xpathProcessor));
+    }
+
+    // digest policy
+    Node digestNode = XPathHelper.select(config, "ns:security/ns:digest", xpathProcessor);
+    if (digestNode != null) {
+      site.setDigestType(DigestType.valueOf(digestNode.getFirstChild().getNodeValue()));
     }
 
     // role definitions
@@ -1629,6 +1977,12 @@ public class SiteImpl implements Site {
     // security
     if (administrator != null || localRoles.size() > 0) {
       b.append("<security>");
+      if (security != null) {
+        b.append("<configuration>").append(security.toExternalForm()).append("</configuration>");
+      }
+
+      b.append("<digest>").append(digestType.toString()).append("</digest>");
+
       if (administrator != null)
         b.append(administrator.toXml());
 

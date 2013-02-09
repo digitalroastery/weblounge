@@ -1,47 +1,51 @@
-<test>
+<test xmlns="http://www.entwinemedia.com/weblounge/3.0/test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/test http://www.entwinemedia.com/xsd/weblounge/3.0/test.xsd">
   <name><![CDATA[Action Tests]]></name>
   <test-case>
     <name><![CDATA[English greeting test]]></name>
     <url method="get">/greeting</url>
     <parameter name="language">english</parameter>
-    <assert-status>200,304</assert-status>
-    <assert-exists>
-      <path>//div[@id='main']/h1</path>
-    </assert-exists>
-    <assert-not-exists>
-      <path>//div[@id='main']/h2</path>
-    </assert-not-exists>
-    <assert-equals ignorewhitespace="true" ignorecase="true">
-      <path>//div[@id='main']/h1</path>
-      <value><![CDATA[hello world i am happy today]]></value>
-    </assert-equals>
-    <assert-not-equals ignorewhitespace="true" ignorecase="false">
-      <path>//div[@id='main']/h2</path>
-      <value><![CDATA[hello world i am happy now]]></value>
-    </assert-not-equals>
-    <assert-equals regularexpression="true">
-      <path>//div[@id='main']/h2</path>
-      <value><![CDATA[^hello world i am [\w]* now$]]></value>
-    </assert-equals>
+    <assertions>
+      <status>200 304</status>
+      <exists>
+        <path>//div[@id='main']/h1</path>
+      </exists>
+      <not-exists>
+        <path>//div[@id='main']/h2</path>
+      </not-exists>
+      <equals ignorewhitespace="true" ignorecase="true">
+        <path>//div[@id='main']/h1</path>
+        <value><![CDATA[hello world i am happy today]]></value>
+      </equals>
+      <equals regularexpression="true">
+        <path>//div[@id='main']/h2</path>
+        <value><![CDATA[^hello world i am [\w]* now$]]></value>
+      </equals>
+      <not-equals ignorewhitespace="true" ignorecase="false">
+        <path>//div[@id='main']/h2</path>
+        <value><![CDATA[hello world i am happy now]]></value>
+      </not-equals>
+    </assertions>
   </test-case>
   <test-case>
     <name><![CDATA[German greeting test]]></name>
     <url method="get">/greeting</url>
     <parameter name="language">german</parameter>
-    <assert-status>200,304</assert-status>
-    <assert-exists>
-      <path>//div[@id='main']/h1</path>
-    </assert-exists>
-    <assert-not-exists>
-      <path>//div[@id='main']/h2</path>
-    </assert-not-exists>
-    <assert-equals ignorewhitespace="true" ignorecase="true">
-      <path>//div[@id='main']/h1</path>
-      <value><![CDATA[hello world i am happy today]]></value>
-    </assert-equals>
-    <assert-not-equals ignorewhitespace="true" ignorecase="false">
-      <path>//div[@id='main']/h1</path>
-      <value><![CDATA[hello world i am happy today]]></value>
-    </assert-not-equals>
+    <assertions>
+      <status>200 304</status>
+      <exists>
+        <path>//div[@id='main']/h1</path>
+      </exists>
+      <not-exists>
+        <path>//div[@id='main']/h2</path>
+      </not-exists>
+      <equals ignorewhitespace="true" ignorecase="true">
+        <path>//div[@id='main']/h1</path>
+        <value><![CDATA[hello world i am happy today]]></value>
+      </equals>
+      <not-equals ignorewhitespace="true" ignorecase="false">
+        <path>//div[@id='main']/h1</path>
+        <value><![CDATA[hello world i am happy today]]></value>
+      </not-equals>
+    </assertions>
   </test-case>
 </test>

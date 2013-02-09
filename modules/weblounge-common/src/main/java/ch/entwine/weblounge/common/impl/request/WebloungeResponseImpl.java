@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.impl.request;
 
 import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
+import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.request.CacheHandle;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
@@ -37,9 +38,9 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -71,7 +72,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /** The response's cache handle */
   private WeakReference<CacheHandle> cacheHandle = null;
 
-  private Set<HTMLHeadElement> htmlHeaders = null;
+  private List<HTMLHeadElement> htmlHeaders = null;
 
   /** Whether the getOuputStream has already been called */
   private boolean osCalled = false;
@@ -81,6 +82,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
   /** A buffer that can hold the output stream prior to writing it back */
   private CachedOutputStream os = null;
+
+  /** The response's content modification date */
+  private Date modificationDate = new Date(0);
 
   /** Default encoding */
   private static final String DEFAULT_ENCODING = "utf-8";
@@ -427,8 +431,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.entwine.weblounge.common.request.WebloungeResponse#startResponse(ch.entwine.weblounge.common.request.CacheTag[],
    *      long, long)
    */
-  public boolean startResponse(CacheTag[] tags, long validTime, long recheckTime)
-      throws IllegalStateException {
+  public boolean startResponse(CacheTag[] tags, long expirationTime,
+      long revalidationTime) throws IllegalStateException {
     if (!isValid || cache == null)
       return false;
     ResponseCache cache = this.cache.get();
@@ -438,7 +442,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
       throw new IllegalStateException("The response is already being cached");
 
     // Is the response in the cache?
-    CacheHandle hdl = cache.startResponse(tags, request.get(), this, validTime, recheckTime);
+    CacheHandle hdl = cache.startResponse(tags, request.get(), this, expirationTime, revalidationTime);
     if (hdl == null)
       return true;
 
@@ -510,12 +514,20 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     StringBuffer headersHTML = new StringBuffer();
     if (htmlHeaders != null) {
       for (HTMLHeadElement e : htmlHeaders) {
-        headersHTML.append(e.toXml()).append('\n');
+        String header = ConfigurationUtils.processTemplate(e.toHtml(), request.get().getSite(), request.get().getEnvironment());
+        headersHTML.append(header).append('\n');
       }
     }
 
     // Replace the marker with the actual headers
-    response = response.replaceAll(HTML_HEADER_MARKER, headersHTML.toString());
+    int headersPlaceholderLocation = response.indexOf(HTML_HEADER_MARKER);
+    if (headersPlaceholderLocation >= 1) {
+      StringBuffer updatedResponse = new StringBuffer(response.substring(0, headersPlaceholderLocation));
+      updatedResponse.append(headersHTML.toString());
+      updatedResponse.append(response.substring(headersPlaceholderLocation + HTML_HEADER_MARKER.length()));
+      response = updatedResponse.toString();
+    }
+
     setContentLength(response.getBytes().length);
     IOUtils.write(response, clientOS, DEFAULT_ENCODING);
     clientOS.flush();
@@ -527,15 +539,48 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#setModificationDate(Date)
+   */
+  @Override
+  public Date setModificationDate(Date modificationDate) {
+    if (modificationDate == null)
+      return this.modificationDate;
+    this.modificationDate = modificationDate.after(this.modificationDate) ? modificationDate : this.modificationDate;
+    if (cacheHandle == null)
+      return this.modificationDate;
+    CacheHandle hdl = cacheHandle.get();
+    if (hdl == null)
+      return this.modificationDate;
+    return hdl.setModificationDate(modificationDate);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.request.WebloungeResponse#getModificationDate()
+   */
+  @Override
+  public Date getModificationDate() {
+    if (cacheHandle == null)
+      return modificationDate.getTime() > 0 ? modificationDate : new Date();
+    CacheHandle hdl = cacheHandle.get();
+    if (hdl == null)
+      return modificationDate.getTime() > 0 ? modificationDate : new Date();
+    return hdl.getModificationDate();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.request.WebloungeResponse#setClientRevalidationTime(long)
    */
-  public void setClientRevalidationTime(long recheckTime) {
+  public void setClientRevalidationTime(long revalidationTime) {
     if (cacheHandle == null)
       return;
     CacheHandle hdl = cacheHandle.get();
     if (hdl == null)
       return;
-    hdl.setClientRevalidationTime(Math.min(recheckTime, hdl.getClientRevalidationTime()));
+    hdl.setClientRevalidationTime(Math.min(revalidationTime, hdl.getClientRevalidationTime()));
   }
 
   /**
@@ -557,16 +602,16 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * 
    * @see ch.entwine.weblounge.common.request.WebloungeResponse#setCacheExpirationTime(long)
    */
-  public void setCacheExpirationTime(long validTime) {
+  public void setCacheExpirationTime(long expirationTime) {
     if (cacheHandle == null)
       return;
     CacheHandle hdl = cacheHandle.get();
     if (hdl == null)
       return;
-    hdl.setCacheExpirationTime(Math.min(validTime, hdl.getCacheExpirationTime()));
+    hdl.setCacheExpirationTime(Math.min(expirationTime, hdl.getCacheExpirationTime()));
 
     // The recheck time can't be longer than the valid time
-    setClientRevalidationTime(validTime);
+    setClientRevalidationTime(expirationTime);
   }
 
   /**
@@ -624,8 +669,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   @Override
   public void addHTMLHeader(HTMLHeadElement header) {
     if (htmlHeaders == null)
-      htmlHeaders = new HashSet<HTMLHeadElement>();
-    htmlHeaders.add(header);
+      htmlHeaders = new ArrayList<HTMLHeadElement>();
+    if (!htmlHeaders.contains(header))
+      htmlHeaders.add(header);
   }
 
   /**

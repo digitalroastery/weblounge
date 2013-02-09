@@ -27,10 +27,10 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -86,6 +86,12 @@ public class ResourceIteratorTag extends WebloungeTag {
 
   /** The result order */
   private Order order = null;
+
+  /** The maximum number of resources to return */
+  private int limit = 10;
+
+  /** Index of the first document to return */
+  private int offset = 0;
 
   /**
    * Sets the subjects for the search.
@@ -191,6 +197,26 @@ public class ResourceIteratorTag extends WebloungeTag {
   }
 
   /**
+   * Sets the maximum number of resources to iterate over.
+   * 
+   * @param limit
+   *          the maximum number of resources
+   */
+  public void setLimit(int limit) {
+    this.limit = limit;
+  }
+
+  /**
+   * Sets the index of the first document to return.
+   * 
+   * @param offset
+   *          index of the first document to return
+   */
+  public void setOffset(int offset) {
+    this.offset = offset;
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
@@ -235,6 +261,9 @@ public class ResourceIteratorTag extends WebloungeTag {
         if (creatorStartDate != null)
           q.withCreationDateBetween(creatorStartDate);
       }
+      
+      q.withLimit(limit);
+      q.withOffset(offset);
 
       try {
         searchResult = repository.find(q);
@@ -243,7 +272,7 @@ public class ResourceIteratorTag extends WebloungeTag {
         return SKIP_BODY;
       }
       index = 0;
-      iterations = searchResult.getHitCount();
+      iterations = searchResult.getDocumentCount();
     }
 
     if (iterations < 1)
@@ -356,6 +385,8 @@ public class ResourceIteratorTag extends WebloungeTag {
     resourceSeries = null;
     excludeTypes = null;
     includeTypes = null;
+    limit = 10;
+    offset = 0;
   }
 
 }

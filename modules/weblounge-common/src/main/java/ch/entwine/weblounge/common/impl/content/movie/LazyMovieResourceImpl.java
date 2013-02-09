@@ -470,17 +470,6 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Resource#isIndexed()
-   */
-  public boolean isIndexed() {
-    if (!isHeaderLoaded)
-      loadAudioVisualHeader();
-    return audioVisual.isIndexed();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.Resource#isLocked()
    */
   public boolean isLocked() {
@@ -553,17 +542,6 @@ public class LazyMovieResourceImpl implements MovieResource {
    */
   public void setIdentifier(String identifier) {
     uri.setIdentifier(identifier);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.Resource#setIndexed(boolean)
-   */
-  public void setIndexed(boolean index) {
-    if (!isHeaderLoaded)
-      loadAudioVisualHeader();
-    audioVisual.setIndexed(index);
   }
 
   /**
@@ -848,6 +826,22 @@ public class LazyMovieResourceImpl implements MovieResource {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.Modifiable#getLastModified()
+   */
+  @Override
+  public Date getLastModified() {
+    Date date = getModificationDate();
+    if (date != null)
+      return date;
+    date = getPublishFrom();
+    if (date != null)
+      return date;
+    return getCreationDate();
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.Modifiable#getModifier()
    */
@@ -855,6 +849,22 @@ public class LazyMovieResourceImpl implements MovieResource {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
     return audioVisual.getModifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.Modifiable#getLastModifier()
+   */
+  @Override
+  public User getLastModifier() {
+    User user = getModifier();
+    if (user != null)
+      return user;
+    user = getPublisher();
+    if (user != null)
+      return user;
+    return getCreator();
   }
 
   /**
@@ -1054,7 +1064,9 @@ public class LazyMovieResourceImpl implements MovieResource {
    * @see ch.entwine.weblounge.common.content.Resource#getContent(ch.entwine.weblounge.common.language.Language)
    */
   public MovieContent getContent(Language language) {
-    return null;
+    if (!isBodyLoaded)
+      loadAudioVisual();
+    return audioVisual.getContent(language);
   }
 
   /**
@@ -1063,7 +1075,20 @@ public class LazyMovieResourceImpl implements MovieResource {
    * @see ch.entwine.weblounge.common.content.Resource#getOriginalContent()
    */
   public MovieContent getOriginalContent() {
-    return null;
+    if (!isBodyLoaded)
+      loadAudioVisual();
+    return audioVisual.getOriginalContent();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  public void addContent(MovieContent content) {
+    if (!isBodyLoaded)
+      loadAudioVisual();
+    audioVisual.addContent(content);
   }
 
   /**
@@ -1072,7 +1097,9 @@ public class LazyMovieResourceImpl implements MovieResource {
    * @see ch.entwine.weblounge.common.content.Resource#removeContent(ch.entwine.weblounge.common.language.Language)
    */
   public MovieContent removeContent(Language language) {
-    return null;
+    if (!isBodyLoaded)
+      loadAudioVisual();
+    return audioVisual.removeContent(language);
   }
 
   /**
@@ -1081,7 +1108,9 @@ public class LazyMovieResourceImpl implements MovieResource {
    * @see ch.entwine.weblounge.common.content.Resource#contents()
    */
   public Set<MovieContent> contents() {
-    return null;
+    if (!isBodyLoaded)
+      loadAudioVisual();
+    return audioVisual.contents();
   }
 
   /**
@@ -1115,16 +1144,6 @@ public class LazyMovieResourceImpl implements MovieResource {
   @Override
   public String toString() {
     return uri.toString();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
-   */
-  public void addContent(MovieContent content) {
-    // TODO Auto-generated method stub
-
   }
 
 }

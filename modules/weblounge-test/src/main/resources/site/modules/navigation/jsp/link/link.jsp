@@ -1,5 +1,5 @@
 <%@ taglib uri="http://entwinemedia.com/weblounge/3.0/content" prefix="webl" %>
-<%@ taglib uri="/WEB-INF/weblounge-resource.tld" prefix="weblr" %>
+<%@ taglib uri="http://entwinemedia.com/weblounge/3.0/resources" prefix="weblr" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <webl:context define="language, user">
@@ -11,7 +11,7 @@
 		<webl:element define="title, description">
 			<weblr:page uuid="<%= resourceid %>">
 				<%
-				  String link = pagecontent.getResourceURI().getPath();
+				  String link = pagecontent.getURI().getPath();
 				%>
       			<% anchor = StringUtils.isNotBlank(anchor) ? "#" + anchor : ""; %>
       			<% title = StringUtils.isNotBlank(title) ? title : pagecontent.getTitle(language); %>
@@ -21,7 +21,6 @@
         			<br /><span class="text"><%= description %></span>
         		<% } %>
 				</p>
-				<webl:cachetag name="webl:url" value="<%= link %>"/>
 			</weblr:page>
 		</webl:element>
 	</webl:property>		

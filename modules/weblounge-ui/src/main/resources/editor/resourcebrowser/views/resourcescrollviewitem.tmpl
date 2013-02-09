@@ -1,7 +1,7 @@
 <div class="wbl-scrollViewItem wbl-page" id="${page.id}">
 	<div class="wbl-imageContainer">
 		{{if page.version == 'work'}}
-			<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/empty_thumbnail.png" original="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview?version=1" alt="Vorschaubild" class="wbl-pageThumbnail" />
+			<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/empty_thumbnail.png" original="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui-preview?version=1&force=true" alt="Vorschaubild" class="wbl-pageThumbnail" />
 			{{if page.head.locked }}
 		  	{{if page.head.locked.user.id == runtime.user.login }}
 					<div class="wbl-ribbon ribbon-locked-by-me">Locked</div>
@@ -12,7 +12,7 @@
 				<div class="wbl-ribbon ribbon-work">Work</div>
 			{{/if}}
 		{{else}}
-			<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/empty_thumbnail.png" original="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui:preview?version=0" alt="Vorschaubild" class="wbl-pageThumbnail" />
+			<img src="${runtime.getRootPath()}/editor/resourcebrowser/images/empty_thumbnail.png" original="/system/weblounge/previews/${page.id}/locales/${language}/styles/weblounge-ui-preview?version=0&force=true" alt="Vorschaubild" class="wbl-pageThumbnail" />
 		{{/if}}
 	</div>
 	{{if !$.isEmptyObject(page.head.metadata.title) && !$.isEmptyObject(page.head.metadata.title[language])}}

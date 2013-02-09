@@ -20,9 +20,9 @@
 
 package ch.entwine.weblounge.kernel.site;
 
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.Environment;
@@ -559,7 +559,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.site.SiteListener#repositoryConnected(ch.entwine.weblounge.common.site.Site,
-   *      ch.entwine.weblounge.common.content.repository.ContentRepository)
+   *      ch.entwine.weblounge.common.repository.ContentRepository)
    */
   public void repositoryConnected(Site site, ContentRepository repository) {
   }
@@ -568,7 +568,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.site.SiteListener#repositoryDisconnected(ch.entwine.weblounge.common.site.Site,
-   *      ch.entwine.weblounge.common.content.repository.ContentRepository)
+   *      ch.entwine.weblounge.common.repository.ContentRepository)
    */
   public void repositoryDisconnected(Site site, ContentRepository repository) {
   }

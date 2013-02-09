@@ -39,6 +39,19 @@
   </tag>
 
   <tag>
+    <description>Adjust the pagelet's modification date</description>
+    <display-name>Weblounge Cache Modified Date Tag</display-name>
+    <name>modified</name>
+    <tag-class>ch.entwine.weblounge.taglib.content.ModificationDateTag</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>date</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
     <description>Embeds a composer</description>
     <display-name>Weblounge Composer Tag</display-name>
     <name>composer</name>

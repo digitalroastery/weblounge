@@ -37,17 +37,20 @@
     <!-- The rest of the editor functionality needs to be protected -->
     <sec:intercept-url pattern="^/weblounge/.*" access="weblounge:editor"/>
 
-    <!-- Enable anonymous access to the REST documentation -->
+    <!-- Secure the REST documentation -->
     <sec:intercept-url pattern="^/system/weblounge/.*/docs" access="weblounge:siteadministrator"/>
+
+    <!-- Enable anonymous access to the runtime information -->
+    <sec:intercept-url pattern="^/system/weblounge/runtime(/.*)?" access="weblounge:guest"/>
+
+    <!-- The login processing urls needs to be covered by the filter chain -->
+    <sec:intercept-url pattern="^/system/weblounge/login(/.*)?" access="weblounge:guest"/>
+
+    <!--  Same is true for logout -->
+    <sec:intercept-url pattern="^/system/weblounge/logout(/)?" access="weblounge:guest"/>
 
     <!-- Secure the REST endpoints -->
     <sec:intercept-url pattern="^/system/weblounge/.*" access="weblounge:editor"/>
-
-    <!-- The login processing urls needs to be covered by the filter chain -->
-    <sec:intercept-url pattern="^/system/weblounge/login/.*" access="weblounge:guest"/>
-
-    <!--  Same is true for logout -->
-    <sec:intercept-url pattern="^/system/weblounge/logout" access="weblounge:guest"/>
     
     <!-- Secure the management URLs -->
     <sec:intercept-url pattern="^/system/console/.*" access="weblounge:systemadministrator"/>
@@ -60,8 +63,8 @@
     
     <!-- FILTER CONFIGURATION -->
 
-    <!-- Add the site filter to make sure it's available during user lookup -->
-    <sec:custom-filter before="FIRST" ref="siteContextFilter"/>
+    <!-- Add the health check filter -->
+    <sec:custom-filter before="FIRST" ref="healthCheckFilter"/>
 
     <!-- Add the user filter to get everything set up for proper request processing -->
     <sec:custom-filter after="LAST" ref="userContextFilter"/>
@@ -91,11 +94,9 @@
     <sec:logout logout-url="/system/weblounge/logout" success-handler-ref="logoutSuccessHandler"/>
 
   </sec:http>
-  
-  <!-- Instantiates the weblounge site filter that will map requests to their site -->
-  <bean id="siteContextFilter" class="ch.entwine.weblounge.kernel.security.SiteContextFilter">
-    <constructor-arg ref="securityService"/>
-  </bean>
+
+  <!-- Instantiates the weblounge health check filter -->
+  <bean id="healthCheckFilter" class="ch.entwine.weblounge.kernel.security.HealthCheckFilter"/>
 
   <!-- Instantiates the weblounge user filter that will map requests to users -->
   <bean id="userContextFilter" class="ch.entwine.weblounge.kernel.security.UserContextFilter">
@@ -114,7 +115,6 @@
     <property name="welcomePages">
       <map>
         <entry key="weblounge:editor" value="/weblounge/login/success.html" />
-        <entry key="*" value="/index.html" />
       </map>
     </property>
   </bean>
@@ -130,13 +130,9 @@
   <!-- Spring Security Internals -->
 
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
-  <sec:authentication-manager alias="authenticationManager">
+  <sec:authentication-manager>
     <sec:authentication-provider user-service-ref="userDetailsService">
-      <!-- 
-      <sec:password-encoder hash="md5">
-        <sec:salt-source user-property="username"/>
-      </sec:password-encoder>
-       -->
+      <sec:password-encoder hash="md5"/>
     </sec:authentication-provider>
   </sec:authentication-manager>
 

@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.taglib.security;
 
-import ch.entwine.weblounge.common.impl.security.Guest;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -42,8 +42,10 @@ public class IfAuthenticatedTag extends WebloungeTag {
   public int doStartTag() throws JspException {
     super.doStartTag();
     User user = getRequest().getUser();
-    if (user instanceof Guest)
+
+    if (!SecurityUtils.isAuthenticated(user))
       return SKIP_BODY;
+
     return EVAL_BODY_INCLUDE;
   }
 

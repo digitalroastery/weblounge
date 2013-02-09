@@ -251,7 +251,7 @@ public class Precompiler {
               logger.error("Precompilation failed: {}:/{}: not found", site, pathInfo);
               break;
             default:
-              logger.error("Precompilation of {}:/{} failed with status {}", new Object[] {
+              logger.debug("Precompilation of {}:/{} failed with status {}", new Object[] {
                   site,
                   pathInfo,
                   response.getStatus() });

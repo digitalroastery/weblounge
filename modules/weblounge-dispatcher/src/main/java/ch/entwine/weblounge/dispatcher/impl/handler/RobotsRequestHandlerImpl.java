@@ -28,11 +28,14 @@ import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -59,6 +62,9 @@ public class RobotsRequestHandlerImpl implements RequestHandler {
 
   /** Content of the restrictive robots.txt */
   private String disallowRobotsTxt = null;
+  
+  /** The bundle's modification date */
+  private Date modificationDate = new Date();
 
   /**
    * Creates a new robots.txt request handler.
@@ -92,6 +98,18 @@ public class RobotsRequestHandlerImpl implements RequestHandler {
   }
 
   /**
+   * OSGi callback upon component activation that provides access to the
+   * component and bundle context.
+   * 
+   * @param ctx
+   *          the context
+   */
+  void activate(ComponentContext ctx) {
+    BundleContext bundleCtx = ctx.getBundleContext();
+    modificationDate = new Date(bundleCtx.getBundle().getLastModified());
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.dispatcher.RequestHandler#service(ch.entwine.weblounge.common.request.WebloungeRequest,
@@ -102,7 +120,7 @@ public class RobotsRequestHandlerImpl implements RequestHandler {
     String path = url.getPath();
 
     // Is the request intended for this handler?
-    if (!path.equals(URI_PREFIX)) {
+    if (!URI_PREFIX.equals(path)) {
       logger.debug("Skipping request for {}, request path does not start with {}", URI_PREFIX);
       return false;
     }
@@ -134,6 +152,7 @@ public class RobotsRequestHandlerImpl implements RequestHandler {
     try {
       response.setContentType("text/plain");
       response.setContentLength(robotsDirective.length());
+      response.setModificationDate(modificationDate);
       IOUtils.write(robotsDirective, response.getOutputStream(), "UTF-8");
     } catch (IOException e) {
       logger.warn("Error sending robots.txt to client: {}", e.getMessage());

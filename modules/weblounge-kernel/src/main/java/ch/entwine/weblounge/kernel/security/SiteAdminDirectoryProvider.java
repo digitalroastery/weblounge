@@ -55,11 +55,11 @@ public class SiteAdminDirectoryProvider implements DirectoryProvider {
       return null;
 
     WebloungeUser siteAdmin = site.getAdministrator();
-    if (siteAdmin != null && userName.equals(siteAdmin.getLogin())) {
-      return siteAdmin;
-    }
 
-    return null;
+    if (siteAdmin == null || !userName.equals(siteAdmin.getLogin()))
+      return null;
+
+    return siteAdmin;
   }
 
   /**

@@ -43,8 +43,11 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
   /** Localized values */
   protected Map<Language, List<T>> localizedValues = new HashMap<Language, List<T>>();
 
-  /** True to add the values to the fulltext index */
-  protected boolean addToFulltext = true;
+  /** True to add the values to the backend fulltext index */
+  protected boolean addToFulltext = false;
+
+  /** True to add the values to the user facing fulltext index */
+  protected boolean addToText = false;
 
   /**
    * Creates a new metadata object with the given name and values.
@@ -56,14 +59,19 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
    * @param localizedValues
    *          the localized values
    * @param addToFulltext
-   *          <code>true</code> to add these items to the fulltext index
+   *          <code>true</code> to add these items to the backend fulltext index
+   * @param addToText
+   *          <code>true</code> to add these items to the user facing fulltext
+   *          index
    */
   public ResourceMetadataImpl(String name, List<T> values,
-      Map<Language, List<T>> localizedValues, boolean addToFulltext) {
+      Map<Language, List<T>> localizedValues, boolean addToFulltext,
+      boolean addToText) {
     this.name = name;
     this.values = values;
     this.localizedValues = localizedValues;
     this.addToFulltext = addToFulltext;
+    this.addToText = addToText;
   }
 
   /**
@@ -126,7 +134,7 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.content.ResourceMetadata#addValue(java.lang.Object)
    */
   public void addValue(T v) {
@@ -148,10 +156,21 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
   }
 
   /**
-   * Adds the metadata values to the fulltext index.
+   * {@inheritDoc}
    * 
-   * @param addToFulltext
-   *          <code>true</code> to add the values to the fulltext index
+   * @see ch.entwine.weblounge.common.content.ResourceMetadata#getValue()
+   */
+  @Override
+  public T getValue() {
+    if (values == null || values.size() == 0)
+      return null;
+    return values.get(0);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceMetadata#setAddToFulltext(boolean)
    */
   public void setAddToFulltext(boolean addToFulltext) {
     this.addToFulltext = addToFulltext;
@@ -165,7 +184,25 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
   public boolean addToFulltext() {
     return addToFulltext;
   }
-  
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceMetadata#setAddToText(boolean)
+   */
+  public void setAddToText(boolean addToText) {
+    this.addToText = addToText;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceMetadata#addToFulltext()
+   */
+  public boolean addToText() {
+    return addToText;
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -187,22 +224,22 @@ public class ResourceMetadataImpl<T> implements ResourceMetadata<T> {
   public int hashCode() {
     return name.hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof ResourceMetadata<?>))
       return false;
-    return name.equals(((ResourceMetadata<?>)obj).getName());
+    return name.equals(((ResourceMetadata<?>) obj).getName());
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

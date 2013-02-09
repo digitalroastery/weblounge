@@ -25,6 +25,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.entwine.weblounge.common.impl.request.Http11ResponseType;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.request.SiteRequestWrapper;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
@@ -87,7 +88,7 @@ public class SiteServlet extends HttpServlet {
   protected final Servlet jasperServlet;
 
   /** Path rules */
-  private List<ResourceSet> resourceSets = null;
+  private List<ResourceSet> resources = null;
 
   /** The security service */
   private SecurityService securityService = null;
@@ -119,9 +120,9 @@ public class SiteServlet extends HttpServlet {
     this.bundle = bundle;
     this.environment = environment;
     this.jasperServlet = new JspServletWrapper(bundle);
-    this.resourceSets = new ArrayList<ResourceSet>();
-    this.resourceSets.add(new SiteResourceSet());
-    this.resourceSets.add(new ModuleResourceSet());
+    this.resources = new ArrayList<ResourceSet>();
+    this.resources.add(new SiteResourceSet(site));
+    this.resources.add(new ModuleResourceSet());
     this.tika = new Tika();
   }
 
@@ -271,14 +272,13 @@ public class SiteServlet extends HttpServlet {
         response.flushBuffer();
       }
     } catch (ServletException e) {
-      // re-thrown
       throw e;
     } catch (IOException e) {
-      // re-thrown
       throw e;
     } catch (Throwable t) {
-      // re-thrown
-      logger.error("Error while serving jsp {}: {}", request.getRequestURI(), t.getMessage());
+      // Don't log errors during precompilation
+      if (!RequestUtils.isPrecompileRequest(request))
+        logger.error("Error while serving jsp {}: {}", request.getRequestURI(), t.getMessage());
       response.sendError(SC_INTERNAL_SERVER_ERROR, t.getMessage());
     }
   }
@@ -376,7 +376,7 @@ public class SiteServlet extends HttpServlet {
    * @return <code>true</code> if the resource needs to be protected
    */
   public boolean isProtected(String path) {
-    for (ResourceSet resourceSet : resourceSets) {
+    for (ResourceSet resourceSet : resources) {
       if (resourceSet.includes(path) && resourceSet.excludes(path))
         return true;
     }

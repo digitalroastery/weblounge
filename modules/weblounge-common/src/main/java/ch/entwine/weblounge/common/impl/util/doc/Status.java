@@ -65,6 +65,18 @@ public class Status {
   }
 
   /**
+   * Creates a return status <code>201</code> with the given optional
+   * description.
+   * 
+   * @param description
+   *          detailed meaning of this response status code
+   * @return the status
+   */
+  public static Status created(String description) {
+    return new Status(201, description);
+  }
+
+  /**
    * Creates a return status <code>204</code> with the given optional
    * description.
    * 
@@ -249,7 +261,7 @@ public class Status {
     // list from http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
     String result = null;
     switch (code) {
-      // 1xx Informational
+    // 1xx Informational
       case 100:
         result = "Continue";
         break;

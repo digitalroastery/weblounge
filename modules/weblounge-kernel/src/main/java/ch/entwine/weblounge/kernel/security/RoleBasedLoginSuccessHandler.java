@@ -20,9 +20,10 @@
 
 package ch.entwine.weblounge.kernel.security;
 
+import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.security.SecurityService;
-import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
 
 import org.apache.commons.lang.StringUtils;
@@ -61,7 +62,7 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
   protected Map<String, String> welcomePages = new HashMap<String, String>();
 
   /** The default welcome page */
-  protected String defaultWelcomePage = "/?edit";
+  protected String defaultWelcomePage = "/";
 
   /**
    * {@inheritDoc}
@@ -84,7 +85,7 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
     User user = ((SpringSecurityUser) principal).getUser();
     boolean isEditor = SecurityUtils.userHasRole(user, SystemRole.EDITOR);
 
-    logger.info("{} logged in", user);
+    logger.info("User '{}' logged in", user);
 
     // Try to redirect the user to the initial url
     HttpSession session = request.getSession(false);
@@ -105,10 +106,8 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
     // Try to send users to an appropriate welcome page based on their roles
     for (Map.Entry<String, String> entry : welcomePages.entrySet()) {
       String roleId = entry.getKey();
-      if (roleId.contains(":"))
-        roleId = roleId.substring(roleId.indexOf(":") + 1);
       String welcomePage = entry.getValue();
-      if (SecurityUtils.userHasRole(user, roleId)) {
+      if (SecurityUtils.userHasRole(user, new RoleImpl(roleId))) {
         response.sendRedirect(addTimeStamp(welcomePage));
         return;
       }

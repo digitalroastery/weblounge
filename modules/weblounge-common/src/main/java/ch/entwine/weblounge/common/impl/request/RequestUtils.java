@@ -27,11 +27,11 @@ import static ch.entwine.weblounge.common.impl.security.SystemRole.EDITOR;
 import static java.lang.Boolean.TRUE;
 
 import ch.entwine.weblounge.common.editor.EditingState;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.site.ActionSupport;
 import ch.entwine.weblounge.common.impl.site.PrecompileHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
-import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.site.Action;
 
 import org.apache.commons.lang.StringUtils;
@@ -63,6 +63,19 @@ public final class RequestUtils {
    * RequestSupport is a static class and therefore has no constructor.
    */
   private RequestUtils() {
+  }
+
+  /**
+   * Returns true if an action is set as request attribute
+   * <code>WebloungeRequest.ACTION</code>.
+   * 
+   * @param request
+   *          the request
+   * @return true if an action is found as request attribute
+   */
+  public static boolean containsAction(WebloungeRequest request) {
+    Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
+    return action != null;
   }
 
   /**
@@ -219,8 +232,9 @@ public final class RequestUtils {
     String p = request.getParameter(parameter);
     if (p != null) {
       try {
-        p = URLDecoder.decode(p.trim(), "utf-8");
+        p = decode(p, "utf-8");
       } catch (UnsupportedEncodingException e) {
+        logger.error("Encoding 'utf-8' is not supported on this platform");
       }
     }
     return StringUtils.trimToNull(p);
@@ -249,11 +263,38 @@ public final class RequestUtils {
 
     String p = urlparams.get(index);
     try {
-      p = URLDecoder.decode(p.trim(), "utf-8");
+      p = decode(p, "utf-8");
     } catch (UnsupportedEncodingException e) {
       logger.error("Encoding 'utf-8' is not supported on this platform");
     }
     return StringUtils.trimToNull(p);
+  }
+
+  /**
+   * Ensures parameter values potentially containing the <code>%</code>
+   * character are decoded properly using the <code>utf-8</code> encoding.
+   * 
+   * @param s
+   *          the parameter value
+   * @param encoding
+   *          the character encoding to be used
+   * @return the properly decoded value
+   * @throws UnsupportedEncodingException
+   *           if <code>encoding</code> is not supported by the plattform
+   */
+  static String decode(String s, String encoding)
+      throws UnsupportedEncodingException {
+    s = StringUtils.trimToEmpty(s);
+    while (true) {
+      try {
+        return URLDecoder.decode(s, encoding);
+      } catch (IllegalArgumentException e) {
+        // Illegal hex characters in escape (%) pattern - For input string: "si"
+        String m = e.getMessage();
+        String illegalSequence = m.substring(m.length() - 3, m.length() - 1);
+        s = s.replaceAll("%" + illegalSequence, "%25" + illegalSequence);
+      }
+    }
   }
 
   /**
@@ -364,7 +405,7 @@ public final class RequestUtils {
       p = p.trim();
       if ("application/x-www-form-urlencoded".equalsIgnoreCase(request.getContentType())) {
         try {
-          p = URLDecoder.decode(p, decoding);
+          p = decode(p, decoding);
         } catch (UnsupportedEncodingException e) {
           throw new IllegalArgumentException("Encoding " + decoding + " is unsupported");
         } catch (IllegalArgumentException e) {
@@ -492,7 +533,7 @@ public final class RequestUtils {
    */
   public static short getShortParameterWithDefault(WebloungeRequest request,
       Action action, int index, short defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getShortParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -613,7 +654,7 @@ public final class RequestUtils {
    */
   private static short getShortParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-          throws IllegalArgumentException, IllegalStateException {
+      throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -691,7 +732,7 @@ public final class RequestUtils {
    */
   public static int getIntegerParameterWithDefault(WebloungeRequest request,
       Action action, int index, int defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getIntegerParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -764,7 +805,7 @@ public final class RequestUtils {
    */
   private static int getIntegerParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-          throws IllegalArgumentException, IllegalStateException {
+      throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -890,7 +931,7 @@ public final class RequestUtils {
    */
   public static long getLongParameterWithDefault(WebloungeRequest request,
       Action action, int index, long defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getLongParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1090,7 +1131,7 @@ public final class RequestUtils {
    */
   public static float getFloatParameterWithDefault(WebloungeRequest request,
       Action action, int index, float defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getFloatParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1163,7 +1204,7 @@ public final class RequestUtils {
    */
   private static float getFloatParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-          throws IllegalArgumentException, IllegalStateException {
+      throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -1296,7 +1337,7 @@ public final class RequestUtils {
    */
   public static boolean getBooleanParameterWithDefault(
       WebloungeRequest request, String parameterName, boolean defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     String p = getParameter(request, parameterName);
     if (p == null)
       return defaultValue;
@@ -1322,7 +1363,7 @@ public final class RequestUtils {
    */
   public static boolean getBooleanParameterWithDefault(
       WebloungeRequest request, Action action, int index, boolean defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getBooleanParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1442,7 +1483,7 @@ public final class RequestUtils {
    */
   private static boolean getBooleanParameter(WebloungeRequest request,
       Action action, int index, boolean required)
-          throws IllegalArgumentException, IllegalStateException {
+      throws IllegalArgumentException, IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, action, index);
@@ -1522,7 +1563,7 @@ public final class RequestUtils {
    */
   public static Date getDateParameterWithDefault(WebloungeRequest request,
       Action action, int index, Date defaultValue)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
       return getDateParameter(request, action, index, true);
     } catch (IllegalStateException e) {
@@ -1692,7 +1733,7 @@ public final class RequestUtils {
         "yyyy-MM-ddTkk:mmZ",
         "yyyy-MM-ddTkk:mm:ssZ",
         // us date format
-    "MM/dd/yyyy" };
+        "MM/dd/yyyy" };
     return DateUtils.parseDate(datestring, parsePatterns);
   }
 

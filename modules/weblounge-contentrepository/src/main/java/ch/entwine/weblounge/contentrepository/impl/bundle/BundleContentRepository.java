@@ -25,22 +25,20 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.content.repository.ResourceSelector;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ResourceSelector;
+import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.ResourceSerializer;
-import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSelectorImpl;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
@@ -53,7 +51,6 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -62,7 +59,6 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Content repository that reads pages and resources from the site's
@@ -102,9 +98,6 @@ public class BundleContentRepository extends AbstractContentRepository implement
   /** Path to the storage root directory */
   protected String rootDirPath = null;
 
-  /** The root directory for the temporary bundle index */
-  protected File idxRootDir = null;
-
   /** Flag to indicate whether temporary indices should be removed on shutdown */
   protected boolean cleanupTemporaryIndex = false;
 
@@ -123,13 +116,6 @@ public class BundleContentRepository extends AbstractContentRepository implement
    */
   @Override
   public void connect(Site site) throws ContentRepositoryException {
-    idxRootDir = new File(PathUtils.concat(rootDirPath, site.getIdentifier(), "index"));
-    try {
-      FileUtils.forceMkdir(idxRootDir);
-    } catch (IOException e) {
-      throw new ContentRepositoryException("Unable to create temporary site index at " + idxRootDir, e);
-    }
-
     // Find the site's bundle
     bundle = loadBundle(site);
     if (bundle == null)
@@ -146,10 +132,6 @@ public class BundleContentRepository extends AbstractContentRepository implement
   @Override
   public void disconnect() throws ContentRepositoryException {
     super.disconnect();
-    if (idxRootDir != null && idxRootDir.exists() && cleanupTemporaryIndex) {
-      logger.info("Removing temporary site index at {}", idxRootDir);
-      FileUtils.deleteQuietly(idxRootDir);
-    }
   }
 
   /**
@@ -224,16 +206,13 @@ public class BundleContentRepository extends AbstractContentRepository implement
       throws ContentRepositoryException {
     if (uri == null)
       throw new IllegalArgumentException("Page uri cannot be null");
-    try {
-      List<ResourceURI> uris = new ArrayList<ResourceURI>();
-      long[] versions = index.getRevisions(uri);
-      for (long version : versions) {
-        uris.add(new ResourceURIImpl(uri, version));
-      }
-      return uris.toArray(new ResourceURI[uris.size()]);
-    } catch (IOException e) {
-      throw new ContentRepositoryException(e);
+
+    List<ResourceURI> uris = new ArrayList<ResourceURI>();
+    long[] versions = index.getRevisions(uri);
+    for (long version : versions) {
+      uris.add(new ResourceURIImpl(uri, version));
     }
+    return uris.toArray(new ResourceURI[uris.size()]);
 
   }
 
@@ -275,9 +254,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
     List<ResourceURI> uris = new ArrayList<ResourceURI>();
 
     // Add all known resource types to the index
-    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-
-    for (ResourceSerializer<?, ?> serializer : serializers) {
+    for (ResourceSerializer<?, ?> serializer : getSerializers()) {
 
       // Construct this resource type's entry point into the bundle
       String resourcePath = "/" + serializer.getType() + "s";
@@ -311,40 +288,33 @@ public class BundleContentRepository extends AbstractContentRepository implement
   protected ContentRepositoryIndex loadIndex() throws IOException,
   ContentRepositoryException {
 
-    logger.debug("Creating temporary site index at {}", idxRootDir);
-    FileUtils.forceMkdir(idxRootDir);
-
     BundleContentRepositoryIndex index = null;
-    index = new BundleContentRepositoryIndex(idxRootDir);
+    index = new BundleContentRepositoryIndex(site, resourceSerializer);
     boolean success = false;
 
     // Make sure the version matches the implementation
     if (index.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
       logger.warn("Index version does not match implementation, triggering reindex");
-      FileUtils.deleteQuietly(idxRootDir);
-      FileUtils.forceMkdir(idxRootDir);
-      index = new BundleContentRepositoryIndex(idxRootDir);
+      index = new BundleContentRepositoryIndex(site, resourceSerializer);
     }
 
     // Is there an existing index?
     else if (index.getResourceCount() > 0) {
       long resourceCount = index.getResourceCount();
       long revisionCount = index.getRevisionCount();
-      logger.info("Loaded exising site index from {}", idxRootDir);
       logger.info("Index contains {} resources and {} revisions", resourceCount, revisionCount - resourceCount);
       return index;
     }
 
     try {
-      logger.info("Populating temporary site index '{}' at {}", site, idxRootDir);
+      logger.info("Populating temporary site index '{}'", site);
       long time = System.currentTimeMillis();
       long resourceCount = 0;
       long revisionCount = 0;
       ResourceURI previousURI = null;
 
       // Add all known resource types to the index
-      Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
-      for (ResourceSerializer<?, ?> serializer : serializers) {
+      for (ResourceSerializer<?, ?> serializer : getSerializers()) {
         ResourceSelector selector = new ResourceSelectorImpl(site).withTypes(serializer.getType());
         for (ResourceURI uri : list(selector)) {
 
@@ -402,10 +372,11 @@ public class BundleContentRepository extends AbstractContentRepository implement
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadPage()
+   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadResource(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @Override
-  protected InputStream loadResource(ResourceURI uri) throws IOException {
+  protected InputStream loadResource(ResourceURI uri)
+      throws ContentRepositoryException, IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path
@@ -438,7 +409,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
    */
   @Override
   protected InputStream loadResourceContent(ResourceURI uri, Language language)
-      throws IOException {
+      throws ContentRepositoryException, IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path

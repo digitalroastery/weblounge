@@ -22,11 +22,11 @@ package ch.entwine.weblounge.taglib.resource;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -126,7 +126,8 @@ public class PageTag extends WebloungeTag {
     try {
       page = (Page) repository.get(uri);
       language = LanguageUtils.getPreferredLanguage(page, request, site);
-      page.switchTo(language);
+      if (language != null)
+        page.switchTo(language);
     } catch (ContentRepositoryException e) {
       logger.warn("Error trying to load page " + uri + ": " + e.getMessage(), e);
       return SKIP_BODY;
@@ -140,6 +141,9 @@ public class PageTag extends WebloungeTag {
     // Add the cache tags to the response
     response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
     response.addTag(CacheTag.Url, page.getURI().getPath());
+    
+    // Adjust the modification time
+    response.setModificationDate(page.getLastModified());
 
     return EVAL_BODY_INCLUDE;
   }

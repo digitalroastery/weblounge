@@ -469,17 +469,6 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#isIndexed()
-   */
-  public boolean isIndexed() {
-    if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.isIndexed();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.image.Page#isLocked()
    */
   public boolean isLocked() {
@@ -552,17 +541,6 @@ public class LazyImageResourceImpl implements ImageResource {
    */
   public void setIdentifier(String identifier) {
     uri.setIdentifier(identifier);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setIndexed(boolean)
-   */
-  public void setIndexed(boolean index) {
-    if (!isHeaderLoaded)
-      loadImageHeader();
-    image.setIndexed(index);
   }
 
   /**
@@ -847,6 +825,22 @@ public class LazyImageResourceImpl implements ImageResource {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.Modifiable#getLastModified()
+   */
+  @Override
+  public Date getLastModified() {
+    Date date = getModificationDate();
+    if (date != null)
+      return date;
+    date = getPublishFrom();
+    if (date != null)
+      return date;
+    return getCreationDate();
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.Modifiable#getModifier()
    */
@@ -854,6 +848,22 @@ public class LazyImageResourceImpl implements ImageResource {
     if (!isHeaderLoaded)
       loadImageHeader();
     return image.getModifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.Modifiable#getLastModifier()
+   */
+  @Override
+  public User getLastModifier() {
+    User user = getModifier();
+    if (user != null)
+      return user;
+    user = getPublisher();
+    if (user != null)
+      return user;
+    return getCreator();
   }
 
   /**
@@ -1053,7 +1063,9 @@ public class LazyImageResourceImpl implements ImageResource {
    * @see ch.entwine.weblounge.common.content.Resource#getContent(ch.entwine.weblounge.common.language.Language)
    */
   public ImageContent getContent(Language language) {
-    return null;
+    if (!isBodyLoaded)
+      loadImage();
+    return image.getContent(language);
   }
 
   /**
@@ -1062,7 +1074,20 @@ public class LazyImageResourceImpl implements ImageResource {
    * @see ch.entwine.weblounge.common.content.Resource#getOriginalContent()
    */
   public ImageContent getOriginalContent() {
-    return null;
+    if (!isBodyLoaded)
+      loadImage();
+    return image.getOriginalContent();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  public void addContent(ImageContent content) {
+    if (!isBodyLoaded)
+      loadImage();
+    image.addContent(content);
   }
 
   /**
@@ -1071,7 +1096,9 @@ public class LazyImageResourceImpl implements ImageResource {
    * @see ch.entwine.weblounge.common.content.Resource#removeContent(ch.entwine.weblounge.common.language.Language)
    */
   public ImageContent removeContent(Language language) {
-    return null;
+    if (!isBodyLoaded)
+      loadImage();
+    return image.removeContent(language);
   }
 
   /**
@@ -1080,7 +1107,9 @@ public class LazyImageResourceImpl implements ImageResource {
    * @see ch.entwine.weblounge.common.content.Resource#contents()
    */
   public Set<ImageContent> contents() {
-    return null;
+    if (!isBodyLoaded)
+      loadImage();
+    return image.contents();
   }
 
   /**
@@ -1114,16 +1143,6 @@ public class LazyImageResourceImpl implements ImageResource {
   @Override
   public String toString() {
     return uri.toString();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.Resource#addContent(ch.entwine.weblounge.common.content.ResourceContent)
-   */
-  public void addContent(ImageContent content) {
-    // TODO Auto-generated method stub
-
   }
 
 }

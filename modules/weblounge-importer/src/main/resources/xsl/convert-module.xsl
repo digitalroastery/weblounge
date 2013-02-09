@@ -35,10 +35,12 @@
         <xsl:text>file://${module.root}/</xsl:text>
         <xsl:value-of select="jsp/file"></xsl:value-of>
       </renderer>
+      <xsl:if test="editor">
       <editor>
         <xsl:text>file://${module.root}/</xsl:text>
         <xsl:value-of select="editor/jsp"></xsl:value-of>
       </editor>
+      </xsl:if>
       <recheck>
         <xsl:value-of select="./recheck"></xsl:value-of>
       </recheck>
@@ -58,7 +60,6 @@
         <xsl:value-of select="handler/class"></xsl:value-of>
       </class>
       <mountpoint>
-        <xsl:text>/</xsl:text>
         <xsl:value-of select="mountpoint"></xsl:value-of>
       </mountpoint>
       <page>

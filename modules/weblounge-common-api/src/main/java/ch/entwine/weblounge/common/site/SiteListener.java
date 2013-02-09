@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.common.site;
 
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepository;
 
 /**
  * This interface defines the methods that have to be implemented by a

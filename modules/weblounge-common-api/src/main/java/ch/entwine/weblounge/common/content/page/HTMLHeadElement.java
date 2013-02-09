@@ -71,10 +71,17 @@ public interface HTMLHeadElement {
   void setEnvironment(Environment environment);
 
   /**
-   * Returns the xml representation of this script.
+   * Returns the <code>XML</code> representation of this script.
    * 
    * @return the xml representation
    */
   String toXml();
+
+  /**
+   * Returns the <code>HTML</code> representation of this script.
+   * 
+   * @return
+   */
+  String toHtml();
 
 }

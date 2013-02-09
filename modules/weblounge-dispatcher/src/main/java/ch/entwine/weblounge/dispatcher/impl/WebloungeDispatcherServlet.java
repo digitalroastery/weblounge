@@ -19,6 +19,10 @@
 
 package ch.entwine.weblounge.dispatcher.impl;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+
 import ch.entwine.weblounge.cache.CacheService;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
@@ -99,11 +103,17 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   /** List with well known urls and files */
   private static List<String> wellknownFiles = new ArrayList<String>();
 
-  /** List of sites that have already issued a warning once */
-  private final List<Site> missingRepositoryWarnings = new ArrayList<Site>();
+  /** List of offline sites that have already issued a warning once */
+  private final Set<String> missingRepositoryWarnings = new TreeSet<String>();
+
+  /** List of missing sites that have already issued a warning once */
+  private final Set<String> missingSiteWarnings = new TreeSet<String>();
 
   /** The response caches */
   private Map<String, ResponseCache> caches = null;
+
+  /** Name of this Weblounge instance */
+  private String instanceName = null;
 
   static {
     wellknownFiles.add("/favicon.ico");
@@ -133,33 +143,14 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   }
 
   /**
-   * Sets the site locator.
+   * Sets the name of this Weblounge instance or <code>null</code> if no
+   * instance name was configured.
    * 
-   * @param siteDispatcher
-   *          the site locator
+   * @param instanceName
+   *          name of the instance
    */
-  void setSiteDispatcher(SiteDispatcherService siteDispatcher) {
-    this.sites = siteDispatcher;
-  }
-
-  /**
-   * Removes the site locator.
-   * 
-   * @param siteDispatcher
-   *          the site locator
-   */
-  void removeSiteDispatcher(SiteDispatcherService siteDispatcher) {
-    this.sites = null;
-  }
-
-  /**
-   * Sets the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
+  public void setName(String instanceName) {
+    this.instanceName = instanceName;
   }
 
   /**
@@ -266,8 +257,13 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   protected void service(HttpServletRequest httpRequest,
       HttpServletResponse httpResponse) throws ServletException, IOException {
 
+    // Return the instance name if available
+    if (instanceName != null) {
+      httpResponse.addHeader("X-Weblounge-Instance", instanceName);
+    }
+
     if (sites == null) {
-      httpResponse.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+      httpResponse.sendError(SC_SERVICE_UNAVAILABLE);
       return;
     }
 
@@ -280,27 +276,32 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
       securityService.setSite(site);
     }
 
-    boolean isSpecial = StringUtils.isNotBlank(httpRequest.getHeader("X-Weblounge-Special"));
+    boolean isSpecialRequest = StringUtils.isNotBlank(httpRequest.getHeader("X-Weblounge-Special"));
+
+    // See if a site dispatcher was found, and if so, if it's enabled
     if (site == null) {
-      if (!wellknownFiles.contains(httpRequest.getRequestURI()))
-        logger.warn("No site found to handle {}", httpRequest.getRequestURL());
-      httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+      String serverName = httpRequest.getScheme() + "://" + httpRequest.getServerName();
+      if (httpRequest.getServerPort() != 80)
+        serverName += ":" + httpRequest.getServerPort();
+      if (!wellknownFiles.contains(httpRequest.getRequestURI()) && !missingSiteWarnings.contains(serverName)) {
+        missingSiteWarnings.add(serverName);
+        logger.warn("No site found to handle {}", serverName);
+      }
+      httpResponse.sendError(SC_NOT_FOUND);
       return;
-    } else if (!site.isOnline() && !isSpecial) {
+    } else if (!site.isOnline() && !isSpecialRequest) {
       if (site.getContentRepository() == null) {
-        if (!missingRepositoryWarnings.contains(site)) {
+        if (!missingRepositoryWarnings.contains(site.getIdentifier())) {
           logger.warn("No content repository connected to site '{}'", site);
-          missingRepositoryWarnings.add(site);
+          missingRepositoryWarnings.add(site.getIdentifier());
         } else {
           logger.debug("No content repository connected to site '{}'", site);
         }
       } else {
         logger.debug("Ignoring request for disabled site '{}'", site);
       }
-      httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+      httpResponse.sendError(SC_SERVICE_UNAVAILABLE);
       return;
-    } else if (missingRepositoryWarnings.size() > 0) {
-      missingRepositoryWarnings.remove(site);
     }
 
     // Make sure the response is buffered
@@ -321,20 +322,12 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest, siteServlet, environment);
     WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
 
-    // See if a site dispatcher was found, and if so, if it's enabled
-    if (!site.isOnline() && !isSpecial) {
-      logger.warn("Dispatcher for site {} is temporarily not available", site);
-      DispatchUtils.sendServiceUnavailable("Site is temporarily unavailable", request, response);
-      return;
-    }
-
     // Configure request and response objects
     request.init(site);
     response.setRequest(request);
     response.setResponseCache(cache);
     response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
     response.setHeader("X-Powered-By", POWERED_BY);
-    response.setHeader("Cache-Control", "private");
     response.setDateHeader("Date", Calendar.getInstance().getTimeInMillis());
 
     // Notify listeners about starting request
@@ -569,6 +562,36 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    */
   public void setEnvironment(Environment environment) {
     this.environment = environment;
+  }
+
+  /**
+   * Sets the site locator.
+   * 
+   * @param siteDispatcher
+   *          the site locator
+   */
+  void setSiteDispatcher(SiteDispatcherService siteDispatcher) {
+    this.sites = siteDispatcher;
+  }
+
+  /**
+   * Removes the site locator.
+   * 
+   * @param siteDispatcher
+   *          the site locator
+   */
+  void removeSiteDispatcher(SiteDispatcherService siteDispatcher) {
+    this.sites = null;
+  }
+
+  /**
+   * Sets the security service.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**

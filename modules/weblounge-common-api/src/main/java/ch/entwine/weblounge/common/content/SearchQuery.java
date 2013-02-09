@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -41,6 +42,11 @@ public interface SearchQuery {
   public enum Order {
     None, Ascending, Descending
   }
+
+  /** The search quantifier */
+  public enum Quantifier {
+    All, Any
+  };
 
   /**
    * Returns the contextual site for this query.
@@ -86,6 +92,21 @@ public interface SearchQuery {
    * @return the offset
    */
   int getOffset();
+
+  /**
+   * Enables boosting based on creation/modification date of resources so that
+   * recent documents are ranked higher than old ones.
+   * 
+   * @return the search query
+   */
+  SearchQuery withRececyPriority();
+
+  /**
+   * Returns whether priority boosting has been enabled.
+   * 
+   * @return <code>true</code> if recent documents are ranked higher
+   */
+  boolean getRecencyPriority();
 
   /**
    * Return the resources with the given identifier.
@@ -246,28 +267,105 @@ public interface SearchQuery {
    * Return resources that contain the given text either in the page header or
    * in one of the pagelets.
    * 
-   * @param text
-   *          the text to look up
    * @param wildcardSearch
    *          <code>True</code> to perform a (much slower) wildcard search
+   * @param text
+   *          the text to look up
+   * 
    * @return the query extended by this criterion
    */
-  SearchQuery withText(String text, boolean wildcardSearch);
+  SearchQuery withText(boolean wildcardSearch, String text);
+
+  /**
+   * Return resources that contain the given text either in the page header or
+   * in one of the pagelets.
+   * <p>
+   * Depending on the quantifier, either resources are returned that contain at
+   * least one of the terms are only resources containing all of the terms.
+   * 
+   * @param text
+   *          the text to look up
+   * @param quantifier
+   *          whether all or some of the terms need to be matched
+   * @param fuzzy
+   *          <code>true</code> to perform a fuzzy search
+   * @return the query extended by this criterion
+   */
+  SearchQuery withText(boolean fuzzy, Quantifier quantifier, String... text);
+
+  /**
+   * Returns the search terms or an empty collection if no terms were specified.
+   * 
+   * @return the terms
+   */
+  Collection<SearchTerms<String>> getTerms();
 
   /**
    * Returns the search text or <code>null</code> if no text was specified.
    * 
    * @return the text
    */
-  String getText();
+  String getQueryString();
+
+  /**
+   * Return resources that contain the given text in the fulltext search field.
+   * <p>
+   * Note that this search field is not intended to serve frontend applications
+   * but rather backend purposes.
+   * 
+   * @param text
+   *          the text to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withFulltext(String text);
+
+  /**
+   * Return resources that contain the given text in the fulltext search field.
+   * <p>
+   * Note that this search field is not intended to serve frontend applications
+   * but rather backend purposes.
+   * 
+   * @param fuzzy
+   *          <code>true</code> to perform a fuzzy search
+   * @param text
+   *          the text to look up
+   * 
+   * @return the query extended by this criterion
+   */
+  SearchQuery withFulltext(boolean fuzzy, String text);
+
+  /**
+   * Return resources that contain the given text in the fulltext search field.
+   * <p>
+   * Note that this search field is not intended to serve frontend applications
+   * but rather backend purposes.
+   * 
+   * @param fuzzy
+   *          <code>true</code> to perform a fuzzy search
+   * @param quantifier
+   *          whether documents need to match all or just one of the text
+   *          elements
+   * @param text
+   *          the text to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withFulltext(boolean fuzzy, Quantifier quantifier, String... text);
+
+  /**
+   * Returns the fulltext search terms or <code>null</code> if no text was
+   * specified.
+   * 
+   * @return the text
+   */
+  Collection<SearchTerms<String>> getFulltext();
 
   /**
    * Returns <code>true</code> if the current search operation should be
-   * performed using (slower) wildcard searching.
+   * performed using fuzzy searching.
    * 
-   * @return <code>true</code> if wildcard search should be used
+   * @return <code>true</code> if fzzy search should be used
    */
-  boolean isWildcardSearch();
+  boolean isFuzzySearch();
 
   /**
    * Returns resources that match the search query <i>and</i> and the text
@@ -306,7 +404,7 @@ public interface SearchQuery {
   Map<String, String> getElements();
 
   /**
-   * Sets the search text.
+   * Sets the properties and their values to search for.
    * 
    * @param property
    *          the property name
@@ -317,9 +415,10 @@ public interface SearchQuery {
   SearchQuery withProperty(String property, String value);
 
   /**
-   * Returns the search text or <code>null</code> if no text was specified.
+   * Returns the properties and their values or <code>null</code> if no
+   * properties were specified.
    * 
-   * @return the text
+   * @return the properties
    */
   Map<String, String> getProperties();
 
@@ -340,10 +439,7 @@ public interface SearchQuery {
   Language getLanguage();
 
   /**
-   * Only returns resources that contain the specified subject. Note that this
-   * method may be called multiple times in order to specify more than one
-   * subject combined with logical OR. To combine subjects with logical AND, see
-   * <code>andSubject(String)</code>
+   * Only returns resources that contain the specified subject.
    * 
    * @param subject
    *          the subject
@@ -352,31 +448,26 @@ public interface SearchQuery {
   SearchQuery withSubject(String subject);
 
   /**
-   * Returns the subjects or an empty array if no subjects have been specified.
+   * Returns only resources that match the given subjects. Depending on
+   * <code>quantifier</code>, either all or some of the terms need to be
+   * present.
    * 
-   * @return the subjects
-   */
-  String[] getSubjects();
-
-  /**
-   * Only returns resources that contain the specified subject. Note that this
-   * method may be called multiple times in order to specify more than one
-   * subject combined with logical AND. To combine subjects with logical OR, see
-   * <code>withSubject(String)</code>
+   * @param quantifier
+   *          the quantifier
+   * @param subjects
+   *          the list of subjects
    * 
-   * @param subject
-   *          the subject
    * @return the query extended by this criterion
    */
-  SearchQuery andSubject(String subject);
+  SearchQuery withSubjects(Quantifier quantifier, String... subjects);
 
   /**
-   * Returns the subjects which will be conjuncted in the search query or an
-   * empty array if no subjects to conjunct have been specified.
+   * Returns the subjects as a collection of search terms or <code>null</code>
+   * if no subjects have been specified.
    * 
    * @return the subjects
    */
-  String[] getANDSubjects();
+  Collection<SearchTerms<String>> getSubjects();
 
   /**
    * Only returns resources that contain the specified series. Note that this
@@ -684,21 +775,35 @@ public interface SearchQuery {
    * {@link #andElement(String, String)} and
    * {@link #andProperty(String, String)}.
    * 
-   * @param module
-   *          the module identifier
-   * @param id
-   *          the pagelet identifier
+   * @param pagelet
+   *          the pagelet
    * @return the query extended by this criterion
    */
-  SearchQuery withPagelet(String module, String id);
+  SearchQuery withPagelet(Pagelet pagelet);
+
+  /**
+   * Return resources that contain all or any of the specified pagelets.
+   * <p>
+   * Note that you can specify the location where the pagelet needs to be as
+   * additional elements or properties by a subsequent call to
+   * {@link #inComposer(String)} {@link #atPosition(int)},
+   * {@link #andElement(String, String)} and
+   * {@link #andProperty(String, String)}.
+   * 
+   * @param pagelets
+   *          the pagelets
+   * @return the query extended by this criterion
+   */
+  SearchQuery withPagelets(Quantifier quantifier, Pagelet... pagelets);
 
   /**
    * Returns the list of required pagelets, along with their elements,
-   * properties and location information.
+   * properties and location information as a collection of search terms or
+   * <code>null</code> if not pagelets have been specified.
    * 
    * @return the pagelets
    */
-  Pagelet[] getPagelets();
+  Collection<SearchTerms<Pagelet>> getPagelets();
 
   /**
    * This method may be called after a call to {@link #withPagelet(Pagelet)} in
@@ -871,20 +976,6 @@ public interface SearchQuery {
   Order getPublishingDateSortOrder();
 
   /**
-   * Turns on faceting for subjects
-   * 
-   * @return the search query
-   */
-  SearchQuery withSubjectFacet();
-
-  /**
-   * Returns <code>true</code> if faceting on subjects is enabled.
-   * 
-   * @return <code>true</code> the subject facet is enabled
-   */
-  boolean isSubjectFacetEnabled();
-
-  /**
    * Asks the search index to return only resources with the indicated version.
    * 
    * @param version
@@ -916,5 +1007,33 @@ public interface SearchQuery {
    * @return the preferred version
    */
   long getPreferredVersion();
+
+  /**
+   * Returns the fields that should be returned by the query. If all fields
+   * should be returned, the method will return an empty array.
+   * 
+   * @return the names of the fields to return
+   */
+  String[] getFields();
+
+  /**
+   * Adds a field that needs to be returned by the query. If no fields are being
+   * set, all fields will be returned.
+   * 
+   * @param field
+   *          the field name
+   * @return the query
+   */
+  SearchQuery withField(String field);
+
+  /**
+   * Adds the fields that need to be returned by the query. If no fields are
+   * being set, all fields will be returned.
+   * 
+   * @param fields
+   *          the field names
+   * @return the query
+   */
+  SearchQuery withFields(String... fields);
 
 }

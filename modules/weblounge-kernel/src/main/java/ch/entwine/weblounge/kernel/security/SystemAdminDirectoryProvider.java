@@ -24,10 +24,10 @@ import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.security.DigestType;
-import ch.entwine.weblounge.common.security.DirectoryProvider;
 import ch.entwine.weblounge.common.security.Password;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.Security;
+import ch.entwine.weblounge.common.security.SystemDirectory;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -38,14 +38,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * An in-memory user directory containing the users and roles used by the
  * system.
  */
-public class SystemAdminDirectoryProvider implements DirectoryProvider, ManagedService {
+public class SystemAdminDirectoryProvider implements SystemDirectory, ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SystemAdminDirectoryProvider.class);
@@ -59,6 +57,9 @@ public class SystemAdminDirectoryProvider implements DirectoryProvider, ManagedS
   /** Configuration key for the system user's password */
   public static final String OPT_ADMIN_PASSWORD = "systemdirectory.password";
 
+  /** Configuration key for the system user's password digest */
+  public static final String OPT_ADMIN_DIGEST = "systemdirectory.password.digest";
+
   /** Configuration key for the system user's name */
   public static final String OPT_ADMIN_NAME = "systemdirectory.name";
 
@@ -66,8 +67,8 @@ public class SystemAdminDirectoryProvider implements DirectoryProvider, ManagedS
   public static final String OPT_ADMIN_EMAIL = "systemdirectory.email";
 
   /** Well-known accounts */
-  protected Map<String, User> internalAccounts = new HashMap<String, User>();
-
+  protected WebloungeUserImpl administrator = null;
+  
   /**
    * {@inheritDoc}
    * 
@@ -77,40 +78,51 @@ public class SystemAdminDirectoryProvider implements DirectoryProvider, ManagedS
   public void updated(Dictionary properties) throws ConfigurationException {
     String login = null;
     String pass = "";
+    String digest = null;
     String name = null;
     String email = null;
 
     if (properties != null) {
       login = StringUtils.trimToNull((String) properties.get(OPT_ADMIN_LOGIN));
       pass = StringUtils.trimToEmpty((String) properties.get(OPT_ADMIN_PASSWORD));
+      digest = StringUtils.trimToEmpty((String) properties.get(OPT_ADMIN_DIGEST));
       name = StringUtils.trimToEmpty((String) properties.get(OPT_ADMIN_NAME));
       email = StringUtils.trimToEmpty((String) properties.get(OPT_ADMIN_EMAIL));
     }
 
-    // Whatever has been defined before is no longer valid
-    internalAccounts.clear();
-
     // If no user can be found
     if (login == null || "".equals(pass)) {
       logger.info("No system accounts have been defined");
-      if (internalAccounts.size() > 0)
+      if (administrator != null)
         logger.info("Deactivating system admin account");
+      administrator = null;
       return;
     }
 
-    // Remove previous administrators
-    internalAccounts.clear();
-
     // Register the new one
     logger.info("Activating system admin user '{}'", login);
-    WebloungeUserImpl administrator = new WebloungeUserImpl(login, Security.SYSTEM_CONTEXT);
+    administrator = new WebloungeUserImpl(login, Security.SYSTEM_CONTEXT);
     if (StringUtils.isNotBlank(name))
       administrator.setName(name);
     if (StringUtils.isNotBlank(email))
       administrator.setEmail(email);
-    internalAccounts.put(login, administrator);
-    Password password = new PasswordImpl(StringUtils.trimToEmpty(pass), DigestType.plain);
-    administrator.addPrivateCredentials(password);
+
+    DigestType digestType = DigestType.plain;
+    if (StringUtils.isNotBlank(digest)) {
+      try {
+        digestType = DigestType.valueOf(digest);
+      } catch (IllegalArgumentException e) {
+        logger.error("Digest type '{}' is unknown", digest);
+        throw new ConfigurationException(OPT_ADMIN_DIGEST, digest);
+      }
+    }
+
+    if (StringUtils.isNotBlank(pass)) {
+      Password password = new PasswordImpl(StringUtils.trimToEmpty(pass), digestType);
+      administrator.addPrivateCredentials(password);
+    }
+
+    // Add the roles
     for (Role role : SystemRole.SYSTEMADMIN.getClosure()) {
       administrator.addPublicCredentials(role);
     }
@@ -132,7 +144,11 @@ public class SystemAdminDirectoryProvider implements DirectoryProvider, ManagedS
    *      Site)
    */
   public User loadUser(String userName, Site site) {
-    return internalAccounts.get(userName);
+    if (administrator == null)
+      return null;
+    if (!administrator.getLogin().equals(userName))
+      return null;
+    return administrator;
   }
 
   /**

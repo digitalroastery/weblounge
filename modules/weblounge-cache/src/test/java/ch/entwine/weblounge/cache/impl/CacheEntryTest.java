@@ -117,19 +117,19 @@ public class CacheEntryTest {
   public void testGetETag() throws Exception {
     String eTag = entry.getETag();
     assertNotNull(eTag);
-    Thread.sleep(100);
+    Thread.sleep(1000);
     CacheHandle newHandle = new TaggedCacheHandle(tags.getTags(), expirationTime, recheckTime);
     String newETag = new CacheEntry(newHandle, content.getBytes(), encoding, headers).getETag();
     assertFalse(eTag.equals(newETag));
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.cache.impl.CacheEntry#getLastModified()}.
+   * Test method for {@link ch.entwine.weblounge.cache.impl.CacheEntry#getCreationDate()}.
    */
   @Test
   public void testGetCreationDate() throws Exception {
     Thread.sleep(100);
-    assertTrue(System.currentTimeMillis() >= entry.getLastModified());
+    assertTrue(System.currentTimeMillis() >= entry.getCreationDate());
   }
 
   /**
@@ -179,7 +179,7 @@ public class CacheEntryTest {
     CacheableHttpServletResponseHeaders h = entry.getHeaders();
     h.addHeader("Last-Modified", df.format(modificationDate));
     entry.setHeaders(h);
-    assertEquals(modificationDate.getTime(), entry.getLastModified());
+    assertEquals(modificationDate.getTime(), entry.getModificationDate());
   }
   
   /**

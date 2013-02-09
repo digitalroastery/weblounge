@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.content.page.Script;
 import ch.entwine.weblounge.common.impl.site.SiteImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
@@ -174,6 +175,14 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    */
   public void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException {
+
+    // Adjust revalidation and expiration time
+    response.setClientRevalidationTime(getClientRevalidationTime());
+    response.setCacheExpirationTime(getCacheExpirationTime());
+
+    // Add cache support
+    response.addTag(CacheTag.Renderer, getIdentifier());
+
     URL renderer = renderers.get(RendererType.Page.toString().toLowerCase());
     includeJSP(request, response, renderer);
   }
@@ -281,11 +290,13 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
         template.setIdentifier(id);
         template.setRenderer(rendererUrl);
       } catch (ClassNotFoundException e) {
-        throw new IllegalStateException("Pagelet renderer implementation " + className + " not found", e);
+        throw new IllegalStateException("Implementation " + className + " for page template '" + id + "' not found", e);
       } catch (InstantiationException e) {
-        throw new IllegalStateException("Error instantiating pagelet renderer " + className, e);
+        throw new IllegalStateException("Error instantiating impelementation " + className + " for page template '" + id + "'", e);
       } catch (IllegalAccessException e) {
-        throw new IllegalStateException("Access violation instantiating pagelet renderer " + className, e);
+        throw new IllegalStateException("Access violation instantiating implementation " + className + " for page template '" + id + "'", e);
+      } catch (Throwable t) {
+        throw new IllegalStateException("Error loading implementation " + className + " for page template '" + id + "'", t);
       }
     } else {
       template = new PageTemplateImpl(id, rendererUrl);
@@ -393,16 +404,16 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       buf.append("<layout>").append(layout).append("</layout>");
 
     // Recheck time
-    if (recheckTime >= 0) {
+    if (clientRevalidationTime >= 0) {
       buf.append("<recheck>");
-      buf.append(ConfigurationUtils.toDuration(recheckTime));
+      buf.append(ConfigurationUtils.toDuration(clientRevalidationTime));
       buf.append("</recheck>");
     }
 
     // Valid time
-    if (validTime >= 0) {
+    if (cacheExpirationTime >= 0) {
       buf.append("<valid>");
-      buf.append(ConfigurationUtils.toDuration(validTime));
+      buf.append(ConfigurationUtils.toDuration(cacheExpirationTime));
       buf.append("</valid>");
     }
 

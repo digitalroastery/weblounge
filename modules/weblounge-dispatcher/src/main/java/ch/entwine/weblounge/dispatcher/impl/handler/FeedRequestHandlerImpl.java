@@ -32,14 +32,14 @@ import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
-import ch.entwine.weblounge.common.content.repository.ContentRepository;
-import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -82,6 +82,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -220,14 +221,14 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     // Check if the page is already part of the cache. If so, our task is
     // already done!
     if (!noCache) {
-      long validTime = Renderer.DEFAULT_VALID_TIME;
-      long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+      long expirationTime = Renderer.DEFAULT_VALID_TIME;
+      long revalidationTime = Renderer.DEFAULT_RECHECK_TIME;
 
       // Create the set of tags that identify the request output
       CacheTagSet cacheTags = createPrimaryCacheTags(request);
 
       // Check if the page is already part of the cache
-      if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
+      if (response.startResponse(cacheTags.getTags(), expirationTime, revalidationTime)) {
         logger.debug("Feed handler answered request for {} from cache", request.getUrl());
         return true;
       }
@@ -250,6 +251,9 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       // Set the character encoding
       feed.setEncoding(response.getCharacterEncoding());
 
+      // Set the modification date
+      response.setModificationDate(feed.getPublishedDate());
+
       // Write the feed back to the response
 
       SyndFeedOutput output = new SyndFeedOutput();
@@ -271,6 +275,14 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       return true;
     } catch (IOException e) {
       logger.error("Error sending {} feed to the client: {}", feedType, e.getMessage());
+      DispatchUtils.sendInternalError(request, response);
+      return true;
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to create feed of type '{}': {}", feedType, e.getMessage());
+      DispatchUtils.sendNotFound(e.getMessage(), request, response);
+      return true;
+    } catch (Throwable t) {
+      logger.error("Error creating feed of type '{}': {}", feedType, t.getMessage());
       DispatchUtils.sendInternalError(request, response);
       return true;
     } finally {
@@ -297,7 +309,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
    */
   private SyndFeed createFeed(String feedType, String feedVersion, Site site,
       WebloungeRequest request, WebloungeResponse response)
-          throws ContentRepositoryException {
+      throws ContentRepositoryException {
     // Extract the subjects. The parameter may be specified multiple times
     // and add more than one subject by separating them using a comma.
     String[] subjectParameter = request.getParameterValues(PARAM_SUBJECT);
@@ -346,6 +358,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     feed.setTitle(site.getName());
     feed.setDescription(site.getName());
     feed.setLanguage(language.getDescription());
+    feed.setPublishedDate(new Date());
 
     // TODO: Add more feed metadata, ask site
 
@@ -374,6 +387,12 @@ public class FeedRequestHandlerImpl implements RequestHandler {
 
       // Tag the cache entry
       response.addTag(CacheTag.Resource, page.getIdentifier());
+
+      // If this is to become the most recent entry, let's set the feed's
+      // modification date to be that of this entry
+      if (entries.size() == 0) {
+        feed.setPublishedDate(page.getPublishFrom());
+      }
 
       // Create the entry
       SyndEntry entry = new SyndEntryImpl();
@@ -419,8 +438,10 @@ public class FeedRequestHandlerImpl implements RequestHandler {
             rendererContent = loadContents(rendererURL, site, page, composer, pagelet, environment);
           } catch (ServletException e) {
             logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
+            DispatchUtils.sendInternalError(request, response);
           } catch (IOException e) {
             logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
+            DispatchUtils.sendInternalError(request, response);
           }
           SyndContent content = new SyndContentImpl();
           content.setType("text/html");
@@ -488,7 +509,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
    */
   private String loadContents(URL rendererURL, Site site, Page page,
       Composer composer, Pagelet pagelet, Environment environment)
-          throws IOException, ServletException {
+      throws IOException, ServletException {
 
     Servlet servlet = siteServlets.get(site.getIdentifier());
 
