@@ -23,7 +23,6 @@ package ch.entwine.weblounge.common.impl.site;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.PageLayout;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.page.PageletRenderer;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJob;
