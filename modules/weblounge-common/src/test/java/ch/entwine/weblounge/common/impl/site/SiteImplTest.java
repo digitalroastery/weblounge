@@ -533,7 +533,7 @@ public class SiteImplTest {
     assertEquals(guestRole, site.getLocalRole(Security.GUEST_ROLE));
 
     String nonExistingRole = "test";
-    assertEquals(nonExistingRole, site.getLocalRole(nonExistingRole));
+    assertEquals(null, site.getLocalRole(nonExistingRole));
   }
   
   /**
