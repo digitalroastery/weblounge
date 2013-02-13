@@ -89,24 +89,24 @@ public class ModuleImplTest {
 
   /** The Italian language */
   protected static final Language ITALIAN = new LanguageImpl(new Locale("it"));
-  
+
   /** The test action */
   protected Action action = null;
-  
+
   /** The action identifier */
   protected String actionIdentifier = "myaction";
-  
+
   /** The pagelet renderer */
   protected PageletRenderer renderer = null;
-  
+
   /** The pagelet renderer identifier */
   protected String rendererIdentifier = "renderer";
-  
+
   /** The image style */
   protected ImageStyle imageStyle = null;
-  
+
   protected String imageStyleIdentifier = "modulestyle";
-  
+
   /**
    * Sets up the test bed.
    * 
@@ -141,10 +141,10 @@ public class ModuleImplTest {
     EasyMock.expect(site.getIdentifier()).andReturn("test");
     EasyMock.expect(site.getHostname((Environment) EasyMock.anyObject())).andReturn(new SiteURLImpl(new URL("http://localhost"))).anyTimes();
     EasyMock.replay(site);
-    
+
     action = new TestAction();
     action.setIdentifier(actionIdentifier);
-    
+
     renderer = new PageletRendererImpl();
     renderer.setIdentifier(rendererIdentifier);
 
@@ -158,7 +158,8 @@ public class ModuleImplTest {
    */
   @After
   public void tearDown() throws Exception {
-    module.destroy();
+    if (module != null)
+      module.destroy();
   }
 
   /**

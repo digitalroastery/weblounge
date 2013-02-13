@@ -36,6 +36,11 @@ import ch.entwine.weblounge.common.site.ImageScalingMode;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -47,6 +52,9 @@ import javax.xml.xpath.XPathFactory;
  */
 public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
+  /** Identifier for the global context */
+  public static final String GLOBAL_CONTEXT = "all";
+
   /** the image width */
   protected int width = -1;
 
@@ -56,11 +64,8 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   /** the scaling mode */
   protected ImageScalingMode scalingMode = null;
 
-  /**
-   * defines whether this image style will be applied to all resources by
-   * default
-   */
-  protected boolean preview = true;
+  /** The styling context */
+  protected List<Context> contexts = null;
 
   /**
    * Creates a new image style with the name as its identifier, width and
@@ -87,7 +92,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    */
   public ImageStyleImpl(String id, int width, int height,
       ImageScalingMode scaling, boolean composeable, boolean preview)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     if (StringUtils.isBlank(id))
       throw new IllegalArgumentException("Identifier cannot be null");
     this.identifier = id;
@@ -95,7 +100,6 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     this.height = height;
     this.scalingMode = scaling;
     this.composeable = composeable;
-    this.preview = preview;
     switch (scaling) {
       case Box:
       case Cover:
@@ -155,6 +159,65 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    */
   public ImageStyleImpl(String id) {
     this(id, -1, -1, None, true, false);
+  }
+
+  /**
+   * Adds a new context to this image style.
+   * 
+   * @param type
+   *          the context
+   * @param preview
+   *          <code>true</code> to create previews
+   * @throws IllegalArgumentException
+   *           if <code>type</code> is blank
+   */
+  public void addContext(String type, boolean preview)
+      throws IllegalArgumentException {
+    if (StringUtils.isBlank(type))
+      throw new IllegalArgumentException("Type must not be blank");
+    if (contexts == null)
+      contexts = new ArrayList<Context>();
+    if (GLOBAL_CONTEXT.equals(type))
+      contexts.clear();
+    contexts.add(new Context(type, preview));
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.image.ImageStyle#getContexts()
+   */
+  @Override
+  public List<String> getContexts() {
+    if (contexts == null || contexts.isEmpty())
+      return Collections.emptyList();
+    if (GLOBAL_CONTEXT.equals(contexts.get(0).getResource()))
+      return Collections.emptyList();
+    List<String> result = new ArrayList<String>(contexts.size());
+    for (Context ctx : contexts) {
+      result.add(ctx.getResource());
+    }
+    return result;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.image.ImageStyle#createPreview(java.lang.String)
+   */
+  @Override
+  public boolean createPreview(String context) throws IllegalArgumentException {
+    if (StringUtils.isBlank(context))
+      throw new IllegalArgumentException("Context must not be blank");
+    if (contexts == null || contexts.isEmpty())
+      return false;
+    if ("all".equals(contexts.get(0).getResource()))
+      return contexts.get(0).createPreview();
+    for (Context ctx : contexts) {
+      if (context.equals(ctx.getResource()))
+        return ctx.createPreview();
+    }
+    return false;
   }
 
   /**
@@ -257,27 +320,6 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    */
   public int getWidth() {
     return width;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.image.ImageStyle#isPreview()
-   */
-  @Override
-  public boolean isPreview() {
-    return preview;
-  }
-
-  /**
-   * Specifies whether this image style should be automatically applied to all
-   * resources.
-   * 
-   * @param autoCreate
-   *          <code>true</code> to automatically create this preview
-   */
-  void setPreview(boolean autoCreate) {
-    this.preview = autoCreate;
   }
 
   /**
@@ -388,6 +430,17 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     String name = XPathHelper.valueOf(node, "m:name", xpath);
     imageStyle.setName(name);
 
+    // Contexts
+    NodeList contexts = XPathHelper.selectList(node, "m:context/m:resource", xpath);
+    if (contexts != null) {
+      for (int i = 0; i < contexts.getLength(); i++) {
+        Node n = contexts.item(i);
+        boolean createPreviews = ConfigurationUtils.isTrue(n.getAttributes().getNamedItem("preview"));
+        String resource = n.getFirstChild().getNodeValue();
+        imageStyle.addContext(resource, createPreviews);
+      }
+    }
+
     return imageStyle;
   }
 
@@ -405,9 +458,6 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
     // composeable
     buf.append(" composeable=\"").append(composeable).append("\"");
-
-    // composeable
-    buf.append(" preview=\"").append(preview).append("\"");
 
     buf.append(">");
 
@@ -430,6 +480,19 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     // height
     if (height > 0)
       buf.append("<height>").append(height).append("</height>");
+
+    // contexts
+    if (contexts != null) {
+      buf.append("<context>");
+      for (Context ctx : contexts) {
+        buf.append("<resource");
+        if (ctx.createPreview())
+          buf.append(" preview=\"true\"");
+        buf.append(">").append(ctx.getResource());
+        buf.append("</resource>");
+      }
+      buf.append("</context>");
+    }
 
     buf.append("</imagestyle>");
     return buf.toString();
@@ -455,6 +518,52 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     }
     buf.append("]");
     return buf.toString();
+  }
+
+  /**
+   * The image style context.
+   */
+  private static final class Context {
+
+    /** The resource type */
+    private String resource = null;
+
+    /** Whether to render previews for the resource */
+    private boolean preview = false;
+
+    /**
+     * Creates a new context for the given resource and defines whether previews
+     * should be created automatically for this resource.
+     * 
+     * @param resource
+     *          the resource
+     * @param preview
+     *          <code>true</code> to automatically render previews
+     */
+    public Context(String resource, boolean preview) {
+      this.resource = resource;
+      this.preview = preview;
+    }
+
+    /**
+     * Returns the resource type.
+     * 
+     * @return the resource
+     */
+    public String getResource() {
+      return resource;
+    }
+
+    /**
+     * Returns <code>true</code> if previews need to be created for the
+     * resource.
+     * 
+     * @return the preview the preview
+     */
+    public boolean createPreview() {
+      return preview;
+    }
+
   }
 
 }

@@ -866,7 +866,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
           boolean stylesMatch = s.getWidth() == style.getWidth();
           stylesMatch = stylesMatch && s.getHeight() == style.getHeight();
           stylesMatch = stylesMatch && s.getScalingMode().equals(style.getScalingMode());
-          stylesMatch = stylesMatch && s.isPreview() == style.isPreview();
+          stylesMatch = stylesMatch && s.getContexts().size() == style.getContexts().size();
+          for (String ctx : s.getContexts()) {
+            stylesMatch = stylesMatch && s.createPreview(ctx) == style.createPreview(ctx);
+          }
           styleHasChanged = styleHasChanged || !stylesMatch;
         } catch (ParserConfigurationException e) {
           logger.error("Error setting up image style parser: {}", e.getMessage());
@@ -876,7 +879,11 @@ public abstract class AbstractContentRepository implements ContentRepository {
           logger.error("Error reading image style {}: {}", definitionFile, e.getMessage());
         }
       } else {
-        if (s.isPreview()) {
+        boolean previewsForAnyContext = false;
+        for (String ctx : s.getContexts()) {
+          previewsForAnyContext |= s.createPreview(ctx);
+        }
+        if (previewsForAnyContext) {
           logger.debug("No previews found for image style '{}'", s.getIdentifier());
           styleIsMissing = true;
         }
@@ -944,7 +951,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
     // Add the global image styles that have the preview flag turned on
     for (ImageStyle s : imageStyleTracker.getImageStyles()) {
-      if (s.isPreview()) {
+      if (s.createPreview(resource.getURI().getType())) {
         previewStyles.add(s);
         logger.debug("Preview images will be generated for {}", s);
       } else {
@@ -955,7 +962,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     // Add the site's preview image styles as well as
     for (Module m : getSite().getModules()) {
       for (ImageStyle s : m.getImageStyles()) {
-        if (s.isPreview()) {
+        if (s.createPreview(resource.getURI().getType())) {
           previewStyles.add(s);
           logger.debug("Preview images will be generated for {}", s);
         } else {
@@ -1308,38 +1315,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
 
     /**
-     * Adds the languages to the list of languages.
-     * 
-     * @param languages
-     *          the languages to add
-     */
-    public void addLanguages(Collection<Language> languages) {
-      for (Language l : languages) {
-        if (!this.languages.contains(languages))
-          this.languages.add(l);
-      }
-    }
-
-    /**
      * Returns the image styles.
      * 
      * @return the styles
      */
     public List<ImageStyle> getStyles() {
       return styles;
-    }
-
-    /**
-     * Adds the image styles to the list of styles.
-     * 
-     * @param styles
-     *          the styles to add
-     */
-    public void addStyles(Collection<ImageStyle> styles) {
-      for (ImageStyle s : styles) {
-        if (!this.styles.contains(styles))
-          this.styles.add(s);
-      }
     }
 
     /**

@@ -1,4 +1,4 @@
-<test xmlns="http://www.entwinemedia.com/weblounge/3.0/test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/test http://www.entwinemedia.com/xsd/weblounge/3.0/test.xsd">
+<test xmlns="http://www.entwinemedia.com/weblounge/3.2/test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.2/test http://www.entwinemedia.com/xsd/weblounge/3.2/test.xsd">
   <name><![CDATA[Action Tests]]></name>
   <test-case>
     <name><![CDATA[English greeting test]]></name>

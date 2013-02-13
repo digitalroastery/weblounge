@@ -46,7 +46,7 @@ public final class IntegrationTestParser {
   private static final Logger logger = LoggerFactory.getLogger(IntegrationTestParser.class);
 
   /** Xml namespace for the module */
-  public static final String TEST_XMLNS = "http://www.entwinemedia.com/weblounge/3.0/test";
+  public static final String TEST_XMLNS = "http://www.entwinemedia.com/weblounge/3.2/test";
 
   /**
    * This utility class is not intended to be instantiated.

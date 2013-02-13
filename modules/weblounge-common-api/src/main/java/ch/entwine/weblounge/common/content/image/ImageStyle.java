@@ -23,12 +23,34 @@ package ch.entwine.weblounge.common.content.image;
 import ch.entwine.weblounge.common.content.Composeable;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 
+import java.util.List;
+
 /**
  * The <code>ImageStyle</code> defines a presentation style for images of a
  * certain size as well as the method to get from the original image version to
  * scaled ones.
  */
 public interface ImageStyle extends Composeable {
+
+  /**
+   * Returns the list of resources that this image style is associated with or
+   * an empty list if the image style applies to all possible resources.
+   * 
+   * @return the list of contexts
+   */
+  List<String> getContexts();
+
+  /**
+   * Returns <code>true</code> if previews are automatically being generated for
+   * this context.
+   * 
+   * @param context
+   *          the context
+   * @return <code>true</code> to automatically create previews
+   * @throws IllegalArgumentException
+   *           if <code>context</code> is blank
+   */
+  boolean createPreview(String context);
 
   /**
    * Sets the scaling mode for this image style. The scaling mode defines which
@@ -87,14 +109,6 @@ public interface ImageStyle extends Composeable {
    * @return the scaling factor
    */
   float scale(int width, int height);
-
-  /**
-   * Returns <code>true</code> whether this image style should be automatically
-   * created for all resources ahead of access.
-   * 
-   * @return <code>true</code> if this style should be automatically created
-   */
-  boolean isPreview();
 
   /**
    * Returns an xml representation of this image style.
