@@ -20,12 +20,17 @@
 
 package ch.entwine.weblounge.common.impl.site;
 
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.util.classloader.BundleClassLoader;
 import ch.entwine.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
 import ch.entwine.weblounge.common.impl.util.xml.ValidationErrorHandler;
+import ch.entwine.weblounge.common.security.SystemDirectory;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -148,7 +153,8 @@ public class SiteActivator {
    *          the component properties
    * @param throws Exception if component activation fails
    */
-  protected void activate(Object service, Map<?, ?> properties) throws Exception {
+  protected void activate(Object service, Map<?, ?> properties)
+      throws Exception {
     if (bundleContext == null)
       throw new IllegalStateException("Bundle context has not been set");
 
@@ -175,7 +181,8 @@ public class SiteActivator {
    *          the component properties
    * @param throws Exception if component activation fails
    */
-  protected void deactivate(Object service, Map<?, ?> properties) throws Exception {
+  protected void deactivate(Object service, Map<?, ?> properties)
+      throws Exception {
     if (bundleContext == null)
       throw new IllegalStateException("Bundle context has not been set");
     deactivate(bundleContext, this.properties);
@@ -240,6 +247,27 @@ public class SiteActivator {
                 logger.info("Loading site from bundle '{}'", bundleName);
 
                 site = SiteImpl.fromXml(siteXml.getFirstChild());
+
+                // Make sure the system admin account is not shadowed
+                if (site.getAdministrator() != null) {
+                  ServiceReference userDirectoryRef = bundleContext.getServiceReference(SystemDirectory.class.getName());
+                  if (userDirectoryRef != null) {
+                    SystemDirectory systemDirectory = (SystemDirectory) bundleContext.getService(userDirectoryRef);
+                    User siteAdmin = site.getAdministrator();
+                    if (siteAdmin != null) {
+                      logger.debug("Checking site '{}' admin user '{}' for shadowing of system account");
+                      User shadowedUser = systemDirectory.loadUser(siteAdmin.getLogin(), site);
+                      if (shadowedUser != null && SecurityUtils.userHasRole(shadowedUser, SystemRole.SYSTEMADMIN)) {
+                        throw new IllegalStateException("Site '" + site.getIdentifier() + "' administrative account '" + siteAdmin.getLogin() + "' is shadowing the system account");
+                      }
+                    }
+                  } else {
+                    logger.warn("Directory service not found, site '{}' admin user cannot be checked for user shadowing", site.getIdentifier());
+                  }
+                } else {
+                  logger.info("Site '{}' does not specify an administrative account", site.getIdentifier());
+                }
+
                 if (site instanceof SiteImpl) {
                   beforeActivation(site, bundleContext, properties);
                   ((SiteImpl) site).activate(bundleContext, properties);

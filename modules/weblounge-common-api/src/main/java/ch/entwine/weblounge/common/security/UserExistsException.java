@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2013 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -17,36 +17,24 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
-package ch.entwine.weblounge.taglib.security;
-
-import ch.entwine.weblounge.common.impl.security.SecurityUtils;
-import ch.entwine.weblounge.common.security.User;
-import ch.entwine.weblounge.taglib.WebloungeTag;
-
-import javax.servlet.jsp.JspException;
+package ch.entwine.weblounge.common.security;
 
 /**
- * Checks if a user is authenticated. The body content is only evaluated, if the
- * user is logged in.
+ * This exception is raised if a new user would be replacing an existing user.
  */
-public class IfAuthenticatedTag extends WebloungeTag {
+public class UserExistsException extends Exception {
 
-  /** serial version uid */
-  private static final long serialVersionUID = 5576649176077112454L;
+  /** The */
+  private static final long serialVersionUID = -5231190349105882121L;
 
   /**
-   * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
+   * Creates a new exception.
+   * 
+   * @param msg
+   *          the message
    */
-  @Override
-  public int doStartTag() throws JspException {
-    super.doStartTag();
-    User user = getRequest().getUser();
-
-    if (!SecurityUtils.isAuthenticated(user))
-      return SKIP_BODY;
-
-    return EVAL_BODY_INCLUDE;
+  public UserExistsException(String msg) {
+    super(msg);
   }
 
 }

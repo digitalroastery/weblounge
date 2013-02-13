@@ -21,10 +21,10 @@
 package ch.entwine.weblounge.common.impl.security;
 
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ch.entwine.weblounge.common.security.Security;
-import ch.entwine.weblounge.common.security.SecurityUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class WebloungeAdminImplTest extends UserImplTest {
     assertTrue(SecurityUtils.userHasRole(user, SystemRole.SYSTEMADMIN));
     assertTrue(SecurityUtils.userHasRole(user, SystemRole.SITEADMIN));
     assertTrue(SecurityUtils.userHasRole(user, SystemRole.EDITOR));
-    assertTrue(SecurityUtils.userHasRole(user, SystemRole.GUEST));
+    assertFalse(SecurityUtils.userHasRole(user, SystemRole.GUEST));
   }
 
 }

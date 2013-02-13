@@ -211,7 +211,7 @@ public class PagePreviewTag extends WebloungeTag {
       return;
     String[] parts = value.split("/");
     if (parts.length != 2)
-      throw new IllegalArgumentException("Preview start element '" + value + "' is malformed. Expecting '<module>/<pagelet>'");
+      throw new IllegalArgumentException("Preview start element '" + value + "' on " + request.getUrl() + " is malformed. Expecting '<module>/<pagelet>'");
     startOfPreviewElement = value;
   }
 
@@ -236,7 +236,7 @@ public class PagePreviewTag extends WebloungeTag {
       return;
     String[] parts = value.split("/");
     if (parts.length != 2)
-      throw new IllegalArgumentException("Preview end element '" + value + "' is malformed. Expecting '<module>/<pagelet>'");
+      throw new IllegalArgumentException("Preview end element '" + value + "' on " + request.getUrl() + " is malformed. Expecting '<module>/<pagelet>'");
     endOfPreviewElement = value;
   }
 
@@ -278,7 +278,7 @@ public class PagePreviewTag extends WebloungeTag {
         // Skip body, if this is a mock-request
         return SKIP_BODY;
       } else {
-        throw new JspException("Page preview tag needs either a page id or embedding inside a PageListTag");
+        throw new JspException("Page preview tag on " + request.getUrl() + " requires either a page id or embedding inside a PageListTag");
       }
     } else {
       ContentRepository contentRepository = null;
@@ -317,7 +317,7 @@ public class PagePreviewTag extends WebloungeTag {
 
     String stage = template.getStage();
     if (stage == null) {
-      logger.error("No stage defined for page template '{}'", template);
+      logger.error("No stage defined for page template '{}' on {}", template, request.getUrl());
       return EVAL_PAGE;
     }
 
@@ -338,7 +338,7 @@ public class PagePreviewTag extends WebloungeTag {
         break;
       case Marker:
         if (StringUtils.isBlank(endOfPreviewElement))
-          throw new IllegalStateException("No stop marker element set");
+          throw new IllegalStateException("No stop marker element set on " + request.getUrl());
         for (Pagelet p : page.getPagelets(stage)) {
           if (p.toString().equals(startOfPreviewElement)) {
             pagelets.clear();
@@ -353,7 +353,7 @@ public class PagePreviewTag extends WebloungeTag {
         pagelets.addAll(Arrays.asList(page.getPreview()));
         break;
       default:
-        throw new IllegalStateException("Don't know how to handle stop marker '" + stopMarker + "'");
+        throw new IllegalStateException("Don't know how to handle stop marker '" + stopMarker + "' on " + request.getUrl());
     }
 
     if (pagelets.size() == 0)

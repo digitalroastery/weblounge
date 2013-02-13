@@ -20,9 +20,6 @@
 
 package ch.entwine.weblounge.kernel.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
@@ -36,9 +33,6 @@ import ch.entwine.weblounge.common.site.Site;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Set;
 
 /**
  * Tests the combined user and role directory service.
@@ -105,28 +99,6 @@ public class DirectoryServiceImplTest {
     directory.setSecurityService(securityService);
     directory.addDirectoryProvider(directoryA);
     directory.addDirectoryProvider(directoryB);
-  }
-
-  /**
-   * Test for {@link ch.entwine.weblounge.kernel.security.}
-   * 
-   * @throws Exception
-   */
-  @Test
-  public void testUserMerge() throws Exception {
-    User mergedUser = directory.loadUser(login, site);
-
-    Set<Object> roles = mergedUser.getPublicCredentials(Role.class);
-    assertTrue(roles.contains(roleA));
-    assertTrue(roles.contains(roleB));
-    assertTrue(roles.contains(roleC));
-
-    Set<Object> passwords = mergedUser.getPrivateCredentials(Password.class);
-    assertEquals(1, passwords.size());
-    assertTrue(passwords.iterator().next() instanceof Password);
-    Password pw = (Password)passwords.iterator().next();
-    assertEquals(password.getPassword(), pw.getPassword());
-    assertEquals(login, mergedUser.getLogin());
   }
 
 }

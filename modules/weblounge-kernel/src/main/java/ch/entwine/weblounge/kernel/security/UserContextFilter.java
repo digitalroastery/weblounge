@@ -139,27 +139,22 @@ public class UserContextFilter implements Filter {
     User user = null;
     Set<Role> roles = new HashSet<Role>();
 
-    // If we just logged in, then the user may have been set already
-    // if (securityService.getUser() != null)
-    // return securityService.getUser();
-
     if (!securityService.isEnabled()) {
       user = new UserImpl(Security.ADMIN_USER, Security.SYSTEM_CONTEXT, Security.ADMIN_NAME);
       roles.add(SystemRole.SYSTEMADMIN);
-      // user = new UserImpl(ADMIN_USER, site.getIdentifier());
-      // roles.add(getLocalRole(site, SystemRole.SYSTEMADMIN));
+      roles.add(getLocalRole(site, SystemRole.SYSTEMADMIN));
     } else if (auth == null) {
       logger.debug("No spring security context available, setting current user to anonymous");
       String realm = site != null ? site.getIdentifier() : Security.SYSTEM_CONTEXT;
       user = new UserImpl(Security.ANONYMOUS_USER, realm, Security.ANONYMOUS_NAME);
       roles.add(SystemRole.GUEST);
-      // roles.add(getLocalRole(site, SystemRole.GUEST));
+      roles.add(getLocalRole(site, SystemRole.GUEST));
     } else {
       Object principal = auth.getPrincipal();
       if (principal == null) {
         logger.warn("No principal found in spring security context, setting current user to anonymous");
         user = new Guest(site.getIdentifier());
-        // roles.add(getLocalRole(site, SystemRole.GUEST));
+        roles.add(getLocalRole(site, SystemRole.GUEST));
       } else if (principal instanceof SpringSecurityUser) {
         user = ((SpringSecurityUser) principal).getUser();
         logger.debug("Principal was identified as '{}'", user.getLogin());
@@ -178,11 +173,11 @@ public class UserContextFilter implements Filter {
 
       } else if (Security.ANONYMOUS_USER.equals(principal)) {
         user = new Guest(site.getIdentifier());
-        // roles.add(getLocalRole(site, SystemRole.GUEST));
+        roles.add(getLocalRole(site, SystemRole.GUEST));
       } else {
         logger.warn("Principal was not compatible with spring security, setting current user to anonymous");
         user = new Guest(site.getIdentifier());
-        // roles.add(getLocalRole(site, SystemRole.GUEST));
+        roles.add(getLocalRole(site, SystemRole.GUEST));
       }
     }
 

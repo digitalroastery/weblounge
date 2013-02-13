@@ -6,7 +6,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.1.4</version>
+    <version>3.1.5</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -611,11 +611,12 @@
             </Embed-Dependency>
             <Service-Component>
               OSGI-INF/directory-service.xml,
-              OSGI-INF/fop-rest-service.xml,
-              OSGI-INF/fop-service.xml,
               OSGI-INF/endpoint-publishing-service.xml,
               OSGI-INF/endpoint-runtime-information.xml,
               OSGI-INF/environment-service.xml,
+              OSGI-INF/fop-rest-service.xml,
+              OSGI-INF/fop-service.xml,
+              OSGI-INF/https-request-filter.xml,
               OSGI-INF/kernel-service.xml,
               OSGI-INF/language-runtime-information.xml,
               OSGI-INF/resource-publishing-service.xml,

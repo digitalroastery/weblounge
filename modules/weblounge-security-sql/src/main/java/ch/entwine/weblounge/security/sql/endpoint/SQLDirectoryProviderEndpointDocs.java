@@ -102,7 +102,7 @@ public final class SQLDirectoryProviderEndpointDocs {
     createAccount.addStatus(serviceUnavailable("the site is temporarily offline"));
     createAccount.setTestForm(new TestForm());
     createAccount.addRequiredParameter(new Parameter("login", Parameter.Type.String, "Unique login name"));
-    createAccount.addRequiredParameter(new Parameter("password", Parameter.Type.String, "Password"));
+    createAccount.addRequiredParameter(new Parameter("password", Parameter.Type.Password, "Password"));
     createAccount.addOptionalParameter(new Parameter("email", Parameter.Type.String, "E-mail address"));
     docs.addEndpoint(Endpoint.Type.WRITE, createAccount);
 
@@ -119,26 +119,53 @@ public final class SQLDirectoryProviderEndpointDocs {
     getAccount.addPathParameter(new Parameter("login", Parameter.Type.String, "Login name"));
     docs.addEndpoint(Endpoint.Type.READ, getAccount);
 
-    // PUT /account/{login}/status
+    // PUT /account/{login}
     Endpoint updateAccount = new Endpoint("/account/{login}", Method.PUT, "updateaccount");
     updateAccount.setDescription("Updates the account");
     updateAccount.addFormat(Format.xml());
     updateAccount.addStatus(ok("the account has been updated"));
     updateAccount.addStatus(forbidden("insufficient rights to update the account"));
+    updateAccount.addStatus(badRequest("if a non-existing language identifier is provided"));
     updateAccount.addStatus(notFound("the account does not exist"));
     updateAccount.addStatus(notFound("the site does not exist"));
     updateAccount.addStatus(serviceUnavailable("the site is temporarily offline"));
     updateAccount.setTestForm(new TestForm());
     updateAccount.addPathParameter(new Parameter("login", Parameter.Type.String, "Unique login name"));
-    updateAccount.addOptionalParameter(new Parameter("password", Parameter.Type.String, "Password"));
     updateAccount.addOptionalParameter(new Parameter("email", Parameter.Type.String, "E-mail address"));
     updateAccount.addOptionalParameter(new Parameter("firstname", Parameter.Type.String, "First name"));
     updateAccount.addOptionalParameter(new Parameter("lastname", Parameter.Type.String, "Last name"));
     updateAccount.addOptionalParameter(new Parameter("initials", Parameter.Type.String, "Initials"));
     updateAccount.addOptionalParameter(new Parameter("language", Parameter.Type.String, "Two letter ISO code for the preferred language"));
-    updateAccount.addOptionalParameter(new Parameter("challenge", Parameter.Type.String, "Challenge"));
-    updateAccount.addOptionalParameter(new Parameter("response", Parameter.Type.String, "Response"));
     docs.addEndpoint(Endpoint.Type.WRITE, updateAccount);
+
+    // PUT /account/{login}/password
+    Endpoint updateAccountPassword = new Endpoint("/account/{login}/password", Method.PUT, "updateaccountpassword");
+    updateAccountPassword.setDescription("Updates the account password");
+    updateAccountPassword.addFormat(Format.xml());
+    updateAccountPassword.addStatus(ok("the password has been updated"));
+    updateAccountPassword.addStatus(forbidden("insufficient rights to update the account"));
+    updateAccountPassword.addStatus(notFound("the account does not exist"));
+    updateAccountPassword.addStatus(notFound("the site does not exist"));
+    updateAccountPassword.addStatus(serviceUnavailable("the site is temporarily offline"));
+    updateAccountPassword.setTestForm(new TestForm());
+    updateAccountPassword.addPathParameter(new Parameter("login", Parameter.Type.String, "Unique login name"));
+    updateAccountPassword.addOptionalParameter(new Parameter("password", Parameter.Type.Password, "Password"));
+    docs.addEndpoint(Endpoint.Type.WRITE, updateAccountPassword);
+
+    // PUT /account/{login}/challenge
+    Endpoint updateAccountChallenge = new Endpoint("/account/{login}/challenge", Method.PUT, "updateaccountchallenge");
+    updateAccountChallenge.setDescription("Updates the account challenge");
+    updateAccountChallenge.addFormat(Format.xml());
+    updateAccountChallenge.addStatus(ok("the challenge has been updated"));
+    updateAccountChallenge.addStatus(forbidden("insufficient rights to update the account"));
+    updateAccountChallenge.addStatus(notFound("the account does not exist"));
+    updateAccountChallenge.addStatus(notFound("the site does not exist"));
+    updateAccountChallenge.addStatus(serviceUnavailable("the site is temporarily offline"));
+    updateAccountChallenge.setTestForm(new TestForm());
+    updateAccountChallenge.addPathParameter(new Parameter("login", Parameter.Type.String, "Unique login name"));
+    updateAccountChallenge.addOptionalParameter(new Parameter("challenge", Parameter.Type.String, "Password"));
+    updateAccountChallenge.addOptionalParameter(new Parameter("response", Parameter.Type.Password, "Password"));
+    docs.addEndpoint(Endpoint.Type.WRITE, updateAccountChallenge);
 
     // DELETE /account/{login}
     Endpoint deleteAccount = new Endpoint("/account/{login}", Method.DELETE, "removeaccount");

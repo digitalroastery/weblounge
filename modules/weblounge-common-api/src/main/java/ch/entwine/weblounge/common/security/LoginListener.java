@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2013 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -17,36 +17,26 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+package ch.entwine.weblounge.common.security;
 
-package ch.entwine.weblounge.taglib.security;
-
-import ch.entwine.weblounge.common.impl.security.SecurityUtils;
-import ch.entwine.weblounge.common.security.User;
-import ch.entwine.weblounge.taglib.WebloungeTag;
-
-import javax.servlet.jsp.JspException;
+import ch.entwine.weblounge.common.site.Site;
 
 /**
- * Checks if a user is authenticated. The body content is only evaluated, if the
- * user is logged in.
+ * The login listener will be notified before and after login attempts. This
+ * allows applications to react to initiated, successful or failed login
+ * attempts.
  */
-public class IfAuthenticatedTag extends WebloungeTag {
-
-  /** serial version uid */
-  private static final long serialVersionUID = 5576649176077112454L;
+public interface LoginListener {
 
   /**
-   * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
+   * This method is called right before <code>user</code> is passed on to the
+   * authentication layer.
+   * 
+   * @param site
+   *          the site
+   * @param user
+   *          the user
    */
-  @Override
-  public int doStartTag() throws JspException {
-    super.doStartTag();
-    User user = getRequest().getUser();
-
-    if (!SecurityUtils.isAuthenticated(user))
-      return SKIP_BODY;
-
-    return EVAL_BODY_INCLUDE;
-  }
+  void beforeLogin(Site site, User user);
 
 }

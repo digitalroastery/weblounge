@@ -23,13 +23,15 @@ package ch.entwine.weblounge.security.sql.endpoint;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.PasswordEncoder;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.SecurityService;
-import ch.entwine.weblounge.common.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.security.UserExistsException;
+import ch.entwine.weblounge.common.security.UserShadowedException;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -154,7 +156,6 @@ public class SQLDirectoryProviderEndpoint {
       @FormParam("password") String password, @FormParam("email") String eMail,
       @Context HttpServletRequest request) {
 
-    // TODO: Check if this user is the site admin
     // TODO: If not, return a one time pad that needs to be used when verifying
     // the e-mail
 
@@ -164,21 +165,25 @@ public class SQLDirectoryProviderEndpoint {
 
     Response response = null;
     Site site = getSite(request);
+
+    // Hash the password
+    if (StringUtils.isNotBlank(password)) {
+      logger.debug("Hashing password for user '{}@{}' using md5", login, site.getIdentifier());
+      password = PasswordEncoder.encode(StringUtils.trim(password));
+    }
+
+    // Create the user
     try {
-      JpaAccount account = directory.getAccount(site, login);
-      if (account != null)
-        return Response.status(Status.CONFLICT).build();
-
-      // Hash the password
-      if (StringUtils.isNotBlank(password)) {
-        logger.debug("Hashing password for user '{}@{}' using md5", login, site.getIdentifier());
-        password = PasswordEncoder.encode(StringUtils.trim(password));
-      }
-
-      account = directory.addAccount(site, login, password);
+      JpaAccount account = directory.addAccount(site, login, password);
       account.setEmail(StringUtils.trimToNull(eMail));
       directory.updateAccount(account);
       response = Response.created(new URI(UrlUtils.concat(request.getRequestURL().toString(), account.getLogin()))).build();
+    } catch (UserExistsException e) {
+      logger.warn("Error creating account: {}", e.getMessage());
+      return Response.status(Status.CONFLICT).build();
+    } catch (UserShadowedException e) {
+      logger.warn("Error creating account: {}", e.getMessage());
+      return Response.status(Status.CONFLICT).build();
     } catch (Throwable t) {
       logger.warn("Error creating account: {}", t.getMessage());
       response = Response.serverError().build();
@@ -191,7 +196,7 @@ public class SQLDirectoryProviderEndpoint {
   public Response getAccount(@PathParam("login") String login,
       @Context HttpServletRequest request) {
     Site site = getSite(request);
-    
+
     JpaAccount account = null;
     try {
       account = directory.getAccount(site, login);
@@ -213,7 +218,7 @@ public class SQLDirectoryProviderEndpoint {
     if (account.getLanguage() != null)
       wu.setLanguage(LanguageUtils.getLanguage(account.getLanguage()));
     if (account.getResponse() != null)
-      wu.setResponse(account.getResponse().getBytes(Charset.forName("utf-8")), DigestType.plain);
+      wu.setResponse(account.getResponse().getBytes(Charset.forName("utf-8")), DigestType.md5);
     for (JpaRole r : account.getRoles()) {
       wu.addPublicCredentials(new RoleImpl(r.getContext(), r.getRolename()));
     }
@@ -229,7 +234,7 @@ public class SQLDirectoryProviderEndpoint {
     Site site = getSite(request);
     try {
       boolean success = directory.activateAccount(site, login, activation);
-      return (success) ? Response.ok().build() : Response.status(Status.NOT_FOUND).build();
+      return (success) ? Response.ok().build() : Response.status(Status.UNAUTHORIZED).build();
     } catch (Throwable t) {
       logger.warn("Error activating account '{}': {}", login, t.getMessage());
       return Response.serverError().build();
@@ -271,13 +276,16 @@ public class SQLDirectoryProviderEndpoint {
       account.setLastname(StringUtils.trimToNull(lastname));
       account.setInitials(StringUtils.trimToNull(initials));
       account.setEmail(StringUtils.trimToNull(email));
-      account.setChallenge(StringUtils.trimToNull(challenge));
 
       // The language
-      try {
-        account.setLanguage(LanguageUtils.getLanguage(language));
-      } catch (UnknownLanguageException e) {
-        return Response.status(Status.BAD_REQUEST).build();
+      if (StringUtils.isNotBlank(language)) {
+        try {
+          account.setLanguage(LanguageUtils.getLanguage(language));
+        } catch (UnknownLanguageException e) {
+          return Response.status(Status.BAD_REQUEST).build();
+        }
+      } else {
+        account.setLanguage(null);
       }
 
       // Hash the response
@@ -285,6 +293,78 @@ public class SQLDirectoryProviderEndpoint {
         logger.debug("Hashing response for user '{}@{}' using md5", login, site.getIdentifier());
         String digestResponse = PasswordEncoder.encode(StringUtils.trim(response));
         account.setResponse(digestResponse);
+      }
+
+      directory.updateAccount(account);
+      return Response.ok().build();
+    } catch (Throwable t) {
+      return Response.serverError().build();
+    }
+  }
+
+  @PUT
+  @Path("/account/{id}/password")
+  public Response updateAccountPassword(@PathParam("id") String login,
+      @FormParam("password") String password,
+      @Context HttpServletRequest request) {
+
+    // Make sure that the user owns the roles required for this operation
+    User user = securityService.getUser();
+    if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN) && !user.getLogin().equals(login))
+      return Response.status(Status.FORBIDDEN).build();
+
+    JpaAccount account = null;
+    Site site = getSite(request);
+    try {
+      account = directory.getAccount(site, login);
+      if (account == null)
+        return Response.status(Status.NOT_FOUND).build();
+
+      // Hash the password
+      if (StringUtils.isNotBlank(password)) {
+        logger.debug("Hashing password for user '{}@{}' using md5", login, site.getIdentifier());
+        String digestPassword = PasswordEncoder.encode(StringUtils.trim(password));
+        account.setPassword(digestPassword);
+      } else {
+        account.setPassword(null);
+      }
+
+      directory.updateAccount(account);
+      return Response.ok().build();
+    } catch (Throwable t) {
+      return Response.serverError().build();
+    }
+  }
+
+  @PUT
+  @Path("/account/{id}/challenge")
+  public Response updateAccountChallenge(@PathParam("id") String login,
+      @FormParam("challenge") String challenge,
+      @FormParam("response") String response,
+      @Context HttpServletRequest request) {
+
+    // Make sure that the user owns the roles required for this operation
+    User user = securityService.getUser();
+    if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN) && !user.getLogin().equals(login))
+      return Response.status(Status.FORBIDDEN).build();
+
+    JpaAccount account = null;
+    Site site = getSite(request);
+    try {
+      account = directory.getAccount(site, login);
+      if (account == null)
+        return Response.status(Status.NOT_FOUND).build();
+
+      // Set the challenge
+      account.setChallenge(StringUtils.trimToNull(challenge));
+
+      // Hash the response
+      if (StringUtils.isNotBlank(response)) {
+        logger.debug("Hashing response for user '{}@{}' using md5", login, site.getIdentifier());
+        String digestResponse = PasswordEncoder.encode(StringUtils.trim(response));
+        account.setResponse(digestResponse);
+      } else {
+        account.setResponse(response);
       }
 
       directory.updateAccount(account);

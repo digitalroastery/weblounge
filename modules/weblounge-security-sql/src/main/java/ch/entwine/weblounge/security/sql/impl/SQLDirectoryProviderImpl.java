@@ -19,13 +19,23 @@
  */
 package ch.entwine.weblounge.security.sql.impl;
 
+import static ch.entwine.weblounge.common.impl.security.SystemRole.EDITOR;
+import static ch.entwine.weblounge.common.impl.security.SystemRole.GUEST;
+import static ch.entwine.weblounge.common.impl.security.SystemRole.PUBLISHER;
+import static ch.entwine.weblounge.common.impl.security.SystemRole.SITEADMIN;
+import static ch.entwine.weblounge.common.impl.security.SystemRole.SYSTEMADMIN;
+
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
-import ch.entwine.weblounge.common.impl.security.SystemRole;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.security.DigestType;
+import ch.entwine.weblounge.common.security.DirectoryService;
 import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.security.UserExistsException;
+import ch.entwine.weblounge.common.security.UserShadowedException;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.security.sql.SQLDirectoryProvider;
@@ -34,6 +44,9 @@ import ch.entwine.weblounge.security.sql.entities.JpaAccount;
 import ch.entwine.weblounge.security.sql.entities.JpaRole;
 
 import org.apache.commons.lang.StringUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,8 +64,21 @@ public class SQLDirectoryProviderImpl implements SQLDirectoryProvider {
   /** Identifier of this directory provider */
   private static final String PROVIDER_IDENTIFIER = "weblounge-sql-database";
 
+  /** The bundle context */
+  private BundleContext bundleCtx = null;
+
   /** The persistence layer */
   private SQLDirectoryProviderPersistence persistence = null;
+
+  /**
+   * OSGi callback on component activation.
+   * 
+   * @param context
+   *          the context
+   */
+  void activate(ComponentContext context) {
+    this.bundleCtx = context.getBundleContext();
+  }
 
   /**
    * {@inheritDoc}
@@ -95,9 +121,26 @@ public class SQLDirectoryProviderImpl implements SQLDirectoryProvider {
     user.addPrivateCredentials(new PasswordImpl(jpaAccount.getPassword(), DigestType.md5));
 
     // Roles
-    user.addPublicCredentials(SystemRole.GUEST);
     for (JpaRole r : jpaAccount.getRoles()) {
-      user.addPublicCredentials(new RoleImpl(r.getContext(), r.getRolename()));
+
+      // Make sure weblounge roles get special treatment in order
+      // to support role inheritance. Other directories will need
+      // to implement this through a LoginListener implementation
+      if (Security.SYSTEM_CONTEXT.equals(r.getContext())) {
+        if (SYSTEMADMIN.getIdentifier().equals(r.getRolename())) {
+          user.addPublicCredentials(SYSTEMADMIN);
+        } else if (SITEADMIN.getIdentifier().equals(r.getRolename())) {
+          user.addPublicCredentials(SITEADMIN);
+        } else if (PUBLISHER.getIdentifier().equals(r.getRolename())) {
+          user.addPublicCredentials(PUBLISHER);
+        } else if (EDITOR.getIdentifier().equals(r.getRolename())) {
+          user.addPublicCredentials(EDITOR);
+        } else if (GUEST.getIdentifier().equals(r.getRolename())) {
+          user.addPublicCredentials(GUEST);
+        }
+      } else {
+        user.addPublicCredentials(new RoleImpl(r.getContext(), r.getRolename()));
+      }
     }
 
     return user;
@@ -147,6 +190,25 @@ public class SQLDirectoryProviderImpl implements SQLDirectoryProvider {
    */
   public JpaAccount addAccount(Site site, String user, String password)
       throws Exception {
+
+    // Check for existing administrative accounts with the same login
+    ServiceReference userDirectoryRef = bundleCtx.getServiceReference(DirectoryService.class.getName());
+    if (userDirectoryRef != null) {
+      DirectoryService systemDirectory = (DirectoryService) bundleCtx.getService(userDirectoryRef);
+      logger.debug("Checking new site '{}' user '{}' for shadowing of site or system account");
+      User shadowedUser = systemDirectory.loadUser(user, site);
+      if (shadowedUser != null) {
+        if (SecurityUtils.userHasRole(shadowedUser, SYSTEMADMIN))
+          throw new UserShadowedException("Site '" + site.getIdentifier() + "' account '" + user + "' is shadowing the system account");
+        else if (SecurityUtils.userHasRole(shadowedUser, SITEADMIN))
+          throw new UserShadowedException("Site '" + site.getIdentifier() + "' account '" + user + "' is shadowing the site account");
+        else
+          throw new UserExistsException("Site '" + site.getIdentifier() + "' account '" + user + "' already exists");
+      }
+    } else {
+      logger.warn("Directory service not found, site '{}' user '{}' cannot be checked for user shadowing", site.getIdentifier(), user);
+    }
+    
     return persistence.addAccount(site.getIdentifier(), user, password);
   }
 

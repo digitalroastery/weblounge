@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.site;
 
+import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.PageLayout;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
@@ -52,6 +53,7 @@ import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.security.UserListener;
 import ch.entwine.weblounge.common.security.WebloungeUser;
+import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.I18nDictionary;
 import ch.entwine.weblounge.common.site.Module;
@@ -184,7 +186,7 @@ public class SiteImpl implements Site {
 
   /** URL to the security configuration */
   protected URL security = null;
-  
+
   /** This site's digest policy */
   protected DigestType digestType = DigestType.md5;
 
@@ -714,24 +716,24 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.site.Site#setDigestType(ch.entwine.weblounge.common.security.DigestType)
    */
   @Override
   public void setDigestType(DigestType digest) {
     this.digestType = digest;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.site.Site#getDigestType()
    */
   @Override
   public DigestType getDigestType() {
     return digestType;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -854,7 +856,7 @@ public class SiteImpl implements Site {
   public String getLocalRole(String role) {
     if (localRoles.containsKey(role))
       return localRoles.get(role);
-    return role;
+    return null;
   }
 
   /**
@@ -1264,27 +1266,82 @@ public class SiteImpl implements Site {
           throw new IllegalStateException("Errors found while validating module descriptor " + moduleXml);
         }
 
-        // Load i18n dictionaries
-        String i18nPath = UrlUtils.concat(moduleUrl.getPath(), "i18n");
-        i18nEnum = bundle.findEntries(i18nPath, "*.xml", true);
-        while (i18nEnum != null && i18nEnum.hasMoreElements()) {
-          i18n.addDictionary(i18nEnum.nextElement());
-        }
-
+        // We need the module id even if the module initialization fails to log
+        // a proper error message
         Node moduleNode = moduleXml.getFirstChild();
         String moduleId = moduleNode.getAttributes().getNamedItem("id").getNodeValue();
 
+        Module module;
         try {
-          Module m = ModuleImpl.fromXml(moduleNode);
-          logger.debug("Module '{}' loaded for site '{}'", m, this);
-          addModule(m);
+          module = ModuleImpl.fromXml(moduleNode);
+          logger.debug("Module '{}' loaded for site '{}'", module, this);
         } catch (Throwable t) {
           logger.error("Error loading module '{}' of site {}", moduleId, identifier);
           if (t instanceof Exception)
             throw (Exception) t;
           throw new Exception(t);
         }
+
+        // If module is disabled, don't add it to the site
+        if (!module.isEnabled()) {
+          logger.info("Module '{}' for site '{}' is disabled", module, this);
+          continue;
+        }
+
+        // Make sure there is only one module with this identifier
+        if (modules.containsKey(module.getIdentifier())) {
+          logger.warn("A module with id '{}' is already registered in site '{}'", module.getIdentifier(), identifier);
+          logger.error("Module '{}' is not registered due to conflicting identifier", module.getIdentifier());
+          continue;
+        }
+
+        // Check inter-module compatibility
+        for (Module m : modules.values()) {
+
+          // Check actions
+          for (Action a : m.getActions()) {
+            for (Action action : module.getActions()) {
+              if (action.getIdentifier().equals(a.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines an action with id '{}'", new String[] { m.getIdentifier(), identifier, a.getIdentifier() });
+              } else if (action.getPath().equals(a.getPath())) {
+                logger.warn("Module '{}' of site '{}' already defines an action at '{}'", new String[] { m.getIdentifier(), identifier, a.getPath() });
+                logger.error("Module '{}' of site '{}' is not registered due to conflicting mountpoints", m.getIdentifier(), identifier);
+                continue;
+              }
+            }
+          }
+
+          // Check image styles
+          for (ImageStyle s : m.getImageStyles()) {
+            for (ImageStyle style : module.getImageStyles()) {
+              if (style.getIdentifier().equals(s.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines an image style with id '{}'", new String[] { m.getIdentifier(), identifier, s.getIdentifier() });
+              }
+            }
+          }
+
+          // Check jobs
+          for (Job j : m.getJobs()) {
+            for (Job job : module.getJobs()) {
+              if (job.getIdentifier().equals(j.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines a job with id '{}'", new String[] { m.getIdentifier(), identifier, j.getIdentifier() });
+              }
+            }
+          }
+
+        }
+        
+        addModule(module);
+
+        // Do this as last step since we don't want to have i18n dictionaries of
+        // an invalid or disabled module in the site
+        String i18nPath = UrlUtils.concat(moduleUrl.getPath(), "i18n");
+        i18nEnum = bundle.findEntries(i18nPath, "*.xml", true);
+        while (i18nEnum != null && i18nEnum.hasMoreElements()) {
+          i18n.addDictionary(i18nEnum.nextElement());
+        }
       }
+      
     } else {
       logger.debug("Site '{}' has no modules", this);
     }
@@ -1315,7 +1372,8 @@ public class SiteImpl implements Site {
    * @throws Exception
    *           if the site deactivation fails
    */
-  protected void deactivate(BundleContext context, Map<String, String> properties) throws Exception {
+  protected void deactivate(BundleContext context,
+      Map<String, String> properties) throws Exception {
     try {
       isShutdownInProgress = true;
       logger.debug("Taking down site '{}'", this);
@@ -1831,7 +1889,7 @@ public class SiteImpl implements Site {
     if (adminNode != null) {
       site.setAdministrator(SiteAdminImpl.fromXml(adminNode, site, xpathProcessor));
     }
-    
+
     // digest policy
     Node digestNode = XPathHelper.select(config, "ns:security/ns:digest", xpathProcessor);
     if (digestNode != null) {
