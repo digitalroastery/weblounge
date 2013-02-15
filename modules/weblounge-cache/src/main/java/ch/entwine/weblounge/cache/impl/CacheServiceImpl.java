@@ -241,7 +241,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see ch.entwine.weblounge.cache.CacheService#addCacheListener(ch.entwine.weblounge.cache.CacheListener)
    */
   public void addCacheListener(CacheListener listener) {
-    if (cacheListeners.contains(listener))
+    if (!cacheListeners.contains(listener))
       cacheListeners.add(listener);
   }
 
