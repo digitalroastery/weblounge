@@ -66,6 +66,9 @@
             <Export-Package>
               ch.entwine.weblounge.cache;version=${project.version}
             </Export-Package>
+            <Service-Component>
+              OSGI-INF/cache-utils.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
