@@ -20,9 +20,12 @@
 
 package ch.entwine.weblounge.kernel.security;
 
+import static ch.entwine.weblounge.dispatcher.SharedHttpContext.HTTP_CONTEXT_ID;
+import static ch.entwine.weblounge.dispatcher.SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID;
+import static ch.entwine.weblounge.dispatcher.SharedHttpContext.PROPERTY_OSGI_HTTP_SERVICE_RANKING;
+
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.security.Security;
-import ch.entwine.weblounge.dispatcher.SharedHttpContext;
 import ch.entwine.weblounge.kernel.site.SiteManager;
 
 import org.apache.felix.webconsole.WebConsoleSecurityProvider;
@@ -215,7 +218,8 @@ public class SpringSecurityConfigurationService implements ManagedService {
     logger.info("Enabling spring security");
     Dictionary<String, String> props = new Hashtable<String, String>();
     props.put("pattern", ".*");
-    props.put(SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
+    props.put(PROPERTY_OSGI_HTTP_CONTEXT_ID, HTTP_CONTEXT_ID);
+    props.put(PROPERTY_OSGI_HTTP_SERVICE_RANKING, "0");
     props.put("security", "weblounge");
     try {
       securityFilterRegistration = bundleCtx.registerService(Filter.class.getName(), securityFilter, props);

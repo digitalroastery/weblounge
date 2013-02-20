@@ -199,7 +199,10 @@ public class SiteManager {
         alias = alias.replace("*", ".*");
         if (hostName.matches(alias)) {
           site = e.getValue();
-          logger.info("Registering {} to site '{}', matching url {}", new Object[] { url, site.getIdentifier(), siteUrl });
+          logger.info("Registering {} to site '{}', matching url {}", new Object[] {
+              url,
+              site.getIdentifier(),
+              siteUrl });
           sitesByServerName.put(hostName, site);
           return site;
         }
@@ -330,7 +333,12 @@ public class SiteManager {
     // Inform site listeners
     synchronized (listeners) {
       for (SiteServiceListener listener : listeners) {
-        listener.siteAppeared(site, reference);
+        try {
+          listener.siteAppeared(site, reference);
+        } catch (Throwable t) {
+          logger.error("Error during notifaction of site '{}': {}", site.getIdentifier(), t.getMessage());
+          return;
+        }
       }
     }
 
