@@ -26,6 +26,9 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -35,35 +38,33 @@ import javax.servlet.jsp.JspTagException;
 
 /**
  * The body of this tag is only evaluated if the user has a certain role.
- * 
- * @author Tobias Wunden
- * @version 1.0 Mon Aug 05 2002
- * @since WebLounge 1.0
  */
-
 public class RoleCheckTag extends WebloungeTag {
-
+  
   /** serial uid */
   private static final long serialVersionUID = 8899627757239254637L;
+  
+  /** the logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(RoleCheckTag.class);
 
   /** the roles to be checked */
-  private List<Role> oneOf_;
+  private List<Role> oneOf;
 
   /** the roles to be checked */
-  private List<Role> allOf_;
+  private List<Role> allOf;
 
   /** the role context */
-  private String context_;
+  private String context;
 
   /** the role identifier */
-  private String id_;
+  private String id;
 
   /**
    * Constructor for class RoleCheckTag.
    */
   public RoleCheckTag() {
-    oneOf_ = new ArrayList<Role>();
-    allOf_ = new ArrayList<Role>();
+    oneOf = new ArrayList<Role>();
+    allOf = new ArrayList<Role>();
   }
 
   /**
@@ -74,7 +75,7 @@ public class RoleCheckTag extends WebloungeTag {
    *          the role context
    */
   public void setContext(String value) {
-    context_ = value;
+    context = value;
   }
 
   /**
@@ -85,7 +86,7 @@ public class RoleCheckTag extends WebloungeTag {
    *          the role identifier
    */
   public void setRoleid(String value) {
-    id_ = value;
+    id = value;
   }
 
   /**
@@ -97,8 +98,8 @@ public class RoleCheckTag extends WebloungeTag {
    */
   public void setRole(String value) throws JspTagException {
     try {
-      oneOf_.add(new RoleImpl(value));
-      allOf_.add(new RoleImpl(value));
+      oneOf.add(new RoleImpl(value));
+      allOf.add(new RoleImpl(value));
     } catch (IllegalArgumentException e) {
       throw new JspTagException(e);
     }
@@ -118,7 +119,7 @@ public class RoleCheckTag extends WebloungeTag {
     while (tok.hasMoreTokens()) {
       role = tok.nextToken();
       try {
-        oneOf_.add(new RoleImpl(role));
+        oneOf.add(new RoleImpl(role));
       } catch (IllegalArgumentException e) {
         throw new JspTagException(e);
       }
@@ -139,7 +140,7 @@ public class RoleCheckTag extends WebloungeTag {
     while (tok.hasMoreTokens()) {
       role = tok.nextToken();
       try {
-        allOf_.add(new RoleImpl(role));
+        allOf.add(new RoleImpl(role));
       } catch (IllegalArgumentException e) {
         throw new JspTagException(e);
       }
@@ -151,15 +152,15 @@ public class RoleCheckTag extends WebloungeTag {
    */
   @Override
   public int doStartTag() throws JspException {
-    if (context_ != null && id_ != null) {
+    if (context != null && id != null) {
       Role role;
       try {
-        role = new RoleImpl(context_ + ":" + id_);
+        role = new RoleImpl(context + ":" + id);
       } catch (IllegalArgumentException e) {
         throw new JspTagException(e);
       }
-      allOf_.add(role);
-      oneOf_.add(role);
+      allOf.add(role);
+      oneOf.add(role);
     }
     return super.doStartTag();
   }
@@ -175,13 +176,13 @@ public class RoleCheckTag extends WebloungeTag {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.taglib.WebloungeTag#reset()
    */
   @Override
   public void reset() {
-    allOf_ = new ArrayList<Role>();
-    oneOf_ = new ArrayList<Role>();
+    allOf = new ArrayList<Role>();
+    oneOf = new ArrayList<Role>();
     super.reset();
   }
 
@@ -195,14 +196,20 @@ public class RoleCheckTag extends WebloungeTag {
    * @return <code>true</code> if the user has one of the roles
    */
   protected boolean hasOneOf(User user, Site site) {
-    for(Role role : oneOf_) {
+    if (oneOf.size() == 0)
+      return true;
+
+    for (Role role : oneOf) {
       try {
-        if(SecurityUtils.userHasRole(user, role)) 
+        if (SecurityUtils.userHasRole(user, role)) {
+          logger.debug("User '{}' has required role '{}'", user.getLogin(), role);
           return true;
+        }
       } catch (IllegalArgumentException e) {
-        
+
       }
     }
+
     return false;
   }
 
@@ -216,10 +223,16 @@ public class RoleCheckTag extends WebloungeTag {
    * @return <code>true</code> if the user has all of the roles
    */
   protected boolean hasAllOf(User user, Site site) {
-    for(Role role : allOf_) {
-      if(!SecurityUtils.userHasRole(user, role)) 
+    if (allOf.size() == 0)
+      return true;
+    
+    for (Role role : allOf) {
+      if (!SecurityUtils.userHasRole(user, role)) {
+        logger.debug("User '{}' does not have required role '{}'", user.getLogin(), role);
         return false;
+      }
     }
+
     return true;
   }
 
