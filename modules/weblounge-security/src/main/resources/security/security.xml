@@ -63,9 +63,6 @@
     
     <!-- FILTER CONFIGURATION -->
 
-    <!-- Add the health check filter -->
-    <sec:custom-filter before="FIRST" ref="healthCheckFilter"/>
-
     <!-- Add the user filter to get everything set up for proper request processing -->
     <sec:custom-filter after="LAST" ref="userContextFilter"/>
 
@@ -94,9 +91,6 @@
     <sec:logout logout-url="/system/weblounge/logout" success-handler-ref="logoutSuccessHandler"/>
 
   </sec:http>
-
-  <!-- Instantiates the weblounge health check filter -->
-  <bean id="healthCheckFilter" class="ch.entwine.weblounge.kernel.security.HealthCheckFilter"/>
 
   <!-- Instantiates the weblounge user filter that will map requests to users -->
   <bean id="userContextFilter" class="ch.entwine.weblounge.kernel.security.UserContextFilter">
