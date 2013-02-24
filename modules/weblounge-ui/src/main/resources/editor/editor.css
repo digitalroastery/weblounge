@@ -52,10 +52,6 @@ div.DataTables_sort_wrapper span {
 	display: block;
 }
 
-#wbl-pageleteditor p {
-	
-}
-
 #wbl-pageleteditor span.required {
 	font-size: 12px;
 }
@@ -77,7 +73,9 @@ div.DataTables_sort_wrapper span {
 	margin-left: 0;
 }
 
-
+.ui-dialog {
+  z-index: 10000 !important; /* overrides the default z-index from jqueryui */
+}
 
 /* Horizontal form in pagelet-dialogs */
 #wbl-pageleteditor .ui-dialog-content {

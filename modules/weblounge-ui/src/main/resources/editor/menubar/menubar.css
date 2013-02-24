@@ -9,11 +9,11 @@
 	width: 100%;
 	padding-left: 20px;
 	overflow: hidden;
-	z-index: 10001;
+	z-index: 10001; /* higher than #wbl-pagebrowser: 10000 */
 }
 
 #wbl-pageletcreator {
-	z-index: 400;
+	z-index: 9999; /* NOT higher than #wbl-pagebrowser: 10000 */
 }
 
 .editor_menubar img {
