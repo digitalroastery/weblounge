@@ -1,3 +1,20 @@
+/* icons for the pagelets */
+.icon-spacer:before{content:"\f07d"}
+.icon-paragraph:before{content:"\f036"}
+.icon-email:before{content:"\f0e0"}
+.icon-enumeration:before{content:"\f0cb"}
+.icon-download:before{content:"\f019"}
+.icon-image:before{content:"\f03e"}
+.icon-author:before{content:"\f007"}
+.icon-divider:before{content:"\f068"}
+.icon-linklist:before{content:"\f00b"}
+.icon-faq:before{content:"\f059"}
+.icon-address:before{content:"\f015"}
+.icon-gallery:before{content:"\f030"}
+.icon-title:before{}
+.icon-subtitle:before{}
+
+
 .editor_pageletcreator {
     position: fixed;
 	top: 35px;
@@ -29,6 +46,8 @@
 	float: left;
 	margin: 5px;
 	cursor: move;
+	background: none repeat scroll 0 0 #FAFAFA;
+    border-radius: 5px 5px 5px 5px;
 }
 
 .wbl-draggableHelper {

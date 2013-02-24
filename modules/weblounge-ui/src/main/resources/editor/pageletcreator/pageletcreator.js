@@ -133,18 +133,20 @@ steal.plugins('jquery',
 	    	this._bodyAbsoluteTop(45);
 	    },
 	    
+	    // load all pagelets from the correspondent module
 	    _loadContent: function(modules) {
 			$.each(modules, $.proxy(function(index, module) {
 	    		var contentPane = this.element.find('div.wbl-pane' + module.id);
 	    		if(contentPane.length < 1) return;
 	    		$.each(module.pagelets, function(key, pagelet) {
-	    			contentPane.append('<div id="' + pagelet.id + '" class="wbl-draggable ui-widget-content" module="' + module.id + '">' + pagelet.id + '</div>');
+	    			contentPane.append('<div id="' + pagelet.id + '" class="wbl-draggable ui-widget-content" module="' + module.id + '"><i class="icon-'+ pagelet.id + '"></i> ' + pagelet.id + '</div>');
 	    		});
 	    		this._calculateHeight();
 	    		this._initDraggable(contentPane);
 			}, this));
 	    },
 	    
+	    // TODO: make this automatic with no hardcoded numbres
 	    _calculateHeight: function() {
 	    	var visiblePane = this.element.find('div.wbl-panes > div:visible');
 	    	if(!this.enabled) return;
