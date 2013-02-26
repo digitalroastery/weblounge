@@ -1,0 +1,156 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <packaging>bundle</packaging>
+  <artifactId>weblounge-indexer</artifactId>
+  <name>Weblounge Indexer</name>
+  <parent>
+    <groupId>ch.entwine.weblounge</groupId>
+    <artifactId>weblounge-base</artifactId>
+    <version>3.2.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <properties>
+    <weblounge.basedir>${project.basedir}/../..</weblounge.basedir>
+    <weblounge.deploymentdir>lib/weblounge</weblounge.deploymentdir>
+    <checkstyle.skip>false</checkstyle.skip>
+  </properties>
+
+  <dependencies>
+
+    <!-- weblounge -->
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-common-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-contentrepository-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.entwine.weblounge</groupId>
+      <artifactId>weblounge-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- osgi support -->
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+
+    <!-- thirdparty -->
+
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>3.9</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>3.9</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>ooxml-schemas</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans-xpath</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.indexer</Bundle-SymbolicName>
+            <Import-Package>
+              javax.xml.parsers,
+              javax.xml.transform,
+              javax.xml.transform.dom,
+              javax.xml.transform.stream,
+              net.sf.saxon,
+              net.sf.saxon.dom,
+              net.sf.saxon.om,
+              net.sf.saxon.query,
+              net.sf.saxon.sxpath,
+              net.sf.saxon.trans,
+              org.dom4j,
+              org.dom4j.io,
+              org.slf4j;version="1.6.1",
+              org.w3c.dom,
+              org.osgi.framework,
+              org.osgi.service.blueprint,
+              org.osgi.service.cm,
+              org.osgi.service.component,
+              com.sun.javadoc;resolution:=optional, 
+              com.sun.tools.javadoc;resolution:=optional,
+              !org.apache.crimson.jaxp,
+              javax.crypto;resolution:=optional,
+              javax.crypto.spec;resolution:=optional,
+              javax.imageio;resolution:=optional,
+              javax.imageio.metadata;resolution:=optional,
+              javax.imageio.stream;resolution:=optional,
+              !javax.swing,
+              javax.xml.namespace, 
+              javax.xml.stream, 
+              javax.xml.stream.util, 
+              javax.xml.validation, 
+              javax.xml.xpath, 
+              !junit.framework,
+              !junit.textui,
+              org.apache.commons.codec.binary,
+              org.apache.commons.codec.digest,
+              org.apache.commons.logging,
+              !org.apache.poi.hdgf.*,
+              !org.apache.poi.hpbf.*,
+              !org.apache.poi.hslf.*,
+              !org.apache.poi.hsmf.*,
+              !org.apache.poi.hwpf.*,
+              !org.apache.tools.ant.*,
+              org.apache.xml.resolver,
+              org.apache.xml.resolver.tools,
+              org.xml.sax, 
+              org.xml.sax.ext, 
+              org.xml.sax.helpers
+            </Import-Package>
+            <Embed-Dependency>
+              poi,
+              poi-ooxml,
+              ooxml-schemas,
+              xmlbeans,
+              xmlbeans-xpath
+            </Embed-Dependency>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
