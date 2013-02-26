@@ -4,7 +4,7 @@
   <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-base</artifactId>
   <packaging>pom</packaging>
-  <version>3.1.6</version>
+  <version>3.1.6-SNAPSHOT</version>
   <name>Weblounge</name>
   <description>Weblounge is a multilingual web content management system</description>
   <url>http://www.entwinemedia.com/weblounge</url>
