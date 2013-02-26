@@ -233,6 +233,12 @@
     </dependency>
 
     <dependency>
+    	<groupId>org.apache.servicemix.bundles</groupId>
+    	<artifactId>org.apache.servicemix.bundles.poi</artifactId>
+    	<version>3.9_1</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.neethi</groupId>
       <artifactId>neethi</artifactId>
       <version>3.0.1</version>
@@ -315,6 +321,12 @@
       <groupId>org.jdom</groupId>
       <artifactId>com.springsource.org.jdom</artifactId>
       <version>1.0.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.dom4j</groupId>
+      <artifactId>com.springsource.org.dom4j</artifactId>
+      <version>1.6.1</version>
     </dependency>
 
     <dependency>
@@ -554,6 +566,12 @@
       <version>1.13.1_4</version>
     </dependency>
     
+    <dependency>
+    	<groupId>org.apache.servicemix.bundles</groupId>
+    	<artifactId>org.apache.servicemix.bundles.saxon</artifactId>
+    	<version>9.4.0.4_2</version>
+    </dependency>
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
