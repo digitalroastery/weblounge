@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge Editor Application">
+
+  <implementation class="com.vaadin.server.VaadinServlet" />
+  <property name="service.description" value="Weblounge Editor Application" />
+  
+  <!-- Servlet properties -->
+  <property name="contextId" value="weblounge" />
+  <property name="alias" value="/weblounge-editor" />
+  <property name="servlet-name" value="Weblounge Editor" />
+  
+  <!-- Vaadin properties (servlet init parameter) -->
+  <property name="init.UI" value="ch.entwine.weblounge.editor.WebloungeUI" />
+  
+  <service>
+    <provide interface="javax.servlet.Servlet" />
+  </service>
+
+</scr:component>

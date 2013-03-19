@@ -180,6 +180,17 @@
       </modules>
     </profile>
 
+    <!-- Editor aggregator -->
+    <profile>
+      <id>editor</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/weblounge-editor</module>
+      </modules>
+    </profile>
+
     <!-- Performance testing -->
     <profile>
       <id>test</id>
@@ -842,6 +853,31 @@
      	  <artifactId>org.springframework.core</artifactId>
      	  <version>3.1.2.RELEASE</version>
    	  </dependency>
+   	  
+   	  <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-server</artifactId>
+        <version>7.0.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-client-compiled</artifactId>
+        <version>7.0.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-client</artifactId>
+        <version>7.0.2</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-themes</artifactId>
+        <version>7.0.2</version>
+      </dependency>
     
       <!-- Testing -->
   
