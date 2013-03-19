@@ -506,11 +506,11 @@
       <version>1.0.0</version>
     </dependency>
 
-	<dependency>
-	  <groupId>org.apache.aries.jpa</groupId>
-	  <artifactId>org.apache.aries.jpa.api</artifactId>
-	  <version>1.0.0</version>
-	</dependency>
+    <dependency>
+      <groupId>org.apache.aries.jpa</groupId>
+      <artifactId>org.apache.aries.jpa.api</artifactId>
+      <version>1.0.0</version>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.aries.jpa</groupId>
