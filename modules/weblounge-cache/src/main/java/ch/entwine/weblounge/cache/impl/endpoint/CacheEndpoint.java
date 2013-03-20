@@ -54,7 +54,7 @@ import javax.ws.rs.core.Response.Status;
 public class CacheEndpoint {
 
   /** The logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(CacheEndpoint.class);
+  private static final Logger logger = LoggerFactory.getLogger(CacheEndpoint.class);
 
   /** The endpoint documentation */
   private String docs = null;
