@@ -188,6 +188,7 @@
       </activation>
       <modules>
         <module>modules/weblounge-editor</module>
+        <module>modules/weblounge-vaadin</module>
       </modules>
     </profile>
 

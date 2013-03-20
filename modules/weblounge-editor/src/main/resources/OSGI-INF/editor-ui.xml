@@ -10,7 +10,8 @@
   <property name="contextId" value="weblounge" />
   <property name="alias" value="/weblounge-editor" />
   <property name="servlet-name" value="Weblounge Editor" />
-  
+  <property name="pattern" value=".*" />
+ 
   <!-- Vaadin properties (servlet init parameter) -->
   <property name="init.UI" value="ch.entwine.weblounge.editor.WebloungeUI" />
   
