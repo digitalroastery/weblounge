@@ -21,9 +21,8 @@
 package ch.entwine.weblounge.editor;
 
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
@@ -35,17 +34,36 @@ public class WebloungeUI extends UI {
 
   @Override
   protected void init(VaadinRequest request) {
-    final VerticalLayout layout = new VerticalLayout();
-    layout.setMargin(true);
-    setContent(layout);
+    getPage().setTitle("Weblounge Editor");
 
-    Button button = new Button("Hello World");
-    button.addClickListener(new Button.ClickListener() {
-      public void buttonClick(ClickEvent event) {
-        layout.addComponent(new Label("Thank you for clicking"));
-      }
-    });
-    layout.addComponent(button);
+    TabSheet tabsheet = new TabSheet();
+    setContent(tabsheet);
+    
+    tabsheet.addTab(createDesigner());
+    tabsheet.addTab(createPageBrowser());
+    tabsheet.addTab(createMediaBrowser());
+    
+  }
+  
+  private Component createDesigner() {
+    final VerticalLayout layout = new VerticalLayout();
+    layout.setCaption("Designer");
+    layout.setMargin(true);
+    return layout;
+  }
+
+  private Component createPageBrowser() {
+    final VerticalLayout layout = new VerticalLayout();
+    layout.setCaption("Pages");
+    layout.setMargin(true);
+    return layout;
+  }
+
+  private Component createMediaBrowser() {
+    final VerticalLayout layout = new VerticalLayout();
+    layout.setCaption("Media");
+    layout.setMargin(true);
+    return layout;
   }
 
 }

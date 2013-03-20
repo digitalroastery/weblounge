@@ -616,12 +616,6 @@
       <version>1.7.2</version>
     </dependency>
     
-    <dependency>
-      <groupId>de.twentyeleven.skysail</groupId>
-      <artifactId>org.json-osgi</artifactId>
-      <version>20080701</version>
-    </dependency>
-    
   </dependencies>
 
   <build>
