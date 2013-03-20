@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <service interface="javax.servlet.Servlet">
+    <service-properties>
+      <entry key="servlet-name" value="Vaadin Resources"/>
+      <entry key="alias" value="/VAADIN"/>
+      <entry key="contextId" value="weblounge"/>
+    </service-properties>
+    <bean class="com.vaadin.server.VaadinServlet"/>
+  </service>
+
+</blueprint>
