@@ -20,7 +20,9 @@
 
 package ch.entwine.weblounge.editor;
 
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
@@ -38,17 +40,22 @@ public class WebloungeUI extends UI {
 
     TabSheet tabsheet = new TabSheet();
     setContent(tabsheet);
-    
+
     tabsheet.addTab(createDesigner());
     tabsheet.addTab(createPageBrowser());
     tabsheet.addTab(createMediaBrowser());
-    
+
   }
-  
+
   private Component createDesigner() {
     final VerticalLayout layout = new VerticalLayout();
     layout.setCaption("Designer");
     layout.setMargin(true);
+
+    BrowserFrame page = new BrowserFrame("Site", new ExternalResource("http://localhost:8080"));
+    page.setSizeFull();
+    layout.addComponent(page);
+
     return layout;
   }
 
