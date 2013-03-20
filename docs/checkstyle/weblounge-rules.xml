@@ -39,9 +39,11 @@
   
   <!-- Checks for Size Violations.                    -->
   <!-- See http://checkstyle.sf.net/config_sizes.html -->
+  <!--
   <module name="FileLength">
     <property name="severity" value="warning" />
   </module>
+  -->
 
   <module name="TreeWalker">
     <property name="cacheFile" value="${checkstyle.cache.file}" />

@@ -28,7 +28,7 @@ import javax.persistence.UniqueConstraint;
  * and at the same time ties in the roles that the user is being assigned.
  */
 @Entity
-@Table(name = "directory_account", uniqueConstraints = @UniqueConstraint(columnNames = {"login", "site_id"}))
+@Table(name = "directory_account", uniqueConstraints = @UniqueConstraint(columnNames = {" login", "site_id" }))
 @NamedQueries({
     @NamedQuery(name = "getAccount", query = "SELECT a FROM JpaAccount a WHERE a.site.name = :siteId AND a.login = :userId"),
     @NamedQuery(name = "getActiveAccount", query = "SELECT a FROM JpaAccount a WHERE a.site.name = :siteId AND a.login = :userId AND a.enabled = true and a.site.enabled = true"),
