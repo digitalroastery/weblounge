@@ -156,7 +156,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
   public Object getAttribute(String name) {
     if (includeAttrs.contains(name))
       return attrs.get(name);
-    return super.getAttribute(name);
+    return ((WebloungeRequest) getRequest()).getAttribute(name);
   }
 
   /**
