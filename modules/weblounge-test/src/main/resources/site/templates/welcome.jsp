@@ -12,11 +12,12 @@
 	</head>
     <webl:context>
 	<body>
+		<h1>Welcome to the Weblounge 3.0 testpage!</h1>
 	    <webls:ifauthenticated>
 			<h1>Hi <%= user.getName() %></h1>
 		</webls:ifauthenticated>
 		<webls:ifnotauthenticated>
-			<h1>Welcome to the Weblounge 3.0 testpage!</h1>
+			<h1>Hello, stranger</h1>
 		</webls:ifnotauthenticated>
 		<div>
 			i18n: <webl:i18n key="greeting.hello"/> <webl:i18n key="greeting.world"/>
