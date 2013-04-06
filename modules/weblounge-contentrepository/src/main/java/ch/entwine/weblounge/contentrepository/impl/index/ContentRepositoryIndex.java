@@ -277,6 +277,8 @@ public class ContentRepositoryIndex {
 
     // Load the identifier from the index
     SearchQuery q = new SearchQueryImpl(site).withPath(path);
+    if (uri.getType() != null)
+      q.withTypes(uri.getType());
     SearchResultItem[] items = searchIdx.getByQuery(q).getItems();
     if (items.length == 0) {
       logger.debug("Attempt to locate id for non-existing path {}", path);
@@ -312,6 +314,8 @@ public class ContentRepositoryIndex {
 
     // Load the path from the index
     SearchQuery q = new SearchQueryImpl(site).withIdentifier(id);
+    if (uri.getType() != null)
+      q.withTypes(uri.getType());
     SearchResultItem[] items = searchIdx.getByQuery(q).getItems();
     if (items.length == 0) {
       logger.debug("Attempt to locate path for non existing resource '{}'", id);
