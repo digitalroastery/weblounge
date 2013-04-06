@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.cache.impl;
 
+import static ch.entwine.weblounge.common.impl.request.Http11Constants.HEADER_IF_MODIFIED_SINCE;
+import static ch.entwine.weblounge.common.impl.request.Http11Constants.HEADER_IF_NONE_MATCH;
 import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 
 import ch.entwine.weblounge.cache.CacheListener;
@@ -610,7 +612,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
           logger.debug("Waiting for cache transaction {} to be finished", request);
           while (transactions.containsKey(handle.getKey())) {
             transactions.wait(1000);
-            
+
             // Was this a notify or a timeout?
             if (transactions.get(handle.getKey()) != null) {
               logger.debug("After waiting 1s, cache entry {} is still being worked on", handle.getKey());
@@ -674,9 +676,14 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     CacheEntry entry = (CacheEntry) element.getValue();
 
     // Check what the client has available locally
-    long clientCacheDate = request.getDateHeader("If-Modified-Since");
-    String eTag = request.getHeader("If-None-Match");
-    
+    String eTag = request.getHeader(HEADER_IF_NONE_MATCH);
+    long clientCacheDate = 0;
+    try {
+      clientCacheDate = request.getDateHeader(HEADER_IF_MODIFIED_SINCE);
+    } catch (IllegalArgumentException e) {
+      logger.debug("The client provided a malformed '{}' date header: '{}'", HEADER_IF_MODIFIED_SINCE, request.getHeader(HEADER_IF_MODIFIED_SINCE));
+    }
+
     // Do we have a more recent version?
     boolean isModified = !entry.notModified(clientCacheDate) && !entry.matches(eTag);
 
