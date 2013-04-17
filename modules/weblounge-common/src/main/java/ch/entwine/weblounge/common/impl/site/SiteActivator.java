@@ -288,7 +288,7 @@ public class SiteActivator {
               }
             });
           } catch (Throwable e) {
-            logger.error("Error loading site from bundle '{}': {}", bundleName, e.getMessage());
+            logger.error("Error loading site from bundle '{}': {}", bundleName, e);
           }
         }
       };

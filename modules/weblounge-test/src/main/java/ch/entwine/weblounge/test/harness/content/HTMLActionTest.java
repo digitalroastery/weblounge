@@ -133,10 +133,6 @@ public class HTMLActionTest extends IntegrationTestBase {
           assertNotNull("General template output does not work", templateOutput);
           assertEquals("Template title is not as expected", "Welcome to Weblounge", templateOutput);
 
-          // Make sure it is rendered on the home page
-          String testSuiteTitle = XPathHelper.valueOf(xml, "/html/body/h1");
-          assertEquals("Action is not rendered on start page", "Welcome to the Weblounge 3.0 testpage!", testSuiteTitle);
-
           // Look for action parameter handling and direct output of
           // startState()
           String actualGreeting = XPathHelper.valueOf(xml, "/html/body/div[@id='main']/h1");
@@ -250,7 +246,7 @@ public class HTMLActionTest extends IntegrationTestBase {
     logger.info("Testing action target page overriding");
 
     StringBuffer requestUrl = new StringBuffer(targetedActionPath);
-    requestUrl.append("?").append(HTMLAction.TARGET_PAGE).append("=/");
+    requestUrl.append("?").append(HTMLAction.TARGET_PAGE).append("=%2F");
     HttpGet request = new HttpGet(UrlUtils.concat(serverUrl, requestUrl.toString()));
 
     // Send the request and make sure it ends up on the expected page
