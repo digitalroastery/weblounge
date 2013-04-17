@@ -35,6 +35,7 @@ import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,6 +116,8 @@ public class ResourceIteratorTag extends WebloungeTag {
    *          the resource identifier to search
    */
   public void setUuid(String id) {
+	if (StringUtils.isBlank(id))
+		return;
     if (resourceId == null)
       resourceId = new ArrayList<String>();
     StringTokenizer st = new StringTokenizer(id, ",;");
