@@ -73,6 +73,9 @@ public class ResourceIteratorTag extends WebloungeTag {
   /** The minimum creation start date */
   private Date creatorStartDate = null;
 
+  /** The maximum creation start date */
+  private Date creatorEndDate = null;
+
   /** The iteration index */
   protected int index = 0;
 
@@ -116,8 +119,8 @@ public class ResourceIteratorTag extends WebloungeTag {
    *          the resource identifier to search
    */
   public void setUuid(String id) {
-	if (StringUtils.isBlank(id))
-		return;
+    if (StringUtils.isBlank(id))
+      return;
     if (resourceId == null)
       resourceId = new ArrayList<String>();
     StringTokenizer st = new StringTokenizer(id, ",;");
@@ -172,7 +175,10 @@ public class ResourceIteratorTag extends WebloungeTag {
   }
 
   /**
-   * Set the minimum creation date to search from
+   * Set the minimum creation date to search from.
+   * <p>
+   * If the start date is omitted but the end date is given, the earliest date
+   * possible <code>new Date(0)</code> is assumed.
    * 
    * @param startDate
    *          the creator date
@@ -181,7 +187,24 @@ public class ResourceIteratorTag extends WebloungeTag {
     try {
       creatorStartDate = WebloungeDateFormat.parseStatic(startDate);
     } catch (ParseException e) {
-      logger.debug("Unable to parse date '{}'", startDate);
+      logger.debug("Unable to parse start date '{}'", startDate);
+    }
+  }
+
+  /**
+   * Set the maximum creation date to search to.
+   * <p>
+   * If the end date is omitted but the start date is given, the current date
+   * possible <code>new Date()</code> is assumed.
+   * 
+   * @param endDate
+   *          the creator date
+   */
+  public void setEnddate(String endDate) {
+    try {
+      creatorEndDate = WebloungeDateFormat.parseStatic(endDate);
+    } catch (ParseException e) {
+      logger.debug("Unable to parse end date '{}'", endDate);
     }
   }
 
@@ -261,10 +284,16 @@ public class ResourceIteratorTag extends WebloungeTag {
             q.withSeries(series);
           }
         }
-        if (creatorStartDate != null)
+        if (creatorStartDate != null || creatorEndDate != null) {
+          if (creatorStartDate == null)
+            creatorStartDate = new Date(0);
+          if (creatorEndDate == null)
+            creatorEndDate = new Date();
           q.withCreationDateBetween(creatorStartDate);
+          q.and(creatorEndDate);
+        }
       }
-      
+
       q.withLimit(limit);
       q.withOffset(offset);
 
@@ -383,6 +412,7 @@ public class ResourceIteratorTag extends WebloungeTag {
     resourceSubjects = null;
     repository = null;
     creatorStartDate = null;
+    creatorEndDate = null;
     resourceId = null;
     order = null;
     resourceSeries = null;

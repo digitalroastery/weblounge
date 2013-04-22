@@ -135,6 +135,11 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
     <attribute>
+      <name>enddate</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
       <name>uuid</name>
       <required>false</required>
       <rtexprvalue>true</rtexprvalue>
