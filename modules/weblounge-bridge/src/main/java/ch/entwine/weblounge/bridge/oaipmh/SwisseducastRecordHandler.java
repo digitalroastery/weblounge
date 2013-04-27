@@ -60,12 +60,14 @@ public class SwisseducastRecordHandler extends AbstractWebloungeRecordHandler im
    *          the dublin core episode flavor
    * @param dcSeriesFlavor
    *          the dublin core series flavor
+   * @param mimeTypesStr
+   * 		  the string containing the list of mime-types separated by a string
    */
   public SwisseducastRecordHandler(Site site,
       WritableContentRepository contentRepository, User harvesterUser,
       String presentationTrackFlavor, String presenterTrackFlavor,
-      String dcEpisodeFlavor, String dcSeriesFlavor) {
-    super(site, contentRepository, harvesterUser, presentationTrackFlavor, presenterTrackFlavor, dcEpisodeFlavor, dcSeriesFlavor);
+      String dcEpisodeFlavor, String dcSeriesFlavor, String mimeTypesStr) {
+    super(site, contentRepository, harvesterUser, presentationTrackFlavor, presenterTrackFlavor, dcEpisodeFlavor, dcSeriesFlavor, mimeTypesStr);
   }
 
   /**

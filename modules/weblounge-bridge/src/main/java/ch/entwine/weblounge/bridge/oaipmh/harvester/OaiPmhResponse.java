@@ -60,7 +60,8 @@ public abstract class OaiPmhResponse {
    * Get the error code if this is an error response.
    */
   public Option<String> getErrorCode() {
-    return Option.wrap(trimToNull(xpathString("/oai20:OAI-PMH/oai20:error/@code")));
+	return Option.option(trimToNull(xpathString("/oai20:OAI-PMH/oai20:error/@code")));
+    //return Option.wrap(trimToNull(xpathString("/oai20:OAI-PMH/oai20:error/@code")));
   }
 
   /**

@@ -148,7 +148,7 @@ public class WebloungeHarvesterTest {
   @Test
   public void testMatterhornRecordHandler() throws Exception {
     UserImpl harvesterUser = new UserImpl("testlogin", site.getIdentifier(), "Harvester");
-    RecordHandler recordHandler = new MatterhornRecordHandler(site, contentRepository, harvesterUser, "presentation/delivery", "presenter/delivery", "dublincore/episode", "dublincore/series");
+    RecordHandler recordHandler = new MatterhornRecordHandler(site, contentRepository, harvesterUser, "presentation/delivery", "presenter/delivery", "dublincore/episode", "dublincore/series","video/webm");
 
     assertEquals(METADATA_PREFIX, recordHandler.getMetadataPrefix());
     assertEquals(1, contentRepository.getResourceCount());

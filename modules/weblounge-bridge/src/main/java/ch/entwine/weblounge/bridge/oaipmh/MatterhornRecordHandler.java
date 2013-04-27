@@ -27,10 +27,12 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Stream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.util.MimeType;
 import org.w3c.dom.Node;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 
 /**
  * A Matterhorn specified implementation of a record handler. This class is not
@@ -61,12 +63,14 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
    *          the dublin core episode flavor
    * @param dcSeriesFlavor
    *          the dublin core series flavor
+   * @param mimeTypesStr
+   * 		  the string containing the list of mime-types separated by a string
    */
   public MatterhornRecordHandler(Site site,
       WritableContentRepository contentRepository, User harvesterUser,
       String presentationTrackFlavor, String presenterTrackFlavor,
-      String dcEpisodeFlavor, String dcSeriesFlavor) {
-    super(site, contentRepository, harvesterUser, presentationTrackFlavor, presenterTrackFlavor, dcEpisodeFlavor, dcSeriesFlavor);
+      String dcEpisodeFlavor, String dcSeriesFlavor, String mimeTypesStr) {
+    super(site, contentRepository, harvesterUser, presentationTrackFlavor, presenterTrackFlavor, dcEpisodeFlavor, dcSeriesFlavor, mimeTypesStr);
     mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
   }
 
@@ -109,10 +113,31 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
       movieResource.addSeries(mediaPackage.getSeries());
     if (StringUtils.isNotBlank(mediaPackage.getSeriesTitle()))
       movieResource.setDescription(mediaPackage.getSeriesTitle(), language);
+    
+    DublinCoreCatalogImpl episodeDC = null;
+    Catalog episodeCatalog = null;
+    Catalog[] episodeCatalogs = mediaPackage.getCatalogs(MediaPackageElementFlavor.parseFlavor(dcEpisodeFlavor));
+    if(episodeCatalogs.length > 0) {
+    	episodeCatalog = episodeCatalogs[0];
+    }
 
-    Catalog episodeCatalog = mediaPackage.getCatalog(dcEpisodeFlavor);
-
-    Catalog seriesCatalog = mediaPackage.getCatalog(dcSeriesFlavor);
+    
+    
+    /*InputStream is = null;
+    try {
+      is = episodeCatalog.getURI().toURL().openStream();
+      episodeDC = new DublinCoreCatalogImpl(is);
+    } catch (Exception e) {
+      logger.error("Error loading Dublin Core metadata: {}", e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
+    
+    if (episodeCatalog != null) {
+    	movieResource.setDescription(episodeDC.get(DublinCoreCatalogImpl.PROPERTY_DESCRIPTION).get(0).getValue(), site.getDefaultLanguage());		
+    }*/
+    
+    // Catalog seriesCatalog = mediaPackage.getCatalogs(MediaPackageElementFlavor.parseFlavor(dcSeriesFlavor));
     // movieResource.addSeries(series)
     // getRightsHolder
     // movieResource.setCoverage(coverage, language)
@@ -139,22 +164,17 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
 
     // TODO: Use tracks with correct flavor for movie
     // ??? presenterTrackFlavor
-    String[] presentationTrack = presentationTrackFlavor.split("/");
-    MediaPackageElementFlavor elementFlavor = new MediaPackageElementFlavor(presentationTrack[0], presentationTrack[1]);
+    // MediaPackageElementFlavor elementFlavor = MediaPackageElementFlavor.parseFlavor(presentationTrackFlavor);
 
     // Set Content
-    MimeType mimeType = new MimeType("video", "webm");
-    MediaPackageElement element = null;
-    for (MediaPackageElement elem : mediaPackage.getElementsByFlavor(elementFlavor)) {
-      if (elem.getMimeType().equals(mimeType)) {
-        element = elem;
-        break;
-      }
+    MediaPackageElement element = getMediapackageElementByFlavor(MediaPackageElementFlavor.parseFlavor(presentationTrackFlavor), mimeTypes, mediaPackage);
+    if (element == null) {
+    	element = getMediapackageElementByFlavor(MediaPackageElementFlavor.parseFlavor(presenterTrackFlavor), mimeTypes, mediaPackage);
+    	if (element == null)
+    		return null;
     }
-    if (element == null)
-      return null;
 
-    MovieContent content = new MovieContentImpl(FilenameUtils.getBaseName(element.getURI().toString()), language, element.getMimeType().asString());
+    MovieContent content = new MovieContentImpl(FilenameUtils.getBaseName(element.getURI().toString()), language, element.getMimeType().toString());
     StringBuilder author = new StringBuilder();
     String[] creators = mediaPackage.getCreators();
     for (int i = 0; i < creators.length; i++) {
@@ -175,16 +195,13 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
     if (mediaPackage.getDuration() != -1)
       content.setDuration(mediaPackage.getDuration());
 
-    Track track = null;
-    for (Track tr : mediaPackage.getTracks(new MediaPackageElementFlavor(presentationTrack[0], presentationTrack[1]))) {
-      if (tr.getMimeType().equals(mimeType)) {
-        track = tr;
-        break;
-      }
+    Track track = getTrackByFlavor(MediaPackageElementFlavor.parseFlavor(presentationTrackFlavor), mimeTypes, mediaPackage);
+    if (track == null) {
+    	track = getTrackByFlavor(MediaPackageElementFlavor.parseFlavor(presenterTrackFlavor), mimeTypes, mediaPackage);
+        if (track == null)
+            return null;
     }
 
-    if (track == null)
-      return null;
     for (Stream stream : track.getStreams()) {
       if (stream instanceof AudioStream) {
         ch.entwine.weblounge.common.content.movie.AudioStream audioStream = new ch.entwine.weblounge.common.impl.content.movie.AudioStreamImpl();
@@ -223,5 +240,49 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
     content.setCreator(harvesterUser);
     content.setCreationDate(mediaPackage.getDate());
     return content;
+  }
+  
+  /**
+   * Get the first mediapackage element matching with the given flavor and mimetypes.
+   * 
+   * @param flavor
+   * @param mimeType
+   * @param mediaPackage
+   * @return the fist matching mediapackage element or null 
+   */
+  private MediaPackageElement getMediapackageElementByFlavor(MediaPackageElementFlavor flavor, ArrayList<MimeType> mimeTypes, MediaPackage mediaPackage) {
+	MediaPackageElement element = null;
+	  
+    for (MediaPackageElement elem : mediaPackage.getElementsByFlavor(flavor)) {
+    	for (MimeType mimeType : mimeTypes) {	
+	        if (elem.getMimeType().equals(mimeType)) {
+	          element = elem;
+	          break;
+	        }
+    	}
+      }
+    return element;
+  }
+  
+  /**
+   * Get the first track matching with the given flavor and mimetypes.
+   * 
+   * @param flavor
+   * @param mimeType
+   * @param mediaPackage
+   * @return the fist matching mediapackage element or null 
+   */
+  private Track getTrackByFlavor(MediaPackageElementFlavor flavor, ArrayList<MimeType> mimeTypes, MediaPackage mediaPackage) {
+	Track track = null;
+	  
+    for (Track t : mediaPackage.getTracks(flavor)) {
+    	for (MimeType mimeType : mimeTypes) {	
+	        if (t.getMimeType().equals(mimeType)) {
+	          track = t;
+	          break;
+	        }
+    	}
+      }
+    return track;
   }
 }

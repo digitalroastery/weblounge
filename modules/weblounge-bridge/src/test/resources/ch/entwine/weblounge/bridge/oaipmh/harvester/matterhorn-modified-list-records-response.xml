@@ -9,15 +9,15 @@
         <datestamp>2011-09-06</datestamp>
       </header>
       <metadata>
-        <ns2:mediapackage xmlns:ns2="http://mediapackage.opencastproject.org" duration="2669505" id="dd9b7a70-e964-49a9-a9e5-304885c797c7" start="2009-03-02T23:00:00Z">
-          <title xmlns="">Convolution and Filtering</title>
-          <series xmlns="">252-0206-00L</series>
-          <seriestitle xmlns="">Visual Computing</seriestitle>
-          <creators xmlns="">
+        <mediapackage xmlns="http://mediapackage.opencastproject.org" duration="2669505" id="dd9b7a70-e964-49a9-a9e5-304885c797c7" start="2009-03-02T23:00:00Z">
+          <title >Convolution and Filtering</title>
+          <series >252-0206-00L</series>
+          <seriestitle >Visual Computing</seriestitle>
+          <creators >
             <creator>Prof. Marc Pollefeys</creator>
           </creators>
-          <language xmlns="">eng</language>
-          <media xmlns="">
+          <language >eng</language>
+          <media >
             <track id="track-7" ref="track:dcb3566d-22f0-4efd-b7ba-e2abd206251b" type="presentation/delivery">
               <mimetype>video/webm</mimetype>
               <tags>
@@ -115,7 +115,7 @@
               </video>
             </track>
           </media>
-          <metadata xmlns="">
+          <metadata >
             <catalog id="catalog-3" ref="catalog:catalog-2" type="dublincore/series">
               <mimetype>text/xml</mimetype>
               <tags>
@@ -133,7 +133,7 @@
               <checksum type="md5">582ef5eb511bf0bc22b23a2f593fabb1</checksum>
             </catalog>
           </metadata>
-          <attachments xmlns="">
+          <attachments >
             <attachment id="attachment-4" ref="attachment:attachment-2" type="presentation/search+preview">
               <mimetype>image/jpeg</mimetype>
               <tags>
@@ -160,7 +160,7 @@
               <url>http://matterhorn-connect.ethz.ch/static/dd9b7a70-e964-49a9-a9e5-304885c797c7/attachment-1/20090303_E1_Gross.jpg</url>
             </attachment>
           </attachments>
-        </ns2:mediapackage>
+        </mediapackage>
       </metadata>
     </record>
     <record>
@@ -169,15 +169,15 @@
         <datestamp>2011-11-11</datestamp>
       </header>
       <metadata>
-        <ns2:mediapackage xmlns:ns2="http://mediapackage.opencastproject.org" duration="5028583" id="aa2c3988-42fd-4a0b-8ae1-fa61910c3eb3" start="2009-03-04T23:00:00Z">
-          <title xmlns="">Lecture No 3</title>
-          <series xmlns="">252-0054-00L</series>
-          <seriestitle xmlns="">Advanced Computational Science</seriestitle>
-          <creators xmlns="">
+        <mediapackage xmlns="http://mediapackage.opencastproject.org" duration="5028583" id="aa2c3988-42fd-4a0b-8ae1-fa61910c3eb3" start="2009-03-04T23:00:00Z">
+          <title >Lecture No 3</title>
+          <series >252-0054-00L</series>
+          <seriestitle >Advanced Computational Science</seriestitle>
+          <creators >
             <creator>Prof. Koumoutsakos</creator>
           </creators>
-          <language xmlns="">eng</language>
-          <media xmlns="">
+          <language >eng</language>
+          <media >
             <track id="track-7" ref="track:834918d0-bfb9-4691-befe-4c9c6ed50195" type="presentation/delivery">
               <mimetype>video/webm</mimetype>
               <tags>
@@ -321,7 +321,7 @@
               </video>
             </track>
           </media>
-          <metadata xmlns="">
+          <metadata >
             <catalog id="catalog-3" ref="catalog:catalog-2" type="dublincore/series">
               <mimetype>text/xml</mimetype>
               <tags>
@@ -379,7 +379,7 @@
               <checksum type="md5">437a0f74dc3154de3fe03fd9b08cf5e9</checksum>
             </catalog>
           </metadata>
-          <attachments xmlns="">
+          <attachments >
             <attachment id="attachment-4" ref="attachment:attachment-2" type="presentation/search+preview">
               <mimetype>image/jpeg</mimetype>
               <tags>
@@ -2198,7 +2198,7 @@
               <url>http://matterhorn-connect.ethz.ch/static/aa2c3988-42fd-4a0b-8ae1-fa61910c3eb3/attachment-86/20090305_E5_Koumoutsakos.jpg</url>
             </attachment>
           </attachments>
-        </ns2:mediapackage>
+        </mediapackage>
       </metadata>
     </record>
   </ListRecords>
