@@ -15,6 +15,7 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
@@ -28,11 +29,14 @@ import org.opencastproject.mediapackage.Stream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.util.MimeType;
 import org.w3c.dom.Node;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A Matterhorn specified implementation of a record handler. This class is not
@@ -121,9 +125,7 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
     	episodeCatalog = episodeCatalogs[0];
     }
 
-    
-    
-    /*InputStream is = null;
+    InputStream is = null;
     try {
       is = episodeCatalog.getURI().toURL().openStream();
       episodeDC = new DublinCoreCatalogImpl(is);
@@ -134,14 +136,17 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
     }
     
     if (episodeCatalog != null) {
-    	movieResource.setDescription(episodeDC.get(DublinCoreCatalogImpl.PROPERTY_DESCRIPTION).get(0).getValue(), site.getDefaultLanguage());		
-    }*/
+    	List<DublinCoreValue> descriptions = episodeDC.get(DublinCoreCatalogImpl.PROPERTY_DESCRIPTION);
+    	if (descriptions.size() > 0)	
+    		movieResource.setDescription(descriptions.get(0).getValue(), site.getDefaultLanguage());		
+    }
     
-    // Catalog seriesCatalog = mediaPackage.getCatalogs(MediaPackageElementFlavor.parseFlavor(dcSeriesFlavor));
-    // movieResource.addSeries(series)
-    // getRightsHolder
-    // movieResource.setCoverage(coverage, language)
-    // movieResource.setRights(rights, language)
+    Catalog[] seriesCatalogs = mediaPackage.getCatalogs(MediaPackageElementFlavor.parseFlavor(dcSeriesFlavor));
+    
+    if (seriesCatalogs != null && seriesCatalogs.length > 0) {
+    	movieResource.addSeries(seriesCatalogs[0].getIdentifier());
+    }
+
     return movieResource;
   }
 
