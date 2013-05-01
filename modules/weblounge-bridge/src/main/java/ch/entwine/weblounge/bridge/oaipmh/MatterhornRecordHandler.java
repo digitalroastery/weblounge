@@ -4,7 +4,10 @@ import ch.entwine.weblounge.bridge.oaipmh.harvester.HarvesterException;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.ListRecordsResponse;
 import ch.entwine.weblounge.bridge.oaipmh.harvester.RecordHandler;
 import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.movie.MovieContent;
+import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
+import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.content.movie.MovieContentImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceImpl;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
@@ -14,9 +17,11 @@ import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -31,8 +36,11 @@ import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.util.MimeType;
+import org.opencastproject.util.MimeTypes;
 import org.w3c.dom.Node;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -44,6 +52,8 @@ import java.util.List;
  */
 public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler implements RecordHandler {
 
+  public static final String MATTERHORN_HARVESTING = "Matterhorn-harvested";
+  
   /** Name of the oai pmh prefix */
   private static final String MATTERHORN_REPOSITORY_PREFIX = "matterhorn";
 
@@ -118,6 +128,30 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
     if (StringUtils.isNotBlank(mediaPackage.getSeriesTitle()))
       movieResource.setDescription(mediaPackage.getSeriesTitle(), language);
     
+    
+    // Copy preview images
+    ArrayList<MimeType> imgMimeTypes = new ArrayList<MimeType>();
+    imgMimeTypes.add(MimeTypes.JPG);
+    imgMimeTypes.add(MimeTypes.parseMimeType("image/jpeg"));
+    
+    ImageStyle imgStyle = new ImageStyleImpl(MATTERHORN_REPOSITORY_PREFIX);
+    Attachment attachement = getAttachementByFlavor(MediaPackageElementFlavor.parseFlavor("presenter/player+preview"), imgMimeTypes, mediaPackage);
+    
+    if (attachement != null) {
+    	for (Language l:site.getLanguages()) {
+    		File file = ImageStyleUtils.getScaledFile(movieResource, attachement.getURI().getPath(), l, imgStyle);
+    		try {
+    			FileUtils.copyURLToFile(attachement.getURI().toURL(), file);
+    		} catch (MalformedURLException e) {
+    			logger.error("Error copying preview image: {}", e.getMessage());
+    			e.printStackTrace();
+    		} catch (IOException e) {
+    			logger.error("Error copying preview image: {}", e.getMessage());
+    			e.printStackTrace();
+    		}     		
+    	}    	
+    }
+    
     DublinCoreCatalogImpl episodeDC = null;
     Catalog episodeCatalog = null;
     Catalog[] episodeCatalogs = mediaPackage.getCatalogs(MediaPackageElementFlavor.parseFlavor(dcEpisodeFlavor));
@@ -140,12 +174,9 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
     	if (descriptions.size() > 0)	
     		movieResource.setDescription(descriptions.get(0).getValue(), site.getDefaultLanguage());		
     }
-    
-    Catalog[] seriesCatalogs = mediaPackage.getCatalogs(MediaPackageElementFlavor.parseFlavor(dcSeriesFlavor));
-    
-    if (seriesCatalogs != null && seriesCatalogs.length > 0) {
-    	movieResource.addSeries(seriesCatalogs[0].getIdentifier());
-    }
+  
+    // Add matterhorn-harvested as subject to help identifying it as harvested resource
+    movieResource.addSubject(MATTERHORN_HARVESTING);
 
     return movieResource;
   }
@@ -289,5 +320,27 @@ public class MatterhornRecordHandler extends AbstractWebloungeRecordHandler impl
     	}
       }
     return track;
+  }
+  
+  /**
+   * Get the first attachement matching with the given flavor and mimetypes.
+   * 
+   * @param flavor
+   * @param mimeType
+   * @param mediaPackage
+   * @return the fist matching mediapackage element or null 
+   */
+  private Attachment getAttachementByFlavor(MediaPackageElementFlavor flavor, ArrayList<MimeType> mimeTypes, MediaPackage mediaPackage) {
+	Attachment attachement = null;
+	  
+    for (Attachment a : mediaPackage.getAttachments(flavor)) {
+    	for (MimeType mimeType : mimeTypes) {	
+	        if (a.getMimeType().equals(mimeType)) {
+	          attachement = a;
+	          break;
+	        }
+    	}
+      }
+    return attachement;
   }
 }

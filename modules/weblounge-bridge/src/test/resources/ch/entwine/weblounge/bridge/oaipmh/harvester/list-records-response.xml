@@ -61,42 +61,10 @@
               </track>
             </media>
             <metadata >
-              <catalog id="catalog-2" ref="catalog:40b2ec10-c0ba-44c0-a593-6bf2a5df715b" type="dublincore/episode">
-                <mimetype>text/xml</mimetype>
-                <tags>
-                  <tag>publish</tag>
-                </tags>
-                <url>
-                  http://localhost:8080/static/548adbd3-13ef-4189-9805-a3d83b4dc2a2/40b2ec10-c0ba-44c0-a593-6bf2a5df715b/dublincore.xml
-                </url>
-              </catalog>
+             
             </metadata>
             <attachments >
-              <attachment id="attachment-4" ref="attachment:attachment-1" type="presenter/player+preview">
-                <mimetype>image/jpeg</mimetype>
-                <tags>
-                  <tag>engage</tag>
-                  <tag>publish</tag>
-                </tags>
-                <url>http://localhost:8080/static/548adbd3-13ef-4189-9805-a3d83b4dc2a2/attachment-1/Freunde.jpg</url>
-              </attachment>
-              <attachment id="attachment-5" ref="attachment:attachment-2" type="presenter/search+preview">
-                <mimetype>image/jpeg</mimetype>
-                <tags>
-                  <tag>engage</tag>
-                  <tag>publish</tag>
-                </tags>
-                <url>http://localhost:8080/static/548adbd3-13ef-4189-9805-a3d83b4dc2a2/attachment-2/Freunde.jpg</url>
-              </attachment>
-              <attachment id="attachment-6" ref="attachment:attachment-3" type="presenter/feed+preview">
-                <mimetype>image/jpeg</mimetype>
-                <tags>
-                  <tag>atom</tag>
-                  <tag>publish</tag>
-                  <tag>rss</tag>
-                </tags>
-                <url>http://localhost:8080/static/548adbd3-13ef-4189-9805-a3d83b4dc2a2/attachment-3/Freunde.jpg</url>
-              </attachment>
+       
             </attachments>
           </mediapackage>
         </matterhorn:mediapackage>

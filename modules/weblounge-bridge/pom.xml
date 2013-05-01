@@ -50,13 +50,13 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
-      <version>1.4-rc6</version>
+      <version>1.4-rc8</version>
     </dependency>
     
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-dublincore</artifactId>
-      <version>1.4-rc6</version>
+      <version>1.4-rc8</version>
     </dependency>
     
     <dependency>
