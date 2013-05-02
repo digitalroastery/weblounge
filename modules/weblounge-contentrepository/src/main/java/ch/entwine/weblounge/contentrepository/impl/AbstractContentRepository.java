@@ -848,7 +848,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     boolean styleIsMissing = false;
 
     for (ImageStyle s : allStyles) {
-      File baseDir = ImageStyleUtils.getScaledFileBase(site, s);
+      File baseDir = ImageStyleUtils.getDirectory(site, s);
       File definitionFile = new File(baseDir, "style.xml");
 
       // Try and read the file on disk

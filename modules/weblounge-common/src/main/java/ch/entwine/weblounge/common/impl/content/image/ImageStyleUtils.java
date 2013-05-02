@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
@@ -407,7 +408,7 @@ public final class ImageStyleUtils {
    *          the language
    * @param style
    *          the image style
-   * @return
+   * @return the file on the filesystem
    */
   public static File getScaledFile(Resource<?> resource, Language language,
       ImageStyle style) {
@@ -415,10 +416,29 @@ public final class ImageStyleUtils {
   }
 
   /**
+   * Returns the original file for the scaled image that is identified by
+   * <code>filename</code> and <code>language</code>.
+   * <p>
+   * If no filename is specified, the resource's identifier is used.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @return the file on the filesystem
+   */
+  public static File getUnscaledFile(Resource<?> resource, Language language) {
+    return getScaledFile(resource, null, language, null);
+  }
+
+  /**
    * Returns the file for the scaled image that is identified by
    * <code>filename</code>, <code>language</code> and <code>style</code>.
    * <p>
    * If no filename is specified, the resource's identifier is used.
+   * <p>
+   * If <code>null</code> is provided as the image style, the
+   * <code>original</code> style will be used.
    * 
    * @param resource
    *          the resource
@@ -428,7 +448,7 @@ public final class ImageStyleUtils {
    *          the language
    * @param style
    *          the image style
-   * @return
+   * @return the path to the scaled image
    */
   public static File getScaledFile(Resource<?> resource, String filename,
       Language language, ImageStyle style) {
@@ -437,6 +457,10 @@ public final class ImageStyleUtils {
       filename = resource.getContent(language).getFilename();
     if (StringUtils.isBlank(filename))
       filename = resource.getURI().getIdentifier();
+
+    if (style == null) {
+      style = new ImageStyleImpl("original", ImageScalingMode.None);
+    }
 
     String suffix = FilenameUtils.getExtension(filename);
     if (StringUtils.isBlank(suffix))
@@ -449,10 +473,28 @@ public final class ImageStyleUtils {
     // Create the filename
     StringBuffer scaledFilename = new StringBuffer(FilenameUtils.getBaseName(filename));
     scaledFilename.append("-").append(style.getIdentifier());
+
     if (StringUtils.isNotBlank(suffix))
       scaledFilename.append(".").append(suffix);
 
     return new File(dir, scaledFilename.toString());
+  }
+
+  /**
+   * Returns the file for the original image that is identified by
+   * <code>filename</code> and <code>language</code>.
+   * 
+   * @param resource
+   *          the resource
+   * @param filename
+   *          the file name
+   * @param language
+   *          the language
+   * @return the path to the preview image
+   */
+  public static File getUnscaledFile(Resource<?> resource, String filename,
+      Language language) {
+    return getScaledFile(resource, filename, language, null);
   }
 
   /**
@@ -464,7 +506,7 @@ public final class ImageStyleUtils {
    * @throws IllegalArgumentException
    *           if <code>site</code> is null
    */
-  public static File getScaledFileBase(Site site) {
+  public static File getDirectory(Site site) {
     if (site == null)
       throw new IllegalArgumentException("site must not be null");
     return new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images"));
@@ -481,7 +523,7 @@ public final class ImageStyleUtils {
    * @throws IllegalArgumentException
    *           if either one of <code>site</code>, <code>style</code> is null
    */
-  public static File getScaledFileBase(Site site, ImageStyle style) {
+  public static File getDirectory(Site site, ImageStyle style) {
     if (site == null)
       throw new IllegalArgumentException("site must not be null");
     if (style == null)

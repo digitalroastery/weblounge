@@ -365,7 +365,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
   @Path("/")
   public Response removePreviews(@Context HttpServletRequest request) {
     Site site = super.getSite(request);
-    File previewsDir = ImageStyleUtils.getScaledFileBase(site);
+    File previewsDir = ImageStyleUtils.getDirectory(site);
     if (FileUtils.deleteQuietly(previewsDir))
       return Response.ok().build();
     else
@@ -430,7 +430,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     if (style == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
-    File previewsDir = ImageStyleUtils.getScaledFileBase(site, style);
+    File previewsDir = ImageStyleUtils.getDirectory(site, style);
     if (FileUtils.deleteQuietly(previewsDir))
       return Response.ok().build();
     else

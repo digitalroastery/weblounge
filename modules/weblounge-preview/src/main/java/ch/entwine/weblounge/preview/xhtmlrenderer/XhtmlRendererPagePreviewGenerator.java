@@ -272,7 +272,7 @@ public class XhtmlRendererPagePreviewGenerator implements PagePreviewGenerator {
     try {
       int screenshotWidth = DEFAULT_SCREENSHOT_WIDTH;
       int screenshotHeight = DEFAULT_SCREENSHOT_HEIGHT;
-      if (style.getWidth() > 0 && style.getHeight() > 0) {
+      if (style != null && style.getWidth() > 0 && style.getHeight() > 0) {
         screenshotHeight = (int) ((float) screenshotWidth / (float) style.getWidth() * style.getHeight());
       }
 
