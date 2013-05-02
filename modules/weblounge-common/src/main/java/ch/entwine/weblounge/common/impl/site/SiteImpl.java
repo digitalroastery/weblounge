@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestGroup;
 import ch.entwine.weblounge.common.impl.testing.IntegrationTestParser;
+import ch.entwine.weblounge.common.impl.util.classloader.BundleClassLoader;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.config.OptionsHelper;
 import ch.entwine.weblounge.common.impl.util.xml.ValidationErrorHandler;
@@ -1495,6 +1496,7 @@ public class SiteImpl implements Site {
       // Set up the job detail
       JobDataMap jobData = new JobDataMap();
       jobData.put(QuartzJobWorker.CLASS, jobClass);
+      jobData.put(QuartzJobWorker.CLASS_LOADER, new BundleClassLoader(bundleContext.getBundle()));
       jobData.put(QuartzJobWorker.CONTEXT, job.getContext());
       job.getContext().put(Site.class.getName(), this);
       job.getContext().put(BundleContext.class.getName(), bundleContext);
