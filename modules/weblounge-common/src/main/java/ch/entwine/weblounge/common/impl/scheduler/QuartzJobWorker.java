@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.scheduler;
 
+import ch.entwine.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
 import ch.entwine.weblounge.common.scheduler.JobException;
 import ch.entwine.weblounge.common.scheduler.JobWorker;
 import ch.entwine.weblounge.common.site.Site;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.concurrent.Callable;
 
 /**
  * Wrapper class that is passed to the Quartz scheduler and that will execute
@@ -50,6 +52,9 @@ public class QuartzJobWorker implements org.quartz.Job {
   /** The class key */
   public static final String CONTEXT = "ch.entwine.weblounge.JobContext";
 
+  /** The class loader key */
+  public static final String CLASS_LOADER = "ch.entwine.weblounge.JobClassLoader";
+
   /** The job instance */
   private JobWorker jobInstance = null;
 
@@ -59,7 +64,8 @@ public class QuartzJobWorker implements org.quartz.Job {
    * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
    */
   @SuppressWarnings("unchecked")
-  public void execute(JobExecutionContext ctx) throws JobExecutionException {
+  public void execute(final JobExecutionContext ctx)
+      throws JobExecutionException {
     try {
       if (jobInstance == null) {
         jobInstance = createJobInstance(ctx);
@@ -68,16 +74,24 @@ public class QuartzJobWorker implements org.quartz.Job {
 
       // Prepare the local job context
       JobDataMap jobData = ctx.getJobDetail().getJobDataMap();
-      Dictionary<String, Serializable> jobContext = (Dictionary<String, Serializable>) jobData.get(CONTEXT);
-      if (jobContext == null) {
+      final Dictionary<String, Serializable> jobContext;
+      if (jobData.get(CONTEXT) == null) {
         logger.debug("Creating default job context");
         jobContext = new Hashtable<String, Serializable>();
         jobContext.put(Site.class.getName(), (Site) jobData.get(Site.class.getName()));
         jobData.put(CONTEXT, jobContext);
+      } else {
+        jobContext = (Dictionary<String, Serializable>) jobData.get(CONTEXT);
       }
 
       // Execute the worker
-      jobInstance.execute(ctx.getJobDetail().getName(), jobContext);
+      ClassLoader contextClassLoader = (ClassLoader) jobData.get(CLASS_LOADER);
+      ContextClassLoaderUtils.doWithClassLoader(contextClassLoader, new Callable<Void>() {
+        public Void call() throws Exception {
+          jobInstance.execute(ctx.getJobDetail().getName(), jobContext);
+          return null;
+        }
+      });
 
     } catch (JobException e) {
       logger.warn(e.getMessage());
@@ -101,6 +115,7 @@ public class QuartzJobWorker implements org.quartz.Job {
   private JobWorker createJobInstance(JobExecutionContext ctx) throws Exception {
     JobDataMap jobData = ctx.getJobDetail().getJobDataMap();
     Class<?> c = (Class<?>) jobData.get(CLASS);
+
     if (c == null)
       throw new IllegalStateException("Lookup of job implementation failed");
     try {
