@@ -1284,7 +1284,7 @@ public class SiteImpl implements Site {
 
         // If module is disabled, don't add it to the site
         if (!module.isEnabled()) {
-          logger.info("Module '{}' for site '{}' is disabled", module, this);
+          logger.info("Found disabled module '{}' in site '{}'", module, this);
           continue;
         }
 
