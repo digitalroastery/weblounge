@@ -159,7 +159,7 @@ steal.plugins('jquery/controller',
 			$('div.#' + this.id + '-ghost').hide();
 		} else {
 			$('div.#' + this.id + '-ghost').show();
-			$(this.element).hide();
+			// $(this.element).hide();
 		}
 	},
     
