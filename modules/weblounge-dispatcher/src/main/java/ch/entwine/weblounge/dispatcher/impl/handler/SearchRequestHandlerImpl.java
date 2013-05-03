@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
+import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
@@ -161,12 +162,12 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
 
     // Create the search expression and the query
     SearchQuery q = new SearchQueryImpl(site);
-    q.withText(true, queryString);
+    q.withFulltext(true, queryString);
     q.withVersion(Resource.LIVE);
     q.withRececyPriority();
     q.withOffset(offset);
     q.withLimit(limit);
-    q.withTypes(Page.TYPE);
+    q.withTypes(Page.TYPE, MovieResource.TYPE);
 
     // Return the result
     SearchResult result = null;
