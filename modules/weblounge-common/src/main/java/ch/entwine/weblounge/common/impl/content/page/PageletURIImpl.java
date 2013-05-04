@@ -127,12 +127,14 @@ public class PageletURIImpl implements PageletURI {
   @Override
   public int hashCode() {
     int hashCode = 0;
-    // int positionMask = 255 << 24; // Keep the 8 first (from the MSB) bits for the position
-    int composerMask = 255 << 16; // Keep the 8 bits after the position for the composer
-    // int pageMask = 65535; // Keep 16 last bits for the page 
-    
+    // int positionMask = 255 << 24; // Keep the 8 first (from the MSB) bits for
+    // the position
+    int composerMask = 255 << 16; // Keep the 8 bits after the position for the
+                                  // composer
+    // int pageMask = 65535; // Keep 16 last bits for the page
+
     if (pageURI != null)
-      hashCode |= ((~pageURI.hashCode()) >> 24);
+      hashCode |= ((pageURI.hashCode()) >> 24);
     if (composer != null)
       hashCode |= ((composer.hashCode() << 16) & composerMask);
     if (position > 0)
