@@ -288,12 +288,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
       // Set an appropriate content type
       response.setContentType("text/html");
-      
+
       // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.HTML);
-      
+
       // See if the action cares about the response's modification date. If not,
-      // we do, even though we don't know exactly. response.getModificationDate()
+      // we do, even though we don't know exactly.
+      // response.getModificationDate()
       // will return either the date that has been set or the current date, both
       // of which is fine with us.
       response.setModificationDate(response.getModificationDate());
@@ -361,15 +362,16 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   private void serveXML(Action action, WebloungeRequest request,
       WebloungeResponse response) {
     try {
-      
+
       // Set an appropriate content type
       response.setContentType("text/xml");
-      
+
       // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.XML);
-      
+
       // See if the action cares about the response's modification date. If not,
-      // we do, even though we don't know exactly. response.getModificationDate()
+      // we do, even though we don't know exactly.
+      // response.getModificationDate()
       // will return either the date that has been set or the current date, both
       // of which is fine with us.
       response.setModificationDate(response.getModificationDate());
@@ -413,12 +415,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
       // Set an appropriate content type
       response.setContentType("text/json");
-      
+
       // Ask the action to get started and validate the request
       action.configure(request, response, RequestFlavor.JSON);
-      
+
       // See if the action cares about the response's modification date. If not,
-      // we do, even though we don't know exactly. response.getModificationDate()
+      // we do, even though we don't know exactly.
+      // response.getModificationDate()
       // will return either the date that has been set or the current date, both
       // of which is fine with us.
       response.setModificationDate(response.getModificationDate());
@@ -463,9 +466,10 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       WebloungeResponse response) {
     try {
       action.configure(request, response, RequestFlavor.ANY);
-      
+
       // See if the action cares about the response's modification date. If not,
-      // we do, even though we don't know exactly. response.getModificationDate()
+      // we do, even though we don't know exactly.
+      // response.getModificationDate()
       // will return either the date that has been set or the current date, both
       // of which is fine with us.
       response.setModificationDate(response.getModificationDate());
@@ -686,10 +690,11 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    * @return the handler
    */
   private ActionPool getActionForUrl(WebUrl url, RequestFlavor flavor) {
-    String normalizedUrl = url.normalize(false, false, true);
+    StringBuilder normalizedUrlBuilder = new StringBuilder(url.getSite().getIdentifier());
+    normalizedUrlBuilder.append("://").append(url.normalize(false, false, true));
 
     // Try to use the url cache
-    ActionPool actionPool = urlCache.get(normalizedUrl);
+    ActionPool actionPool = urlCache.get(normalizedUrlBuilder.toString());
     if (actionPool != null)
       return actionPool;
 
@@ -715,10 +720,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     }
 
     // Register the url for future reference
-    urlCache.put(normalizedUrl, actionPool);
-
-    // Get an action worker and return it
-    // TODO: Instantiate the action
+    urlCache.put(normalizedUrlBuilder.toString(), actionPool);
 
     return actionPool;
   }

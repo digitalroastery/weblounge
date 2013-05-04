@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Health Check Filter">
+  
+  <implementation class="ch.entwine.weblounge.kernel.http.HealthCheckFilter" />
+  <property name="contextId" value="weblounge" />
+  <property name="service.description" value="Health Check Filter" />
+  <property name="pattern" value="/weblounge-health" />
+  <property name="service.ranking" value="2" />
+  <service>
+    <provide interface="javax.servlet.Filter" />
+  </service>
+  <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" />
+
+</scr:component>

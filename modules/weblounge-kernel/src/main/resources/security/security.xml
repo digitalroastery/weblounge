@@ -1,0 +1,164 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:sec="http://www.springframework.org/schema/security"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi  
+       http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+  <!-- ######################################## -->
+  <!-- # Open and unsecured url patterns      # -->
+  <!-- ######################################## -->
+
+  <!-- The login form can't be protected -->
+
+  <sec:http request-matcher="regex" pattern="^/weblounge/login/.*" security="none"/>
+
+  <!-- These need to be open to load preliminaries to the editor -->
+  <sec:http request-matcher="regex" pattern="^/weblounge/jquery/.*" security="none"/>
+  <sec:http request-matcher="regex" pattern="^/weblounge/jqueryui/.*" security="none"/>
+  <sec:http request-matcher="regex" pattern="^/weblounge/steal/.*" security="none"/>
+
+  <sec:http 
+    create-session="ifRequired"
+    servlet-api-provision="true" 
+    realm="Weblounge"
+    entry-point-ref="userEntryPoint" 
+    request-matcher="regex" 
+    access-decision-manager-ref="accessDecisionManager">
+
+    <!-- Some resources are open to everyone -->
+    <sec:intercept-url pattern="^/favicon.ico" access="weblounge:guest"/>
+
+    <!-- Shared resources should not be protected -->
+    <sec:intercept-url pattern="^/weblounge-shared/.*" access="weblounge:guest"/>
+
+    <!-- The rest of the editor functionality needs to be protected -->
+    <sec:intercept-url pattern="^/weblounge/.*" access="weblounge:editor"/>
+
+    <!-- Secure the REST documentation -->
+    <sec:intercept-url pattern="^/system/weblounge/.*/docs" access="weblounge:siteadministrator"/>
+
+    <!-- Enable anonymous access to the runtime information -->
+    <sec:intercept-url pattern="^/system/weblounge/runtime(/.*)?" access="weblounge:guest"/>
+
+    <!-- The login processing urls needs to be covered by the filter chain -->
+    <sec:intercept-url pattern="^/system/weblounge/login(/.*)?" access="weblounge:guest"/>
+
+    <!--  Same is true for logout -->
+    <sec:intercept-url pattern="^/system/weblounge/logout(/)?" access="weblounge:guest"/>
+
+    <!-- Secure the REST endpoints -->
+    <sec:intercept-url pattern="^/system/weblounge/.*" access="weblounge:editor"/>
+    
+    <!-- Secure the management URLs -->
+    <sec:intercept-url pattern="^/system/console/.*" access="weblounge:systemadministrator"/>
+
+    <!-- Trigger authentication on editing entry point by appending [?|&]edit(=true) -->
+    <sec:intercept-url pattern="^/.*?(\x3F|\x26)edit(=true|\x26.*)?(\x26.*)?$" access="weblounge:editor"/>
+
+    <!-- Don't bother about the rest -->
+    <sec:intercept-url pattern="^/.*" access="weblounge:guest"/>
+    
+    <!-- FILTER CONFIGURATION -->
+
+    <!-- Add the user filter to get everything set up for proper request processing -->
+    <sec:custom-filter after="LAST" ref="userContextFilter"/>
+
+    <!-- LOGIN / LOGOUT MECHANISMS -->
+
+    <!-- Enable and configure the failure URL for form-based logins -->
+    <sec:form-login login-page="/weblounge/login/login.html" login-processing-url="/system/weblounge/login/form" authentication-failure-url="/weblounge/login/failed.html" authentication-success-handler-ref="loginSuccessHandler"/>
+
+    <!-- Enables "remember me" functionality -->
+    <sec:remember-me key="weblounge" user-service-ref="userDetailsService"/>
+
+    <!-- Set the request cache -->
+    <!-- 
+    <sec:request-cache ref="requestCache"/>
+    -->
+        
+    <!-- When sessions time out, send the user to a special (re)login form -->
+    <!-- 
+    <sec:session-management invalid-session-url="/weblounge/login/timeout.html" session-fixation-protection="newSession"/>
+     -->
+
+    <!-- If any URLs are to be exposed to anonymous users, the "sec:anonymous" filter must be present -->
+    <sec:anonymous username="anonymous" granted-authority="weblounge:guest"/>
+
+    <!-- Enables log out -->
+    <sec:logout logout-url="/system/weblounge/logout" success-handler-ref="logoutSuccessHandler"/>
+
+  </sec:http>
+
+  <!-- Instantiates the weblounge user filter that will map requests to users -->
+  <bean id="userContextFilter" class="ch.entwine.weblounge.kernel.security.UserContextFilter">
+    <constructor-arg ref="securityService"/>
+  </bean>
+
+  <!-- Authentication Entry and Exit Points -->
+
+  <!-- Redirects unauthenticated requests to the login form -->
+  <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+    <property name="loginFormUrl" value="/weblounge/login/login.html"/>
+  </bean>
+
+  <bean id="loginSuccessHandler" class="ch.entwine.weblounge.kernel.security.RoleBasedLoginSuccessHandler">
+    <property name="securityService" ref="securityService" />
+    <property name="welcomePages">
+      <map>
+        <entry key="weblounge:editor" value="/weblounge/login/success.html" />
+      </map>
+    </property>
+  </bean>
+  
+  <bean id="logoutSuccessHandler" class="ch.entwine.weblounge.kernel.security.WebloungeLogoutSuccessHandler" />
+  
+  <!-- OSGI Integration -->
+ 
+  <!-- Obtain services from the OSGI service registry -->
+  <osgi:reference id="userDetailsService" cardinality="1..1" interface="org.springframework.security.core.userdetails.UserDetailsService"/>
+  <osgi:reference id="securityService" cardinality="1..1" interface="ch.entwine.weblounge.common.security.SecurityService"/>
+
+  <!-- Spring Security Internals -->
+
+  <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
+  <sec:authentication-manager>
+    <sec:authentication-provider user-service-ref="userDetailsService">
+      <sec:password-encoder hash="md5"/>
+    </sec:authentication-provider>
+  </sec:authentication-manager>
+
+  <!-- Get rid of the required ROLE_ prefix for role names -->
+  <bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter">
+    <property name="rolePrefix" value="" />
+  </bean>
+
+  <!-- The authenticated voter is used as is -->
+  <bean id="authenticatedVoter" class="org.springframework.security.access.vote.AuthenticatedVoter" />
+
+  <!-- Register the decision manager with our modified role voter -->
+  <bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+    <property name="decisionVoters">
+      <list>
+        <ref bean="roleVoter" />
+        <ref bean="authenticatedVoter" />
+      </list>
+    </property>
+  </bean>
+  
+  <sec:global-method-security secured-annotations="enabled"  access-decision-manager-ref="accessDecisionManager" />
+
+  <!-- Do not use a request cache -->
+  <!-- 
+  <bean id="requestCache" class="org.springframework.security.web.savedrequest.NullRequestCache"/>
+  -->
+
+  <!-- Uncomment to enable logging interceptors -->
+  <!-- 
+  <bean class="org.springframework.security.access.event.LoggerListener" />
+  <bean class="org.springframework.security.authentication.event.LoggerListener" />
+  -->
+
+</beans>

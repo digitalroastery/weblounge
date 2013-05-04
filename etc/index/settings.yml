@@ -227,7 +227,7 @@ path.plugins: ${weblounge.home}/index/plugins
 
 # Disable HTTP completely:
 #
-http.enabled: true
+# http.enabled: true
 
 
 ################################### Gateway ###################################
@@ -332,6 +332,8 @@ http.enabled: true
 #
 # See <http://elasticsearch.org/tutorials/2011/08/22/elasticsearch-on-ec2.html>
 # for a step-by-step tutorial.
+
+discovery.zen.ping.multicast.enabled: false
 
 
 ################################## Slow Log ##################################

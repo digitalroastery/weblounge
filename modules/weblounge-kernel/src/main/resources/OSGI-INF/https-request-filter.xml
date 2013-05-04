@@ -7,6 +7,7 @@
   <property name="contextId" value="weblounge" />
   <property name="service.description" value="Https Request Filter" />
   <property name="pattern" value=".*" />
+  <property name="service.ranking" value="1" />
   <service>
     <provide interface="javax.servlet.Filter" />
   </service>

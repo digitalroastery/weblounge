@@ -6,7 +6,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.1.5</version>
+    <version>3.1.8-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.scr</artifactId>
-      <version>1.6.0</version>
+      <version>1.6.2</version>
     </dependency>
 
     <dependency>
@@ -67,19 +67,13 @@
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.configadmin</artifactId>
-      <version>1.2.8</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.eventadmin</artifactId>
-      <version>1.2.6</version>
+      <version>1.6.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.metatype</artifactId>
-      <version>1.0.4</version>
+      <version>1.0.6</version>
     </dependency>
 
     <dependency>
@@ -233,6 +227,12 @@
     </dependency>
 
     <dependency>
+    	<groupId>org.apache.servicemix.bundles</groupId>
+    	<artifactId>org.apache.servicemix.bundles.poi</artifactId>
+    	<version>3.9_1</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.neethi</groupId>
       <artifactId>neethi</artifactId>
       <version>3.0.1</version>
@@ -315,6 +315,12 @@
       <groupId>org.jdom</groupId>
       <artifactId>com.springsource.org.jdom</artifactId>
       <version>1.0.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.dom4j</groupId>
+      <artifactId>com.springsource.org.dom4j</artifactId>
+      <version>1.6.1</version>
     </dependency>
 
     <dependency>
@@ -494,11 +500,11 @@
       <version>1.0.0</version>
     </dependency>
 
-	<dependency>
-	  <groupId>org.apache.aries.jpa</groupId>
-	  <artifactId>org.apache.aries.jpa.api</artifactId>
-	  <version>1.0.0</version>
-	</dependency>
+    <dependency>
+      <groupId>org.apache.aries.jpa</groupId>
+      <artifactId>org.apache.aries.jpa.api</artifactId>
+      <version>1.0.0</version>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.aries.jpa</groupId>
@@ -554,6 +560,12 @@
       <version>1.13.1_4</version>
     </dependency>
     
+    <dependency>
+    	<groupId>org.apache.servicemix.bundles</groupId>
+    	<artifactId>org.apache.servicemix.bundles.saxon</artifactId>
+    	<version>9.4.0.4_2</version>
+    </dependency>
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>

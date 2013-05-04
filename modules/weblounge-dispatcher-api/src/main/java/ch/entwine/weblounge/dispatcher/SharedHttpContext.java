@@ -33,4 +33,7 @@ public interface SharedHttpContext {
   /** The shared context identifier */
   String HTTP_CONTEXT_ID = "weblounge";
 
+  /** Property to define the ranking of a service in the filter chain */
+  String PROPERTY_OSGI_HTTP_SERVICE_RANKING = "service.ranking";
+
 }

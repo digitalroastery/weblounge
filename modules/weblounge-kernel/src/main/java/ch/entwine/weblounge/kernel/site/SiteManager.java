@@ -199,7 +199,10 @@ public class SiteManager {
         alias = alias.replace("*", ".*");
         if (hostName.matches(alias)) {
           site = e.getValue();
-          logger.info("Registering {} to site '{}', matching url {}", new Object[] { url, site.getIdentifier(), siteUrl });
+          logger.info("Registering {} to site '{}', matching url {}", new Object[] {
+              url,
+              site.getIdentifier(),
+              siteUrl });
           sitesByServerName.put(hostName, site);
           return site;
         }
@@ -209,6 +212,22 @@ public class SiteManager {
     }
 
     logger.debug("Lookup for {} did not match any site", url);
+    return null;
+  }
+
+  /**
+   * Returns the site that is defined by the given OSGi bundle or
+   * <code>null</code> if the bundle is not known to have registered a site.
+   * 
+   * @param bundle
+   *          the bundle
+   * @return the site
+   */
+  public Site findSiteByBundle(Bundle bundle) {
+    for (Map.Entry<Site, Bundle> entry : siteBundles.entrySet()) {
+      if (bundle.equals(entry.getValue()))
+        return entry.getKey();
+    }
     return null;
   }
 
@@ -330,7 +349,12 @@ public class SiteManager {
     // Inform site listeners
     synchronized (listeners) {
       for (SiteServiceListener listener : listeners) {
-        listener.siteAppeared(site, reference);
+        try {
+          listener.siteAppeared(site, reference);
+        } catch (Throwable t) {
+          logger.error("Error during notifaction of site '{}': {}", site.getIdentifier(), t.getMessage());
+          return;
+        }
       }
     }
 

@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.test.harness.content;
 
+import static ch.entwine.weblounge.common.impl.request.Http11Constants.HEADER_ETAG;
+import static ch.entwine.weblounge.common.impl.request.Http11Constants.HEADER_LAST_MODIFIED;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
@@ -215,22 +217,22 @@ public class PageContentTest extends IntegrationTestBase {
             break;
         }
 
-        // Test ETag header
-        Header eTagHeader = response.getFirstHeader("ETag");
-        assertNotNull(eTagHeader);
-        assertNotNull(eTagHeader.getValue());
-        eTagValue = eTagHeader.getValue();
-
-        // Test Last-Modified header
-        Header modifiedHeader = response.getFirstHeader("Last-Modified");
-        assertNotNull(modifiedHeader);
-        modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
-
         // See if the cache is online
         if (response.getHeaders("X-Cache-Key").length == 0) {
           logger.warn("Cache is turned off, ETags are not tested");
           return;
         }
+
+        // Test ETag header
+        Header eTagHeader = response.getFirstHeader(HEADER_ETAG);
+        assertNotNull(eTagHeader);
+        assertNotNull(eTagHeader.getValue());
+        eTagValue = eTagHeader.getValue();
+
+        // Test Last-Modified header
+        Header modifiedHeader = response.getFirstHeader(HEADER_LAST_MODIFIED);
+        assertNotNull(modifiedHeader);
+        modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
 
         TestSiteUtils.testETagHeader(request, eTagValue, logger, params);
         TestSiteUtils.testModifiedHeader(request, modificationDate, logger, params);
@@ -377,6 +379,12 @@ public class PageContentTest extends IntegrationTestBase {
       assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${module.root}')]"));
       assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${site.root}')]"));
 
+      // See if the cache is online
+      if (response.getHeaders("X-Cache-Key").length == 0) {
+        logger.warn("Cache is turned off, ETags are not tested");
+        return;
+      }
+
       // Test ETag header
       Header eTagHeader = response.getFirstHeader("ETag");
       assertNotNull(eTagHeader);
@@ -387,12 +395,6 @@ public class PageContentTest extends IntegrationTestBase {
       Header modifiedHeader = response.getFirstHeader("Last-Modified");
       assertNotNull(modifiedHeader);
       modificationDate = lastModifiedDateFormat.parse(modifiedHeader.getValue());
-
-      // See if the cache is online
-      if (response.getHeaders("X-Cache-Key").length == 0) {
-        logger.warn("Cache is turned off, ETags are not tested");
-        return;
-      }
 
       TestSiteUtils.testETagHeader(request, eTagValue, logger, null);
       TestSiteUtils.testModifiedHeader(request, modificationDate, logger, null);

@@ -6,7 +6,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.1.5</version>
+    <version>3.1.8-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -616,6 +616,7 @@
               OSGI-INF/environment-service.xml,
               OSGI-INF/fop-rest-service.xml,
               OSGI-INF/fop-service.xml,
+              OSGI-INF/healthcheck-filter.xml,
               OSGI-INF/https-request-filter.xml,
               OSGI-INF/kernel-service.xml,
               OSGI-INF/language-runtime-information.xml,

@@ -23,16 +23,13 @@ package ch.entwine.weblounge.cache;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.site.Site;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO Move this class to weblounge-cache
 /**
  * <code>CacheUtils</code> are meant to provide an easy way to gain access to a
  * site's cache service instance.
@@ -42,29 +39,8 @@ public class CacheUtils {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CacheUtils.class);
 
-  /** The cache service */
+  /** The cache services */
   private static Map<String, CacheService> cacheServices = new HashMap<String, CacheService>();
-
-  /** The cache service tracker */
-  private ServiceTracker cacheServiceTracker = null;
-
-  /**
-   * Callback from OSGi declarative services on component startup.
-   * 
-   * @param ctx
-   *          the component context
-   */
-  void activate(ComponentContext ctx) {
-    cacheServiceTracker = new CacheServiceTracker(ctx.getBundleContext());
-    cacheServiceTracker.open();
-  }
-
-  /**
-   * Callback from OSGi declarative services on component shutdown.
-   */
-  void deactivate() {
-    cacheServiceTracker.close();
-  }
 
   /**
    * Returns the cache instance with the given identifier or <code>null</code>
@@ -101,6 +77,8 @@ public class CacheUtils {
     if (cache != null) {
       logger.debug("Invalidating entries that are tagged {}", tags);
       cache.invalidate(tags, partialMatches);
+    } else {
+      logger.warn("No cache for site '{}' found to invalidate tags '{}'", site.getIdentifier(), tags);
     }
   }
 
@@ -124,48 +102,6 @@ public class CacheUtils {
   void removeCacheService(CacheService cache) {
     String id = cache.getIdentifier();
     cacheServices.remove(id);
-  }
-
-  /**
-   * Implementation of a <code>ServiceTracker</code> that is tracking instances
-   * of type {@link CacheService}.
-   */
-  private class CacheServiceTracker extends ServiceTracker {
-
-    /**
-     * Creates a new cache service tracker that is using the given bundle
-     * context to look up service instances.
-     * 
-     * @param ctx
-     *          the bundle context
-     */
-    CacheServiceTracker(BundleContext ctx) {
-      super(ctx, CacheService.class.getName(), null);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.osgi.util.tracker.ServiceTracker#addingService(org.osgi.framework.ServiceReference)
-     */
-    @Override
-    public Object addingService(ServiceReference reference) {
-      CacheService cache = (CacheService) super.addingService(reference);
-      addCacheService(cache);
-      return cache;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.osgi.util.tracker.ServiceTracker#removedService(org.osgi.framework.ServiceReference,
-     *      java.lang.Object)
-     */
-    @Override
-    public void removedService(ServiceReference reference, Object service) {
-      removeCacheService((CacheService) service);
-    }
-
   }
 
 }

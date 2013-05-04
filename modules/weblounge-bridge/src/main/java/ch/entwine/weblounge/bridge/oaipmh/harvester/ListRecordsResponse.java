@@ -149,7 +149,7 @@ public class ListRecordsResponse extends OaiPmhResponse {
   }
 
   public Option<String> getResumptionToken() {
-    return Option.wrap(trimToNull(xpathString("/oai20:OAI-PMH/oai20:ListRecords/oai20:resumptionToken/text()")));
+    return Option.option(trimToNull(xpathString("/oai20:OAI-PMH/oai20:ListRecords/oai20:resumptionToken/text()")));
   }
 
   //

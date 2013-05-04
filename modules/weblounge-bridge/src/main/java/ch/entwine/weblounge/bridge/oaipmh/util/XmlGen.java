@@ -16,7 +16,7 @@
 
 package ch.entwine.weblounge.bridge.oaipmh.util;
 
-import static org.opencastproject.util.data.CollectionUtil.flatMap;
+import static org.opencastproject.util.data.Collections.flatMap;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;

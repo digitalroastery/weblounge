@@ -1,0 +1,9 @@
+This directory is a good place to drop Java libraries (jars) that are used for this special Weblounge instance. Examples of such libraries would be drivers for specific databases or directories.
+
+Note that putting these libraries here is a suggestion and best practice only. 
+
+Libraries that have been put here are not loaded automatically and need to be registered in etc/system.properties with corresponding entries like
+
+# Local libraries.
+felix.auto.start.4= \
+ file:${weblounge.home}/lib/local/mylibrary-1.0.0.jar

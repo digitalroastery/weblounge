@@ -20,11 +20,16 @@
 
 package ch.entwine.weblounge.kernel.publisher;
 
+import ch.entwine.weblounge.common.site.Environment;
+import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteURL;
+
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.json.JSONException;
+import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +63,15 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
   /** The wrapped endpoint */
   private Object service = null;
 
+  /** The bundle that defined this servlet */
+  private Bundle bundle = null;
+
+  /** The associated site (if not a global endpoint) */
+  private Site site = null;
+
+  /** The environment */
+  private Environment environment = null;
+
   /**
    * Creates a new servlet that maps <code>service</code> to the given address.
    * 
@@ -65,19 +79,51 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
    *          the servlet address
    * @param service
    *          the service implementation
+   * @param bundle
+   *          the bundle that defined this service
    */
-  JAXRSServlet(String address, Object service) {
+  JAXRSServlet(String address, Object service, Bundle bundle) {
     if (address == null)
       throw new IllegalArgumentException("Address can't be null");
     if (service == null)
       throw new IllegalArgumentException("Service implementation can't be null");
+    if (bundle == null)
+      throw new IllegalArgumentException("Defining bundle can't be null");
     this.address = address;
     this.service = service;
+    this.bundle = bundle;
   }
 
   @Override
   protected void handleRequest(HttpServletRequest request,
       HttpServletResponse response) throws ServletException {
+
+    // If a site registered this endpoint, other sites should not be able to
+    // access it
+    if (site != null) {
+      String requestPath = request.getRequestURL().toString();
+      SiteURL siteUrl = null;
+      logger.trace("Making sure the endpoint should be accessible through site '{}'", site);
+      for (SiteURL url : site.getHostnames()) {
+        if (environment != null && !environment.equals(url.getEnvironment()))
+          continue;
+        if (requestPath.startsWith(url.toExternalForm())) {
+          siteUrl = url;
+          break;
+        }
+      }
+      if (siteUrl == null || !site.isOnline()) {
+        try {
+          logger.debug("Request to site '{}' cannot acces {}", this);
+          response.sendError(HttpServletResponse.SC_NOT_FOUND);
+          return;
+        } catch (IOException e) {
+          logger.debug("Error sending response back to client: {}", e.getMessage());
+        }
+      }
+      logger.trace("Access through site '{}' to {} granted", site, request.getRequestURI());
+    }
+
     if (requiresJson(request)) {
       JSONResponseWrapper wrappedResponse = new JSONResponseWrapper(response);
       super.handleRequest(request, wrappedResponse);
@@ -201,6 +247,35 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
     Map<Class, ResourceProvider> providers = super.getResourceProviders(servletConfig, resourceClasses);
     providers.put(service.getClass(), new SingletonResourceProvider(service));
     return providers;
+  }
+
+  /**
+   * Returns the bundle that defined this endpoint.
+   * 
+   * @return the bundle
+   */
+  Bundle getBundle() {
+    return bundle;
+  }
+
+  /**
+   * Sets the site that is associated with this REST endpoint.
+   * 
+   * @param site
+   *          the site
+   */
+  void setSite(Site site) {
+    this.site = site;
+  }
+
+  /**
+   * Sets the current environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
   }
 
 }
