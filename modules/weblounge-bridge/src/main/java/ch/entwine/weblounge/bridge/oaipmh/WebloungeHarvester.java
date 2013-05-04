@@ -79,6 +79,9 @@ public class WebloungeHarvester implements JobWorker {
 
   /** Configuration option for the flavor of the dublin core series to use */
   public static final String OPT_SERIES_DC_FLAVORS = "series-dublincore-flavor";
+  
+  /** Configuration option for the mime-types to use */
+  public static final String OPT_MIMETYPES = "mime-types";
 
   /**
    * {@inheritDoc}
@@ -127,7 +130,12 @@ public class WebloungeHarvester implements JobWorker {
     String dcSeriesFlavor = (String) ctx.get(OPT_SERIES_DC_FLAVORS);
     if (StringUtils.isBlank(dcSeriesFlavor))
       throw new JobException(this, "Configuration option '" + OPT_SERIES_DC_FLAVORS + "' is missing from the job configuration");
-
+    
+    String mimesTypes = (String) ctx.get(OPT_MIMETYPES);
+    if (StringUtils.isBlank(mimesTypes))
+      throw new JobException(this, "Configuration option '" + OPT_MIMETYPES + "' is missing from the job configuration");
+    
+    
     // Read the configuration value for the handler class
     String handlerClass = (String) ctx.get(OPT_HANDLER_CLASS);
     if (StringUtils.isBlank(handlerClass))
@@ -137,8 +145,8 @@ public class WebloungeHarvester implements JobWorker {
 
     RecordHandler handler;
     try {
-      Class<? extends AbstractWebloungeRecordHandler> c = (Class<? extends AbstractWebloungeRecordHandler>) getClass().getClassLoader().loadClass(handlerClass);
-      Class<?> paramTypes[] = new Class[7];
+      Class<? extends AbstractWebloungeRecordHandler> c = (Class<? extends AbstractWebloungeRecordHandler>) Thread.currentThread().getContextClassLoader().loadClass(handlerClass);
+      Class<?> paramTypes[] = new Class[8];
       paramTypes[0] = Site.class;
       paramTypes[1] = WritableContentRepository.class;
       paramTypes[2] = User.class;
@@ -146,8 +154,9 @@ public class WebloungeHarvester implements JobWorker {
       paramTypes[4] = String.class;
       paramTypes[5] = String.class;
       paramTypes[6] = String.class;
+      paramTypes[7] = String.class;
       Constructor<? extends AbstractWebloungeRecordHandler> constructor = c.getConstructor(paramTypes);
-      Object arglist[] = new Object[7];
+      Object arglist[] = new Object[8];
       arglist[0] = site;
       arglist[1] = contentRepository;
       arglist[2] = harvesterUser;
@@ -155,6 +164,7 @@ public class WebloungeHarvester implements JobWorker {
       arglist[4] = presenterTrackFlavor;
       arglist[5] = dcEpisodeFlavor;
       arglist[6] = dcSeriesFlavor;
+      arglist[7] = mimesTypes;
       handler = constructor.newInstance(arglist);
     } catch (Throwable t) {
       throw new IllegalStateException("Unable to instantiate class " + handlerClass + ": " + t.getMessage(), t);

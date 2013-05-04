@@ -215,12 +215,8 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
     if (is.available() == 0)
       throw new IllegalArgumentException("Empty input stream was passed to image styling");
 
-    // Is an image style permitted?
-    if (style == null)
-      throw new IllegalArgumentException("Image style cannot be null");
-
     // Do we need to do any work at all?
-    if (ImageScalingMode.None.equals(style.getScalingMode())) {
+    if (style == null || ImageScalingMode.None.equals(style.getScalingMode())) {
       logger.trace("No scaling needed, performing a noop stream copy");
       IOUtils.copy(is, os);
       return;

@@ -20,11 +20,14 @@
 
 package ch.entwine.weblounge.kernel.publisher;
 
+import ch.entwine.weblounge.common.site.Environment;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.dispatcher.SharedHttpContext;
+import ch.entwine.weblounge.kernel.site.SiteManager;
+import ch.entwine.weblounge.kernel.site.SiteServiceListener;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
@@ -51,7 +54,7 @@ import javax.ws.rs.Path;
  * Listens for JAX-RS annotated services and publishes them to the global URL
  * space using a single shared HttpContext.
  */
-public class EndpointPublishingService implements ManagedService {
+public class EndpointPublishingService implements ManagedService, SiteServiceListener {
 
   /** Logging facility */
   static final Logger logger = LoggerFactory.getLogger(EndpointPublishingService.class);
@@ -86,11 +89,21 @@ public class EndpointPublishingService implements ManagedService {
   /** Mapping of registered endpoints */
   protected Map<String, ServiceRegistration> endpointRegistrations = null;
 
+  /** Mapping of registered servlets */
+  protected Map<String, JAXRSServlet> endpointServlets = null;
+
+  /** The site manager */
+  protected SiteManager sites = null;
+
+  /** The environment */
+  protected Environment environment = null;
+
   /**
    * Creates a new publishing service for JSR 311 annotated classes.
    */
   public EndpointPublishingService() {
     endpointRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
+    endpointServlets = new ConcurrentHashMap<String, JAXRSServlet>();
     jsr311ServiceListener = new JSR311AnnotatedServiceListener();
   }
 
@@ -105,6 +118,8 @@ public class EndpointPublishingService implements ManagedService {
   void activate(ComponentContext componentContext) throws Exception {
     this.componentContext = componentContext;
     this.bundleContext = componentContext.getBundleContext();
+
+    sites.addSiteListener(this);
 
     logger.info("Starting rest publishing service");
 
@@ -156,6 +171,9 @@ public class EndpointPublishingService implements ManagedService {
       unregisterEndpoint(path);
     }
     endpointRegistrations.clear();
+
+    // Stop listening to sites
+    sites.removeSiteListener(this);
   }
 
   /**
@@ -233,19 +251,24 @@ public class EndpointPublishingService implements ManagedService {
    *          The jsr311 annotated service
    * @param contextPath
    *          the http context
+   * @param bundle
+   *          the registering bundle
    * @param the
    *          endpoint's path
    */
   protected void registerEndpoint(Object service, String contextPath,
-      String endpointPath) {
+      String endpointPath, Bundle bundle) {
     try {
-      CXFNonSpringServlet servlet = new JAXRSServlet(endpointPath, service);
+      JAXRSServlet servlet = new JAXRSServlet(endpointPath, service, bundle);
+      servlet.setSite(sites.findSiteByBundle(bundle));
+      servlet.setEnvironment(environment);
       Dictionary<String, String> initParams = new Hashtable<String, String>();
       initParams.put("alias", contextPath);
       initParams.put("servlet-name", service.toString());
       initParams.put(SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
       ServiceRegistration reg = bundleContext.registerService(Servlet.class.getName(), servlet, initParams);
       endpointRegistrations.put(contextPath, reg);
+      endpointServlets.put(contextPath, servlet);
       logger.debug("Registering {} at {}", service, contextPath);
     } catch (Throwable t) {
       logger.error("Error registering rest service at " + contextPath, t);
@@ -272,8 +295,9 @@ public class EndpointPublishingService implements ManagedService {
       logger.error("Unregistering endpoint at '{}' failed: {}", contextPath, t.getMessage());
     }
 
-    // Destroy the servlet
+    // Unregister the servlet
     endpointRegistrations.remove(contextPath);
+    endpointServlets.remove(contextPath);
   }
 
   /**
@@ -311,11 +335,26 @@ public class EndpointPublishingService implements ManagedService {
         contextPath = UrlUtils.concat(defaultContextPathPrefix, contextPath);
       }
 
+      // Find the registering bundle
+      Bundle bundle = ref.getBundle();
+
       // Process the event
       switch (event.getType()) {
         case ServiceEvent.REGISTERED:
           logger.debug("Registering JAX-RS service {} at {}", service, contextPath);
-          registerEndpoint(service, contextPath, pathAnnotation.value());
+
+          // Make sure there is no clash in context paths
+          ServiceRegistration existingRef = endpointRegistrations.get(contextPath);
+          if (existingRef != null) {
+            Object s = bundleContext.getService(existingRef.getReference());
+            logger.error("Endpoint {} cannot be registered since the context path {} has already been claimed", new Object[] {
+                service,
+                s,
+                contextPath });
+            return;
+          }
+
+          registerEndpoint(service, contextPath, pathAnnotation.value(), bundle);
           break;
         case ServiceEvent.MODIFIED:
           logger.debug("JAX-RS service {} modified", service);
@@ -330,6 +369,55 @@ public class EndpointPublishingService implements ManagedService {
       }
     }
 
+  }
+
+  /**
+   * OSGi callback to set the sites manager.
+   * 
+   * @param sites
+   *          the sites manager
+   */
+  void setSites(SiteManager sites) {
+    this.sites = sites;
+  }
+
+  /**
+   * OSGi callback to set the environment.
+   * 
+   * @param environment
+   *          the environment
+   */
+  void setEnvironment(Environment environment) {
+    this.environment = environment;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.kernel.site.SiteServiceListener#siteAppeared(ch.entwine.weblounge.common.site.Site,
+   *      org.osgi.framework.ServiceReference)
+   */
+  @Override
+  public void siteAppeared(Site site, ServiceReference reference) {
+    Bundle siteBundle = reference.getBundle();
+    if (siteBundle == null)
+      return;
+    for (Map.Entry<String, JAXRSServlet> r : endpointServlets.entrySet()) {
+      JAXRSServlet servlet = r.getValue();
+      if (siteBundle.equals(servlet.getBundle())) {
+        servlet.setSite(site);
+      }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.kernel.site.SiteServiceListener#siteDisappeared(ch.entwine.weblounge.common.site.Site)
+   */
+  @Override
+  public void siteDisappeared(Site site) {
+    // Nothing to do, the associated endpoints will soon be gone, too
   }
 
 }

@@ -22,15 +22,11 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import static ch.entwine.weblounge.common.Times.MS_PER_DAY;
 
-import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.image.ImageContent;
-import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageResource;
-import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
-import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
@@ -39,13 +35,12 @@ import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Environment;
-import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -53,19 +48,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
@@ -90,12 +76,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(ImageRequestHandlerImpl.class);
-
-  /** The preview generators */
-  private final List<ImagePreviewGenerator> previewGenerators = new ArrayList<ImagePreviewGenerator>();
-
-  /** The list of previews that are being created at the moment */
-  private final List<String> previews = new ArrayList<String>();
 
   /**
    * Handles the request for an image resource that is believed to be in the
@@ -243,55 +223,27 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return true;
     }
 
-    // Find an image preview generator
-    ImagePreviewGenerator imagePreviewGenerator = null;
-    synchronized (previewGenerators) {
-      for (ImagePreviewGenerator generator : previewGenerators) {
-        if (generator.supports(imageResource)) {
-          imagePreviewGenerator = generator;
-          break;
-        }
-      }
-    }
-
-    // If we did not find a preview generator, we need to let go
-    if (imagePreviewGenerator == null) {
-      logger.debug("Unable to generate image previews since no suitable image preview generator is available");
-      DispatchUtils.sendServiceUnavailable(request, response);
-      return true;
-    }
-
     // Extract the image style and scale the image
-    ImageStyle style = null;
     String styleId = StringUtils.trimToNull(request.getParameter(OPT_IMAGE_STYLE));
     if (styleId != null) {
-      style = ImageStyleUtils.findStyle(styleId, site);
-      if (style == null) {
-        DispatchUtils.sendBadRequest("Image style '" + styleId + "' not found", request, response);
-        return true;
+      try {
+        StringBuffer redirect = new StringBuffer(PathUtils.concat(PreviewRequestHandlerImpl.URI_PREFIX, imageResource.getURI().getIdentifier()));
+        redirect.append("?style=").append(styleId);
+        response.sendRedirect(redirect.toString());
+      } catch (Throwable t) {
+        logger.debug("Error sending redirect to the client: {}", t.getMessage());
       }
+      return true;
     }
-
-    File scaledImageFile = null;
 
     // Check the modified headers
     long revalidationTime = MS_PER_DAY;
     long expirationDate = System.currentTimeMillis() + revalidationTime;
-    if (style == null || ImageScalingMode.None.equals(style.getScalingMode())) {
-      if (!ResourceUtils.hasChanged(request, imageResource, language)) {
-        logger.debug("Image {} was not modified", imageURI);
-        response.setDateHeader("Expires", expirationDate);
-        DispatchUtils.sendNotModified(request, response);
-        return true;
-      }
-    } else {
-      scaledImageFile = ImageStyleUtils.getScaledFile(imageResource, language, style);
-      if (!ResourceUtils.hasChanged(request, scaledImageFile)) {
-        logger.debug("Scaled image {} was not modified", imageURI);
-        response.setDateHeader("Expires", expirationDate);
-        DispatchUtils.sendNotModified(request, response);
-        return true;
-      }
+    if (!ResourceUtils.hasChanged(request, imageResource, language)) {
+      logger.debug("Image {} was not modified", imageURI);
+      response.setDateHeader("Expires", expirationDate);
+      DispatchUtils.sendNotModified(request, response);
+      return true;
     }
 
     // Load the image contents from the repository
@@ -315,226 +267,49 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Set Expires header
     response.setDateHeader("Expires", expirationDate);
 
-    // Get the mime type
-    final String mimetype = imageContents.getMimetype();
-    final String format = mimetype.substring(mimetype.indexOf("/") + 1);
-
     // Determine the resource's modification date
     long resourceLastModified = ResourceUtils.getModificationDate(imageResource, language).getTime();
 
-    // When there is no scaling required, just return the original
-    if (style == null || ImageScalingMode.None.equals(style.getScalingMode())) {
+    // Add last modified header
+    response.setDateHeader("Last-Modified", resourceLastModified);
 
-      // Add last modified header
-      response.setDateHeader("Last-Modified", resourceLastModified);
+    // Add ETag header
+    response.setHeader("ETag", ResourceUtils.getETagValue(imageResource));
 
-      // Add ETag header
-      response.setHeader("ETag", ResourceUtils.getETagValue(imageResource));
-
-      // Load the input stream from the repository
-      InputStream imageInputStream = null;
-      try {
-        imageInputStream = contentRepository.getContent(imageURI, language);
-      } catch (Throwable t) {
-        logger.error("Error loading {} image '{}' from {}: {}", new Object[] {
-            language,
-            imageResource,
-            contentRepository,
-            t.getMessage() });
-        logger.error(t.getMessage(), t);
-        IOUtils.closeQuietly(imageInputStream);
-        return false;
-      }
-
-      // Write the image back to the client
-      try {
-        response.setHeader("Content-Length", Long.toString(imageContents.getSize()));
-        response.setHeader("Content-Disposition", "inline; filename=" + imageContents.getFilename());
-        IOUtils.copy(imageInputStream, response.getOutputStream());
-        response.getOutputStream().flush();
-      } catch (EOFException e) {
-        logger.debug("Error writing image '{}' back to client: connection closed by client", imageResource);
-        return true;
-      } catch (IOException e) {
-        logger.error("Error writing {} image '{}' back to client: {}", new Object[] {
-            language,
-            imageResource,
-            e.getMessage() });
-      } finally {
-        IOUtils.closeQuietly(imageInputStream);
-      }
-      return true;
-    }
-
-    // Write the scaled file back to the response (and create it, if needed)
-    boolean scalingFailed = false;
-
-    String pathToImageFile = scaledImageFile.getAbsolutePath();
-    boolean scaledImageExists = scaledImageFile.isFile();
-    boolean scaledImageIsOutdated = scaledImageFile.lastModified() < resourceLastModified;
-
-    // Do we need to render the image?
-    if (!scaledImageExists || scaledImageIsOutdated) {
-
-      boolean firstOne = true;
-
-      // Make sure the preview is not already being generated
-      synchronized (previews) {
-        while (previews.contains(pathToImageFile)) {
-          logger.debug("Preview at {} is being created, waiting for it to be generated", pathToImageFile);
-          firstOne = false;
-          try {
-            previews.wait(1000);
-            
-            // Was this a notify or a timeout?
-            if (previews.contains(pathToImageFile)) {
-              logger.debug("After waiting 1s, preview at {} is still being worked on", pathToImageFile);
-              DispatchUtils.sendServiceUnavailable(request, response);
-              return true;
-            }
-            
-          } catch (InterruptedException e) {
-            DispatchUtils.sendServiceUnavailable(request, response);
-            return true;
-          }
-        }
-
-        // Make sure others are waiting until we are done
-        if (firstOne) {
-          previews.add(pathToImageFile);
-        }
-      }
-
-      // Create the preview if this is the first request
-      if (firstOne) {
-        logger.info("Creating preview of {} with style '{}' at {}", new String[] {
-            imageResource.getIdentifier(),
-            style.getIdentifier(),
-            pathToImageFile });
-
-        InputStream imageInputStream = null;
-        FileOutputStream fos = null;
-        try {
-          imageInputStream = contentRepository.getContent(imageURI, language);
-
-          // Remove the original image
-          FileUtils.deleteQuietly(scaledImageFile);
-
-          // Create a work file
-          File imageDirectory = scaledImageFile.getParentFile();
-          String workFileName = "." + UUID.randomUUID() + "-" + scaledImageFile.getName();
-          FileUtils.forceMkdir(imageDirectory);
-          File workImageFile = new File(imageDirectory, workFileName);
-
-          // Create the scaled image
-          fos = new FileOutputStream(workImageFile);
-          logger.debug("Creating scaled image '{}' at {}", imageResource, scaledImageFile);
-          imagePreviewGenerator.createPreview(imageResource, environment, language, style, format, imageInputStream, fos);
-
-          // Move the work image in place
-          try {
-            FileUtils.moveFile(workImageFile, scaledImageFile);
-          } catch (IOException e) {
-            logger.warn("Concurrent creation of preview {} resolved by copy instead of rename", scaledImageFile.getAbsolutePath());
-            FileUtils.copyFile(workImageFile, scaledImageFile);
-            FileUtils.deleteQuietly(workImageFile);
-          } finally {
-            scaledImageFile.setLastModified(Math.max(new Date().getTime(), resourceLastModified));
-          }
-
-          // Make sure preview generation was successful          
-          if (!scaledImageFile.isFile()) {
-            logger.warn("The file at {} is not a regular file", pathToImageFile);
-            scalingFailed = true;
-          } else if (scaledImageFile.length() == 0) {
-            logger.warn("The scaled file at {} has zero length", pathToImageFile);
-            scalingFailed = true;
-          }
-
-        } catch (ContentRepositoryException e) {
-          logger.error("Unable to load image {}: {}", new Object[] {
-              imageURI,
-              e.getMessage(),
-              e });
-          scalingFailed = true;
-          DispatchUtils.sendInternalError(request, response);
-          return true;
-        } catch (IOException e) {
-          logger.error("Error sending image '{}' to the client: {}", imageURI, e.getMessage());
-          DispatchUtils.sendInternalError(request, response);
-          scalingFailed = true;
-          return true;
-        } catch (Throwable t) {
-          logger.error("Error creating scaled image '{}': {}", imageURI, t.getMessage());
-          DispatchUtils.sendInternalError(request, response);
-          scalingFailed = true;
-          return true;
-        } finally {
-          IOUtils.closeQuietly(imageInputStream);
-          IOUtils.closeQuietly(fos);
-
-          try {
-            if (scalingFailed && scaledImageFile != null) {
-              logger.info("Cleaning up after failed scaling of {}", pathToImageFile);
-              File f = scaledImageFile;
-              FileUtils.deleteQuietly(scaledImageFile);
-              f = scaledImageFile.getParentFile();
-              while (f != null && f.isDirectory() && f.listFiles().length == 0) {
-                FileUtils.deleteQuietly(f);
-                f = f.getParentFile();
-              }
-            }
-          } catch (Throwable t) {
-            logger.warn("Error cleaning up after failed scaling of {}", pathToImageFile);
-          }
-
-          synchronized (previews) {
-            previews.remove(pathToImageFile);
-            previews.notifyAll();
-          }
-
-        }
-      }
-
-      // Make sure whoever was in charge of creating the preview, was
-      // successful
-      else {
-        scaledImageExists = scaledImageFile.isFile();
-        scaledImageIsOutdated = scaledImageFile.lastModified() < resourceLastModified;
-        if (!scaledImageExists || scaledImageIsOutdated) {
-          logger.debug("Apparently, preview rendering for {} failed", scaledImageFile.getAbsolutePath());
-          DispatchUtils.sendServiceUnavailable(request, response);
-          return true;
-        }
-      }
+    // Load the input stream from the repository
+    InputStream imageInputStream = null;
+    try {
+      imageInputStream = contentRepository.getContent(imageURI, language);
+    } catch (Throwable t) {
+      logger.error("Error loading {} image '{}' from {}: {}", new Object[] {
+          language,
+          imageResource,
+          contentRepository,
+          t.getMessage() });
+      logger.error(t.getMessage(), t);
+      IOUtils.closeQuietly(imageInputStream);
+      return false;
     }
 
     // Write the image back to the client
-    InputStream imageInputStream = null;
     try {
-      // Add last modified header
-      response.setDateHeader("Last-Modified", scaledImageFile.lastModified());
-      response.setHeader("ETag", ResourceUtils.getETagValue(scaledImageFile.lastModified()));
-      response.setHeader("Content-Disposition", "inline; filename=" + scaledImageFile.getName());
-      response.setHeader("Content-Length", Long.toString(scaledImageFile.length()));
-      imageInputStream = new FileInputStream(scaledImageFile);
+      response.setHeader("Content-Length", Long.toString(imageContents.getSize()));
+      response.setHeader("Content-Disposition", "inline; filename=" + imageContents.getFilename());
       IOUtils.copy(imageInputStream, response.getOutputStream());
       response.getOutputStream().flush();
-      return true;
     } catch (EOFException e) {
       logger.debug("Error writing image '{}' back to client: connection closed by client", imageResource);
       return true;
     } catch (IOException e) {
-      logger.error("Error sending image '{}' to the client: {}", imageURI, e.getMessage());
-      DispatchUtils.sendInternalError(request, response);
-      return true;
-    } catch (Throwable t) {
-      logger.error("Error creating scaled image '{}': {}", imageURI, t.getMessage());
-      DispatchUtils.sendInternalError(request, response);
-      return true;
+      logger.error("Error writing {} image '{}' back to client: {}", new Object[] {
+          language,
+          imageResource,
+          e.getMessage() });
     } finally {
       IOUtils.closeQuietly(imageInputStream);
     }
+    return true;
+
   }
 
   /**
@@ -545,36 +320,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
    */
   void setEnvironment(Environment environment) {
     this.environment = environment;
-  }
-
-  /**
-   * Adds the preview generator to the list of registered preview generators.
-   * 
-   * @param generator
-   *          the generator
-   */
-  void addPreviewGenerator(ImagePreviewGenerator generator) {
-    synchronized (previewGenerators) {
-      previewGenerators.add(generator);
-      Collections.sort(previewGenerators, new Comparator<PreviewGenerator>() {
-        public int compare(PreviewGenerator a, PreviewGenerator b) {
-          return Integer.valueOf(b.getPriority()).compareTo(a.getPriority());
-        }
-      });
-    }
-  }
-
-  /**
-   * Removes the preview generator from the list of registered preview
-   * generators.
-   * 
-   * @param generator
-   *          the generator
-   */
-  void removePreviewGenerator(ImagePreviewGenerator generator) {
-    synchronized (previewGenerators) {
-      previewGenerators.remove(generator);
-    }
   }
 
   /**

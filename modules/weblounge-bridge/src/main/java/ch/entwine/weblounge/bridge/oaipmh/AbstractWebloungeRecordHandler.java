@@ -21,6 +21,9 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.opencastproject.util.MimeType;
+import org.opencastproject.util.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -28,6 +31,7 @@ import org.w3c.dom.Node;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -64,6 +68,9 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
 
   /** Dublin core series flavor */
   protected final String dcSeriesFlavor;
+  
+  /** Elements mimetypes */
+  protected final ArrayList<MimeType> mimeTypes = new ArrayList<MimeType>();
 
   /**
    * Creates a new abstract weblounge record handler
@@ -82,11 +89,13 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
    *          the dublin core episode flavor
    * @param dcSeriesFlavor
    *          the dublin core series flavor
+   * @param mimeTypesStr
+   * 		  the string containing the list of mime-types separated by a string
    */
   public AbstractWebloungeRecordHandler(Site site,
       WritableContentRepository contentRepository, User harvesterUser,
       String presentationTrackFlavor, String presenterTrackFlavor,
-      String dcEpisodeFlavor, String dcSeriesFlavor) {
+      String dcEpisodeFlavor, String dcSeriesFlavor, String mimeTypesStr) {
     this.site = site;
     this.contentRepository = contentRepository;
     this.harvesterUser = harvesterUser;
@@ -94,6 +103,9 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
     this.presenterTrackFlavor = presenterTrackFlavor;
     this.dcEpisodeFlavor = dcEpisodeFlavor;
     this.dcSeriesFlavor = dcSeriesFlavor;
+    for(String str : StringUtils.split(StringUtils.trimToEmpty(mimeTypesStr), ",")) {
+    	this.mimeTypes.add(MimeTypes.parseMimeType(StringUtils.trimToEmpty(str)));
+    }
     logger = LoggerFactory.getLogger(getClass());
   }
 
@@ -222,7 +234,8 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
       }
     }
     if (language == null)
-      throw new UnknownLanguageException(languageCode);
+      language = site.getDefaultLanguage();
+      //throw new UnknownLanguageException(languageCode);
     return language;
   }
 

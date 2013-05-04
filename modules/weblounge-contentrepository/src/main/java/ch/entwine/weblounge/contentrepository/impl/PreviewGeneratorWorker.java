@@ -27,7 +27,6 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
-import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -166,11 +165,10 @@ class PreviewGeneratorWorker implements Runnable {
           return;
         
         // Create the original preview image for every language
-        ImageStyle originalStyle = new ImageStyleImpl("original", ImageScalingMode.None);
         File originalPreview = null;
         if (!resource.supportsContentLanguage(l))
           continue;
-        originalPreview = createPreview(resource, originalStyle, l, previewGenerator, format);
+        originalPreview = createPreview(resource, null, l, previewGenerator, format);
         if (originalPreview == null || !originalPreview.exists() || originalPreview.length() == 0) {
           logger.warn("Preview generation for {} failed", resource);
           return;
@@ -206,7 +204,7 @@ class PreviewGeneratorWorker implements Runnable {
               scaledFile.setLastModified(Math.max(new Date().getTime(), resourceLastModified));
 
               // Store the style definition used while creating the preview
-              File baseDir = ImageStyleUtils.getScaledFileBase(resource.getURI().getSite(), style);
+              File baseDir = ImageStyleUtils.getDirectory(resource.getURI().getSite(), style);
               File definitionFile = new File(baseDir, "style.xml");
               if (!definitionFile.isFile()) {
                 logger.debug("Storing style definition at {}", definitionFile);
