@@ -216,6 +216,22 @@ public class SiteManager {
   }
 
   /**
+   * Returns the site that is defined by the given OSGi bundle or
+   * <code>null</code> if the bundle is not known to have registered a site.
+   * 
+   * @param bundle
+   *          the bundle
+   * @return the site
+   */
+  public Site findSiteByBundle(Bundle bundle) {
+    for (Map.Entry<Site, Bundle> entry : siteBundles.entrySet()) {
+      if (bundle.equals(entry.getValue()))
+        return entry.getKey();
+    }
+    return null;
+  }
+
+  /**
    * Returns the OSGi bundle that contains the given site or <code>null</code>
    * if no such site has been registered.
    * 
