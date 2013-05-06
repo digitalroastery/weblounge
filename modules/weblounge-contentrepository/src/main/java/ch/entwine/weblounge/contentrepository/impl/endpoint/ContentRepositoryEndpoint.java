@@ -27,6 +27,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -132,8 +133,7 @@ public class ContentRepositoryEndpoint {
         try {
           IOUtils.copy(is, os);
         } catch (IOException e) {
-          Throwable cause = e.getCause();
-          if (cause == null || !"Broken pipe".equals(cause.getMessage()))
+          if (!RequestUtils.isCausedByClient(e))
             logger.warn("Error writing file contents to response", e);
         } finally {
           IOUtils.closeQuietly(is);

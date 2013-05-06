@@ -39,6 +39,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.ParseException;
@@ -1812,6 +1813,25 @@ public final class RequestUtils {
     }
 
     // Definitely not
+    return false;
+  }
+
+  /**
+   * Returns <code>true</code> if the exception was caused by the client closing
+   * the connection.
+   * 
+   * @param e
+   *          the exception
+   * @return <code>true</code> if the client caused
+   */
+  public static boolean isCausedByClient(IOException e) {
+    Throwable cause = e.getCause();
+    if (cause == null)
+      return false;
+    if ("Broken pipe".equals(cause.getMessage()))
+      return true;
+    if ("Connection reset by peer".equals(cause.getMessage()))
+      return true;
     return false;
   }
 
