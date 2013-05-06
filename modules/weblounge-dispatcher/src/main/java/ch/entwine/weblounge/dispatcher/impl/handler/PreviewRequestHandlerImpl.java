@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -331,8 +332,10 @@ public final class PreviewRequestHandlerImpl implements RequestHandler {
       logger.debug("Error writing image '{}' back to client: connection closed by client", resource);
       return true;
     } catch (IOException e) {
-      logger.error("Error sending image '{}' to the client: {}", resourceURI, e.getMessage());
       DispatchUtils.sendInternalError(request, response);
+      if (RequestUtils.isCausedByClient(e))
+        return true;
+      logger.error("Error sending image '{}' to the client: {}", resourceURI, e.getMessage());
       return true;
     } catch (Throwable t) {
       logger.error("Error creating scaled image '{}': {}", resourceURI, t.getMessage());

@@ -144,7 +144,7 @@ public final class Http11ProtocolHandler implements Times, Http11Constants {
   private Http11ProtocolHandler() {
     // Nothing to be done
   }
-  
+
   /**
    * Method isError.
    * 
@@ -192,7 +192,7 @@ public final class Http11ProtocolHandler implements Times, Http11Constants {
     } catch (IllegalArgumentException e) {
       log.debug("Client provided malformed '{}' header: {}", HEADER_IF_UNMODIFIED_SINCE, req.getDateHeader(HEADER_IF_UNMODIFIED_SINCE));
     }
-    
+
     String ifMatch = req.getHeader(HEADER_IF_MATCH);
     String method = req.getMethod();
     type.headerOnly = method.equals(METHOD_HEAD);
@@ -210,13 +210,13 @@ public final class Http11ProtocolHandler implements Times, Http11Constants {
       type.type = RESPONSE_NOT_MODIFIED;
       return type;
     }
-    
+
     /* check not modified */
     if (ifNoneMatch == null && ifModifiedSince != -1 && modified < ifModifiedSince + MS_PER_SECOND) {
       type.type = RESPONSE_NOT_MODIFIED;
       return type;
     }
-    
+
     /* precondition check failed */
     if (ifNoneMatch != null && ifNoneMatchMatch && !reqGetHead) {
       log.error("412 PCF: Method={}, If-None-Match={}, match={}", new Object[] {
@@ -321,8 +321,9 @@ public final class Http11ProtocolHandler implements Times, Http11Constants {
             try {
               os = resp.getOutputStream();
               IOUtils.copy(is, os);
-            } catch (SocketException e) {
-              log.debug("Request canceled by client");
+            } catch (IOException e) {
+              if (RequestUtils.isCausedByClient(e))
+                return true;
             } finally {
               IOUtils.closeQuietly(os);
             }
@@ -353,7 +354,7 @@ public final class Http11ProtocolHandler implements Times, Http11Constants {
               int read = type.to - type.from;
               int copy = read;
               int write = 0;
-              
+
               read = is.read(tmp);
               while (copy > 0 && read >= 0) {
                 copy -= read;

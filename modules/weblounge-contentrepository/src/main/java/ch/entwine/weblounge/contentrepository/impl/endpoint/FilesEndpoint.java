@@ -576,7 +576,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
               try {
                 IOUtils.copy(item.openStream(), fos);
               } catch (IOException e) {
-                IOUtils.closeQuietly(fos);
                 throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
               } finally {
                 IOUtils.closeQuietly(fos);
@@ -1107,7 +1106,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
               try {
                 IOUtils.copy(item.openStream(), fos);
               } catch (IOException e) {
-                IOUtils.closeQuietly(fos);
                 throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
               } finally {
                 IOUtils.closeQuietly(fos);

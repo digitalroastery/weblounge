@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -292,6 +293,8 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       logger.debug("Error writing file '{}' back to client: connection closed by client", fileURI);
       return true;
     } catch (IOException e) {
+      if (RequestUtils.isCausedByClient(e))
+        return true;
       logger.error("Error sending file {} to the client: {}", fileURI, e.getMessage());
       DispatchUtils.sendInternalError(request, response);
       return true;
