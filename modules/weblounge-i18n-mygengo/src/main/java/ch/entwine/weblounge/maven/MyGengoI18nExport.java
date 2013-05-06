@@ -108,21 +108,24 @@ public class MyGengoI18nExport extends AbstractMojo {
                                              // structure
     }
     if (modules.exists()) {
-      for (File module : modules.listFiles()) {
-        if (module.isDirectory()) {
-          for (String lang : langs) {
-            File moduleI18n = new File(module, "i18n");
-            if (!moduleI18n.exists()) {
-              moduleI18n = new File(module, "conf/i18n"); // fallback for
-                                                          // Weblounge 2 site
-                                                          // structure
-            }
-            File file = new File(moduleI18n, "message_".concat(lang).concat(".xml"));
-            if (file.exists()) {
-              try {
-                copyFile(file, new File(outputDir, lang.concat("/").concat(siteName).concat("_module_").concat(module.getName()).concat(".xml")));
-              } catch (IOException e) {
-                this.getLog().equals("Error collecting i18n files: ".concat(e.getMessage()));
+      File[] moduleFiles = modules.listFiles();
+      if (moduleFiles != null) {
+        for (File module : moduleFiles) {
+          if (module.isDirectory()) {
+            for (String lang : langs) {
+              File moduleI18n = new File(module, "i18n");
+              if (!moduleI18n.exists()) {
+                moduleI18n = new File(module, "conf/i18n"); // fallback for
+                                                            // Weblounge 2 site
+                                                            // structure
+              }
+              File file = new File(moduleI18n, "message_".concat(lang).concat(".xml"));
+              if (file.exists()) {
+                try {
+                  copyFile(file, new File(outputDir, lang.concat("/").concat(siteName).concat("_module_").concat(module.getName()).concat(".xml")));
+                } catch (IOException e) {
+                  this.getLog().equals("Error collecting i18n files: ".concat(e.getMessage()));
+                }
               }
             }
           }

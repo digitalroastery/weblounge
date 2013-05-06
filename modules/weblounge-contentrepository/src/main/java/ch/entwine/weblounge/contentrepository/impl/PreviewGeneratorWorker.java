@@ -72,7 +72,7 @@ class PreviewGeneratorWorker implements Runnable {
 
   /** The format */
   private String format = null;
-  
+
   /** Flag to indicate a canceled preview generation */
   private boolean canceled = false;
 
@@ -103,9 +103,10 @@ class PreviewGeneratorWorker implements Runnable {
     this.styles = styles;
     this.format = format;
   }
-  
+
   /**
-   * Indicates to this preview generation worker to cancel the current operation.
+   * Indicates to this preview generation worker to cancel the current
+   * operation.
    */
   public void cancel() {
     this.canceled = true;
@@ -163,7 +164,7 @@ class PreviewGeneratorWorker implements Runnable {
         // Have we been told to stop doing work in the meantime?
         if (canceled)
           return;
-        
+
         // Create the original preview image for every language
         File originalPreview = null;
         if (!resource.supportsContentLanguage(l))
@@ -328,7 +329,7 @@ class PreviewGeneratorWorker implements Runnable {
       if (f != null && f.length() == 0) {
         FileUtils.deleteQuietly(f);
         f = f.getParentFile();
-        while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+        while (f != null && f.isDirectory() && (f.listFiles() == null || f.listFiles().length == 0)) {
           FileUtils.deleteQuietly(f);
           f = f.getParentFile();
         }
