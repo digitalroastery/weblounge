@@ -311,7 +311,7 @@ public final class PreviewRequestHandlerImpl implements RequestHandler {
       } else {
         previewInputStream = createPreview(request, response, resource, language, style, previewGenerator, previewFile, contentRepository);
       }
-          
+
       if (previewInputStream == null) {
         // Assuming that createPreview() is setting the response header in the
         // case of failure
@@ -471,7 +471,7 @@ public final class PreviewRequestHandlerImpl implements RequestHandler {
             File f = previewFile;
             FileUtils.deleteQuietly(previewFile);
             f = previewFile.getParentFile();
-            while (f != null && f.isDirectory() && f.listFiles().length == 0) {
+            while (f != null && f.isDirectory() && (f.listFiles() == null || f.listFiles().length == 0)) {
               FileUtils.deleteQuietly(f);
               f = f.getParentFile();
             }

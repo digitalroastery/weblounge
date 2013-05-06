@@ -583,7 +583,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
    *          the directory
    */
   private void deleteIfEmpty(File dir) {
-    while (dir != null && dir.isDirectory() && dir.listFiles().length == 0) {
+    while (dir != null && dir.isDirectory() && (dir.listFiles() == null || dir.listFiles().length == 0)) {
       FileUtils.deleteQuietly(dir);
       dir = dir.getParentFile();
     }
