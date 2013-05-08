@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.impl.content.PublishingContext;
 import ch.entwine.weblounge.common.impl.language.LocalizableContent;
 import ch.entwine.weblounge.common.impl.language.LocalizableObject;
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
@@ -792,18 +793,20 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
       else
         b.append(">");
 
-      b.append("<modified>");
-      User u = modificationCtx.getModifier(l);
-      if (u == null)
-        u = uri.getSite().getAdministrator();
-      b.append(u.toXml());
-      b.append("<date>");
-      Date d = modificationCtx.getModificationDate(l);
-      if (d == null)
-        d = new Date();
-      b.append(WebloungeDateFormat.formatStatic(d));
-      b.append("</date>");
-      b.append("</modified>");
+      if (modificationCtx.getModificationDate() != null) {
+        b.append("<modified>");
+        User u = modificationCtx.getModifier(l);
+        if (u == null)
+          u = new UserImpl(uri.getSite().getAdministrator());
+        b.append(u.toXml());
+        b.append("<date>");
+        Date d = modificationCtx.getModificationDate(l);
+        if (d == null)
+          d = new Date();
+        b.append(WebloungeDateFormat.formatStatic(d));
+        b.append("</date>");
+        b.append("</modified>");
+      }
 
       // export content
       MapEntryComparator comparator = new MapEntryComparator();
