@@ -1303,9 +1303,15 @@ public class SiteImpl implements Site {
           for (Action a : m.getActions()) {
             for (Action action : module.getActions()) {
               if (action.getIdentifier().equals(a.getIdentifier())) {
-                logger.warn("Module '{}' of site '{}' already defines an action with id '{}'", new String[] { m.getIdentifier(), identifier, a.getIdentifier() });
+                logger.warn("Module '{}' of site '{}' already defines an action with id '{}'", new String[] {
+                    m.getIdentifier(),
+                    identifier,
+                    a.getIdentifier() });
               } else if (action.getPath().equals(a.getPath())) {
-                logger.warn("Module '{}' of site '{}' already defines an action at '{}'", new String[] { m.getIdentifier(), identifier, a.getPath() });
+                logger.warn("Module '{}' of site '{}' already defines an action at '{}'", new String[] {
+                    m.getIdentifier(),
+                    identifier,
+                    a.getPath() });
                 logger.error("Module '{}' of site '{}' is not registered due to conflicting mountpoints", m.getIdentifier(), identifier);
                 continue;
               }
@@ -1316,7 +1322,10 @@ public class SiteImpl implements Site {
           for (ImageStyle s : m.getImageStyles()) {
             for (ImageStyle style : module.getImageStyles()) {
               if (style.getIdentifier().equals(s.getIdentifier())) {
-                logger.warn("Module '{}' of site '{}' already defines an image style with id '{}'", new String[] { m.getIdentifier(), identifier, s.getIdentifier() });
+                logger.warn("Module '{}' of site '{}' already defines an image style with id '{}'", new String[] {
+                    m.getIdentifier(),
+                    identifier,
+                    s.getIdentifier() });
               }
             }
           }
@@ -1325,13 +1334,16 @@ public class SiteImpl implements Site {
           for (Job j : m.getJobs()) {
             for (Job job : module.getJobs()) {
               if (job.getIdentifier().equals(j.getIdentifier())) {
-                logger.warn("Module '{}' of site '{}' already defines a job with id '{}'", new String[] { m.getIdentifier(), identifier, j.getIdentifier() });
+                logger.warn("Module '{}' of site '{}' already defines a job with id '{}'", new String[] {
+                    m.getIdentifier(),
+                    identifier,
+                    j.getIdentifier() });
               }
             }
           }
 
         }
-        
+
         addModule(module);
 
         // Do this as last step since we don't want to have i18n dictionaries of
@@ -1342,7 +1354,7 @@ public class SiteImpl implements Site {
           i18n.addDictionary(i18nEnum.nextElement());
         }
       }
-      
+
     } else {
       logger.debug("Site '{}' has no modules", this);
     }
@@ -1353,7 +1365,8 @@ public class SiteImpl implements Site {
     schedulingServiceTracker.open();
 
     // Load the tests
-    integrationTests = loadIntegrationTests();
+    if (!Environment.Production.equals(environment))
+      integrationTests = loadIntegrationTests();
 
     logger.info("Site '{}' initialized", this);
   }
