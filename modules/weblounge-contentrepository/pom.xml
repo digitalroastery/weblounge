@@ -168,6 +168,19 @@
       <version>3.6.0</version>
       <scope>runtime</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>javax.jcr</groupId> 
+      <artifactId>jcr</artifactId> 
+      <version>2.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-jcr-rmi</artifactId>
+      <version>2.6.1</version>
+    </dependency>
+                
 
     <!-- testing -->
 
@@ -249,7 +262,8 @@
               org.apache.commons.lang.text;version="2.4",
               org.apache.commons.logging;version="1.1.1",
               org.apache.http.params,
-			  org.apache.regexp,
+              org.apache.jackrabbit.rmi.repository,
+			        org.apache.regexp,
               org.apache.tika;version="0.9",
               org.slf4j;version="[1.5.0,1.6.0)",
               org.osgi.framework;version="1.4.0",
@@ -259,6 +273,7 @@
               javax.annotation,
               javax.crypto,
               javax.crypto.spec,
+              javax.jcr,
               javax.net,
               javax.net.ssl,
               javax.servlet;version="2.5",
@@ -297,7 +312,7 @@
               !org.joda.*,
               !com.google.common.*,
               !com.ning.compress.*,
-              !org.elasticsearch.common.joda.convert, 
+              !org.elasticsearch.common.joda.convert
             </Import-Package>
             <Export-Package>
               ch.entwine.weblounge.contentrepository.impl;version=${project.version},
@@ -306,6 +321,7 @@
               ch.entwine.weblounge.contentrepository.impl.fs;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.index;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;version=${project.version},
+              ch.entwine.weblounge.contentrepository.impl.jcr;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.operation;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
