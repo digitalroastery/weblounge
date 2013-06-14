@@ -184,7 +184,11 @@ public class WebloungeHarvester implements JobWorker {
     Option<Date> harvestingDate = Option.<Date> none();
     if (searchResult.getHitCount() > 0) {
       MovieResourceSearchResultItemImpl resultItem = (MovieResourceSearchResultItemImpl) searchResult.getItems()[0];
-      harvestingDate = some(resultItem.getMovieResource().getPublishFrom());
+      Date lastDate = resultItem.getMovieResource().getPublishFrom();
+      // To not include the resources updated, 1 second is added to the last
+      // update date
+      lastDate.setTime(lastDate.getTime() + 1000);
+      harvestingDate = some(lastDate);
     }
 
     try {
