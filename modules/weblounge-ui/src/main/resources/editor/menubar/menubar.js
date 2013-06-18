@@ -450,7 +450,7 @@ steal.plugins(
 				var isWorkVersion = this.options.page.isWorkVersion();
 				this.options.page.lock(this.options.runtime.getUserLogin(), $.proxy(function() {
 					$('input#wbl-editmode', this.element).val(['editmode']);
-					$('span.wbl-editmodeText', this.element).html('Editiermodus');
+					$('span.wbl-editmodeText', this.element).html('Edit');
 					// if version is life set page to work and init composer
 					if(!isWorkVersion) {
 						$('#weblounge-editor').editor_app('_initComposer', this.options.page);
