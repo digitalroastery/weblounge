@@ -18,11 +18,11 @@
 
 set -x 
 
-#script execution checks
-echo "time check: script starting"
+# Script execution checks
+echo "Time check: script starting"
 date +%H\:%M
 
-#Get Jenkins passed arguments
+# Get Jenkins passed arguments
 #
 WORKSPACE=
 CUSTOMER=
@@ -50,18 +50,20 @@ do
 esac
 done
 
-# Get the release
+# Get the version and release
+VERSION=3.1
 RELEASE="$(git log -1 --pretty=format:"%ad %h" --date=short|sed s/'[[:space:]]'/."$(git log --oneline|wc -l)"git/|sed s/-//g)"
 cd
 
 # Sanity check for production default config files replacement
-if [ ! -d $WORKSPACE/docs/scripts/rpm/contents ];then
-  echo "$WORKSPACE/docs/scripts/rpm/contents does not exist, check the branch used for the checkout"
+if [ ! -d "$WORKSPACE/docs/scripts/rpm" ];then
+  echo "$WORKSPACE/docs/scripts/rpm does not exist, check the branch used for the checkout"
   exit 1
 fi
 
-# Set the release tag for the package
-sed -i s#CHANGE_ME_RELEASE#"$RELEASE"# $WORKSPACE/docs/scripts/rpm/weblounge.spec
+# Set version and release tag for the package
+sed -i s#CHANGE_ME_VERSION#"$VERSION"# "$WORKSPACE/docs/scripts/rpm/weblounge.spec"
+sed -i s#CHANGE_ME_RELEASE#"$RELEASE"# "$WORKSPACE/docs/scripts/rpm/weblounge.spec"
 
 # Time check
 echo "Time check: starting the rpm building preparations"
@@ -71,22 +73,22 @@ date +%H\:%M
 sudo useradd "$RELEASE"
 
 # Remove what we don't want in the rpm
-sudo rm -f $WORKSPACE/bin/start.sh 
-sudo rm -f $WORKSPACE/bin/start.bat
+sudo rm -f "$WORKSPACE/bin/start.sh"
+sudo rm -f "$WORKSPACE/bin/start.bat"
 
 # Create the release RPM
 sudo su - "$RELEASE" -c "rpmdev-setuptree"
 sudo su - "$RELEASE" -c "mkdir -p /home/""$RELEASE"/weblounge."$RELEASE"
 sudo su - "$RELEASE" -c "ls /home/""$RELEASE""/weblounge.""$RELEASE"
-sudo cp -r $WORKSPACE/bin /home/"$RELEASE"/weblounge."$RELEASE"
-sudo cp -r $WORKSPACE/docs/scripts/rpm/contents/etc /home/"$RELEASE"/weblounge."$RELEASE"
-sudo cp -r $WORKSPACE/etc /home/"$RELEASE"/weblounge."$RELEASE"
-sudo cp -r $WORKSPACE/lib /home/"$RELEASE"/weblounge."$RELEASE"
+sudo cp -r "$WORKSPACE/bin" /home/"$RELEASE"/weblounge."$RELEASE"
+sudo cp -r "$WORKSPACE/docs/scripts/rpm/contents/etc" /home/"$RELEASE"/weblounge."$RELEASE"
+sudo cp -r "$WORKSPACE/etc" /home/"$RELEASE"/weblounge."$RELEASE"
+sudo cp -r "$WORKSPACE/lib" /home/"$RELEASE"/weblounge."$RELEASE"
 
 # Create the sources RPM
 sudo su - $RELEASE -c "cd;tar cvzf /home/$RELEASE/rpm/SOURCES/weblounge.$RELEASE.tar.gz weblounge.$RELEASE"
 sudo chown $RELEASE /home/"$RELEASE"/rpm/SOURCES/weblounge."$RELEASE".tar.gz
-sudo cp $WORKSPACE/docs/scripts/rpm/weblounge.spec /home/"$RELEASE"/rpm/SPECS
+sudo cp "$WORKSPACE/docs/scripts/rpm/weblounge.spec" /home/"$RELEASE"/rpm/SPECS
 sudo chown $RELEASE /home/"$RELEASE"/rpm/SPECS/weblounge.spec
 
 # Time check
