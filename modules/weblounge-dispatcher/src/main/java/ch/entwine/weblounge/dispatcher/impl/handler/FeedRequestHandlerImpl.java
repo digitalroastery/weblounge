@@ -310,6 +310,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
   private SyndFeed createFeed(String feedType, String feedVersion, Site site,
       WebloungeRequest request, WebloungeResponse response)
       throws ContentRepositoryException {
+
     // Extract the subjects. The parameter may be specified multiple times
     // and add more than one subject by separating them using a comma.
     String[] subjectParameter = request.getParameterValues(PARAM_SUBJECT);
@@ -374,15 +375,18 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     // Load the result and add feed entries
     SearchResult result = contentRepository.find(query);
     List<SyndEntry> entries = new ArrayList<SyndEntry>();
-    limit = result.getItems().length;
+    int items = Math.min(limit, result.getItems().length);
 
-    while (limit > 0) {
-      SearchResultItem item = result.getItems()[limit - 1];
-      limit--;
+    for (int i = 0; i < items; i++) {
+      SearchResultItem item = result.getItems()[i];
 
       // Get the page
       PageSearchResultItem pageItem = (PageSearchResultItem) item;
       Page page = pageItem.getPage();
+      
+      // TODO: Can the page be accessed?
+
+      // Set the page's language to the feed language
       page.switchTo(language);
 
       // Tag the cache entry
@@ -397,9 +401,11 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       // Create the entry
       SyndEntry entry = new SyndEntryImpl();
       entry.setPublishedDate(page.getPublishFrom());
+      entry.setUpdatedDate(page.getModificationDate());
       entry.setLink(site.getHostname(request.getEnvironment()).toExternalForm() + item.getUrl().getLink());
       entry.setAuthor(page.getCreator().getName());
       entry.setTitle(page.getTitle());
+      entry.setUri(page.getIdentifier());
 
       // Categories
       if (page.getSubjects().length > 0) {
@@ -411,8 +417,6 @@ public class FeedRequestHandlerImpl implements RequestHandler {
         }
         entry.setCategories(categories);
       }
-
-      // TODO: Can the page be accessed?
 
       // Try to render the preview pagelets and write them to the feed
       List<SyndContent> entryContent = new ArrayList<SyndContent>();

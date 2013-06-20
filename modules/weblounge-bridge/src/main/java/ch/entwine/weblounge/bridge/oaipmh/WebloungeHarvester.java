@@ -79,7 +79,7 @@ public class WebloungeHarvester implements JobWorker {
 
   /** Configuration option for the flavor of the dublin core series to use */
   public static final String OPT_SERIES_DC_FLAVORS = "series-dublincore-flavor";
-  
+
   /** Configuration option for the mime-types to use */
   public static final String OPT_MIMETYPES = "mime-types";
 
@@ -130,12 +130,11 @@ public class WebloungeHarvester implements JobWorker {
     String dcSeriesFlavor = (String) ctx.get(OPT_SERIES_DC_FLAVORS);
     if (StringUtils.isBlank(dcSeriesFlavor))
       throw new JobException(this, "Configuration option '" + OPT_SERIES_DC_FLAVORS + "' is missing from the job configuration");
-    
+
     String mimesTypes = (String) ctx.get(OPT_MIMETYPES);
     if (StringUtils.isBlank(mimesTypes))
       throw new JobException(this, "Configuration option '" + OPT_MIMETYPES + "' is missing from the job configuration");
-    
-    
+
     // Read the configuration value for the handler class
     String handlerClass = (String) ctx.get(OPT_HANDLER_CLASS);
     if (StringUtils.isBlank(handlerClass))
@@ -185,13 +184,18 @@ public class WebloungeHarvester implements JobWorker {
     Option<Date> harvestingDate = Option.<Date> none();
     if (searchResult.getHitCount() > 0) {
       MovieResourceSearchResultItemImpl resultItem = (MovieResourceSearchResultItemImpl) searchResult.getItems()[0];
-      harvestingDate = some(resultItem.getMovieResource().getPublishFrom());
+      Date lastDate = resultItem.getMovieResource().getPublishFrom();
+      // To not include the resources updated, 1 second is added to the last
+      // update date
+      lastDate.setTime(lastDate.getTime() + 1000);
+      harvestingDate = some(lastDate);
     }
 
     try {
       harvest(repositoryUrl, harvestingDate, handler);
     } catch (Exception e) {
-      logger.error("An error occured while harvesting " + url + ". Skipping this repository for now...", e);
+      logger.warn("An error occured while harvesting " + url + ". Skipping this repository for now...", e.getMessage());
+
     }
   }
 

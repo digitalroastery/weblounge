@@ -163,9 +163,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     }
 
     // Clear those directories that aren't the home to the index
-    for (File f : repositorySiteRoot.listFiles()) {
-      logger.debug("Removing {}", f.getAbsolutePath());
-      FileUtils.deleteQuietly(f);
+    File[] filesToDelete = repositorySiteRoot.listFiles();
+    if (filesToDelete != null) {
+      for (File f : filesToDelete) {
+        logger.debug("Removing {}", f.getAbsolutePath());
+        FileUtils.deleteQuietly(f);
+      }
     }
 
     // The home page needs to come back
@@ -194,7 +197,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @return the file
    */
   protected File uriToFile(ResourceURI uri) throws ContentRepositoryException,
-  IOException {
+      IOException {
     StringBuffer path = new StringBuffer(repositorySiteRoot.getAbsolutePath());
     if (uri.getType() == null)
       throw new IllegalArgumentException("Resource uri has no type");
@@ -398,7 +401,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     // Remove the resource directory itself if there are no more resources
     try {
       File f = resourceDir;
-      while (!uri.getType().equals(f.getName()) && f.listFiles().length == 0) {
+      while (!uri.getType().equals(f.getName()) && (f.listFiles() == null || f.listFiles().length == 0)) {
         FileUtils.deleteDirectory(f);
         f = f.getParentFile();
       }
@@ -442,7 +445,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   @Override
   protected ResourceContent storeResourceContent(ResourceURI uri,
       ResourceContent content, InputStream is)
-          throws ContentRepositoryException, IOException {
+      throws ContentRepositoryException, IOException {
 
     if (is == null)
       return content;

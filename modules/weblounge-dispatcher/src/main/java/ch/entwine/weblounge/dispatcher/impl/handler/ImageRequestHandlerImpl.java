@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -301,6 +302,8 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       logger.debug("Error writing image '{}' back to client: connection closed by client", imageResource);
       return true;
     } catch (IOException e) {
+      if (RequestUtils.isCausedByClient(e))
+        return true;
       logger.error("Error writing {} image '{}' back to client: {}", new Object[] {
           language,
           imageResource,

@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.repository.ContentRepository;
@@ -293,6 +294,9 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
         try {
           IOUtils.copy(is, os);
           os.flush();
+        } catch (IOException e) {
+          if (!RequestUtils.isCausedByClient(e))
+            logger.error("Error writing preview to client", e);
         } finally {
           IOUtils.closeQuietly(is);
         }
@@ -583,7 +587,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
    *          the directory
    */
   private void deleteIfEmpty(File dir) {
-    while (dir != null && dir.isDirectory() && dir.listFiles().length == 0) {
+    while (dir != null && dir.isDirectory() && (dir.listFiles() == null || dir.listFiles().length == 0)) {
       FileUtils.deleteQuietly(dir);
       dir = dir.getParentFile();
     }

@@ -23,6 +23,7 @@ package ch.entwine.weblounge.cache.impl;
 import ch.entwine.weblounge.cache.StreamFilter;
 import ch.entwine.weblounge.cache.impl.filter.FilterWriter;
 import ch.entwine.weblounge.common.impl.request.CachedOutputStream;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.request.CacheHandle;
 
 import org.apache.commons.io.IOUtils;
@@ -200,7 +201,10 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
         super.getOutputStream().close();
       }
     } catch (IOException e) {
-      logger.debug("Can't write cached response back to client: " + e.getMessage());
+      if (RequestUtils.isCausedByClient(e))
+        logger.debug("Can't write cached response back to client: " + e.getMessage());
+      else
+        logger.error("Unknown error while writing cached response back to client", e);
     }
     return tx;
   }

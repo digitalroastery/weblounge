@@ -142,12 +142,28 @@ public class EndpointPublishingService implements ManagedService, SiteServiceLis
 
     // Register JAX-RS services that have already been loaded
     for (Bundle bundle : bundleContext.getBundles()) {
+
       ServiceReference[] refs = bundle.getRegisteredServices();
       if (refs == null)
         continue;
-      for (ServiceReference ref : refs) {
-        ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, ref);
-        jsr311ServiceListener.serviceChanged(event);
+
+      // For bundles that are already activating or active, explicitly
+      // register the JAXB service
+      switch (bundle.getState()) {
+        case Bundle.STARTING:
+        case Bundle.ACTIVE:
+          for (ServiceReference ref : refs) {
+            try {
+              ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, ref);
+              jsr311ServiceListener.serviceChanged(event);
+            } catch (Throwable t) {
+              logger.error("Error registering JAXRS annotated service {} : {}", ref);
+            }
+          }
+          break;
+        default:
+          logger.trace("Skipping services in non-active bundle {}", bundle);
+          continue;
       }
     }
 

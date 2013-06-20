@@ -383,20 +383,22 @@ public class Importer {
         }
 
         File[] files = current.listFiles();
-        for (int i = 0; i < files.length; i++) {
-          try {
-            if (files[i].isDirectory()) {
-              directories.push(files[i]);
-            } else if (!"__contents__.xml".equals(files[i].getName()) && !".DS_Store".equals(files[i].getName()) && !"repository.xml".equals(files[i].getName())) {
-              if (!callback.fileImported(files[i])) {
-                System.err.println("Error importing " + files[i].getPath());
-                errorCount++;
-              } else {
-                pageCount++;
+        if (files != null) {
+          for (int i = 0; i < files.length; i++) {
+            try {
+              if (files[i].isDirectory()) {
+                directories.push(files[i]);
+              } else if (!"__contents__.xml".equals(files[i].getName()) && !".DS_Store".equals(files[i].getName()) && !"repository.xml".equals(files[i].getName())) {
+                if (!callback.fileImported(files[i])) {
+                  System.err.println("Error importing " + files[i].getPath());
+                  errorCount++;
+                } else {
+                  pageCount++;
+                }
               }
+            } catch (Exception e) {
+              System.err.println("Error importing " + files[i] + ": " + e.getMessage());
             }
-          } catch (Exception e) {
-            System.err.println("Error importing " + files[i] + ": " + e.getMessage());
           }
         }
       }
