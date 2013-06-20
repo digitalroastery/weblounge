@@ -1,0 +1,357 @@
+#!/bin/bash
+#
+# Weblounge      This shell script takes care of starting and stopping Weblounge
+#
+# chkconfig: - 80 20
+#
+### BEGIN INIT INFO
+# Provides: weblounge
+# Required-Start: $network $syslog
+# Required-Stop: $network $syslog
+# Default-Start:
+# Default-Stop:
+# Description: Release implementation for OSGi 4.2
+# Short-Description: start and stop Weblounge
+
+# Source LSB function library.
+if [ -r /lib/lsb/init-functions ]; then
+    . /lib/lsb/init-functions
+else
+    exit 1
+fi
+
+# Figure out which release we are running on
+DISTRIB_ID=`lsb_release -i -s 2>/dev/null`
+
+# Determin this service's name
+NAME="$(basename $0)"
+unset ISBOOT
+if [ "${NAME:0:1}" = "S" -o "${NAME:0:1}" = "K" ]; then
+    NAME="${NAME:3}"
+    ISBOOT="1"
+fi
+
+# For SELinux we need to use 'runuser' not 'su'
+if [ -x "/sbin/runuser" ]; then
+    SU="/sbin/runuser -s /bin/sh"
+else
+    SU="/bin/su -s /bin/sh"
+fi
+
+# Get the Weblounge config (use this for environment specific settings)
+WEBLOUNGE_CFG="/etc/weblounge/weblounge.conf"
+if [ -r "$WEBLOUNGE_CFG" ]; then
+    . $WEBLOUNGE_CFG
+fi
+
+# Get this service's instance specific config file
+if [ -r "/etc/sysconfig/${NAME}" ]; then
+    . /etc/sysconfig/${NAME}
+fi
+
+export DISPLAY=:99
+
+# Path to the Weblounge launch script
+WEBLOUNGE_SCRIPT="${WEBLOUNGE_HOME}/bin/weblounge"
+
+# Define the Weblounge user
+WEBLOUNGE_USER="${WEBLOUNGE_USER:-weblounge}"
+
+# Define the Weblounge group
+WEBLOUNGE_GROUP="${WEBLOUNGE_GROUP:-weblounge}"
+
+# Define the Weblounge log directory
+WEBLOUNGE_LOG_DIR="${WEBLOUNGE_LOG_DIR:-/var/log/${NAME}}"
+
+# Define the Weblounge home directory
+WEBLOUNGE_HOME="${WEBLOUNGE_HOME:-/opt/weblounge}"
+
+# Define the Weblounge configuration directory
+WEBLOUNGE_CONF_DIR="${WEBLOUNGE_CONF_DIR:-/ect/weblounge}"
+
+# Define the Weblounge configuration directory
+WEBLOUNGE_CONF_EXT_DIR="${WEBLOUNGE_CONF_EXT_DIR:-$WEBLOUNGE_CONF_DIR/apps}"
+
+# Define the Weblounge data directory
+WEBLOUNGE_DATA_DIR="${WEBLOUNGE_DATA_DIR:-/var/lib/weblounge}"
+
+# Define the Weblounge configuration directory
+WEBLOUNGE_SITES_DIR="${WEBLOUNGE_SITES_DIR:-$WEBLOUNGE_DATA_DIR/sites}"
+
+# Define the Weblounge configuration directory
+WEBLOUNGE_SITESDATA_DIR="${WEBLOUNGE_SITESDATA_DIR:-$WEBLOUNGE_DATA_DIR/sites-data}"
+
+# Define the Weblounge pid file
+WEBLOUNGE_PID_FILE="/var/run/${NAME}.pid"
+
+# Define the Weblounge pid file
+WEBLOUNGE_LOCK_FILE="/var/lock/subsys/${NAME}"
+
+# Load application configurations
+if [ -d "$WEBLOUNGE_CONF_EXT_DIR" ]; then
+   for appconfig in `find "$WEBLOUNGE_CONF_EXT_DIR" -type f`; do
+       . "$appconfig"
+   done
+fi
+
+RETVAL="0"
+
+
+# Create the necessary directories
+function makeDirectories() {
+    if [ ! -d "$WEBLOUNGE_HOME" ]; then
+        echo "$WEBLOUNGE_HOME does not exist, creating"
+        if [ ! -d "/usr/share/${NAME}" ]; then
+            mkdir /usr/share/${NAME}
+            cp -pLR /usr/share/weblounge/* /usr/share/${NAME}
+        fi
+        mkdir -p /var/cache/${NAME} \
+                 /var/log/${NAME} \
+                 /var/tmp/${NAME}
+        chown ${WEBLOUNGE_USER}:root /var/log/${NAME} \
+                                 /var/cache/${NAME} \
+                                 /var/tmp/${NAME}
+    fi
+}
+
+# Create a script that defines all of the currently set options as export
+# variables for the Weblounge start/stop script.
+function parseOptions() {
+    options=""
+    
+    # Add basic Weblounge configuration
+    options="$options $(awk '!/^#/ && !/^$/ { ORS=" "; print "export ", $0, ";" }' $WEBLOUNGE_CFG)"
+
+    # Add service specific configuration
+    if [ -r "/etc/sysconfig/${NAME}" ]; then
+        options="$options $(awk '!/^#/ && !/^$/ { ORS=" "; print "export ", $0, ";" }' /etc/sysconfig/${NAME})"
+    fi
+    
+    # Add application definitions
+    if [ -d "$WEBLOUNGE_CONF_EXT_DIR" ]; then
+       for appconfig in `find "$WEBLOUNGE_CONF_EXT_DIR" -type f`; do
+           options="$options $(awk '!/^#/ && !/^$/ { ORS=" "; print "export ", $0, ";" }' $appconfig)"
+       done
+    fi
+
+    # Add some special options as defined in this script
+    options="$options export WEBLOUNGE_HOME=\"$WEBLOUNGE_HOME\";"
+    options="$options export WEBLOUNGE_USER=\"$WEBLOUNGE_USER\";"
+    options="$options export WEBLOUNGE_GROUP=\"$WEBLOUNGE_GROUP\";"
+    options="$options export WEBLOUNGE_PID_FILE=\"$WEBLOUNGE_PID_FILE\";"
+    options="$options export WEBLOUNGE_LOG_DIR=\"$WEBLOUNGE_LOG_DIR\";"
+    options="$options export WEBLOUNGE_CONF_DIR=\"$WEBLOUNGE_CONF_DIR\";"
+    options="$options export WEBLOUNGE_CONF_EXT_DIR=\"$WEBLOUNGE_CONF_EXT_DIR\";"
+    options="$options export WEBLOUNGE_DATA_DIR=\"$WEBLOUNGE_DATA_DIR\";"
+    options="$options export WEBLOUNGE_SITES_DIR=\"$WEBLOUNGE_SITES_DIR\";"
+    options="$options export WEBLOUNGE_SITESDATA_DIR=\"$WEBLOUNGE_SITESDATA_DIR\";"
+
+    WEBLOUNGE_SCRIPT="$options ${WEBLOUNGE_SCRIPT}"
+}
+
+# See how we were called.
+function start() {
+
+    WEBLOUNGE_INSTANCES="$(ps ax | grep felix.jar | grep -vc grep)"
+  
+    if [ $WEBLOUNGE_INSTANCES -ne 0 ]; then
+        if [ -f "$WEBLOUNGE_PID_FILE" ]; then
+            read pid < /var/run/${NAME}.pid
+            log_warning_msg "${NAME} already running ($pid)"
+        else
+            log_failure_msg "Service already running (unknown pid)"
+        fi
+        RETVAL="4"
+        return
+    elif [ -f "$WEBLOUNGE_LOCK_FILE" ]; then
+        log_failure_msg "Service startup locked by $WEBLOUNGE_LOCK_FILE"
+        RETVAL="4"
+        return
+    elif [ -f "$WEBLOUNGE_PID_FILE" ]; then
+        log_warning_msg "Removing orphaned pid file ${WEBLOUNGE_PID}"
+    fi
+
+    echo -n "Starting ${NAME}: "
+    
+    # Fix permissions on the log and pid files
+    export WEBLOUNGE_PID_FILE="/var/run/${NAME}.pid"
+    touch $WEBLOUNGE_PID_FILE 2>&1 || RETVAL="4"
+    if [ "$RETVAL" -eq "0" -a "$?" -eq "0" ]; then 
+       chown ${WEBLOUNGE_USER}:${WEBLOUNGE_GROUP} $WEBLOUNGE_PID_FILE
+    fi
+    [ "$RETVAL" -eq "0" ] && mkdir -p "$WEBLOUNGE_LOG_DIR" 2>&1 || RETVAL="4" 
+    if [ "$RETVAL" -eq "0" -a "$?" -eq "0" ]; then
+       chown -R ${WEBLOUNGE_USER}:${WEBLOUNGE_GROUP} $WEBLOUNGE_LOG_DIR
+    fi
+
+    # Create the Weblounge directory if it doesn't exist
+    if [ "$WEBLOUNGE_HOME" != "/usr/share/weblounge" -a "$RETVAL" -eq "0" ]; then
+         makeDirectories
+    fi
+
+    parseOptions
+    
+    # Finally, start Weblounge
+    if [ "$RETVAL" -eq "0" -a "$SECURITY_MANAGER" = "true" ]; then
+       $SU - $WEBLOUNGE_USER -c "${WEBLOUNGE_SCRIPT} start-security" > /var/log/${NAME}/initd.out 2>&1 || RETVAL="4"
+    else
+       [ "$RETVAL" -eq "0" ] && $SU - $WEBLOUNGE_USER -c "${WEBLOUNGE_SCRIPT} start" > /var/log/${NAME}/initd.out 2>&1 || RETVAL="4"
+    fi
+    
+    if [ "$RETVAL" -eq "0" ]; then 
+        log_success_msg
+        touch /var/lock/subsys/${NAME}
+    else
+        log_failure_msg "Error code ${RETVAL}"
+    fi
+    if [ "$DISTRIB_ID" = "MandrivaLinux" ]; then
+        echo
+    fi
+}
+
+function stop() {
+
+    WEBLOUNGE_INSTANCES="$(ps ax | grep felix.jar | grep -vc grep)"
+    SHUTDOWN_WAIT=10
+    
+    if [ -f "$WEBLOUNGE_PID_FILE" ] && [ $WEBLOUNGE_INSTANCES -eq 0 ]; then
+       log_warning_msg "Removing unused pid and lock file"
+       rm -f "$WEBLOUNGE_PID_FILE" "$WEBLOUNGE_LOCK_FILE"
+       RETVAL="0"
+       return
+    fi
+    
+    echo -n "Stopping ${NAME}: "
+
+    if [ ! -f "$WEBLOUNGE_PID_FILE" ] && [ $WEBLOUNGE_INSTANCES -ne 0 ]; then
+       pid="$(ps ax | grep felix.jar | grep -v grep | awk '{ print $1 }')"
+       log_failure_msg
+       echo "Found orphaned running $NAME instances ($pid)"
+       RETVAL="4"
+    elif [ -f "$WEBLOUNGE_PID_FILE" ]; then
+      read pid < "$WEBLOUNGE_PID_FILE"
+      if [ -z "$pid" ]; then
+          log_failure_msg
+          echo "Service pid file $WEBLOUNGE_PID_FILE is empty"
+          RETVAL="4"
+          return
+      fi
+      parseOptions
+      if [ "$RETVAL" -eq "0" ]; then
+         touch $WEBLOUNGE_PID_FILE 2>&1 || RETVAL="4"
+         [ "$RETVAL" -eq "0" ] && $SU - $WEBLOUNGE_USER -c "${WEBLOUNGE_SCRIPT} stop" >> /var/log/${NAME}/initd.out 2>&1 || RETVAL="4"
+      fi
+      if [ "$RETVAL" -eq "0" ]; then
+         count="0"
+         read pid < "$WEBLOUNGE_PID_FILE"
+         until [ "$(ps --pid $pid | grep -c $pid)" -eq 0 ] || [ "$count" -gt $SHUTDOWN_WAIT ]; do
+            if [ "$SHUTDOWN_VERBOSE" = "true" ]; then
+               echo "waiting for processes $pid to exit"
+            fi
+            sleep 1
+            let count="${count}+1"
+         done
+         if [ "$count" -gt $SHUTDOWN_WAIT ]; then
+             if [ "$SHUTDOWN_VERBOSE" = "true" ]; then
+                 log_warning_msg "Killing processes which did not stop after ${SHUTDOWN_WAIT} seconds"
+             fi
+             kill -9 $pid
+         fi
+         log_success_msg
+        fi
+       rm -f "$WEBLOUNGE_PID_FILE" "$WEBLOUNGE_LOCK_FILE"
+    else
+        log_success_msg
+        RETVAL="0"
+    fi
+    if [ "$DISTRIB_ID" = "MandrivaLinux" ]; then
+        echo
+    fi
+}
+
+function status()
+{
+   checkpidfile 
+   if [ "$RETVAL" -eq "0" ]; then
+      log_success_msg "${NAME} (pid ${pid}) is running..."
+   elif [ "$RETVAL" -eq "1" ]; then
+      log_failure_msg "PID file exists, but process is not running"
+   else 
+      checklockfile
+      if [ "$RETVAL" -eq "2" ]; then
+         log_failure_msg "${NAME} lockfile exists but process is not running"
+      else
+         pid="$(/usr/bin/pgrep -d , -u ${WEBLOUNGE_USER} -G ${WEBLOUNGE_USER} java)"
+         if [ -z "$pid" ]; then
+             log_success_msg "${NAME} is stopped"
+             RETVAL="3"
+         else
+             log_success_msg "${NAME} (pid $pid) is running..."
+             RETVAL="0"
+         fi
+      fi
+  fi
+}
+
+function checklockfile()
+{
+   if [ -f /var/lock/subsys/${NAME} ]; then
+      pid="$(/usr/bin/pgrep -d , -u ${WEBLOUNGE_USER} -G ${WEBLOUNGE_USER} java)"
+      # The lockfile exists but the process is not running
+      if [ -z "$pid" ]; then
+         RETVAL="2"
+      fi
+   fi
+}
+
+function checkpidfile()
+{
+   if [ -f "/var/run/${NAME}.pid" ]; then
+      read pid < /var/run/${NAME}.pid
+      if [ -d "/proc/${pid}" ]; then
+          # The pid file exists and the process is running
+          RETVAL="0"
+      else
+          # The pid file exists but the process is not running
+          RETVAL="1"
+          return
+      fi
+   fi
+  # pid file does not exist and program is not running
+   RETVAL="3"
+}
+
+function usage()
+{
+   echo "Usage: $0 {start|stop|restart|force-restart|status}"
+   RETVAL="2"
+}
+
+# See how we were called.
+RETVAL="0"
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    force-restart)
+        if [ -f "/var/run/${NAME}.pid" ]; then
+            stop
+            start
+        fi
+        ;;
+    status)
+        status
+        ;;
+    *)
+      usage
+      ;;
+esac
+
+exit $RETVAL

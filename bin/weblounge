@@ -1,0 +1,67 @@
+#!/bin/bash
+
+if [ -r /usr/share/java-utils/java-functions ]; then
+  . /usr/share/java-utils/java-functions
+else
+  echo "Can't read Java functions library /usr/share/java-utils/java-functions, aborting"
+  exit 1
+fi
+
+# Include the weblounge specific binaries
+export PATH=$PATH:$WEBLOUNGE_LIB_DIR/libexec
+
+set_javacmd
+
+# CLASSPATH munging
+if [ -n "$JSSE_HOME" ]; then
+  CLASSPATH="${CLASSPATH}:$(build-classpath jcert jnet jsse 2>/dev/null)"
+fi
+CLASSPATH="${CLASSPATH}:${WEBLOUNGE_HOME}/bin/felix.jar"
+
+if [ "$1" = "start" ]; then
+  ${JAVACMD} \
+    $JVM_OPTS \
+    $JVM_MEMORY_OPTS \
+    $JVM_DEBUG_OPTS \
+    $JVM_AWT_OPTS \
+    $JVM_ENCODING_OPTS \
+    $JVM_PROFILING_OPTS \
+    $JVM_MONITORING_OPTS \
+    $WEBLOUNGE_OPTS \
+    $WEBLOUNGE_APPS_OPTS \
+    -classpath "$CLASSPATH" \
+    -Dfelix.fileinstall.dir="$WEBLOUNGE_CONF_DIR/load" \
+    -Dfelix.config.properties="file:$WEBLOUNGE_CONF_DIR/config.properties" \
+    -Dfelix.system.properties="file:$WEBLOUNGE_CONF_DIR/system.properties" \
+    -Dbundles.configuration.location="$WEBLOUNGE_CONF_DIR" \
+    -Dgosh.args=--nointeractive \
+    -Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN \
+    -Dweblounge.logdir="$WEBLOUNGE_LOG_DIR" \
+    -Dweblounge.datadir="$WEBLOUNGE_DATA_DIR" \
+    -Dweblounge.sitesdir="$WEBLOUNGE_SITES_DIR" \
+    -Dweblounge.sitesdatadir="$WEBLOUNGE_SITESDATA_DIR" \
+    -Dweblounge.libdir="$WEBLOUNGE_LIB_DIR" \
+    -Djava.io.tmpdir="$WEBLOUNGE_TEMP_DIR" \
+    -jar $WEBLOUNGE_HOME/bin/felix.jar "$WEBLOUNGE_CACHE_DIR/bundle-cache" \
+    2>&1 >> /dev/null &
+    if [ ! -z "$WEBLOUNGE_PID_FILE" ]; then
+      echo $! > "$WEBLOUNGE_PID_FILE"
+    fi
+elif [ "$1" = "stop" ]; then
+    if [ -z "$WEBLOUNGE_PID_FILE" ]; then
+      echo "WEBLOUNGE_PID_FILE is undefined"
+      exit 1
+    elif [ ! -f "$WEBLOUNGE_PID_FILE" ]; then
+      echo "$WEBLOUNGE_PID_FILE does not exist"
+      exit 1
+    fi    
+    read pid < "$WEBLOUNGE_PID_FILE"
+    if [ -z "$pid" ]; then
+      echo "Weblounge pid file $WEBLOUNGE_PID_FILE is empty"
+      exit 1
+    fi
+    kill $pid
+else
+  echo "Usage: $0 {start|stop}"
+  exit 1
+fi
