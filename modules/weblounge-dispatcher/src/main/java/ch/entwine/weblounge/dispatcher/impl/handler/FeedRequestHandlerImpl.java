@@ -421,6 +421,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       // Try to render the preview pagelets and write them to the feed
       List<SyndContent> entryContent = new ArrayList<SyndContent>();
       Composer composer = new ComposerImpl("preview", page.getPreview());
+      StringBuffer renderedContent = new StringBuffer();
 
       for (Pagelet pagelet : composer.getPagelets()) {
         Module module = site.getModule(pagelet.getModule());
@@ -430,16 +431,22 @@ public class FeedRequestHandlerImpl implements RequestHandler {
           continue;
         }
 
-        renderer = module.getRenderer(pagelet.getIdentifier());
+        renderer = module.getRenderer(pagelet.getIdentifier());        
+        if (renderer == null) {
+          logger.warn("Skipping pagelet {} in feed due to missing renderer '{}/{}'", new Object[] { pagelet, pagelet.getModule(), pagelet.getIdentifier() });
+          continue;
+        }
+
         URL rendererURL = renderer.getRenderer(RendererType.Feed.toString());
         Environment environment = request.getEnvironment();
         if (rendererURL == null)
           rendererURL = renderer.getRenderer();
         if (rendererURL != null) {
-          String rendererContent = null;
+          String pageletContent = null;
           try {
             pagelet.switchTo(language);
-            rendererContent = loadContents(rendererURL, site, page, composer, pagelet, environment);
+            pageletContent = loadContents(rendererURL, site, page, composer, pagelet, environment);
+            renderedContent.append(pageletContent);
           } catch (ServletException e) {
             logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
             DispatchUtils.sendInternalError(request, response);
@@ -447,15 +454,15 @@ public class FeedRequestHandlerImpl implements RequestHandler {
             logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
             DispatchUtils.sendInternalError(request, response);
           }
-          SyndContent content = new SyndContentImpl();
-          content.setType("text/html");
-          content.setMode("escaped");
-          content.setValue(rendererContent);
-          entryContent.add(content);
         }
       }
 
-      if (entryContent.size() > 0) {
+      if (renderedContent.length() > 0) {
+        SyndContent content = new SyndContentImpl();
+        content.setType("text/html");
+        content.setMode("escaped");
+        content.setValue(renderedContent.toString());
+        entryContent.add(content);
         entry.setContents(entryContent);
       }
 
