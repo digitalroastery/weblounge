@@ -76,18 +76,25 @@ sudo useradd "$RELEASE"
 sudo rm -f "bin/start.sh"
 sudo rm -f "bin/start.bat"
 
-# Create the release RPM
+# Create the directory structure for putting together the RPMs
 sudo su - "$RELEASE" -c "rpmdev-setuptree"
-sudo su - "$RELEASE" -c "mkdir -p /home/""$RELEASE"/weblounge."$RELEASE"
-sudo su - "$RELEASE" -c "ls /home/""$RELEASE""/weblounge.""$RELEASE"
+sudo su - "$RELEASE" -c "mkdir -p /home/$RELEASE/weblounge.$RELEASE"
+sudo su - "$RELEASE" -c "mkdir -p /home/$RELEASE/rpm/{SOURCES,SPECS}"
+
+# Move the files in place for the creation of the RPMs
 sudo cp -r "bin" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "docs/scripts/rpm/contents/etc" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "etc" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "lib" /home/"$RELEASE"/weblounge."$RELEASE"
 
+# Switch to the rpm build directory
+sudo su - "$RELEASE" -c "cd ~"
+
 # Create the sources RPM
-sudo su - $RELEASE -c "cd;tar cvzf /home/$RELEASE/rpm/SOURCES/weblounge.$RELEASE.tar.gz weblounge.$RELEASE"
-sudo chown $RELEASE /home/"$RELEASE"/rpm/SOURCES/weblounge."$RELEASE".tar.gz
+sudo su - "$RELEASE" -c "tar -cvzf rpm/SOURCES/weblounge.$RELEASE.tar.gz weblounge.$RELEASE"
+sudo chown "$RELEASE" /home/"$RELEASE"/rpm/SOURCES/weblounge."$RELEASE".tar.gz
+
+# Move the spec file to the release directory
 sudo cp "docs/scripts/rpm/weblounge.spec" /home/"$RELEASE"/rpm/SPECS
 sudo chown $RELEASE /home/"$RELEASE"/rpm/SPECS/weblounge.spec
 
@@ -95,7 +102,7 @@ sudo chown $RELEASE /home/"$RELEASE"/rpm/SPECS/weblounge.spec
 echo "Time check: end of rpm preparations, starting the rpm build process"
 date +%H\:%M
 
-sudo su - "$RELEASE" -c "rpm -ba /home/$RELEASE/rpm/SPECS/weblounge.spec"
+sudo su - "$RELEASE" -c "rpmbuild -ba rpm/SPECS/weblounge.spec"
 rpm_exit_code=$?
 if [ ! $rpm_exit_code -eq 0 ];then
   echo "RPM Creation failed, check rpm log, exiting"
@@ -109,12 +116,12 @@ echo "tTime check: package created repository operations starting"
 date +%H\:%M
 
 # Move the package to the repo (on Entwine infrastructure)
-sudo chmod 777 -R /home/$RELEASE/rpm
-sudo rm -rf /tmp/$RELEASE
-mkdir /tmp/$RELEASE
-chmod -R 777 /tmp/$RELEASE
-sudo su $RELEASE -c "cp -r /home/$RELEASE/rpm/SRPMS/ /tmp/$RELEASE/"
-sudo su $RELEASE -c "cp -r /home/$RELEASE/rpm/RPMS/* /tmp/$RELEASE/"
+sudo chmod 777 -R /home/"$RELEASE"/rpm
+sudo rm -rf /tmp/"$RELEASE"
+mkdir /tmp/"$RELEASE"
+chmod -R 777 /tmp/"$RELEASE"
+sudo su "$RELEASE" -c "cp -r rpm/SRPMS/ /tmp/$RELEASE/"
+sudo su "$RELEASE" -c "cp -r rpm/RPMS/* /tmp/$RELEASE/"
 sudo mkdir -p /var/www/rpm-repos/$CUSTOMER/{SRPMS,RPMS}
 sudo cp -r /tmp/$RELEASE/SRPMS/* /var/www/rpm-repos/$CUSTOMER/SRPMS/
 sudo cp -r /tmp/$RELEASE/x86_64/entwine* /var/www/rpm-repos/$CUSTOMER/RPMS
