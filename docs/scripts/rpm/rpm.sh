@@ -79,10 +79,11 @@ sudo rm -f "bin/start.bat"
 # Create the directory structure for putting together the RPMs
 sudo su - "$RELEASE" -c "rpmdev-setuptree"
 sudo su - "$RELEASE" -c "mkdir -p /home/$RELEASE/weblounge.$RELEASE"
-sudo su - "$RELEASE" -c "mkdir -p /home/$RELEASE/rpm/{SOURCES,SPECS}"
+sudo su - "$RELEASE" -c "mkdir -p /home/$RELEASE/rpmbuild/{SOURCES,SPECS}"
 
 # Move the files in place for the creation of the RPMs
 sudo cp -r "bin" /home/"$RELEASE"/weblounge."$RELEASE"
+sudo cp -r "docs" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "docs/scripts/rpm/contents/etc" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "etc" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "lib" /home/"$RELEASE"/weblounge."$RELEASE"
@@ -91,18 +92,18 @@ sudo cp -r "lib" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo su - "$RELEASE" -c "cd ~"
 
 # Create the sources RPM
-sudo su - "$RELEASE" -c "tar -cvzf rpm/SOURCES/weblounge.$RELEASE.tar.gz weblounge.$RELEASE"
-sudo chown "$RELEASE" /home/"$RELEASE"/rpm/SOURCES/weblounge."$RELEASE".tar.gz
+sudo su - "$RELEASE" -c "tar -cvzf rpmbuild/SOURCES/weblounge.$RELEASE.tar.gz weblounge.$RELEASE"
+sudo chown "$RELEASE" /home/"$RELEASE"/rpmbuild/SOURCES/weblounge."$RELEASE".tar.gz
 
 # Move the spec file to the release directory
-sudo cp "docs/scripts/rpm/weblounge.spec" /home/"$RELEASE"/rpm/SPECS
-sudo chown $RELEASE /home/"$RELEASE"/rpm/SPECS/weblounge.spec
+sudo cp "docs/scripts/rpm/weblounge.spec" /home/"$RELEASE"/rpmbuild/SPECS
+sudo chown $RELEASE /home/"$RELEASE"/rpmbuild/SPECS/weblounge.spec
 
 # Time check
 echo "Time check: end of rpm preparations, starting the rpm build process"
 date +%H\:%M
 
-sudo su - "$RELEASE" -c "rpmbuild -ba rpm/SPECS/weblounge.spec"
+sudo su - "$RELEASE" -c "rpmbuild -ba rpmbuild/SPECS/weblounge.spec"
 rpm_exit_code=$?
 if [ ! $rpm_exit_code -eq 0 ];then
   echo "RPM Creation failed, check rpm log, exiting"
