@@ -16,8 +16,8 @@ Requires: java-1.6.0-openjdk
 Requires: redhat-lsb
 
 #3rd Party tools
-Requires: ffmpeg
-Requires: ImageMagick
+#Requires: ffmpeg
+#Requires: ImageMagick
 #Requires: phantomjs
 
 %description
