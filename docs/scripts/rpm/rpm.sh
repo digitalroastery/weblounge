@@ -121,8 +121,8 @@ sudo chmod 777 -R /home/"$RELEASE"/rpmbuild
 sudo rm -rf /tmp/"$RELEASE"
 mkdir /tmp/"$RELEASE"
 chmod -R 777 /tmp/"$RELEASE"
-sudo su "$RELEASE" -c "cp -r rpm/SRPMS/ /tmp/$RELEASE/"
-sudo su "$RELEASE" -c "cp -r rpm/RPMS/* /tmp/$RELEASE/"
+sudo su "$RELEASE" -c "cp -r rpmbuild/SRPMS /tmp/$RELEASE/"
+sudo su "$RELEASE" -c "cp -r rpmbuild/RPMS /tmp/$RELEASE/"
 sudo mkdir -p /var/www/rpm-repos/$CUSTOMER/{SRPMS,RPMS}
 sudo cp -r /tmp/$RELEASE/SRPMS/* /var/www/rpm-repos/$CUSTOMER/SRPMS/
 sudo cp -r /tmp/$RELEASE/x86_64/* /var/www/rpm-repos/$CUSTOMER/RPMS
