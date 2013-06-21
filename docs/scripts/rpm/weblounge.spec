@@ -98,7 +98,8 @@ rm -rf %{buildroot}
 
 %defattr(-,weblounge,weblounge,-)
 
-#/etc/matterhorn
+# /etc/matterhorn
+
 %{_initrddir}
 
 /etc/logrotate.d/weblounge
@@ -109,16 +110,19 @@ rm -rf %{buildroot}
 %attr(0755,weblounge,weblounge) /var/log/weblounge
 %attr(0755,weblounge,weblounge) %{_data_prefix}
 
-### Weblounge Config files ###
-%config(noreplace) /opt/weblounge/etc/
+# Protect the Weblounge configuration files
+%config(noreplace) /opt/weblounge/etc
 
-#Uninstall
+# Uninstall
+
 %preun
+
 #if [ "$1" = "0" ];then
 # service matterhorn stop
 #fi
 
 %postun
+
 if [ "$1" = "0" ];then
   userdel -r weblounge
   groupdel weblounge
