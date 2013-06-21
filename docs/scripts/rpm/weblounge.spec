@@ -94,6 +94,7 @@ fi
 rm -rf %{buildroot}
 
 %files
+
 %defattr(-,weblounge,weblounge,-)
 
 #/etc/matterhorn
@@ -108,7 +109,6 @@ rm -rf %{buildroot}
 %attr(0755,weblounge,weblounge) %{_data_prefix}
 
 ### Weblounge Config files ###
-%config(noreplace) /opt/weblounge/bin/
 %config(noreplace) /opt/weblounge/etc/
 
 #Uninstall
