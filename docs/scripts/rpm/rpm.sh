@@ -117,7 +117,7 @@ echo "tTime check: package created repository operations starting"
 date +%H\:%M
 
 # Move the package to the repo (on Entwine infrastructure)
-sudo chmod 777 -R /home/"$RELEASE"/rpm
+sudo chmod 777 -R /home/"$RELEASE"/rpmbuild
 sudo rm -rf /tmp/"$RELEASE"
 mkdir /tmp/"$RELEASE"
 chmod -R 777 /tmp/"$RELEASE"
