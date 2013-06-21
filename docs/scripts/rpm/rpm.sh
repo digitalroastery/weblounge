@@ -112,7 +112,7 @@ if [ ! $rpm_exit_code -eq 0 ];then
 fi
 
 
-#time check
+# Rime check
 echo "tTime check: package created repository operations starting"
 date +%H\:%M
 
@@ -126,14 +126,14 @@ sudo su "$RELEASE" -c "cp -r rpm/RPMS/* /tmp/$RELEASE/"
 sudo mkdir -p /var/www/rpm-repos/$CUSTOMER/{SRPMS,RPMS}
 sudo cp -r /tmp/$RELEASE/SRPMS/* /var/www/rpm-repos/$CUSTOMER/SRPMS/
 sudo cp -r /tmp/$RELEASE/x86_64/entwine* /var/www/rpm-repos/$CUSTOMER/RPMS
-sudo userdel -r "$RELEASE"
+#sudo userdel -r "$RELEASE"
 
-#Delete debuginfo packages from customer repo
+# Delete debuginfo packages from customer repo
 sudo rm -f /var/www/rpm-repos/$CUSTOMER/RPMS/*debuginfo*.rpm
 
 # Delete all packages but the 3 newest ones
-cd /var/www/rpm-repos/$CUSTOMER/RPMS && sudo ls -t1|tail -n +4|sudo xargs rm -r
-cd /var/www/rpm-repos/$CUSTOMER/SRPMS && sudo ls -t1|tail -n +4|sudo xargs rm -r
+cd /var/www/rpm-repos/$CUSTOMER/RPMS && sudo ls -t1 | tail -n +4 | sudo xargs rm -r
+cd /var/www/rpm-repos/$CUSTOMER/SRPMS && sudo ls -t1 | tail -n +4 | sudo xargs rm -r
 
 # Update the customer repo
 sudo createrepo /var/www/rpm-repos/$CUSTOMER
