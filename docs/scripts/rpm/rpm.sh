@@ -137,8 +137,8 @@ sudo userdel -r "$RELEASE"
 sudo rm -f /var/www/rpm-repos/$CUSTOMER/RPMS/*debuginfo*.rpm
 
 # Delete all packages but the 3 newest ones (and don't care if there are less than 3)
-cd /var/www/rpm-repos/$CUSTOMER/RPMS && sudo ls -t1 | tail -n +4 | sudo xargs rm -r 2> /dev/null
-cd /var/www/rpm-repos/$CUSTOMER/SRPMS && sudo ls -t1 | tail -n +4 | sudo xargs rm -r 2> /dev/null
+cd /var/www/rpm-repos/$CUSTOMER/RPMS && sudo ls -t1 weblounge-* | tail -n +4 | sudo xargs rm -r 2> /dev/null
+cd /var/www/rpm-repos/$CUSTOMER/SRPMS && sudo ls -t1 weblounge-* | tail -n +4 | sudo xargs rm -r 2> /dev/null
 
 # Update the customer repo
 sudo createrepo /var/www/rpm-repos/$CUSTOMER
