@@ -52,7 +52,9 @@ done
 
 # Get the version and release
 VERSION=3.1
+ARTIFACT_VERSION=3.1.8
 RELEASE="$(git log -1 --pretty=format:"%ad %h" --date=short|sed s/'[[:space:]]'/."$(git log --oneline|wc -l)"git/|sed s/-//g)"
+
 cd "$WORKSPACE"
 
 # Sanity check for production default config files replacement
@@ -64,6 +66,9 @@ fi
 # Set version and release tag for the package
 sed -i s#CHANGE_ME_VERSION#"$VERSION"# "docs/scripts/rpm/weblounge.spec"
 sed -i s#CHANGE_ME_RELEASE#"$RELEASE"# "docs/scripts/rpm/weblounge.spec"
+
+# Adjust the artifact name in the spec file
+sed -i s#CHANGE_ME_ARTIFACT_VERSION#"$RELEASE"# "docs/scripts/rpm/contents/etc/system.properties"
 
 # Time check
 echo "Starting the rpm build preparations"
