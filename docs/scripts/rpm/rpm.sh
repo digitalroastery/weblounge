@@ -128,7 +128,7 @@ sudo cp -r /tmp/$RELEASE/SRPMS/* /var/www/rpm-repos/$CUSTOMER/SRPMS/
 sudo cp -r /tmp/$RELEASE/x86_64/* /var/www/rpm-repos/$CUSTOMER/RPMS
 
 # Remove the user and its home directory (and with that all the rpmbuild work directory)
-sudo userdel -r "$RELEASE"
+#sudo userdel -r "$RELEASE"
 
 # Delete debuginfo packages from customer repo
 sudo rm -f /var/www/rpm-repos/$CUSTOMER/RPMS/*debuginfo*.rpm
