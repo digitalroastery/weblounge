@@ -2,8 +2,8 @@
 %define 	_data_prefix /var/lib/weblounge
 %define 	__jar_repack 0
 
-Name:		  weblounge
-Version:	3.1
+Name:		weblounge
+Version:	CHANGE_ME_VERSION
 Release:	CHANGE_ME_RELEASE
 Summary:	Weblounge Web Content Management System
 License:	LGPL 2.0	
@@ -55,26 +55,26 @@ mkdir -p $RPM_BUILD_ROOT/var/tmp/weblounge
 mkdir -p $RPM_BUILD_ROOT/var/log/weblounge
 
 # Data directories
-mkdir -p $RPM_BUILD_ROOT/%{_data_prefix}/index
-mkdir -p $RPM_BUILD_ROOT/%{_data_prefix}/sites
-mkdir -p $RPM_BUILD_ROOT/%{_data_prefix}/sites-data
+mkdir -p $RPM_BUILD_ROOT%{_data_prefix}/index
+mkdir -p $RPM_BUILD_ROOT%{_data_prefix}/sites
+mkdir -p $RPM_BUILD_ROOT%{_data_prefix}/sites-data
 
 # Weblounge binaries
-install -d -m 755 $RPM_BUILD_ROOT/%{_prefix}
-install -d -m 755 $RPM_BUILD_ROOT/%{_initrddir}
+install -d -m 755 $RPM_BUILD_ROOT%{_prefix}
+install -d -m 755 $RPM_BUILD_ROOT%{_initrddir}
 install -d -m 755 $RPM_BUILD_ROOT/etc
 
-install -D -m 644 bin/felix.jar $RPM_BUILD_ROOT/%{_prefix}/bin/felix.jar
-cp -rf  lib $RPM_BUILD_ROOT/%{_prefix}
+install -D -m 644 bin/felix.jar $RPM_BUILD_ROOT%{_prefix}/bin/felix.jar
+cp -rf  lib $RPM_BUILD_ROOT%{_prefix}
 
 # Weblounge Start script
-install -D -m 755 bin/weblounge $RPM_BUILD_ROOT/%{_prefix}/bin/weblounge
+install -D -m 755 bin/weblounge $RPM_BUILD_ROOT%{_prefix}/bin/weblounge
 
-cp -rf etc $RPM_BUILD_ROOT/%{_prefix}
+cp -rf etc $RPM_BUILD_ROOT%{_prefix}
 
 # Log rotation
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
-install -m644 ./docs/scripts/rpm/weblounge.logrotate $RPM_BUILD_ROOT/etc/logrotate.d/weblounge
+install -m644 docs/scripts/rpm/weblounge.logrotate $RPM_BUILD_ROOT/etc/logrotate.d/weblounge
 
 %post
 
@@ -98,7 +98,8 @@ rm -rf %{buildroot}
 
 #/etc/matterhorn
 %{_initrddir}
-/etc/logrotate.d/matterhorn_initdout
+
+/etc/logrotate.d/weblounge
 
 %attr(0755,weblounge,weblounge) /opt/weblounge/
 %attr(0755,weblounge,weblounge) /var/cache/weblounge
