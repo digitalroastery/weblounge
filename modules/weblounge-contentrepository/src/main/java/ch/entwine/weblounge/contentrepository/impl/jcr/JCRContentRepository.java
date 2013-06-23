@@ -425,6 +425,8 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
     String resNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), String.valueOf(uri.getVersion()), "resource_content", language.getIdentifier());
     InputStream content = null;
     try {
+      if (!session.nodeExists(resNodePath))
+        return null;
       Node resNode = session.getNode(resNodePath);
       Node resContent = resNode.getNode(Node.JCR_CONTENT);
       Property data = resContent.getProperty(Property.JCR_DATA);
