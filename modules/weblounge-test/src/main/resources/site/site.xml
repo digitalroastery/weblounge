@@ -64,7 +64,7 @@
   <options>
   	<option>
   		<name>contentrepository.type</name>
-  		<value>ch.entwine.weblounge.contentrepository.impl.bundle.WritableBundleContentRepository</value>
+  		<value>ch.entwine.weblounge.contentrepository.impl.jcr.JCRContentRepository</value>
   	</option>
   </options>
 </site>
