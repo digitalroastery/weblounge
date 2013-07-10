@@ -50,13 +50,13 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
-      <version>1.4-rc8</version>
+      <version>1.4.0</version>
     </dependency>
     
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-dublincore</artifactId>
-      <version>1.4-rc8</version>
+      <version>1.4.0</version>
     </dependency>
     
     <dependency>
@@ -69,7 +69,6 @@
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
-      <version>1.4</version>
     </dependency>
 
     <dependency>
