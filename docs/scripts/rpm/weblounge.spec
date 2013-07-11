@@ -69,7 +69,7 @@ cp -rf  lib $RPM_BUILD_ROOT%{_prefix}
 
 # Weblounge Start script
 install -D -m 755 bin/weblounge $RPM_BUILD_ROOT%{_prefix}/bin/weblounge
-install -D -m 755 bin/init $RPM_BUILD_ROOT%{_prefix}/bin/init
+install -D -m 755 bin/init $RPM_BUILD_ROOT%{_initrddir}/weblounge
 
 cp -rf etc $RPM_BUILD_ROOT%{_prefix}
 
@@ -82,7 +82,6 @@ install -m644 docs/scripts/rpm/weblounge.logrotate $RPM_BUILD_ROOT/etc/logrotate
 # First install only
 if [ "$1" =  "1" ]; then
   ln -s /opt/weblounge/etc ${RPM_BUILD_ROOT}/etc/weblounge
-  mv -f /opt/weblounge/bin/init ${RPM_BUILD_ROOT}/%{_initrddir}/weblounge
   chkconfig --add weblounge
   chkconfig --level 235 weblounge on
 elif [ "$1" =  "2" ];then
