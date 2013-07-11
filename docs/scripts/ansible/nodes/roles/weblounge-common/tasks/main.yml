@@ -1,0 +1,120 @@
+---
+
+- name: "Installing weblounge rpm repository"
+  template: >
+        src=weblounge.repo.j2
+        dest=/etc/yum.repos.d/weblounge.repo
+        backup=yes
+  tags: weblounge_repo
+
+
+- name: "Installing Weblounge"
+  yum: >
+        name=weblounge
+        state=latest
+  notify:
+        - restart weblounge
+  tags: weblounge
+
+
+- name: "Installing Apache webserver"
+  yum: >
+        name=httpd
+        state=latest
+  notify:
+        - restart httpd
+  tags: httpd
+
+
+- name: "Configuring Apache for Weblounge proxying"
+  template: >
+        src=vhost.conf.j2
+        dest=/etc/httpd/conf.d/weblounge.conf
+        backup=yes
+  notify:
+        - restart httpd
+  tags: httpd
+
+- name: "Creating Apache log files"
+  file: >
+        dest=/var/log/httpd/vhosts/${ansible_hostname}
+        state=directory
+
+- name: "Permanently starting Apache"
+  service: >
+        name=httpd
+        state=started
+        enabled=yes
+  tags: httpd
+
+
+- name: "Creating directory for Weblounge database connection"
+  file: >
+        dest=/etc/weblounge/datasource
+        state=directory
+  notify:
+        - restart weblounge
+  tags: datasource
+
+
+- name: "Configuring the Weblounge database connection"
+  template: >
+        src=weblounge-ds.xml.j2
+        dest=/etc/weblounge/datasource/weblounge-ds.xml
+        backup=yes
+  notify:
+        - restart weblounge
+  tags: datasource
+
+
+- name: "Process /etc/weblounge/weblounge.conf"
+  template: >
+        src=weblounge.conf.j2
+        dest=/etc/weblounge/weblounge.conf
+        backup=yes
+  notify:
+        - restart weblounge
+  tags: service
+
+
+- name: "Create the weblounge system user"
+  user: >
+        name=${weblounge_user}
+        state=present
+  tags: user
+  notify:
+        - restart weblounge
+
+
+- name: "Create the weblounge system group"
+  group: >
+        name=${weblounge_group}
+        state=present
+        system=yes
+  tags: group
+  notify:
+        - restart weblounge
+
+
+- name: "Make the weblounge system user owner of the weblounge directories"
+  file: >
+        state=directory
+        recurse=yes
+        owner=${weblounge_user}
+        path=$item
+  with_items:
+        - ${weblounge_configuration_dir}
+        - ${weblounge_cache_dir}
+        - ${weblounge_temp_dir}
+        - ${weblounge_log_dir}
+        - ${weblounge_data_dir}
+  tags: permissions
+  notify:
+        - restart weblounge
+        
+- name: "Permanently starting Weblounge"
+  service: >
+        name=weblounge
+        state=started
+        enabled=yes
+  tags: weblounge
