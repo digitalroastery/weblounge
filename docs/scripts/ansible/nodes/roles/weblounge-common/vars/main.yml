@@ -1,0 +1,83 @@
+---
+
+#
+# Database settings
+#
+
+# Datsource implementation class
+db_driver: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+
+# Name of the database specific part of the jdbc:xyz protocol string
+db_jdbc_protocol: mysql
+
+# Database hostname or ip
+#db_host: ${db_host}
+
+# Database name
+#db_name: ${db_name}
+
+# Database username
+#db_user: ${db_user}
+
+# Database password
+#db_group: ${db_password}
+
+
+#
+# Weblounge directory layout
+#
+
+# System user running weblounge
+weblounge_user: vagrant
+
+# System group
+weblounge_group: vagrant
+
+
+#
+# Weblounge directory layout
+#
+
+# Where Weblounge is located
+weblounge_home_dir: /opt/weblounge
+
+# Configuration files for Weblounge
+weblounge_configuration_dir: /etc/weblounge
+
+# Data directory
+weblounge_data_dir: /var/lib/weblounge
+
+# Weblounge temporary files
+weblounge_temp_dir: /var/tmp/weblounge
+
+# Weblounge cache files
+weblounge_cache_dir: /var/cache/weblounge
+
+# Where to put Weblounge's log files
+weblounge_log_dir: /var/log/weblounge
+
+# Options that can be set to pass apps configurations to the java virtual machine (provided as -D<option>=<value>)
+weblounge_apps_opts:
+
+
+#
+# Java virtual machine configuration
+#
+
+# JVM Memory configuration parameter
+jvm_memory_opts: -Xmx3072m -Xms1024m -XX:MaxPermSize=192m -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:/var/log/weblounge/jvm_gc.log
+
+# Options to pass to the JVM to enable debugging
+jvm_debug_otps: -Xdebug -ea:ch -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n
+
+# Options for the advanced windowing toolkit
+jvm_awt_opts: -Djava.awt.headless=true
+
+# Set the vm encoding
+jvm_encoding_opts: -Dfile.encoding=utf-8
+
+# Options for the YourKit profiler
+jvm_profiling_opts: -agentpath:${WEBLOUNGE_HOME}/lib/libexec/yourkit/linux-x86-64/libyjpagent.so
+
+# Options for remote monitoring
+jvm_monitoring_opts: -Dcom.sun.management.jmxremote.port=9001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false

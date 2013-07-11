@@ -1,0 +1,39 @@
+---
+
+- name: Installing MySQL database server
+  yum: >
+       state=latest
+       name=$item
+  with_items:
+       - mysql
+       - mysql-server
+       - MySQL-python
+  tags:
+       - mysql
+
+
+- name: Permanently starting MySQL database server
+  service: >
+       name=mysqld
+       enabled=yes
+       state=started
+  tags:
+       - mysql
+    
+
+- name: Creating MySQL weblounge user
+  mysql_user: >
+       name=${db_user}
+       host=%
+       priv=*.*:ALL
+       password=${db_password}
+  tags: 
+       - mysql
+
+
+- name: Creating MySQL weblounge database
+  mysql_db: >
+      name=${db_name}
+      state=present
+  tags: 
+      - mysql

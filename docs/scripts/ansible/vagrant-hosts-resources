@@ -1,0 +1,58 @@
+#ANSIBLE HOSTS FILE FOR VAGRANT MULTI VM
+
+### Specifying user to run the playbooks ##
+#Applying the same user to the group of all groups
+[ssh-user-all-groups:children]
+repository
+mysql
+weblounge
+
+[ssh-user-all-groups:vars]
+ansible_ssh_user=vagrant
+
+#
+# Weblounge resources
+#
+
+[allinone]
+10.1.2.100
+
+#
+# Weblounge configuration
+#
+
+[weblounge:children]
+allinone
+
+[weblounge:vars]
+
+#
+# Infrastructure resources
+#
+
+[repository]
+10.1.2.200
+
+[mysql]
+10.1.2.201
+
+#
+# Infrastructure configuration
+#
+
+[repository-clients:children]
+mysql
+weblounge
+
+[repository-clients:vars]
+local_weblounge_rpm_repository_url=http://10.1.2.200
+
+[db-clients:children]
+mysql
+weblounge
+
+[db-clients:vars]
+db_host=10.1.2.201
+db_name=weblounge
+db_user=weblounge
+db_password=weblounge
