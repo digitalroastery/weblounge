@@ -1,0 +1,7 @@
+/var/log/weblounge/initd.out {
+    missingok
+    notifempty
+    size 10M
+    copytruncate
+    rotate 4
+}
