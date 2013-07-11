@@ -3,3 +3,5 @@
   sudo: yes
   roles:
        - repository
+  vars:
+      weblounge_reposync_schedule: '* * * * *'
