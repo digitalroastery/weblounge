@@ -51,10 +51,8 @@ esac
 done
 
 # Get the version and release
-VERSION=3.1
-ARTIFACT_VERSION=3.1.8
+VERSION="$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)')"
 RELEASE="$(git log -1 --pretty=format:"%ad %h" --date=short|sed s/'[[:space:]]'/."$(git log --oneline|wc -l)"git/|sed s/-//g)"
-
 cd "$WORKSPACE"
 
 # Sanity check for production default config files replacement
@@ -66,9 +64,8 @@ fi
 # Set version and release tag for the package
 sed -i s#CHANGE_ME_VERSION#"$VERSION"# "docs/scripts/rpm/weblounge.spec"
 sed -i s#CHANGE_ME_RELEASE#"$RELEASE"# "docs/scripts/rpm/weblounge.spec"
-
-# Adjust the artifact name in the spec file
-sed -i s#CHANGE_ME_ARTIFACT_VERSION#"$RELEASE"# "docs/scripts/rpm/contents/etc/system.properties"
+sed -i s#CHANGE_ME_VERSION#"$VERSION"# "docs/scripts/rpm/contents/etc/system.properties"
+sed -i s#CHANGE_ME_VERSION#"$VERSION"# "docs/scripts/rpm/contents/etc/motd"
 
 # Time check
 echo "Starting the rpm build preparations"
@@ -92,7 +89,6 @@ echo "Moving the rpm contents to /home/$RELEASE/weblounge.$RELEASE"
 sudo cp -r "bin" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "docs" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "docs/scripts/rpm/contents/etc" /home/"$RELEASE"/weblounge."$RELEASE"
-sudo cp -r "etc" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "lib" /home/"$RELEASE"/weblounge."$RELEASE"
 
 # Switch to the rpm build directory
@@ -142,8 +138,8 @@ sudo userdel -r "$RELEASE"
 sudo rm -f /var/www/rpm-repos/$CUSTOMER/RPMS/*debuginfo*.rpm
 
 # Delete all packages but the 3 newest ones (and don't care if there are less than 3)
-cd /var/www/rpm-repos/$CUSTOMER/RPMS && sudo ls -t1 weblounge-* | tail -n +4 | sudo xargs rm -r 2> /dev/null
-cd /var/www/rpm-repos/$CUSTOMER/SRPMS && sudo ls -t1 weblounge-* | tail -n +4 | sudo xargs rm -r 2> /dev/null
+cd /var/www/rpm-repos/$CUSTOMER/RPMS && sudo ls -t1 | tail -n +4 | sudo xargs rm -r 2> /dev/null
+cd /var/www/rpm-repos/$CUSTOMER/SRPMS && sudo ls -t1 | tail -n +4 | sudo xargs rm -r 2> /dev/null
 
 # Update the customer repo
 sudo createrepo /var/www/rpm-repos/$CUSTOMER
