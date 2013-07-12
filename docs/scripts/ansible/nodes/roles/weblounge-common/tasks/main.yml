@@ -111,7 +111,48 @@
   notify:
         - restart weblounge
 
-        
+
+- name: "Installing Graylog library"
+  copy: >
+        src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/gelfj-0.9.1.jar" 
+        dest="/opt/weblounge/lib/local"
+  tags: local-libs
+
+
+- name: "Installing MySQL driver"
+  copy: >
+        src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/mysql-connector-java-5.1.22.jar" 
+        dest="/opt/weblounge/lib/local"
+  tags: local-libs
+
+
+- name: "Installing MySQL JPA datasource"
+  copy: >
+        src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/pax-jdbc-mysql-0.2.0.jar" 
+        dest="/opt/weblounge/lib/local"
+  tags: local-libs
+
+
+- name: "Enabling loading of local Java libraries"
+  lineinfile: >
+        dest="/etc/weblounge/system.properties"
+        insertafter="mylibrary-1.0.0.jar"
+        regexp="^felix\.auto\.start\.4"
+        line="felix.auto.start.4= \\"
+  tags: local-libs
+
+- name: "Loading the local libraries"
+  lineinfile: >
+        dest="/etc/weblounge/system.properties"
+        insertafter="^felix.auto.start.4"
+        regexp="{{ item }}"
+        line=" file:${weblounge.home}/lib/local/{{ item }} \\ "
+  with_items:
+        - "gelfj-0.9.1.jar "
+        - "mysql-connector-java-5.1.22.jar "
+        - "pax-jdbc-mysql-0.2.0.jar "
+  tags: local-libs
+
 - name: "Permanently starting Weblounge"
   service: >
         name=weblounge
