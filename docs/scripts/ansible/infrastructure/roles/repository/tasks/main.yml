@@ -42,6 +42,14 @@
       - rpm-repo
 
 
+- name: "Configure regular weblounge repository syncing"
+  template: >
+      src=weblounge-reposync.crontab.j2
+      dest=/etc/cron.d/weblounge-reposync
+      backup=yes
+  tags:
+      - rpm-repo
+
 
 
 
