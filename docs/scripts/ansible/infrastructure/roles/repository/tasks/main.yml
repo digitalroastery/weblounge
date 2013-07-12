@@ -43,16 +43,9 @@
 
 
 - name: "Configure regular weblounge repository syncing"
-  template: >
-      src=weblounge-reposync.crontab.j2
-      dest=/etc/cron.d/weblounge-reposync
-      backup=yes
+  cron: >
+      job="reposync -n -r weblounge -p /var/www/html -q 1&> /var/log/yum-reposync.log"
+      name="Weblounge repository mirroring"
   tags:
       - rpm-repo
-
-
-
-
-
-
-
+ 
