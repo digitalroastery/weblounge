@@ -28,7 +28,6 @@ if [ "$1" = "start" ]; then
     $JVM_PROFILING_OPTS \
     $JVM_MONITORING_OPTS \
     $WEBLOUNGE_OPTS \
-    $WEBLOUNGE_APPS_OPTS \
     -classpath "$CLASSPATH" \
     -Dfelix.fileinstall.dir="$WEBLOUNGE_CONF_DIR/load" \
     -Dfelix.config.properties="file:$WEBLOUNGE_CONF_DIR/config.properties" \
