@@ -117,6 +117,8 @@
         src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/gelfj-0.9.1.jar" 
         dest="/opt/weblounge/lib/local"
   tags: local-libs
+  notify:
+        - restart weblounge
 
 
 - name: "Installing MySQL driver"
@@ -124,6 +126,8 @@
         src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/mysql-connector-java-5.1.22.jar" 
         dest="/opt/weblounge/lib/local"
   tags: local-libs
+  notify:
+        - restart weblounge
 
 
 - name: "Installing MySQL JPA datasource"
@@ -131,6 +135,8 @@
         src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/pax-jdbc-mysql-0.2.0.jar" 
         dest="/opt/weblounge/lib/local"
   tags: local-libs
+  notify:
+        - restart weblounge
 
 
 - name: "Enabling loading of local Java libraries"
@@ -140,6 +146,9 @@
         regexp="^felix\.auto\.start\.4"
         line="felix.auto.start.4= \\"
   tags: local-libs
+  notify:
+        - restart weblounge
+
 
 - name: "Loading the local libraries"
   lineinfile: >
@@ -152,6 +161,9 @@
         - "mysql-connector-java-5.1.22.jar "
         - "pax-jdbc-mysql-0.2.0.jar "
   tags: local-libs
+  notify:
+        - restart weblounge
+
 
 - name: "Permanently starting Weblounge"
   service: >
