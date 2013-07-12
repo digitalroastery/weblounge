@@ -103,7 +103,6 @@
         owner=${weblounge_user}
         path=$item
   with_items:
-        - ${weblounge_configuration_dir}
         - ${weblounge_cache_dir}
         - ${weblounge_temp_dir}
         - ${weblounge_log_dir}
@@ -111,6 +110,7 @@
   tags: permissions
   notify:
         - restart weblounge
+
         
 - name: "Permanently starting Weblounge"
   service: >
