@@ -28,10 +28,10 @@ db_jdbc_protocol: mysql
 #
 
 # System user running weblounge
-weblounge_user: vagrant
+weblounge_user: weblounge
 
 # System group
-weblounge_group: vagrant
+weblounge_group: weblounge
 
 
 #
