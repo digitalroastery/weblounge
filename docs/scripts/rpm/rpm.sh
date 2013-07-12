@@ -52,7 +52,7 @@ done
 
 # Get the version and release
 MVN_VERSION="$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)')"
-RPM_VERSION="$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)') | awk '{split($0,a,"-"); print a[1]}')"
+RPM_VERSION="$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)' | awk '{split($0,a,"-"); print a[1]}')"
 RPM_RELEASE="$(git log -1 --pretty=format:"%ad %h" --date=short|sed s/'[[:space:]]'/."$(git log --oneline|wc -l)"git/|sed s/-//g)"
 cd "$WORKSPACE"
 
