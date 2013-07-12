@@ -51,7 +51,7 @@ esac
 done
 
 # Get the version and release
-VERSION=3.1
+VERSION="$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)')"
 RELEASE="$(git log -1 --pretty=format:"%ad %h" --date=short|sed s/'[[:space:]]'/."$(git log --oneline|wc -l)"git/|sed s/-//g)"
 cd "$WORKSPACE"
 
@@ -64,6 +64,8 @@ fi
 # Set version and release tag for the package
 sed -i s#CHANGE_ME_VERSION#"$VERSION"# "docs/scripts/rpm/weblounge.spec"
 sed -i s#CHANGE_ME_RELEASE#"$RELEASE"# "docs/scripts/rpm/weblounge.spec"
+sed -i s#CHANGE_ME_VERSION#"$VERSION"# "docs/scripts/rpm/contents/etc/system.properties"
+sed -i s#CHANGE_ME_VERSION#"$VERSION"# "docs/scripts/rpm/contents/etc/motd"
 
 # Time check
 echo "Starting the rpm build preparations"
@@ -87,7 +89,6 @@ echo "Moving the rpm contents to /home/$RELEASE/weblounge.$RELEASE"
 sudo cp -r "bin" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "docs" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "docs/scripts/rpm/contents/etc" /home/"$RELEASE"/weblounge."$RELEASE"
-sudo cp -r "etc" /home/"$RELEASE"/weblounge."$RELEASE"
 sudo cp -r "lib" /home/"$RELEASE"/weblounge."$RELEASE"
 
 # Switch to the rpm build directory
