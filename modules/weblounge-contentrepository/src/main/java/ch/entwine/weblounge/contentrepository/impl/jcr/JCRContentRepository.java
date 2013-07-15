@@ -73,13 +73,13 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
   /** Prefix for repository configuration keys */
   private static final String CONF_PREFIX = "contentrepository.jcr.";
 
-  /** Configuration key for the repository's url */
+  /** Configuration key for the repository's URL */
   public static final String OPT_URL = CONF_PREFIX + "url";
 
-  /** Configuration key for the repository's url */
+  /** Configuration key for the repository's URL */
   public static final String OPT_USER = CONF_PREFIX + "user";
 
-  /** Configuration key for the repository's url */
+  /** Configuration key for the repository's URL */
   public static final String OPT_PASSWORD = CONF_PREFIX + "password";
 
   /** The repository storage root directory */
@@ -96,9 +96,6 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
 
   /** The JCR repository */
   private Repository repository = null;
-
-  /** The session to the JCR repository */
-  private Session session = null;
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(JCRContentRepository.class);
@@ -119,22 +116,19 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
   public void connect(Site site) throws ContentRepositoryException {
 
     if (repository != null) {
-      logger.warn("JCR repository '{}' already seams to be connected", repository);
+      logger.warn("JCR repository '{}' already seams to be connected, trying to reconnect.", repository);
     }
 
     if (repositoryUrl == null || repositoryCred == null)
       throw new ContentRepositoryException("Repository not properly configured. Either url or credentials are missing.");
 
     repository = new URLRemoteRepository(repositoryUrl);
-    try {
-      session = repository.login(repositoryCred);
-    } catch (LoginException e) {
-      throw new ContentRepositoryException("Login to the repository failed", e);
-    } catch (RepositoryException e) {
-      throw new ContentRepositoryException(e);
-    }
 
-    logger.debug("Successfuly connected to repository as user '{}'", session.getUserID());
+    // Just check, if we can establish a session to the repository
+    // Since sessions in JCR are NOT thread safe, we don't save the session
+    // for further usage.
+    Session testSession = getSession();
+    testSession.logout();
 
     // Tell the super implementation
     super.connect(site);
@@ -179,6 +173,7 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
       throws ContentRepositoryException, IOException {
 
     String resNodePath = UrlUtils.concat(getBaseNodePath(resource.getType()), resource.getIdentifier(), String.valueOf(resource.getURI().getVersion()));
+    Session session = getSession();
 
     try {
       // First of all, we have to make sure, the base node for the given
@@ -211,6 +206,8 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
 
     } catch (RepositoryException e) {
       throw new IOException(e);
+    } finally {
+      session.logout();
     }
 
     return resource;
@@ -229,6 +226,7 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
       throws ContentRepositoryException, IOException {
 
     String resNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), String.valueOf(uri.getVersion()));
+    Session session = getSession();
 
     try {
       // First of all, we have to make sure, the base node for the given
@@ -266,6 +264,8 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
 
     } catch (RepositoryException e) {
       throw new IOException(e);
+    } finally {
+      session.logout();
     }
 
     return content;
@@ -282,6 +282,8 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
       throws ContentRepositoryException, IOException {
 
     String resNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier());
+    Session session = getSession();
+
     try {
       if (!session.nodeExists(resNodePath)) {
         logger.warn("Resource '{}' does not exist", uri.getIdentifier());
@@ -307,6 +309,8 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
 
     } catch (RepositoryException e) {
       throw new ContentRepositoryException(e);
+    } finally {
+      session.logout();
     }
 
   }
@@ -322,12 +326,15 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
       throws ContentRepositoryException, IOException {
 
     String resContentNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), Long.toString(uri.getVersion()), "resource_content", content.getLanguage().getIdentifier());
+    Session session = getSession();
 
     try {
       if (session.itemExists(resContentNodePath))
         session.removeItem(resContentNodePath);
     } catch (RepositoryException e) {
       throw new ContentRepositoryException(e);
+    } finally {
+      session.logout();
     }
   }
 
@@ -340,6 +347,7 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
   protected Collection<ResourceURI> listResources()
       throws ContentRepositoryException, IOException {
     List<ResourceURI> uris = new ArrayList<ResourceURI>();
+    Session session = getSession();
 
     // TODO The current implementation does not yet support versions
 
@@ -381,6 +389,8 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
         throw new ContentRepositoryException(e);
       } catch (RepositoryException e) {
         throw new ContentRepositoryException(e);
+      } finally {
+        session.logout();
       }
 
     }
@@ -398,7 +408,9 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
       throws ContentRepositoryException, IOException {
 
     String resNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), String.valueOf(uri.getVersion()), "resource");
+    Session session = getSession();
     InputStream res = null;
+
     try {
       Node resNode = session.getNode(resNodePath);
       Node resContent = resNode.getNode(Node.JCR_CONTENT);
@@ -408,6 +420,8 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
       throw new ContentRepositoryException(e);
     } catch (RepositoryException e) {
       throw new IOException(e);
+    } finally {
+      session.logout();
     }
 
     return res;
@@ -423,7 +437,9 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
   protected InputStream loadResourceContent(ResourceURI uri, Language language)
       throws ContentRepositoryException, IOException {
     String resNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), String.valueOf(uri.getVersion()), "resource_content", language.getIdentifier());
+    Session session = getSession();
     InputStream content = null;
+
     try {
       if (!session.nodeExists(resNodePath))
         return null;
@@ -435,6 +451,8 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
       throw new ContentRepositoryException(e);
     } catch (RepositoryException e) {
       throw new IOException(e);
+    } finally {
+      session.logout();
     }
 
     return content;
@@ -451,6 +469,25 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
       return repositoryUrl.toString();
     else
       return super.toString();
+  }
+
+  /**
+   * Returns a session to the JCR repository. If no connection could be
+   * established, a <code>ContentRepositoryException</code> is thrown.
+   * 
+   * @return a valid session
+   * @throws ContentRepositoryException
+   *           if no connection could be established
+   */
+  private Session getSession() throws ContentRepositoryException {
+    try {
+      return repository.login(repositoryCred);
+    } catch (LoginException e) {
+      throw new ContentRepositoryException("Login to the repository failed.", e);
+    } catch (RepositoryException e) {
+      throw new ContentRepositoryException(e);
+    }
+
   }
 
   /**
