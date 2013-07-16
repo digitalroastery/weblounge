@@ -67,6 +67,10 @@ import javax.jcr.nodetype.NodeType;
  */
 public class JCRContentRepository extends AbstractWritableContentRepository implements ManagedService {
 
+  private static final String NODE_NAME_RESOURCE_CONTENT = "resource_content";
+
+  private static final String NODE_NAME_RESOURCE = "resource";
+
   /** The repository type */
   public static final String TYPE = "ch.entwine.weblounge.contentrepository.jcr";
 
@@ -143,13 +147,12 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties)
       throws ConfigurationException {
 
-    // TODO What should we do if repository/session is already setup?
-
     String url = (String) properties.get(OPT_URL);
     if (url == null)
       throw new ConfigurationException(OPT_URL, "Required configuration property seems not to be configured.");
     try {
       repositoryUrl = new URL(url);
+      logger.debug("Repository URL set to '{}'.", url);
     } catch (MalformedURLException e) {
       throw new ConfigurationException(OPT_URL, e.getMessage(), e);
     }
@@ -157,9 +160,13 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
     String user = (String) properties.get(OPT_USER);
     if (user == null)
       throw new ConfigurationException(OPT_USER, "Required configuration property seems not to be configured.");
+    logger.debug("User set to '{}'.", user);
+
     String password = (String) properties.get(OPT_PASSWORD);
     if (password == null)
       throw new ConfigurationException(OPT_PASSWORD, "Required configuration property seems not to be configured.");
+    logger.debug("Password set to '{}'.", password);
+
     repositoryCred = new SimpleCredentials(user, password.toCharArray());
   }
 
@@ -183,10 +190,10 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
 
       // We want to store the resource in an own sub-node
       Node resNode = null;
-      if (resBaseNode.hasNode("resource"))
-        resNode = resBaseNode.getNode("resource");
+      if (resBaseNode.hasNode(NODE_NAME_RESOURCE))
+        resNode = resBaseNode.getNode(NODE_NAME_RESOURCE);
       else
-        resNode = resBaseNode.addNode("resource", NodeType.NT_FILE);
+        resNode = resBaseNode.addNode(NODE_NAME_RESOURCE, NodeType.NT_FILE);
 
       // The serialized resource is stored as a file in a JCR resource node with
       // the name 'jcr:content'
@@ -197,13 +204,14 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
         contentNode = resNode.addNode(Node.JCR_CONTENT, NodeType.NT_RESOURCE);
 
       contentNode.setProperty(Property.JCR_ENCODING, "UTF-8");
+      contentNode.setProperty(Property.JCR_MIMETYPE, "application/xml");
       Calendar lastModified = Calendar.getInstance();
       lastModified.setTime(resource.getLastModified());
       contentNode.setProperty(Property.JCR_LAST_MODIFIED, lastModified);
       contentNode.setProperty(Property.JCR_DATA, new BinaryValue(resource.toXml().getBytes()));
 
       session.save();
-
+      logger.debug("Resource successfully saved in node '{}'.", resBaseNode);
     } catch (RepositoryException e) {
       throw new IOException(e);
     } finally {
@@ -236,10 +244,10 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
 
       // We want to store the resource in an own sub-node
       Node resNode = null;
-      if (resBaseNode.hasNode("resource_content"))
-        resNode = resBaseNode.getNode("resource_content");
+      if (resBaseNode.hasNode(NODE_NAME_RESOURCE_CONTENT))
+        resNode = resBaseNode.getNode(NODE_NAME_RESOURCE_CONTENT);
       else
-        resNode = resBaseNode.addNode("resource_content", NodeType.NT_FOLDER);
+        resNode = resBaseNode.addNode(NODE_NAME_RESOURCE_CONTENT, NodeType.NT_FOLDER);
 
       // Each language needs its own subnode
       Node resLangNode = null;
@@ -261,7 +269,7 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
       contentNode.setProperty(Property.JCR_DATA, new BinaryValue(is));
 
       session.save();
-
+      logger.debug("Resource content successfully saved in node '{}'.", resBaseNode);
     } catch (RepositoryException e) {
       throw new IOException(e);
     } finally {
@@ -306,7 +314,7 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
         resNode.remove();
 
       session.save();
-
+      logger.debug("Successfully deleted revisions '{}' of the resource '{}'", revisions, uri);
     } catch (RepositoryException e) {
       throw new ContentRepositoryException(e);
     } finally {
@@ -325,12 +333,15 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
   protected void deleteResourceContent(ResourceURI uri, ResourceContent content)
       throws ContentRepositoryException, IOException {
 
-    String resContentNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), Long.toString(uri.getVersion()), "resource_content", content.getLanguage().getIdentifier());
+    String resContentNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), Long.toString(uri.getVersion()), NODE_NAME_RESOURCE_CONTENT, content.getLanguage().getIdentifier());
     Session session = getSession();
 
     try {
       if (session.itemExists(resContentNodePath))
         session.removeItem(resContentNodePath);
+      
+      session.save();
+      logger.debug("Successfully deleted resource content '{}' ({})", uri, content.getLanguage());
     } catch (RepositoryException e) {
       throw new ContentRepositoryException(e);
     } finally {
@@ -349,8 +360,6 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
     List<ResourceURI> uris = new ArrayList<ResourceURI>();
     Session session = getSession();
 
-    // TODO The current implementation does not yet support versions
-
     // Add all known resource types to the index
     for (ResourceSerializer<?, ?> serializer : getSerializers()) {
 
@@ -363,6 +372,7 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
           continue;
         }
         it = session.getNode(resRootNode).getNodes();
+        logger.debug("Found {} resources for resource type '{}'.", it.getSize(), serializer.getType());
 
         // Iterate over all the resource nodes found for the given resource type
         while (it.hasNext()) {
@@ -407,15 +417,18 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
   protected InputStream loadResource(ResourceURI uri)
       throws ContentRepositoryException, IOException {
 
-    String resNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), String.valueOf(uri.getVersion()), "resource");
+    String resNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), String.valueOf(uri.getVersion()), NODE_NAME_RESOURCE);
     Session session = getSession();
     InputStream res = null;
 
     try {
+      if (!session.nodeExists(resNodePath)) 
+        throw new ContentRepositoryException("Resource '" + uri + "' does not exist.");
       Node resNode = session.getNode(resNodePath);
       Node resContent = resNode.getNode(Node.JCR_CONTENT);
       Property data = resContent.getProperty(Property.JCR_DATA);
       res = data.getBinary().getStream();
+      logger.debug("Stream to resource '{}' successfully opened.", resNodePath);
     } catch (PathNotFoundException e) {
       throw new ContentRepositoryException(e);
     } catch (RepositoryException e) {
@@ -436,17 +449,18 @@ public class JCRContentRepository extends AbstractWritableContentRepository impl
   @Override
   protected InputStream loadResourceContent(ResourceURI uri, Language language)
       throws ContentRepositoryException, IOException {
-    String resNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), String.valueOf(uri.getVersion()), "resource_content", language.getIdentifier());
+    String resNodePath = UrlUtils.concat(getBaseNodePath(uri.getType()), uri.getIdentifier(), String.valueOf(uri.getVersion()), NODE_NAME_RESOURCE_CONTENT, language.getIdentifier());
     Session session = getSession();
     InputStream content = null;
 
     try {
       if (!session.nodeExists(resNodePath))
-        return null;
+        throw new ContentRepositoryException("Resource content '" + uri + "' (" + language.getIdentifier() + ") does not exist.");
       Node resNode = session.getNode(resNodePath);
       Node resContent = resNode.getNode(Node.JCR_CONTENT);
       Property data = resContent.getProperty(Property.JCR_DATA);
       content = data.getBinary().getStream();
+      logger.debug("Stream to resource content '{}' ({}) successfully opened.", resNodePath, language.getIdentifier());
     } catch (PathNotFoundException e) {
       throw new ContentRepositoryException(e);
     } catch (RepositoryException e) {
