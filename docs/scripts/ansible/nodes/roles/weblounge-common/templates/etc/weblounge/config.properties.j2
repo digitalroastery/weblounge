@@ -1,0 +1,26 @@
+#
+# Weblounge properties
+#
+
+# Name of this Weblounge instance, which becomes relevant as soon as
+# Weblounge is used in load balanced scenarios where multiple instances
+# may be returning responses. The name is sent back with every response
+# in the X-Weblounge-Instance header.
+# 
+# If the name is not specified, the corresponding header will not be sent.
+ch.entwine.weblounge.name=${weblounge_node_name}
+
+#
+# Bundle config properties.
+#
+
+# Port that the http service is running on. See the dispatcher service
+# configuration (in conf/services/) for additional settings.
+org.osgi.service.http.port=8080
+
+# Enable the Felix Http Service
+org.apache.felix.http.enable=true
+org.apache.felix.http.jettyEnabled=true
+
+# Enable the Felix Http Service's whiteboard pattern implementation
+org.apache.felix.http.whiteboardEnabled=true

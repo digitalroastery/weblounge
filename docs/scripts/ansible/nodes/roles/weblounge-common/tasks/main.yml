@@ -2,7 +2,7 @@
 
 - name: "Installing weblounge rpm repository"
   template: >
-        src=weblounge.repo.j2
+        src=etc/yum.repos.d/weblounge.repo.j2
         dest=/etc/yum.repos.d/weblounge.repo
         backup=yes
   tags: weblounge_repo
@@ -28,12 +28,13 @@
 
 - name: "Configuring Apache for Weblounge proxying"
   template: >
-        src=vhost.conf.j2
+        src=etc/httpd/conf.d/weblounge.conf.j2
         dest=/etc/httpd/conf.d/weblounge.conf
         backup=yes
   notify:
         - restart httpd
   tags: httpd
+
 
 - name: "Creating Apache log files"
   file: >
@@ -48,6 +49,16 @@
   tags: httpd
 
 
+- name: "Configuring Weblounge node name"
+  template: >
+        src=etc/weblounge/config.properties.j2
+        dest=/etc/weblounge/config.properties
+        backup=yes
+  notify:
+        - restart weblounge
+  tags: datasource
+
+
 - name: "Creating directory for Weblounge database connection"
   file: >
         dest=/etc/weblounge/datasource
@@ -59,7 +70,7 @@
 
 - name: "Configuring the Weblounge database connection"
   template: >
-        src=weblounge-ds.xml.j2
+        src=etc/weblounge/datasource/weblounge-ds.xml.j2
         dest=/etc/weblounge/datasource/weblounge-ds.xml
         backup=yes
   notify:
@@ -67,9 +78,19 @@
   tags: datasource
 
 
-- name: "Process /etc/weblounge/weblounge.conf"
+- name: "Configuring the Elasticsearch index"
   template: >
-        src=weblounge.conf.j2
+        src=etc/weblounge/index/settings.yml.j2
+        dest=/etc/weblounge/index/settings.yml
+        backup=yes
+  notify:
+        - restart weblounge
+  tags: elasticsearch
+
+
+- name: "Processing /etc/weblounge/weblounge.conf"
+  template: >
+        src=etc/weblounge/weblounge.conf.j2
         dest=/etc/weblounge/weblounge.conf
         backup=yes
   notify:
