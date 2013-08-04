@@ -17,6 +17,9 @@ ansible_ssh_user=vagrant
 [allinone]
 10.1.2.100
 
+[allinone:vars]
+weblounge_node_name=Standalone
+
 #
 # Weblounge configuration
 #
