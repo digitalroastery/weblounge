@@ -81,3 +81,10 @@ jvm_profiling_opts: -agentpath:${WEBLOUNGE_HOME}/lib/libexec/yourkit/linux-x86-6
 
 # Options for remote monitoring
 jvm_monitoring_opts: -Dcom.sun.management.jmxremote.port=9001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+
+#
+# Elasticsearch configuration
+#
+
+# Name of the Elasticsearch cluster
+elasticsearch_cluster_name: Weblounge
