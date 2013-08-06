@@ -49,6 +49,24 @@
   tags: httpd
 
 
+- name: "Installing Image Magick"
+  yum: >
+        name=ImageMagick
+        state=latest
+  notify:
+        - restart weblounge
+  tags: imagemagick
+
+
+- name: "Installing Phantomjs"
+  yum: >
+        name=phantomjs
+        state=latest
+  notify:
+        - restart weblounge
+  tags: pahntomjs
+
+
 - name: "Configuring Weblounge node name"
   template: >
         src=etc/weblounge/config.properties.j2
