@@ -15,10 +15,16 @@ Source:		weblounge.%{release}.tar.gz
 Requires: java-1.6.0-openjdk	
 Requires: redhat-lsb
 
-#3rd Party tools
+# ffmepg
 #Requires: ffmpeg
-#Requires: ImageMagick
-#Requires: phantomjs
+
+# Image magick
+Requires: ImageMagick
+
+# PhantomJS and dependencies
+Requires: phantomjs
+Requires: fontconfig
+Requires: freetype
 
 %description
 Weblounge Web Content Management System
