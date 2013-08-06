@@ -2,4 +2,5 @@
 - hosts: allinone
   sudo: yes
   roles:
-       - weblounge-common 
+       - weblounge-common
+       - weblounge-thirdparty

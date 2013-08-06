@@ -1,0 +1,76 @@
+---
+
+- name: "Installing weblounge rpm repository"
+  template: >
+        src=etc/yum.repos.d/weblounge.repo.j2
+        dest=/etc/yum.repos.d/weblounge.repo
+        backup=yes
+  tags: weblounge_repo
+
+
+- name: "Installing Apache webserver"
+  yum: >
+        name=httpd
+        state=latest
+  notify:
+        - restart httpd
+  tags: httpd
+
+
+- name: "Configuring Apache for Weblounge proxying"
+  template: >
+        src=etc/httpd/conf.d/weblounge.conf.j2
+        dest=/etc/httpd/conf.d/weblounge.conf
+        backup=yes
+  notify:
+        - restart httpd
+  tags: httpd
+
+
+- name: "Creating Apache log files"
+  file: >
+        dest=/var/log/httpd/vhosts/${ansible_hostname}
+        state=directory
+
+- name: "Permanently starting Apache"
+  service: >
+        name=httpd
+        state=started
+        enabled=yes
+  tags: httpd
+
+
+- name: "Installing Image Magick"
+  yum: >
+        name=ImageMagick
+        state=latest
+  notify:
+        - restart weblounge
+  tags: imagemagick
+
+
+- name: "Installing Phantomjs"
+  yum: >
+        name=phantomjs
+        state=latest
+  notify:
+        - restart weblounge
+  tags: phantomjs
+
+
+- name: "Installing Freetype"
+  yum: >
+        name=freetype
+        state=latest
+  notify:
+        - restart weblounge
+  tags: phantomjs
+
+
+- name: "Installing Fontconfig"
+  yum: >
+        name=fontconfig
+        state=latest
+  notify:
+      - restart weblounge
+  tags: phantomjs
