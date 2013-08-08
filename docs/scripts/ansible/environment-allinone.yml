@@ -1,8 +1,0 @@
----
-- include: infrastructure/repository.yml
-- include: nodes/allinone.yml
-
-#MySQL playbook needs to be run independently at the moment
-#until idempotency via DB schema versioning is implemented
-#- include: infrastructure/mysql.yml
-

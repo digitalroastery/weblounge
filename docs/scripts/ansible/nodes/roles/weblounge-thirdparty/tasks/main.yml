@@ -27,10 +27,25 @@
   tags: httpd
 
 
+- name: "Setting Apache server name"
+  lineinfile: >
+        dest="/etc/httpd/conf/httpd.conf"
+        insertafter="#ServerName www.example.com:80"
+        regexp="ServerName www\.example\.com\:80"
+        line="ServerName ${httpd_servername}:80"
+  notify:
+        - restart httpd
+  tags: httpd
+
+
 - name: "Creating Apache log files"
   file: >
         dest=/var/log/httpd/vhosts/${ansible_hostname}
         state=directory
+  notify:
+        - restart httpd
+  tags: httpd
+        
 
 - name: "Permanently starting Apache"
   service: >
