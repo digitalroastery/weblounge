@@ -1,5 +1,5 @@
 ---
-- hosts: allinone
+- hosts: standalone
   sudo: yes
   roles:
        - weblounge-common
