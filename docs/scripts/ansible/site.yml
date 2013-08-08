@@ -1,0 +1,4 @@
+---
+- include: infrastructure/repository.yml
+- include: infrastructure/mysql.yml
+- include: nodes/weblounge.yml
