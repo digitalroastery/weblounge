@@ -14,7 +14,10 @@
         state=latest
   notify:
         - restart weblounge
-  tags: weblounge
+  tags: 
+        - weblounge 
+        - datasource
+        - rpm
 
 
 - name: "Configuring Weblounge node name"
@@ -24,7 +27,9 @@
         backup=yes
   notify:
         - restart weblounge
-  tags: datasource
+  tags: 
+        - weblounge 
+        - datasource
 
 
 - name: "Creating directory for Weblounge database connection"
@@ -33,7 +38,9 @@
         state=directory
   notify:
         - restart weblounge
-  tags: datasource
+  tags: 
+        - weblounge 
+        - datasource
 
 
 - name: "Configuring the Weblounge database connection"
@@ -43,7 +50,9 @@
         backup=yes
   notify:
         - restart weblounge
-  tags: datasource
+  tags: 
+        - weblounge 
+        - datasource
 
 
 - name: "Configuring the Elasticsearch index"
@@ -53,7 +62,9 @@
         backup=yes
   notify:
         - restart weblounge
-  tags: elasticsearch
+  tags: 
+        - weblounge 
+        - elasticsearch
 
 
 - name: "Processing /etc/weblounge/weblounge.conf"
@@ -63,16 +74,18 @@
         backup=yes
   notify:
         - restart weblounge
-  tags: service
+  tags: 
+        - weblounge 
 
 
 - name: "Create the weblounge system user"
   user: >
         name=${weblounge_user}
         state=present
-  tags: user
   notify:
         - restart weblounge
+  tags: 
+        - weblounge 
 
 
 - name: "Create the weblounge system group"
@@ -80,9 +93,10 @@
         name=${weblounge_group}
         state=present
         system=yes
-  tags: group
   notify:
         - restart weblounge
+  tags: 
+        - weblounge 
 
 
 - name: "Make the weblounge system user owner of the weblounge directories"
@@ -96,36 +110,44 @@
         - ${weblounge_temp_dir}
         - ${weblounge_log_dir}
         - ${weblounge_data_dir}
-  tags: permissions
   notify:
         - restart weblounge
+  tags: 
+        - weblounge 
+        - permissions
 
 
 - name: "Installing Graylog library"
   copy: >
         src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/gelfj-0.9.1.jar" 
         dest="/opt/weblounge/lib/local"
-  tags: local-libs
   notify:
         - restart weblounge
+  tags: 
+        - weblounge 
+        - permissions
 
 
 - name: "Installing MySQL driver"
   copy: >
         src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/mysql-connector-java-5.1.22.jar" 
         dest="/opt/weblounge/lib/local"
-  tags: local-libs
   notify:
         - restart weblounge
+  tags: 
+        - weblounge 
+        - local-libs
 
 
 - name: "Installing MySQL JPA datasource"
   copy: >
         src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/pax-jdbc-mysql-0.2.0.jar" 
         dest="/opt/weblounge/lib/local"
-  tags: local-libs
   notify:
         - restart weblounge
+  tags: 
+        - weblounge 
+        - local-libs
 
 
 - name: "Enabling loading of local Java libraries"
@@ -134,9 +156,11 @@
         insertafter="mylibrary-1.0.0.jar"
         regexp="^felix\.auto\.start\.4"
         line="felix.auto.start.4= \\"
-  tags: local-libs
   notify:
         - restart weblounge
+  tags: 
+        - weblounge 
+        - local-libs
 
 
 - name: "Loading the local libraries"
@@ -149,9 +173,11 @@
         - "gelfj-0.9.1.jar "
         - "mysql-connector-java-5.1.22.jar "
         - "pax-jdbc-mysql-0.2.0.jar "
-  tags: local-libs
   notify:
         - restart weblounge
+  tags:
+        - weblounge 
+        - local-libs
 
 
 - name: "Permanently starting Weblounge"
@@ -159,4 +185,5 @@
         name=weblounge
         state=started
         enabled=yes
-  tags: weblounge
+  tags: 
+      - weblounge 
