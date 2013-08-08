@@ -309,7 +309,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
    */
   private SyndFeed createFeed(String feedType, String feedVersion, Site site,
       WebloungeRequest request, WebloungeResponse response)
-      throws ContentRepositoryException {
+          throws ContentRepositoryException {
 
     // Extract the subjects. The parameter may be specified multiple times
     // and add more than one subject by separating them using a comma.
@@ -358,7 +358,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     feed.setLink(request.getRequestURL().toString());
     feed.setTitle(site.getName());
     feed.setDescription(site.getName());
-    feed.setLanguage(language.getDescription());
+    feed.setLanguage(language.getIdentifier());
     feed.setPublishedDate(new Date());
 
     // TODO: Add more feed metadata, ask site
@@ -383,7 +383,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       // Get the page
       PageSearchResultItem pageItem = (PageSearchResultItem) item;
       Page page = pageItem.getPage();
-      
+
       // TODO: Can the page be accessed?
 
       // Set the page's language to the feed language
@@ -431,7 +431,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
           continue;
         }
 
-        renderer = module.getRenderer(pagelet.getIdentifier());        
+        renderer = module.getRenderer(pagelet.getIdentifier());
         if (renderer == null) {
           logger.warn("Skipping pagelet {} in feed due to missing renderer '{}/{}'", new Object[] { pagelet, pagelet.getModule(), pagelet.getIdentifier() });
           continue;
@@ -520,7 +520,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
    */
   private String loadContents(URL rendererURL, Site site, Page page,
       Composer composer, Pagelet pagelet, Environment environment)
-      throws IOException, ServletException {
+          throws IOException, ServletException {
 
     Servlet servlet = siteServlets.get(site.getIdentifier());
 
