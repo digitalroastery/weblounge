@@ -1,0 +1,12 @@
+---
+
+- name: restart weblounge 
+  service: >
+         name=weblounge
+         state=restarted
+
+
+- name: restart httpd
+  service: >
+         name=httpd
+         state=restarted

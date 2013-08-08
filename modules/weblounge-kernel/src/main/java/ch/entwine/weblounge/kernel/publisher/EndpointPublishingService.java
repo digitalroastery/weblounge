@@ -150,7 +150,6 @@ public class EndpointPublishingService implements ManagedService, SiteServiceLis
       // For bundles that are already activating or active, explicitly
       // register the JAXB service
       switch (bundle.getState()) {
-        case Bundle.STARTING:
         case Bundle.ACTIVE:
           for (ServiceReference ref : refs) {
             try {

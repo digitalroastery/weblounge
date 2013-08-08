@@ -1,0 +1,6 @@
+---
+- hosts: standalone
+  sudo: yes
+  roles:
+       - weblounge-common
+       - weblounge-thirdparty

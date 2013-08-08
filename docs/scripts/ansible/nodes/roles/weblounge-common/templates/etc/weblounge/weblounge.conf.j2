@@ -1,0 +1,79 @@
+# Service-specific configuration for the Weblounge web content management system.
+#
+# This file will be sourced by the Weblounge SysV init script after the
+# global configuration file /etc/weblounge/weblounge.conf, thus allowing values
+# to be overridden in a per-service manner.
+#
+# The first section below describes the general setup with a focus on
+# directory structures and runtime options that are being passed to the
+# java virtual machine (jvm).
+#
+# The second part configures the jvm itself and adds options for memory,
+# debugging and some other options.
+#
+# 2011/08/10  Tobias Wunden <tobias@entwinemedia.com>
+
+#
+# Weblounge configuration
+#
+
+# What user should run Weblounge
+WEBLOUNGE_USER="{{weblounge_user}}"
+
+# What user should run Weblounge
+WEBLOUNGE_GROUP="{{weblounge_group}}"
+
+# Where Weblounge is located
+WEBLOUNGE_HOME="{{weblounge_home_dir}}"
+
+# Configuration files for Weblounge
+WEBLOUNGE_CONF_DIR="{{weblounge_configuration_dir}}"
+
+# Define the Weblounge applications configuration directory
+WEBLOUNGE_CONF_EXT_DIR="$WEBLOUNGE_CONF_DIR/apps"
+
+# Directory for the Weblounge jars.
+WEBLOUNGE_LIB_DIR="$WEBLOUNGE_HOME/lib"
+
+# Work directory
+WEBLOUNGE_DATA_DIR="{{weblounge_data_dir}}"
+
+# Weblounge temporary files go here
+WEBLOUNGE_TEMP_DIR="{{weblounge_temp_dir}}"
+
+# Weblounge cache files go here
+WEBLOUNGE_CACHE_DIR="{{weblounge_cache_dir}}"
+
+# Where to put Weblounge's log files
+WEBLOUNGE_LOG_DIR="{{weblounge_log_dir}}"
+
+# Runtime options for Weblounge (provided as -D<option>=<value>)
+WEBLOUNGE_OPTS="-Dweblounge.home=$WEBLOUNGE_HOME"
+
+# Directory for the site bundles.
+WEBLOUNGE_SITES_DIR="$WEBLOUNGE_DATA_DIR/sites"
+
+# Directory where the data for the sites resides.
+WEBLOUNGE_SITESDATA_DIR="$WEBLOUNGE_DATA_DIR/sites-data"
+
+#
+# Java virtual machine configuration
+#
+
+# JVM Memory configuration parameter
+JVM_MEMORY_OPTS="{{jvm_memory_opts}}"
+
+# Options to pass to the JVM to enable debugging
+JVM_DEBUG_OPTS="{{jvm_debug_otps}}"
+
+# Options for the advanced windowing toolkit
+JVM_AWT_OPTS="{{jvm_awt_opts}}"
+
+# Set the vm encoding
+JVM_ENCODING_OPTS="{{jvm_encoding_opts}}"
+
+# Options for the YourKit profiler
+#JVM_PROFILING_OPTS="{{jvm_profiling_opts}}"
+
+# Options for remote monitoring
+#JVM_MONITORING_OPTS="{{jvm_monitoring_opts}}"

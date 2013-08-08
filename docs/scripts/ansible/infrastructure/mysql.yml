@@ -1,0 +1,5 @@
+---
+- hosts: mysql
+  sudo: yes
+  roles:
+       - mysql

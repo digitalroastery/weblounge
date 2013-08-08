@@ -1,0 +1,51 @@
+---
+
+- name: "Installing packages for repository syncing"
+  yum: >
+       state=latest
+       name=$item
+  with_items:
+       - yum-utils
+       - createrepo
+       - httpd
+  tags:
+       - rpm-repo
+
+
+- name: "Installing and starting Apache httpd"
+  service: >
+       name=httpd
+       enabled=yes
+       state=started
+  tags:
+       - rpm-repo
+
+
+- name: "Configuring weblounge rpm repository"
+  template: >
+       src=weblounge.repo.j2
+       dest=/etc/yum.repos.d/weblounge.repo
+       backup=yes
+  tags:
+      - rpm-repo
+
+
+- name: "Syncing weblounge repository at rpm.entwinemedia.com"
+  command: reposync -n -r weblounge -p /var/www/html
+  tags:
+      - rpm-repo
+         
+
+- name: "Updating local weblounge rpm repository metadata"
+  command: createrepo /var/www/html/weblounge
+  tags:
+      - rpm-repo
+
+
+- name: "Configure regular weblounge repository syncing"
+  cron: >
+      job="reposync -n -r weblounge -p /var/www/html -q 1&> /var/log/yum-reposync.log"
+      name="Weblounge repository mirroring"
+  tags:
+      - rpm-repo
+ 

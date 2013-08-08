@@ -309,7 +309,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
    */
   private SyndFeed createFeed(String feedType, String feedVersion, Site site,
       WebloungeRequest request, WebloungeResponse response)
-      throws ContentRepositoryException {
+          throws ContentRepositoryException {
 
     // Extract the subjects. The parameter may be specified multiple times
     // and add more than one subject by separating them using a comma.
@@ -358,7 +358,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     feed.setLink(request.getRequestURL().toString());
     feed.setTitle(site.getName());
     feed.setDescription(site.getName());
-    feed.setLanguage(language.getDescription());
+    feed.setLanguage(language.getIdentifier());
     feed.setPublishedDate(new Date());
 
     // TODO: Add more feed metadata, ask site
@@ -383,7 +383,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       // Get the page
       PageSearchResultItem pageItem = (PageSearchResultItem) item;
       Page page = pageItem.getPage();
-      
+
       // TODO: Can the page be accessed?
 
       // Set the page's language to the feed language
@@ -421,6 +421,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
       // Try to render the preview pagelets and write them to the feed
       List<SyndContent> entryContent = new ArrayList<SyndContent>();
       Composer composer = new ComposerImpl("preview", page.getPreview());
+      StringBuffer renderedContent = new StringBuffer();
 
       for (Pagelet pagelet : composer.getPagelets()) {
         Module module = site.getModule(pagelet.getModule());
@@ -431,15 +432,21 @@ public class FeedRequestHandlerImpl implements RequestHandler {
         }
 
         renderer = module.getRenderer(pagelet.getIdentifier());
+        if (renderer == null) {
+          logger.warn("Skipping pagelet {} in feed due to missing renderer '{}/{}'", new Object[] { pagelet, pagelet.getModule(), pagelet.getIdentifier() });
+          continue;
+        }
+
         URL rendererURL = renderer.getRenderer(RendererType.Feed.toString());
         Environment environment = request.getEnvironment();
         if (rendererURL == null)
           rendererURL = renderer.getRenderer();
         if (rendererURL != null) {
-          String rendererContent = null;
+          String pageletContent = null;
           try {
             pagelet.switchTo(language);
-            rendererContent = loadContents(rendererURL, site, page, composer, pagelet, environment);
+            pageletContent = loadContents(rendererURL, site, page, composer, pagelet, environment);
+            renderedContent.append(pageletContent);
           } catch (ServletException e) {
             logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
             DispatchUtils.sendInternalError(request, response);
@@ -447,15 +454,15 @@ public class FeedRequestHandlerImpl implements RequestHandler {
             logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
             DispatchUtils.sendInternalError(request, response);
           }
-          SyndContent content = new SyndContentImpl();
-          content.setType("text/html");
-          content.setMode("escaped");
-          content.setValue(rendererContent);
-          entryContent.add(content);
         }
       }
 
-      if (entryContent.size() > 0) {
+      if (renderedContent.length() > 0) {
+        SyndContent content = new SyndContentImpl();
+        content.setType("text/html");
+        content.setMode("escaped");
+        content.setValue(renderedContent.toString());
+        entryContent.add(content);
         entry.setContents(entryContent);
       }
 
@@ -513,7 +520,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
    */
   private String loadContents(URL rendererURL, Site site, Page page,
       Composer composer, Pagelet pagelet, Environment environment)
-      throws IOException, ServletException {
+          throws IOException, ServletException {
 
     Servlet servlet = siteServlets.get(site.getIdentifier());
 

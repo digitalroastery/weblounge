@@ -1,0 +1,211 @@
+---
+
+- name: "Installing Weblounge rpm repository"
+  template: >
+        src=etc/yum.repos.d/weblounge.repo.j2
+        dest=/etc/yum.repos.d/weblounge.repo
+        backup=yes
+  tags: weblounge_repo
+
+
+- name: "Installing Weblounge"
+  yum: >
+        name=weblounge
+        state=latest
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - datasource
+        - rpm
+
+
+- name: "Configuring Weblounge node name"
+  template: >
+        src=etc/weblounge/config.properties.j2
+        dest=/etc/weblounge/config.properties
+        backup=yes
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - datasource
+
+
+- name: "Creating directory for Weblounge database connection"
+  file: >
+        dest=/etc/weblounge/datasource
+        state=directory
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - datasource
+
+
+- name: "Configuring the Weblounge database connection"
+  template: >
+        src=etc/weblounge/datasource/weblounge-ds.xml.j2
+        dest=/etc/weblounge/datasource/weblounge-ds.xml
+        backup=yes
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - datasource
+
+
+- name: "Configuring the Elasticsearch index"
+  template: >
+        src=etc/weblounge/index/settings.yml.j2
+        dest=/etc/weblounge/index/settings.yml
+        backup=yes
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - elasticsearch
+
+
+- name: "Processing /etc/weblounge/weblounge.conf"
+  template: >
+        src=etc/weblounge/weblounge.conf.j2
+        dest=/etc/weblounge/weblounge.conf
+        backup=yes
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+
+
+- name: "Create the Weblounge system user"
+  user: >
+        name=${weblounge_user}
+        state=present
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+
+
+- name: "Create the Weblounge system group"
+  group: >
+        name=${weblounge_group}
+        state=present
+        system=yes
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+
+
+- name: "Make the Weblounge system user owner of the weblounge directories"
+  file: >
+        state=directory
+        recurse=yes
+        owner=${weblounge_user}
+        path=$item
+  with_items:
+        - ${weblounge_cache_dir}
+        - ${weblounge_temp_dir}
+        - ${weblounge_log_dir}
+        - ${weblounge_data_dir}
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - permissions
+
+
+- name: "Installing Graylog library"
+  copy: >
+        src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/gelfj-0.9.1.jar" 
+        dest="/opt/weblounge/lib/local"
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - permissions
+
+
+- name: "Installing MySQL driver"
+  copy: >
+        src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/mysql-connector-java-5.1.22.jar" 
+        dest="/opt/weblounge/lib/local"
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - local-libs
+
+
+- name: "Installing MySQL JPA datasource"
+  copy: >
+        src="/opt/weblounge/docs/scripts/ansible/nodes/roles/weblounge-common/files/pax-jdbc-mysql-0.2.0.jar" 
+        dest="/opt/weblounge/lib/local"
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - local-libs
+
+
+- name: "Enabling loading of local Java libraries"
+  lineinfile: >
+        dest="/etc/weblounge/system.properties"
+        insertafter="mylibrary-1.0.0.jar"
+        regexp="^felix\.auto\.start\.4"
+        line="felix.auto.start.4= \\"
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - local-libs
+
+
+- name: "Loading the local libraries"
+  lineinfile: >
+        dest="/etc/weblounge/system.properties"
+        insertafter="^felix.auto.start.4"
+        regexp="{{ item }}"
+        line=" file:${weblounge.home}/lib/local/{{ item }} \\ "
+  with_items:
+        - "gelfj-0.9.1.jar "
+        - "mysql-connector-java-5.1.22.jar "
+        - "pax-jdbc-mysql-0.2.0.jar "
+  notify:
+        - restart weblounge
+  tags:
+        - weblounge 
+        - local-libs
+
+
+- name: "Configuring the Weblounge cache status"
+  template: >
+        src=etc/weblounge/services/ch.entwine.weblounge.cache.properties.j2
+        dest=/etc/weblounge/services/ch.entwine.weblounge.cache.properties
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - cache
+
+
+- name: "Configuring the Weblounge environment indicator"
+  template: >
+        src=etc/weblounge/services/ch.entwine.weblounge.environment.properties.j2
+        dest=/etc/weblounge/services/ch.entwine.weblounge.environment.properties
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - environment
+        
+
+- name: "Permanently starting Weblounge"
+  service: >
+        name=weblounge
+        state=started
+        enabled=yes
+  tags: 
+      - weblounge 
