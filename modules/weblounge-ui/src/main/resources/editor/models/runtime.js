@@ -79,7 +79,18 @@ steal.then('jsonix')
 	    	});
 	    	return isAdmin;
 	    },
-	    
+
+	    isSiteAdmin: function() {
+	    	var isAdmin = false;
+	    	$.each(this.roles, function(index, role) {
+	    		if(role.id == 'siteadministrator' && role.context == 'weblounge') {
+	    			isAdmin = true;
+	    			return false;
+	    		}
+	    	});
+	    	return isAdmin;
+	    },
+
 	    getUserName: function() {
 	    	return this.user.name;
 	    },

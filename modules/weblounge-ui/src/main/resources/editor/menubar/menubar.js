@@ -185,7 +185,8 @@ steal.plugins(
         _initPageLocking: function() {
         	var locked = this.options.page.isLocked();
         	var userLocked = this.options.page.isLockedUser(this.options.runtime.getUserLogin())
-        	var isAdmin = this.options.runtime.isSystemAdmin();
+        	var isSystemAdmin = this.options.runtime.isSystemAdmin();
+        	var isSiteAdmin = this.options.runtime.isSiteAdmin();
         	var lockCheckBox = $('input#wbl-editmode', this.element);
         	
         	if(locked && !userLocked) {
@@ -205,7 +206,7 @@ steal.plugins(
         		this._disableEditing();
         	}
         	
-        	if(lockCheckBox.is(':disabled') && isAdmin) {
+        	if(lockCheckBox.is(':disabled') && (isSystemAdmin || isSiteAdmin)) {
         		lockCheckBox.removeAttr('disabled');
         		lockCheckBox.val([]);
         	}
