@@ -1,4 +1,4 @@
-#ANSIBLE HOSTS FILE FOR VAGRANT MULTI VM
+#ANSIBLE HOSTS FILE FOR VAGRANT
 
 ### Specifying user to run the playbooks ##
 #Applying the same user to the group of all groups
@@ -14,10 +14,10 @@ ansible_ssh_user=vagrant
 # Weblounge resources
 #
 
-[allinone]
+[standalone]
 10.1.2.100
 
-[allinone:vars]
+[standalone:vars]
 weblounge_node_name=Standalone
 
 #
@@ -25,9 +25,10 @@ weblounge_node_name=Standalone
 #
 
 [weblounge:children]
-allinone
+standalone
 
 [weblounge:vars]
+httpd_servername=weblounge.localdomain
 
 #
 # Infrastructure resources
