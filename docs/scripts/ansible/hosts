@@ -18,6 +18,9 @@ ansible_ssh_user=vagrant
 10.1.2.100
 
 [standalone:vars]
+
+# The name of this weblounge instance which can be found in the Weblounge
+# response headers.
 weblounge_node_name=Standalone
 
 #
@@ -28,7 +31,17 @@ weblounge_node_name=Standalone
 standalone
 
 [weblounge:vars]
+
+# Name of the Apache web server, provided to eliminate Apache warning upon restart.
 httpd_servername=weblounge.localdomain
+
+# Whether the cache should be enabled.
+# Possible values are [true, false].
+weblounge_cache_enable=false
+
+# The environment indicator.
+# Possible values are [production, staging or development].
+weblounge_environment=development
 
 #
 # Infrastructure resources
