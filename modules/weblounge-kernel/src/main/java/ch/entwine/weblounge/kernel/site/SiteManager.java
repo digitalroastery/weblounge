@@ -311,6 +311,7 @@ public class SiteManager {
         }
       }
 
+      logger.info("Site '{}' will be reachable on host {}", site.getIdentifier(), hostName);
       sitesByServerName.put(hostName, site);
     }
 
@@ -562,6 +563,7 @@ public class SiteManager {
      * 
      * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
      */
+    @Override
     public Object addingService(ServiceReference reference) {
       Site site = (Site) super.addingService(reference);
       siteManager.addSite(site, reference);
@@ -574,6 +576,7 @@ public class SiteManager {
      * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference,
      *      java.lang.Object)
      */
+    @Override
     public void removedService(ServiceReference reference, Object service) {
       Site site = (Site) service;
       siteManager.removeSite(site);
@@ -618,6 +621,7 @@ public class SiteManager {
      * 
      * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
      */
+    @Override
     public Object addingService(ServiceReference reference) {
       String siteIdentifier = (String) reference.getProperty(Site.class.getName().toLowerCase());
       if (siteIdentifier == null) {
@@ -642,6 +646,7 @@ public class SiteManager {
      * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference,
      *      java.lang.Object)
      */
+    @Override
     public void removedService(ServiceReference reference, Object service) {
       ContentRepository repository = (ContentRepository) service;
       siteManager.removeContentRepository(repository);

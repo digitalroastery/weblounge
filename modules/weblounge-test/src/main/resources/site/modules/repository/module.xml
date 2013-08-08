@@ -19,7 +19,7 @@
     <pagelet id="image" composeable="true">
       <name>Image</name>
       <renderer>file://${module.root}/jsp/image/image.jsp</renderer>
-      <renderer type="feed">file://${module.root}/jsp/image/image.jsp</renderer>
+      <renderer type="feed">file://${module.root}/jsp/image/image-feed.jsp</renderer>
       <editor>file://${module.root}/jsp/image/image_editor.jsp</editor>
       <includes>
         <link use="renderer" href="file://${module.root}/jsp/image/apple_overlay.css" rel="stylesheet" type="text/css"></link>
