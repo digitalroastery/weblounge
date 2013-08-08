@@ -1,6 +1,6 @@
 ---
 
-- name: "Installing weblounge rpm repository"
+- name: "Installing Weblounge rpm repository"
   template: >
         src=etc/yum.repos.d/weblounge.repo.j2
         dest=/etc/yum.repos.d/weblounge.repo
@@ -78,7 +78,7 @@
         - weblounge 
 
 
-- name: "Create the weblounge system user"
+- name: "Create the Weblounge system user"
   user: >
         name=${weblounge_user}
         state=present
@@ -88,7 +88,7 @@
         - weblounge 
 
 
-- name: "Create the weblounge system group"
+- name: "Create the Weblounge system group"
   group: >
         name=${weblounge_group}
         state=present
@@ -99,7 +99,7 @@
         - weblounge 
 
 
-- name: "Make the weblounge system user owner of the weblounge directories"
+- name: "Make the Weblounge system user owner of the weblounge directories"
   file: >
         state=directory
         recurse=yes
@@ -179,6 +179,28 @@
         - weblounge 
         - local-libs
 
+
+- name: "Configuring the Weblounge cache status"
+  template: >
+        src=etc/weblounge/services/ch.entwine.weblounge.cache.properties.j2
+        dest=/etc/weblounge/services/ch.entwine.weblounge.cache.properties
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - cache
+
+
+- name: "Configuring the Weblounge environment indicator"
+  template: >
+        src=etc/weblounge/services/ch.entwine.weblounge.environment.properties.j2
+        dest=/etc/weblounge/services/ch.entwine.weblounge.environment.properties
+  notify:
+        - restart weblounge
+  tags: 
+        - weblounge 
+        - environment
+        
 
 - name: "Permanently starting Weblounge"
   service: >
