@@ -43,6 +43,7 @@ import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.repository.ContentRepositoryListener;
 import ch.entwine.weblounge.common.repository.ContentRepositoryOperation;
 import ch.entwine.weblounge.common.repository.ContentRepositoryResourceOperation;
 import ch.entwine.weblounge.common.repository.DeleteContentOperation;
@@ -117,6 +118,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** Flag to indicate off-site indexing */
   protected boolean indexingOffsite = false;
 
+  /** List with all content repository listeners */
+  protected List<ContentRepositoryListener> listeners;
+
   /**
    * Creates a new instance of the content repository.
    * 
@@ -125,6 +129,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   public AbstractWritableContentRepository(String type) {
     super(type);
+    listeners = new ArrayList<ContentRepositoryListener>();
   }
 
   /**
@@ -1467,6 +1472,27 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       }
     }
 
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#addContentRepositoryListener(ch.entwine.weblounge.common.repository.ContentRepositoryListener)
+   */
+  @Override
+  public void addContentRepositoryListener(ContentRepositoryListener listener) {
+    if (!listeners.contains(listener))
+      listeners.add(listener);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#removeContentRepositoryListener(ch.entwine.weblounge.common.repository.ContentRepositoryListener)
+   */
+  @Override
+  public void removeContentRepositoryListener(ContentRepositoryListener listener) {
+    listeners.remove(listener);
   }
 
 }
