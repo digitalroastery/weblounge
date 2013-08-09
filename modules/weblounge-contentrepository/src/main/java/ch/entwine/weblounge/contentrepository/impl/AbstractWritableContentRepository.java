@@ -547,7 +547,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Delete resources, but get an in-memory representation first
     Resource<?> resource = ((DeleteOperation) CurrentOperation.get()).getResource();
     deleteResource(uri, revisions);
+    for (ContentRepositoryListener listener : listeners) {
+      for (long revision : revisions) {
+        listener.resourceDeleted(new ResourceURIImpl(uri, revision));
+      }
+    }
 
+    // TODO Change code to listener pattern
     // Delete the index entries
     for (long revision : revisions) {
       index.delete(new ResourceURIImpl(uri, revision));
@@ -682,7 +688,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         // Store the updated resource
         r.getURI().setPath(newPath);
         storeResource(r);
+        for (ContentRepositoryListener listener : listeners) {
+          listener.resourceUpdated(r);
+        }
 
+        // TODO Change code to listener pattern
         // Update the index
         r.getURI().setPath(originalPath);
         index.move(r.getURI(), newPath);
@@ -788,7 +798,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     ResourceURI uri = resource.getURI();
+    boolean isResourceNew = false;
 
+    // TODO Change code to listener pattern
     // If the document exists in the given version, update it otherwise add it
     // to the index
     if (index.exists(uri)) {
@@ -797,6 +809,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       if (resource.contents().size() > 0)
         throw new IllegalStateException("Cannot add content metadata without content");
       index.add(resource);
+      isResourceNew = true;
     }
 
     // Make sure related stuff gets thrown out of the cache
@@ -816,6 +829,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Write the updated resource to disk
     storeResource(resource);
+    for (ContentRepositoryListener listener : listeners) {
+      if (isResourceNew)
+        listener.resourceAdded(resource);
+      else
+        listener.resourceUpdated(resource);
+    }
 
     // Create the preview images. Don't if the site is currently being created.
     if (updatePreviews && connected && !initializing)
@@ -862,6 +881,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException(e);
     }
 
+    boolean isResourceContentNew = false;
+    if (resource.getContent(content.getLanguage()) == null)
+      isResourceContentNew = true;
+
     // Store the content and add entry to index
     try {
       resource.addContent(content);
@@ -872,6 +895,15 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     storeResourceContent(uri, content, is);
     storeResource(resource);
+    for (ContentRepositoryListener listener : listeners) {
+      if (isResourceContentNew)
+        listener.resourceContentAdded(uri, content);
+      else
+        listener.resourceContentUpdated(uri, content);
+      listener.resourceUpdated(resource);
+    }
+
+    // TODO Change code to listener pattern
     index.update(resource);
 
     // Create the preview images
@@ -943,10 +975,19 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException(e);
     }
 
-    // Store the content and add entry to index
     resource.removeContent(content.getLanguage());
+
     deleteResourceContent(uri, content);
+    for (ContentRepositoryListener listener : listeners) {
+      listener.resourceContentDeleted(uri, content);
+    }
+
     storeResource(resource);
+    for (ContentRepositoryListener listener : listeners) {
+      listener.resourceUpdated(resource);
+    }
+
+    // TODO Change code to listener pattern
     index.update(resource);
 
     // Delete previews
@@ -1189,6 +1230,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
                     path });
                 resource.setPath(null);
                 storeResource(resource);
+                for (ContentRepositoryListener listener : listeners) {
+                  listener.resourceUpdated(resource);
+                }
               }
             }
           }
