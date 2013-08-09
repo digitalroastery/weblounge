@@ -119,7 +119,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   protected boolean indexingOffsite = false;
 
   /** List with all content repository listeners */
-  protected List<ContentRepositoryListener> listeners;
+  protected List<ContentRepositoryListener> listeners = new ArrayList<ContentRepositoryListener>();
 
   /**
    * Creates a new instance of the content repository.
@@ -129,7 +129,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   public AbstractWritableContentRepository(String type) {
     super(type);
-    listeners = new ArrayList<ContentRepositoryListener>();
   }
 
   /**
@@ -1479,8 +1478,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.entwine.weblounge.common.repository.WritableContentRepository#addContentRepositoryListener(ch.entwine.weblounge.common.repository.ContentRepositoryListener)
    */
-  @Override
-  public void addContentRepositoryListener(ContentRepositoryListener listener) {
+  public void addContentRepositoryListener(ContentRepositoryListener listener)
+      throws IllegalArgumentException {
+    if (listener == null)
+      throw new IllegalArgumentException("Listener must not be null");
     if (!listeners.contains(listener))
       listeners.add(listener);
   }
@@ -1490,8 +1491,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.entwine.weblounge.common.repository.WritableContentRepository#removeContentRepositoryListener(ch.entwine.weblounge.common.repository.ContentRepositoryListener)
    */
-  @Override
-  public void removeContentRepositoryListener(ContentRepositoryListener listener) {
+  public void removeContentRepositoryListener(ContentRepositoryListener listener)
+      throws IllegalArgumentException {
+    if (listener == null)
+      throw new IllegalArgumentException("Listener must not be null");
     listeners.remove(listener);
   }
 

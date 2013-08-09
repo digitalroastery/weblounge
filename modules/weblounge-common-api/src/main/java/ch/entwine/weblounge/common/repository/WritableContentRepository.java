@@ -61,7 +61,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @return the updated resource
    */
   Resource<?> put(Resource<?> resource) throws ContentRepositoryException,
-  IOException, IllegalStateException;
+      IOException, IllegalStateException;
 
   /**
    * Puts the resource to the specified location. Depending on whether the
@@ -208,7 +208,7 @@ public interface WritableContentRepository extends ContentRepository {
    */
   PutContentOperation putContentAsynchronously(ResourceURI uri,
       ResourceContent content, InputStream is)
-          throws ContentRepositoryException, IOException, IllegalStateException;
+      throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
    * Deletes the resource content.
@@ -301,7 +301,7 @@ public interface WritableContentRepository extends ContentRepository {
    *           if removal fails due to a database error
    */
   boolean delete(ResourceURI uri) throws ContentRepositoryException,
-  IOException;
+      IOException;
 
   /**
    * Removes the resource in the given version from the content repository and
@@ -418,7 +418,7 @@ public interface WritableContentRepository extends ContentRepository {
    *           if the resource can't be accessed
    */
   Resource<?> lock(ResourceURI uri, User user) throws IOException,
-  ContentRepositoryException, IllegalStateException;
+      ContentRepositoryException, IllegalStateException;
 
   /**
    * Locks the resource for editing by <code>user</code>. This method will throw
@@ -454,7 +454,7 @@ public interface WritableContentRepository extends ContentRepository {
    *           if the resource can't be accessed
    */
   Resource<?> unlock(ResourceURI uri, User user) throws IOException,
-  ContentRepositoryException;
+      ContentRepositoryException;
 
   /**
    * Removes the editing lock from the resource and returns the user if the
@@ -471,5 +471,28 @@ public interface WritableContentRepository extends ContentRepository {
    */
   UnlockOperation unlockAsynchronously(ResourceURI uri, User user)
       throws IOException, ContentRepositoryException;
+
+  /**
+   * Adds a content repository listener to this content repository instance.
+   * 
+   * @param listener
+   *          the listener to add
+   * @throws IllegalArgumentException
+   *           if listener is null
+   */
+  void addContentRepositoryListener(ContentRepositoryListener listener)
+      throws IllegalArgumentException;
+
+  /**
+   * Removes a content repository listener from this content repository
+   * instance.
+   * 
+   * @param listener
+   *          the listener to remove
+   * @throws IllegalArgumentException
+   *           if listener is null
+   */
+  void removeContentRepositoryListener(ContentRepositoryListener listener)
+      throws IllegalArgumentException;
 
 }
