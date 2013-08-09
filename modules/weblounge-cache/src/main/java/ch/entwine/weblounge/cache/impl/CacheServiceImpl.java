@@ -29,7 +29,12 @@ import ch.entwine.weblounge.cache.CacheService;
 import ch.entwine.weblounge.cache.StreamFilter;
 import ch.entwine.weblounge.cache.impl.handle.TaggedCacheHandle;
 import ch.entwine.weblounge.common.Times;
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.repository.ContentRepositoryListener;
 import ch.entwine.weblounge.common.request.CacheHandle;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
@@ -75,7 +80,7 @@ import javax.servlet.http.HttpServletResponse;
  * stopping the cache. The actual caching is provided by the
  * <code>CacheManager</code>.
  */
-public class CacheServiceImpl implements CacheService, ManagedService {
+public class CacheServiceImpl implements CacheService, ContentRepositoryListener, ManagedService {
 
   /** Logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
@@ -998,6 +1003,90 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   @Override
   public String toString() {
     return name;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceAdded(ch.entwine.weblounge.common.content.Resource)
+   */
+  @Override
+  public void resourceAdded(Resource<?> resource) {
+    // Nothing to-do here, because resource got newly added
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceContentAdded(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  @Override
+  public void resourceContentAdded(ResourceURI resource, ResourceContent content) {
+    // Nothing to-do here, because resource content got newly added
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceUpdated(ch.entwine.weblounge.common.content.Resource)
+   */
+  @Override
+  public void resourceUpdated(Resource<?> resource) {
+    invalidateByURI(resource.getURI());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceContentUpdated(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  @Override
+  public void resourceContentUpdated(ResourceURI resource,
+      ResourceContent content) {
+    invalidateByURI(resource);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceDeleted(ch.entwine.weblounge.common.content.ResourceURI)
+   */
+  @Override
+  public void resourceDeleted(ResourceURI resource) {
+    invalidateByURI(resource);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceContentDeleted(ch.entwine.weblounge.common.content.ResourceURI,
+   *      ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  @Override
+  public void resourceContentDeleted(ResourceURI resource,
+      ResourceContent content) {
+    invalidateByURI(resource);
+  }
+
+  /**
+   * Invalidates cache entries tagged with the given URI
+   * 
+   * @param uri
+   *          the URI
+   */
+  private void invalidateByURI(ResourceURI uri) {
+    if (uri == null)
+      return;
+
+    if (uri.getVersion() == Resource.LIVE) {
+      this.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) }, true);
+      logger.debug("Cache entries with tag '{}:{}' in cache '{}' invalidated.", new Object[] {
+          CacheTag.Resource,
+          uri.getIdentifier(),
+          getIdentifier() });
+    }
   }
 
 }
