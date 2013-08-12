@@ -21,13 +21,18 @@
 package ch.entwine.weblounge.cache.impl;
 
 import ch.entwine.weblounge.cache.CacheService;
+import ch.entwine.weblounge.common.repository.ContentRepository;
+import ch.entwine.weblounge.common.repository.ContentRepositoryListener;
+import ch.entwine.weblounge.common.repository.WritableContentRepository;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,6 +120,9 @@ public class CacheServiceFactory implements ManagedServiceFactory {
       try {
         CacheServiceImpl cache = new CacheServiceImpl(id, name, diskStorePath);
         cache.updated(properties);
+        ContentRepositoryTracker tracker = new ContentRepositoryTracker(bundleCtx, id, cache);
+        tracker.open();
+        // TODO Save reference to tracker and remove it when service disappears
 
         // Register the service
         String serviceType = CacheService.class.getName();
@@ -146,6 +154,87 @@ public class CacheServiceFactory implements ManagedServiceFactory {
       logger.error("Unregistering cache service failed: {}", t.getMessage());
     }
     cache.shutdown();
+  }
+  
+
+
+  private static class ContentRepositoryTracker extends ServiceTracker {
+
+    private BundleContext ctx = null;
+    
+    /** ID of the content repository's site this tracker is interested in */
+    private String siteId;
+
+    /** Reference to the content repository */
+    private WritableContentRepository repository;
+
+    /** The content repository listener instance */
+    private ContentRepositoryListener repositoryListener;
+
+    /**
+     * 
+     * @param context
+     * @param siteId
+     * @param repositoryListener
+     */
+    public ContentRepositoryTracker(BundleContext context, String siteId,
+        ContentRepositoryListener repositoryListener) {
+      super(context, ContentRepository.class.getName(), null);
+      this.ctx = context;
+      this.siteId = siteId;
+      this.repositoryListener = repositoryListener;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTracker#addingService(org.osgi.framework.ServiceReference)
+     */
+    @Override
+    public Object addingService(ServiceReference reference) {
+      String siteProperty = (String) reference.getProperty("ch.entwine.weblounge.common.site.site");
+
+      if (siteId.equals(siteProperty)) {
+        repository = (WritableContentRepository) ctx.getService(reference);
+        repository.addContentRepositoryListener(repositoryListener);
+      }
+
+      return super.addingService(reference);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTracker#removedService(org.osgi.framework.ServiceReference,
+     *      java.lang.Object)
+     */
+    @Override
+    public void removedService(ServiceReference reference, Object service) {
+      String siteProperty = (String) reference.getProperty("ch.entwine.weblounge.common.site.site");
+      if (siteId.equals(siteProperty)) {
+        this.repository = null;
+      }
+      try {
+        super.removedService(reference, service);
+      } catch (IllegalStateException e) {
+        // The service has been removed, probably due to bundle shutdown
+      } catch (Throwable t) {
+        logger.warn("Error removing service: {}", t.getMessage());
+      }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTracker#close()
+     */
+    @Override
+    public synchronized void close() {
+      if (this.repository != null)
+        repository.removeContentRepositoryListener(repositoryListener);
+      super.close();
+    }
+
   }
 
 }
