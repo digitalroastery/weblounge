@@ -23,7 +23,6 @@ package ch.entwine.weblounge.contentrepository.impl;
 import static ch.entwine.weblounge.common.content.ResourceUtils.equalsByIdOrPath;
 import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
 
-import ch.entwine.weblounge.cache.ResponseCacheTracker;
 import ch.entwine.weblounge.common.content.MalformedResourceURIException;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
@@ -38,7 +37,6 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
-import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -58,8 +56,6 @@ import ch.entwine.weblounge.common.repository.ResourceSelector;
 import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.repository.UnlockOperation;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
-import ch.entwine.weblounge.common.request.CacheTag;
-import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
@@ -106,9 +102,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /** Holds pages while they are written to the index */
   protected OperationProcessor processor = null;
 
-  /** The response cache tracker */
-  private ResponseCacheTracker responseCacheTracker = null;
-
   /** The environment tracker */
   private EnvironmentTracker environmentTracker = null;
 
@@ -148,8 +141,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     Bundle bundle = loadBundle(site);
     if (bundle != null) {
-      responseCacheTracker = new ResponseCacheTracker(bundle.getBundleContext(), site.getIdentifier());
-      responseCacheTracker.open();
       environmentTracker = new EnvironmentTracker(bundle.getBundleContext(), this);
       environmentTracker.open();
     }
@@ -175,28 +166,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     if (bundle == null || bundle.getState() != Bundle.ACTIVE)
       return;
 
-    // Close the cache tracker
-    if (responseCacheTracker != null) {
-      responseCacheTracker.close();
-      responseCacheTracker = null;
-    }
-
     // Close the environment tracker
     if (environmentTracker != null) {
       environmentTracker.close();
       environmentTracker = null;
     }
-  }
-
-  /**
-   * Returns the site's response cache.
-   * 
-   * @return the cache
-   */
-  protected ResponseCache getCache() {
-    if (responseCacheTracker == null)
-      return null;
-    return responseCacheTracker.getCache();
   }
 
   /**
@@ -562,12 +536,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Delete previews
     deletePreviews(resource);
 
-    // Make sure related stuff gets thrown out of the cache
-    ResponseCache cache = getCache();
-    if (cache != null && (allRevisions || uri.getVersion() == Resource.LIVE)) {
-      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) }, true);
-    }
-
     return true;
 
   }
@@ -702,12 +670,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           createPreviews(r);
       }
     }
-
-    // Make sure related stuff gets thrown out of the cache
-    ResponseCache cache = getCache();
-    if (cache != null) {
-      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) }, true);
-    }
   }
 
   /**
@@ -811,22 +773,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       index.add(resource);
       isResourceNew = true;
     }
-
-    // Make sure related stuff gets thrown out of the cache
-    ResponseCache cache = getCache();
-    if (cache != null && uri.getVersion() == Resource.LIVE) {
-      List<CacheTag> tags = new ArrayList<CacheTag>();
-
-      // resource id
-      tags.add(new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()));
-
-      // subjects, so that resource lists get updated
-      for (String subject : resource.getSubjects())
-        tags.add(new CacheTagImpl(CacheTag.Subject, subject));
-
-      cache.invalidate(tags.toArray(new CacheTagImpl[tags.size()]), true);
-    }
-
+    
     // Write the updated resource to disk
     storeResource(resource);
     for (ContentRepositoryListener listener : listeners) {
@@ -910,12 +857,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     if (connected && !initializing)
       createPreviews(resource);
 
-    // Make sure related stuff gets thrown out of the cache
-    ResponseCache cache = getCache();
-    if (cache != null) {
-      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) }, true);
-    }
-
     return resource;
   }
 
@@ -992,12 +933,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Delete previews
     deletePreviews(resource, content.getLanguage());
-
-    // Make sure related stuff gets thrown out of the cache
-    ResponseCache cache = getCache();
-    if (cache != null) {
-      cache.invalidate(new CacheTag[] { new CacheTagImpl(CacheTag.Resource, uri.getIdentifier()) }, true);
-    }
 
     return resource;
   }
