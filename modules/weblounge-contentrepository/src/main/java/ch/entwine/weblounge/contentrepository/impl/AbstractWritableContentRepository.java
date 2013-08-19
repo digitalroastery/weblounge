@@ -181,7 +181,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws ContentRepositoryException
    */
   protected void createHomepage() throws IllegalStateException,
-      ContentRepositoryException {
+  ContentRepositoryException {
     // Make sure there is a home page
     ResourceURI homeURI = new ResourceURIImpl(Page.TYPE, site, "/");
     if (!existsInAnyVersion(homeURI)) {
@@ -455,7 +455,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.entwine.weblounge.common.repository.WritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI)
    */
   public boolean delete(ResourceURI uri) throws ContentRepositoryException,
-      IOException {
+  IOException {
     return delete(uri, false);
   }
 
@@ -523,7 +523,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     deleteResource(uri, revisions);
     for (ContentRepositoryListener listener : listeners) {
       for (long revision : revisions) {
-        listener.resourceDeleted(new ResourceURIImpl(uri, revision));
+        try {
+          listener.resourceDeleted(new ResourceURIImpl(uri, revision));
+        } catch (Throwable t) {
+          logger.warn("Content repository listener {} failed during callback: {}", listener, t.getMessage());
+        }
       }
     }
 
@@ -657,7 +661,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
         r.getURI().setPath(newPath);
         storeResource(r);
         for (ContentRepositoryListener listener : listeners) {
-          listener.resourceUpdated(r);
+          try {
+            listener.resourceUpdated(r);
+          } catch (Throwable t) {
+            logger.warn("Content repository listener {} failed during callback: {}", listener, t.getMessage());
+          }
         }
 
         // TODO Change code to listener pattern
@@ -680,7 +688,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   public MoveOperation moveAsynchronously(final ResourceURI uri,
       final String path, final boolean moveChildren)
-      throws ContentRepositoryException, IOException {
+          throws ContentRepositoryException, IOException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
@@ -773,14 +781,18 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       index.add(resource);
       isResourceNew = true;
     }
-    
+
     // Write the updated resource to disk
     storeResource(resource);
     for (ContentRepositoryListener listener : listeners) {
-      if (isResourceNew)
-        listener.resourceAdded(resource);
-      else
-        listener.resourceUpdated(resource);
+      try {
+        if (isResourceNew)
+          listener.resourceAdded(resource);
+        else
+          listener.resourceUpdated(resource);
+      } catch (Throwable t) {
+        logger.warn("Content repository listener {} failed during callback: {}", listener, t.getMessage());
+      }
     }
 
     // Create the preview images. Don't if the site is currently being created.
@@ -843,11 +855,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     storeResourceContent(uri, content, is);
     storeResource(resource);
     for (ContentRepositoryListener listener : listeners) {
-      if (isResourceContentNew)
-        listener.resourceContentAdded(uri, content);
-      else
-        listener.resourceContentUpdated(uri, content);
-      listener.resourceUpdated(resource);
+      try {
+        if (isResourceContentNew)
+          listener.resourceContentAdded(uri, content);
+        else
+          listener.resourceContentUpdated(uri, content);
+        listener.resourceUpdated(resource);
+      } catch (Throwable t) {
+        logger.warn("Content repository listener {} failed during callback: {}", listener, t.getMessage());
+      }
+
     }
 
     // TODO Change code to listener pattern
@@ -869,7 +886,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   public PutContentOperation putContentAsynchronously(final ResourceURI uri,
       final ResourceContent content, final InputStream is)
-      throws ContentRepositoryException, IOException, IllegalStateException {
+          throws ContentRepositoryException, IOException, IllegalStateException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
@@ -920,12 +937,20 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     deleteResourceContent(uri, content);
     for (ContentRepositoryListener listener : listeners) {
-      listener.resourceContentDeleted(uri, content);
+      try {
+        listener.resourceContentDeleted(uri, content);
+      } catch (Throwable t) {
+        logger.warn("Content repository listener {} failed during callback: {}", listener, t.getMessage());
+      }
     }
 
     storeResource(resource);
     for (ContentRepositoryListener listener : listeners) {
-      listener.resourceUpdated(resource);
+      try {
+        listener.resourceUpdated(resource);
+      } catch (Throwable t) {
+        logger.warn("Content repository listener {} failed during callback: {}", listener, t.getMessage());
+      }
     }
 
     // TODO Change code to listener pattern
@@ -946,7 +971,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   public DeleteContentOperation deleteContentAsynchronously(
       final ResourceURI uri, final ResourceContent content)
-      throws ContentRepositoryException, IOException, IllegalStateException {
+          throws ContentRepositoryException, IOException, IllegalStateException {
 
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
@@ -1166,7 +1191,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
                 resource.setPath(null);
                 storeResource(resource);
                 for (ContentRepositoryListener listener : listeners) {
-                  listener.resourceUpdated(resource);
+                  try {
+                    listener.resourceUpdated(resource);
+                  } catch (Throwable t) {
+                    logger.warn("Content repository listener {} failed during callback: {}", listener, t.getMessage());
+                  }
+
                 }
               }
             }
@@ -1208,7 +1238,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   @Override
   protected ContentRepositoryIndex loadIndex() throws IOException,
-      ContentRepositoryException {
+  ContentRepositoryException {
     logger.debug("Trying to load site index");
 
     ContentRepositoryIndex idx = null;
@@ -1270,7 +1300,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   protected abstract ResourceContent storeResourceContent(ResourceURI uri,
       ResourceContent content, InputStream is)
-      throws ContentRepositoryException, IOException;
+          throws ContentRepositoryException, IOException;
 
   /**
    * Deletes the indicated revisions of resource <code>uri</code> from the
