@@ -167,7 +167,7 @@ public class S3DeployMojo extends AbstractMojo {
 
         // Delete old file version in bucket
         getLog().debug("Removing existing object at " + key);
-        uploadClient.deleteObject(bucket, path);
+        uploadClient.deleteObject(bucket, key);
 
         // Setup meta data
         ObjectMetadata meta = new ObjectMetadata();
