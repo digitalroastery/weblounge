@@ -1051,7 +1051,8 @@ public class CacheServiceImpl implements CacheService, ContentRepositoryListener
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceDeleted(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceDeleted(ch.entwine.weblounge.common.content.ResourceURI,
+   *      long)
    */
   @Override
   public void resourceDeleted(ResourceURI resource) {
@@ -1068,6 +1069,49 @@ public class CacheServiceImpl implements CacheService, ContentRepositoryListener
   public void resourceContentDeleted(ResourceURI resource,
       ResourceContent content) {
     invalidateByURI(resource);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceDeleted(ch.entwine.weblounge.common.content.ResourceURI,
+   *      long)
+   */
+  @Override
+  public void resourceDeleted(ResourceURI resource, long version) {
+    invalidateByURI(resource);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceLocked(ch.entwine.weblounge.common.content.Resource)
+   */
+  @Override
+  public void resourceLocked(Resource<?> resource) {
+    invalidateByURI(resource.getURI());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceUnlocked(ch.entwine.weblounge.common.content.Resource)
+   */
+  @Override
+  public void resourceUnlocked(Resource<?> resource) {
+    invalidateByURI(resource.getURI());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.repository.ContentRepositoryListener#resourceMoved(ch.entwine.weblounge.common.content.Resource,
+   *      java.lang.String, java.lang.String)
+   */
+  @Override
+  public void resourceMoved(Resource<?> resource, String originalPath,
+      String newPath) {
+    invalidateByURI(resource.getURI());
   }
 
   /**

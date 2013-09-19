@@ -68,12 +68,24 @@ public interface ContentRepositoryListener {
   void resourceContentUpdated(ResourceURI resource, ResourceContent content);
 
   /**
-   * Notifies the listener about a resource which got deleted.
+   * Notifies the listener about a resource which got deleted completely (which
+   * means, there's no other version left).
    * 
    * @param resource
    *          the deleted resource
    */
   void resourceDeleted(ResourceURI resource);
+
+  /**
+   * Notifies the listener about a specific version of a resource which got
+   * deleted.
+   * 
+   * @param resource
+   *          the deleted resource
+   * @param version
+   *          the version which got deleted
+   */
+  void resourceDeleted(ResourceURI resource, long version);
 
   /**
    * Notifies the listener about a resource content which got deleted.
@@ -85,4 +97,31 @@ public interface ContentRepositoryListener {
    */
   void resourceContentDeleted(ResourceURI resource, ResourceContent content);
 
+  /**
+   * Notifies the listener about a resource which got locked.
+   * 
+   * @param resource
+   *          the locked resource
+   */
+  void resourceLocked(Resource<?> resource);
+
+  /**
+   * Notifies the listener about a resource which got unlocked.
+   * 
+   * @param resource
+   *          the unlocked resource
+   */
+  void resourceUnlocked(Resource<?> resource);
+
+  /**
+   * Notifies the listener about a resource which got moved to a new path.
+   * 
+   * @param resource
+   *          the moved resource
+   * @param originalPath
+   *          the old path
+   * @param newPath
+   *          the new path
+   */
+  void resourceMoved(Resource<?> resource, String originalPath, String newPath);
 }
