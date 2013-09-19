@@ -521,6 +521,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Delete resources, but get an in-memory representation first
     Resource<?> resource = ((DeleteOperation) CurrentOperation.get()).getResource();
     deleteResource(uri, revisions);
+
+    // Delete the index entries
+    for (long revision : revisions) {
+      index.delete(new ResourceURIImpl(uri, revision));
+    }
+    
+    // Notify all listeners
     for (ContentRepositoryListener listener : listeners) {
       for (long revision : revisions) {
         try {
@@ -529,12 +536,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
           logger.warn("Content repository listener {} failed during callback: {}", listener, t.getMessage());
         }
       }
-    }
-
-    // TODO Change code to listener pattern
-    // Delete the index entries
-    for (long revision : revisions) {
-      index.delete(new ResourceURIImpl(uri, revision));
     }
 
     // Delete previews
