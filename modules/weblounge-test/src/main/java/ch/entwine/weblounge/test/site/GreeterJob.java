@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2003 - 2013 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -20,22 +20,19 @@
 
 package ch.entwine.weblounge.test.site;
 
-import ch.entwine.weblounge.common.scheduler.JobException;
-import ch.entwine.weblounge.common.scheduler.JobWorker;
 import ch.entwine.weblounge.test.util.TestSiteUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.Dictionary;
 import java.util.Map;
 
 /**
  * Test job that will print a friendly greeting to <code>System.out</code>.
  */
-public class GreeterJob implements JobWorker {
+@SuppressWarnings("unchecked")
+public class GreeterJob implements Runnable {
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(GreeterJob.class);
@@ -48,21 +45,14 @@ public class GreeterJob implements JobWorker {
     greetings = hellos.entrySet().toArray(new Map.Entry[hellos.size()]);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.scheduler.JobWorker#execute(java.lang.String,
-   *      java.util.Dictionary)
-   */
-  public void execute(String name, Dictionary<String, Serializable> ctx)
-      throws JobException {
+  @Override
+  public void run() {
     int index = (int) ((greetings.length - 1) * Math.random());
     Map.Entry<String, String> entry = greetings[index];
     try {
       logger.info(new String(entry.getValue().getBytes("utf-8"), "utf-8") + " (" + entry.getKey() + ")");
     } catch (UnsupportedEncodingException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      logger.warn("Error decoding greeting for {}, :", entry.getKey(), e.getMessage());
     }
   }
 

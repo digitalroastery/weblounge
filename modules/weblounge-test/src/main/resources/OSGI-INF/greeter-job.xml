@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge Test Site - Greeter Job">
+
+  <implementation class="ch.entwine.weblounge.test.site.GreeterJob" />
+  <property name="service.description" value="Weblounge Test Site - Greeter Job" />
+  
+  <property name="scheduler.period" value="300" type="Long" />
+  
+  <service>
+    <provide interface="java.lang.Runnable" />
+  </service>
+
+</scr:component>
