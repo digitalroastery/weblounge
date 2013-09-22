@@ -213,7 +213,8 @@
               com.springsource.javax.media.jai.codec;inline=true
             </Embed-Dependency>
             <Service-Component>
-              OSGI-INF/site-activator.xml
+              OSGI-INF/site-activator.xml,
+              OSGI-INF/greeter-job.xml
             </Service-Component>
           </instructions>
         </configuration>
