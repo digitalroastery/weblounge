@@ -508,8 +508,8 @@ public class ImagesTest extends IntegrationTestBase {
 
           assertEquals(scaledHeight, imageHeight, 1);
           assertEquals(scaledWidth, imageWidth, 1);
-          fileName.append("-").append(style.getIdentifier());
         }
+        fileName.append("-").append(style.getIdentifier());
       } finally {
         IOUtils.closeQuietly(seekableInputStream);
       }
@@ -592,8 +592,8 @@ public class ImagesTest extends IntegrationTestBase {
 
           assertEquals(scaledHeight, imageHeight, 1);
           assertEquals(scaledWidth, imageWidth, 1);
-          fileName.append("-").append(style.getIdentifier());
         }
+        fileName.append("-").append(style.getIdentifier());
       } finally {
         IOUtils.closeQuietly(seekableInputStream);
       }
