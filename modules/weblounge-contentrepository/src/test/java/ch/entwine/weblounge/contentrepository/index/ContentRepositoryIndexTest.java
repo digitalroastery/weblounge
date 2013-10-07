@@ -52,7 +52,7 @@ import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
+import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;

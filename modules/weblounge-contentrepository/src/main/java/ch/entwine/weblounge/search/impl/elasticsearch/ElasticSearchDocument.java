@@ -17,12 +17,12 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;
+package ch.entwine.weblounge.search.impl.elasticsearch;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.FULLTEXT;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.LOCALIZED_FULLTEXT;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.LOCALIZED_TEXT;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEXT;
+import static ch.entwine.weblounge.search.impl.IndexSchema.FULLTEXT;
+import static ch.entwine.weblounge.search.impl.IndexSchema.LOCALIZED_FULLTEXT;
+import static ch.entwine.weblounge.search.impl.IndexSchema.LOCALIZED_TEXT;
+import static ch.entwine.weblounge.search.impl.IndexSchema.TEXT;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceMetadata;

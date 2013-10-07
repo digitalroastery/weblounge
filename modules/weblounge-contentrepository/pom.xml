@@ -305,8 +305,9 @@
               ch.entwine.weblounge.contentrepository.impl.endpoint;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.fs;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.index;version=${project.version},
-              ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;version=${project.version},
-              ch.entwine.weblounge.contentrepository.impl.operation;version=${project.version}
+              ch.entwine.weblounge.contentrepository.impl.operation;version=${project.version},
+              ch.entwine.weblounge.search.impl;version=${project.version},
+              ch.entwine.weblounge.search.impl.elasticsearch;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
               lucene-core;inline=true,

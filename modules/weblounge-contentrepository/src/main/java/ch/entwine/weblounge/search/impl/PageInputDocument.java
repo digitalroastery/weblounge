@@ -18,30 +18,31 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index;
+package ch.entwine.weblounge.search.impl;
+
+import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED_BY_NAME;
+import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED_BY_NAME;
+import static ch.entwine.weblounge.search.impl.IndexSchema.OWNED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.OWNED_BY_NAME;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_CONTENTS;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_CONTENTS_LOCALIZED;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_PROPERTIES;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_PROPERTY_VALUE;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_COMPOSER;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_POSITION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_XML_COMPOSER;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_XML_COMPOSER_POSITION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PREVIEW_XML;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_BY_NAME;
+import static ch.entwine.weblounge.search.impl.IndexSchema.STATIONARY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.TEMPLATE;
 
 import static ch.entwine.weblounge.common.impl.content.SearchQueryImpl.STAGE_COMPOSER;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CREATED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CREATED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.MODIFIED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.MODIFIED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.OWNED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.OWNED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_CONTENTS;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_CONTENTS_LOCALIZED;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_PROPERTIES;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_PROPERTY_VALUE;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_XML_COMPOSER;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_XML_COMPOSER_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PREVIEW_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY_NAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.STATIONARY;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEMPLATE;
 
 import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;

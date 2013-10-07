@@ -18,13 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index;
+package ch.entwine.weblounge.search.impl;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.RESOURCE_ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.UID;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
+import static ch.entwine.weblounge.search.impl.IndexSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.search.impl.IndexSchema.TYPE;
+import static ch.entwine.weblounge.search.impl.IndexSchema.UID;
+import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 

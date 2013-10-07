@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.security.User;
-import ch.entwine.weblounge.contentrepository.impl.index.IndexUtils;
+import ch.entwine.weblounge.search.impl.IndexUtils;
 
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class IndexUtilsTest {
   protected final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#clean(java.lang.String)}.
+   * Test method for {@link ch.entwine.weblounge.search.impl.IndexUtils#clean(java.lang.String)}.
    */
   @Test
   public void testClean() {
@@ -52,7 +52,7 @@ public class IndexUtilsTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#serializeDate(java.util.Date)}.
+   * Test method for {@link ch.entwine.weblounge.search.impl.IndexUtils#serializeDate(java.util.Date)}.
    */
   @Test
   public void testSerializeDate() {
@@ -69,7 +69,7 @@ public class IndexUtilsTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#serializeDateRange(Date, Date)}.
+   * Test method for {@link ch.entwine.weblounge.search.impl.IndexUtils#serializeDateRange(Date, Date)}.
    */
   @Test
   public void testSerializeDateRange() {
@@ -90,7 +90,7 @@ public class IndexUtilsTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.contentrepository.impl.index.IndexUtils#serializeUserId(ch.entwine.weblounge.common.security.User)}.
+   * Test method for {@link ch.entwine.weblounge.search.impl.IndexUtils#serializeUserId(ch.entwine.weblounge.common.security.User)}.
    */
   @Test
   public void testSerializeUser() {

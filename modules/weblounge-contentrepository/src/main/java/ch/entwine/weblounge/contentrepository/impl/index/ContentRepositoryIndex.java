@@ -20,10 +20,10 @@
 
 package ch.entwine.weblounge.contentrepository.impl.index;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.RESOURCE_ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
+import static ch.entwine.weblounge.search.impl.IndexSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.search.impl.IndexSchema.TYPE;
+import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
@@ -36,6 +36,7 @@ import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.search.impl.SearchIndex;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

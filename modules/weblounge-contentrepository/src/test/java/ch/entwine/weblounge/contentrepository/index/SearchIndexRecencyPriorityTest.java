@@ -39,8 +39,8 @@ import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
-import ch.entwine.weblounge.contentrepository.impl.index.SearchIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
+import ch.entwine.weblounge.search.impl.SearchIndex;
+import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -219,7 +219,7 @@ public class SearchIndexRecencyPriorityTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test

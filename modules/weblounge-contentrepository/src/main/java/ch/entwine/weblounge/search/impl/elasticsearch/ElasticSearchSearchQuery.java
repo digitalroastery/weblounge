@@ -18,40 +18,39 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index.elasticsearch;
+package ch.entwine.weblounge.search.impl.elasticsearch;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.FULLTEXT_FUZZY;
-
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEXT_FUZZY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ALTERNATE_VERSION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_EXTERNAL_REPRESENTATION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_FILENAME;
+import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_MIMETYPE;
+import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_SOURCE;
+import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED;
+import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.FULLTEXT;
+import static ch.entwine.weblounge.search.impl.IndexSchema.FULLTEXT_FUZZY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.LOCKED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED;
+import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_PROPERTIES;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_COMPOSER;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_POSITION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PATH_PREFIX;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_FROM;
+import static ch.entwine.weblounge.search.impl.IndexSchema.SERIES;
+import static ch.entwine.weblounge.search.impl.IndexSchema.STATIONARY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.SUBJECT;
+import static ch.entwine.weblounge.search.impl.IndexSchema.TEMPLATE;
+import static ch.entwine.weblounge.search.impl.IndexSchema.TEXT;
+import static ch.entwine.weblounge.search.impl.IndexSchema.TEXT_FUZZY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.TYPE;
+import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
 
 import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.ALTERNATE_VERSION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CONTENT_EXTERNAL_REPRESENTATION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CONTENT_FILENAME;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CONTENT_MIMETYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CONTENT_SOURCE;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CREATED;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.CREATED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.FULLTEXT;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.LOCKED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.MODIFIED;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.MODIFIED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_PROPERTIES;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_COMPOSER_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PAGELET_TYPE_POSITION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH_PREFIX;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_BY;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PUBLISHED_FROM;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.SERIES;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.STATIONARY;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.SUBJECT;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEMPLATE;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TEXT;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.TYPE;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Quantifier;
@@ -60,8 +59,8 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.security.User;
-import ch.entwine.weblounge.contentrepository.impl.index.IndexSchema;
-import ch.entwine.weblounge.contentrepository.impl.index.IndexUtils;
+import ch.entwine.weblounge.search.impl.IndexSchema;
+import ch.entwine.weblounge.search.impl.IndexUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.bytes.BytesReference;

@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index;
+package ch.entwine.weblounge.search.impl;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.ALTERNATE_VERSION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ALTERNATE_VERSION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
@@ -44,10 +44,10 @@ import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchDocument;
-import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchSearchQuery;
-import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
-import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.SuggestRequest;
+import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchDocument;
+import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchSearchQuery;
+import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
+import ch.entwine.weblounge.search.impl.elasticsearch.SuggestRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;

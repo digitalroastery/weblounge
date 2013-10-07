@@ -20,8 +20,9 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
+
 import static ch.entwine.weblounge.common.content.ResourceUtils.equalsByIdOrPath;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
 
 import ch.entwine.weblounge.cache.ResponseCacheTracker;
 import ch.entwine.weblounge.common.content.MalformedResourceURIException;

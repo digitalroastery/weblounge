@@ -20,11 +20,11 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.HEADER_XML;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.PATH;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.RESOURCE_ID;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.XML;
+import static ch.entwine.weblounge.search.impl.IndexSchema.HEADER_XML;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
+import static ch.entwine.weblounge.search.impl.IndexSchema.RESOURCE_ID;
+import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.XML;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
@@ -48,7 +48,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
-import ch.entwine.weblounge.contentrepository.impl.index.ImageInputDocument;
+import ch.entwine.weblounge.search.impl.ImageInputDocument;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
