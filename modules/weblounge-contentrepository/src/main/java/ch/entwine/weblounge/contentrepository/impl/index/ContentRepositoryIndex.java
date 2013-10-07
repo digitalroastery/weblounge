@@ -36,7 +36,7 @@ import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.search.impl.SearchIndex;
+import ch.entwine.weblounge.search.impl.SearchIndexImpl;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class ContentRepositoryIndex {
   private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryIndex.class);
 
   /** The search index */
-  protected SearchIndex searchIdx = null;
+  protected SearchIndexImpl searchIdx = null;
 
   /** The site */
   protected Site site = null;
@@ -81,7 +81,7 @@ public class ContentRepositoryIndex {
       ResourceSerializerService serializer, boolean readOnly)
           throws IOException {
     this.site = site;
-    this.searchIdx = new SearchIndex(site, serializer, readOnly);
+    this.searchIdx = new SearchIndexImpl(site, serializer, readOnly);
   }
 
   /**
@@ -100,7 +100,7 @@ public class ContentRepositoryIndex {
    * @param searchIndex
    *          the search index
    */
-  protected void setSearchIndex(SearchIndex searchIndex) {
+  protected void setSearchIndex(SearchIndexImpl searchIndex) {
     this.searchIdx = searchIndex;
   }
 

@@ -55,7 +55,7 @@ import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
-import ch.entwine.weblounge.search.impl.SearchIndex;
+import ch.entwine.weblounge.search.impl.SearchIndexImpl;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -78,12 +78,12 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Test case for {@link SearchIndex}.
+ * Test case for {@link SearchIndexImpl}.
  */
 public class SearchIndexTest {
 
   /** The search index */
-  protected static SearchIndex idx = null;
+  protected static SearchIndexImpl idx = null;
 
   /** The index root directory */
   protected static File idxRoot = null;
@@ -178,7 +178,7 @@ public class SearchIndexTest {
     System.setProperty("weblounge.home", rootPath);
     idxRoot = new File(rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
-    idx = new SearchIndex(site, serializer, isReadOnly);
+    idx = new SearchIndexImpl(site, serializer, isReadOnly);
   }
 
   /**
@@ -234,7 +234,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getIndexVersion()}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getIndexVersion()}
    * .
    */
   @Test
@@ -245,7 +245,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -257,7 +257,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -269,7 +269,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -300,7 +300,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -347,7 +347,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -359,7 +359,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -371,7 +371,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -383,7 +383,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -398,7 +398,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -413,7 +413,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -428,7 +428,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -443,7 +443,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -458,7 +458,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -472,7 +472,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -487,7 +487,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -502,7 +502,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -517,7 +517,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -530,7 +530,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -543,7 +543,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -556,7 +556,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -569,7 +569,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
@@ -582,7 +582,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#clear()}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#clear()}
    * .
    */
   @Test
@@ -598,7 +598,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#delete(ch.entwine.weblounge.common.content.ResourceURI)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#delete(ch.entwine.weblounge.common.content.ResourceURI)}
    * .
    */
   @Test
@@ -615,7 +615,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#add(ch.entwine.weblounge.common.content.page.Page)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#add(ch.entwine.weblounge.common.content.page.Page)}
    * .
    */
   @Test
@@ -627,7 +627,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#update(ch.entwine.weblounge.common.content.page.Page)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#update(ch.entwine.weblounge.common.content.page.Page)}
    * .
    */
   @Test
@@ -647,7 +647,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#move(ch.entwine.weblounge.common.content.ResourceURI, java.lang.String)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#move(ch.entwine.weblounge.common.content.ResourceURI, java.lang.String)}
    * .
    */
   @Test
@@ -669,7 +669,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#suggest(ch.entwine.weblounge.contentrepository.impl.index.solr.Suggestions.Dictionary, String, boolean, int, boolean)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#suggest(ch.entwine.weblounge.contentrepository.impl.index.solr.Suggestions.Dictionary, String, boolean, int, boolean)}
    * .
    */
   @Test

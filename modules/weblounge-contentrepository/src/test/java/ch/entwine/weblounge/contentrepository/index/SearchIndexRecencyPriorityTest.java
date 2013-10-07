@@ -39,7 +39,7 @@ import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
-import ch.entwine.weblounge.search.impl.SearchIndex;
+import ch.entwine.weblounge.search.impl.SearchIndexImpl;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -62,12 +62,12 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Test case for {@link SearchIndex}.
+ * Test case for {@link SearchIndexImpl}.
  */
 public class SearchIndexRecencyPriorityTest {
 
   /** The search index */
-  protected static SearchIndex idx = null;
+  protected static SearchIndexImpl idx = null;
 
   /** The index root directory */
   protected static File idxRoot = null;
@@ -145,7 +145,7 @@ public class SearchIndexRecencyPriorityTest {
     idxRoot = new File(rootPath);
     System.setProperty("weblounge.home", rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
-    idx = new SearchIndex(site, serializer, isReadOnly);
+    idx = new SearchIndexImpl(site, serializer, isReadOnly);
   }
 
   /**
@@ -219,7 +219,7 @@ public class SearchIndexRecencyPriorityTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.search.impl.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
+   * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)}
    * .
    */
   @Test
