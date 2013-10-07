@@ -178,7 +178,7 @@ public class SearchIndexTest {
     System.setProperty("weblounge.home", rootPath);
     idxRoot = new File(rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
-    idx = new SearchIndexImpl(site, serializer, isReadOnly);
+    idx = new SearchIndexImpl(site, serializer);
   }
 
   /**

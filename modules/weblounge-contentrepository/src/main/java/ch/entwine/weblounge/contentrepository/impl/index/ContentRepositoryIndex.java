@@ -81,7 +81,7 @@ public class ContentRepositoryIndex {
       ResourceSerializerService serializer, boolean readOnly)
           throws IOException {
     this.site = site;
-    this.searchIdx = new SearchIndexImpl(site, serializer, readOnly);
+    this.searchIdx = new SearchIndexImpl(site, serializer);
   }
 
   /**

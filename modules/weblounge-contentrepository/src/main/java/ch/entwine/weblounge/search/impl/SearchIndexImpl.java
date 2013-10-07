@@ -116,9 +116,6 @@ public class SearchIndexImpl implements VersionedContentRepositoryIndex, SearchI
   /** Client for talking to elastic search */
   private Client nodeClient = null;
 
-  /** True if this is a read only index */
-  protected boolean isReadOnly = false;
-
   /** The site */
   protected Site site = null;
 
@@ -135,16 +132,12 @@ public class SearchIndexImpl implements VersionedContentRepositoryIndex, SearchI
    *          the site
    * @param serializer
    *          the resource serializer
-   * @param readOnly
-   *          <code>true</code> to indicate a read only index
    * @throws IOException
    *           if either loading or creating the index fails
    */
-  public SearchIndexImpl(Site site, ResourceSerializerService serializer,
-      boolean readOnly) throws IOException {
+  public SearchIndexImpl(Site site, ResourceSerializerService serializer) throws IOException {
     this.site = site;
     this.resourceSerializer = serializer;
-    this.isReadOnly = readOnly;
     try {
       init();
     } catch (Throwable t) {
