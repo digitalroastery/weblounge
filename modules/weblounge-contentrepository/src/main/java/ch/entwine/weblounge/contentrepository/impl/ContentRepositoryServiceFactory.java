@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
+import ch.entwine.weblounge.search.impl.SearchIndex;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -93,6 +94,9 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
 
   /** Service managing available resource serializer */
   private ResourceSerializerService serializer = null;
+
+  /** The search index */
+  private SearchIndex searchIndex = null;
 
   /**
    * Sets a reference to the service factory's component context.
@@ -170,6 +174,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
         repository = repositoryImplementation.newInstance();
         repository.setEnvironment(environment);
         repository.setSerializer(serializer);
+        // TODO Set search index on content repository
 
         // If this is a managed service, make sure it's configured properly
         // before the site is connected
@@ -287,6 +292,16 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
    */
   void setResourceSerializer(ResourceSerializerService serializer) {
     this.serializer = serializer;
+  }
+
+  /**
+   * OSGi callback to set the search index.
+   * 
+   * @param index
+   *          the search index
+   */
+  void setSearchIndex(SearchIndex index) {
+    this.searchIndex = index;
   }
 
 }
