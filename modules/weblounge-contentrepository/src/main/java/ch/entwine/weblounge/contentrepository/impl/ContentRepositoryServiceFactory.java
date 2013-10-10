@@ -174,7 +174,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
         repository = repositoryImplementation.newInstance();
         repository.setEnvironment(environment);
         repository.setSerializer(serializer);
-        // TODO Set search index on content repository
+        repository.setSearchIndex(searchIndex);
 
         // If this is a managed service, make sure it's configured properly
         // before the site is connected
