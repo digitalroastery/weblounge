@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSelector;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -223,6 +224,11 @@ public class EmptyContentRepository implements ContentRepository {
    * @see ch.entwine.weblounge.common.repository.ContentRepository#setSerializer(ch.entwine.weblounge.common.repository.ResourceSerializerService)
    */
   public void setSerializer(ResourceSerializerService serializer) {
+    // Nothing to do
+  }
+
+  @Override
+  public void setSearchIndex(SearchIndex index) {
     // Nothing to do
   }
 

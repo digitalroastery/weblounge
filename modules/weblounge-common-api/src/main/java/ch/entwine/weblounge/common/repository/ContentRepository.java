@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -88,7 +89,7 @@ public interface ContentRepository {
    *           if the content repository is already connected
    */
   void connect(Site site) throws ContentRepositoryException,
-  IllegalStateException;
+      IllegalStateException;
 
   /**
    * Disconnects from the content repository.
@@ -260,4 +261,11 @@ public interface ContentRepository {
    */
   void setSerializer(ResourceSerializerService serializer);
 
+  /**
+   * Sets the search index.
+   * 
+   * @param index
+   *          the search index
+   */
+  void setSearchIndex(SearchIndex index);
 }

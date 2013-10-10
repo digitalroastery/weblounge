@@ -45,6 +45,7 @@ import ch.entwine.weblounge.common.repository.ResourceSelector;
 import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
@@ -133,6 +134,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /** The resource serializer service */
   protected ResourceSerializerService resourceSerializer = null;
+
+  /** The search index service */
+  protected SearchIndex searchIndex = null;
 
   /** The image style tracker */
   private ImageStyleTracker imageStyleTracker = null;
@@ -1193,6 +1197,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   public void setSerializer(ResourceSerializerService service) {
     resourceSerializer = service;
+  }
+
+  public void setSearchIndex(SearchIndex index) {
+    searchIndex = index;
   }
 
   /**
