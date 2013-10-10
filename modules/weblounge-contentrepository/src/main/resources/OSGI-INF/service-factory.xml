@@ -14,6 +14,6 @@
   
   <reference name="environment" interface="ch.entwine.weblounge.common.site.Environment" cardinality="1..1" policy="static" bind="setEnvironment" />
   <reference name="serializer" interface="ch.entwine.weblounge.common.repository.ResourceSerializerService" cardinality="1..1" policy="static" bind="setResourceSerializer" />
-  <reference name="searchindex" interface="ch.entwine.weblounge.search.SearchIndex" cardinality="1..1" policy="static" bind="setSearchIndex" />
+  <reference name="searchindex" interface="ch.entwine.weblounge.common.search.SearchIndex" cardinality="1..1" policy="static" bind="setSearchIndex" />
 
 </scr:component>

@@ -41,10 +41,10 @@ import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
-import ch.entwine.weblounge.search.SearchIndex;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchDocument;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchSearchQuery;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
@@ -187,7 +187,7 @@ public class SearchIndexImpl implements VersionedContentRepositoryIndex, SearchI
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.search.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)
+   * @see ch.entwine.weblounge.common.search.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)
    */
   @Override
   public SearchResult getByQuery(SearchQuery query)
@@ -369,7 +369,7 @@ public class SearchIndexImpl implements VersionedContentRepositoryIndex, SearchI
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.search.SearchIndex#delete(ch.entwine.weblounge.common.content.ResourceURI)
+   * @see ch.entwine.weblounge.common.search.SearchIndex#delete(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @Override
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
@@ -396,7 +396,7 @@ public class SearchIndexImpl implements VersionedContentRepositoryIndex, SearchI
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.search.SearchIndex#add(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.search.SearchIndex#add(ch.entwine.weblounge.common.content.Resource)
    */
   @Override
   public boolean add(Resource<?> resource) throws ContentRepositoryException {
@@ -408,7 +408,7 @@ public class SearchIndexImpl implements VersionedContentRepositoryIndex, SearchI
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.search.SearchIndex#update(ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.common.search.SearchIndex#update(ch.entwine.weblounge.common.content.Resource)
    */
   @Override
   public boolean update(Resource<?> resource) throws ContentRepositoryException {
@@ -559,7 +559,7 @@ public class SearchIndexImpl implements VersionedContentRepositoryIndex, SearchI
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.search.SearchIndex#move(ch.entwine.weblounge.common.content.ResourceURI, java.lang.String)
+   * @see ch.entwine.weblounge.common.search.SearchIndex#move(ch.entwine.weblounge.common.content.ResourceURI, java.lang.String)
    */
   @Override
   public boolean move(ResourceURI uri, String path)
@@ -609,7 +609,7 @@ public class SearchIndexImpl implements VersionedContentRepositoryIndex, SearchI
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.search.SearchIndex#suggest(java.lang.String, java.lang.String, boolean, int, boolean)
+   * @see ch.entwine.weblounge.common.search.SearchIndex#suggest(java.lang.String, java.lang.String, boolean, int, boolean)
    */
   @Override
   public List<String> suggest(String dictionary, String seed,

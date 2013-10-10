@@ -65,6 +65,7 @@
               ch.entwine.weblounge.common.language;version=${project.version},
               ch.entwine.weblounge.common.request;version=${project.version},
               ch.entwine.weblounge.common.scheduler;version=${project.version},
+              ch.entwine.weblounge.common.search;version=${project.version},
               ch.entwine.weblounge.common.security;version=${project.version},
               ch.entwine.weblounge.common.site;version=${project.version},
               ch.entwine.weblounge.common.url;version=${project.version},
