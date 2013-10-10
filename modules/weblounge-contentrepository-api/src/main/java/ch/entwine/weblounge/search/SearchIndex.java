@@ -1,4 +1,4 @@
-package ch.entwine.weblounge.search.impl;
+package ch.entwine.weblounge.search;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;

@@ -26,7 +26,7 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
-import ch.entwine.weblounge.search.impl.SearchIndex;
+import ch.entwine.weblounge.search.SearchIndex;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
