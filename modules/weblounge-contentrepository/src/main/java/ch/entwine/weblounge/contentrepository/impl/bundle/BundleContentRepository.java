@@ -31,10 +31,10 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSelector;
 import ch.entwine.weblounge.common.repository.ResourceSerializer;
+import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSelectorImpl;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
@@ -293,7 +293,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
     boolean success = false;
 
     // Make sure the version matches the implementation
-    if (index.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
+    if (index.getIndexVersion() != SearchIndex.INDEX_VERSION) {
       logger.warn("Index version does not match implementation, triggering reindex");
       index = new BundleContentRepositoryIndex(site, resourceSerializer);
     }

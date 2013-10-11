@@ -46,10 +46,10 @@ import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
-import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
@@ -240,7 +240,7 @@ public class SearchIndexTest {
   @Test
   public void testGetIndexVersion() throws Exception {
     populateIndex();
-    assertEquals(VersionedContentRepositoryIndex.INDEX_VERSION, idx.getIndexVersion());
+    assertEquals(SearchIndex.INDEX_VERSION, idx.getIndexVersion());
   }
 
   /**

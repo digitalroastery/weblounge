@@ -20,9 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
-import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
-
 import static ch.entwine.weblounge.common.content.ResourceUtils.equalsByIdOrPath;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
 
 import ch.entwine.weblounge.cache.ResponseCacheTracker;
 import ch.entwine.weblounge.common.content.MalformedResourceURIException;
@@ -60,11 +59,11 @@ import ch.entwine.weblounge.common.repository.UnlockOperation;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
+import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
-import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.operation.CurrentOperation;
 import ch.entwine.weblounge.contentrepository.impl.operation.DeleteContentOperationImpl;
@@ -1243,10 +1242,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Make sure the version matches the implementation
-    else if (idx.getIndexVersion() < VersionedContentRepositoryIndex.INDEX_VERSION) {
+    else if (idx.getIndexVersion() < SearchIndex.INDEX_VERSION) {
       logger.info("Index of '{}' needs to be updated, triggering reindex", site.getIdentifier());
       buildIndex(idx);
-    } else if (idx.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
+    } else if (idx.getIndexVersion() != SearchIndex.INDEX_VERSION) {
       logger.warn("Index '{}' needs to be downgraded, triggering reindex", site.getIdentifier());
       buildIndex(idx);
     }

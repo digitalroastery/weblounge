@@ -10,6 +10,9 @@ import java.util.List;
 
 public interface SearchIndex {
 
+  /** Version of this index */
+  int INDEX_VERSION = 3009;
+
   /**
    * Makes a request and returns the result set.
    * 
@@ -80,5 +83,14 @@ public interface SearchIndex {
    */
   List<String> suggest(String dictionary, String seed, boolean onlyMorePopular,
       int count, boolean collate) throws ContentRepositoryException;
+
+  /**
+   * Returns the index's version number. If that number is different from
+   * {@link #INDEX_VERSION}, a reindex is needed, since the index's structure
+   * could have changed significantly.
+   * 
+   * @return the index version
+   */
+  int getIndexVersion();
 
 }

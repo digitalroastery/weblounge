@@ -44,7 +44,6 @@ import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
-import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchDocument;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchSearchQuery;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
@@ -97,7 +96,7 @@ import java.util.Map;
 /**
  * A search index implementation based on ElasticSearch.
  */
-public class SearchIndexImpl implements VersionedContentRepositoryIndex, SearchIndex {
+public class SearchIndexImpl implements SearchIndex {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchIndexImpl.class);
@@ -721,7 +720,7 @@ public class SearchIndexImpl implements VersionedContentRepositoryIndex, SearchI
 
     // The index does not exist, let's create it
     if (!versionIndexExists) {
-      indexVersion = VersionedContentRepositoryIndex.INDEX_VERSION;
+      indexVersion = SearchIndex.INDEX_VERSION;
       logger.debug("Creating version index for site '{}'", site.getIdentifier());
       IndexRequestBuilder requestBuilder = nodeClient.prepareIndex(site.getIdentifier(), VERSION_TYPE, ROOT_ID);
       logger.debug("Index version of site '{}' is {}", site.getIdentifier(), indexVersion);
