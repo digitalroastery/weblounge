@@ -80,6 +80,9 @@ public class ContentRepositoryIndexTest {
   /** The index' root directory */
   protected static File idxRoot = null;
 
+  /** The search index */
+  protected static SearchIndexImplStub searchIdx = null;
+
   /** The structural index' root directory */
   protected File structuralIndexRootDirectory = null;
 
@@ -130,6 +133,7 @@ public class ContentRepositoryIndexTest {
     EasyMock.expect(template.getStage()).andReturn("main").anyTimes();
     EasyMock.replay(template);
 
+    // Site
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
     EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
@@ -137,13 +141,17 @@ public class ContentRepositoryIndexTest {
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("testsite")).anyTimes();
     EasyMock.replay(site);
 
+    // Search index
+    searchIdx = new SearchIndexImplStub();
+    searchIdx.bindResourceSerializerService(serializer);
+
     idxRoot = new File(new File(System.getProperty("java.io.tmpdir")), "index");
     FileUtils.deleteDirectory(idxRoot);
 
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
     System.setProperty("weblounge.home", idxRoot.getAbsolutePath());
     TestUtils.startTesting();
-    idx = new ContentRepositoryIndex(site, serializer, false);
+    idx = new ContentRepositoryIndex(site, searchIdx);
   }
 
   /**
@@ -230,7 +238,7 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testUpdate() throws IllegalArgumentException,
-  ContentRepositoryException {
+      ContentRepositoryException {
 
     String propertyName = "testproperty";
     String propertyValue = "testvalue";

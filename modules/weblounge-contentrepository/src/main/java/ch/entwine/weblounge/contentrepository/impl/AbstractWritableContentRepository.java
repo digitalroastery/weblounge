@@ -1002,7 +1002,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Create the new index
     try {
-      newIndex = new ContentRepositoryIndex(site, resourceSerializer, false);
+      newIndex = new ContentRepositoryIndex(site, searchIndex);
       indexingOffsite = true;
       rebuildIndex(newIndex);
     } catch (IOException e) {
@@ -1021,7 +1021,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       indexing = true;
       index.close();
       logger.info("Loading new index");
-      index = new ContentRepositoryIndex(site, resourceSerializer, oldReadOnly);
+      index = new ContentRepositoryIndex(site, searchIndex);
     } catch (IOException e) {
       Throwable cause = e.getCause();
       if (cause == null)
@@ -1233,7 +1233,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     logger.debug("Loading site index '{}'", site.getIdentifier());
 
     // Add content if there is any
-    idx = new ContentRepositoryIndex(site, resourceSerializer, readOnly);
+    idx = new ContentRepositoryIndex(site, searchIndex);
 
     // Create the idx if there is nothing in place so far
     if (idx.getResourceCount() <= 0) {

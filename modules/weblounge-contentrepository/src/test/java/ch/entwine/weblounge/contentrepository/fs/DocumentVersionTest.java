@@ -51,6 +51,7 @@ import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
+import ch.entwine.weblounge.contentrepository.index.SearchIndexImplStub;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -61,6 +62,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -83,6 +85,9 @@ public class DocumentVersionTest {
 
   /** Page template */
   protected PageTemplate template = null;
+
+  /** The mock search index */
+  protected SearchIndexImplStub searchIndex = null;
 
   /** The resource serializer */
   private static ResourceSerializerServiceImpl serializer = null;
@@ -135,10 +140,15 @@ public class DocumentVersionTest {
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin")).anyTimes();
     EasyMock.replay(site);
 
+    // Search Index
+    searchIndex = new SearchIndexImplStub();
+    searchIndex.bindResourceSerializerService(serializer);
+
     // Connect to the repository
     repository = new FileSystemContentRepository();
     repository.setSerializer(serializer);
     repository.setEnvironment(Environment.Production);
+    repository.setSearchIndex(searchIndex);
     Dictionary<String, Object> repositoryProperties = new Hashtable<String, Object>();
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
     repository.updated(repositoryProperties);
@@ -158,6 +168,13 @@ public class DocumentVersionTest {
       FileUtils.deleteQuietly(repositoryRoot);
     } catch (ContentRepositoryException e) {
       fail("Error disconnecting content repository: " + e.getMessage());
+    }
+
+    try {
+      searchIndex.clear();
+      searchIndex.close();
+    } catch (IOException e) {
+      fail("Error clearing & closing search index: " + e.getMessage());
     }
   }
 

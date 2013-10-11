@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2013 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -17,33 +17,28 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+package ch.entwine.weblounge.contentrepository.index;
 
-package ch.entwine.weblounge.contentrepository.impl.bundle;
-
-import ch.entwine.weblounge.common.repository.ResourceSerializerService;
-import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
+import ch.entwine.weblounge.search.impl.SearchIndexImpl;
 
 import java.io.IOException;
 
 /**
- * Index implementation for a content repository located inside an OSGi bundle.
+ * SearchIndexImplStub
  */
-public class BundleContentRepositoryIndex extends ContentRepositoryIndex {
+public class SearchIndexImplStub extends SearchIndexImpl {
+
+  public SearchIndexImplStub() throws IOException {
+    super.init();
+  }
 
   /**
-   * Creates a new repository index at the specified location.
+   * Calls the underlying deactivate-method.
    * 
-   * @param site
-   *          the site
-   * @param serializer
-   *          the resource serializer
    * @throws IOException
-   *           if the index cannot be created at the given location
    */
-  public BundleContentRepositoryIndex(Site site,
-      ResourceSerializerService serializer) throws IOException {
-    super(site, null);
+  public void close() throws IOException {
+    super.close();
   }
 
 }

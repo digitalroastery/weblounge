@@ -159,7 +159,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     try {
       index.clear();
     } catch (IOException e) {
-      logger.error("");
+      logger.error("Error while clearing the search index: {}", e.getMessage());
     }
 
     // Clear those directories that aren't the home to the index

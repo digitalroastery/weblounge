@@ -80,6 +80,7 @@ import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.sort.SortOrder;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,15 +110,15 @@ public class SearchIndexImpl implements SearchIndex {
 
   /** The local elastic search node */
   private static Node elasticSearch = null;
-  
+
   /** List of clients to the local node */
-  private static List<Client> elasticSearchClients = new ArrayList<Client>(); 
+  private static List<Client> elasticSearchClients = new ArrayList<Client>();
 
   /** Client for talking to elastic search */
   private Client nodeClient = null;
 
-  /** The site */
-  protected Site site = null;
+  /** List of sites with prepared index */
+  private List<String> preparedIndices = new ArrayList<String>();
 
   /** The version number */
   protected int indexVersion = -1;
@@ -126,52 +127,40 @@ public class SearchIndexImpl implements SearchIndex {
   protected ResourceSerializerService resourceSerializer = null;
 
   /**
-   * Creates a search index.
+   * OSGi callback to activate this component instance.
    * 
-   * @param site
-   *          the site
-   * @param serializer
-   *          the resource serializer
+   * @param ctx
+   *          the component context
    * @throws IOException
-   *           if either loading or creating the index fails
+   *           if the search index cannot be initialized
    */
-  public SearchIndexImpl(Site site, ResourceSerializerService serializer) throws IOException {
-    this.site = site;
-    this.resourceSerializer = serializer;
+  protected void activate(ComponentContext ctx) throws IOException {
     try {
       init();
     } catch (Throwable t) {
-      throw new IOException("Error creating elastic search index", t);
+      throw new IOException("Error initializing elastic search index", t);
     }
-
   }
 
   /**
-   * Shuts down the elastic search index node.
+   * OSGi callback to deactivate this component.
    * 
+   * @param ctx
+   *          the component context
    * @throws IOException
-   *           if stopping the index fails
    */
-  public void close() throws IOException {
-    try {
-      if (nodeClient != null) {
-        nodeClient.close();
-        synchronized (elasticSearch) {
-          elasticSearchClients.remove(nodeClient);
-        }
-        
-        synchronized (this) {
-          if (elasticSearchClients.isEmpty()) {
-            logger.info("Stopping local Elasticsearch node");
-            elasticSearch.stop();
-            elasticSearch.close();
-            elasticSearch = null;
-          }
-        }
-      }
-    } catch (Throwable t) {
-      throw new IOException("Error stopping the elastic search node", t);
-    }
+  protected void deactivate(ComponentContext ctx) throws IOException {
+    close();
+  }
+
+  /**
+   * OSGi callback to bind a resource serializer service to this instance.
+   * 
+   * @param srv
+   *          the resource serializer service
+   */
+  public void bindResourceSerializerService(ResourceSerializerService srv) {
+    this.resourceSerializer = srv;
   }
 
   /**
@@ -185,12 +174,20 @@ public class SearchIndexImpl implements SearchIndex {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.search.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)
    */
   @Override
   public SearchResult getByQuery(SearchQuery query)
       throws ContentRepositoryException {
+
+    if (!preparedIndices.contains(query.getSite().getIdentifier())) {
+      try {
+        createIndex(query.getSite());
+      } catch (IOException e) {
+        throw new ContentRepositoryException(e);
+      }
+    }
 
     logger.debug("Searching index using query '{}'", query);
 
@@ -349,29 +346,39 @@ public class SearchIndexImpl implements SearchIndex {
   }
 
   /**
-   * Clears the search index.
+   * {@inheritDoc}
    * 
-   * @throws IOException
-   *           if clearing the index fails
+   * @see ch.entwine.weblounge.search.impl.SearchIndex#clear()
    */
+  @Override
   public void clear() throws IOException {
     try {
       DeleteIndexResponse delete = nodeClient.admin().indices().delete(new DeleteIndexRequest()).actionGet();
       if (!delete.acknowledged())
         logger.error("Indices could not be deleted");
-      createIndices();
     } catch (Throwable t) {
       throw new IOException("Cannot clear index", t);
     }
+    
+    preparedIndices.clear();
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.search.SearchIndex#delete(ch.entwine.weblounge.common.content.ResourceURI)
    */
   @Override
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
+
+    if (!preparedIndices.contains(uri.getSite().getIdentifier())) {
+      try {
+        createIndex(uri.getSite());
+      } catch (IOException e) {
+        throw new ContentRepositoryException(e);
+      }
+    }
+
     logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
 
     String index = uri.getSite().getIdentifier();
@@ -394,7 +401,7 @@ public class SearchIndexImpl implements SearchIndex {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.search.SearchIndex#add(ch.entwine.weblounge.common.content.Resource)
    */
   @Override
@@ -406,7 +413,7 @@ public class SearchIndexImpl implements SearchIndex {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.search.SearchIndex#update(ch.entwine.weblounge.common.content.Resource)
    */
   @Override
@@ -426,6 +433,14 @@ public class SearchIndexImpl implements SearchIndex {
    */
   private void addToIndex(Resource<?> resource)
       throws ContentRepositoryException {
+
+    if (!preparedIndices.contains(resource.getURI().getSite().getIdentifier())) {
+      try {
+        createIndex(resource.getURI().getSite());
+      } catch (IOException e) {
+        throw new ContentRepositoryException(e);
+      }
+    }
 
     // Have the serializer create an input document
     ResourceURI uri = resource.getURI();
@@ -557,12 +572,22 @@ public class SearchIndexImpl implements SearchIndex {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.search.SearchIndex#move(ch.entwine.weblounge.common.content.ResourceURI, java.lang.String)
+   * 
+   * @see ch.entwine.weblounge.common.search.SearchIndex#move(ch.entwine.weblounge.common.content.ResourceURI,
+   *      java.lang.String)
    */
   @Override
   public boolean move(ResourceURI uri, String path)
       throws ContentRepositoryException {
+
+    if (!preparedIndices.contains(uri.getSite().getIdentifier())) {
+      try {
+        createIndex(uri.getSite());
+      } catch (IOException e) {
+        throw new ContentRepositoryException(e);
+      }
+    }
+
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
 
     SearchQuery q = new SearchQueryImpl(uri.getSite()).withVersion(uri.getVersion()).withIdentifier(uri.getIdentifier());
@@ -607,8 +632,9 @@ public class SearchIndexImpl implements SearchIndex {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.common.search.SearchIndex#suggest(java.lang.String, java.lang.String, boolean, int, boolean)
+   * 
+   * @see ch.entwine.weblounge.common.search.SearchIndex#suggest(java.lang.String,
+   *      java.lang.String, boolean, int, boolean)
    */
   @Override
   public List<String> suggest(String dictionary, String seed,
@@ -633,10 +659,10 @@ public class SearchIndexImpl implements SearchIndex {
   /**
    * Initializes an Elasticsearch node for the site.
    * 
-   * @throws Exception
-   *           if loading or creating solr fails
+   * @throws IOException
+   *           if loading of settings fails
    */
-  private void init() throws Exception {
+  protected void init() throws IOException {
     synchronized (this) {
       if (elasticSearch == null) {
         logger.info("Starting local Elasticsearch node");
@@ -645,33 +671,61 @@ public class SearchIndexImpl implements SearchIndex {
         Settings settings = loadSettings();
 
         // Configure and start the elastic search node. In a testing scenario,
-        // the
-        // node is being created locally.
+        // the node is being created locally.
         NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().settings(settings);
         elasticSearch = nodeBuilder.local(TestUtils.isTest()).build();
         elasticSearch.start();
       }
     }
-    
+
     // Create the client
     synchronized (elasticSearch) {
       nodeClient = elasticSearch.client();
       elasticSearchClients.add(nodeClient);
     }
-    
-    // Create indices and type definitions
-    createIndices();
   }
 
   /**
-   * Prepares elastic search to take Weblounge data.
+   * Closes the client & stops and closes the Elasticsearch node
+   * 
+   * @throws IOException
+   *           if stopping the Elasticsearch node fails
+   */
+  protected void close() throws IOException {
+    try {
+      if (nodeClient != null) {
+        nodeClient.close();
+        synchronized (elasticSearch) {
+          elasticSearchClients.remove(nodeClient);
+        }
+
+        synchronized (this) {
+          if (elasticSearchClients.isEmpty()) {
+            logger.info("Stopping local Elasticsearch node");
+            elasticSearch.stop();
+            elasticSearch.close();
+            elasticSearch = null;
+          }
+        }
+      }
+    } catch (Throwable t) {
+      throw new IOException("Error stopping the Elasticsearch node", t);
+    }
+  }
+
+  /**
+   * Prepares elastic search to take Weblounge data of the given site.
+   * 
+   * @param site
+   *          the site, which index needs to be prepared
    * 
    * @throws ContentRepositoryException
    *           if index and type creation fails
    * @throws IOException
    *           if loading of the type definitions fails
    */
-  private void createIndices() throws ContentRepositoryException, IOException {
+  private void createIndex(Site site) throws ContentRepositoryException,
+      IOException {
 
     // Make sure the site index exists
     try {
@@ -728,6 +782,7 @@ public class SearchIndexImpl implements SearchIndex {
       requestBuilder.execute().actionGet();
     }
 
+    preparedIndices.add(site.getIdentifier());
   }
 
   /**

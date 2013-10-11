@@ -34,9 +34,8 @@ import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
-import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.search.impl.SearchIndexImpl;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -58,7 +57,7 @@ public class ContentRepositoryIndex {
   private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryIndex.class);
 
   /** The search index */
-  protected SearchIndexImpl searchIdx = null;
+  protected SearchIndex searchIdx = null;
 
   /** The site */
   protected Site site = null;
@@ -68,20 +67,15 @@ public class ContentRepositoryIndex {
    * 
    * @param site
    *          the site
-   * @param rootDir
-   *          the root directory
-   * @param readOnly
-   *          <code>true</code> if the index should be read only
-   * @param serializer
-   *          the resource serializer
+   * @param searchIndex
+   *          the search index
    * @throws IOException
    *           if creating the indices fails
    */
-  public ContentRepositoryIndex(Site site,
-      ResourceSerializerService serializer, boolean readOnly)
-          throws IOException {
+  public ContentRepositoryIndex(Site site, SearchIndex searchIndex)
+      throws IOException {
     this.site = site;
-    this.searchIdx = new SearchIndexImpl(site, serializer);
+    this.searchIdx = searchIndex;
   }
 
   /**
@@ -95,16 +89,6 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Sets the search index.
-   * 
-   * @param searchIndex
-   *          the search index
-   */
-  protected void setSearchIndex(SearchIndexImpl searchIndex) {
-    this.searchIdx = searchIndex;
-  }
-
-  /**
    * Closes the index files. No more read and write operations are allowed.
    * 
    * @throws IOException
@@ -112,7 +96,7 @@ public class ContentRepositoryIndex {
    */
   public void close() throws IOException {
     if (searchIdx != null)
-      searchIdx.close();
+      searchIdx = null;
   }
 
   /**
@@ -152,7 +136,7 @@ public class ContentRepositoryIndex {
    *           if adding to the index fails
    */
   public synchronized ResourceURI add(Resource<?> resource) throws IOException,
-  ContentRepositoryException {
+      ContentRepositoryException {
 
     ResourceURI uri = resource.getURI();
     String id = uri.getIdentifier();
@@ -224,7 +208,7 @@ public class ContentRepositoryIndex {
    *           if deleting the resource fails
    */
   public synchronized boolean delete(ResourceURI uri) throws IOException,
-  ContentRepositoryException, IllegalArgumentException {
+      ContentRepositoryException, IllegalArgumentException {
     getIdentifier(uri);
     StringUtils.trimToNull(uri.getPath());
     uri.getVersion();
@@ -305,7 +289,7 @@ public class ContentRepositoryIndex {
    *           if accessing the index fails
    */
   public String getPath(ResourceURI uri) throws ContentRepositoryException,
-  IllegalArgumentException {
+      IllegalArgumentException {
     if (uri.getPath() != null)
       return uri.getPath();
 
@@ -376,7 +360,7 @@ public class ContentRepositoryIndex {
    *           if updating the index fails
    */
   public synchronized void update(Resource<?> resource) throws IOException,
-  ContentRepositoryException {
+      ContentRepositoryException {
     ResourceURI uri = resource.getURI();
 
     // Make sure the uri has an identifier
@@ -532,7 +516,7 @@ public class ContentRepositoryIndex {
    */
   public List<String> suggest(String dictionary, String seed,
       boolean onlyMorePopular, int count, boolean collate)
-          throws ContentRepositoryException {
+      throws ContentRepositoryException {
     if (StringUtils.isBlank(dictionary))
       throw new IllegalArgumentException("Dictionary cannot be null");
     if (StringUtils.isBlank(seed))

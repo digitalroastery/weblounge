@@ -41,7 +41,6 @@ import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
-import ch.entwine.weblounge.search.impl.SearchIndexImpl;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -65,7 +64,7 @@ import java.util.UUID;
 public class SearchIndexFulltextTest {
 
   /** The search index */
-  protected static SearchIndexImpl idx = null;
+  protected static SearchIndexImplStub idx = null;
 
   /** The index root directory */
   protected static File idxRoot = null;
@@ -131,7 +130,8 @@ public class SearchIndexFulltextTest {
     idxRoot = new File(rootPath);
     System.setProperty("weblounge.home", rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
-    idx = new SearchIndexImpl(site, serializer);
+    idx = new SearchIndexImplStub();
+    idx.bindResourceSerializerService(serializer);
 
     // Prepare the pages
     PageReader pageReader = new PageReader();
@@ -164,6 +164,7 @@ public class SearchIndexFulltextTest {
   @AfterClass
   public static void tearDownClass() {
     try {
+      idx.clear();
       idx.close();
       FileUtils.deleteQuietly(idxRoot);
     } catch (IOException e) {

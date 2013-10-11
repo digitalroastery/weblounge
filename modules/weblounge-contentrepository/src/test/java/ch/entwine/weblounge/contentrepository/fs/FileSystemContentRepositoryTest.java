@@ -71,6 +71,7 @@ import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSelectorImpl;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
+import ch.entwine.weblounge.contentrepository.index.SearchIndexImplStub;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -196,6 +197,9 @@ public class FileSystemContentRepositoryTest {
   /** Root directory for index configuration and test data */
   private static File testRoot = null;
 
+  /** the search index */
+  private static SearchIndexImplStub searchIndex = null;
+
   /**
    * Sets up everything valid for all test runs.
    * 
@@ -242,11 +246,16 @@ public class FileSystemContentRepositoryTest {
     EasyMock.expect(site.getDefaultLanguage()).andReturn(LanguageUtils.getLanguage("de")).anyTimes();
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin")).anyTimes();
     EasyMock.replay(site);
+    
+    // Search Index
+    searchIndex = new SearchIndexImplStub();
+    searchIndex.bindResourceSerializerService(serializer);
 
     // Connect to the repository
     repository = new FileSystemContentRepository();
     repository.setSerializer(serializer);
     repository.setEnvironment(Environment.Production);
+    repository.setSearchIndex(searchIndex);
     Dictionary<String, Object> repositoryProperties = new Hashtable<String, Object>();
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
     repository.updated(repositoryProperties);
@@ -309,6 +318,13 @@ public class FileSystemContentRepositoryTest {
   public static void tearDownAfterClass() throws ContentRepositoryException {
     repository.disconnect();
     FileUtils.deleteQuietly(testRoot);
+
+    try {
+      searchIndex.clear();
+      searchIndex.close();
+    } catch (IOException e) {
+      fail("Error clearing & closing search index: " + e.getMessage());
+    }
   }
 
   /**

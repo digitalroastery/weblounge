@@ -6,6 +6,7 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface SearchIndex {
@@ -83,6 +84,14 @@ public interface SearchIndex {
    */
   List<String> suggest(String dictionary, String seed, boolean onlyMorePopular,
       int count, boolean collate) throws ContentRepositoryException;
+
+  /**
+   * Clears the search index.
+   * 
+   * @throws IOException
+   *           if clearing the index fails
+   */
+  void clear() throws IOException;
 
   /**
    * Returns the index's version number. If that number is different from
