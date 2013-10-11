@@ -261,7 +261,7 @@ public class ContentRepositoryIndexTest {
     // search result and therefore are likely to be lost
 
     SearchQuery q = new SearchQueryImpl(site).withProperty(propertyName, propertyValue);
-    SearchResult result = idx.find(q);
+    SearchResult result = searchIdx.getByQuery(q);
     assertEquals(1, result.getDocumentCount());
     assertEquals(page.getURI().getIdentifier(), result.getItems()[0].getId());
   }

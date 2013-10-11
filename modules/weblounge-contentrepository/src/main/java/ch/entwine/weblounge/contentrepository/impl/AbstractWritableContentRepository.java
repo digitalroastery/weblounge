@@ -526,7 +526,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       SearchQuery searchByResource = new SearchQueryImpl(uri.getSite());
       searchByResource.withVersion(Resource.LIVE);
       searchByResource.withProperty("resourceid", uri.getIdentifier());
-      if (index.find(searchByResource).getDocumentCount() > 0) {
+      if (searchIndex.getByQuery(searchByResource).getDocumentCount() > 0) {
         logger.debug("Resource '{}' is still being referenced", uri);
         throw new ReferentialIntegrityException(uri.getIdentifier());
       }
@@ -625,7 +625,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       SearchQuery q = new SearchQueryImpl(site).withPreferredVersion(Resource.LIVE);
       q.withPathPrefix(originalPathPrefix);
 
-      SearchResult result = index.find(q);
+      SearchResult result = searchIndex.getByQuery(q);
       if (result.getDocumentCount() == 0) {
         logger.warn("Trying to move non existing resource {}", uri);
         return;

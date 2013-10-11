@@ -29,7 +29,6 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
-import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
@@ -43,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -476,52 +474,6 @@ public class ContentRepositoryIndex {
    */
   public Iterator<ResourceURI> list(ResourceURI uri, int level, long version) {
     throw new UnsupportedOperationException("Not yet implemented");
-  }
-
-  /**
-   * Issues a search query and returns the matches in the result set.
-   * 
-   * @param query
-   *          the search query
-   * @return the search result
-   * @throws IllegalArgumentException
-   *           if the query is <code>null</code>
-   * @throws ContentRepositoryException
-   *           if processing the query fails
-   */
-  public SearchResult find(SearchQuery query)
-      throws ContentRepositoryException, IllegalArgumentException {
-    if (query == null)
-      throw new IllegalArgumentException("Query cannot be null");
-    return searchIdx.getByQuery(query);
-  }
-
-  /**
-   * Returns the suggestions as returned from the selected dictionary based on
-   * <code>seed</code>.
-   * 
-   * @param dictionary
-   *          the dictionary
-   * @param seed
-   *          the seed used for suggestions
-   * @param onlyMorePopular
-   *          whether to return only more popular results
-   * @param count
-   *          the maximum number of suggestions
-   * @param collate
-   *          whether to provide a query collated with the first matching
-   *          suggestion
-   * @throws ContentRepositoryException
-   *           if suggesting fails
-   */
-  public List<String> suggest(String dictionary, String seed,
-      boolean onlyMorePopular, int count, boolean collate)
-      throws ContentRepositoryException {
-    if (StringUtils.isBlank(dictionary))
-      throw new IllegalArgumentException("Dictionary cannot be null");
-    if (StringUtils.isBlank(seed))
-      throw new IllegalArgumentException("Seed cannot be null");
-    return searchIdx.suggest(dictionary, seed, onlyMorePopular, count, collate);
   }
 
 }

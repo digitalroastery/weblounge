@@ -301,7 +301,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   public SearchResult find(SearchQuery query) throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
-    return index.find(query);
+    return searchIndex.getByQuery(query);
   }
 
   /**
@@ -316,7 +316,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
-    return index.suggest(dictionary, seed, false, count, false);
+    return searchIndex.suggest(dictionary, seed, false, count, false);
   }
 
   /**
@@ -346,7 +346,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
     // Load the resource
     SearchQuery q = new SearchQueryImpl(site).withVersion(uri.getVersion()).withIdentifier(uri.getIdentifier());
-    SearchResult result = index.find(q);
+    SearchResult result = searchIndex.getByQuery(q);
 
     if (result.getDocumentCount() > 0) {
       ResourceSearchResultItem searchResultItem = (ResourceSearchResultItem) result.getItems()[0];
