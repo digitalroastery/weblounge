@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  activate="activate"
+  deactivate="deactivate"
+  name="Weblounge Search Index Service">
+
+  <implementation class="ch.entwine.weblounge.search.impl.SearchIndexImpl" />
+  <property name="service.description" value="Weblounge Search Index Service" />
+  <property name="service.pid" value="ch.entwine.weblounge.search"/>
+  <service>
+    <provide interface="ch.entwine.weblounge.common.search.SearchIndex" />
+  </service>
+  
+  <reference name="resourceserializer" interface="ch.entwine.weblounge.common.repository.ResourceSerializerService" cardinality="1..1" policy="static" bind="bindResourceSerializerService" />
+
+</scr:component>
