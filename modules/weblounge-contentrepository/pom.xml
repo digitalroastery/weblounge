@@ -250,7 +250,7 @@
               org.apache.commons.lang.text;version="2.4",
               org.apache.commons.logging;version="1.1.1",
               org.apache.http.params,
-			        org.apache.regexp,
+              org.apache.regexp,
               org.apache.tika;version="0.9",
               org.slf4j;version="[1.5.0,1.6.0)",
               org.osgi.framework;version="1.4.0",

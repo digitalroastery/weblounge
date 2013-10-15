@@ -3,7 +3,7 @@
   immediate="true"
   activate="activate"
   deactivate="deactivate"
-  name="Weblounge Search Index Service">
+  name="Weblounge Search Index">
 
   <implementation class="ch.entwine.weblounge.search.impl.SearchIndexImpl" />
   <property name="service.description" value="Weblounge Search Index Service" />
