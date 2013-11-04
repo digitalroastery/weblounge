@@ -80,28 +80,28 @@ public abstract class ResourceRepository {
       NamespaceRegistry nsRegistry = session.getWorkspace().getNamespaceRegistry();
       nsRegistry.registerNamespace("webl", "http://entwine.ch/weblounge/jcr");
       
-      NodeTypeManager nodeTypeManager = session.getWorkspace().getNodeTypeManager();
-      
-
-      /* Create node type */
-      NodeTypeTemplate nodeType = nodeTypeManager.createNodeTypeTemplate();
-      nodeType.setName("webl:Resource");
-
-      /* Create a new property */
-      PropertyDefinitionTemplate layoutProperty = nodeTypeManager.createPropertyDefinitionTemplate();
-      layoutProperty.setName("webl:layout");
-      layoutProperty.setRequiredType(PropertyType.STRING);
-      /* Add property to node type */
-      nodeType.getPropertyDefinitionTemplates().add(layoutProperty);
-
-      /* Create a new property */
-      PropertyDefinitionTemplate templateProperty = nodeTypeManager.createPropertyDefinitionTemplate();
-      templateProperty.setName("webl:template");
-      templateProperty.setRequiredType(PropertyType.STRING);
-      /* Add property to node type */
-      nodeType.getPropertyDefinitionTemplates().add(templateProperty);
-
-      nodeTypeManager.registerNodeType(nodeType, false);
+//      NodeTypeManager nodeTypeManager = session.getWorkspace().getNodeTypeManager();
+//      
+//
+//      /* Create node type */
+//      NodeTypeTemplate nodeType = nodeTypeManager.createNodeTypeTemplate();
+//      nodeType.setName("webl:Resource");
+//
+//      /* Create a new property */
+//      PropertyDefinitionTemplate layoutProperty = nodeTypeManager.createPropertyDefinitionTemplate();
+//      layoutProperty.setName("webl:layout");
+//      layoutProperty.setRequiredType(PropertyType.STRING);
+//      /* Add property to node type */
+//      nodeType.getPropertyDefinitionTemplates().add(layoutProperty);
+//
+//      /* Create a new property */
+//      PropertyDefinitionTemplate templateProperty = nodeTypeManager.createPropertyDefinitionTemplate();
+//      templateProperty.setName("webl:template");
+//      templateProperty.setRequiredType(PropertyType.STRING);
+//      /* Add property to node type */
+//      nodeType.getPropertyDefinitionTemplates().add(templateProperty);
+//
+//      nodeTypeManager.registerNodeType(nodeType, false);
     } catch (ContentRepositoryException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
