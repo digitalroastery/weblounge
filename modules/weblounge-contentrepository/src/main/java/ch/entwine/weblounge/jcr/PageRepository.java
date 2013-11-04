@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.jackrabbit.JcrConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,9 @@ public class PageRepository extends ResourceRepository {
       String pagePath = page.getPath();
       if (StringUtils.endsWith(pagePath, "/"))
         pagePath = StringUtils.removeEnd(pagePath, "/");
-      Node pageNode = resNode.addNode(pagePath.substring(pagePath.lastIndexOf('/') + 1, pagePath.length()), "webl:Resource");
+      pagePath = pagePath.substring(pagePath.lastIndexOf('/') + 1, pagePath.length());
+      Node pageNode = resNode.addNode(pagePath, JcrConstants.NT_UNSTRUCTURED);
+      
       pageNode.setProperty("webl:layout", page.getLayout());
       pageNode.setProperty("webl:template", page.getTemplate());
       resNode.getSession().save();
