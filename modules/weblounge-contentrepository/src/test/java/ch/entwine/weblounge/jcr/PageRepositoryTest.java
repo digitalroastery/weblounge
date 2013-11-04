@@ -41,7 +41,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
@@ -54,8 +53,6 @@ public class PageRepositoryTest {
   @ClassRule
   public static TemporaryFolder temp = new TemporaryFolder();
 
-  private static File repositoryDir = null;
-
   private static TransientRepository repository = null;
 
   /** Page template */
@@ -65,9 +62,10 @@ public class PageRepositoryTest {
   protected static Site site = null;
 
   @BeforeClass
-  public static void setUpClass() throws IOException {
-    repositoryDir = temp.newFolder("repository");
-    repository = new TransientRepository(repositoryDir);
+  public static void setUpClass() throws Exception {
+    File dir = temp.newFolder("repository");
+    File xml = new File(PageRepositoryTest.class.getResource("/repository.xml").toURI());
+    repository = new TransientRepository(xml, dir);
 
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
