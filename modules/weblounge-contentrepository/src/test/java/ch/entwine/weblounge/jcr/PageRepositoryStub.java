@@ -19,6 +19,8 @@
  */
 package ch.entwine.weblounge.jcr;
 
+import ch.entwine.weblounge.common.site.Site;
+
 import javax.jcr.Repository;
 
 /**
@@ -28,12 +30,22 @@ public class PageRepositoryStub extends PageRepository {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.weblounge.jcr.ResourceRepository#setRepository(javax.jcr.Repository)
+   * 
+   * @see ch.entwine.weblounge.jcr.AbstractResourceRepository#bindRepository(javax.jcr.Repository)
    */
   @Override
-  public void setRepository(Repository repository) {
-    super.setRepository(repository);
+  public void bindRepository(Repository repository) {
+    super.bindRepository(repository);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.jcr.AbstractResourceRepository#bindSite(ch.entwine.weblounge.common.site.Site)
+   */
+  @Override
+  public void bindSite(Site site) {
+    super.bindSite(site);
   }
 
 }

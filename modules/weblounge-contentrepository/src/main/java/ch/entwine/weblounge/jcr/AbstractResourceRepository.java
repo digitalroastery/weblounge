@@ -19,9 +19,12 @@
  */
 package ch.entwine.weblounge.jcr;
 
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.UrlUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +41,10 @@ import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
+import javax.jcr.version.VersionManager;
 
 /**
  * This is a base class for all kind of resource specific repository
@@ -128,6 +135,38 @@ public abstract class AbstractResourceRepository {
     log.info("Site '{}' unbound from this repository", site.getIdentifier());
   }
 
+  public List<String> getVersions(ResourceURI uri)
+      throws ContentRepositoryException {
+
+    if (StringUtils.isEmpty(uri.getPath()))
+      throw new IllegalArgumentException("The given ResourceURI must have a path set");
+
+    Session session = getSession();
+
+    try {
+      VersionManager versionManager = session.getWorkspace().getVersionManager();
+      VersionHistory history = versionManager.getVersionHistory(getAbsNodePath(uri));
+      VersionIterator versions = history.getAllVersions();
+
+      List<String> versionsList = new ArrayList<String>();
+      while (versions.hasNext()) {
+        Version version = versions.nextVersion();
+        if (version.getName().equals(JcrConstants.JCR_ROOTVERSION))
+          continue;
+        versionsList.add(version.getName());
+      }
+
+      return versionsList;
+    } catch (RepositoryException e) {
+      log.warn("Problem while reading the versions of the resource '{}'", uri);
+      throw new ContentRepositoryException("Problem while reading the versions of the resource " + uri.toString(), e);
+    }
+  }
+
+  public void publishResource(ResourceURI uri, String version) {
+
+  }
+
   /**
    * Returns a valid session to the underlying JCR repository. The returned
    * session should only be used for one operation (e.g. saving a new resource)
@@ -203,9 +242,28 @@ public abstract class AbstractResourceRepository {
 
   }
 
+  protected String getAbsNodePath(ResourceURI uri) {
+    String absPath = UrlUtils.concat(SITES_ROOT_NODE_REL_PATH, uri.getSite().getIdentifier(), RESOURCES_NODE_NAME, uri.getPath());
+    absPath = StringUtils.removeEnd(absPath, "/");
+    absPath = "/" + absPath;
+    return absPath;
+  }
+
+  protected String getAbsParentNodePath(ResourceURI uri) {
+    String absPath = getAbsNodePath(uri);
+    absPath = absPath.substring(0, absPath.lastIndexOf("/"));
+    return absPath;
+  }
+
+  protected String getNodeName(ResourceURI uri) {
+    String path = uri.getPath();
+    String name = StringUtils.removeEnd(path, "/");
+    return name.substring(name.lastIndexOf("/") + 1, path.length() - 1);
+  }
+
   /**
-   * Returns the resources node of a site. The resources is the parent node of all
-   * resources inside the repository.
+   * Returns the resources node of a site. The resources is the parent node of
+   * all resources inside the repository.
    * 
    * @param session
    *          the JCR session to get the node
@@ -281,9 +339,9 @@ public abstract class AbstractResourceRepository {
       Node rootNode = session.getRootNode();
       if (!rootNode.hasNode(SITES_ROOT_NODE_REL_PATH)) {
         log.info("No base node for sites found. JCR repository has never been used with Weblounge");
-        Node SitesNode = rootNode.addNode(SITES_ROOT_NODE_REL_PATH);
+        Node sitesNode = rootNode.addNode(SITES_ROOT_NODE_REL_PATH);
         session.save();
-        log.info("Base node '{}' for sites added to JCR repository", SitesNode.getPath());
+        log.info("Base node '{}' for sites added to JCR repository", sitesNode.getPath());
       }
     } catch (RepositoryException e) {
       log.error("There was an error while creating the root node for the sites:  {}", e.getMessage());
