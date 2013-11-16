@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge JCR Page Resource Serializer"> 
+  
+  <implementation class="ch.entwine.weblounge.jcr.JCRPageResourceSerializer" />
+  <property name="service.description" value="Weblounge JCR Page Resource Serializer" />
+  <service>
+    <provide interface="ch.entwine.weblounge.jcr.JCRResourceSerializer" />
+  </service>
+
+</scr:component>

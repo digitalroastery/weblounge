@@ -19,6 +19,7 @@
  */
 package ch.entwine.weblounge.jcr;
 
+import ch.entwine.weblounge.common.content.PageContent;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
@@ -26,7 +27,6 @@ import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.jackrabbit.JcrConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +46,14 @@ public class PageRepository extends AbstractResourceRepository {
 
   /** The logging facility */
   private Logger log = LoggerFactory.getLogger(PageRepository.class);
+  
+  public Page createPage(String path) {
+    
+  }
+  
+  public boolean deletePage(ResourceURI uri) {
+    
+  }
 
   /**
    * Adds the given page to the repository.
@@ -55,42 +63,15 @@ public class PageRepository extends AbstractResourceRepository {
    * @return
    * @throws ContentRepositoryException
    */
-  public Page addPage(ResourceURI uri, Page page)
-      throws ContentRepositoryException {
-
-    if (uri == null || page == null)
-      throw new IllegalArgumentException("Parameters uri and page must not be null");
-
-    try {
-      Session session = getSession();
-
-      String absPathParentNode = getAbsParentNodePath(page.getURI());
-      if (!session.nodeExists(absPathParentNode)) {
-        log.warn("Tried to add path with path '{}', but parent page does not exist.", page.getPath());
-        throw new ContentRepositoryException("Tried to add path wit path '" + page.getPath() + "', but parent page does not exist.");
-      }
-
-      Node parentNode = session.getNode(absPathParentNode);
-      Node pageNode = parentNode.addNode(getNodeName(page.getURI()), JcrConstants.NT_UNSTRUCTURED);
-      storePageInNode(pageNode, page);
-      session.save();
-
-      page.setIdentifier(pageNode.getIdentifier());
-      log.info("Identifier of new page '{}' set to '{}'", page.getPath(), page.getIdentifier());
-
-      VersionManager versionManager = session.getWorkspace().getVersionManager();
-      checkinResourceWithVersionLabel(versionManager, pageNode, uri);
-
-      // session.save();
-    } catch (RepositoryException e) {
-      log.warn("Page could not be added: {}", e.getMessage());
-      throw new ContentRepositoryException(e);
-    }
-
-    return page;
+  public Page createPage(ResourceURI uri, Page page) throws ContentRepositoryException {
+    Resource<?> res = addResource(uri, page);
+    return (Page) res;
   }
+  
 
+  // TODO Do we need the URI parameter?
   public Page updatePage(ResourceURI uri, Page page) {
+    
     try {
       Session session = getSession();
 
@@ -105,7 +86,14 @@ public class PageRepository extends AbstractResourceRepository {
       VersionManager versionMgr = session.getWorkspace().getVersionManager();
       versionMgr.checkout(pageNode.getPath());
 
-      storePageInNode(pageNode, page);
+      //storePageInNode(pageNode, page);
+      JCRPageResourceSerializer serializer = new JCRPageResourceSerializer();
+      serializer.store(pageNode, page);
+      
+      // Make node versionable
+      // QUESTION Do we need to add the mix-in here again?
+      //pageNode.addMixin(JcrConstants.MIX_VERSIONABLE);
+      
       session.save();
 
       checkinResourceWithVersionLabel(versionMgr, pageNode, uri);
@@ -123,7 +111,7 @@ public class PageRepository extends AbstractResourceRepository {
     return page;
   }
 
-  public Page getPage(ResourceURI uri) throws ContentRepositoryException {
+  public PageResource getPage(ResourceURI uri) throws ContentRepositoryException {
 
     try {
       Session session = getSession();
@@ -131,7 +119,7 @@ public class PageRepository extends AbstractResourceRepository {
 
       if (uri.getPath() != null) {
         log.debug("Lookup page by given path '{}'", uri.getPath());
-        pageNode = session.getNode(getAbsNodePath(uri));
+        pageNode = session.getNode(JCRResourceUtils.getAbsNodePath(uri));
         log.info("Page node '{}' found by given path '{}'", pageNode.getIdentifier(), uri.getPath());
       } else if (uri.getIdentifier() != null) {
         log.debug("Lookup page by given identifier '{}'", uri.getIdentifier());
@@ -153,7 +141,7 @@ public class PageRepository extends AbstractResourceRepository {
       Page page = new PageImpl(uri);
       page.setIdentifier(pageNode.getIdentifier());
       page.setPath(pageNode.getPath());
-      page.setTemplate(pageNode.getProperty("webl:template").getString());
+      page.setTemplate(pageNode.getProperty("template").getString());
 
       return page;
     } catch (ItemNotFoundException e) {
@@ -162,6 +150,14 @@ public class PageRepository extends AbstractResourceRepository {
       throw new ContentRepositoryException(e);
     }
   }
+  
+  public PageContent getPageContent(ResourceURI uri) {
+     return super.getRepresentation(uri, PageContent.class);
+  }
+  
+  public PageContent updatePageContent(ResourceURI uri, PageContent content) {
+    
+  }
 
   private String getJCRVersionLabel(long version) {
     if (version == Resource.LIVE)
@@ -169,14 +165,6 @@ public class PageRepository extends AbstractResourceRepository {
     if (version == Resource.WORK)
       return "webl:work";
     return String.valueOf(version);
-  }
-
-  private void storePageInNode(Node node, Page page) throws RepositoryException {
-    node.setProperty("webl:layout", page.getLayout());
-    node.setProperty("webl:template", page.getTemplate());
-    node.setProperty("webl:promoted", page.isPromoted());
-    node.setProperty("webl:indexed", page.isPromoted());
-    node.addMixin(JcrConstants.MIX_VERSIONABLE);
   }
 
   private void checkinResourceWithVersionLabel(VersionManager versionMgr,

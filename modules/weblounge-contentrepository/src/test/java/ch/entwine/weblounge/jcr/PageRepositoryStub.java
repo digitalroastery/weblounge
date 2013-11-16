@@ -48,4 +48,15 @@ public class PageRepositoryStub extends PageRepository {
     super.bindSite(site);
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.jcr.AbstractResourceRepository#bindJCRResourceSerializerRegistry(ch.entwine.weblounge.jcr.JCRResourceSerializerRegistry)
+   */
+  @Override
+  public void bindJCRResourceSerializerRegistry(
+      JCRResourceSerializerRegistry serializerRegistry) {
+    super.bindJCRResourceSerializerRegistry(serializerRegistry);
+  }
+
 }

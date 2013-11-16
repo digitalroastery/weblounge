@@ -279,6 +279,10 @@
               javax.annotation,
               javax.crypto,
               javax.crypto.spec,
+              javax.jcr,
+              javax.jcr.lock,
+              javax.jcr.nodetype,
+              javax.jcr.version,
               javax.net,
               javax.net.ssl,
               javax.servlet;version="2.5",
@@ -327,7 +331,8 @@
               ch.entwine.weblounge.contentrepository.impl.index;version=${project.version},
               ch.entwine.weblounge.contentrepository.impl.operation;version=${project.version},
               ch.entwine.weblounge.search.impl;version=${project.version},
-              ch.entwine.weblounge.search.impl.elasticsearch;version=${project.version}
+              ch.entwine.weblounge.search.impl.elasticsearch;version=${project.version},
+              ch.entwine.weblounge.jcr;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
               lucene-core;inline=true,
@@ -349,6 +354,8 @@
               OSGI-INF/files-rest-service.xml,
               OSGI-INF/image-serializer.xml,
               OSGI-INF/index-rest-service.xml,
+              OSGI-INF/jcr-page-serializer.xml,
+              OSGI-INF/jcr-resourceserializer-service.xml,
               OSGI-INF/movie-serializer.xml,
               OSGI-INF/pages-rest-service.xml,
               OSGI-INF/page-serializer.xml,

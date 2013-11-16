@@ -19,10 +19,12 @@
  */
 package ch.entwine.weblounge.jcr;
 
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceRepresentation;
+import ch.entwine.weblounge.common.content.ResourceRepresentationCharacteristic;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.jcr.Credentials;
 import javax.jcr.LoginException;
@@ -52,16 +55,11 @@ import javax.jcr.version.VersionManager;
  */
 public abstract class AbstractResourceRepository {
 
-  private static final String RESOURCES_NODE_NAME = "resources";
-
   /** URI of the Weblounge JCR namespace */
   private static final String WEBLOUNGE_JCR_NS_URI = "http://entwine.ch/weblounge/jcr";
 
   /** Name of the Weblounge JCR namespace */
   private static final String WEBLOUNGE_JCR_NS_NAME = "webl";
-
-  /** Relative path of sites node */
-  private static final String SITES_ROOT_NODE_REL_PATH = "sites";
 
   /** The underlying JCR content repository */
   protected Repository repository = null;
@@ -74,6 +72,9 @@ public abstract class AbstractResourceRepository {
 
   /** Holds a list of all sites this repository is able to serve */
   protected List<Site> sites = new ArrayList<Site>();
+
+  /** The resource serializer registry */
+  protected JCRResourceSerializerRegistry serializerRegistry = null;
 
   /** The logging facility */
   private Logger log = LoggerFactory.getLogger(AbstractResourceRepository.class);
@@ -97,6 +98,19 @@ public abstract class AbstractResourceRepository {
     } catch (ContentRepositoryException e) {
       log.error("Initializing the repository failed: {}", e.getMessage());
     }
+  }
+
+  /**
+   * OSGi callback to bind a {@link JCRResourceSerializerRegistry} to this
+   * repository.
+   * 
+   * @param serializerRegistry
+   *          the registry
+   */
+  protected void bindJCRResourceSerializerRegistry(
+      JCRResourceSerializerRegistry serializerRegistry) {
+    this.serializerRegistry = serializerRegistry;
+    log.info("Resource serializer registry set ({})", serializerRegistry);
   }
 
   /**
@@ -135,6 +149,87 @@ public abstract class AbstractResourceRepository {
     log.info("Site '{}' unbound from this repository", site.getIdentifier());
   }
 
+  public Resource<?> addResource(ResourceURI uri, Resource<?> resource)
+      throws ContentRepositoryException {
+
+    if (uri == null || resource == null)
+      throw new IllegalArgumentException("Parameters uri and resource must not be null");
+
+    try {
+      Session session = getSession();
+
+      // We need to check, if there's already a resource at the parents path
+      // since each node (resource) needs to have a direct parent node
+      String absPathParentNode = JCRResourceUtils.getAbsParentNodePath(resource.getURI());
+      if (!session.nodeExists(absPathParentNode)) {
+        log.warn("Tried to add resource with path '{}', but parent resource does not exist.", resource.getPath());
+        throw new ContentRepositoryException("Tried to add resource wit path '" + resource.getPath() + "', but parent resource does not exist.");
+      }
+      Node parentNode = session.getNode(absPathParentNode);
+      Node pageNode = parentNode.addNode(JCRResourceUtils.getNodeName(resource.getURI()), JcrConstants.NT_UNSTRUCTURED);
+
+      // FIXME How can we get type of resource?
+      JCRResourceSerializer serializer = serializerRegistry.getSerializer("page");
+      serializer.store(pageNode, resource);
+
+      // Make node versionable
+      pageNode.addMixin(JcrConstants.MIX_VERSIONABLE);
+
+      session.save();
+
+      // Check-in resource (setting version to 1.0)
+      VersionManager versionManager = session.getWorkspace().getVersionManager();
+      versionManager.checkin(pageNode.getPath());
+
+      // We need to set the identifier of the resource to the newly generated
+      // identifier of the node
+      resource.setIdentifier(pageNode.getIdentifier());
+      log.info("Identifier of new resource '{}' set to '{}'", resource.getPath(), resource.getIdentifier());
+    } catch (RepositoryException e) {
+      log.warn("Resource could not be added: {}", e.getMessage());
+      throw new ContentRepositoryException("Resource could not be added", e);
+    }
+
+    return resource;
+  }
+
+  public <T extends ResourceRepresentation> T createRepresentation(
+      ResourceURI uri, Class<T> type) {
+    return null;
+  }
+
+  public <T extends ResourceRepresentation> T getRepresentation(
+      ResourceURI uri, Class<T> type) {
+    return null;
+  }
+
+  public <T extends ResourceRepresentation> List<T> getRepresentation(
+      ResourceURI uri, Class<T> type,
+      ResourceRepresentationCharacteristic... characteristics) {
+    return null;
+  }
+
+  public Map<Class<ResourceRepresentation>, List<ResourceRepresentationCharacteristic>> listRepresentations(
+      ResourceURI uri) {
+    return null;
+  }
+
+  public <T extends ResourceRepresentation> long[] getRepresentationSize(
+      ResourceURI uri, Class<T> type,
+      ResourceRepresentationCharacteristic... characteristics) {
+    return null;
+  }
+
+  public <T extends ResourceRepresentation> T updateRepresentation(
+      ResourceURI uri, T representation) {
+    return null;
+  }
+
+  public <T extends ResourceRepresentation> boolean deleteRepresentation(
+      ResourceURI uri, T representation) {
+    return false;
+  }
+
   public List<String> getVersions(ResourceURI uri)
       throws ContentRepositoryException {
 
@@ -145,7 +240,7 @@ public abstract class AbstractResourceRepository {
 
     try {
       VersionManager versionManager = session.getWorkspace().getVersionManager();
-      VersionHistory history = versionManager.getVersionHistory(getAbsNodePath(uri));
+      VersionHistory history = versionManager.getVersionHistory(JCRResourceUtils.getAbsNodePath(uri));
       VersionIterator versions = history.getAllVersions();
 
       List<String> versionsList = new ArrayList<String>();
@@ -229,8 +324,8 @@ public abstract class AbstractResourceRepository {
     try {
       Node siteNode = getSiteNode(session, site);
       Node homepage;
-      if (!siteNode.hasNode(RESOURCES_NODE_NAME)) {
-        homepage = siteNode.addNode(RESOURCES_NODE_NAME);
+      if (!siteNode.hasNode(JCRResourceConstants.RESOURCES_NODE_NAME)) {
+        homepage = siteNode.addNode(JCRResourceConstants.RESOURCES_NODE_NAME);
         homepage.addMixin(JcrConstants.MIX_VERSIONABLE);
         session.save();
         log.info("Homepage for site '{}' added to JCR repository", site.getIdentifier());
@@ -240,25 +335,6 @@ public abstract class AbstractResourceRepository {
       throw new ContentRepositoryException("There was a problem creating the homepage of the site '" + site.getIdentifier() + "'", e);
     }
 
-  }
-
-  protected String getAbsNodePath(ResourceURI uri) {
-    String absPath = UrlUtils.concat(SITES_ROOT_NODE_REL_PATH, uri.getSite().getIdentifier(), RESOURCES_NODE_NAME, uri.getPath());
-    absPath = StringUtils.removeEnd(absPath, "/");
-    absPath = "/" + absPath;
-    return absPath;
-  }
-
-  protected String getAbsParentNodePath(ResourceURI uri) {
-    String absPath = getAbsNodePath(uri);
-    absPath = absPath.substring(0, absPath.lastIndexOf("/"));
-    return absPath;
-  }
-
-  protected String getNodeName(ResourceURI uri) {
-    String path = uri.getPath();
-    String name = StringUtils.removeEnd(path, "/");
-    return name.substring(name.lastIndexOf("/") + 1, path.length() - 1);
   }
 
   /**
@@ -277,7 +353,7 @@ public abstract class AbstractResourceRepository {
       throws ContentRepositoryException {
     Node siteNode = getSiteNode(session, site);
     try {
-      return siteNode.getNode(RESOURCES_NODE_NAME);
+      return siteNode.getNode(JCRResourceConstants.RESOURCES_NODE_NAME);
     } catch (PathNotFoundException e) {
       log.error("No homepage for site '{}' found", site.getIdentifier());
       throw new ContentRepositoryException(e);
@@ -337,9 +413,9 @@ public abstract class AbstractResourceRepository {
     // Check, if base node for sites exists; create it otherwise
     try {
       Node rootNode = session.getRootNode();
-      if (!rootNode.hasNode(SITES_ROOT_NODE_REL_PATH)) {
+      if (!rootNode.hasNode(JCRResourceConstants.SITES_ROOT_NODE_REL_PATH)) {
         log.info("No base node for sites found. JCR repository has never been used with Weblounge");
-        Node sitesNode = rootNode.addNode(SITES_ROOT_NODE_REL_PATH);
+        Node sitesNode = rootNode.addNode(JCRResourceConstants.SITES_ROOT_NODE_REL_PATH);
         session.save();
         log.info("Base node '{}' for sites added to JCR repository", sitesNode.getPath());
       }
@@ -363,7 +439,7 @@ public abstract class AbstractResourceRepository {
    */
   private Node getSitesNode(Session session) throws ContentRepositoryException {
     try {
-      return session.getRootNode().getNode(SITES_ROOT_NODE_REL_PATH);
+      return session.getRootNode().getNode(JCRResourceConstants.SITES_ROOT_NODE_REL_PATH);
     } catch (RepositoryException e) {
       log.error("There was a problem getting the base node of the sites: {}", e.getMessage());
       throw new ContentRepositoryException("There was a problem getting the base node of the sites", e);

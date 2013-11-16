@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge JCR Resource Serializer Service"> 
+  
+  <implementation class="ch.entwine.weblounge.jcr.JCRResourceSerializerRegistry" />
+  <property name="service.description" value="Weblounge JCR Resource Serializer Service" />
+
+  <reference name="serializers" interface="ch.entwine.weblounge.jcr.JCRResourceSerializer" cardinality="0..n" policy="dynamic" bind="bindJCRResourceSerializer" unbind="unbindJCRResourceSerializer" />
+
+</scr:component>
