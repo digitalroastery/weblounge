@@ -90,3 +90,4 @@ frontend
 backend
 elasticsearch
 malformed
+versionable
