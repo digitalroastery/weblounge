@@ -48,12 +48,13 @@ public class PageRepository extends AbstractResourceRepository {
   /** The logging facility */
   private Logger log = LoggerFactory.getLogger(PageRepository.class);
   
+  
   public Page createPage(String path) {
-    
+    return null;
   }
   
   public boolean deletePage(ResourceURI uri) {
-    
+    return false;
   }
 
   /**
@@ -112,7 +113,8 @@ public class PageRepository extends AbstractResourceRepository {
     return page;
   }
 
-  public PageResource getPage(ResourceURI uri) throws ContentRepositoryException {
+  //public PageResource getPage(ResourceURI uri) throws ContentRepositoryException {
+  public Page getPage(ResourceURI uri) throws ContentRepositoryException {
 
     try {
       Session session = getSession();
@@ -153,11 +155,12 @@ public class PageRepository extends AbstractResourceRepository {
   }
   
   public PageContent getPageContent(ResourceURI uri) {
-     return super.getRepresentation(uri, PageContent.class);
+     //return super.getRepresentation(uri, PageContent.class);
+    return null;
   }
   
   public PageContent updatePageContent(ResourceURI uri, PageContent content) {
-    
+    return null;
   }
 
   private String getJCRVersionLabel(long version) {
