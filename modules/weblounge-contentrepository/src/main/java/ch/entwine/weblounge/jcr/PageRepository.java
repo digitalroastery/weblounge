@@ -31,6 +31,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
+
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
@@ -47,33 +49,43 @@ public class PageRepository extends AbstractResourceRepository {
 
   /** The logging facility */
   private Logger log = LoggerFactory.getLogger(PageRepository.class);
-  
-  
-  public Page createPage(String path) {
-    return null;
-  }
-  
-  public boolean deletePage(ResourceURI uri) {
-    return false;
+
+  public Page createPage(ResourceURI uri) throws ContentRepositoryException {
+    if (uri == null)
+      throw new IllegalArgumentException("URI must not be null");
+
+    String absParentNodePath = JCRResourceUtils.getAbsParentNodePath(uri);
+
+    Session session = getSession();
+
+    try {
+      if (!session.nodeExists(absParentNodePath))
+        throw new ContentRepositoryException("Parent Resource for new Page '" + uri.toString() + "' does not exist.");
+
+      Node parentNode = session.getNode(absParentNodePath);
+      Node pageNode = parentNode.addNode(JCRResourceUtils.getNodeName(uri));
+      pageNode.setProperty("resource-type", Page.TYPE);
+
+      Node created = pageNode.addNode("webl:created");
+      created.setProperty("date", Calendar.getInstance());
+      // TODO Add creator/owner, but which user shall we take?
+
+      Page page = new PageImpl(uri);
+      page.setIdentifier(pageNode.getIdentifier());
+
+      session.save();
+
+      return page;
+    } catch (RepositoryException e) {
+      log.warn("New page '{}' could not be created", uri);
+      throw new ContentRepositoryException("New page could not be created", e);
+    }
   }
 
-  /**
-   * Adds the given page to the repository.
-   * 
-   * @param uri
-   * @param page
-   * @return
-   * @throws ContentRepositoryException
-   */
-  public Page createPage(ResourceURI uri, Page page) throws ContentRepositoryException {
-    Resource<?> res = addResource(uri, page);
-    return (Page) res;
-  }
-  
 
   // TODO Do we need the URI parameter?
   public Page updatePage(ResourceURI uri, Page page) {
-    
+
     try {
       Session session = getSession();
 
@@ -88,14 +100,14 @@ public class PageRepository extends AbstractResourceRepository {
       VersionManager versionMgr = session.getWorkspace().getVersionManager();
       versionMgr.checkout(pageNode.getPath());
 
-      //storePageInNode(pageNode, page);
+      // storePageInNode(pageNode, page);
       JCRPageResourceSerializer serializer = new JCRPageResourceSerializer();
       serializer.store(pageNode, page);
-      
+
       // Make node versionable
-      // QUESTION Do we need to add the mix-in here again?
-      //pageNode.addMixin(JcrConstants.MIX_VERSIONABLE);
-      
+      // TODO Do we need to add the mix-in here again?
+      // pageNode.addMixin(JcrConstants.MIX_VERSIONABLE);
+
       session.save();
 
       checkinResourceWithVersionLabel(versionMgr, pageNode, uri);
@@ -113,7 +125,25 @@ public class PageRepository extends AbstractResourceRepository {
     return page;
   }
 
-  //public PageResource getPage(ResourceURI uri) throws ContentRepositoryException {
+  public boolean deletePage(ResourceURI uri) throws ContentRepositoryException {
+    if (uri == null)
+      throw new IllegalArgumentException("URI must not be null");
+
+    Session session = getSession();
+    try {
+      session.removeItem(JCRResourceUtils.getAbsNodePath(uri));
+      session.save();
+
+      log.info("Successfuly removed Page '{}'", uri);
+      return true;
+    } catch (RepositoryException e) {
+      log.warn("Error while deleting Page '{}': {}", uri, e.getMessage());
+      throw new ContentRepositoryException("Error while deleting page", e);
+    }
+  }
+
+  // public PageResource getPage(ResourceURI uri) throws
+  // ContentRepositoryException {
   public Page getPage(ResourceURI uri) throws ContentRepositoryException {
 
     try {
@@ -153,12 +183,12 @@ public class PageRepository extends AbstractResourceRepository {
       throw new ContentRepositoryException(e);
     }
   }
-  
+
   public PageContent getPageContent(ResourceURI uri) {
-     //return super.getRepresentation(uri, PageContent.class);
+    // return super.getRepresentation(uri, PageContent.class);
     return null;
   }
-  
+
   public PageContent updatePageContent(ResourceURI uri, PageContent content) {
     return null;
   }
