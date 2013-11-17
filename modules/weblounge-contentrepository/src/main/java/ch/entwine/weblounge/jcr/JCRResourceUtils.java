@@ -27,7 +27,10 @@ import org.apache.commons.lang.StringUtils;
 /**
  * TODO: Comment JCRResourceUtils
  */
-public class JCRResourceUtils {
+public final class JCRResourceUtils {
+
+  private JCRResourceUtils() {
+  }
 
   public static String getAbsNodePath(ResourceURI uri) {
     String absPath = UrlUtils.concat(JCRResourceConstants.SITES_ROOT_NODE_REL_PATH, uri.getSite().getIdentifier(), JCRResourceConstants.RESOURCES_NODE_NAME, uri.getPath());
