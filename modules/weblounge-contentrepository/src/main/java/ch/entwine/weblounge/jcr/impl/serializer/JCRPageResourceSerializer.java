@@ -2,11 +2,23 @@ package ch.entwine.weblounge.jcr.impl.serializer;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.impl.content.page.PageImpl;
+import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
+/**
+ * This is a {@link JCRResourceSerializer} for the resource type {@link Page}
+ */
 public class JCRPageResourceSerializer extends AbstractJCRResourceSerializer {
+
+  /** The logging facility */
+  private Logger log = LoggerFactory.getLogger(JCRPageResourceSerializer.class);
 
   /**
    * {@inheritDoc}
@@ -14,19 +26,19 @@ public class JCRPageResourceSerializer extends AbstractJCRResourceSerializer {
    * @see ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer#getSerializableTypes()
    */
   @Override
-  public String[] getSerializableTypes() {
-    return new String[] { Page.TYPE };
+  public Class[] getSerializableTypes() {
+    return new Class[] { Page.class };
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.jcr.impl.serializer.AbstractJCRResourceSerializer#store(javax.jcr.Node,
+   * @see ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer#store(javax.jcr.Node,
    *      ch.entwine.weblounge.common.content.Resource)
    */
   @Override
-  public void store(Node node, Resource<?> resource) {
-    super.store(node, resource);
+  public void store(Node node, Resource<?> resource)
+      throws ContentRepositoryException {
 
     // TODO Finish!!!
     Page page = null;
@@ -35,67 +47,41 @@ public class JCRPageResourceSerializer extends AbstractJCRResourceSerializer {
     else
       return;
 
+    storeResource(node, resource);
+
     try {
       // Set page specific properties
       node.setProperty("layout", page.getLayout());
       node.setProperty("template", page.getTemplate());
       node.setProperty("stationary", page.isStationary());
     } catch (RepositoryException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      log.warn("Error while trying to store page '{}' in JCR node '{}'", resource, node);
+      throw new ContentRepositoryException("Error while trying to store page in JCR node", e);
     }
-    
-    
-    
-    // TODO Move to JCRPageResourceRepresentationSerializer
-//    try {
-//      if (!node.hasNode("webl:composers"))
-//        node.addNode("webl:composers");
-//
-//      Node composers = node.getNode("webl:composers");
-//
-//      for (Composer composer : page.getComposers()) {
-//        if (!composers.hasNode(composer.getIdentifier()))
-//          composers.addNode(composer.getIdentifier());
-//        
-//        Node composerNode = composers.getNode(composer.getIdentifier());
-//        
-//        for (Pagelet pagelet : composer.getPagelets()) {
-//          if (!composerNode.hasNode(relPath))
-//        }
-//      }
-//
-//    } catch (ItemExistsException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    } catch (PathNotFoundException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    } catch (VersionException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    } catch (ConstraintViolationException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    } catch (LockException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    } catch (RepositoryException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    }
+
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.jcr.impl.serializer.AbstractJCRResourceSerializer#read(javax.jcr.Node,
-   *      ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer#read(javax.jcr.Node)
    */
   @Override
-  public void read(Node node, Resource<?> resource) {
-    // TODO Auto-generated method stub
-    super.read(node, resource);
+  public Page read(Node node) throws ContentRepositoryException {
+    // FIXME Add uri (from node)
+    Page page = new PageImpl(null);
+    readResource(node, page);
+
+    try {
+      page.setLayout(node.getProperty("layout").toString());
+      page.setTemplate(node.getProperty("template").toString());
+      page.setStationary(node.getProperty("stationary").getBoolean());
+    } catch (RepositoryException e) {
+      log.warn("Error while trying to read page from JCR node '{}'", node);
+      throw new ContentRepositoryException("Error while trying to read page from JCR node", e);
+    }
+
+    return page;
   };
 
 }
