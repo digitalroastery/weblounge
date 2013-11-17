@@ -46,6 +46,7 @@
             <Bundle-SymbolicName>${project.groupId}.common-api</Bundle-SymbolicName>
             <Import-Package>
               org.apache.commons.lang;version="2.6",
+              org.apache.commons.lang.builder;version="2.6",
               org.slf4j;version="[1.5.0,1.6.0)",
               javax.security.auth.login,
               javax.security.auth.spi,

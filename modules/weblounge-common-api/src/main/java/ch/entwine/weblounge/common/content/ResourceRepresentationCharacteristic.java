@@ -19,6 +19,9 @@
  */
 package ch.entwine.weblounge.common.content;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  * TODO: Comment ResourceRepresentationCharacteristic
  */
@@ -65,11 +68,25 @@ public class ResourceRepresentationCharacteristic {
    */
   @Override
   public boolean equals(Object obj) {
+    if (obj == null)
+      return false;
+    if (obj == this)
+      return true;
     if (!(obj instanceof ResourceRepresentationCharacteristic))
       return false;
 
-    ResourceRepresentationCharacteristic characteristic = (ResourceRepresentationCharacteristic) obj;
-    return (characteristic.getName().equals(name) && characteristic.getValue().equals(value));
+    ResourceRepresentationCharacteristic rhs = (ResourceRepresentationCharacteristic) obj;
+    return new EqualsBuilder().append(name, rhs.getName()).append(value, rhs.getValue()).isEquals();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(9, 23).append(name).append(value).toHashCode();
   }
 
   /**
