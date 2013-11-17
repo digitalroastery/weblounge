@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class JCRResourceSerializerRegistry {
 
-  private Map<String, JCRResourceSerializer> resourceSerializers = new HashMap<String, JCRResourceSerializer>();
+  private Map<Class<?>, JCRResourceSerializer> resourceSerializers = new HashMap<Class<?>, JCRResourceSerializer>();
 
   /** The logging facility */
   private Logger log = LoggerFactory.getLogger(JCRResourceSerializerRegistry.class);
@@ -45,7 +45,7 @@ public class JCRResourceSerializerRegistry {
    *          the new resource serializer service
    */
   protected void bindJCRResourceSerializer(JCRResourceSerializer serializer) {
-    for (String type : serializer.getSerializableTypes()) {
+    for (Class<?> type : serializer.getSerializableTypes()) {
       if (resourceSerializers.containsKey(type))
         log.warn("There's already a resource serializer for the type '{}' registered!", type);
       else {
@@ -62,7 +62,7 @@ public class JCRResourceSerializerRegistry {
    *          the resource serializer to remove
    */
   protected void unbindJCRResourceSerializer(JCRResourceSerializer serializer) {
-    for (String type : serializer.getSerializableTypes()) {
+    for (Class<?> type : serializer.getSerializableTypes()) {
       if (serializer.equals(resourceSerializers.get(type))) {
         resourceSerializers.remove(type);
         log.info("Resource serializer for resources of type '{}' removed.", type);
@@ -78,7 +78,7 @@ public class JCRResourceSerializerRegistry {
    * @return
    * @throws ContentRepositoryException
    */
-  public JCRResourceSerializer getSerializer(String type)
+  public JCRResourceSerializer getSerializer(Class<?> type)
       throws ContentRepositoryException {
     if (!resourceSerializers.containsKey(type)) {
       log.error("No serializer found for resource type '{}'", type);

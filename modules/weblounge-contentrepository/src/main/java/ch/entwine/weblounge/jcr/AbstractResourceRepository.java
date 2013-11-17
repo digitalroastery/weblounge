@@ -170,7 +170,7 @@ public abstract class AbstractResourceRepository {
       Node pageNode = parentNode.addNode(JCRResourceUtils.getNodeName(resource.getURI()), JcrConstants.NT_UNSTRUCTURED);
 
       // FIXME How can we get type of resource?
-      JCRResourceSerializer serializer = serializerRegistry.getSerializer("page");
+      JCRResourceSerializer serializer = serializerRegistry.getSerializer(resource.getClass());
       serializer.store(pageNode, resource);
 
       // Make node versionable
