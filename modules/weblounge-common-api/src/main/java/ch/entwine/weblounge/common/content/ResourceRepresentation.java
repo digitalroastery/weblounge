@@ -26,11 +26,11 @@ import java.util.List;
 /**
  * A ResoourceRepresentation is, as its name states, a kind of representation of
  * the resource. Each representation consists of a particular type (e.g.
- * PageData) and a set of {@link ResourceCharacteristics}.
+ * PageData) and a set of {@link ResourceRepresentationCharacteristic}.
  * <p>
- * Each {@link Resource} contains an undefined number of
- * ResourceRepresentations. There may be multiple representations of the same
- * type having a unique set of characteristics.<br>
+ * Each {@link Resource} contains an undefined number of representations. There
+ * may be multiple representations of the same type having a unique set of
+ * characteristics.<br>
  * E.g.: A page resource may contains multiple content resource representations,
  * each with a unique language characteristic.
  * 
