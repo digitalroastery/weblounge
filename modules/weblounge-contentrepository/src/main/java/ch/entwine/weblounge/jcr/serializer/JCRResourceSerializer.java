@@ -1,4 +1,4 @@
-package ch.entwine.weblounge.jcr;
+package ch.entwine.weblounge.jcr.serializer;
 
 import ch.entwine.weblounge.common.content.Resource;
 

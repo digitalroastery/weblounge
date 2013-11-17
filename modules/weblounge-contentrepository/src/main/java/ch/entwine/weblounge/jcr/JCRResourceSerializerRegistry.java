@@ -20,6 +20,7 @@
 package ch.entwine.weblounge.jcr;
 
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

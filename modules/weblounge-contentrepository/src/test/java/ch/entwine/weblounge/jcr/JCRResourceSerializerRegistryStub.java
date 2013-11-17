@@ -19,6 +19,8 @@
  */
 package ch.entwine.weblounge.jcr;
 
+import ch.entwine.weblounge.jcr.impl.serializer.JCRPageResourceSerializer;
+
 /**
  * TODO: Comment JCRResourceSerializerRegistryStub
  */

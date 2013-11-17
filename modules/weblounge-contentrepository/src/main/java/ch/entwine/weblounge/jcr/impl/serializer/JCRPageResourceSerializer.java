@@ -1,4 +1,4 @@
-package ch.entwine.weblounge.jcr;
+package ch.entwine.weblounge.jcr.impl.serializer;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.page.Page;
@@ -11,7 +11,7 @@ public class JCRPageResourceSerializer extends AbstractJCRResourceSerializer {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.jcr.JCRResourceSerializer#getSerializableTypes()
+   * @see ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer#getSerializableTypes()
    */
   @Override
   public String[] getSerializableTypes() {
@@ -21,7 +21,7 @@ public class JCRPageResourceSerializer extends AbstractJCRResourceSerializer {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.jcr.AbstractJCRResourceSerializer#store(javax.jcr.Node,
+   * @see ch.entwine.weblounge.jcr.impl.serializer.AbstractJCRResourceSerializer#store(javax.jcr.Node,
    *      ch.entwine.weblounge.common.content.Resource)
    */
   @Override
@@ -89,7 +89,7 @@ public class JCRPageResourceSerializer extends AbstractJCRResourceSerializer {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.jcr.AbstractJCRResourceSerializer#read(javax.jcr.Node,
+   * @see ch.entwine.weblounge.jcr.impl.serializer.AbstractJCRResourceSerializer#read(javax.jcr.Node,
    *      ch.entwine.weblounge.common.content.Resource)
    */
   @Override

@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.jcr.impl.serializer.JCRPageResourceSerializer;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

@@ -6,6 +6,6 @@
   <implementation class="ch.entwine.weblounge.jcr.JCRResourceSerializerRegistry" />
   <property name="service.description" value="Weblounge JCR Resource Serializer Service" />
 
-  <reference name="serializers" interface="ch.entwine.weblounge.jcr.JCRResourceSerializer" cardinality="0..n" policy="dynamic" bind="bindJCRResourceSerializer" unbind="unbindJCRResourceSerializer" />
+  <reference name="serializers" interface="ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer" cardinality="0..n" policy="dynamic" bind="bindJCRResourceSerializer" unbind="unbindJCRResourceSerializer" />
 
 </scr:component>

@@ -3,10 +3,10 @@
   immediate="true"
   name="Weblounge JCR Page Resource Serializer"> 
   
-  <implementation class="ch.entwine.weblounge.jcr.JCRPageResourceSerializer" />
+  <implementation class="ch.entwine.weblounge.jcr.impl.serializer.JCRPageResourceSerializer" />
   <property name="service.description" value="Weblounge JCR Page Resource Serializer" />
   <service>
-    <provide interface="ch.entwine.weblounge.jcr.JCRResourceSerializer" />
+    <provide interface="ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer" />
   </service>
 
 </scr:component>

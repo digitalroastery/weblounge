@@ -17,11 +17,12 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package ch.entwine.weblounge.jcr;
+package ch.entwine.weblounge.jcr.impl.serializer;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -39,7 +40,7 @@ public abstract class AbstractJCRResourceSerializer implements JCRResourceSerial
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.jcr.JCRResourceSerializer#store(javax.jcr.Node, ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer#store(javax.jcr.Node, ch.entwine.weblounge.common.content.Resource)
    */
   @Override
   public void store(Node node, Resource<?> resource) {
@@ -109,7 +110,7 @@ public abstract class AbstractJCRResourceSerializer implements JCRResourceSerial
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.jcr.JCRResourceSerializer#read(javax.jcr.Node, ch.entwine.weblounge.common.content.Resource)
+   * @see ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer#read(javax.jcr.Node, ch.entwine.weblounge.common.content.Resource)
    */
   @Override
   public void read(Node node, Resource<?> resource) {

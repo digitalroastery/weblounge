@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.content.ResourceRepresentationCharacteristic;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
@@ -194,11 +195,6 @@ public abstract class AbstractResourceRepository {
   }
 
   public <T extends ResourceRepresentation> T createRepresentation(
-      ResourceURI uri, Class<T> type) {
-    return null;
-  }
-
-  public <T extends ResourceRepresentation> T getRepresentation(
       ResourceURI uri, Class<T> type) {
     return null;
   }
