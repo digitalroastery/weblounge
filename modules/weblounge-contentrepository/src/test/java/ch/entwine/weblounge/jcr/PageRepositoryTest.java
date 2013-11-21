@@ -20,9 +20,9 @@
 package ch.entwine.weblounge.jcr;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
@@ -47,7 +47,6 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -126,102 +125,214 @@ public class PageRepositoryTest {
     IOUtils.closeQuietly(is);
   }
 
+  /**
+   * Test for {@link PageRepository#createPage(ResourceURI)}
+   */
   @Test
-  public void testAddPageWithInvalidPath() throws Exception {
-    ResourceURI uri = new ResourceURIImpl(Page.TYPE, site, "invalid:path");
-
-    PageReader pageReader = new PageReader();
-    InputStream is1 = this.getClass().getResourceAsStream("/page1.xml");
-    Page page1 = pageReader.read(is1, site);
-    IOUtils.closeQuietly(is1);
-
-    pageRepository.createPage(uri, page1);
-  }
-
-  @Test
-  public void testAddPageNull() throws Exception {
+  public void testCreatePage() throws Exception {
+    // Test creating page with null value
     try {
-      pageRepository.createPage(null, page1);
-      fail("Adding a page without an URI should throw an exception");
+      pageRepository.createPage(null);
+      fail("Creating page with a null-value URI should throw an IllegalArgumentException");
     } catch (IllegalArgumentException e) {
+      // Nothing to do
     }
 
+    // Test creating page with no parent page
     try {
-      pageRepository.createPage(page1.getURI(), null);
-      fail("Adding a null-value page should throw an exception");
+      pageRepository.createPage(new ResourceURIImpl(Page.TYPE, site, "/no/parent/page"));
+      fail("Creating a page on a path without existing parent-page should throw a ContentRepositoryException");
+    } catch (ContentRepositoryException e) {
+      // Nothing to do
+    }
+
+    // Test creating page
+    ResourceURI uri = new ResourceURIImpl(Page.TYPE, site, "/test-create-page");
+    Page createdPage = pageRepository.createPage(uri);
+    assertNotNull("Created page must have its identifier set", createdPage.getIdentifier());
+    assertEquals("Path of created page must equal to given uri", uri.getPath(), createdPage.getPath());
+
+    // Test creating sub-page
+    ResourceURI subUri = new ResourceURIImpl(Page.TYPE, site, "/test-create-page/sub-page");
+    try {
+      pageRepository.createPage(subUri);
+    } catch (ContentRepositoryException e) {
+      fail("Creating a page with a valid parent-page should not fail");
+    }
+
+    // Test creating existing page
+    try {
+      pageRepository.createPage(uri);
+      fail("Adding a page with a path that already exists must fail");
+    } catch (ContentRepositoryException e) {
+      // Nothing to do
+    }
+  }
+
+  /**
+   * Test for {@link PageRepository#updatePage(Page)}
+   */
+  @Test
+  public void testUpdatePage() throws Exception {
+    // Test updating page with null value
+    try {
+      pageRepository.updatePage(null);
+      fail("Updating page wit a null-value should throw an IllegalArgumentException");
     } catch (IllegalArgumentException e) {
+      // Nothing to do
+    }
+
+    ResourceURI uri1 = new ResourceURIImpl(Page.TYPE, site, "/test-update-page");
+    page1.setPath(uri1.getPath());
+
+    // Test updating non-existing page
+    try {
+      pageRepository.updatePage(page1);
+      fail("Updating a non-existing page should throw a ContentRepositoryException");
+    } catch (ContentRepositoryException e) {
+      // Nothing to do
+    }
+
+    // Test updating page (default)
+    Page createdPage1 = pageRepository.createPage(uri1);
+    pageRepository.updatePage(createdPage1);
+    assertNotNull("Returned page must not be null", pageRepository.updatePage(createdPage1));
+
+    // Test updating sub-page
+    ResourceURI uri2 = new ResourceURIImpl(Page.TYPE, site, "/test-update-page/sub-page");
+    page1.setPath(uri2.getPath());
+    Page createdPage2 = pageRepository.createPage(uri2);
+    pageRepository.updatePage(createdPage2);
+
+    // Test updating page with non-matching identifier
+    createdPage1.setIdentifier("00000000-0000-0000-0000-000000000000");
+    try {
+      pageRepository.updatePage(createdPage1);
+      fail("Updating page with a non-matching identifier must fail");
+    } catch (ContentRepositoryException e) {
+      // Nothing to do
     }
   }
 
+  /**
+   * Test for {@link PageRepository#getPage(ResourceURI)}
+   */
   @Test
-  public void testAddPageWithVersion() throws Exception {
-    ResourceURI uri = page1.getURI();
-    uri.setPath("/test-page-with-version-live");
-    uri.setVersion(Resource.LIVE);
-    page1.setVersion(Resource.LIVE);
+  public void testGetPage() throws Exception {
+    // Test getting page with null value
+    try {
+      pageRepository.getPage(null);
+      fail("Getting a page with a null-value uri must throw an IllegalArgumentException");
+    } catch (IllegalArgumentException e) {
+      // Nothing to do
+    }
 
-    Page page = pageRepository.createPage(uri, page1);
-    assertEquals(Resource.LIVE, page.getVersion());
+    ResourceURI uri1 = page1.getURI();
+    uri1.setPath("/test-get-page");
 
-    uri.setPath("/test-page-with-version-work");
-    page1.setVersion(Resource.WORK);
+    // Test getting non-existing page
+    try {
+      pageRepository.getPage(uri1);
+      fail("Trying to get a page wich not exists must throw a ContentRepositoryException");
+    } catch (ContentRepositoryException e) {
+      // Nothing to do
+    }
 
-    page = pageRepository.createPage(uri, page1);
-    assertEquals(Resource.WORK, page.getVersion());
+    // Create page before getting it
+    Page createdPage = pageRepository.createPage(uri1);
+    page1.setIdentifier(createdPage.getIdentifier());
+    page1.setPath(createdPage.getPath());
+    pageRepository.updatePage(page1);
+
+    // Test getting page
+    Page page = pageRepository.getPage(uri1);
+    assertNotNull("Returned page must not be null", page);
+    assertEquals(page1.getTemplate(), page.getTemplate());
+    assertEquals(page1.getLayout(), page.getLayout());
+    assertEquals(page1.isStationary(), page.isStationary());
+
+    // Test getting page with non-equivalent identifier
+    uri1.setIdentifier("00000000-0000-0000-0000-000000000000");
+    try {
+      pageRepository.getPage(uri1);
+      fail("Getting a page with a non-equivalent identifier must fail");
+    } catch (ContentRepositoryException e) {
+      // Nothing to do
+    }
+  }
+
+  /**
+   * Test for {@link PageRepository#existsPage(ResourceURI)}
+   */
+  @Test
+  public void testExistsPage() throws Exception {
+    // Test with null-value
+    try {
+      pageRepository.existsPage(null);
+      fail("Checking if a page exists with a null-value uri must throw an IllegalArgumentException");
+    } catch (IllegalArgumentException e) {
+      // Nothing to do
+    }
+
+    ResourceURI notExisting = new ResourceURIImpl(Page.TYPE, site, "/test-exists-page-not-existing");
+    ResourceURI existing = new ResourceURIImpl(Page.TYPE, site, "/test-exists-page-existing");
+
+    pageRepository.createPage(existing);
+
+    assertEquals("Page should not exist...", false, pageRepository.existsPage(notExisting));
+    assertEquals("Page should exist...", true, pageRepository.existsPage(existing));
   }
 
   @Test
-  public void testAddPage() throws Exception {
+  public void testDeletePage() throws Exception {
+    // Test deleting with null value
+    try {
+      pageRepository.deletePage(null);
+      fail("Deleting a page with a null-value uri must throw an IllegalArgumentException");
+    } catch (IllegalArgumentException e) {
+      // Nothing to do
+    }
 
-    // // Prepare the pages
-    // PageReader pageReader = new PageReader();
-    // InputStream is1 = this.getClass().getResourceAsStream("/page1.xml");
-    // Page page1 = pageReader.read(is1, site);
-    // IOUtils.closeQuietly(is1);
-    // InputStream is2 = this.getClass().getResourceAsStream("/page2.xml");
-    // Page page2 = pageReader.read(is2, site);
-    // IOUtils.closeQuietly(is2);
+    // Test deleting homepage
+    try {
+      pageRepository.deletePage(new ResourceURIImpl(Page.TYPE, site, "/"));
+      fail("Deleting homepage of a site must throw a ContentRepositoryException");
+    } catch (ContentRepositoryException e) {
+      // Nothing to do
+    }
+
+    ResourceURI uri1 = page1.getURI();
+    uri1.setPath("/test-delete-page");
+
+    // Test deleting non-existing page
+    try {
+      pageRepository.deletePage(uri1);
+      fail("Deleting a non-existing page must throw a ContentRepositoryException");
+    } catch (ContentRepositoryException e) {
+      // Nothing to do
+    }
+
+    page1.setIdentifier(pageRepository.createPage(uri1).getIdentifier());
+    page1.setPath(uri1.getPath());
+    pageRepository.updatePage(page1);
+
+    ResourceURI uri2 = page2.getURI();
+    uri2.setPath("/test-delete-page/sub-page");
+    page2.setIdentifier(pageRepository.createPage(uri2).getIdentifier());
+    page2.setPath(uri2.getPath());
+    pageRepository.updatePage(page2);
 
     try {
-      ResourceURI uri = page1.getURI();
-      pageRepository.createPage(uri, page1);
-
-      // Page pageRead = pageRepository.getPage(uri);
-      // assertEquals("home", pageRead.getTemplate());
-      // assertEquals("news", pageRead.getLayout());
-      //
-      // page1.setTemplate("my-new-template");
-      // page1.setVersion(Resource.WORK);
-      // pageRepository.updatePage(page1.getURI(), page1);
-      //
-      // page1.setVersion(Resource.LIVE);
-      // pageRepository.updatePage(page1.getURI(), page1);
+      pageRepository.deletePage(uri1);
+      fail("Deleting a page with existing sub-pages must throw a ContentRepositoryException");
     } catch (ContentRepositoryException e) {
-      fail("Failed to add page to the repository: " + e.getMessage());
+      // Nothing to do
     }
 
-    try {
-      ResourceURI uri = page1.getURI();
-      uri.setVersion(100);
-      pageRepository.getPage(uri);
-      fail("Version 100 should not be present");
-    } catch (ContentRepositoryException e) {
-      // expected
-    }
-  }
-
-  @Test
-  public void testGetVersions() throws Exception {
-    ResourceURI uri = page1.getURI();
-    uri.setPath("test-get-versions");
-
-    pageRepository.createPage(uri, page1);
-    pageRepository.updatePage(uri, page1);
-    pageRepository.updatePage(uri, page1);
-    pageRepository.updatePage(uri, page1);
-
-    List<String> versions = pageRepository.getVersions(uri);
-    assertEquals(4, versions.size());
+    pageRepository.deletePage(uri2);
+    assertEquals("Page should no longer exits", false, pageRepository.existsPage(uri2));
+    pageRepository.deletePage(uri1);
+    assertEquals("Page should no longer exits", false, pageRepository.existsPage(uri1));
   }
 
 }
