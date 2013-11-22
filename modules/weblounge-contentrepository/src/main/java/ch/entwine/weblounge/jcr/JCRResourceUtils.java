@@ -25,30 +25,69 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * TODO: Comment JCRResourceUtils
+ * Utility class for working with resources and a JCR repository.
  */
 public final class JCRResourceUtils {
 
   private JCRResourceUtils() {
   }
 
+  /**
+   * Returns the absolute path of the resource's node.
+   * <p>
+   * If you have a resource uri with a site value <code>my-site</code> and a
+   * path <code>/my/test/resource/</code> this method will return
+   * <code>/sites/my-site/resources/my/test/resource</code> as absolute node
+   * path.
+   * 
+   * @param uri
+   *          the resource uri
+   * @return the absolute node path
+   */
   public static String getAbsNodePath(ResourceURI uri) {
+    if (uri == null)
+      throw new IllegalArgumentException("URI must not be null");
+
     String absPath = UrlUtils.concat(JCRResourceConstants.SITES_ROOT_NODE_REL_PATH, uri.getSite().getIdentifier(), JCRResourceConstants.RESOURCES_NODE_NAME, uri.getPath());
     absPath = StringUtils.removeEnd(absPath, "/");
     absPath = "/" + absPath;
     return absPath;
   }
 
+  /**
+   * Return the absolute path of the resource's parent node.
+   * <p>
+   * If you have a resource uri with a site value <code>my-site</code> and a
+   * path <code>/my/test/resource/</code> this method will return
+   * <code>/sites/my-site/resources/my/test</code> as absolute node path.
+   * 
+   * @param uri
+   *          the resource uri
+   * @return the absolute path of the parent node
+   */
   public static String getAbsParentNodePath(ResourceURI uri) {
     String absPath = getAbsNodePath(uri);
     absPath = absPath.substring(0, absPath.lastIndexOf("/"));
     return absPath;
   }
 
+  /**
+   * Returns the node name of the given URI.
+   * <p>
+   * For the uri with path <code>/this/is/my/page</code> the node name
+   * </code>page</code> will be returned.
+   * 
+   * @param uri
+   *          the uri
+   * @return the node name
+   */
   public static String getNodeName(ResourceURI uri) {
-    String path = uri.getPath();
-    String name = StringUtils.removeEnd(path, "/");
-    return name.substring(name.lastIndexOf("/") + 1, path.length() - 1);
+    if (uri == null)
+      throw new IllegalArgumentException("URI must not be null");
+
+    String absPath = getAbsNodePath(uri);
+    String name = StringUtils.removeEnd(absPath, "/");
+    return name.substring(name.lastIndexOf("/") + 1, absPath.length());
   }
 
 }
