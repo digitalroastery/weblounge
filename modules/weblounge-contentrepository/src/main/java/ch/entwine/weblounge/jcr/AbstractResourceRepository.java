@@ -32,8 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.jcr.Credentials;
 import javax.jcr.LoginException;
@@ -235,7 +238,7 @@ public abstract class AbstractResourceRepository {
    * @throws ContentRepositoryException
    *           if the resource does not exist or any other error occurs
    */
-  public List<String> getVersions(ResourceURI uri)
+  public SortedMap<String, Calendar> getVersions(ResourceURI uri)
       throws ContentRepositoryException {
 
     if (uri == null)
@@ -254,15 +257,15 @@ public abstract class AbstractResourceRepository {
       VersionHistory history = versionManager.getVersionHistory(JCRResourceUtils.getAbsNodePath(uri));
       VersionIterator versions = history.getAllVersions();
 
-      List<String> versionsList = new ArrayList<String>();
+      SortedMap<String, Calendar> versionsMap = new TreeMap<String, Calendar>();
       while (versions.hasNext()) {
         Version version = versions.nextVersion();
         if (version.getName().equals(JcrConstants.JCR_ROOTVERSION))
           continue;
-        versionsList.add(version.getName());
+        versionsMap.put(version.getName(), version.getCreated());
       }
 
-      return versionsList;
+      return versionsMap;
     } catch (RepositoryException e) {
       log.warn("Problem while reading the versions of the resource '{}'", uri);
       throw new ContentRepositoryException("Problem while reading the versions of the resource " + uri.toString(), e);

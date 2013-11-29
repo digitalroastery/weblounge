@@ -21,6 +21,7 @@ package ch.entwine.weblounge.jcr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
@@ -31,7 +32,8 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Calendar;
+import java.util.SortedMap;
 
 /**
  * Test class for {@link PageRepository}
@@ -290,9 +292,9 @@ public class PageRepositoryTest extends AbstractResourceRepositoryTest {
     page1.setPath(uri1.getPath());
     pageRepository.updatePage(page1);
 
-    List<String> versions1 = pageRepository.getVersions(uri1);
+    SortedMap<String, Calendar> versions1 = pageRepository.getVersions(uri1);
     assertEquals(1, versions1.size());
-    assertEquals("1.0", versions1.get(0));
+    assertTrue(versions1.containsKey("1.0"));
 
     ResourceURI uri2 = page2.getURI();
     uri2.setPath("/test-get-versions/sub-page");
@@ -300,7 +302,7 @@ public class PageRepositoryTest extends AbstractResourceRepositoryTest {
     page2.setPath(uri2.getPath());
     pageRepository.updatePage(page2);
 
-    List<String> versions2 = pageRepository.getVersions(uri2);
+    SortedMap<String, Calendar> versions2 = pageRepository.getVersions(uri2);
     assertEquals(1, versions2.size());
     versions1 = pageRepository.getVersions(uri1);
     assertEquals(2, versions1.size());
@@ -309,13 +311,14 @@ public class PageRepositoryTest extends AbstractResourceRepositoryTest {
     pageRepository.updatePage(page2);
     versions1 = pageRepository.getVersions(uri1);
     assertEquals(3, versions1.size());
-    assertEquals("1.0", versions1.get(0));
-    assertEquals("1.1", versions1.get(1));
-    assertEquals("1.2", versions1.get(2));
+    assertTrue(versions1.containsKey("1.0"));
+    assertTrue(versions1.containsKey("1.1"));
+    assertTrue(versions1.containsKey("1.2"));
     versions2 = pageRepository.getVersions(uri2);
     assertEquals(2, versions2.size());
-    assertEquals("1.0", versions2.get(0));
-    assertEquals("1.1", versions2.get(1));
+    assertTrue(versions2.containsKey("1.0"));
+    assertTrue(versions2.containsKey("1.1"));
 
+    assertTrue(versions1.get("1.0").getTimeInMillis() < versions1.get("1.1").getTimeInMillis());
   }
 }
