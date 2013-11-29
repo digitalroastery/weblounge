@@ -27,7 +27,6 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -226,15 +225,31 @@ public abstract class AbstractResourceRepository {
     return false;
   }
 
+  /**
+   * Returns a list of versions for the given resource. If the resource not
+   * exists, a <code>ContentRepositoryException</code> is thrown.
+   * 
+   * @param uri
+   *          the resource to get the versions from
+   * @return the list of versions
+   * @throws ContentRepositoryException
+   *           if the resource does not exist or any other error occurs
+   */
   public List<String> getVersions(ResourceURI uri)
       throws ContentRepositoryException {
 
-    if (StringUtils.isEmpty(uri.getPath()))
-      throw new IllegalArgumentException("The given ResourceURI must have a path set");
+    if (uri == null)
+      throw new IllegalArgumentException("URI must not be null");
 
     Session session = getSession();
+    String nodeAbsPath = JCRResourceUtils.getAbsNodePath(uri);
 
     try {
+      if (!session.nodeExists(nodeAbsPath)) {
+        log.warn("Resource '{}' not found", uri);
+        throw new ContentRepositoryException("Resource '" + uri.toString() + "' not found");
+      }
+
       VersionManager versionManager = session.getWorkspace().getVersionManager();
       VersionHistory history = versionManager.getVersionHistory(JCRResourceUtils.getAbsNodePath(uri));
       VersionIterator versions = history.getAllVersions();

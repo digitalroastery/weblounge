@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.jcr.impl.serializer.JCRPageResourceSerializer;
 
+import org.apache.jackrabbit.JcrConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,7 @@ import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.jcr.version.VersionManager;
 
 /**
  * TODO: Comment PageRepository
@@ -79,7 +81,11 @@ public class PageRepository extends AbstractResourceRepository {
         throw new ContentRepositoryException("There is already a resource at the given path '" + uri.getPath() + "'");
       }
 
+      VersionManager versionMgr = session.getWorkspace().getVersionManager();
+      versionMgr.checkout(absParentNodePath);
       Node pageNode = parentNode.addNode(JCRResourceUtils.getNodeName(uri));
+
+      pageNode.addMixin(JcrConstants.MIX_VERSIONABLE);
       pageNode.setProperty("resource-type", Page.TYPE);
 
       Node created = pageNode.addNode("webl:created");
@@ -90,6 +96,7 @@ public class PageRepository extends AbstractResourceRepository {
       page.setIdentifier(pageNode.getIdentifier());
 
       session.save();
+      versionMgr.checkin(absParentNodePath);
 
       log.info("Successfully created new page '{}'", uri);
       return page;
@@ -129,20 +136,16 @@ public class PageRepository extends AbstractResourceRepository {
         throw new ContentRepositoryException("Identifier of page and identifier of node do not match");
       }
 
-      // VersionManager versionMgr = session.getWorkspace().getVersionManager();
-      // versionMgr.checkout(pageNode.getPath());
+      VersionManager versionMgr = session.getWorkspace().getVersionManager();
+      versionMgr.checkout(pageNode.getPath());
 
       // storePageInNode(pageNode, page);
       JCRPageResourceSerializer serializer = new JCRPageResourceSerializer();
       serializer.store(pageNode, page);
 
-      // Make node versionable
-      // TODO Do we need to add the mix-in here again?
-      // pageNode.addMixin(JcrConstants.MIX_VERSIONABLE);
-
       session.save();
+      versionMgr.checkin(absPagePath);
 
-      // checkinResourceWithVersionLabel(versionMgr, pageNode, uri);
     } catch (PathNotFoundException e) {
       log.warn("Tryied updating non existing page '{}'", page);
       throw new ContentRepositoryException("Tryed updating non existing page");
@@ -192,8 +195,11 @@ public class PageRepository extends AbstractResourceRepository {
         }
       }
 
+      VersionManager versionMgr = session.getWorkspace().getVersionManager();
+      versionMgr.checkout(JCRResourceUtils.getAbsParentNodePath(uri));
       pageNode.remove();
       session.save();
+      versionMgr.checkin(JCRResourceUtils.getAbsParentNodePath(uri));
 
       log.info("Successfully deleted page '{}'", uri);
     } catch (RepositoryException e) {

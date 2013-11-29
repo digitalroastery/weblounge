@@ -31,6 +31,8 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.List;
+
 /**
  * Test class for {@link PageRepository}
  */
@@ -38,7 +40,7 @@ public class PageRepositoryTest extends AbstractResourceRepositoryTest {
 
   /** The page repository */
   private static PageRepository pageRepository = null;
-  
+
   @BeforeClass
   public static void beforeClass() {
     // JCR repository
@@ -206,6 +208,9 @@ public class PageRepositoryTest extends AbstractResourceRepositoryTest {
     assertEquals("Page should exist...", true, pageRepository.existsPage(existing));
   }
 
+  /**
+   * Test for {@link PageRepository#deletePage(ResourceURI)}
+   */
   @Test
   public void testDeletePage() throws Exception {
     // Test deleting with null value
@@ -258,4 +263,59 @@ public class PageRepositoryTest extends AbstractResourceRepositoryTest {
     assertEquals("Page should no longer exits", false, pageRepository.existsPage(uri1));
   }
 
+  /**
+   * Test for {@link PageRepository#getVersions(ResourceURI)}
+   */
+  @Test
+  public void testGetVersions() throws Exception {
+    try {
+      pageRepository.getVersions(null);
+      fail("Trying to get versions of null-value uri");
+    } catch (IllegalArgumentException e) {
+      // Nothing to do
+    }
+
+    ResourceURI uri1 = page1.getURI();
+    uri1.setPath("/test-get-versions");
+
+    try {
+      pageRepository.getVersions(uri1);
+      fail("Getting versions of non-existing resource must throw a ContentRepositoryException");
+    } catch (ContentRepositoryException e) {
+      // TODO ResourceNotFoundException, see issue #301
+      // Nothing to do
+    }
+
+    page1.setIdentifier(pageRepository.createPage(uri1).getIdentifier());
+    page1.setPath(uri1.getPath());
+    pageRepository.updatePage(page1);
+
+    List<String> versions1 = pageRepository.getVersions(uri1);
+    assertEquals(1, versions1.size());
+    assertEquals("1.0", versions1.get(0));
+
+    ResourceURI uri2 = page2.getURI();
+    uri2.setPath("/test-get-versions/sub-page");
+    page2.setIdentifier(pageRepository.createPage(uri2).getIdentifier());
+    page2.setPath(uri2.getPath());
+    pageRepository.updatePage(page2);
+
+    List<String> versions2 = pageRepository.getVersions(uri2);
+    assertEquals(1, versions2.size());
+    versions1 = pageRepository.getVersions(uri1);
+    assertEquals(2, versions1.size());
+
+    pageRepository.updatePage(page1);
+    pageRepository.updatePage(page2);
+    versions1 = pageRepository.getVersions(uri1);
+    assertEquals(3, versions1.size());
+    assertEquals("1.0", versions1.get(0));
+    assertEquals("1.1", versions1.get(1));
+    assertEquals("1.2", versions1.get(2));
+    versions2 = pageRepository.getVersions(uri2);
+    assertEquals(2, versions2.size());
+    assertEquals("1.0", versions2.get(0));
+    assertEquals("1.1", versions2.get(1));
+
+  }
 }
