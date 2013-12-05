@@ -4,6 +4,7 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,9 @@ public class JCRPageResourceSerializer extends AbstractJCRResourceSerializer {
   @Override
   public void store(Node node, Resource<?> resource)
       throws ContentRepositoryException {
+
+    if (node == null || resource == null)
+      throw new IllegalArgumentException("Neither node nor resource parameter must be null");
 
     // TODO Finish!!!
     Page page = null;
