@@ -28,32 +28,18 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.jackrabbit.core.TransientRepository;
 import org.easymock.EasyMock;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * TODO: Comment AbstractResourceRepositoryTest
+ * TODO: Comment ResourceRepositoryTestBase
  */
-public abstract class AbstractResourceRepositoryTest {
-
-  /** The temporary folder for the transient JCR repository */
-  @ClassRule
-  // CHECKSTYLE:OFF - field must be public, because it's a ClassRule
-  public static TemporaryFolder temp = new TemporaryFolder();
-  // CHECKSTYLE:ON
-
-  /** The JCR repository */
-  protected static TransientRepository repository = null;
+public class ResourceRepositoryTestBase extends WebloungeJCRTestBase {
 
   /** Page template */
   protected static PageTemplate template = null;
@@ -66,11 +52,7 @@ public abstract class AbstractResourceRepositoryTest {
   protected Page page2 = null;
 
   @BeforeClass
-  public static void setUpClass() throws Exception {
-    File dir = temp.newFolder("repository");
-    File xml = new File(PageRepositoryTest.class.getResource("/repository.xml").toURI());
-    repository = new TransientRepository(xml, dir);
-
+  public static void setupEnvironment() throws Exception {
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
     EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
@@ -89,12 +71,6 @@ public abstract class AbstractResourceRepositoryTest {
     EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("testsite")).anyTimes();
     EasyMock.replay(site);
-  }
-
-  @AfterClass
-  public static void afterClass() {
-    repository.shutdown();
-    repository = null;
   }
 
   @Before

@@ -38,16 +38,16 @@ import java.util.SortedMap;
 /**
  * Test class for {@link PageRepository}
  */
-public class PageRepositoryTest extends AbstractResourceRepositoryTest {
+public class PageRepositoryTest extends ResourceRepositoryTestBase {
 
   /** The page repository */
   private static PageRepository pageRepository = null;
 
   @BeforeClass
-  public static void beforeClass() {
+  public static void setUpPageRepository() {
     // JCR repository
     pageRepository = new PageRepositoryStub();
-    pageRepository.bindRepository(repository);
+    pageRepository.bindRepository(getRepository());
     pageRepository.bindSite(site);
     pageRepository.bindJCRResourceSerializerRegistry(new JCRResourceSerializerRegistryStub());
   }
