@@ -20,6 +20,7 @@
 package ch.entwine.weblounge.jcr.serializer;
 
 import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 
 import javax.jcr.Node;
@@ -67,10 +68,11 @@ public interface JCRResourceSerializer {
    * 
    * @param node
    *          the node containing the resource's data
+   * @param uri TODO
    * @return the resource created from the node's data
    * @throws ContentRepositoryException
    *           if there occurs any error while reading the resource
    */
-  Resource<?> read(Node node) throws ContentRepositoryException;
+  Resource<?> read(Node node, ResourceURI uri) throws ContentRepositoryException;
 
 }

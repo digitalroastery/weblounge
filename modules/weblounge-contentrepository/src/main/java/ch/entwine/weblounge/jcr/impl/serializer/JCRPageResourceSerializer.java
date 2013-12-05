@@ -1,10 +1,10 @@
 package ch.entwine.weblounge.jcr.impl.serializer;
 
 import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
-import ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,17 +43,17 @@ public class JCRPageResourceSerializer extends AbstractJCRResourceSerializer {
     if (node == null || resource == null)
       throw new IllegalArgumentException("Neither node nor resource parameter must be null");
 
-    // TODO Finish!!!
     Page page = null;
     if (resource instanceof Page)
       page = (Page) resource;
     else
-      return;
+      throw new IllegalArgumentException("This Resource Serializer only supports Resources of the type Page");
 
     storeResource(node, resource);
 
     try {
       // Set page specific properties
+      node.setProperty("resource-type", "page");
       node.setProperty("layout", page.getLayout());
       node.setProperty("template", page.getTemplate());
       node.setProperty("stationary", page.isStationary());
@@ -67,12 +67,14 @@ public class JCRPageResourceSerializer extends AbstractJCRResourceSerializer {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer#read(javax.jcr.Node)
+   * @see ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer#read(javax.jcr.Node, ResourceURI)
    */
   @Override
-  public Page read(Node node) throws ContentRepositoryException {
-    // FIXME Add uri (from node)
-    Page page = new PageImpl(null);
+  public Page read(Node node, ResourceURI uri) throws ContentRepositoryException {
+    if (node == null || uri == null)
+      throw new IllegalArgumentException("Node parameter must not be null");
+
+    Page page = new PageImpl(uri);
     readResource(node, page);
 
     try {
