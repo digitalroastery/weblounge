@@ -73,8 +73,6 @@ public abstract class AbstractJCRResourceSerializer implements JCRResourceSerial
 
     try {
       // Set properties
-      // FIXME Set resource type like page, file, image, ...
-      node.setProperty("resource-type", "");
       node.setProperty("type", resource.getType());
       node.setProperty("promoted", resource.isPromoted());
 
@@ -99,42 +97,6 @@ public abstract class AbstractJCRResourceSerializer implements JCRResourceSerial
       // TODO Finish implementation (language dependent metadata, see ticket
       // #304)
 
-      // TODO Move to repository methods
-      // // Save owner
-      // if (resource.getOwner() != null) {
-      // Node owner = JcrUtils.getOrAddNode(node, "webl:owner");
-      // storeUser(owner, resource.getOwner());
-      // }
-      //
-      // // Save lock owner
-      // if (resource.isLocked() && resource.getLockOwner() != null) {
-      // Node lockOwner = JcrUtils.getOrAddNode(node, "webl:lockowner");
-      // storeUser(lockOwner, resource.getLockOwner());
-      // }
-      // // Save creation date & creator
-      // if (resource.getCreationDate() != null) {
-      // Node created = JcrUtils.getOrAddNode(node, "webl:created");
-      // Calendar cal = Calendar.getInstance();
-      // cal.setTime(resource.getCreationDate());
-      // created.setProperty("date", cal);
-      // }
-      // if (resource.getCreator() != null) {
-      // Node created = JcrUtils.getOrAddNode(node, "webl:created");
-      // storeUser(created, resource.getCreator());
-      // }
-      //
-      // // Save modification date & modifier
-      // if (resource.getModificationDate() != null) {
-      // Node modified = JcrUtils.getOrAddNode(node, "webl:modified");
-      // Calendar cal = Calendar.getInstance();
-      // cal.setTime(resource.getModificationDate());
-      // modified.setProperty("date", cal);
-      // }
-      // if (resource.getModifier() != null) {
-      // Node modified = JcrUtils.getOrAddNode(node, "webl:modified");
-      // storeUser(modified, resource.getModifier());
-      // }
-
     } catch (RepositoryException e) {
       log.warn("Error while storing a the resource '{}' in the given JCR node '{}'", resource, node);
       throw new ContentRepositoryException("Error while storing the resource in the JCR node", e);
@@ -158,15 +120,12 @@ public abstract class AbstractJCRResourceSerializer implements JCRResourceSerial
 
     try {
       // Read properties
-      resource.setIdentifier(node.getIdentifier());
-      // FIXME Set path relative to resources node
-      resource.setPath(node.getPath());
       resource.setType(node.getProperty("type").getString());
       resource.setPromoted(node.getProperty("promoted").getBoolean());
 
       // Read subjects
       if (node.hasNode("webl:subjects")) {
-        Node subjects = node.getNode("webl:subject");
+        Node subjects = node.getNode("webl:subjects");
         NodeIterator subjectsIterator = subjects.getNodes();
         while (subjectsIterator.hasNext()) {
           resource.addSubject(subjectsIterator.nextNode().getName());
