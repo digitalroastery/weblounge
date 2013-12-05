@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -416,9 +417,11 @@ public abstract class AbstractResourceRepository {
     // Register Weblounge namespace
     try {
       NamespaceRegistry nsRegistry = session.getWorkspace().getNamespaceRegistry();
-      nsRegistry.registerNamespace(WEBLOUNGE_JCR_NS_NAME, WEBLOUNGE_JCR_NS_URI);
-      session.save();
-      log.info("Registered namespace '{}' with uri '{}'", WEBLOUNGE_JCR_NS_NAME, WEBLOUNGE_JCR_NS_URI);
+      if (!Arrays.asList(nsRegistry.getURIs()).contains(WEBLOUNGE_JCR_NS_URI)) {
+        nsRegistry.registerNamespace(WEBLOUNGE_JCR_NS_NAME, WEBLOUNGE_JCR_NS_URI);
+        session.save();
+        log.info("Registered namespace '{}' with uri '{}'", WEBLOUNGE_JCR_NS_NAME, WEBLOUNGE_JCR_NS_URI);
+      }
     } catch (RepositoryException e) {
       log.warn("Error while trying to register namespace '{}': {}", WEBLOUNGE_JCR_NS_NAME, e.getMessage());
       throw new ContentRepositoryException(e);
