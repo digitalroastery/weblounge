@@ -32,6 +32,10 @@ import java.io.InputStream;
  */
 public class RepositoryTestUtils {
 
+  private RepositoryTestUtils() {
+    // Utility classes should not have a public or default constructor.
+  }
+
   /**
    * Loads a page from an resource (XML representation of a page). Returns the
    * loaded page.
