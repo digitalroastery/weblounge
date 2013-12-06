@@ -89,11 +89,13 @@ public class PageRepository extends AbstractResourceRepository {
       pageNode.setProperty("resource-type", Page.TYPE);
 
       Node created = pageNode.addNode("webl:created");
-      created.setProperty("date", Calendar.getInstance());
+      Calendar creationDate = Calendar.getInstance();
+      created.setProperty("date", creationDate);
       // TODO Add creator/owner, but which user shall we take?
 
       Page page = new PageImpl(uri);
       page.setIdentifier(pageNode.getIdentifier());
+      page.setCreationDate(creationDate.getTime());
 
       session.save();
       versionMgr.checkin(absParentNodePath);

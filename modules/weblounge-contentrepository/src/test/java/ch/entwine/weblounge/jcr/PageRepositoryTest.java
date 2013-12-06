@@ -33,6 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.SortedMap;
 
 /**
@@ -75,9 +76,11 @@ public class PageRepositoryTest extends ResourceRepositoryTestBase {
 
     // Test creating page
     ResourceURI uri = new ResourceURIImpl(Page.TYPE, site, "/test-create-page");
+    Date beforeCreation = new Date();
     Page createdPage = pageRepository.createPage(uri);
     assertNotNull("Created page must have its identifier set", createdPage.getIdentifier());
     assertEquals("Path of created page must equal to given uri", uri.getPath(), createdPage.getPath());
+    assertTrue("Creation date must be set on creation", beforeCreation.getTime()/1000 <= createdPage.getCreationDate().getTime()/1000);
 
     // Test creating sub-page
     ResourceURI subUri = new ResourceURIImpl(Page.TYPE, site, "/test-create-page/sub-page");
