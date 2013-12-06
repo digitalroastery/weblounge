@@ -78,8 +78,8 @@ public class JCRPageResourceSerializer extends AbstractJCRResourceSerializer {
     readResource(node, page);
 
     try {
-      page.setLayout(node.getProperty("layout").toString());
-      page.setTemplate(node.getProperty("template").toString());
+      page.setLayout(node.getProperty("layout").getString());
+      page.setTemplate(node.getProperty("template").getString());
       page.setStationary(node.getProperty("stationary").getBoolean());
     } catch (RepositoryException e) {
       log.warn("Error while trying to read page from JCR node '{}'", node);
