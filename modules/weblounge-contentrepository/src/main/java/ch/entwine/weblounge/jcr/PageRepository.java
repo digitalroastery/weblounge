@@ -150,7 +150,6 @@ public class PageRepository extends AbstractResourceRepository {
       VersionManager versionMgr = session.getWorkspace().getVersionManager();
       versionMgr.checkout(pageNode.getPath());
 
-      // storePageInNode(pageNode, page);
       JCRPageResourceSerializer serializer = new JCRPageResourceSerializer();
       serializer.store(pageNode, page);
 
