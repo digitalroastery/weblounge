@@ -24,7 +24,9 @@ import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
+import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.IOUtils;
@@ -46,6 +48,9 @@ public class ResourceRepositoryTestBase extends WebloungeJCRTestBase {
 
   /** The mock site */
   protected static Site site = null;
+  
+  /** The editor user */
+  protected static User editor = null;
 
   protected Page page1 = null;
 
@@ -71,6 +76,9 @@ public class ResourceRepositoryTestBase extends WebloungeJCRTestBase {
     EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("testsite")).anyTimes();
     EasyMock.replay(site);
+    
+    // Users
+    editor = new UserImpl("editor", "weblounge-test", "Editor");
   }
 
   @Before

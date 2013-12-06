@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.security.User;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -54,21 +55,27 @@ public class PageRepositoryTest extends ResourceRepositoryTestBase {
   }
 
   /**
-   * Test for {@link PageRepository#createPage(ResourceURI)}
+   * Test for {@link PageRepository#createPage(ResourceURI, User)}
    */
   @Test
   public void testCreatePage() throws Exception {
     // Test creating page with null value
     try {
-      pageRepository.createPage(null);
+      pageRepository.createPage(null, editor);
       fail("Creating page with a null-value URI should throw an IllegalArgumentException");
+    } catch (IllegalArgumentException e) {
+      // Nothing to do
+    }
+    try {
+      pageRepository.createPage(page1.getURI(), null);
+      fail("Creating page with a null-value user should throw an IllegalArgumentException");
     } catch (IllegalArgumentException e) {
       // Nothing to do
     }
 
     // Test creating page with no parent page
     try {
-      pageRepository.createPage(new ResourceURIImpl(Page.TYPE, site, "/no/parent/page"));
+      pageRepository.createPage(new ResourceURIImpl(Page.TYPE, site, "/no/parent/page"), editor);
       fail("Creating a page on a path without existing parent-page should throw a ContentRepositoryException");
     } catch (ContentRepositoryException e) {
       // Nothing to do
@@ -77,22 +84,23 @@ public class PageRepositoryTest extends ResourceRepositoryTestBase {
     // Test creating page
     ResourceURI uri = new ResourceURIImpl(Page.TYPE, site, "/test-create-page");
     Date beforeCreation = new Date();
-    Page createdPage = pageRepository.createPage(uri);
+    Page createdPage = pageRepository.createPage(uri, editor);
     assertNotNull("Created page must have its identifier set", createdPage.getIdentifier());
     assertEquals("Path of created page must equal to given uri", uri.getPath(), createdPage.getPath());
     assertTrue("Creation date must be set on creation", beforeCreation.getTime()/1000 <= createdPage.getCreationDate().getTime()/1000);
+    assertEquals(editor, createdPage.getCreator());
 
     // Test creating sub-page
     ResourceURI subUri = new ResourceURIImpl(Page.TYPE, site, "/test-create-page/sub-page");
     try {
-      pageRepository.createPage(subUri);
+      pageRepository.createPage(subUri, editor);
     } catch (ContentRepositoryException e) {
       fail("Creating a page with a valid parent-page should not fail");
     }
 
     // Test creating existing page
     try {
-      pageRepository.createPage(uri);
+      pageRepository.createPage(uri, editor);
       fail("Adding a page with a path that already exists must fail");
     } catch (ContentRepositoryException e) {
       // Nothing to do
@@ -124,14 +132,14 @@ public class PageRepositoryTest extends ResourceRepositoryTestBase {
     }
 
     // Test updating page (default)
-    Page createdPage1 = pageRepository.createPage(uri1);
+    Page createdPage1 = pageRepository.createPage(uri1, editor);
     pageRepository.updatePage(createdPage1);
     assertNotNull("Returned page must not be null", pageRepository.updatePage(createdPage1));
 
     // Test updating sub-page
     ResourceURI uri2 = new ResourceURIImpl(Page.TYPE, site, "/test-update-page/sub-page");
     page1.setPath(uri2.getPath());
-    Page createdPage2 = pageRepository.createPage(uri2);
+    Page createdPage2 = pageRepository.createPage(uri2, editor);
     pageRepository.updatePage(createdPage2);
 
     // Test updating page with non-matching identifier
@@ -169,7 +177,7 @@ public class PageRepositoryTest extends ResourceRepositoryTestBase {
     }
 
     // Create page before getting it
-    Page createdPage = pageRepository.createPage(uri1);
+    Page createdPage = pageRepository.createPage(uri1, editor);
     page1.setIdentifier(createdPage.getIdentifier());
     page1.setPath(createdPage.getPath());
     pageRepository.updatePage(page1);
@@ -177,6 +185,7 @@ public class PageRepositoryTest extends ResourceRepositoryTestBase {
     // Test getting page
     Page page = pageRepository.getPage(uri1);
     assertNotNull("Returned page must not be null", page);
+    //assertEquals(editor, page.getCreator());
     assertEquals(page1.getTemplate(), page.getTemplate());
     assertEquals(page1.getLayout(), page.getLayout());
     assertEquals(page1.isStationary(), page.isStationary());
@@ -207,7 +216,7 @@ public class PageRepositoryTest extends ResourceRepositoryTestBase {
     ResourceURI notExisting = new ResourceURIImpl(Page.TYPE, site, "/test-exists-page-not-existing");
     ResourceURI existing = new ResourceURIImpl(Page.TYPE, site, "/test-exists-page-existing");
 
-    pageRepository.createPage(existing);
+    pageRepository.createPage(existing, editor);
 
     assertEquals("Page should not exist...", false, pageRepository.existsPage(notExisting));
     assertEquals("Page should exist...", true, pageRepository.existsPage(existing));
@@ -245,13 +254,13 @@ public class PageRepositoryTest extends ResourceRepositoryTestBase {
       // Nothing to do
     }
 
-    page1.setIdentifier(pageRepository.createPage(uri1).getIdentifier());
+    page1.setIdentifier(pageRepository.createPage(uri1, editor).getIdentifier());
     page1.setPath(uri1.getPath());
     pageRepository.updatePage(page1);
 
     ResourceURI uri2 = page2.getURI();
     uri2.setPath("/test-delete-page/sub-page");
-    page2.setIdentifier(pageRepository.createPage(uri2).getIdentifier());
+    page2.setIdentifier(pageRepository.createPage(uri2, editor).getIdentifier());
     page2.setPath(uri2.getPath());
     pageRepository.updatePage(page2);
 
@@ -291,7 +300,7 @@ public class PageRepositoryTest extends ResourceRepositoryTestBase {
       // Nothing to do
     }
 
-    page1.setIdentifier(pageRepository.createPage(uri1).getIdentifier());
+    page1.setIdentifier(pageRepository.createPage(uri1, editor).getIdentifier());
     page1.setPath(uri1.getPath());
     pageRepository.updatePage(page1);
 
@@ -301,7 +310,7 @@ public class PageRepositoryTest extends ResourceRepositoryTestBase {
 
     ResourceURI uri2 = page2.getURI();
     uri2.setPath("/test-get-versions/sub-page");
-    page2.setIdentifier(pageRepository.createPage(uri2).getIdentifier());
+    page2.setIdentifier(pageRepository.createPage(uri2, editor).getIdentifier());
     page2.setPath(uri2.getPath());
     pageRepository.updatePage(page2);
 

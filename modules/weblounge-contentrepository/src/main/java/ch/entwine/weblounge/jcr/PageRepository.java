@@ -24,7 +24,9 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.jcr.impl.serializer.JCRPageResourceSerializer;
+import ch.entwine.weblounge.jcr.serializer.JCRResourceSerializer;
 
 import org.apache.jackrabbit.JcrConstants;
 import org.slf4j.Logger;
@@ -57,13 +59,16 @@ public class PageRepository extends AbstractResourceRepository {
    * 
    * @param uri
    *          URI with site and path information
+   * @param user
+   *          TODO
    * @return the empty page
    * @throws ContentRepositoryException
    *           if no parent resource exists or if there's any other error
    */
-  public Page createPage(ResourceURI uri) throws ContentRepositoryException {
-    if (uri == null)
-      throw new IllegalArgumentException("URI must not be null");
+  public Page createPage(ResourceURI uri, User user)
+      throws ContentRepositoryException {
+    if (uri == null || user == null)
+      throw new IllegalArgumentException("Neither URI nor user must be null");
 
     String absParentNodePath = JCRResourceUtils.getAbsParentNodePath(uri);
     Session session = getSession();
@@ -85,17 +90,21 @@ public class PageRepository extends AbstractResourceRepository {
       versionMgr.checkout(absParentNodePath);
       Node pageNode = parentNode.addNode(JCRResourceUtils.getNodeName(uri));
 
+      JCRResourceSerializer pageSerializer = serializerRegistry.getSerializer(Page.class);
+
       pageNode.addMixin(JcrConstants.MIX_VERSIONABLE);
       pageNode.setProperty("resource-type", Page.TYPE);
 
       Node created = pageNode.addNode("webl:created");
       Calendar creationDate = Calendar.getInstance();
       created.setProperty("date", creationDate);
-      // TODO Add creator/owner, but which user shall we take?
+      created.setProperty("login", user.getLogin());
+      created.setProperty("realm", user.getRealm());
+      created.setProperty("name", user.getName());
 
       Page page = new PageImpl(uri);
       page.setIdentifier(pageNode.getIdentifier());
-      page.setCreationDate(creationDate.getTime());
+      page.setCreated(user, creationDate.getTime());
 
       session.save();
       versionMgr.checkin(absParentNodePath);
@@ -242,25 +251,8 @@ public class PageRepository extends AbstractResourceRepository {
         throw new ContentRepositoryException("Identifier of page and identifier of node do not match");
       }
 
-      // VersionManager versionManager =
-      // session.getWorkspace().getVersionManager();
-      // VersionHistory versionHistory =
-      // versionManager.getVersionHistory(pageNode.getPath());
-      //
-      // String versionLabel = getJCRVersionLabel(uri.getVersion());
-      // if (!versionHistory.hasVersionLabel(versionLabel))
-      // throw new ContentRepositoryException("No version '" + versionLabel +
-      // "' found");
-      // Version version = versionHistory.getVersionByLabel(versionLabel);
-      //
-      // pageNode = version.getFrozenNode();
-
-      Page page = new PageImpl(uri);
-      page.setIdentifier(pageNode.getIdentifier());
-      page.setPath(pageNode.getPath());
-      page.setTemplate(pageNode.getProperty("template").getString());
-      page.setLayout(pageNode.getProperty("layout").getString());
-      page.setStationary(pageNode.getProperty("stationary").getBoolean());
+      JCRResourceSerializer pageSerializer = serializerRegistry.getSerializer(Page.class);
+      Page page = (Page) pageSerializer.read(pageNode, uri);
 
       return page;
     } catch (RepositoryException e) {
