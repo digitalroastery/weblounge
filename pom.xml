@@ -474,7 +474,7 @@
 
         <!-- Enhance JPA classes -->
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
+          <groupId>org.apache.openjpa</groupId>
           <artifactId>openjpa-maven-plugin</artifactId>
           <version>2.2.2</version>
         </plugin>
