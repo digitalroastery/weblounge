@@ -10,5 +10,8 @@
     <provide interface="ch.entwine.weblounge.kernel.fop.FopEndpoint" />
   </service>
   <reference name="fop" interface="ch.entwine.weblounge.kernel.fop.FopService" cardinality="0..1" policy="dynamic" bind="setFopService" />
+  
+  <!-- Endpoints within the weblounge-kernel bundles must wait until the endpoint publisher is fully activated -->
+  <reference name="endpoint-publisher" interface="ch.entwine.weblounge.kernel.publisher.EndpointPublishingService" cardinality="1..1" policy="static"/>
 
 </scr:component>
