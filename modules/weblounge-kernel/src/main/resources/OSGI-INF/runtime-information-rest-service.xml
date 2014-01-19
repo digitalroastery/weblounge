@@ -13,4 +13,7 @@
   <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
   <reference name="providers" interface="ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider" cardinality="0..n" policy="dynamic" bind="addRuntimeInformationProvider" unbind="removeRuntimeInformationProvider" />
 
+  <!-- Endpoints within the weblounge-kernel bundles must wait until the endpoint publisher is fully activated -->
+  <reference name="endpoint-publisher" interface="ch.entwine.weblounge.kernel.publisher.EndpointPublishingService" cardinality="1..1" policy="static"/>
+
 </scr:component>
