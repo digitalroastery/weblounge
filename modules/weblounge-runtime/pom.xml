@@ -21,7 +21,7 @@
   <dependencies>
 
     <!-- Start level 1 -->
-
+    <!-- org.osgi bundles -->
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
@@ -34,6 +34,50 @@
       <version>4.2.0</version>
     </dependency>
 
+    <!-- org.apache.felix bundles -->
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.configadmin</artifactId>
+      <version>1.6.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.fileinstall</artifactId>
+      <version>3.1.10</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.http.bundle</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.metatype</artifactId>
+      <version>1.0.6</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.prefs</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.scr</artifactId>
+      <version>1.6.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.webconsole</artifactId>
+      <version>3.1.8</version>
+    </dependency>
+
+    <!-- org.ops4j.pax bundles -->
     <dependency>
       <groupId>org.ops4j.pax.confman</groupId>
       <artifactId>pax-confman-propsloader</artifactId>
@@ -53,51 +97,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.scr</artifactId>
-      <version>1.6.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.prefs</artifactId>
-      <version>1.0.4</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.configadmin</artifactId>
-      <version>1.6.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.metatype</artifactId>
-      <version>1.0.6</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.http.bundle</artifactId>
-      <version>2.2.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.fileinstall</artifactId>
-      <version>3.1.10</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-jsp</artifactId>
       <version>1.1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.webconsole</artifactId>
-      <version>3.1.8</version>
     </dependency>
 
     <!-- Start level 2 -->
