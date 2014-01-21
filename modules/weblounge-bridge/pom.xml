@@ -205,6 +205,17 @@
             <Embed-Dependency>
               matterhorn-common;inline=true,
             </Embed-Dependency>
+            <_exportcontents>
+              org.opencastproject.job.api,
+              org.opencastproject.mediapackage,
+              org.opencastproject.mediapackage.attachment,
+              org.opencastproject.mediapackage.identifier,
+              org.opencastproject.mediapackage.track,
+              org.opencastproject.security.api,
+              org.opencastproject.serviceregistry.api,
+              org.opencastproject.util,
+              org.opencastproject.util.data,
+            </_exportcontents>
             <Private-Package>
               org.opencastproject.*
             </Private-Package>
