@@ -1214,7 +1214,6 @@ public class SiteImpl implements Site {
    * @throws Exception
    *           if the site activation fails
    */
-  @SuppressWarnings("unchecked")
   protected void activate(BundleContext ctx, Map<String, String> properties)
       throws Exception {
 
@@ -1570,7 +1569,6 @@ public class SiteImpl implements Site {
    * 
    * @return the tests
    */
-  @SuppressWarnings("unchecked")
   private List<IntegrationTest> loadIntegrationTests() {
     BundleContext ctx = getBundleContext();
 
@@ -1770,7 +1768,6 @@ public class SiteImpl implements Site {
    *           if the site cannot be parsed
    * @see #toXml()
    */
-  @SuppressWarnings("unchecked")
   public static Site fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
