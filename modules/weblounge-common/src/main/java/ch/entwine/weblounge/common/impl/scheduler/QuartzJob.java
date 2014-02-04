@@ -29,8 +29,6 @@ import ch.entwine.weblounge.common.scheduler.JobWorker;
 import ch.entwine.weblounge.common.site.Environment;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 import java.util.Dictionary;
@@ -46,9 +44,6 @@ import javax.xml.xpath.XPathFactory;
  * Base implementation for jobs.
  */
 public final class QuartzJob implements Job, Customizable {
-
-  /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(QuartzJob.class);
 
   /** The job identifier */
   protected String identifier = null;
