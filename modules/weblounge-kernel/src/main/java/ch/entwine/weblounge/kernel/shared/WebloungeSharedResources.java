@@ -201,8 +201,8 @@ public class WebloungeSharedResources implements ManagedService {
   private ServiceRegistration register(String context, File resourcesDir,
       Bundle bundle) {
     Dictionary<String, String> registrationProperties = new Hashtable<String, String>();
-    registrationProperties.put(SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
-    registrationProperties.put("alias", context);
+    registrationProperties.put(SharedHttpContext.CONTEXT_ID, SharedHttpContext.WEBLOUNGE_CONTEXT_ID);
+    registrationProperties.put(SharedHttpContext.ALIAS, context);
     registrationProperties.put("servlet-name", "weblounge.sharedresources");
     Servlet servlet = new WebloungeResourcesServlet(resourcesDir, bundle, RESOURCES_BUNDLE_DIR);
     return bundleContext.registerService(Servlet.class.getName(), servlet, registrationProperties);

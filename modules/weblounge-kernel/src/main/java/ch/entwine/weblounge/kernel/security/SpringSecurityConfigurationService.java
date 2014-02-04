@@ -20,9 +20,10 @@
 
 package ch.entwine.weblounge.kernel.security;
 
-import static ch.entwine.weblounge.dispatcher.SharedHttpContext.HTTP_CONTEXT_ID;
-import static ch.entwine.weblounge.dispatcher.SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID;
-import static ch.entwine.weblounge.dispatcher.SharedHttpContext.PROPERTY_OSGI_HTTP_SERVICE_RANKING;
+import static ch.entwine.weblounge.dispatcher.SharedHttpContext.CONTEXT_ID;
+import static ch.entwine.weblounge.dispatcher.SharedHttpContext.PATTERN;
+import static ch.entwine.weblounge.dispatcher.SharedHttpContext.SERVICE_RANKING;
+import static ch.entwine.weblounge.dispatcher.SharedHttpContext.WEBLOUNGE_CONTEXT_ID;
 
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.security.Security;
@@ -107,7 +108,7 @@ public class SpringSecurityConfigurationService implements ManagedService {
    *           if the service configuration is malformed
    */
   void activate(ComponentContext ctx) throws IOException,
-      ConfigurationException {
+  ConfigurationException {
     bundleCtx = ctx.getBundleContext();
 
     // Try to get hold of the service configuration
@@ -217,9 +218,9 @@ public class SpringSecurityConfigurationService implements ManagedService {
   private void startSecurity() {
     logger.info("Enabling spring security");
     Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put("pattern", ".*");
-    props.put(PROPERTY_OSGI_HTTP_CONTEXT_ID, HTTP_CONTEXT_ID);
-    props.put(PROPERTY_OSGI_HTTP_SERVICE_RANKING, "0");
+    props.put(PATTERN, ".*");
+    props.put(CONTEXT_ID, WEBLOUNGE_CONTEXT_ID);
+    props.put(SERVICE_RANKING, "0");
     props.put("security", "weblounge");
     try {
       securityFilterRegistration = bundleCtx.registerService(Filter.class.getName(), securityFilter, props);

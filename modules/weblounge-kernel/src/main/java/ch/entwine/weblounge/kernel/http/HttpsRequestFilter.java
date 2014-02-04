@@ -43,7 +43,7 @@ public class HttpsRequestFilter implements Filter {
 
   /** Value of the X-Forwarded-SSL header that activates request wrapping */
   public static final String X_FORWARDED_SSL_VALUE = "on";
-  
+
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(HttpsRequestFilter.class);
 
@@ -53,7 +53,7 @@ public class HttpsRequestFilter implements Filter {
    */
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-          ServletException {
+  ServletException {
     HttpServletRequest httpReqquest = (HttpServletRequest) request;
 
     // Check if the forwarded SSL header is set
@@ -70,6 +70,16 @@ public class HttpsRequestFilter implements Filter {
 
   @Override
   public void destroy() {
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "HTTPS request filter";
   }
 
 }

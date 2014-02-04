@@ -20,7 +20,6 @@
 package ch.entwine.weblounge.dispatcher.impl;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-
 import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 
 import ch.entwine.weblounge.cache.CacheService;
@@ -601,7 +600,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    */
   @Override
   public String toString() {
-    return "Weblounge Dispatcher Servlet";
+    return "Weblounge dispatcher servlet";
   }
 
 }

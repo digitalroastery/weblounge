@@ -429,10 +429,10 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
           siteServlet.setSecurityService(securityService);
           Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
           servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
-          servletRegistrationProperties.put("alias", siteRoot);
+          servletRegistrationProperties.put(SharedHttpContext.ALIAS, siteRoot);
           servletRegistrationProperties.put("servlet-name", site.getIdentifier());
-          servletRegistrationProperties.put(SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
-          servletRegistrationProperties.put("init." + OPT_JASPER_SCRATCHDIR, scratchDirPath);
+          servletRegistrationProperties.put(SharedHttpContext.CONTEXT_ID, SharedHttpContext.WEBLOUNGE_CONTEXT_ID);
+          servletRegistrationProperties.put(SharedHttpContext.INIT_PREFIX + OPT_JASPER_SCRATCHDIR, scratchDirPath);
           ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
           servletRegistrations.put(site, servletRegistration);
 

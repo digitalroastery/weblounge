@@ -124,4 +124,14 @@ public class SharedHttpContextImpl implements HttpContext {
     logger.info("Disabling requests to protected resources");
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Weblounge http context";
+  }
+
 }

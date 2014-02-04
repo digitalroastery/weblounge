@@ -127,4 +127,14 @@ public class HealthCheckFilter implements Filter {
     this.sites = siteManager;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Healtch check filter";
+  }
+
 }
