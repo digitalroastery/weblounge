@@ -47,9 +47,9 @@ import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchDocument;
 import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchSearchQuery;
 import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
-import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.SuggestRequest;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.ElasticSearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
@@ -643,20 +643,8 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   public List<String> suggest(String dictionary, String seed,
       boolean onlyMorePopular, int count, boolean collate)
       throws ContentRepositoryException {
-    if (StringUtils.isBlank(seed))
-      throw new IllegalArgumentException("Seed must not be blank");
-    if (StringUtils.isBlank(dictionary))
-      throw new IllegalArgumentException("Dictionary must not be blank");
-
-    SuggestRequest request = null;
-    // TODO: Implement
-    // SuggestRequest request = new SuggestRequest(solrServer, dictionary,
-    // onlyMorePopular, count, collate);
-    try {
-      return request.getSuggestions(seed);
-    } catch (Throwable t) {
-      throw new ContentRepositoryException(t);
-    }
+    // TODO implement method
+    throw new NotImplementedException();
   }
 
   /**
