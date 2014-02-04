@@ -90,7 +90,7 @@ public class SharedHttpContextImpl implements HttpContext {
    * @see org.osgi.service.http.HttpContext#getResource(java.lang.String)
    */
   public URL getResource(String name) {
-    return null;
+    return Thread.currentThread().getContextClassLoader().getResource(name);
   }
 
   /**
