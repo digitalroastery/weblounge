@@ -42,6 +42,11 @@ public interface SharedHttpContext {
   String ALIAS = "alias";
 
   /**
+   * Key for the servlet name.
+   */
+  String SERVLET_NAME = "servlet-name";
+
+  /**
    * The key for defining a pattern for request filters.
    */
   String PATTERN = "pattern";

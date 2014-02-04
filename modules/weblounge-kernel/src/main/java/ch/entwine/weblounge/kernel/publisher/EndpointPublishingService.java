@@ -277,7 +277,7 @@ public class EndpointPublishingService implements ManagedService, SiteServiceLis
       servlet.setEnvironment(environment);
       Dictionary<String, String> initParams = new Hashtable<String, String>();
       initParams.put(SharedHttpContext.ALIAS, contextPath);
-      initParams.put("servlet-name", service.toString());
+      initParams.put(SharedHttpContext.SERVLET_NAME, service.toString());
       initParams.put(SharedHttpContext.CONTEXT_ID, SharedHttpContext.WEBLOUNGE_CONTEXT_ID);
       ServiceRegistration reg = bundleContext.registerService(Servlet.class.getName(), servlet, initParams);
       endpointRegistrations.put(contextPath, reg);

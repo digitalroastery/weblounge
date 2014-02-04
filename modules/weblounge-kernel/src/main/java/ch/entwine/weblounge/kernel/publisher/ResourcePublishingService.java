@@ -137,7 +137,7 @@ public class ResourcePublishingService implements BundleListener {
       Servlet servlet = new ResourcesServlet(bundle, resourcePath, welcomeFile);
       Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
       servletRegistrationProperties.put(ALIAS, contextPath);
-      servletRegistrationProperties.put("servlet-name", bundle.getSymbolicName() + "-static");
+      servletRegistrationProperties.put(SharedHttpContext.SERVLET_NAME, bundle.getSymbolicName() + "-static");
       ServiceRegistration servletRegistration = bundleCtx.registerService(Servlet.class.getName(), servlet, servletRegistrationProperties);
       resourceRegistrations.put(bundle.getSymbolicName(), servletRegistration);
     } catch (Throwable t) {

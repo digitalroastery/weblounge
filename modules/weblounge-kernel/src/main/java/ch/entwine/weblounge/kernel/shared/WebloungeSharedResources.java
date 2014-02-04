@@ -203,7 +203,7 @@ public class WebloungeSharedResources implements ManagedService {
     Dictionary<String, String> registrationProperties = new Hashtable<String, String>();
     registrationProperties.put(SharedHttpContext.CONTEXT_ID, SharedHttpContext.WEBLOUNGE_CONTEXT_ID);
     registrationProperties.put(SharedHttpContext.ALIAS, context);
-    registrationProperties.put("servlet-name", "weblounge.sharedresources");
+    registrationProperties.put(SharedHttpContext.SERVLET_NAME, "weblounge.sharedresources");
     Servlet servlet = new WebloungeResourcesServlet(resourcesDir, bundle, RESOURCES_BUNDLE_DIR);
     return bundleContext.registerService(Servlet.class.getName(), servlet, registrationProperties);
   }

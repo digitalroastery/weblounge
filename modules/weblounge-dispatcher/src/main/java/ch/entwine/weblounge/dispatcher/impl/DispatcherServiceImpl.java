@@ -101,7 +101,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
 
     Dictionary<String, String> initParams = new Hashtable<String, String>();
     initParams.put(SharedHttpContext.ALIAS, "/");
-    initParams.put("servlet-name", "default");
+    initParams.put(SharedHttpContext.SERVLET_NAME, "default");
     initParams.put(SharedHttpContext.CONTEXT_ID, SharedHttpContext.WEBLOUNGE_CONTEXT_ID);
     initParams.put(SharedHttpContext.PATTERN, ".*");
     dispatcherServiceRegistration = bundleContext.registerService(Servlet.class.getName(), dispatcher, initParams);

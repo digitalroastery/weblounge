@@ -430,7 +430,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
           Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
           servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
           servletRegistrationProperties.put(SharedHttpContext.ALIAS, siteRoot);
-          servletRegistrationProperties.put("servlet-name", site.getIdentifier());
+          servletRegistrationProperties.put(SharedHttpContext.SERVLET_NAME, site.getIdentifier());
           servletRegistrationProperties.put(SharedHttpContext.CONTEXT_ID, SharedHttpContext.WEBLOUNGE_CONTEXT_ID);
           servletRegistrationProperties.put(SharedHttpContext.INIT_PREFIX + OPT_JASPER_SCRATCHDIR, scratchDirPath);
           ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
