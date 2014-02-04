@@ -1308,38 +1308,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
 
     /**
-     * Adds the languages to the list of languages.
-     * 
-     * @param languages
-     *          the languages to add
-     */
-    public void addLanguages(Collection<Language> languages) {
-      for (Language l : languages) {
-        if (!this.languages.contains(languages))
-          this.languages.add(l);
-      }
-    }
-
-    /**
      * Returns the image styles.
      * 
      * @return the styles
      */
     public List<ImageStyle> getStyles() {
       return styles;
-    }
-
-    /**
-     * Adds the image styles to the list of styles.
-     * 
-     * @param styles
-     *          the styles to add
-     */
-    public void addStyles(Collection<ImageStyle> styles) {
-      for (ImageStyle s : styles) {
-        if (!this.styles.contains(styles))
-          this.styles.add(s);
-      }
     }
 
     /**
