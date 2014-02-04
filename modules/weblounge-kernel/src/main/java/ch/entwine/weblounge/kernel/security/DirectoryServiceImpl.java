@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -165,7 +165,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
       for (Object o : user.getPublicCredentials(Role.class)) {
         Role masterRole = (Role) o;
         for (Role r : masterRole.getClosure()) {
-          authorities.add(new GrantedAuthorityImpl(r.getContext() + ":" + r.getIdentifier()));
+          authorities.add(new SimpleGrantedAuthority(r.getContext() + ":" + r.getIdentifier()));
 
           // Every role may or may not be a system role or - in case of non-
           // system roles, may or may not be including one or more of those
@@ -173,7 +173,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
           // to the set of granted authorities
           Role[] systemEquivalents = getSystemRoles(r);
           for (Role systemRole : systemEquivalents) {
-            authorities.add(new GrantedAuthorityImpl(systemRole.getContext() + ":" + systemRole.getIdentifier()));
+            authorities.add(new SimpleGrantedAuthority(systemRole.getContext() + ":" + systemRole.getIdentifier()));
             user.addPublicCredentials(systemRole);
           }
         }
