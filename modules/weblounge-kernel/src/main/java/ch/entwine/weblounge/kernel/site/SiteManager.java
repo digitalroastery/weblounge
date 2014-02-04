@@ -282,7 +282,13 @@ public class SiteManager {
       }
 
       // Register the site urls and make sure we don't double book
-      site.initialize(env);
+      try {
+        site.initialize(env);
+      } catch (Throwable t) {
+        logger.error("Error loading site '{}': {}", site.getIdentifier(), t.getMessage());
+        return;
+      }
+
       for (SiteURL url : site.getHostnames()) {
         if (!env.equals(url.getEnvironment()))
           continue;
@@ -541,7 +547,14 @@ public class SiteManager {
     if (Environment.Production.equals(this.environment)) {
       logger.info("Changing site environments to {}", Environment.Production);
       for (Site site : sites) {
-        site.initialize(Environment.Production);
+        try {
+          site.initialize(Environment.Production);
+        } catch (Throwable t) {
+          logger.warn("Error switching environment of site '{}' to '{}': {}", new Object[] {
+              site.getIdentifier(),
+              Environment.Production,
+              t.getMessage() });
+        }
       }
     }
     this.environment = Environment.Production;
