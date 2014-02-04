@@ -157,6 +157,10 @@ public class CronJobTriggerTest {
     // Move to the next January (or stay if we are already in January)
     if (c.get(Calendar.MONTH) != Calendar.JANUARY) {
       while (c.get(Calendar.MONTH) != Calendar.JANUARY) {
+        while (c.get(Calendar.MONTH) != Calendar.JANUARY) {
+          c.add(Calendar.MONTH, 1);
+        }
+        c.set(Calendar.DATE, 1);
         expectedFireDate = rollUp(c, Calendar.DAY_OF_WEEK, daysOfWeek);
       }
     } else {
@@ -212,8 +216,10 @@ public class CronJobTriggerTest {
         offset = 0;
     }
 
-    while (!c.after(now)) {
-      c.add(field, 1);
+    if (field != Calendar.MONTH) {
+      while (!c.after(now)) {
+        c.add(field, 1);
+      }
     }
 
     // see if we are already good
@@ -237,38 +243,6 @@ public class CronJobTriggerTest {
     }
 
     return c.getTime();
-
-    // c.setFirstDayOfWeek(Calendar.SUNDAY);
-    // c.set(Calendar.MILLISECOND, 0);
-    // c.set(Calendar.SECOND, 0);
-
-    // int offset = 0;
-    // Calendar now = Calendar.getInstance();
-    // now.set(Calendar.MILLISECOND, 0);
-    // now.set(Calendar.SECOND, 0);
-    //
-    // switch (field) {
-    // case Calendar.MONTH:
-    // offset = 1;
-    // break;
-    // case Calendar.DAY_OF_WEEK:
-    // offset = -1;
-    // break;
-    // default:
-    // offset = 0;
-    // }
-    // while (!matches) {
-    // for (int i : fieldValues) {
-    // int calendarValue = c.get(field) + offset;
-    // if (i == calendarValue) {
-    // matches = c.after(now);
-    // }
-    // }
-    // if (!matches) {
-    // c.add(field, 1);
-    // matches = true;
-    // }
-    // }
 
   }
 
