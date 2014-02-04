@@ -108,14 +108,14 @@
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.rome</artifactId>
-      <version>1.0_2</version>
+      <version>1.0_3</version>
     </dependency>
 
     <!-- Transitive dependency to rome -->  
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>com.springsource.org.jdom</artifactId>
-      <version>1.0.0</version>
+      <version>2.0.1</version>
     </dependency>
   
     <!-- testing -->

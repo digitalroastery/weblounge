@@ -36,6 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -187,7 +188,7 @@ public class QuartzJobWorkerTest {
     // Schedule
     scheduleJob(quartzJob);
     assertEquals(1, scheduler.getJobNames(schedulerGroup).length);
-    assertEquals(1, scheduler.getTriggersOfJob(jobName, schedulerGroup).length);
+    assertEquals(1, scheduler.getTriggersOfJob(new JobKey(jobName, schedulerGroup)).size());
 
     synchronized (monitor) {
       try {
@@ -227,7 +228,7 @@ public class QuartzJobWorkerTest {
     // Schedule
     scheduleJob(quartzJob);
     assertEquals(1, scheduler.getJobNames(schedulerGroup).length);
-    assertEquals(1, scheduler.getTriggersOfJob(jobName, schedulerGroup).length);
+    assertEquals(1, scheduler.getTriggersOfJob(new JobKey(jobName, schedulerGroup)).size());
 
     synchronized (monitor) {
       try {
