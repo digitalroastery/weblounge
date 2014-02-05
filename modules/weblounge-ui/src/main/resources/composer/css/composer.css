@@ -1,0 +1,92 @@
+[class^="wbl-composer"] {
+  position: relative;
+  /* important to position the overlay-divs */ }
+
+/* this is an editable weblounge-composer */
+.wbl-composer-editable {
+  min-height: 170px; }
+
+/* this is an empty weblounge-composer */
+.wbl-composer-empty {
+  min-height: 170px; }
+
+/* composer-overlay inside the weblounge-composer */
+.wbl-composer-overlay {
+  -webkit-box-sizing: border-box;
+  /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;
+  /* Firefox, other Gecko */
+  box-sizing: border-box;
+  /* Opera/IE 8+ */
+  background-color: #cccccc;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255, 255, 255, 0.5) 35px, rgba(255, 255, 255, 0.5) 70px);
+  background-image: -webkit-repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255, 255, 255, 0.5) 35px, rgba(255, 255, 255, 0.5) 70px);
+  background-image: -moz-repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255, 255, 255, 0.5) 35px, rgba(255, 255, 255, 0.5) 70px);
+  border: 1px dashed gray;
+  position: relative;
+  min-height: 170px;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+  z-index: 2;
+  /*  +1 gegenÃ¼ber .wbl-align_right */
+  display: none; }
+  .wbl-composer-overlay .wbl-composer-header {
+    height: 12px;
+    padding: 5px;
+    text-align: left;
+    z-index: 3;
+    /* +1 gegenÃ¼ber .wbl-composer-overlay */
+    display: none;
+    position: absolute;
+    cursor: help; }
+    .wbl-composer-overlay .wbl-composer-header .name {
+      text-transform: uppercase;
+      font-weight: 600; }
+    .wbl-composer-overlay .wbl-composer-header .type {
+      text-transform: uppercase;
+      font-weight: 600;
+      opacity: 0.6; }
+  .wbl-composer-overlay .wbl-composer-overlay-center {
+    display: table;
+    width: 100%;
+    height: 100%; }
+    .wbl-composer-overlay .wbl-composer-overlay-center .wbl-composer-info {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: center;
+      color: #000;
+      font-style: normal;
+      font-size: 1em;
+      font-family: sans-serif; }
+      .wbl-composer-overlay .wbl-composer-overlay-center .wbl-composer-info .wbl-icon-4x.block {
+        display: inline-block; }
+      .wbl-composer-overlay .wbl-composer-overlay-center .wbl-composer-info p {
+        padding: 5px; }
+
+/* cursor = pointer on pseudo-link */
+.wbl-composer-locked p.dialog,
+.wbl-composer-ghost p.dialog {
+  cursor: pointer; }
+
+/* standard mode = show all editable composers */
+.wbl-composer-editable .wbl-composer-overlay {
+  display: block; }
+  .wbl-composer-editable .wbl-composer-overlay .wbl-composer-header {
+    display: none; }
+
+/* layout mode = show all composer-mark-up */
+body.wbl-layout-mode .wbl-composer-overlay,
+.wbl-composer-overlay-strong {
+  opacity: 0.95; }
+
+/* expert mode = do not show any composer-mark-up */
+body.wbl-expert-mode .wbl-composer-overlay {
+  display: none !important; }
+
+.wbl-composer-overlay-light {
+  opacity: 0.3; }

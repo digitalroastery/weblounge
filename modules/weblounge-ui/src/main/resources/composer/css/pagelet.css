@@ -1,0 +1,85 @@
+.wbl-pagelet {
+  overflow: hidden;
+  /* needed to display the icons aside a floated pagelet */
+  position: relative;
+  /* important to position overlay-div */
+  cursor: pointer; }
+
+.wbl-pagelet-reset {
+  background: none white !important; }
+
+.wbl-pagelet-overlay {
+  background-color: rgba(128, 128, 128, 0.3);
+  position: relative;
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; }
+  .wbl-pagelet-overlay i {
+    display: inline-block;
+    float: right;
+    padding: 5px;
+    font-size: 120%; }
+
+.wbl-align_right {
+  float: right;
+  z-index: 1;
+  /* important to display the floatet pagelet OVER the normal pagelet */ }
+
+.wbl-clearfix {
+  zoom: 1; }
+  .wbl-clearfix:before, .wbl-clearfix:after {
+    content: "\0020";
+    display: block;
+    height: 0;
+    overflow: hidden; }
+  .wbl-clearfix:after {
+    clear: both; }
+
+/* ----------- My Form ----------- */
+.wbl-form {
+  margin: 0 auto;
+  width: 400px;
+  padding: 14px; }
+  .wbl-form button {
+    float: right; }
+
+.wbl-form h1 {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px; }
+
+.wbl-form p {
+  margin-bottom: 20px;
+  padding-bottom: 10px; }
+
+.wbl-form label {
+  display: block;
+  font-weight: bold;
+  text-align: right;
+  width: 140px;
+  float: left; }
+
+.wbl-form .small {
+  display: block;
+  font-size: 11px;
+  font-weight: normal;
+  text-align: right;
+  width: 140px; }
+
+.wbl-form input {
+  float: left;
+  font-size: 12px;
+  padding: 4px 2px;
+  border: solid 1px #aacfe4;
+  width: 200px;
+  margin: 2px 0 20px 10px; }
+
+button.error {
+  width: 100%;
+  border-color: #A60000; }
+  button.error span {
+    color: #fff;
+    background-color: #A60000; }

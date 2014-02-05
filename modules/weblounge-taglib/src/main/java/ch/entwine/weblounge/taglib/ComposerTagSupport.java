@@ -74,19 +74,19 @@ public class ComposerTagSupport extends WebloungeTag {
   };
 
   /** CSS class name for composer */
-  public static final String CLASS_COMPOSER = "composer";
+  public static final String CLASS_COMPOSER = "wbl-composer-editable";
 
   /** Css class name for a locked composer */
-  public static final String CLASS_LOCKED = "locked";
+  public static final String CLASS_LOCKED = "wbl-composer-info";
 
   /** Css class name for a composer with inheritance enabled */
-  public static final String CLASS_INHERIT_CONTENT = "inherit";
+  public static final String CLASS_INHERIT_CONTENT = "wbl-composer-inherit";
 
-  /** Css class name for a locked composer */
-  public static final String CLASS_GHOST_CONTENT = "ghost";
+  /** Css class name for a composer that is showing inherited content */
+  public static final String CLASS_GHOST_CONTENT = "wbl-composer-ghost";
 
   /** Css class name for an empty composer */
-  public static final String CLASS_EMPTY = "empty";
+  public static final String CLASS_EMPTY = "wbl-composer-empty";
 
   /** Return code indicating that the pagelet should be evaluated */
   public static final int EVAL_PAGELET = 0;
