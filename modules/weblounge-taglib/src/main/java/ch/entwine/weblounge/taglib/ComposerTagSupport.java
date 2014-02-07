@@ -77,7 +77,7 @@ public class ComposerTagSupport extends WebloungeTag {
   public static final String CLASS_COMPOSER = "wbl-composer-editable";
 
   /** Css class name for a locked composer */
-  public static final String CLASS_LOCKED = "wbl-composer-info";
+  public static final String CLASS_LOCKED = "wbl-composer-locked";
 
   /** Css class name for a composer with inheritance enabled */
   public static final String CLASS_INHERIT_CONTENT = "wbl-composer-inherit";
@@ -195,6 +195,7 @@ public class ComposerTagSupport extends WebloungeTag {
     }
 
     buf.append(">");
+
     writer.println(buf.toString());
   }
 

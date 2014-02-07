@@ -11,7 +11,7 @@ steal.plugins('jquery/controller',
   /* @static */
   {
     defaults: {
-      connectWith: ".composer",
+      connectWith: ".wbl-composer-editable",
       page: {}
     }
   },
@@ -55,7 +55,7 @@ steal.plugins('jquery/controller',
         	var composerId = this.id;
         	
         	// Create new composer when empty
-        	if(this.element.hasClass('empty')) {
+        	if(this.element.hasClass('wbl-composer-empty')) {
         		page.createComposer(composerId);
         	}
         	
@@ -120,10 +120,10 @@ steal.plugins('jquery/controller',
     update: function() {
     	var pagelets = this.element.find('div.pagelet');
     	if(!pagelets.length) {
-    		this.element.addClass('empty');
+    		this.element.addClass('wbl-composer-empty');
 			return;
     	}
-		this.element.removeClass('empty');
+		this.element.removeClass('wbl-composer-empty');
 		
     	pagelets.editor_pagelet({
         composer: {
@@ -178,7 +178,7 @@ steal.plugins('jquery/controller',
     
 	'hoverleave': function(el, ev) {
 		if(!$(this.element).hasClass('wbl-nojQuery')) return;
-    	if($(this.element).hasClass('empty')) return;
+    	if($(this.element).hasClass('wbl-composer-empty')) return;
     	$(this.element).removeClass('wbl-composerBorder');
     }
     

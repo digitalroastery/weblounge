@@ -39,7 +39,7 @@
 	background-color: rgba(204, 204, 204, 0.3)
 }
 
-.composer.wbl-nojQuery {
+.wbl-composer-editable.wbl-nojQuery {
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	margin: 2px 0;
 }

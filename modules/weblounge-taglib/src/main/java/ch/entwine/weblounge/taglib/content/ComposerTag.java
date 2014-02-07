@@ -32,6 +32,8 @@ import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.ComposerTagSupport;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 
 import javax.servlet.jsp.JspWriter;
@@ -66,7 +68,7 @@ public class ComposerTag extends ComposerTagSupport {
    */
   @Override
   protected void beforeComposer(JspWriter writer) throws IOException,
-      ContentRepositoryException, ContentRepositoryUnavailableException {
+  ContentRepositoryException, ContentRepositoryUnavailableException {
 
     // Mark inherited composer and ghost content in locked work mode
     if (RequestUtils.isEditingState(request)) {
@@ -82,6 +84,30 @@ public class ComposerTag extends ComposerTagSupport {
 
     // Let the default implementation kick in
     super.beforeComposer(writer);
+
+    if (RequestUtils.isEditingState(request)) {
+      StringBuffer buf = new StringBuffer("");
+
+      // Determine the composer title
+      String composerTitle = title;
+      if (StringUtils.isBlank(composerTitle))
+        composerTitle = id;
+
+      // Add composer info
+      buf.append("<div class=\"wbl-composer-overlay\"><div class=\"wbl-composer-header\" title=\"" + composerTitle + "\"><i class=\"wbl-icon-folder-close\"></i><span class=\"name\">" + composerTitle + "</span></div><div class=\"wbl-composer-overlay-center\"><div class=\"wbl-composer-info\">");
+      buf.append("<i class=\"");
+      if (contentInheritanceEnabled && (ghostPaglets == null || ghostPaglets.length == 0)) {
+        buf.append("wbl-icon-magic");
+      } else if (isComposerLocked) {
+        buf.append("wbl-icon-lock");
+      } else if (pagelets.length == 0) {
+        buf.append("wbl-icon-download-alt");
+      }
+      buf.append(" wbl-icon-4x block\"></i>");
+      buf.append("</div></div></div>");
+
+      writer.println(buf.toString());
+    }
 
   }
 
