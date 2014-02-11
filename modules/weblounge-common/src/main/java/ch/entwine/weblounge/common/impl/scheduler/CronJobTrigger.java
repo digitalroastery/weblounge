@@ -32,11 +32,11 @@ import java.util.StringTokenizer;
  * Job trigger that is created from a cron-style configuration.
  * 
  * <pre>
- *   .---------------- minute (0 - 59) 
+ *   .---------------- minute (0 - 59)
  *   |  .------------- hour (0 - 23)
  *   |  |  .---------- day of month (1 - 31)
- *   |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ... 
- *   |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat 
+ *   |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+ *   |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
  *   |  |  |  |  |
  *   *  *  *  *  *
  * </pre>
@@ -58,105 +58,105 @@ public final class CronJobTrigger implements JobTrigger {
 
   /** The month names */
   private static final String[] MONTHS = new String[] {
-      "jan",
-      "feb",
-      "mar",
-      "apr",
-      "may",
-      "jun",
-      "jul",
-      "aug",
-      "sep",
-      "oct",
-      "nov",
-      "dec" };
+    "jan",
+    "feb",
+    "mar",
+    "apr",
+    "may",
+    "jun",
+    "jul",
+    "aug",
+    "sep",
+    "oct",
+    "nov",
+  "dec" };
 
   /** The day names */
   private static final String[] DAYS = new String[] {
-      "sun",
-      "mon",
-      "tue",
-      "wed",
-      "thu",
-      "fri",
-      "sat",
-      "sun" };
+    "sun",
+    "mon",
+    "tue",
+    "wed",
+    "thu",
+    "fri",
+    "sat",
+  "sun" };
 
   /** All hours of a day */
   private static final int[] ALL_HOURS = new int[] {
-      0,
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      11,
-      12,
-      13,
-      14,
-      15,
-      16,
-      17,
-      18,
-      19,
-      20,
-      21,
-      22,
-      23 };
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23 };
 
   /** All days of a month */
   private static final int[] ALL_DAYS_OF_MONTH = new int[] {
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      11,
-      12,
-      13,
-      14,
-      15,
-      16,
-      17,
-      18,
-      19,
-      20,
-      21,
-      22,
-      23,
-      24,
-      25,
-      26,
-      27,
-      28,
-      29,
-      30,
-      31 };
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31 };
 
   /** All months of a year */
   private static final int[] ALL_MONTHS = new int[] {
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      11,
-      12 };
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12 };
 
   /** All days of a week */
   private static final int[] ALL_DAYS_OF_WEEK = new int[] { 0, 1, 2, 3, 4, 5, 6 };
@@ -209,6 +209,16 @@ public final class CronJobTrigger implements JobTrigger {
     } catch (Throwable t) {
       throw new IllegalArgumentException("Cron schedule " + entry + " is malformed: " + t.getMessage(), t);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    return super.clone();
   }
 
   /**

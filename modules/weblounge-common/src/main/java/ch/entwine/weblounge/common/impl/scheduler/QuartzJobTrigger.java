@@ -125,6 +125,24 @@ public final class QuartzJobTrigger extends Trigger {
   }
 
   /**
+   * The Quartz scheduler is creating clones of the triggers, so we need to
+   * implement support for cloning, too.
+   * 
+   * @see org.quartz.Trigger#clone()
+   */
+  @Override
+  public Object clone() {
+    QuartzJobTrigger copy = null;
+    try {
+      copy = (QuartzJobTrigger) super.clone();
+      copy.trigger = (JobTrigger) trigger.clone();
+    } catch (CloneNotSupportedException ex) {
+      throw new IncompatibleClassChangeError("Not Cloneable.");
+    }
+    return copy;
+  }
+
+  /**
    * Returns the weblounge trigger.
    * 
    * @return the trigger

@@ -47,7 +47,7 @@ public class PeriodicJobTrigger implements JobTrigger {
 
   /** Flag indicating whether to wait a period for the first execution */
   private boolean startImmediately = false;
-  
+
   /** True if this is the first execution */
   private boolean firstExecution = true;
 
@@ -227,6 +227,16 @@ public class PeriodicJobTrigger implements JobTrigger {
   /**
    * {@inheritDoc}
    * 
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    return super.clone();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.scheduler.JobTrigger#getNextExecutionAfter(Date)
    */
   public Date getNextExecutionAfter(Date date) {
@@ -326,7 +336,7 @@ public class PeriodicJobTrigger implements JobTrigger {
   public void setStartImmediately(boolean startImmediately) {
     this.startImmediately = startImmediately;
   }
-  
+
   /**
    * {@inheritDoc}
    *
