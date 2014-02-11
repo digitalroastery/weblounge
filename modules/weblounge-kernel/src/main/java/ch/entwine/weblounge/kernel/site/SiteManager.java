@@ -162,9 +162,11 @@ public class SiteManager {
    * @return the site
    */
   public Site findSiteByIdentifier(String identifier) {
-    for (Site site : sites) {
-      if (site.getIdentifier().equals(identifier)) {
-        return site;
+    synchronized (sites) {
+      for (Site site : sites) {
+        if (site.getIdentifier().equals(identifier)) {
+          return site;
+        }
       }
     }
     return null;
@@ -189,25 +191,27 @@ public class SiteManager {
 
     // There is obviously no direct match. Therefore, try to find a
     // wildcard match
-    for (Map.Entry<String, Site> e : sitesByServerName.entrySet()) {
-      String siteUrl = e.getKey();
+    synchronized (sites) {
+      for (Map.Entry<String, Site> e : sitesByServerName.entrySet()) {
+        String siteUrl = e.getKey();
 
-      try {
-        // convert the host wildcard (ex. *.domain.tld) to a valid regex (ex.
-        // .*\.domain\.tld)
-        String alias = siteUrl.replace(".", "\\.");
-        alias = alias.replace("*", ".*");
-        if (hostName.matches(alias)) {
-          site = e.getValue();
-          logger.info("Registering {} to site '{}', matching url {}", new Object[] {
-              url,
-              site.getIdentifier(),
-              siteUrl });
-          sitesByServerName.put(hostName, site);
-          return site;
+        try {
+          // convert the host wildcard (ex. *.domain.tld) to a valid regex (ex.
+          // .*\.domain\.tld)
+          String alias = siteUrl.replace(".", "\\.");
+          alias = alias.replace("*", ".*");
+          if (hostName.matches(alias)) {
+            site = e.getValue();
+            logger.info("Registering {} to site '{}', matching url {}", new Object[] {
+                url,
+                site.getIdentifier(),
+                siteUrl });
+            sitesByServerName.put(hostName, site);
+            return site;
+          }
+        } catch (PatternSyntaxException ex) {
+          logger.warn("Error while trying to find a host wildcard match: ".concat(ex.getMessage()));
         }
-      } catch (PatternSyntaxException ex) {
-        logger.warn("Error while trying to find a host wildcard match: ".concat(ex.getMessage()));
       }
     }
 
@@ -224,9 +228,11 @@ public class SiteManager {
    * @return the site
    */
   public Site findSiteByBundle(Bundle bundle) {
-    for (Map.Entry<Site, Bundle> entry : siteBundles.entrySet()) {
-      if (bundle.equals(entry.getValue()))
-        return entry.getKey();
+    synchronized (sites) {
+      for (Map.Entry<Site, Bundle> entry : siteBundles.entrySet()) {
+        if (bundle.equals(entry.getValue()))
+          return entry.getKey();
+      }
     }
     return null;
   }
@@ -262,57 +268,67 @@ public class SiteManager {
    * @see ch.entwine.weblounge.dispatcher.SiteDispatcherService#addSite(ch.entwine.weblounge.common.site.Site,
    *      org.osgi.framework.ServiceReference)
    */
-  synchronized void addSite(Site site, ServiceReference reference) {
-    sites.add(site);
-    siteBundles.put(site, reference.getBundle());
+  void addSite(Site site, ServiceReference reference) {
 
-    // Make sure we have an environment
-    Environment env = environment;
-    if (env == null) {
-      logger.warn("No environment has been defined. Assuming '{}'", Environment.Production.toString().toLowerCase());
-      env = Environment.Production;
-    }
+    synchronized (sites) {
+      sites.add(site);
+      siteBundles.put(site, reference.getBundle());
 
-    // Register the site urls and make sure we don't double book
-    site.initialize(env);
-    for (SiteURL url : site.getHostnames()) {
-      if (!env.equals(url.getEnvironment()))
-        continue;
-      String hostName = url.getURL().getHost();
-      Site registeredFirst = sitesByServerName.get(hostName);
-      if (registeredFirst != null && !site.equals(registeredFirst)) {
+      // Make sure we have an environment
+      Environment env = environment;
+      if (env == null) {
+        logger.warn("No environment has been defined. Assuming '{}'", Environment.Production.toString().toLowerCase());
+        env = Environment.Production;
+      }
 
-        // Maybe a wildcard site has taken too many urls. Make sure concrete
-        // sites are able to take over
-        boolean replace = false;
-        for (SiteURL siteUrl : registeredFirst.getHostnames()) {
-          if (siteUrl.toExternalForm().contains("*")) {
-            try {
-              // convert the host wildcard (ex. *.domain.tld) to a valid regex
-              // (ex.
-              // .*\.domain\.tld)
-              String registeredAlias = siteUrl.getURL().getHost().replace(".", "\\.");
-              registeredAlias = registeredAlias.replace("*", ".*");
-              if (hostName.matches(registeredAlias)) {
-                logger.info("Replacing wildcard registration for {} with exact match '{}'", url, site);
-                replace = true;
-                break;
+      // Register the site urls and make sure we don't double book
+      try {
+        site.initialize(env);
+      } catch (Throwable t) {
+        logger.error("Error loading site '{}': {}", site.getIdentifier(), t.getMessage());
+        return;
+      }
+
+      for (SiteURL url : site.getHostnames()) {
+        if (!env.equals(url.getEnvironment()))
+          continue;
+        String hostName = url.getURL().getHost();
+        Site registeredFirst = sitesByServerName.get(hostName);
+        if (registeredFirst != null && !site.equals(registeredFirst)) {
+
+          // Maybe a wildcard site has taken too many urls. Make sure concrete
+          // sites are able to take over
+          boolean replace = false;
+          for (SiteURL siteUrl : registeredFirst.getHostnames()) {
+            if (siteUrl.toExternalForm().contains("*")) {
+              try {
+                // convert the host wildcard (ex. *.domain.tld) to a valid regex
+                // (ex.
+                // .*\.domain\.tld)
+                String registeredAlias = siteUrl.getURL().getHost().replace(".", "\\.");
+                registeredAlias = registeredAlias.replace("*", ".*");
+                if (hostName.matches(registeredAlias)) {
+                  logger.info("Replacing wildcard registration for {} with exact match '{}'", url, site);
+                  replace = true;
+                  break;
+                }
+              } catch (PatternSyntaxException ex) {
+                logger.warn("Error while trying to find a host wildcard match: ".concat(ex.getMessage()));
               }
-            } catch (PatternSyntaxException ex) {
-              logger.warn("Error while trying to find a host wildcard match: ".concat(ex.getMessage()));
             }
+          }
+
+          // This is a real conflict
+          if (!replace) {
+            logger.error("Another site is already registered to {}. Site is not registered", url);
+            continue;
           }
         }
 
-        // This is a real conflict
-        if (!replace) {
-          logger.error("Another site is already registered to {}. Site is not registered", url);
-          continue;
-        }
+        logger.info("Site '{}' will be reachable on host {}", site.getIdentifier(), hostName);
+        sitesByServerName.put(hostName, site);
       }
 
-      logger.info("Site '{}' will be reachable on host {}", site.getIdentifier(), hostName);
-      sitesByServerName.put(hostName, site);
     }
 
     logger.debug("Site '{}' registered", site);
@@ -382,7 +398,7 @@ public class SiteManager {
    * 
    * @see ch.entwine.weblounge.dispatcher.SiteDispatcherService#removeSite(ch.entwine.weblounge.common.site.Site)
    */
-  synchronized void removeSite(Site site) {
+  void removeSite(Site site) {
 
     // Inform site listeners
     synchronized (listeners) {
@@ -417,13 +433,15 @@ public class SiteManager {
     }
 
     // Remove it from the registry
-    sites.remove(site);
-    siteBundles.remove(site);
-    Iterator<Site> si = sitesByServerName.values().iterator();
-    while (si.hasNext()) {
-      Site s = si.next();
-      if (site.equals(s)) {
-        si.remove();
+    synchronized (sites) {
+      sites.remove(site);
+      siteBundles.remove(site);
+      Iterator<Site> si = sitesByServerName.values().iterator();
+      while (si.hasNext()) {
+        Site s = si.next();
+        if (site.equals(s)) {
+          si.remove();
+        }
       }
     }
 
@@ -529,7 +547,14 @@ public class SiteManager {
     if (Environment.Production.equals(this.environment)) {
       logger.info("Changing site environments to {}", Environment.Production);
       for (Site site : sites) {
-        site.initialize(Environment.Production);
+        try {
+          site.initialize(Environment.Production);
+        } catch (Throwable t) {
+          logger.warn("Error switching environment of site '{}' to '{}': {}", new Object[] {
+              site.getIdentifier(),
+              Environment.Production,
+              t.getMessage() });
+        }
       }
     }
     this.environment = Environment.Production;
@@ -564,9 +589,16 @@ public class SiteManager {
      * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
      */
     @Override
-    public Object addingService(ServiceReference reference) {
-      Site site = (Site) super.addingService(reference);
-      siteManager.addSite(site, reference);
+    public Object addingService(final ServiceReference reference) {
+      final Site site = (Site) super.addingService(reference);
+      Thread daemonThread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+          siteManager.addSite(site, reference);
+        }
+      });
+      daemonThread.setDaemon(true);
+      daemonThread.start();
       return site;
     }
 
@@ -578,8 +610,16 @@ public class SiteManager {
      */
     @Override
     public void removedService(ServiceReference reference, Object service) {
-      Site site = (Site) service;
-      siteManager.removeSite(site);
+      final Site site = (Site) service;
+      Thread daemonThread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+          siteManager.removeSite(site);
+        }
+      });
+      daemonThread.setDaemon(true);
+      daemonThread.start();
+
       if (reference.getBundle() != null) {
         try {
           super.removedService(reference, service);

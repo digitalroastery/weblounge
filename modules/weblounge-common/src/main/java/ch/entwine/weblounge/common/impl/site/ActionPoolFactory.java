@@ -38,7 +38,7 @@ import java.util.Map;
  * The action pool factory will create action objects according to the action
  * configuration that is passed in at construction time.
  */
-public final class ActionPoolFactory extends BasePoolableObjectFactory {
+public final class ActionPoolFactory extends BasePoolableObjectFactory<Action> {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ActionPoolFactory.class);
@@ -63,7 +63,7 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
    * @see org.apache.commons.pool.BasePoolableObjectFactory#makeObject()
    */
   @Override
-  public Object makeObject() throws Exception {
+  public Action makeObject() throws Exception {
     logger.debug("Creating new action '{}'", blueprint.getIdentifier());
     
     Action action = blueprint.getClass().newInstance();
@@ -128,15 +128,14 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
    * @see org.apache.commons.pool.BasePoolableObjectFactory#destroyObject(java.lang.Object)
    */
   @Override
-  public void destroyObject(Object obj) throws Exception {
-    Action action = (Action) obj;
+  public void destroyObject(Action action) throws Exception {
     logger.debug("Destroying action '{}'", action.getIdentifier());
     try {
       action.passivate();
     } catch (Throwable t) {
       logger.error("Error destroying action: {}", t.getMessage(), t);
     }
-    super.destroyObject(obj);
+    super.destroyObject(action);
   }
 
   /**
@@ -145,15 +144,14 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
    * @see org.apache.commons.pool.BasePoolableObjectFactory#activateObject(java.lang.Object)
    */
   @Override
-  public void activateObject(Object obj) throws Exception {
-    Action action = (Action) obj;
+  public void activateObject(Action action) throws Exception {
     logger.debug("Activating action '{}'", action.getIdentifier());
     try {
       action.activate();
     } catch (Throwable t) {
       logger.error("Error destroying action: {}", t.getMessage(), t);
     }
-    super.activateObject(obj);
+    super.activateObject(action);
   }
 
   /**
@@ -162,15 +160,14 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
    * @see org.apache.commons.pool.BasePoolableObjectFactory#passivateObject(java.lang.Object)
    */
   @Override
-  public void passivateObject(Object obj) throws Exception {
-    Action action = (Action) obj;
+  public void passivateObject(Action action) throws Exception {
     logger.debug("Passivating action '{}'", action.getIdentifier());
     try {
       action.passivate();
     } catch (Throwable t) {
       logger.error("Error destroying action: {}", t.getMessage(), t);
     }
-    super.passivateObject(obj);
+    super.passivateObject(action);
   }
   
   /**

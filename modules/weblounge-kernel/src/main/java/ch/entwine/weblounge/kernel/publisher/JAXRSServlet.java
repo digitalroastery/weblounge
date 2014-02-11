@@ -243,7 +243,7 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
   @Override
   protected Map<Class, ResourceProvider> getResourceProviders(
       ServletConfig servletConfig, List<Class> resourceClasses)
-      throws ServletException {
+          throws ServletException {
     Map<Class, ResourceProvider> providers = super.getResourceProviders(servletConfig, resourceClasses);
     providers.put(service.getClass(), new SingletonResourceProvider(service));
     return providers;
@@ -276,6 +276,16 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
    */
   void setEnvironment(Environment environment) {
     this.environment = environment;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return service.toString();
   }
 
 }

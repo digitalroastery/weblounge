@@ -58,8 +58,10 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * 
    * @param environment
    *          the system environment
+   * @throws Exception
+   *           if the site initialization fails
    */
-  void initialize(Environment environment);
+  void initialize(Environment environment) throws Exception;
 
   /**
    * Sets the site identifier.

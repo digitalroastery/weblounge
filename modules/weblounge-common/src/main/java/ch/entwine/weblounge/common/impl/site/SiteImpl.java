@@ -224,6 +224,12 @@ public class SiteImpl implements Site {
   /** The registered integration tests */
   private final List<ServiceRegistration> integrationTestRegistrations = new ArrayList<ServiceRegistration>();
 
+  /** Flag to indicate whether the site has been initialized */
+  private boolean siteInitialized = false;
+
+  /** Site bundle initialization properties */
+  protected Map<String, String> serviceProperties = null;
+
   /**
    * Creates a new site that is initially disabled. Use {@link #setEnabled()} to
    * enable the site.
@@ -246,8 +252,13 @@ public class SiteImpl implements Site {
    * 
    * @see ch.entwine.weblounge.common.site.Site#initialize(ch.entwine.weblounge.common.site.Environment)
    */
-  public void initialize(Environment environment) {
+  public void initialize(Environment environment) throws Exception {
     this.environment = environment;
+
+    // Don't inialize twice
+    if (!siteInitialized) {
+      initializeSiteComponents();
+    }
 
     // Pass the initialization on to the templates
     for (PageTemplate template : templates.values()) {
@@ -261,6 +272,162 @@ public class SiteImpl implements Site {
 
     // Switch the options to the new environment
     options.setEnvironment(environment);
+
+  }
+
+  /**
+   * Initializes the site components like modules, templates, actions etc.
+   * 
+   * @throws Exception
+   *           if initialization fails
+   */
+  private void initializeSiteComponents() throws Exception {
+
+    logger.debug("Initializing site '{}'", this);
+
+    final Bundle bundle = bundleContext.getBundle();
+
+    // Load i18n dictionary
+    Enumeration<URL> i18nEnum = bundle.findEntries("site/i18n", "*.xml", true);
+    while (i18nEnum != null && i18nEnum.hasMoreElements()) {
+      i18n.addDictionary(i18nEnum.nextElement());
+    }
+
+    // Prepare schema validator
+    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    URL schemaUrl = SiteImpl.class.getResource("/xsd/module.xsd");
+    Schema moduleSchema = schemaFactory.newSchema(schemaUrl);
+
+    // Set up the document builder
+    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    docBuilderFactory.setSchema(moduleSchema);
+    docBuilderFactory.setNamespaceAware(true);
+    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+
+    // Load the modules
+    final Enumeration<URL> e = bundle.findEntries("site", "module.xml", true);
+
+    if (e != null) {
+      while (e.hasMoreElements()) {
+        URL moduleXmlUrl = e.nextElement();
+        int endIndex = moduleXmlUrl.toExternalForm().lastIndexOf('/');
+        URL moduleUrl = new URL(moduleXmlUrl.toExternalForm().substring(0, endIndex));
+        logger.debug("Loading module '{}' for site '{}'", moduleXmlUrl, this);
+
+        // Load and validate the module descriptor
+        ValidationErrorHandler errorHandler = new ValidationErrorHandler(moduleXmlUrl);
+        docBuilder.setErrorHandler(errorHandler);
+        Document moduleXml = docBuilder.parse(moduleXmlUrl.openStream());
+        if (errorHandler.hasErrors()) {
+          logger.error("Errors found while validating module descriptor {}. Site '{}' is not loaded", moduleXml, this);
+          throw new IllegalStateException("Errors found while validating module descriptor " + moduleXml);
+        }
+
+        // We need the module id even if the module initialization fails to log
+        // a proper error message
+        Node moduleNode = moduleXml.getFirstChild();
+        String moduleId = moduleNode.getAttributes().getNamedItem("id").getNodeValue();
+
+        Module module;
+        try {
+          module = ModuleImpl.fromXml(moduleNode);
+          logger.debug("Module '{}' loaded for site '{}'", module, this);
+        } catch (Throwable t) {
+          logger.error("Error loading module '{}' of site {}", moduleId, identifier);
+          if (t instanceof Exception)
+            throw (Exception) t;
+          throw new Exception(t);
+        }
+
+        // If module is disabled, don't add it to the site
+        if (!module.isEnabled()) {
+          logger.info("Found disabled module '{}' in site '{}'", module, this);
+          continue;
+        }
+
+        // Make sure there is only one module with this identifier
+        if (modules.containsKey(module.getIdentifier())) {
+          logger.warn("A module with id '{}' is already registered in site '{}'", module.getIdentifier(), identifier);
+          logger.error("Module '{}' is not registered due to conflicting identifier", module.getIdentifier());
+          continue;
+        }
+
+        // Check inter-module compatibility
+        for (Module m : modules.values()) {
+
+          // Check actions
+          for (Action a : m.getActions()) {
+            for (Action action : module.getActions()) {
+              if (action.getIdentifier().equals(a.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines an action with id '{}'", new String[] {
+                    m.getIdentifier(),
+                    identifier,
+                    a.getIdentifier() });
+              } else if (action.getPath().equals(a.getPath())) {
+                logger.warn("Module '{}' of site '{}' already defines an action at '{}'", new String[] {
+                    m.getIdentifier(),
+                    identifier,
+                    a.getPath() });
+                logger.error("Module '{}' of site '{}' is not registered due to conflicting mountpoints", m.getIdentifier(), identifier);
+                continue;
+              }
+            }
+          }
+
+          // Check image styles
+          for (ImageStyle s : m.getImageStyles()) {
+            for (ImageStyle style : module.getImageStyles()) {
+              if (style.getIdentifier().equals(s.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines an image style with id '{}'", new String[] {
+                    m.getIdentifier(),
+                    identifier,
+                    s.getIdentifier() });
+              }
+            }
+          }
+
+          // Check jobs
+          for (Job j : m.getJobs()) {
+            for (Job job : module.getJobs()) {
+              if (job.getIdentifier().equals(j.getIdentifier())) {
+                logger.warn("Module '{}' of site '{}' already defines a job with id '{}'", new String[] {
+                    m.getIdentifier(),
+                    identifier,
+                    j.getIdentifier() });
+              }
+            }
+          }
+
+        }
+
+        addModule(module);
+
+        // Do this as last step since we don't want to have i18n dictionaries of
+        // an invalid or disabled module in the site
+        String i18nPath = UrlUtils.concat(moduleUrl.getPath(), "i18n");
+        i18nEnum = bundle.findEntries(i18nPath, "*.xml", true);
+        while (i18nEnum != null && i18nEnum.hasMoreElements()) {
+          i18n.addDictionary(i18nEnum.nextElement());
+        }
+      }
+
+    } else {
+      logger.debug("Site '{}' has no modules", this);
+    }
+
+    // Look for a job scheduler
+    logger.debug("Signing up for a job scheduling services");
+    schedulingServiceTracker = new SchedulingServiceTracker(bundleContext, this);
+    schedulingServiceTracker.open();
+
+    // Load the tests
+    if (!Environment.Production.equals(environment))
+      integrationTests = loadIntegrationTests();
+    else
+      logger.info("Skipped loading of integration tests due to environment '{}'", environment);
+
+    siteInitialized = true;
+    logger.info("Site '{}' initialized", this);
   }
 
   /**
@@ -270,6 +437,15 @@ public class SiteImpl implements Site {
    */
   public BundleContext getBundleContext() {
     return bundleContext;
+  }
+
+  /**
+   * Returns the properties of the site's OSGi service.
+   * 
+   * @return the site properties
+   */
+  public Map<String, String> getServiceProperties() {
+    return serviceProperties;
   }
 
   /**
@@ -1214,12 +1390,14 @@ public class SiteImpl implements Site {
    * @throws Exception
    *           if the site activation fails
    */
-  @SuppressWarnings("unchecked")
   protected void activate(BundleContext ctx, Map<String, String> properties)
       throws Exception {
 
     bundleContext = ctx;
-    final Bundle bundle = bundleContext.getBundle();
+    bundleContext.getBundle();
+    serviceProperties = properties;
+
+    Bundle bundle = ctx.getBundle();
 
     // Fix the site identifier
     if (getIdentifier() == null) {
@@ -1331,7 +1509,7 @@ public class SiteImpl implements Site {
           }
 
         }
-        
+
         addModule(module);
 
         // Do this as last step since we don't want to have i18n dictionaries of
@@ -1342,7 +1520,7 @@ public class SiteImpl implements Site {
           i18n.addDictionary(i18nEnum.nextElement());
         }
       }
-      
+
     } else {
       logger.debug("Site '{}' has no modules", this);
     }
@@ -1356,6 +1534,7 @@ public class SiteImpl implements Site {
     integrationTests = loadIntegrationTests();
 
     logger.info("Site '{}' initialized", this);
+
   }
 
   /**
@@ -1557,7 +1736,6 @@ public class SiteImpl implements Site {
    * 
    * @return the tests
    */
-  @SuppressWarnings("unchecked")
   private List<IntegrationTest> loadIntegrationTests() {
     BundleContext ctx = getBundleContext();
 
@@ -1757,7 +1935,6 @@ public class SiteImpl implements Site {
    *           if the site cannot be parsed
    * @see #toXml()
    */
-  @SuppressWarnings("unchecked")
   public static Site fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();

@@ -283,6 +283,14 @@
               com.springsource.javax.media.jai.codec;inline=true,
               jtidy;inline=true
             </Embed-Dependency>
+            <_exportcontents>
+              javax.media.jai,
+              javax.media.jai.remote,
+              javax.media.jai.tilecodec,
+              javax.media.jai.util,
+              com.sun.media.jai.rmi,
+              com.sun.media.jai.util
+            </_exportcontents>
             <Private-Package>
               com.drew.metadata,
               freemarker.core,

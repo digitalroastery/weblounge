@@ -420,7 +420,7 @@ public class SiteServlet extends HttpServlet {
    */
   @Override
   public String toString() {
-    return "site " + site;
+    return "Site " + site;
   }
 
 }

@@ -137,28 +137,28 @@ public class JAIPreviewGeneratorTest {
         // Test width and height
         switch (style.getScalingMode()) {
           case Box:
-            assertEquals(styleWidth, image.getWidth());
-            assertEquals(originalHeight * (styleWidth / originalWidth), image.getHeight());
+            assertEquals(styleWidth, image.getWidth(), 0);
+            assertEquals(originalHeight * (styleWidth / originalWidth), image.getHeight(), 0);
             break;
           case Cover:
-            assertEquals(originalWidth * (styleHeight / originalHeight), image.getWidth());
-            assertEquals(styleHeight, image.getHeight());
+            assertEquals(originalWidth * (styleHeight / originalHeight), image.getWidth(), 0);
+            assertEquals(styleHeight, image.getHeight(), 0);
             break;
           case Fill:
-            assertEquals(styleWidth, image.getWidth());
-            assertEquals(styleHeight, image.getHeight());
+            assertEquals(styleWidth, image.getWidth(), 0);
+            assertEquals(styleHeight, image.getHeight(), 0);
             break;
           case Height:
-            assertEquals(originalWidth * (styleHeight / originalHeight), image.getWidth());
-            assertEquals(styleHeight, image.getHeight());
+            assertEquals(originalWidth * (styleHeight / originalHeight), image.getWidth(), 0);
+            assertEquals(styleHeight, image.getHeight(), 0);
             break;
           case None:
-            assertEquals(originalWidth, image.getWidth());
-            assertEquals(originalHeight, image.getHeight());
+            assertEquals(originalWidth, image.getWidth(), 0);
+            assertEquals(originalHeight, image.getHeight(), 0);
             break;
           case Width:
-            assertEquals(styleWidth, image.getWidth());
-            assertEquals(originalHeight * (styleWidth / originalWidth), image.getHeight());
+            assertEquals(styleWidth, image.getWidth(), 0);
+            assertEquals(originalHeight * (styleWidth / originalWidth), image.getHeight(), 0);
             break;
           default:
             fail("Unknown scaling mode " + style.getScalingMode());

@@ -32,7 +32,7 @@
 
     <dependency>
       <groupId>ch.entwine.weblounge</groupId>
-      <artifactId>weblounge-contentrepository</artifactId>
+      <artifactId>weblounge-kernel</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -158,10 +158,10 @@
             </Import-Package>
             <Export-Package>
               ch.entwine.weblounge.workbench;version=${project.version},
-              ch.entwine.weblounge.workbench.endpoint;version=${project.version}
+              ch.entwine.weblounge.workbench.endpoint;version=${project.version},
+              ch.entwine.weblounge.workbench.suggest;version=${project.version}
             </Export-Package>
             <Private-Package>
-              ch.entwine.weblounge.workbench.suggest,
               org.json;-split-package:=merge-first,
               org.json.simple,
               org.json.simple.parser

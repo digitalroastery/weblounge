@@ -142,26 +142,26 @@ public class EndpointPublishingService implements ManagedService, SiteServiceLis
 
     // Register JAX-RS services that have already been loaded
     for (Bundle bundle : bundleContext.getBundles()) {
+
+      // Skip bundles that are not active
+      if (Bundle.ACTIVE != bundle.getState()) {
+        logger.trace("Skipping bundle '{}' in state {} while looking for JAXRS endpoints", bundle, bundle.getState());
+        continue;
+      }
+
+      // Skip bundles that don't have any services registered
       ServiceReference[] refs = bundle.getRegisteredServices();
       if (refs == null)
         continue;
 
-      // For bundles that are already activating or active, explicitly
-      // register the JAXB service
-      switch (bundle.getState()) {
-        case Bundle.ACTIVE:
-          for (ServiceReference ref : refs) {
-            try {
-              ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, ref);
-              jsr311ServiceListener.serviceChanged(event);
-            } catch (Throwable t) {
-              logger.error("Error registering JAXRS annotated service {} : {}", ref);
-            }
-          }
-          break;
-        default:
-          logger.trace("Skipping services in non-active bundle {}", bundle);
-          continue;
+      // Explicitly register the JAXB service by crafting a manual ServiceEvent
+      for (ServiceReference ref : refs) {
+        try {
+          ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, ref);
+          jsr311ServiceListener.serviceChanged(event);
+        } catch (Throwable t) {
+          logger.error("Error registering JAXRS annotated service {} : {}", ref);
+        }
       }
     }
 
@@ -177,7 +177,7 @@ public class EndpointPublishingService implements ManagedService, SiteServiceLis
    */
   void deactivate(ComponentContext componentContext) throws Exception {
     if (jsr311ServiceListener != null) {
-      componentContext.getBundleContext().removeServiceListener(jsr311ServiceListener);
+      bundleContext.removeServiceListener(jsr311ServiceListener);
     }
 
     // Unregister the current jsr311 servlets
@@ -195,7 +195,6 @@ public class EndpointPublishingService implements ManagedService, SiteServiceLis
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
@@ -277,9 +276,9 @@ public class EndpointPublishingService implements ManagedService, SiteServiceLis
       servlet.setSite(sites.findSiteByBundle(bundle));
       servlet.setEnvironment(environment);
       Dictionary<String, String> initParams = new Hashtable<String, String>();
-      initParams.put("alias", contextPath);
-      initParams.put("servlet-name", service.toString());
-      initParams.put(SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
+      initParams.put(SharedHttpContext.ALIAS, contextPath);
+      initParams.put(SharedHttpContext.SERVLET_NAME, service.toString());
+      initParams.put(SharedHttpContext.CONTEXT_ID, SharedHttpContext.WEBLOUNGE_CONTEXT_ID);
       ServiceRegistration reg = bundleContext.registerService(Servlet.class.getName(), servlet, initParams);
       endpointRegistrations.put(contextPath, reg);
       endpointServlets.put(contextPath, servlet);
@@ -327,7 +326,16 @@ public class EndpointPublishingService implements ManagedService, SiteServiceLis
      */
     public void serviceChanged(ServiceEvent event) {
       ServiceReference ref = event.getServiceReference();
-      Object service = bundleContext.getService(ref);
+      Object service = null;
+
+      try {
+        service = bundleContext.getService(ref);
+      } catch (IllegalStateException e) {
+        // This is happening when the system is going down and the referenced
+        // bundle context has already become invalid
+        logger.debug("Endpoint publishing service is already down");
+        return;
+      }
 
       // Sometimes, there is a service reference without a service
       if (service == null)
