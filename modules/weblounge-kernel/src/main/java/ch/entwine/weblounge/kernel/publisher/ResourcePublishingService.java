@@ -20,6 +20,10 @@
 
 package ch.entwine.weblounge.kernel.publisher;
 
+import static ch.entwine.weblounge.dispatcher.SharedHttpContext.ALIAS;
+
+import ch.entwine.weblounge.dispatcher.SharedHttpContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -134,8 +138,8 @@ public class ResourcePublishingService implements BundleListener {
     try {
       Servlet servlet = new ResourcesServlet(bundle, resourcePath, welcomeFile);
       Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
-      servletRegistrationProperties.put("alias", contextPath);
-      servletRegistrationProperties.put("servlet-name", bundle.getSymbolicName() + "-static");
+      servletRegistrationProperties.put(ALIAS, contextPath);
+      servletRegistrationProperties.put(SharedHttpContext.SERVLET_NAME, bundle.getSymbolicName() + "-static");
       ServiceRegistration servletRegistration = bundleCtx.registerService(Servlet.class.getName(), servlet, servletRegistrationProperties);
       resourceRegistrations.put(bundle.getSymbolicName(), servletRegistration);
     } catch (Throwable t) {

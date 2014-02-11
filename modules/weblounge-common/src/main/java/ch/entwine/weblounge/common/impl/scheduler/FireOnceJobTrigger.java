@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.scheduler;
 
+import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.scheduler.JobTrigger;
 
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ import java.util.Date;
  * After this one execution, the job will not be executed again.
  */
 public class FireOnceJobTrigger implements JobTrigger {
-  
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(FireOnceJobTrigger.class);
 
@@ -52,13 +53,23 @@ public class FireOnceJobTrigger implements JobTrigger {
       logger.debug("Fired one-time job trigger {} was asked for additional fire dates", this);
       return null;
     } else if (fireDate != null && !fireDate.equals(date)) {
-      logger.debug("One-time job trigger {} was asked for additional fire dates", this);
+      logger.warn("One-time job trigger {} was asked for additional fire dates", this);
       return null;
     }
-    fireDate = date;
+    fireDate = new Date(date.getTime() + 1 * Times.MS_PER_SECOND);
     return date;
   }
-  
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    return super.clone();
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -69,7 +80,7 @@ public class FireOnceJobTrigger implements JobTrigger {
       throw new IllegalStateException("This trigger should be fired once only");
     fired = true;
   }
-  
+
   /**
    * {@inheritDoc}
    *

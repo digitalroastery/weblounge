@@ -257,4 +257,14 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Security filter";
+  }
+
 }

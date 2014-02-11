@@ -339,7 +339,6 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    * 
    * @see ch.entwine.weblounge.common.security.SecurityContext#getDenied(ch.entwine.weblounge.common.security.Permission)
    */
-  @SuppressWarnings("unused")
   public Authority[] getDenied(Permission p) {
     return new Authority[] {};
   }

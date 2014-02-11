@@ -90,7 +90,7 @@ public class SharedHttpContextImpl implements HttpContext {
    * @see org.osgi.service.http.HttpContext#getResource(java.lang.String)
    */
   public URL getResource(String name) {
-    return null;
+    return Thread.currentThread().getContextClassLoader().getResource(name);
   }
 
   /**
@@ -122,6 +122,16 @@ public class SharedHttpContextImpl implements HttpContext {
   void removeSecurityService(SecurityService securityService) {
     this.securityService = null;
     logger.info("Disabling requests to protected resources");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Weblounge http context";
   }
 
 }

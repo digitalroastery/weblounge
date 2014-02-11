@@ -136,6 +136,7 @@ public class WebloungeResourcesServlet extends HttpServlet {
    * 
    * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
    */
+  @Override
   public void init(ServletConfig config) throws ServletException {
     this.servletConfig = config;
   }
@@ -242,4 +243,15 @@ public class WebloungeResourcesServlet extends HttpServlet {
     }
 
   }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Weblounge bundle resources servlet";
+  }
+
 }

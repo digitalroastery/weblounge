@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
   immediate="true"
-  start="activate"
-  stop="deactivate"
+  activate="activate"
+  deactivate="deactivate"
   name="Weblounge Endpoint Publishing Service">
   
   <implementation class="ch.entwine.weblounge.kernel.publisher.EndpointPublishingService" />

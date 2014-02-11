@@ -529,7 +529,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @see ch.entwine.weblounge.common.site.Action.module.ActionHandler#configure(ch.entwine.weblounge.api.request.WebloungeRequest,
    *      ch.entwine.weblounge.api.request.WebloungeResponse, java.lang.String)
    */
-  @SuppressWarnings("unchecked")
   public void configure(WebloungeRequest request, WebloungeResponse response,
       RequestFlavor flavor) throws ActionException {
 

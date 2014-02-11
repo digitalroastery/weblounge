@@ -100,10 +100,10 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     logger.info("Activating weblounge dispatcher");
 
     Dictionary<String, String> initParams = new Hashtable<String, String>();
-    initParams.put("alias", "/");
-    initParams.put("servlet-name", "default");
-    initParams.put(SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
-    initParams.put("pattern", ".*");
+    initParams.put(SharedHttpContext.ALIAS, "/");
+    initParams.put(SharedHttpContext.SERVLET_NAME, "default");
+    initParams.put(SharedHttpContext.CONTEXT_ID, SharedHttpContext.WEBLOUNGE_CONTEXT_ID);
+    initParams.put(SharedHttpContext.PATTERN, ".*");
     dispatcherServiceRegistration = bundleContext.registerService(Servlet.class.getName(), dispatcher, initParams);
 
     instanceName = StringUtils.trimToNull(context.getBundleContext().getProperty(OPT_INSTANCE_NAME));

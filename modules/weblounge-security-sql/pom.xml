@@ -6,7 +6,7 @@
   <parent>
     <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
-    <version>3.1.9</version>
+    <version>3.1.10</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   
@@ -140,7 +140,6 @@
       <plugin>
         <groupId>org.apache.openjpa</groupId>
         <artifactId>openjpa-maven-plugin</artifactId>
-        <version>2.2.0</version>
         <configuration>
           <includes>
           	**/Jpa*.class

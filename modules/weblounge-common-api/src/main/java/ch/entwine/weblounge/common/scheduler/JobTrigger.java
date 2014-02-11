@@ -28,7 +28,7 @@ import java.util.Date;
  * {@link #getNextExecutionAfter(Date)} returns a valid date or <code>0</code>,
  * in which case the job will be fired once only.
  */
-public interface JobTrigger {
+public interface JobTrigger extends Cloneable {
 
   /**
    * Returns the next execution date and time. If the job should no longer be
@@ -48,13 +48,21 @@ public interface JobTrigger {
    * Note that the callback doesn't imply anything regarding the success or
    * failure of the execution of the job that was triggered.
    * 
-   * @param date the firing date
+   * @param date
+   *          the firing date
    */
   void triggered(Date date);
-  
+
   /**
    * Resets this trigger.
    */
   void reset();
+
+  /**
+   * Creates a clone of this trigger.
+   * 
+   * @see java.lang.Object#clone()
+   */
+  Object clone() throws CloneNotSupportedException;
 
 }

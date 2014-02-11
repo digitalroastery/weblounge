@@ -136,6 +136,9 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /** The precompiler for java server pages */
   private boolean precompile = true;
 
+  /** Shutdown flag for running threads */
+  private boolean shutdown = false;
+
   /** List of precompilers */
   private final WeakHashMap<Site, Precompiler> precompilers = new WeakHashMap<Site, Precompiler>();
 
@@ -185,10 +188,16 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     siteManager.addSiteListener(this);
 
     // Process sites that have already been registered
-    for (Iterator<Site> si = siteManager.sites(); si.hasNext();) {
-      addSite(si.next());
-    }
-
+    Thread t = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        for (Iterator<Site> si = siteManager.sites(); si.hasNext();) {
+          addSite(si.next());
+        }
+      }
+    });
+    t.setDaemon(true);
+    t.start();
   }
 
   /**
@@ -204,6 +213,12 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     // Don't listen to new sites anymore
     siteManager.removeSiteListener(this);
+
+    // Tell everyone to finish their work
+    shutdown = true;
+    synchronized (servletRegistrations) {
+      servletRegistrations.notifyAll();
+    }
 
     // Stop precompilers
     for (Precompiler compiler : precompilers.values()) {
@@ -231,7 +246,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
@@ -246,7 +260,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    * @throws ConfigurationException
    *           if configuration fails
    */
-  private synchronized boolean configure(Dictionary<?, ?> config)
+  private boolean configure(Dictionary<?, ?> config)
       throws ConfigurationException {
 
     logger.debug("Configuring the site registration service");
@@ -372,110 +386,136 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /**
    * Adds a new site.
    * 
+   * This method may be long-running and therefore is executed in its own
+   * thread.
+   * 
    * @param site
    *          the site
    */
-  private void addSite(Site site) {
-    Bundle siteBundle = siteManager.getSiteBundle(site);
-    WebXml webXml = createWebXml(site, siteBundle);
-    Properties initParameters = new Properties();
+  private void addSite(final Site site) {
+    Thread t = new Thread(new Runnable() {
 
-    // Prepare the init parameters
-    // initParameters.put("load-on-startup", Integer.toString(1));
-    initParameters.putAll(webXml.getContextParams());
-    initParameters.putAll(jasperConfig);
+      public void run() {
 
-    // Create the site URI
-    String contextRoot = webXml.getContextParam(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT, DEFAULT_WEBAPP_CONTEXT_ROOT);
-    String bundleURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_URI, site.getIdentifier());
-    String siteContextURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI, DEFAULT_BUNDLE_CONTEXT_ROOT_URI);
-    String siteRoot = UrlUtils.concat(contextRoot, siteContextURI, bundleURI);
+        Bundle siteBundle = siteManager.getSiteBundle(site);
+        WebXml webXml = createWebXml(site, siteBundle);
+        Properties initParameters = new Properties();
 
-    // Prepare the Jasper work directory
-    String scratchDirPath = PathUtils.concat(jasperConfig.get(OPT_JASPER_SCRATCHDIR), site.getIdentifier());
-    File scratchDir = new File(scratchDirPath);
-    boolean jasperArtifactsExist = scratchDir.isDirectory() && scratchDir.list().length > 0;
-    try {
-      FileUtils.forceMkdir(scratchDir);
-      logger.debug("Temporary jsp source files and classes go to {}", scratchDirPath);
-    } catch (IOException e) {
-      logger.warn("Unable to create jasper scratch directory at {}: {}", scratchDirPath, e.getMessage());
-    }
+        // Prepare the init parameters
+        // initParameters.put("load-on-startup", Integer.toString(1));
+        initParameters.putAll(webXml.getContextParams());
+        initParameters.putAll(jasperConfig);
 
-    try {
-      // Create and register the site servlet
-      SiteServlet siteServlet = new SiteServlet(site, siteBundle, environment);
-      siteServlet.setSecurityService(securityService);
-      Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
-      servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
-      servletRegistrationProperties.put("alias", siteRoot);
-      servletRegistrationProperties.put("servlet-name", site.getIdentifier());
-      servletRegistrationProperties.put(SharedHttpContext.PROPERTY_OSGI_HTTP_CONTEXT_ID, SharedHttpContext.HTTP_CONTEXT_ID);
-      servletRegistrationProperties.put("init." + OPT_JASPER_SCRATCHDIR, scratchDirPath);
-      ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
-      servletRegistrations.put(site, servletRegistration);
+        // Create the site URI
+        String contextRoot = webXml.getContextParam(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT, DEFAULT_WEBAPP_CONTEXT_ROOT);
+        String bundleURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_URI, site.getIdentifier());
+        String siteContextURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI, DEFAULT_BUNDLE_CONTEXT_ROOT_URI);
+        String siteRoot = UrlUtils.concat(contextRoot, siteContextURI, bundleURI);
 
-      // We are using the whiteboard pattern to register servlets. Wait for the
-      // http service to pick up the servlet and initialize it
-      while (!siteServlet.isInitialized()) {
-        logger.debug("Waiting for http service to pick up {}", siteServlet);
-        Thread.sleep(500);
-      }
+        // Prepare the Jasper work directory
+        String scratchDirPath = PathUtils.concat(jasperConfig.get(OPT_JASPER_SCRATCHDIR), site.getIdentifier());
+        File scratchDir = new File(scratchDirPath);
+        boolean jasperArtifactsExist = scratchDir.isDirectory() && scratchDir.list().length > 0;
+        try {
+          FileUtils.forceMkdir(scratchDir);
+          logger.debug("Temporary jsp source files and classes go to {}", scratchDirPath);
+        } catch (IOException e) {
+          logger.warn("Unable to create jasper scratch directory at {}: {}", scratchDirPath, e.getMessage());
+        }
 
-      siteServlets.put(site, siteServlet);
+        try {
+          // Create and register the site servlet
+          SiteServlet siteServlet = new SiteServlet(site, siteBundle, environment);
+          siteServlet.setSecurityService(securityService);
+          Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
+          servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
+          servletRegistrationProperties.put(SharedHttpContext.ALIAS, siteRoot);
+          servletRegistrationProperties.put(SharedHttpContext.SERVLET_NAME, site.getIdentifier());
+          servletRegistrationProperties.put(SharedHttpContext.CONTEXT_ID, SharedHttpContext.WEBLOUNGE_CONTEXT_ID);
+          servletRegistrationProperties.put(SharedHttpContext.INIT_PREFIX + OPT_JASPER_SCRATCHDIR, scratchDirPath);
+          ServiceRegistration servletRegistration = siteBundle.getBundleContext().registerService(Servlet.class.getName(), siteServlet, servletRegistrationProperties);
+          servletRegistrations.put(site, servletRegistration);
 
-      logger.info("Site '{}' registered under site://{}", site, siteRoot);
+          // We are using the Whiteboard pattern to register servlets. Wait for
+          // the http service to pick up the servlet and initialize it
+          synchronized (servletRegistrations) {
+            boolean warnedOnce = false;
+            while (!siteServlet.isInitialized()) {
 
-      // Did we already miss the "siteStarted()" event? If so, we trigger it
-      // for ourselves, so the modules are being started.
-      site.addSiteListener(this);
-      if (site.isOnline()) {
-        siteStarted(site);
-      }
+              if (!warnedOnce) {
+                logger.info("Waiting for site '{}' to be online", site.getIdentifier());
+                warnedOnce = true;
+              }
 
-      // Start the precompiler if requested
-      if (precompile) {
-        String compilationKey = X_COMPILE_PREFIX + siteBundle.getBundleId();
-        Date compileDate = null;
-
-        boolean needsCompilation = true;
-
-        // Check if this site has been precompiled already
-        if (preferencesService != null) {
-          Preferences preferences = preferencesService.getSystemPreferences();
-          String compileDateString = preferences.get(compilationKey, null);
-          if (compileDateString != null) {
-            compileDate = WebloungeDateFormat.parseStatic(compileDateString);
-            needsCompilation = false;
-            logger.info("Site '{}' has already been precompiled on {}", site.getIdentifier(), compileDate);
+              logger.debug("Waiting for http service to pick up {}", siteServlet);
+              servletRegistrations.wait(500);
+              if (shutdown) {
+                logger.info("Giving up waiting for registration of site '{}'");
+                servletRegistrations.remove(site);
+                return;
+              }
+            }
           }
-        } else {
-          logger.info("Precompilation status cannot be determined, consider deploying a preferences service implementation");
+
+          siteServlets.put(site, siteServlet);
+
+          logger.info("Site '{}' is online and registered under site://{}", site, siteRoot);
+
+          // Did we already miss the "siteStarted()" event? If so, we trigger it
+          // for ourselves, so the modules are being started.
+          site.addSiteListener(SiteDispatcherServiceImpl.this);
+          if (site.isOnline()) {
+            siteStarted(site);
+          }
+
+          // Start the precompiler if requested
+          if (precompile) {
+            String compilationKey = X_COMPILE_PREFIX + siteBundle.getBundleId();
+            Date compileDate = null;
+
+            boolean needsCompilation = true;
+
+            // Check if this site has been precompiled already
+            if (preferencesService != null) {
+              Preferences preferences = preferencesService.getSystemPreferences();
+              String compileDateString = preferences.get(compilationKey, null);
+              if (compileDateString != null) {
+                compileDate = WebloungeDateFormat.parseStatic(compileDateString);
+                needsCompilation = false;
+                logger.info("Site '{}' has already been precompiled on {}", site.getIdentifier(), compileDate);
+              }
+            } else {
+              logger.info("Precompilation status cannot be determined, consider deploying a preferences service implementation");
+            }
+
+            // Does the scratch dir exist?
+            if (!jasperArtifactsExist) {
+              needsCompilation = true;
+              logger.info("Precompiled artifacts for '{}' have been removed", site.getIdentifier());
+            }
+
+            // Let's do the work anyways
+            if (needsCompilation) {
+              Precompiler precompiler = new Precompiler(compilationKey, siteServlet, environment, securityService, logCompileErrors);
+              precompilers.put(site, precompiler);
+              precompiler.precompile();
+            }
+          }
+
+          logger.debug("Site '{}' registered under site://{}", site, siteRoot);
+
+        } catch (Throwable t) {
+          logger.error("Error setting up site '{}' for http requests: {}", new Object[] {
+              site,
+              t.getMessage() });
+          logger.error(t.getMessage(), t);
         }
 
-        // Does the scratch dir exist?
-        if (!jasperArtifactsExist) {
-          needsCompilation = true;
-          logger.info("Precompiled artifacts for '{}' have been removed", site.getIdentifier());
-        }
-
-        // Let's do the work anyways
-        if (needsCompilation) {
-          Precompiler precompiler = new Precompiler(compilationKey, siteServlet, environment, securityService, logCompileErrors);
-          precompilers.put(site, precompiler);
-          precompiler.precompile();
-        }
       }
 
-      logger.debug("Site '{}' registered under site://{}", site, siteRoot);
-
-    } catch (Throwable t) {
-      logger.error("Error setting up site '{}' for http requests: {}", new Object[] {
-          site,
-          t.getMessage() });
-      logger.error(t.getMessage(), t);
-    }
-
+    });
+    t.setDaemon(true);
+    t.start();
   }
 
   /**

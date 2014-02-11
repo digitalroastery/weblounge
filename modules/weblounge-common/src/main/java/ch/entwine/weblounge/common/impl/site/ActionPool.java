@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Object pool for {@link Action} instances.
  */
-public final class ActionPool extends GenericObjectPool {
+public final class ActionPool extends GenericObjectPool<Action> {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ActionPool.class);
@@ -48,13 +48,15 @@ public final class ActionPool extends GenericObjectPool {
    *          the action
    */
   public ActionPool(Action action) {
+    super(new ActionPoolFactory(action), -1);
+
     if (action == null)
       throw new IllegalArgumentException("Action configuration must not be null");
+
     actionName = action.toString();
-    setFactory(new ActionPoolFactory(action));
+
     setTestOnBorrow(false);
     setTestOnReturn(false);
-    setMaxActive(-1);
   }
 
   /**
@@ -63,8 +65,8 @@ public final class ActionPool extends GenericObjectPool {
    * @see org.apache.commons.pool.impl.GenericObjectPool#borrowObject()
    */
   @Override
-  public Object borrowObject() throws Exception {
-    Action action = (Action) super.borrowObject();
+  public Action borrowObject() throws Exception {
+    Action action = super.borrowObject();
     logger.debug("Received request to borrow action '{}', {} remaining", action.getIdentifier(), this.getNumIdle());
 
     if (getNumActive() > reportedLimit + 10) {
@@ -88,9 +90,8 @@ public final class ActionPool extends GenericObjectPool {
    * @see org.apache.commons.pool.impl.GenericObjectPool#returnObject(java.lang.Object)
    */
   @Override
-  public void returnObject(Object obj) throws Exception {
-    super.returnObject(obj);
-    Action action = (Action)obj;
+  public void returnObject(Action action) throws Exception {
+    super.returnObject(action);
     logger.debug("Borrowed action '{}' returned to pool", action.getIdentifier());
     logger.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
         action.getIdentifier(),
@@ -116,8 +117,8 @@ public final class ActionPool extends GenericObjectPool {
    * @see org.apache.commons.pool.impl.GenericObjectPool#invalidateObject(java.lang.Object)
    */
   @Override
-  public void invalidateObject(Object obj) throws Exception {
-    Action action = (Action) super.borrowObject();
+  public void invalidateObject(Action obj) throws Exception {
+    Action action = super.borrowObject();
     logger.debug("Invalidating action '{}'", action.getIdentifier());
     super.invalidateObject(obj);
   }
