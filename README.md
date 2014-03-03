@@ -11,11 +11,11 @@ Weblounge is a full-featured web content management system (aka CMS) written in 
 * Image resizing & cropping
 * Powerful caching mechanics out-of-the-box
 * Multi tenancy
-* Commercial support by (Entwine)[http://entwinemedia.com]
+* Commercial support by [Entwine](http://entwinemedia.com)
 
 ## Installation
 
-Read our [Installation Guide](wiki/Installation Guide) to get started as soon as possible.
+Read our [Installation Guide](https://github.com/entwinemedia/weblounge/wiki/Installation%20Guide) to get started as soon as possible.
 
 ## Contribute
 
@@ -24,7 +24,7 @@ Read our [Installation Guide](wiki/Installation Guide) to get started as soon as
 
 ## Support
 
-If you are having issues, please let us know. We have several mailinglist and are on IRC. See the [Communication](wiki/Communication) page in our wiki.
+If you are having issues, please let us know. We have several mailinglist and are on IRC. See the [Communication](https://github.com/entwinemedia/weblounge/wiki/Communication) page in our wiki.
 
 ## License
 
