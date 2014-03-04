@@ -19,8 +19,8 @@ Read our [Installation Guide](https://github.com/entwinemedia/weblounge/wiki/Ins
 
 ## Contribute
 
-* Issue Tracker: github.com/entwinemedia/weblounge/issues
-* Source Code: github.com/entwinemedia/weblounge
+* Issue Tracker: http://github.com/entwinemedia/weblounge/issues
+* Source Code: http://github.com/entwinemedia/weblounge
 
 ## Support
 
