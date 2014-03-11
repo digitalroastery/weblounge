@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.contentrepository.impl.index;
+package ch.entwine.weblounge.search.impl;
 
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.ALTERNATE_VERSION;
-import static ch.entwine.weblounge.contentrepository.impl.index.IndexSchema.VERSION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ALTERNATE_VERSION;
+import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
@@ -41,15 +41,15 @@ import ch.entwine.weblounge.common.impl.util.TestUtils;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
+import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
-import ch.entwine.weblounge.contentrepository.VersionedContentRepositoryIndex;
-import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchDocument;
-import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchSearchQuery;
-import ch.entwine.weblounge.contentrepository.impl.index.elasticsearch.ElasticSearchUtils;
+import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchDocument;
+import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchSearchQuery;
+import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
+import ch.entwine.weblounge.search.impl.elasticsearch.SuggestRequest;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.ElasticSearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
@@ -80,6 +80,7 @@ import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.sort.SortOrder;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,10 +97,10 @@ import java.util.Map;
 /**
  * A search index implementation based on ElasticSearch.
  */
-public class SearchIndex implements VersionedContentRepositoryIndex {
+public class SearchIndexImpl implements SearchIndex {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(SearchIndex.class);
+  private static final Logger logger = LoggerFactory.getLogger(SearchIndexImpl.class);
 
   /** Identifier of the root entry */
   public static final String ROOT_ID = "root";
@@ -109,18 +110,15 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
   /** The local elastic search node */
   private static Node elasticSearch = null;
-  
+
   /** List of clients to the local node */
-  private static List<Client> elasticSearchClients = new ArrayList<Client>(); 
+  private static List<Client> elasticSearchClients = new ArrayList<Client>();
 
   /** Client for talking to elastic search */
   private Client nodeClient = null;
 
-  /** True if this is a read only index */
-  protected boolean isReadOnly = false;
-
-  /** The site */
-  protected Site site = null;
+  /** List of sites with prepared index */
+  private List<String> preparedIndices = new ArrayList<String>();
 
   /** The version number */
   protected int indexVersion = -1;
@@ -129,56 +127,40 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   protected ResourceSerializerService resourceSerializer = null;
 
   /**
-   * Creates a search index.
+   * OSGi callback to activate this component instance.
    * 
-   * @param site
-   *          the site
-   * @param serializer
-   *          the resource serializer
-   * @param readOnly
-   *          <code>true</code> to indicate a read only index
+   * @param ctx
+   *          the component context
    * @throws IOException
-   *           if either loading or creating the index fails
+   *           if the search index cannot be initialized
    */
-  public SearchIndex(Site site, ResourceSerializerService serializer,
-      boolean readOnly) throws IOException {
-    this.site = site;
-    this.resourceSerializer = serializer;
-    this.isReadOnly = readOnly;
+  protected void activate(ComponentContext ctx) throws IOException {
     try {
       init();
     } catch (Throwable t) {
-      throw new IOException("Error creating elastic search index", t);
+      throw new IOException("Error initializing elastic search index", t);
     }
-
   }
 
   /**
-   * Shuts down the elastic search index node.
+   * OSGi callback to deactivate this component.
    * 
+   * @param ctx
+   *          the component context
    * @throws IOException
-   *           if stopping the index fails
    */
-  public void close() throws IOException {
-    try {
-      if (nodeClient != null) {
-        nodeClient.close();
-        synchronized (elasticSearch) {
-          elasticSearchClients.remove(nodeClient);
-        }
-        
-        synchronized (this) {
-          if (elasticSearchClients.isEmpty()) {
-            logger.info("Stopping local Elasticsearch node");
-            elasticSearch.stop();
-            elasticSearch.close();
-            elasticSearch = null;
-          }
-        }
-      }
-    } catch (Throwable t) {
-      throw new IOException("Error stopping the elastic search node", t);
-    }
+  protected void deactivate(ComponentContext ctx) throws IOException {
+    close();
+  }
+
+  /**
+   * OSGi callback to bind a resource serializer service to this instance.
+   * 
+   * @param srv
+   *          the resource serializer service
+   */
+  public void bindResourceSerializerService(ResourceSerializerService srv) {
+    this.resourceSerializer = srv;
   }
 
   /**
@@ -191,16 +173,21 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   }
 
   /**
-   * Makes a request and returns the result set.
+   * {@inheritDoc}
    * 
-   * @param query
-   *          the search query
-   * @return the result set
-   * @throws ContentRepositoryException
-   *           if executing the search operation fails
+   * @see ch.entwine.weblounge.common.search.SearchIndex#getByQuery(ch.entwine.weblounge.common.content.SearchQuery)
    */
+  @Override
   public SearchResult getByQuery(SearchQuery query)
       throws ContentRepositoryException {
+
+    if (!preparedIndices.contains(query.getSite().getIdentifier())) {
+      try {
+        createIndex(query.getSite());
+      } catch (IOException e) {
+        throw new ContentRepositoryException(e);
+      }
+    }
 
     logger.debug("Searching index using query '{}'", query);
 
@@ -359,31 +346,39 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   }
 
   /**
-   * Clears the search index.
+   * {@inheritDoc}
    * 
-   * @throws IOException
-   *           if clearing the index fails
+   * @see ch.entwine.weblounge.search.impl.SearchIndex#clear()
    */
+  @Override
   public void clear() throws IOException {
     try {
       DeleteIndexResponse delete = nodeClient.admin().indices().delete(new DeleteIndexRequest()).actionGet();
       if (!delete.acknowledged())
         logger.error("Indices could not be deleted");
-      createIndices();
     } catch (Throwable t) {
       throw new IOException("Cannot clear index", t);
     }
+    
+    preparedIndices.clear();
   }
 
   /**
-   * Removes the entry with the given <code>id</code> from the database.
+   * {@inheritDoc}
    * 
-   * @param resourceId
-   *          identifier of the resource or resource
-   * @throws ContentRepositoryException
-   *           if removing the resource from solr fails
+   * @see ch.entwine.weblounge.common.search.SearchIndex#delete(ch.entwine.weblounge.common.content.ResourceURI)
    */
+  @Override
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
+
+    if (!preparedIndices.contains(uri.getSite().getIdentifier())) {
+      try {
+        createIndex(uri.getSite());
+      } catch (IOException e) {
+        throw new ContentRepositoryException(e);
+      }
+    }
+
     logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
 
     String index = uri.getSite().getIdentifier();
@@ -405,13 +400,11 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   }
 
   /**
-   * Posts the resource to the search index.
+   * {@inheritDoc}
    * 
-   * @param resource
-   *          the resource to add to the index
-   * @throws ContentRepositoryException
-   *           if posting the new resource to solr fails
+   * @see ch.entwine.weblounge.common.search.SearchIndex#add(ch.entwine.weblounge.common.content.Resource)
    */
+  @Override
   public boolean add(Resource<?> resource) throws ContentRepositoryException {
     logger.debug("Adding resource {} to search index", resource);
     addToIndex(resource);
@@ -419,13 +412,11 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   }
 
   /**
-   * Posts the updated resource to the search index.
+   * {@inheritDoc}
    * 
-   * @param resource
-   *          the resource to update
-   * @throws ContentRepositoryException
-   *           if posting the updated resource to solr fails
+   * @see ch.entwine.weblounge.common.search.SearchIndex#update(ch.entwine.weblounge.common.content.Resource)
    */
+  @Override
   public boolean update(Resource<?> resource) throws ContentRepositoryException {
     logger.debug("Updating resource {} in search index", resource);
     addToIndex(resource);
@@ -442,6 +433,14 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
    */
   private void addToIndex(Resource<?> resource)
       throws ContentRepositoryException {
+
+    if (!preparedIndices.contains(resource.getURI().getSite().getIdentifier())) {
+      try {
+        createIndex(resource.getURI().getSite());
+      } catch (IOException e) {
+        throw new ContentRepositoryException(e);
+      }
+    }
 
     // Have the serializer create an input document
     ResourceURI uri = resource.getURI();
@@ -572,16 +571,23 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   }
 
   /**
-   * Move the resource identified by <code>uri</code> to the new location.
+   * {@inheritDoc}
    * 
-   * @param uri
-   *          the resource uri
-   * @param path
-   *          the new path
-   * @return
+   * @see ch.entwine.weblounge.common.search.SearchIndex#move(ch.entwine.weblounge.common.content.ResourceURI,
+   *      java.lang.String)
    */
+  @Override
   public boolean move(ResourceURI uri, String path)
       throws ContentRepositoryException {
+
+    if (!preparedIndices.contains(uri.getSite().getIdentifier())) {
+      try {
+        createIndex(uri.getSite());
+      } catch (IOException e) {
+        throw new ContentRepositoryException(e);
+      }
+    }
+
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
 
     SearchQuery q = new SearchQueryImpl(uri.getSite()).withVersion(uri.getVersion()).withIdentifier(uri.getIdentifier());
@@ -625,35 +631,38 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
   }
 
   /**
-   * Returns the suggestions as returned from the selected dictionary based on
-   * <code>seed</code>.
+   * {@inheritDoc}
    * 
-   * @param dictionary
-   *          the dictionary
-   * @param seed
-   *          the seed used for suggestions
-   * @param onlyMorePopular
-   *          whether to return only more popular results
-   * @param count
-   *          the maximum number of suggestions
-   * @param collate
-   *          whether to provide a query collated with the first matching
-   *          suggestion
+   * @see ch.entwine.weblounge.common.search.SearchIndex#suggest(java.lang.String,
+   *      java.lang.String, boolean, int, boolean)
    */
+  @Override
   public List<String> suggest(String dictionary, String seed,
       boolean onlyMorePopular, int count, boolean collate)
       throws ContentRepositoryException {
-    // TODO implement method
-    throw new NotImplementedException();
+    if (StringUtils.isBlank(seed))
+      throw new IllegalArgumentException("Seed must not be blank");
+    if (StringUtils.isBlank(dictionary))
+      throw new IllegalArgumentException("Dictionary must not be blank");
+
+    SuggestRequest request = null;
+    // TODO: Implement
+    // SuggestRequest request = new SuggestRequest(solrServer, dictionary,
+    // onlyMorePopular, count, collate);
+    try {
+      return request.getSuggestions(seed);
+    } catch (Throwable t) {
+      throw new ContentRepositoryException(t);
+    }
   }
 
   /**
    * Initializes an Elasticsearch node for the site.
    * 
-   * @throws Exception
-   *           if loading or creating solr fails
+   * @throws IOException
+   *           if loading of settings fails
    */
-  private void init() throws Exception {
+  protected void init() throws IOException {
     synchronized (this) {
       if (elasticSearch == null) {
         logger.info("Starting local Elasticsearch node");
@@ -662,33 +671,61 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
         Settings settings = loadSettings();
 
         // Configure and start the elastic search node. In a testing scenario,
-        // the
-        // node is being created locally.
+        // the node is being created locally.
         NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().settings(settings);
         elasticSearch = nodeBuilder.local(TestUtils.isTest()).build();
         elasticSearch.start();
       }
     }
-    
+
     // Create the client
     synchronized (elasticSearch) {
       nodeClient = elasticSearch.client();
       elasticSearchClients.add(nodeClient);
     }
-    
-    // Create indices and type definitions
-    createIndices();
   }
 
   /**
-   * Prepares elastic search to take Weblounge data.
+   * Closes the client & stops and closes the Elasticsearch node
+   * 
+   * @throws IOException
+   *           if stopping the Elasticsearch node fails
+   */
+  protected void close() throws IOException {
+    try {
+      if (nodeClient != null) {
+        nodeClient.close();
+        synchronized (elasticSearch) {
+          elasticSearchClients.remove(nodeClient);
+        }
+
+        synchronized (this) {
+          if (elasticSearchClients.isEmpty()) {
+            logger.info("Stopping local Elasticsearch node");
+            elasticSearch.stop();
+            elasticSearch.close();
+            elasticSearch = null;
+          }
+        }
+      }
+    } catch (Throwable t) {
+      throw new IOException("Error stopping the Elasticsearch node", t);
+    }
+  }
+
+  /**
+   * Prepares elastic search to take Weblounge data of the given site.
+   * 
+   * @param site
+   *          the site, which index needs to be prepared
    * 
    * @throws ContentRepositoryException
    *           if index and type creation fails
    * @throws IOException
    *           if loading of the type definitions fails
    */
-  private void createIndices() throws ContentRepositoryException, IOException {
+  private void createIndex(Site site) throws ContentRepositoryException,
+      IOException {
 
     // Make sure the site index exists
     try {
@@ -737,7 +774,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
 
     // The index does not exist, let's create it
     if (!versionIndexExists) {
-      indexVersion = VersionedContentRepositoryIndex.INDEX_VERSION;
+      indexVersion = SearchIndex.INDEX_VERSION;
       logger.debug("Creating version index for site '{}'", site.getIdentifier());
       IndexRequestBuilder requestBuilder = nodeClient.prepareIndex(site.getIdentifier(), VERSION_TYPE, ROOT_ID);
       logger.debug("Index version of site '{}' is {}", site.getIdentifier(), indexVersion);
@@ -745,6 +782,7 @@ public class SearchIndex implements VersionedContentRepositoryIndex {
       requestBuilder.execute().actionGet();
     }
 
+    preparedIndices.add(site.getIdentifier());
   }
 
   /**
