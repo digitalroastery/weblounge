@@ -22,8 +22,6 @@ import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.opencastproject.util.MimeType;
-import org.opencastproject.util.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -36,6 +34,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
 
 /**
  * Base implementation of a weblounge record handler
@@ -70,7 +70,7 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
   protected final String dcSeriesFlavor;
   
   /** Elements mimetypes */
-  protected final ArrayList<MimeType> mimeTypes = new ArrayList<MimeType>();
+  protected final ArrayList<MediaType> mimeTypes = new ArrayList<MediaType>();
 
   /**
    * Creates a new abstract weblounge record handler
@@ -104,7 +104,7 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
     this.dcEpisodeFlavor = dcEpisodeFlavor;
     this.dcSeriesFlavor = dcSeriesFlavor;
     for(String str : StringUtils.split(StringUtils.trimToEmpty(mimeTypesStr), ",")) {
-    	this.mimeTypes.add(MimeTypes.parseMimeType(StringUtils.trimToEmpty(str)));
+			this.mimeTypes.add(MediaType.valueOf(StringUtils.trimToEmpty(str)));
     }
     logger = LoggerFactory.getLogger(getClass());
   }
