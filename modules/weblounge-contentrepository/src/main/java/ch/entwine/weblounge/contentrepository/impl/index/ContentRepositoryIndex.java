@@ -69,9 +69,16 @@ public class ContentRepositoryIndex {
    *          the search index
    * @throws IOException
    *           if creating the indices fails
+   * @throws IllegalArgumentException
+   *           if one of the parameters is null
    */
   public ContentRepositoryIndex(Site site, SearchIndex searchIndex)
-      throws IOException {
+      throws IOException, IllegalArgumentException {
+    if (site == null)
+      throw new IllegalArgumentException("Site must not be null");
+    if (searchIndex == null)
+      throw new IllegalArgumentException("Search index must not be null");
+    
     this.site = site;
     this.searchIdx = searchIndex;
   }

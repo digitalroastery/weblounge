@@ -188,6 +188,22 @@ public class ContentRepositoryIndexTest {
   public void tearDown() throws Exception {
     idx.clear();
   }
+  
+  /**
+   * Test method for {@link ContentRepositoryIndex#ContentRepositoryIndex(Site, ch.entwine.weblounge.common.search.SearchIndex)}
+   */
+  @Test(expected = IllegalArgumentException.class)
+  public void testConstructorWithNullSite() throws Exception {
+    new ContentRepositoryIndex(null, searchIdx);
+  }
+  
+  /**
+   * Test method for {@link ContentRepositoryIndex#ContentRepositoryIndex(Site, ch.entwine.weblounge.common.search.SearchIndex)}
+   */
+  @Test(expected = IllegalArgumentException.class)
+  public void testConstructorWithNullSearchIndex() throws Exception {
+    new ContentRepositoryIndex(site, null);
+  }
 
   /**
    * Test method for
