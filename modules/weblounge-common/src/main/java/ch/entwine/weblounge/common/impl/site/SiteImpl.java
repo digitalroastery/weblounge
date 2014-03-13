@@ -330,7 +330,19 @@ public class SiteImpl implements Site {
 
         Module module;
         try {
-          module = ModuleImpl.fromXml(moduleNode);
+          // Load module with bundle class loader
+          Thread currentThread = null;
+          ClassLoader backupClassLoader = null;
+          try {
+              currentThread = Thread.currentThread();
+              backupClassLoader = currentThread.getContextClassLoader();
+              currentThread.setContextClassLoader(new BundleClassLoader(bundle));
+              module = ModuleImpl.fromXml(moduleNode);
+          } finally {
+            if (backupClassLoader != null && currentThread != null) {
+              currentThread.setContextClassLoader(backupClassLoader);
+            }
+          }
           logger.debug("Module '{}' loaded for site '{}'", module, this);
         } catch (Throwable t) {
           logger.error("Error loading module '{}' of site {}", moduleId, identifier);
@@ -1394,7 +1406,6 @@ public class SiteImpl implements Site {
       throws Exception {
 
     bundleContext = ctx;
-    bundleContext.getBundle();
     serviceProperties = properties;
 
     // Fix the site identifier
@@ -1738,7 +1749,21 @@ public class SiteImpl implements Site {
       try {
         className = className.substring(1, className.indexOf(".class"));
         className = className.replace('/', '.');
-        c = loader.loadClass(className);
+        
+        // Load integration test class with bundle class loader 
+        Thread currentThread = null;
+        ClassLoader backupClassLoader = null;
+        try {
+            currentThread = Thread.currentThread();
+            backupClassLoader = currentThread.getContextClassLoader();
+            currentThread.setContextClassLoader(new BundleClassLoader(bundle));
+            c = loader.loadClass(className);
+        } finally {
+          if (backupClassLoader != null && currentThread != null) {
+            currentThread.setContextClassLoader(backupClassLoader);
+          }
+        }
+        
         boolean implementsInterface = Arrays.asList(c.getInterfaces()).contains(IntegrationTest.class);
         boolean extendsBaseClass = false;
         if (c.getSuperclass() != null) {
