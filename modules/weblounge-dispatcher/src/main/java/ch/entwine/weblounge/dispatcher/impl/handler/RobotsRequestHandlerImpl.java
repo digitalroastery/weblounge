@@ -121,7 +121,7 @@ public class RobotsRequestHandlerImpl implements RequestHandler {
 
     // Is the request intended for this handler?
     if (!URI_PREFIX.equals(path)) {
-      logger.debug("Skipping request for {}, request path does not start with {}", URI_PREFIX);
+      logger.debug("Skipping request for {}, request path does not start with {}", url, URI_PREFIX);
       return false;
     }
 
