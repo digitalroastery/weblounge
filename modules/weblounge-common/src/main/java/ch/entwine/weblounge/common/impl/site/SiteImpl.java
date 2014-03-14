@@ -1734,11 +1734,13 @@ public class SiteImpl implements Site {
     List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
 
     // Load the classes in question
-    ClassLoader loader = Thread.currentThread().getContextClassLoader();
     Enumeration<?> entries = bundle.findEntries("/", "*.class", true);
     if (entries == null) {
       return tests;
     }
+    
+    // Load integration test class with bundle class loader 
+    ClassLoader loader = new BundleClassLoader(bundle)  ;
 
     // Look at the classes and instantiate those that implement the integration
     // test interface.
@@ -1751,18 +1753,7 @@ public class SiteImpl implements Site {
         className = className.replace('/', '.');
         
         // Load integration test class with bundle class loader 
-        Thread currentThread = null;
-        ClassLoader backupClassLoader = null;
-        try {
-            currentThread = Thread.currentThread();
-            backupClassLoader = currentThread.getContextClassLoader();
-            currentThread.setContextClassLoader(new BundleClassLoader(bundle));
-            c = loader.loadClass(className);
-        } finally {
-          if (backupClassLoader != null && currentThread != null) {
-            currentThread.setContextClassLoader(backupClassLoader);
-          }
-        }
+        c = loader.loadClass(className);
         
         boolean implementsInterface = Arrays.asList(c.getInterfaces()).contains(IntegrationTest.class);
         boolean extendsBaseClass = false;
