@@ -133,8 +133,8 @@ public final class LanguageUtils {
     if (language != null)
       return language;
     for (Locale locale : Locale.getAvailableLocales()) {
-      if (locale.getLanguage().equals(languageCode)) {
-        language = new LanguageImpl(new Locale(languageCode, "", ""));
+      if (locale.getLanguage().equals(languageCode) || locale.getISO3Language().equals(languageCode)) {
+        language = new LanguageImpl(new Locale(locale.getLanguage(), "", ""));
         systemLanguages.put(languageCode, language);
         break;
       }
