@@ -171,20 +171,36 @@ public interface SearchQuery {
   boolean isStationary();
 
   /**
-   * Return the resources with the given source.
+   * Return the resources with the given origin.
    * 
-   * @param source
-   *          the source to look up
+   * @param origin
+   *          the origin to look up
    * @return the query extended by this criterion
    */
-  SearchQuery withSource(String source);
+  SearchQuery withOrigin(String origin);
+  
+  /**
+   * Return the resources with the given original identifier.
+   * 
+   * @param originalIdentifier
+   *          the original identifier to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withOriginalIdentifier(String originalIdentifier);
 
   /**
-   * Returns the source or <code>null</code> if no source was specified.
+   * Returns the origin or <code>null</code> if no origin was specified.
    * 
-   * @return the source
+   * @return the origin
    */
-  String getSource();
+  String getOrigin();
+
+  /**
+   * Returns the original identifier or <code>null</code> if no original identifier was specified.
+   * 
+   * @return the original identifier
+   */
+  String getOriginalIdentifier();
 
   /**
    * Return the resources which have an external representation at the given

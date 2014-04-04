@@ -448,6 +448,30 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#getOrigin()
+   */
+  @Override
+  public String getOrigin() {
+    if (!isHeaderLoaded)
+      loadAudioVisualHeader();
+    return audioVisual.getOrigin();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#getOriginalIdentifier()
+   */
+  @Override
+  public String getOriginalIdentifier() {
+    if (!isHeaderLoaded)
+      loadAudioVisualHeader();
+    return audioVisual.getOriginalIdentifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#hasSubject(java.lang.String)
    */
   public boolean hasSubject(String subject) {
@@ -542,6 +566,30 @@ public class LazyMovieResourceImpl implements MovieResource {
    */
   public void setIdentifier(String identifier) {
     uri.setIdentifier(identifier);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#setOrigin(java.lang.String)
+   */
+  @Override
+  public void setOrigin(String origin) {
+    if (!isHeaderLoaded)
+      loadAudioVisualHeader();
+    audioVisual.setOrigin(origin);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#setOriginalIdentifier(java.lang.String)
+   */
+  @Override
+  public void setOriginalIdentifier(String identifier) {
+    if (!isHeaderLoaded)
+      loadAudioVisualHeader();
+    audioVisual.setOriginalIdentifier(identifier);
   }
 
   /**

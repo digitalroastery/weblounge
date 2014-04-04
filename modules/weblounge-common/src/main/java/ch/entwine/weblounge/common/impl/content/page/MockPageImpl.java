@@ -168,6 +168,46 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#setOrigin(java.lang.String)
+   */
+  @Override
+  public void setOrigin(String origin) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#getOrigin()
+   */
+  @Override
+  public String getOrigin() {
+    return new String("Not implemented in mock page");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#setOriginalIdentifier(java.lang.String)
+   */
+  @Override
+  public void setOriginalIdentifier(String identifier) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#getOriginalIdentifier()
+   */
+  @Override
+  public String getOriginalIdentifier() {
+    return new String("Not implemented in mock page");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.Resource#setPromoted(boolean)
    */
   public void setPromoted(boolean promoted) {

@@ -3,6 +3,8 @@
   <head>
     <promote>true</promote>
     <index>true</index>
+    <origin>newspaper</origin>
+    <original-identifier>123-45-678</original-identifier>
     <metadata>
       <title language="de"><![CDATA[Film]]></title>
       <title language="fr"><![CDATA[Video]]></title>

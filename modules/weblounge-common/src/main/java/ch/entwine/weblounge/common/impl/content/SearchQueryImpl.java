@@ -107,8 +107,11 @@ public class SearchQueryImpl implements SearchQuery {
   /** The external location */
   protected URL externalLocation = null;
 
-  /** The source */
-  protected String source = null;
+  /** The origin */
+  protected String origin = null;
+
+  /** The original identifier */
+  protected String originalIdentifier = null;
 
   /** The properties */
   protected Map<String, String> properties = new HashMap<String, String>();
@@ -1457,20 +1460,39 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#withSource(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withOrigin(String)
    */
-  public SearchQuery withSource(String source) {
-    this.source = source;
+  public SearchQuery withOrigin(String origin) {
+    this.origin = origin;
     return this;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#getSource()
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getOrigin()
    */
-  public String getSource() {
-    return source;
+  public String getOrigin() {
+    return origin;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withOriginalIdentifier(String)
+   */
+  public SearchQuery withOriginalIdentifier(String originalIdentifier) {
+    this.originalIdentifier = originalIdentifier;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getOriginalIdentifier()
+   */
+  public String getOriginalIdentifier() {
+    return originalIdentifier;
   }
 
   /**

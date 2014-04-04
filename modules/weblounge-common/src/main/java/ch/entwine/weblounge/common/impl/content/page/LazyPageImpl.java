@@ -613,6 +613,30 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#getOrigin()
+   */
+  @Override
+  public String getOrigin() {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.getOrigin();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#getOriginalIdentifier()
+   */
+  @Override
+  public String getOriginalIdentifier() {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.getOriginalIdentifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.page.Page#hasSubject(java.lang.String)
    */
   public boolean hasSubject(String subject) {
@@ -753,6 +777,30 @@ public class LazyPageImpl implements Page {
    */
   public void setIdentifier(String identifier) {
     uri.setIdentifier(identifier);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#setOrigin(java.lang.String)
+   */
+  @Override
+  public void setOrigin(String origin) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    page.setOrigin(origin);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#setOriginalIdentifier(java.lang.String)
+   */
+  @Override
+  public void setOriginalIdentifier(String identifier) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    page.setOriginalIdentifier(identifier);
   }
 
   /**

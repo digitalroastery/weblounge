@@ -24,7 +24,8 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_EXTERNAL_REPRESENTATION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_FILENAME;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_MIMETYPE;
-import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_SOURCE;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGIN;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGINAL_IDENTIFIER;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.FULLTEXT;
@@ -347,9 +348,14 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
       and(CONTENT_FILENAME, query.getFilename(), true);
     }
 
-    // Content source
-    if (query.getSource() != null) {
-      and(CONTENT_SOURCE, query.getSource(), true);
+    // Resource origin
+    if (query.getOrigin() != null) {
+      and(ORIGIN, query.getOrigin(), true);
+    }
+
+    // Resource original identifier
+    if (query.getOriginalIdentifier() != null) {
+      and(ORIGINAL_IDENTIFIER, query.getOriginalIdentifier(), true);
     }
 
     // Content external location

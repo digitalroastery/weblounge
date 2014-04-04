@@ -37,9 +37,6 @@ public class ResourceContentImpl implements ResourceContent {
   /** The content's name */
   protected String filename = null;
 
-  /** The content's source */
-  protected String source = null;
-
   /** The content's external location */
   protected URL externalLocation = null;
 
@@ -120,24 +117,6 @@ public class ResourceContentImpl implements ResourceContent {
    */
   public String getFilename() {
     return filename;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.ResourceContent#setSource(java.lang.String)
-   */
-  public void setSource(String source) {
-    this.source = source;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.ResourceContent#getSource()
-   */
-  public String getSource() {
-    return source;
   }
 
   /**
@@ -345,8 +324,6 @@ public class ResourceContentImpl implements ResourceContent {
     buf.append(creationCtx.toXml());
     if (filename != null)
       buf.append("<filename><![CDATA[").append(filename).append("]]></filename>");
-    if (source != null)
-      buf.append("<source>").append(source).append("</source>");
     if (externalLocation != null)
       buf.append("<external>").append(externalLocation).append("</external>");
     if (!StringUtils.isBlank(author))

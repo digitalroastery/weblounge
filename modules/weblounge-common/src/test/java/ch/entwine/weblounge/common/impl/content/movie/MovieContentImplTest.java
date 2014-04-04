@@ -29,9 +29,6 @@ public class MovieContentImplTest {
   /** The filename */
   protected String filename = "movie.mov";
 
-  /** The source file */
-  protected String source = "http://entwinemedia.com/moviexyz.ogg";
-
   /** The English language */
   protected Language english = LanguageUtils.getLanguage("en");
 
@@ -101,7 +98,6 @@ public class MovieContentImplTest {
     videoStream.setScanType(scanType);
 
     movie = new MovieContentImpl(filename, english, mimetype, size, duration);
-    movie.setSource(source);
     movie.addStream(audioStream);
     movie.addStream(videoStream);
     ((MovieContentImpl) movie).setCreated(creationDate, amelie);
@@ -125,16 +121,6 @@ public class MovieContentImplTest {
   @Test
   public void testGetMimetype() {
     assertEquals(mimetype, movie.getMimetype());
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.movie.MovieContentImpl#getSource()}
-   * .
-   */
-  @Test
-  public void testGetSource() {
-    assertEquals(source, movie.getSource());
   }
 
   /**
