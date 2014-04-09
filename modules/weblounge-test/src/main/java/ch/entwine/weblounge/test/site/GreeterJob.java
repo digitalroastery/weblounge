@@ -50,7 +50,7 @@ public class GreeterJob implements Runnable {
     int index = (int) ((greetings.length - 1) * Math.random());
     Map.Entry<String, String> entry = greetings[index];
     try {
-      logger.info(new String(entry.getValue().getBytes("utf-8"), "utf-8") + " (" + entry.getKey() + ")");
+      logger.debug(new String(entry.getValue().getBytes("utf-8"), "utf-8") + " (" + entry.getKey() + ")");
     } catch (UnsupportedEncodingException e) {
       logger.warn("Error decoding greeting for {}, :", entry.getKey(), e.getMessage());
     }
