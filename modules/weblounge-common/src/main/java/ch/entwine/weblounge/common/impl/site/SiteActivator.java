@@ -62,6 +62,9 @@ import javax.xml.validation.SchemaFactory;
  */
 public class SiteActivator {
 
+  /** Site identifier OSGi service property */
+  private static final String SITE_IDENTIFIER_SERVICE_PROPERTY = "site.identifier";
+
   /** The logging facility */
   static final Logger logger = LoggerFactory.getLogger(SiteActivator.class);
 
@@ -112,10 +115,10 @@ public class SiteActivator {
     // Extract the component properties
     this.properties.clear();
     if (context.getProperties() != null) {
-      Enumeration<?> ke = context.getProperties().keys();
-      while (ke.hasMoreElements()) {
-        Object key = ke.nextElement();
-        properties.put(ke.toString(), context.getProperties().get(key).toString());
+      Enumeration<?> keys = context.getProperties().keys();
+      while (keys.hasMoreElements()) {
+        Object key = keys.nextElement();
+        properties.put(key.toString(), context.getProperties().get(key).toString());
       }
     }
 
@@ -235,65 +238,53 @@ public class SiteActivator {
         return;
       }
 
-      // Start loading the site in a new thread in order to enable parallel
-      // loading of sites
-      Thread siteLoader = new Thread() {
-        public void run() {
-          final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
-          try {
-            ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
-              public Void call() throws Exception {
+      logger.info("Loading site from bundle '{}'", bundleName);
 
-                logger.info("Loading site from bundle '{}'", bundleName);
+      final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
+      ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
+        public Void call() throws Exception {
+          site = SiteImpl.fromXml(siteXml.getFirstChild());
 
-                site = SiteImpl.fromXml(siteXml.getFirstChild());
-
-                // Make sure the system admin account is not shadowed
-                if (site.getAdministrator() != null) {
-                  ServiceReference userDirectoryRef = bundleContext.getServiceReference(SystemDirectory.class.getName());
-                  if (userDirectoryRef != null) {
-                    SystemDirectory systemDirectory = (SystemDirectory) bundleContext.getService(userDirectoryRef);
-                    User siteAdmin = site.getAdministrator();
-                    if (siteAdmin != null) {
-                      logger.debug("Checking site '{}' admin user '{}' for shadowing of system account");
-                      User shadowedUser = systemDirectory.loadUser(siteAdmin.getLogin(), site);
-                      if (shadowedUser != null && SecurityUtils.userHasRole(shadowedUser, SystemRole.SYSTEMADMIN)) {
-                        throw new IllegalStateException("Site '" + site.getIdentifier() + "' administrative account '" + siteAdmin.getLogin() + "' is shadowing the system account");
-                      }
-                    }
-                  } else {
-                    logger.warn("Directory service not found, site '{}' admin user cannot be checked for user shadowing", site.getIdentifier());
-                  }
-                } else {
-                  logger.info("Site '{}' does not specify an administrative account", site.getIdentifier());
+          // Make sure the system admin account is not shadowed
+          if (site.getAdministrator() != null) {
+            ServiceReference userDirectoryRef = bundleContext.getServiceReference(SystemDirectory.class.getName());
+            if (userDirectoryRef != null) {
+              SystemDirectory systemDirectory = (SystemDirectory) bundleContext.getService(userDirectoryRef);
+              User siteAdmin = site.getAdministrator();
+              if (siteAdmin != null) {
+                logger.debug("Checking site '{}' admin user '{}' for shadowing of system account");
+                User shadowedUser = systemDirectory.loadUser(siteAdmin.getLogin(), site);
+                if (shadowedUser != null && SecurityUtils.userHasRole(shadowedUser, SystemRole.SYSTEMADMIN)) {
+                  throw new IllegalStateException("Site '" + site.getIdentifier() + "' administrative account '" + siteAdmin.getLogin() + "' is shadowing the system account");
                 }
-
-                if (site instanceof SiteImpl) {
-                  beforeActivation(site, bundleContext, properties);
-                  ((SiteImpl) site).activate(bundleContext, properties);
-                  afterActivation(site, bundleContext, properties);
-                }
-
-                // Register the site as a service
-                logger.debug("Registering site '{}' in the service registry", site);
-                Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
-                for (Map.Entry<String, String> entry : properties.entrySet()) {
-                  serviceProperties.put(entry.getKey(), entry.getValue());
-                }
-                siteService = bundleContext.registerService(Site.class.getName(), site, serviceProperties);
-
-                logger.debug("Site '{}' loaded", site);
-
-                return null;
               }
-            });
-          } catch (Throwable e) {
-            logger.error("Error loading site from bundle '{}': {}", bundleName, e);
+            } else {
+              logger.warn("Directory service not found, site '{}' admin user cannot be checked for user shadowing", site.getIdentifier());
+            }
+          } else {
+            logger.info("Site '{}' does not specify an administrative account", site.getIdentifier());
           }
-        }
-      };
 
-      siteLoader.start();
+          if (site instanceof SiteImpl) {
+            beforeActivation(site, bundleContext, properties);
+            ((SiteImpl) site).activate(bundleContext, properties);
+            afterActivation(site, bundleContext, properties);
+          }
+
+          // Register the site as a service
+          logger.debug("Registering site '{}' in the service registry", site);
+          Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
+          serviceProperties.put(SITE_IDENTIFIER_SERVICE_PROPERTY, site.getIdentifier());
+          for (Map.Entry<String, String> entry : properties.entrySet()) {
+            serviceProperties.put(entry.getKey(), entry.getValue());
+          }
+          siteService = bundleContext.registerService(Site.class.getName(), site, serviceProperties);
+
+          logger.debug("Site '{}' loaded", site);
+
+          return null;
+        }
+      });
 
     } else {
       logger.warn("Site activator was unable to locate site.xml");
