@@ -86,7 +86,7 @@ public class SiteActivator {
    * This method should be configured as the <code>bundleContext</code> property
    * in the <tt>Blueprint Services</tt> section of your bundle using
    * <code>blueprintBundleContext</code> as the value.
-   * 
+   *
    * @param ctx
    *          the bundle context
    */
@@ -100,7 +100,7 @@ public class SiteActivator {
    * <p>
    * This method should be configured in the <tt>Dynamic Services</tt> section
    * of your bundle.
-   * 
+   *
    * @param context
    *          the OSGi component context
    * @throws Exception
@@ -129,7 +129,7 @@ public class SiteActivator {
    * <p>
    * This method should be configured in the <tt>Dynamic Services</tt> section
    * of your bundle.
-   * 
+   *
    * @param context
    *          the OSGi component context
    * @throws Exception
@@ -146,7 +146,7 @@ public class SiteActivator {
    * <p>
    * This method should be configured in the <tt>Blueprint Services</tt> section
    * of your bundle.
-   * 
+   *
    * @param service
    *          the service object
    * @param properties
@@ -174,7 +174,7 @@ public class SiteActivator {
    * <p>
    * This method should be configured in the <tt>Blueprint Services</tt> section
    * of your bundle.
-   * 
+   *
    * @param service
    *          the service object
    * @param properties
@@ -193,7 +193,7 @@ public class SiteActivator {
    * <p>
    * Subclasses that are looking to modify the startup behavior of a site are
    * advised to overwrite {@link #beforeInactivation(Site, BundleContext, Map)}.
-   * 
+   *
    * @param context
    *          the OSGi bundle context
    * @param properties
@@ -235,65 +235,53 @@ public class SiteActivator {
         return;
       }
 
-      // Start loading the site in a new thread in order to enable parallel
-      // loading of sites
-      Thread siteLoader = new Thread() {
-        public void run() {
-          final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
-          try {
-            ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
-              public Void call() throws Exception {
+      logger.info("Loading site from bundle '{}'", bundleName);
 
-                logger.info("Loading site from bundle '{}'", bundleName);
+      final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
+      ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
+        public Void call() throws Exception {
+          site = SiteImpl.fromXml(siteXml.getFirstChild());
 
-                site = SiteImpl.fromXml(siteXml.getFirstChild());
-
-                // Make sure the system admin account is not shadowed
-                if (site.getAdministrator() != null) {
-                  ServiceReference userDirectoryRef = bundleContext.getServiceReference(SystemDirectory.class.getName());
-                  if (userDirectoryRef != null) {
-                    SystemDirectory systemDirectory = (SystemDirectory) bundleContext.getService(userDirectoryRef);
-                    User siteAdmin = site.getAdministrator();
-                    if (siteAdmin != null) {
-                      logger.debug("Checking site '{}' admin user '{}' for shadowing of system account");
-                      User shadowedUser = systemDirectory.loadUser(siteAdmin.getLogin(), site);
-                      if (shadowedUser != null && SecurityUtils.userHasRole(shadowedUser, SystemRole.SYSTEMADMIN)) {
-                        throw new IllegalStateException("Site '" + site.getIdentifier() + "' administrative account '" + siteAdmin.getLogin() + "' is shadowing the system account");
-                      }
-                    }
-                  } else {
-                    logger.warn("Directory service not found, site '{}' admin user cannot be checked for user shadowing", site.getIdentifier());
-                  }
-                } else {
-                  logger.info("Site '{}' does not specify an administrative account", site.getIdentifier());
+          // Make sure the system admin account is not shadowed
+          if (site.getAdministrator() != null) {
+            ServiceReference userDirectoryRef = bundleContext.getServiceReference(SystemDirectory.class.getName());
+            if (userDirectoryRef != null) {
+              SystemDirectory systemDirectory = (SystemDirectory) bundleContext.getService(userDirectoryRef);
+              User siteAdmin = site.getAdministrator();
+              if (siteAdmin != null) {
+                logger.debug("Checking site '{}' admin user '{}' for shadowing of system account");
+                User shadowedUser = systemDirectory.loadUser(siteAdmin.getLogin(), site);
+                if (shadowedUser != null && SecurityUtils.userHasRole(shadowedUser, SystemRole.SYSTEMADMIN)) {
+                  throw new IllegalStateException("Site '" + site.getIdentifier() + "' administrative account '" + siteAdmin.getLogin() + "' is shadowing the system account");
                 }
-
-                if (site instanceof SiteImpl) {
-                  beforeActivation(site, bundleContext, properties);
-                  ((SiteImpl) site).activate(bundleContext, properties);
-                  afterActivation(site, bundleContext, properties);
-                }
-
-                // Register the site as a service
-                logger.debug("Registering site '{}' in the service registry", site);
-                Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
-                for (Map.Entry<String, String> entry : properties.entrySet()) {
-                  serviceProperties.put(entry.getKey(), entry.getValue());
-                }
-                siteService = bundleContext.registerService(Site.class.getName(), site, serviceProperties);
-
-                logger.debug("Site '{}' loaded", site);
-
-                return null;
               }
-            });
-          } catch (Throwable e) {
-            logger.error("Error loading site from bundle '{}': {}", bundleName, e);
+            } else {
+              logger.warn("Directory service not found, site '{}' admin user cannot be checked for user shadowing", site.getIdentifier());
+            }
+          } else {
+            logger.info("Site '{}' does not specify an administrative account", site.getIdentifier());
           }
-        }
-      };
 
-      siteLoader.start();
+          if (site instanceof SiteImpl) {
+            beforeActivation(site, bundleContext, properties);
+            ((SiteImpl) site).activate(bundleContext, properties);
+            afterActivation(site, bundleContext, properties);
+          }
+
+          // Register the site as a service
+          logger.debug("Registering site '{}' in the service registry", site);
+          Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
+          serviceProperties.put(SITE_IDENTIFIER_SERVICE_PROPERTY, site.getIdentifier());
+          for (Map.Entry<String, String> entry : properties.entrySet()) {
+            serviceProperties.put(entry.getKey(), entry.getValue());
+          }
+          siteService = bundleContext.registerService(Site.class.getName(), site, serviceProperties);
+
+          logger.debug("Site '{}' loaded", site);
+
+          return null;
+        }
+      });
 
     } else {
       logger.warn("Site activator was unable to locate site.xml");
@@ -305,7 +293,7 @@ public class SiteActivator {
    * <p>
    * Subclasses that are looking to modify the shutdown behavior of a site are
    * advised to overwrite {@link #beforeInactivation(Site, BundleContext, Map)}.
-   * 
+   *
    * @param context
    *          the OSGi bundle context
    * @param properties
@@ -346,7 +334,7 @@ public class SiteActivator {
    * <p>
    * Subclasses that need to do additional initialization work should override
    * this method.
-   * 
+   *
    * @param site
    *          the site
    * @param context
@@ -366,7 +354,7 @@ public class SiteActivator {
    * <p>
    * Subclasses that need to do additional initialization work should override
    * this method.
-   * 
+   *
    * @param site
    *          the site
    * @param context
@@ -385,7 +373,7 @@ public class SiteActivator {
    * from the OSGi the service registry.
    * <p>
    * Subclasses that need to do cleanup work should override this method.
-   * 
+   *
    * @param site
    *          the site
    * @param context
@@ -404,7 +392,7 @@ public class SiteActivator {
    * from the OSGi the service registry.
    * <p>
    * Subclasses that need to do cleanup work should override this method.
-   * 
+   *
    * @param site
    *          the site
    * @param context
