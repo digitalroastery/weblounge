@@ -141,16 +141,17 @@ public class ContentRepositoryIndexTest {
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("testsite")).anyTimes();
     EasyMock.replay(site);
 
-    // Search index
-    searchIdx = new SearchIndexImplStub();
-    searchIdx.bindResourceSerializerService(serializer);
-
     idxRoot = new File(new File(System.getProperty("java.io.tmpdir")), "index");
     FileUtils.deleteQuietly(idxRoot);
 
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
     System.setProperty("weblounge.home", idxRoot.getAbsolutePath());
     TestUtils.startTesting();
+
+    // Search index
+    searchIdx = new SearchIndexImplStub();
+    searchIdx.bindResourceSerializerService(serializer);
+    
     idx = new ContentRepositoryIndex(site, searchIdx);
   }
 
@@ -161,6 +162,7 @@ public class ContentRepositoryIndexTest {
    */
   @AfterClass
   public static void tearDownAfterClass() throws IOException {
+    searchIdx.close();
     idx.close();
     FileUtils.deleteDirectory(idxRoot);
   }
