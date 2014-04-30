@@ -146,8 +146,6 @@ public class QuartzJobWorkerTest {
 
     // Schedule
     scheduleJob(quartzJob);
-    assertEquals(1, scheduler.getJobNames(schedulerGroup).length);
-    assertEquals(1, scheduler.getTriggersOfJob(jobName, schedulerGroup).length);
 
     synchronized (monitor) {
       try {
@@ -186,8 +184,6 @@ public class QuartzJobWorkerTest {
 
     // Schedule
     scheduleJob(quartzJob);
-    assertEquals(1, scheduler.getJobNames(schedulerGroup).length);
-    assertEquals(1, scheduler.getTriggersOfJob(jobName, schedulerGroup).length);
 
     synchronized (monitor) {
       try {
@@ -226,8 +222,6 @@ public class QuartzJobWorkerTest {
 
     // Schedule
     scheduleJob(quartzJob);
-    assertEquals(1, scheduler.getJobNames(schedulerGroup).length);
-    assertEquals(1, scheduler.getTriggersOfJob(jobName, schedulerGroup).length);
 
     synchronized (monitor) {
       try {
