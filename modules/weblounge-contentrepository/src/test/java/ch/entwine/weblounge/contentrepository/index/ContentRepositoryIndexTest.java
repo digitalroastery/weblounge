@@ -146,7 +146,7 @@ public class ContentRepositoryIndexTest {
     searchIdx.bindResourceSerializerService(serializer);
 
     idxRoot = new File(new File(System.getProperty("java.io.tmpdir")), "index");
-    FileUtils.deleteDirectory(idxRoot);
+    FileUtils.deleteQuietly(idxRoot);
 
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
     System.setProperty("weblounge.home", idxRoot.getAbsolutePath());
