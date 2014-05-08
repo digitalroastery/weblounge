@@ -187,7 +187,7 @@ public class QuartzJobWorkerTest {
 
     synchronized (monitor) {
       try {
-        monitor.wait((triggerCount + 1) * period);
+        monitor.wait((triggerCount + 2) * period);
       } catch (InterruptedException e) {
         fail("Trigger was interrupted while waiting for notification: " + e.getMessage());
       }
