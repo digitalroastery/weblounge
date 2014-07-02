@@ -70,13 +70,13 @@ public class QuartzTriggerListenerTest {
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getIdentifier()).andReturn(siteIdentifier).anyTimes();
     EasyMock.expect(site.isStartedAutomatically()).andReturn(true).anyTimes();
-    EasyMock.expect(site.isOnline()).andReturn(true).anyTimes();
+    EasyMock.expect(site.isStarted()).andReturn(true).anyTimes();
     EasyMock.replay(site);
 
     inactiveSite = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(inactiveSite.getIdentifier()).andReturn(siteIdentifier).anyTimes();
     EasyMock.expect(inactiveSite.isStartedAutomatically()).andReturn(false).anyTimes();
-    EasyMock.expect(inactiveSite.isOnline()).andReturn(false).anyTimes();
+    EasyMock.expect(inactiveSite.isStarted()).andReturn(false).anyTimes();
     EasyMock.replay(inactiveSite);
 }
 

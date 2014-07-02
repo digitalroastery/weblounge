@@ -170,7 +170,7 @@ public class SiteCommand {
         int descriptionLength = buf.length();
         for (int j = 0; j < 64 - descriptionLength; j++)
           buf.append(".");
-        buf.append(site.isOnline() ? " STARTED " : " STOPPED");
+        buf.append(site.isStarted() ? " STARTED " : " STOPPED");
         while (buf.length() < 22)
           buf.append(" ");
         System.out.println(buf.toString());
@@ -193,7 +193,7 @@ public class SiteCommand {
     pad("autostart", (site.isStartedAutomatically() ? "yes" : "no"));
 
     // Started / Stopped
-    pad("running", (site.isOnline() ? "yes" : "no"));
+    pad("running", (site.isStarted() ? "yes" : "no"));
 
     // Hostnames
     if (site.getHostnames().length > 0)
@@ -503,7 +503,7 @@ public class SiteCommand {
    *          the site to start
    */
   private void start(Site site) {
-    if (site.isOnline()) {
+    if (site.isStarted()) {
       System.out.println("Site " + site + " is already running");
       return;
     }
@@ -523,7 +523,7 @@ public class SiteCommand {
    *          the site to stop
    */
   private void stop(Site site) {
-    if (!site.isOnline()) {
+    if (!site.isStarted()) {
       System.out.println("Site " + site + " is already stopped");
       return;
     }
@@ -539,7 +539,7 @@ public class SiteCommand {
    */
   private void restart(Site site) {
     try {
-      if (site.isOnline()) {
+      if (site.isStarted()) {
         site.stop();
         site.start();
       } else if (site.isStartedAutomatically()) {

@@ -91,7 +91,7 @@ public class HealthCheckFilter implements Filter {
         Iterator<Site> si = sites.sites();
         while (si.hasNext()) {
           Site site = si.next();
-          if (!site.isOnline()) {
+          if (!site.isStarted()) {
             logger.trace("Site {} is marked as offline", site.getIdentifier());
             logger.trace("Reporting bad health to {}", httpRequest.getRemoteHost());
             ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_CONFLICT);

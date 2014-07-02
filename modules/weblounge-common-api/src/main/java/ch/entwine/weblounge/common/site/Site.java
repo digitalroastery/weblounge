@@ -432,11 +432,13 @@ public interface Site extends Customizable, RequestListener, Serializable {
 
   /**
    * Starts this site.
+   * <p>
+   * Starting the site is only allowed if there is a content repository connected.
    * 
    * @throws SiteException
    *           if the site cannot be started properly
    * @throws IllegalStateException
-   *           if the site is already running
+   *           if the site is already running or if no content repository is connected
    */
   void start() throws SiteException, IllegalStateException;
 
@@ -453,7 +455,7 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * 
    * @return <code>true</code> if the site is online
    */
-  boolean isOnline();
+  boolean isStarted();
 
   /**
    * Returns the site's content repository or <code>null</code> if no repository

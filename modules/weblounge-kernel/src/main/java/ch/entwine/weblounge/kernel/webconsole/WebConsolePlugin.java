@@ -197,10 +197,10 @@ public class WebConsolePlugin extends AbstractWebConsolePlugin {
     synchronized (sites) {
       int i = 1;
       for (Site site : sites) {
-        String state = site.isOnline() ? "active" : "inactive";
-        int stateRaw = site.isOnline() ? 1 : 0;
-        activeSites += site.isOnline() ? 1 : 0;
-        inactiveSites += !site.isOnline() ? 1 : 0;
+        String state = site.isStarted() ? "active" : "inactive";
+        int stateRaw = site.isStarted() ? 1 : 0;
+        activeSites += site.isStarted() ? 1 : 0;
+        inactiveSites += !site.isStarted() ? 1 : 0;
         if (i > 1)
           sitesData.append(",");
         sitesData.append("{");

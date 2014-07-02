@@ -109,7 +109,7 @@ public class SearchEndpoint {
     Site site = sites.findSiteByURL(url);
     if (site == null) {
       return Response.status(Status.NOT_FOUND).build();
-    } else if (!site.isOnline()) {
+    } else if (!site.isStarted()) {
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
 

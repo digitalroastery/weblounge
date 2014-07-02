@@ -135,7 +135,7 @@ public class SiteImpl implements Site {
   protected boolean autoStart = true;
 
   /** Site running state */
-  private boolean isOnline = false;
+  private boolean isStarted = false;
 
   /** Site description */
   protected String name = null;
@@ -489,7 +489,7 @@ public class SiteImpl implements Site {
    */
   public void setAutoStart(boolean enabled) {
     this.autoStart = enabled;
-    if (isOnline)
+    if (isStarted)
       stop();
   }
 
@@ -1055,8 +1055,11 @@ public class SiteImpl implements Site {
    */
   public synchronized void start() throws SiteException, IllegalStateException {
     logger.debug("Starting site {}", this);
-    if (isOnline)
+    if (isStarted)
       throw new IllegalStateException("Site is already running");
+    
+    if (contentRepository == null)
+      throw new IllegalStateException("A site must have a content repository connected before it may be started");
 
     // Start the site modules
     synchronized (modules) {
@@ -1091,7 +1094,7 @@ public class SiteImpl implements Site {
     }
 
     // Finally, mark this site as running
-    isOnline = true;
+    isStarted = true;
     logger.info("Site '{}' started", this);
 
     // Tell listeners
@@ -1105,7 +1108,7 @@ public class SiteImpl implements Site {
    */
   public synchronized void stop() throws IllegalStateException {
     logger.debug("Stopping site '{}'", this);
-    if (!isOnline)
+    if (!isStarted)
       throw new IllegalStateException("Site is not running");
 
     // Stop jobs
@@ -1140,7 +1143,7 @@ public class SiteImpl implements Site {
     }
 
     // Finally, mark this site as stopped
-    isOnline = false;
+    isStarted = false;
     logger.info("Site '{}' stopped", this);
 
     // Tell listeners
@@ -1150,10 +1153,10 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.site.Site#isOnline()
+   * @see ch.entwine.weblounge.common.site.Site#isStarted()
    */
-  public boolean isOnline() {
-    return isOnline && contentRepository != null;
+  public boolean isStarted() {
+    return isStarted;
   }
 
   /**
@@ -1364,7 +1367,7 @@ public class SiteImpl implements Site {
     this.quartzTriggerListener = new QuartzTriggerListener(this);
     try {
       this.scheduler.addTriggerListener(quartzTriggerListener);
-      if (isOnline) {
+      if (isStarted) {
         synchronized (jobs) {
           for (QuartzJob job : jobs.values()) {
             scheduleJob(job);

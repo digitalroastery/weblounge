@@ -409,7 +409,7 @@ public class SiteManager {
 
     // Stop the site if it's running
     try {
-      if (site.isOnline()) {
+      if (site.isStarted()) {
         site.stop();
       }
     } catch (Throwable t) {
