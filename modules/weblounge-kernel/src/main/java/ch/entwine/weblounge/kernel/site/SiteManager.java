@@ -333,17 +333,25 @@ public class SiteManager {
 
     logger.debug("Site '{}' registered", site);
 
+    // Inform site listeners
+    synchronized (listeners) {
+      for (SiteServiceListener listener : listeners) {
+        try {
+          listener.siteAppeared(site, reference);
+        } catch (Throwable t) {
+          logger.error("Error during notifaction of site '{}': {}", site.getIdentifier(), t.getMessage());
+          return;
+        }
+      }
+    }
+
     // Look for content repositories
     ContentRepository repository = repositoriesBySite.get(site.getIdentifier());
-    if (repository != null && site.getContentRepository() == null) {
-      try {
-        repository.connect(site);
-        site.setContentRepository(repository);
-        logger.info("Site '{}' connected to content repository at {}", site, repository);
-      } catch (ContentRepositoryException e) {
-        logger.warn("Error connecting content repository " + repository + " to site '" + site + "'", e);
-      }
-    } else {
+
+    if (repository == null && site.getContentRepository() == null) {
+      // There's no content repository yet.
+
+      // Register configuration for this site's content repository
       try {
         Configuration config = configurationAdmin.createFactoryConfiguration("ch.entwine.weblounge.contentrepository.factory", null);
         Dictionary<Object, Object> properties = new Hashtable<Object, Object>();
@@ -361,18 +369,16 @@ public class SiteManager {
       } catch (IOException e) {
         logger.error("Unable to create configuration for content repository of site '" + site + "'", e);
       }
+
+      return;
     }
 
-    // Inform site listeners
-    synchronized (listeners) {
-      for (SiteServiceListener listener : listeners) {
-        try {
-          listener.siteAppeared(site, reference);
-        } catch (Throwable t) {
-          logger.error("Error during notifaction of site '{}': {}", site.getIdentifier(), t.getMessage());
-          return;
-        }
-      }
+    try {
+      repository.connect(site);
+      site.setContentRepository(repository);
+      logger.info("Site '{}' connected to content repository at {}", site, repository);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error connecting content repository " + repository + " to site '" + site + "'", e);
     }
 
     // Start the site
@@ -471,9 +477,15 @@ public class SiteManager {
         repository.connect(site);
         logger.info("Site '{}' connected to content repository at {}", site, repository);
         site.setContentRepository(repository);
+        
+        site.start();
       } catch (ContentRepositoryException e) {
         logger.warn("Error connecting content repository " + repository + " to site '" + site + "'", e);
         throw e;
+      } catch (IllegalStateException e) {
+        logger.error("Site '{}' could not be started: {}", e.getMessage(), e);
+      } catch (SiteException e) {
+        logger.error("Site '{}' could not be started: {}", e.getMessage(), e);
       }
     }
 
@@ -505,8 +517,9 @@ public class SiteManager {
       repositoriesBySite.remove(siteIdentifier);
 
       // Tell the repository to clean up
-      if (site != null && site.getContentRepository() != null) {
+      if (site != null) {
         try {
+          site.stop();
           site.setContentRepository(null);
           repository.disconnect();
         } catch (ContentRepositoryException e) {
