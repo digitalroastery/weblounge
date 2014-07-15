@@ -458,7 +458,7 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#getType()
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getTypes()
    */
   public String[] getTypes() {
     return types.toArray(new String[types.size()]);

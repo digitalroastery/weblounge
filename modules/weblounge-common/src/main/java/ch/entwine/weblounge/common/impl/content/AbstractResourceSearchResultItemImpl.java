@@ -77,15 +77,6 @@ public abstract class AbstractResourceSearchResultItemImpl extends SearchResultI
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchResultItem#getType()
-   */
-  public String getType() {
-    return uri.getType();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.ResourceSearchResultItem#getMetadata()
    */
   public List<ResourceMetadata<?>> getMetadata() {

@@ -406,7 +406,7 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getTitle(ch.entwine.weblounge.common.language.Language,
+   * @see ch.entwine.weblounge.common.content.Resource#getTitle(ch.entwine.weblounge.common.language.Language,
    *      boolean)
    */
   public String getTitle(Language language, boolean force) {
@@ -418,18 +418,18 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getType()
+   * @see ch.entwine.weblounge.common.content.Resource#getFlavor()
    */
-  public String getType() {
+  public String getFlavor() {
     if (!isHeaderLoaded)
       loadImageHeader();
-    return image.getType();
+    return image.getFlavor();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#getResourceURI()
+   * @see ch.entwine.weblounge.common.content.Resource#getResourceURI()
    */
   public ResourceURI getURI() {
     return uri;
@@ -628,12 +628,12 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.image.Page#setType(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.Resource#setFlavor(java.lang.String)
    */
-  public void setType(String type) {
+  public void setFlavor(String flavor) {
     if (!isHeaderLoaded)
       loadImageHeader();
-    image.setType(type);
+    image.setFlavor(flavor);
   }
 
   /**

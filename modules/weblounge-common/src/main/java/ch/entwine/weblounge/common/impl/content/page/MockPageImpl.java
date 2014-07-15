@@ -96,18 +96,18 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Resource#setType(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.Resource#setFlavor(java.lang.String)
    */
-  public void setType(String type) {
-    uri.setType(type);
+  public void setFlavor(String flavor) {
+    uri.setType(flavor);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Resource#getType()
+   * @see ch.entwine.weblounge.common.content.Resource#getFlavor()
    */
-  public String getType() {
+  public String getFlavor() {
     return uri.getType();
   }
 

@@ -67,7 +67,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   protected ResourceURI uri = null;
 
   /** Resource type */
-  protected String type = null;
+  protected String flavor = null;
 
   /** Keywords */
   protected List<String> subjects = null;
@@ -156,22 +156,21 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   }
 
   /**
-   * Returns the resource type.
+   * {@inheritDoc}
    * 
-   * @return the resource type
+   * @see ch.entwine.weblounge.common.content.Resource#getFlavor()
    */
-  public String getType() {
-    return type;
+  public String getFlavor() {
+    return flavor;
   }
 
   /**
-   * Sets the page type: news, feature, ...
+   * {@inheritDoc}
    * 
-   * @param type
-   *          the resource type
+   * @see ch.entwine.weblounge.common.content.Resource#setFlavor()
    */
-  public void setType(String type) {
-    this.type = type;
+  public void setFlavor(String flavor) {
+    this.flavor = flavor;
   }
 
   /**
@@ -1075,11 +1074,11 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
       b.append("]]></series>");
     }
 
-    // Type
-    if (type != null) {
-      b.append("<type><![CDATA[");
-      b.append(type);
-      b.append("]]></type>");
+    // Flavor
+    if (flavor != null) {
+      b.append("<flavor><![CDATA[");
+      b.append(flavor);
+      b.append("]]></flavor>");
     }
 
     // Coverage
