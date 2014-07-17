@@ -418,7 +418,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#allow(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#allow(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -427,7 +427,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#deny(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#deny(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -436,7 +436,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#check(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#check(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -445,7 +445,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#check(ch.entwine.weblounge.common.security.PermissionSet, ch.entwine.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#check(ch.entwine.weblounge.common.security.ActionSet, ch.entwine.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -454,7 +454,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#checkOne(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority[])}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#checkOne(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority[])}.
    */
   @Test
   @Ignore
@@ -463,7 +463,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#checkAll(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority[])}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#checkAll(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority[])}.
    */
   @Test
   @Ignore
@@ -472,7 +472,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#permissions()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#actions()}.
    */
   @Test
   @Ignore

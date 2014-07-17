@@ -34,9 +34,9 @@ import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -548,82 +548,82 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void allow(Permission permission, Authority authority) {
-    securityCtx.allow(permission, authority);
+  public void allow(Action action, Authority authority) {
+    securityCtx.allow(action, authority);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void deny(Permission permission, Authority authority) {
-    securityCtx.deny(permission, authority);
+  public void deny(Action action, Authority authority) {
+    securityCtx.deny(action, authority);
   }
 
   /**
    * Returns <code>true</code> if the user <code>u</code> is allowed to do
-   * actions that require permission <code>p</code> on this pagelet.
+   * actions that require action <code>p</code> on this pagelet.
    * 
-   * @param p
-   *          the required permission
+   * @param action
+   *          the required action
    * @param a
    *          the authorization used to access to this pagelet
-   * @return <code>true</code> if the user has the required permission
+   * @return <code>true</code> if the user has the required action
    */
-  public boolean check(Permission p, Authority a) {
-    return securityCtx.check(p, a);
+  public boolean check(Action action, Authority a) {
+    return securityCtx.check(action, a);
   }
 
   /**
    * Returns <code>true</code> if the user <code>u</code> is allowed to act on
-   * the secured object in a way that satisfies the given {@link PermissionSet}
+   * the secured object in a way that satisfies the given {@link ActionSet}
    * <code>p</code>.
    * 
-   * @param p
-   *          the required set of permissions
+   * @param actions
+   *          the required set of actions
    * @param a
    *          the authorization used to access to the secured object
-   * @return <code>true</code> if the user owns the required permissions
+   * @return <code>true</code> if the user owns the required actions
    */
-  public boolean check(PermissionSet p, Authority a) {
-    return securityCtx.check(p, a);
+  public boolean check(ActionSet actions, Authority a) {
+    return securityCtx.check(actions, a);
   }
 
   /**
    * Checks whether at least one of the given authorities pass with respect to
-   * the given permission.
+   * the given action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action to obtain
    * @param authorities
-   *          the objects claiming the permission
+   *          the objects claiming the action
    * @return <code>true</code> if all authorities pass
    */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
-    return securityCtx.checkOne(permission, authorities);
+  public boolean checkOne(Action action, Authority... authorities) {
+    return securityCtx.checkOne(action, authorities);
   }
 
   /**
    * Checks whether all of the given authorities pass with respect to the given
-   * permission.
+   * action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action to obtain
    * @param authorities
-   *          the object claiming the permission
+   *          the object claiming the action
    * @return <code>true</code> if all authorities pass
    */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
-    return securityCtx.checkAll(permission, authorities);
+  public boolean checkAll(Action action, Authority... authorities) {
+    return securityCtx.checkAll(action, authorities);
   }
 
   /**
-   * Returns the pagelets permissions, which are
+   * Returns the pagelets actions, which are
    * <ul>
    * <li>READ</li>
    * <li>WRITE</li>
@@ -631,11 +631,11 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * <li>MANAGE</li>
    * </ul>
    * 
-   * @return the permissions that can be set on the pagelet
-   * @see ch.entwine.weblounge.api.security.Secured#permissions()
+   * @return the actions that can be set on the pagelet
+   * @see ch.entwine.weblounge.api.security.Secured#actions()
    */
-  public Permission[] permissions() {
-    return permissions;
+  public Action[] actions() {
+    return actions;
   }
 
   /**

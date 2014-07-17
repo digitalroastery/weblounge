@@ -24,9 +24,9 @@ import ch.entwine.weblounge.common.content.Creatable;
 import ch.entwine.weblounge.common.content.LocalizedModifiable;
 import ch.entwine.weblounge.common.content.Publishable;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.Permission;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Securable;
-import ch.entwine.weblounge.common.security.SystemPermission;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.security.User;
 
 import java.util.Date;
@@ -41,11 +41,11 @@ import java.util.Date;
  */
 public interface Pagelet extends Creatable, Publishable, LocalizedModifiable, Securable {
 
-  /** The pagelet's permissions */
-  Permission[] permissions = new Permission[] {
-      SystemPermission.READ,
-      SystemPermission.WRITE,
-      SystemPermission.MANAGE };
+  /** The pagelet's actions */
+  Action[] actions = new Action[] {
+      SystemAction.READ,
+      SystemAction.WRITE,
+      SystemAction.MANAGE };
 
   /**
    * Returns identifier of the module that contains the pagelet.

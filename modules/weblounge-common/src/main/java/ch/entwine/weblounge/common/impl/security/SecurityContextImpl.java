@@ -21,9 +21,9 @@
 package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.User;
 
 import org.slf4j.Logger;
@@ -63,13 +63,13 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
   private static final Logger logger = LoggerFactory.getLogger(SecurityContextImpl.class);
 
   /** Allowed authorizations */
-  private Map<Permission, Set<Authority>> context = null;
+  private Map<Action, Set<Authority>> context = null;
 
   /** Allowed default authorizations */
-  private Map<Permission, Set<Authority>> defaultContext = null;
+  private Map<Action, Set<Authority>> defaultContext = null;
 
-  /** The permissions */
-  private Permission[] permissions = null;
+  /** The actions */
+  private Action[] actions = null;
 
   /**
    * Creates a default restriction set with no restrictions and a context
@@ -88,8 +88,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    */
   public SecurityContextImpl(User owner) {
     super(owner);
-    context = new HashMap<Permission, Set<Authority>>();
-    defaultContext = new HashMap<Permission, Set<Authority>>();
+    context = new HashMap<Action, Set<Authority>>();
+    defaultContext = new HashMap<Action, Set<Authority>>();
   }
 
   /**
@@ -99,29 +99,29 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    * <b>Note:</b> Calling this method replaces any default authorities on the
    * given permission, so if you want to keep them, add them here explicitly.
    * 
-   * @param permission
+   * @param action
    *          the permission
    * @param authority
    *          the item that is allowed to obtain the permission
    */
-  public void allow(Permission permission, Authority authority) {
-    if (permission == null)
+  public void allow(Action action, Authority authority) {
+    if (action == null)
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
     logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {
         this,
         authority,
-        permission });
+        action });
 
-    Set<Authority> a = context.get(permission);
+    Set<Authority> a = context.get(action);
     if (a == null) {
       a = new HashSet<Authority>();
-      context.put(permission, a);
-      permissions = null;
+      context.put(action, a);
+      actions = null;
     }
     a.add(authority);
-    defaultContext.remove(permission);
+    defaultContext.remove(action);
   }
 
   /**
@@ -129,73 +129,73 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    * the given permission. Default authorities will not be stored in the
    * database, thus saving lots of space and speeding things up.
    * 
-   * @param permission
+   * @param action
    *          the permission
    * @param authority
    *          the item that is allowed to obtain the permission
    */
-  public void allowDefault(Permission permission, Authority authority) {
-    if (permission == null)
+  public void allowDefault(Action action, Authority authority) {
+    if (action == null)
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
     logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {
         this,
         authority,
-        permission });
-    Set<Authority> a = defaultContext.get(permission);
+        action });
+    Set<Authority> a = defaultContext.get(action);
     if (a == null) {
       a = new HashSet<Authority>();
-      defaultContext.put(permission, a);
-      permissions = null;
+      defaultContext.put(action, a);
+      actions = null;
     }
     a.add(authority);
   }
 
   /**
    * Removes <code>authority</code> from the denied authorities regarding the
-   * given permission. This method will remove the authority from both the
+   * given action. This method will remove the authority from both the
    * explicitly allowed and the default authorities.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authority
    *          the authorization to deny
    */
-  public void deny(Permission permission, Authority authority) {
-    if (permission == null)
-      throw new IllegalArgumentException("Permission cannot be null");
+  public void deny(Action action, Authority authority) {
+    if (action == null)
+      throw new IllegalArgumentException("Action cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {
+    logger.debug("Security context '{}' requires '{}' for action '{}'", new Object[] {
         this,
         authority,
-        permission });
+        action });
 
-    deny(permission, authority, context);
-    deny(permission, authority, defaultContext);
+    deny(action, authority, context);
+    deny(action, authority, defaultContext);
   }
 
   /**
    * Removes <code>authority</code> from the denied authorities found in
-   * <code>context</code> regarding the given permission.
+   * <code>context</code> regarding the given action.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authority
    *          the authorization to deny
    * @param context
    *          the authorities context
    */
-  private void deny(Permission permission, Authority authority,
-      Map<Permission, Set<Authority>> context) {
-    Set<Authority> authorities = context.get(permission);
+  private void deny(Action action, Authority authority,
+      Map<Action, Set<Authority>> context) {
+    Set<Authority> authorities = context.get(action);
 
     // If the authorities have been found, iterate over them to find a matching
     // authority. We have to do this instead of directly calling
-    // authorities.remove(authority)
-    // because the context may contain AuthorityImpl instances which will equal
-    // a matching role (after casting them to an authority) but not v. v.
+    // authorities.remove(authority) because the context may contain AuthorityImpl
+    // instances which will equal a matching role (after casting them to an authority)
+    // but not vice versa.
     if (authorities != null) {
       for (Authority a : authorities) {
         if (a.isAuthorizedBy(authority)) {
@@ -204,35 +204,35 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
         }
       }
       if (authorities.size() == 0) {
-        context.remove(permission);
+        context.remove(action);
       }
     }
   }
 
   /**
-   * Denies everyone and everything regarding permission <code>permission</code>
+   * Denies everyone and everything regarding action <code>action</code>
    * .
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    */
-  public void denyAll(Permission permission) {
-    denyAll(permission, context);
-    denyAll(permission, defaultContext);
+  public void denyAll(Action action) {
+    denyAll(action, context);
+    denyAll(action, defaultContext);
   }
 
   /**
-   * Denies everyone and everything regarding permission <code>permission</code>
+   * Denies everyone and everything regarding action <code>action</code>
    * in the specified context.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param context
    *          the context
    */
-  private void denyAll(Permission permission,
-      Map<Permission, Set<Authority>> context) {
-    Set<Authority> authorities = context.get(permission);
+  private void denyAll(Action action,
+      Map<Action, Set<Authority>> context) {
+    Set<Authority> authorities = context.get(action);
     if (authorities != null) {
       authorities.clear();
     }
@@ -248,42 +248,42 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
 
   /**
    * Checks whether the roles that the caller currently owns satisfy the
-   * constraints of this context ion the given permission.
+   * constraints of this context ion the given action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action to obtain
    * @param authority
-   *          the object claiming the permission
-   * @return <code>true</code> if the item may obtain the permission
+   *          the object claiming the action
+   * @return <code>true</code> if the item may obtain the action
    */
-  public boolean check(Permission permission, Authority authority) {
-    if (permission == null)
-      throw new IllegalArgumentException("Permission cannot be null");
+  public boolean check(Action action, Authority authority) {
+    if (action == null)
+      throw new IllegalArgumentException("Action cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    logger.debug("Request to check permission '{}' for authority '{}' at {}", new Object[] {
-        permission,
+    logger.debug("Request to check action '{}' for authority '{}' at {}", new Object[] {
+        action,
         authority,
         this });
 
-    return check(permission, authority, defaultContext) || check(permission, authority, context);
+    return check(action, authority, defaultContext) || check(action, authority, context);
   }
 
   /**
    * Checks whether the roles that the caller currently owns satisfy the
-   * constraints of the given context regarding the given permission.
+   * constraints of the given context regarding the given action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action to obtain
    * @param authority
-   *          the object claiming the permission
+   *          the object claiming the action
    * @param context
    *          the context
-   * @return <code>true</code> if the item may obtain the permission
+   * @return <code>true</code> if the item may obtain the action
    */
-  private boolean check(Permission permission, Authority authority,
-      Map<Permission, Set<Authority>> context) {
-    Set<Authority> authorities = context.get(permission);
+  private boolean check(Action action, Authority authority,
+      Map<Action, Set<Authority>> context) {
+    Set<Authority> authorities = context.get(action);
     if (authorities != null) {
       for (Authority a : authorities) {
         if (authority.isAuthorizedBy(a))
@@ -295,31 +295,31 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
 
   /**
    * Returns <code>true</code> if the object <code>o</code> is allowed to act on
-   * the secured object in a way that satisfies the given permissionset
+   * the secured object in a way that satisfies the given action set
    * <code>p</code>.
    * 
-   * @param permissions
-   *          the required set of permissions
+   * @param actions
+   *          the required set of actions
    * @param authority
-   *          the object claiming the permissions
-   * @return <code>true</code> if the object may obtain the permissions
+   *          the object claiming the actions
+   * @return <code>true</code> if the object may obtain the actions
    */
-  public boolean check(PermissionSet permissions, Authority authority) {
-    if (permissions == null)
-      throw new IllegalArgumentException("Permissions cannot be null");
+  public boolean check(ActionSet actions, Authority authority) {
+    if (actions == null)
+      throw new IllegalArgumentException("Actions cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    logger.debug("Request to check permissionset for authorization '{}' at {}", authority, this);
+    logger.debug("Request to check action set for authorization '{}' at {}", authority, this);
 
-    return checkOneOf(permissions, authority) && checkAllOf(permissions, authority);
+    return checkOneOf(actions, authority) && checkAllOf(actions, authority);
   }
 
   /**
    * Returns the authorities that are explicitly allowed by the context.
    * 
-   * @see ch.entwine.weblounge.common.security.SecurityContext#getAllowed(ch.entwine.weblounge.common.security.Permission)
+   * @see ch.entwine.weblounge.common.security.SecurityContext#getAllowed(ch.entwine.weblounge.common.security.Action)
    */
-  public Authority[] getAllowed(Permission p) {
+  public Authority[] getAllowed(Action p) {
     Set<Authority> authorities = defaultContext.get(p);
     if (authorities == null) {
       authorities = context.get(p);
@@ -337,46 +337,46 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    * context. Since this context only defines allowed items, the returned array
    * will always be empty.
    * 
-   * @see ch.entwine.weblounge.common.security.SecurityContext#getDenied(ch.entwine.weblounge.common.security.Permission)
+   * @see ch.entwine.weblounge.common.security.SecurityContext#getDenied(ch.entwine.weblounge.common.security.Action)
    */
-  public Authority[] getDenied(Permission p) {
+  public Authority[] getDenied(Action p) {
     return new Authority[] {};
   }
 
   /**
    * Returns <code>true</code> if the authorization is sufficient to obtain the
-   * "oneof" permission set.
+   * "oneof" action set.
    * 
    * @param p
-   *          the permission set
+   *          the action set
    * @param authorization
    *          the authorization to check
-   * @return <code>true</code> if the user has one of the permissions
+   * @return <code>true</code> if the user has one of the actions
    */
-  protected boolean checkOneOf(PermissionSet p, Authority authorization) {
-    Permission[] permissions = p.some();
-    for (int i = 0; i < permissions.length; i++) {
-      if (check(permissions[i], authorization)) {
+  protected boolean checkOneOf(ActionSet p, Authority authorization) {
+    Action[] actions = p.some();
+    for (int i = 0; i < actions.length; i++) {
+      if (check(actions[i], authorization)) {
         return true;
       }
     }
-    return (permissions.length == 0);
+    return (actions.length == 0);
   }
 
   /**
    * Returns <code>true</code> if the authorization is sufficient to obtain the
-   * "allof" permission set.
+   * "allof" action set.
    * 
    * @param p
-   *          the permission set
+   *          the action set
    * @param authorization
    *          the authorization to check
-   * @return <code>true</code> if the user has all of the permissions
+   * @return <code>true</code> if the user has all of the actions
    */
-  protected boolean checkAllOf(PermissionSet p, Authority authorization) {
-    Permission[] permissions = p.all();
-    for (int i = 0; i < permissions.length; i++) {
-      if (!check(permissions[i], authorization)) {
+  protected boolean checkAllOf(ActionSet p, Authority authorization) {
+    Action[] actions = p.all();
+    for (int i = 0; i < actions.length; i++) {
+      if (!check(actions[i], authorization)) {
         return false;
       }
     }
@@ -384,19 +384,19 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
   }
 
   /**
-   * Returns the permissions that are defined in this security context.
+   * Returns the actions that are defined in this security context.
    * 
-   * @return the permissions
+   * @return the actions
    */
-  public Permission[] permissions() {
-    if (permissions == null) {
-      permissions = new Permission[context.size() + defaultContext.size()];
-      List<Permission> permissionList = new ArrayList<Permission>();
+  public Action[] actions() {
+    if (actions == null) {
+      actions = new Action[context.size() + defaultContext.size()];
+      List<Action> permissionList = new ArrayList<Action>();
       permissionList.addAll(context.keySet());
       permissionList.addAll(defaultContext.keySet());
-      permissionList.toArray(permissions);
+      permissionList.toArray(actions);
     }
-    return permissions;
+    return actions;
   }
 
   /**
@@ -409,14 +409,14 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    */
   public void init(XPath path, Node context) {
     this.context.clear();
-    permissions = null;
+    actions = null;
 
     // Read permissions
     NodeList permissions = XPathHelper.selectList(context, "/security/permission", path);
     for (int i = 0; i < permissions.getLength(); i++) {
       Node p = permissions.item(i);
       String id = XPathHelper.valueOf(p, "@id", path);
-      Permission permission = new PermissionImpl(id);
+      Action action = new ActionImpl(id);
 
       // Authority name
       String require = XPathHelper.valueOf(p, "text()", path);
@@ -432,7 +432,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
       while (tok.hasMoreTokens()) {
         String authorityId = tok.nextToken();
         Authority authority = new AuthorityImpl(resolveAuthorityTypeShortcut(type), authorityId);
-        allow(permission, authority);
+        allow(action, authority);
       }
 
     }
@@ -455,7 +455,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
     }
 
     // Permissions
-    for (Permission p : context.keySet()) {
+    for (Action p : context.keySet()) {
       Map<String, Set<Authority>> authorities = groupByType(context.get(p));
       for (Map.Entry<String, Set<Authority>> entry : authorities.entrySet()) {
         String type = entry.getKey();
@@ -509,7 +509,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
     ctxt.owner = owner;
     ctxt.context.putAll(context);
     ctxt.defaultContext.putAll(defaultContext);
-    ctxt.permissions = permissions;
+    ctxt.actions = actions;
     ctxt.owner = owner;
     return ctxt;
   }

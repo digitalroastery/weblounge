@@ -20,9 +20,9 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
@@ -91,48 +91,48 @@ public class SecuredObject implements Securable {
 
   /**
    * Checks whether the authorization satisfy the constraints of this context on
-   * the given permission.
+   * the given action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action
    * @param authorization
-   *          the object used to obtain the permission
+   *          the object used to obtain the action
    * @return <code>true</code> if the authorization is sufficient
    */
-  public boolean check(Permission permission, Authority authorization) {
-    return securityCtx.check(permission, authorization);
+  public boolean check(Action action, Authority authorization) {
+    return securityCtx.check(action, authorization);
   }
 
   /**
    * Returns <code>true</code> if the authorization <code>authorization</code>
    * is sufficient to act on the secured object in a way that requires the given
-   * permissionset <code>p</code>.
+   * action set <code>actions</code>.
    * 
-   * @param permissions
-   *          the required set of permissions
+   * @param actions
+   *          the required set of actions
    * @param authorization
-   *          the object claiming the permissions
-   * @return <code>true</code> if the object may obtain the permissions
+   *          the object executing the actions
+   * @return <code>true</code> if the object may execute the actions
    */
-  public boolean check(PermissionSet permissions, Authority authorization) {
-    return securityCtx.check(permissions, authorization);
+  public boolean check(ActionSet actions, Authority authorization) {
+    return securityCtx.check(actions, authorization);
   }
 
   /**
    * Checks whether at least one of the given authorities pass with respect to
-   * the given permission.
+   * the given action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action to obtain
    * @param authorities
-   *          the object claiming the permission
+   *          the object claiming the action
    * @return <code>true</code> if all authorities pass
    */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
+  public boolean checkOne(Action action, Authority... authorities) {
     if (authorities == null || authorities.length == 0)
       return true;
     for (Authority authority : authorities) {
-      if (check(permission, authority))
+      if (check(action, authority))
         return true;
     }
     return false;
@@ -140,64 +140,63 @@ public class SecuredObject implements Securable {
 
   /**
    * Checks whether all of the given authorities pass with respect to the given
-   * permission.
+   * action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action
    * @param authorities
-   *          the object claiming the permission
+   *          the object claiming the action
    * @return <code>true</code> if all authorities pass
    */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
+  public boolean checkAll(Action action, Authority... authorities) {
     if (authorities == null || authorities.length == 0)
       return true;
     for (Authority authority : authorities) {
-      if (!check(permission, authority))
+      if (!check(action, authority))
         return false;
     }
     return true;
   }
 
   /**
-   * Returns the permissions that may be acquired on this object.
+   * Returns the actions that may be acquired on this object.
    * 
-   * @return the available permissions
+   * @return the available actions
    */
-  public Permission[] permissions() {
-    return securityCtx.permissions();
+  public Action[] actions() {
+    return securityCtx.actions();
   }
 
   /**
-   * Sets the permission <code>permission</code> to require the object
-   * <code>item</code>.
+   * Sets the action to require the object <code>item</code>.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authorization
-   *          the item that is allowed to obtain the permission
+   *          the item that is allowed to obtain the action
    */
-  public void allow(Permission permission, Authority authorization) {
-    if (permission == null)
-      throw new IllegalArgumentException("permission");
-    securityCtx.allow(permission, authorization);
-    firePermissionChanged(permission);
+  public void allow(Action action, Authority authorization) {
+    if (action == null)
+      throw new IllegalArgumentException("Action must not be null");
+    securityCtx.allow(action, authorization);
+    firePermissionChanged(action);
   }
 
   /**
-   * Removes the permission and any associated role requirements from this
+   * Removes the action and any associated role requirements from this
    * context.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    */
-  public void deny(Permission permission, Authority authorization) {
-    securityCtx.deny(permission, authorization);
-    firePermissionChanged(permission);
+  public void deny(Action action, Authority authorization) {
+    securityCtx.deny(action, authorization);
+    firePermissionChanged(action);
   }
 
   /**
    * Adds <code>listener</code> to the list of security listeners that will be
-   * notified in case of ownership or permission changes.
+   * notified in case of ownership or action changes.
    * 
    * @param listener
    *          the new security listener
@@ -238,17 +237,17 @@ public class SecuredObject implements Securable {
   }
 
   /**
-   * Fires the <code>permissionChanged</code> event to all registered security
+   * Fires the <code>actionChanged</code> event to all registered security
    * listeners.
    * 
-   * @param p
-   *          the changing permission
+   * @param action
+   *          the changing action
    */
-  protected void firePermissionChanged(Permission p) {
+  protected void firePermissionChanged(Action action) {
     if (listeners == null)
       return;
     for (int i = 0; i < listeners.size(); i++) {
-      (listeners.get(i)).permissionChanged(this, p);
+      (listeners.get(i)).actionChanged(this, action);
     }
   }
 

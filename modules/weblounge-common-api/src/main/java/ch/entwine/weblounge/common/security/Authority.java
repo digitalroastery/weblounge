@@ -29,7 +29,7 @@ package ch.entwine.weblounge.common.security;
  * interface, thereby allowing for one signature on the secured objects.
  * <p>
  * The implementations then need to make sure they can recognize the authority
- * and resolve the permissions that were applied. For example, if a secured
+ * and resolve the actions that were applied. For example, if a secured
  * object <code>o</code> is told to only allow access to {@link Role}
  * <code>r</code>, and then <code>o</code> is being accessed by
  * {@link ch.entwine.weblounge.common.security.User} <code>u</code> who happens to have

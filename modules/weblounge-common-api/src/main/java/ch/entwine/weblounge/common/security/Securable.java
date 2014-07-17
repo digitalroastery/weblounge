@@ -20,7 +20,6 @@
 
 package ch.entwine.weblounge.common.security;
 
-
 /**
  * The <code>Secured</code> interface defines the required methods for a secured
  * object.
@@ -44,85 +43,85 @@ public interface Securable {
 
   /**
    * Adds <code>authority</code> to the authorized authorities regarding the
-   * given permission.
+   * given action.
    * <p>
    * <b>Note:</b> Calling this method replaces any default authorities on the
-   * given permission, so if you want to keep them, add them here explicitly.
+   * given action, so if you want to keep them, add them here explicitly.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authority
-   *          the item that is allowed to obtain the permission
+   *          the item that is allowed to obtain the action
    */
-  void allow(Permission permission, Authority authority);
+  void allow(Action action, Authority authority);
 
   /**
    * Removes <code>authority</code> from the denied authorities regarding the
-   * given permission. This method will remove the authority from both the
+   * given action. This method will remove the authority from both the
    * explicitly allowed and the default authorities.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authority
    *          the authorization to deny
    */
-  void deny(Permission permission, Authority authority);
+  void deny(Action action, Authority authority);
 
   /**
    * Checks whether the authorization satisfy the constraints of this context on
-   * the given permission.
+   * the given action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action
    * @param authority
-   *          the object used to obtain the permission
+   *          the object used to obtain the action
    * @return <code>true</code> if the authorization is sufficient
    */
-  boolean check(Permission permission, Authority authority);
+  boolean check(Action action, Authority authority);
 
   /**
    * Returns <code>true</code> if the authorization <code>authorization</code>
    * is sufficient to act on the secured object in a way that requires the given
-   * {@link PermissionSet} <code>p</code>.
+   * {@link ActionSet} <code>p</code>.
    * 
-   * @param permissions
-   *          the required set of permissions
+   * @param actions
+   *          the required set of actions
    * @param authority
-   *          the object claiming the permissions
-   * @return <code>true</code> if the object may obtain the permissions
+   *          the object claiming the actions
+   * @return <code>true</code> if the object may obtain the actions
    */
-  boolean check(PermissionSet permissions, Authority authority);
+  boolean check(ActionSet actions, Authority authority);
 
   /**
    * Checks whether at least one of the given authorities pass with respect to
-   * the given permission.
+   * the given action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action
    * @param authorities
-   *          the objects claiming the permission
+   *          the objects claiming the action
    * @return <code>true</code> if all authorities pass
    */
-  boolean checkOne(Permission permission, Authority[] authorities);
+  boolean checkOne(Action action, Authority... authorities);
 
   /**
    * Checks whether all of the given authorities pass with respect to the given
-   * permission.
+   * action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action to obtain
    * @param authorities
-   *          the objects claiming the permission
+   *          the objects claiming the action
    * @return <code>true</code> if all authorities pass
    */
-  boolean checkAll(Permission permission, Authority[] authorities);
+  boolean checkAll(Action action, Authority... authorities);
 
   /**
-   * Returns the permissions that may be acquired on this object.
+   * Returns the actions that may be acquired on this object.
    * 
-   * @return the available permissions
+   * @return the available actions
    */
-  Permission[] permissions();
+  Action[] actions();
 
   /**
    * Adds <code>listener</code> to the list of security listeners that will be

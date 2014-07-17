@@ -25,7 +25,7 @@ import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.WebloungeContentReader;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.User;
 
 import org.slf4j.Logger;
@@ -144,12 +144,12 @@ public final class PagePreviewReader extends WebloungeContentReader {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#allow(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
   @Override
-  protected void allow(Permission permission, Authority authority) {
-    pageletReader.allow(permission, authority);
+  protected void allow(Action action, Authority authority) {
+    pageletReader.allow(action, authority);
   }
 
   /**

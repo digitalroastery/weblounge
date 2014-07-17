@@ -18,34 +18,31 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.page;
-
-import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
-import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.security.SystemAction;
-
+package ch.entwine.weblounge.common.security;
 
 /**
- * Specialized security context for a pagelet. This implementation adds the
- * proper name and default values.
+ * This interface defines the methods to deal with a set of actions.
  */
-public class PageletSecurityContext extends SecurityContextImpl {
+public interface ActionSet {
+
+  /** Value identifying conditions that have to match all */
+  int MATCH_ALL = 0;
+
+  /** Value identifying conditions where one of the have to be matched */
+  int MATCH_SOME = 1;
 
   /**
-   * Creates a new security context for a pagelet with the specified url.
+   * Returns the actions all of which have to be matched.
+   * 
+   * @return the actions to match
    */
-  public PageletSecurityContext() {
-    addDefaultValues();
-  }
+  Action[] all();
 
   /**
-   * Adds the default authorities to their respective actions.
+   * Returns the actions that require one or more to be matched.
+   * 
+   * @return the actions to match
    */
-  private void addDefaultValues() {
-    allowDefault(SystemAction.READ, SystemRole.GUEST);
-    allowDefault(SystemAction.WRITE, SystemRole.EDITOR);
-    allowDefault(SystemAction.MANAGE, SystemRole.EDITOR);
-    allowDefault(SystemAction.PUBLISH, SystemRole.PUBLISHER);
-  }
+  Action[] some();
 
 }

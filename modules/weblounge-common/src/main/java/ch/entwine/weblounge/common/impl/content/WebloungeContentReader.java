@@ -21,10 +21,13 @@
 package ch.entwine.weblounge.common.impl.content;
 
 import ch.entwine.weblounge.common.Times;
+import ch.entwine.weblounge.common.impl.security.AbstractSecurityContext;
+import ch.entwine.weblounge.common.impl.security.ActionImpl;
+import ch.entwine.weblounge.common.impl.security.AuthorityImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.util.xml.WebloungeSAXHandler;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
 import ch.entwine.weblounge.common.security.User;
 
 import org.xml.sax.Attributes;
@@ -33,6 +36,7 @@ import org.xml.sax.SAXException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 /**
  * Utility class used to parse generic content including language sensitive
@@ -108,12 +112,12 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
   /**
    * This method is called if a permission was found.
    * 
-   * @param permission
-   *          the permission to grant
+   * @param action
+   *          the action to grant
    * @param authority
-   *          the authority that this permission is granted to
+   *          the authority that this action is granted to
    */
-  protected abstract void allow(Permission permission, Authority authority);
+  protected abstract void allow(Action action, Authority authority);
 
   /**
    * {@inheritDoc}
@@ -142,10 +146,8 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
 
     // permission
     else if (contentReaderContext == Context.Security && "permission".equals(raw)) {
-      // String id = attrs.getValue("id");
-      // String type = attrs.getValue("type");
-      // clipboard.put("id", id);
-      // clipboard.put("type", type);
+      clipboard.put("id", attrs.getValue("id"));
+      clipboard.put("type", attrs.getValue("type"));
     }
 
     // creation context
@@ -264,17 +266,18 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
 
     // permissions
     else if (contentReaderContext == Context.Security && "permission".equals(raw)) {
-      // TODO: Finish this code
-      /*
-       * String id = (String) clipboard.remove("id"); Permission permission = new
-       * PermissionImpl(id); String type = (String) clipboard.remove("type"); if
-       * (type != null) { type =
-       * AbstractSecurityContext.resolveAuthorityTypeShortcut(type);
-       * StringTokenizer tok = new StringTokenizer(getCharacters(), " ,;");
-       * while (tok.hasMoreTokens()) { String authorityId = tok.nextToken();
-       * Authority authority = new AuthorityImpl(type, authorityId);
-       * allow(permission, authority); } }
-       */
+      String id = (String) clipboard.remove("id");
+      Action action = new ActionImpl(id);
+      String type = (String) clipboard.remove("type");
+      if (type != null) {
+        type = AbstractSecurityContext.resolveAuthorityTypeShortcut(type);
+        StringTokenizer tok = new StringTokenizer(getCharacters(), " ,;");
+        while (tok.hasMoreTokens()) {
+          String authorityId = tok.nextToken();
+          Authority authority = new AuthorityImpl(type, authorityId);
+          allow(action, authority);
+        }
+      }
     }
 
   }

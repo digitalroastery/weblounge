@@ -24,9 +24,9 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 
@@ -177,11 +177,11 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void allow(Permission permission, Authority authority) {
-    pagelet.allow(permission, authority);
+  public void allow(Action action, Authority authority) {
+    pagelet.allow(action, authority);
   }
 
   /**
@@ -241,11 +241,11 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void deny(Permission permission, Authority authority) {
-    pagelet.deny(permission, authority);
+  public void deny(Action action, Authority authority) {
+    pagelet.deny(action, authority);
   }
 
   /**
@@ -305,11 +305,11 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(Permission permission, Authority authority) {
-    return pagelet.check(permission, authority);
+  public boolean check(Action action, Authority authority) {
+    return pagelet.check(action, authority);
   }
 
   /**
@@ -380,11 +380,11 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.PermissionSet,
+   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.ActionSet,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(PermissionSet permissions, Authority authority) {
-    return pagelet.check(permissions, authority);
+  public boolean check(ActionSet actions, Authority authority) {
+    return pagelet.check(actions, authority);
   }
 
   /**
@@ -426,11 +426,11 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority[])
    */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
-    return pagelet.checkOne(permission, authorities);
+  public boolean checkOne(Action action, Authority... authorities) {
+    return pagelet.checkOne(action, authorities);
   }
 
   /**
@@ -472,11 +472,11 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority[])
    */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
-    return pagelet.checkAll(permission, authorities);
+  public boolean checkAll(Action action, Authority... authorities) {
+    return pagelet.checkAll(action, authorities);
   }
 
   /**
@@ -501,10 +501,10 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#permissions()
+   * @see ch.entwine.weblounge.common.security.Securable#actions()
    */
-  public Permission[] permissions() {
-    return pagelet.permissions();
+  public Action[] actions() {
+    return pagelet.actions();
   }
 
   /**

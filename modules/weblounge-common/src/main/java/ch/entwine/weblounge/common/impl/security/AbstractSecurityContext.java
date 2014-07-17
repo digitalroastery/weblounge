@@ -20,8 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
@@ -163,77 +163,77 @@ public abstract class AbstractSecurityContext {
 
   /**
    * Adds <code>authorities</code> to the authorized authorities regarding the
-   * given permission.
+   * given action.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authorities
    *          the authorities that are allowed
    */
-  public void allow(Permission permission, Authority[] authorities) {
+  public void allow(Action action, Authority... authorities) {
     if (authorities == null)
       throw new IllegalStateException("Authorities set is null!");
     for (Authority authority : authorities)
-      allow(permission, authority);
+      allow(action, authority);
   }
   
-  public abstract void allow(Permission permission, Authority authoriy);
+  public abstract void allow(Action action, Authority authoriy);
 
   /**
    * Adds <code>authorities</code> to the denied authorities regarding the given
-   * permission.
+   * action.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authorities
    *          the authorities to deny
    */
-  public void deny(Permission permission, Authority[] authorities) {
+  public void deny(Action action, Authority... authorities) {
     if (authorities == null)
       throw new IllegalStateException("Authorities set is null!");
     for (Authority authority : authorities)
-      deny(permission, authority);
+      deny(action, authority);
   }
 
-  public abstract void deny(Permission permission, Authority authoriy);
+  public abstract void deny(Action action, Authority authoriy);
 
   /**
    * Checks whether at least one of the given authorities pass with respect to
-   * the given permission.
+   * the given action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action
    * @param authorities
-   *          the object claiming the permission
+   *          the object claiming the action
    * @return <code>true</code> if all authorities pass
    */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
+  public boolean checkOne(Action action, Authority... authorities) {
     if (authorities == null || authorities.length == 0)
       return true;
     for (Authority authority : authorities) {
-      if (check(permission, authority))
+      if (check(action, authority))
         return true;
     }
     return false;
   }
   
-  public abstract boolean check(Permission permission, Authority authority);
+  public abstract boolean check(Action action, Authority authority);
 
   /**
    * Checks whether all of the given authorities pass with respect to the given
-   * permission.
+   * action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action
    * @param authorities
-   *          the object claiming the permission
+   *          the object claiming the action
    * @return <code>true</code> if all authorities pass
    */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
+  public boolean checkAll(Action action, Authority... authorities) {
     if (authorities == null || authorities.length == 0)
       return true;
     for (Authority authority : authorities) {
-      if (!check(permission, authority))
+      if (!check(action, authority))
         return false;
     }
     return true;

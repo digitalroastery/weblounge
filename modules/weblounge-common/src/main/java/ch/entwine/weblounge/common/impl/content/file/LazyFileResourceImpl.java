@@ -27,9 +27,9 @@ import ch.entwine.weblounge.common.content.page.Composer;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 
@@ -940,73 +940,73 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void allow(Permission permission, Authority authority) {
+  public void allow(Action action, Authority authority) {
     if (!isHeaderLoaded)
       loadFileHeader();
-    file.allow(permission, authority);
+    file.allow(action, authority);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(Permission permission, Authority authority) {
+  public boolean check(Action action, Authority authority) {
     if (!isHeaderLoaded)
       loadFileHeader();
-    return file.check(permission, authority);
+    return file.check(action, authority);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.PermissionSet,
+   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.ActionSet,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(PermissionSet permissions, Authority authority) {
+  public boolean check(ActionSet action, Authority authority) {
     if (!isHeaderLoaded)
       loadFileHeader();
-    return file.check(permissions, authority);
+    return file.check(action, authority);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority[])
    */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
+  public boolean checkAll(Action action, Authority... authorities) {
     if (!isHeaderLoaded)
       loadFileHeader();
-    return file.checkAll(permission, authorities);
+    return file.checkAll(action, authorities);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority[])
    */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
+  public boolean checkOne(Action action, Authority... authorities) {
     if (!isHeaderLoaded)
       loadFileHeader();
-    return file.checkOne(permission, authorities);
+    return file.checkOne(action, authorities);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void deny(Permission permission, Authority authority) {
+  public void deny(Action action, Authority authority) {
     if (!isHeaderLoaded)
       loadFileHeader();
-    file.deny(permission, authority);
+    file.deny(action, authority);
   }
 
   /**
@@ -1023,12 +1023,12 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#permissions()
+   * @see ch.entwine.weblounge.common.security.Securable#actions()
    */
-  public Permission[] permissions() {
+  public Action[] actions() {
     if (!isHeaderLoaded)
       loadFileHeader();
-    return file.permissions();
+    return file.actions();
   }
 
   /**

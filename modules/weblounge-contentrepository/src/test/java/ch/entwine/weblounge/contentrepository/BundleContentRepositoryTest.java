@@ -116,7 +116,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.BundleContentRepository.BundleContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI, ch.entwine.weblounge.common.user.User, ch.entwine.weblounge.common.security.Permission)}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.BundleContentRepository.BundleContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI, ch.entwine.weblounge.common.user.User, ch.entwine.weblounge.common.security.Action)}.
    */
   @Test
   public void testExistsPageURIUserPermission() {
@@ -140,7 +140,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.BundleContentRepository.BundleContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI, ch.entwine.weblounge.common.user.User, ch.entwine.weblounge.common.security.Permission)}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.BundleContentRepository.BundleContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI, ch.entwine.weblounge.common.user.User, ch.entwine.weblounge.common.security.Action)}.
    */
   @Test
   public void testGetPagePageURIUserPermission() {

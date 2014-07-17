@@ -22,9 +22,9 @@ package ch.entwine.weblounge.common.content;
 
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
-import ch.entwine.weblounge.common.security.Permission;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Securable;
-import ch.entwine.weblounge.common.security.SystemPermission;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.security.User;
 
 import java.util.Date;
@@ -36,12 +36,12 @@ import java.util.Set;
  */
 public interface Resource<T extends ResourceContent> extends Localizable, Creatable, Modifiable, Publishable, Securable {
 
-  /** The resource's permissions */
-  Permission[] permissions = new Permission[] {
-      SystemPermission.READ,
-      SystemPermission.WRITE,
-      SystemPermission.PUBLISH,
-      SystemPermission.MANAGE };
+  /** The resource's actions */
+  Action[] actions = new Action[] {
+      SystemAction.READ,
+      SystemAction.WRITE,
+      SystemAction.PUBLISH,
+      SystemAction.MANAGE };
 
   /** Live or work version of a resource */
   long ANY = -1L;

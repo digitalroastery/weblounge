@@ -26,9 +26,9 @@ import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 
@@ -936,73 +936,73 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void allow(Permission permission, Authority authority) {
+  public void allow(Action action, Authority authority) {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
-    audioVisual.allow(permission, authority);
+    audioVisual.allow(action, authority);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(Permission permission, Authority authority) {
+  public boolean check(Action action, Authority authority) {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
-    return audioVisual.check(permission, authority);
+    return audioVisual.check(action, authority);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.PermissionSet,
+   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.ActionSet,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(PermissionSet permissions, Authority authority) {
+  public boolean check(ActionSet actions, Authority authority) {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
-    return audioVisual.check(permissions, authority);
+    return audioVisual.check(actions, authority);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority[])
    */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
+  public boolean checkAll(Action action, Authority... authorities) {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
-    return audioVisual.checkAll(permission, authorities);
+    return audioVisual.checkAll(action, authorities);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority[])
    */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
+  public boolean checkOne(Action action, Authority... authorities) {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
-    return audioVisual.checkOne(permission, authorities);
+    return audioVisual.checkOne(action, authorities);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void deny(Permission permission, Authority authority) {
+  public void deny(Action action, Authority authority) {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
-    audioVisual.deny(permission, authority);
+    audioVisual.deny(action, authority);
   }
 
   /**
@@ -1019,12 +1019,12 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#permissions()
+   * @see ch.entwine.weblounge.common.security.Securable#actions()
    */
-  public Permission[] permissions() {
+  public Action[] actions() {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
-    return audioVisual.permissions();
+    return audioVisual.actions();
   }
 
   /**

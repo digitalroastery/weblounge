@@ -23,10 +23,10 @@ package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.impl.content.page.PageSecurityContext;
 import ch.entwine.weblounge.common.impl.util.xml.XMLUtils;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
 import ch.entwine.weblounge.common.security.Role;
-import ch.entwine.weblounge.common.security.SystemPermission;
+import ch.entwine.weblounge.common.security.SystemAction;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -71,11 +71,11 @@ public class PermissionSecurityContextTest extends TestCase {
   }
 
   /**
-   * Test for void allow(Permission, Authority)
+   * Test for void allow(Action, Authority)
    */
   @Test
   public final void testPermitPermissionAuthority() {
-    Permission publish = SystemPermission.PUBLISH;
+    Action publish = SystemAction.PUBLISH;
     Role editor = SystemRole.EDITOR;
 
     // Create the security context
@@ -87,16 +87,16 @@ public class PermissionSecurityContextTest extends TestCase {
 
     // Test (publish, translator) - expected: success
     if (!context.check(publish, editor)) {
-      fail("Check for permission " + publish + " and role " + editor + " failed while it shouldn't");
+      fail("Check for Action " + publish + " and role " + editor + " failed while it shouldn't");
     }
   }
 
   /**
-   * Test for void allow(Permission, Authority[])
+   * Test for void allow(Action, Authority[])
    */
   @Test
   public final void testPermitPermissionAuthorityArray() {
-    Permission publish = SystemPermission.PUBLISH;
+    Action publish = SystemAction.PUBLISH;
     Role editor = SystemRole.EDITOR;
 
     // Initialize the weblounge admin
@@ -112,16 +112,16 @@ public class PermissionSecurityContextTest extends TestCase {
 
     // Test (publish, editor) - expected: success
     if (!context.check(publish, editor)) {
-      fail("Check for permission " + publish + " and role " + editor + " failed while it shouldn't");
+      fail("Check for Action " + publish + " and role " + editor + " failed while it shouldn't");
     }
   }
 
   /**
-   * Test for void deny(Permission, Authority)
+   * Test for void deny(Action, Authority)
    */
   @Test
   public final void testDenyPermissionAuthority() {
-    Permission write = SystemPermission.WRITE;
+    Action write = SystemAction.WRITE;
     Role editor = SystemRole.EDITOR;
 
     // Create the security context
@@ -133,16 +133,16 @@ public class PermissionSecurityContextTest extends TestCase {
 
     // Test (write, editor) - expected: failure
     if (context.check(write, editor)) {
-      fail("Check for permission " + write + " and role " + editor + " passed while it shouldn't");
+      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
     }
   }
 
   /**
-   * Test for void deny(Permission, Authority[])
+   * Test for void deny(Action, Authority[])
    */
   @Test
   public final void testDenyPermissionAuthorityArray() {
-    Permission write = SystemPermission.WRITE;
+    Action write = SystemAction.WRITE;
     Role editor = SystemRole.EDITOR;
 
     // Create the security context
@@ -154,7 +154,7 @@ public class PermissionSecurityContextTest extends TestCase {
 
     // Test (write, editor) - expected: failure
     if (context.check(write, editor)) {
-      fail("Check for permission " + write + " and role " + editor + " passed while it shouldn't");
+      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
     }
   }
 
@@ -163,8 +163,8 @@ public class PermissionSecurityContextTest extends TestCase {
    */
   @Test
   public final void testDenyAll() {
-    Permission write = SystemPermission.WRITE;
-    Permission publish = SystemPermission.PUBLISH;
+    Action write = SystemAction.WRITE;
+    Action publish = SystemAction.PUBLISH;
     Role editor = SystemRole.EDITOR;
     Role publisher = SystemRole.PUBLISHER;
 
@@ -177,22 +177,22 @@ public class PermissionSecurityContextTest extends TestCase {
 
     // Test (write, editor) - expected: failure
     if (context.check(write, editor)) {
-      fail("Check for permission " + write + " and role " + editor + " passed while it shouldn't");
+      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
     }
 
     // Test (publish, publisher) - expected: success
     if (context.check(publish, publisher)) {
-      fail("Check for permission " + write + " and role " + editor + " passed while it shouldn't");
+      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
     }
   }
 
   /**
-   * Test for denyAll(Permission)
+   * Test for denyAll(Action)
    */
   @Test
   public final void testDenyAllPermission() {
-    Permission write = SystemPermission.WRITE;
-    Permission publish = SystemPermission.PUBLISH;
+    Action write = SystemAction.WRITE;
+    Action publish = SystemAction.PUBLISH;
     Role editor = SystemRole.EDITOR;
     Role publisher = SystemRole.PUBLISHER;
 
@@ -205,22 +205,22 @@ public class PermissionSecurityContextTest extends TestCase {
 
     // Test (write, editor) - expected: failure
     if (context.check(write, editor)) {
-      fail("Check for permission " + write + " and role " + editor + " passed while it shouldn't");
+      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
     }
 
     // Test (publish, publisher) - expected: success
     if (!context.check(publish, publisher)) {
-      fail("Check for permission " + write + " and role " + editor + " failed while it shouldn't");
+      fail("Check for Action " + write + " and role " + editor + " failed while it shouldn't");
     }
   }
 
   /**
-   * Test for boolean check(Permission, Authority)
+   * Test for boolean check(Action, Authority)
    */
   @Test
   public final void testCheckPermissionAuthority() {
-    Permission write = SystemPermission.WRITE;
-    Permission publish = SystemPermission.PUBLISH;
+    Action write = SystemAction.WRITE;
+    Action publish = SystemAction.PUBLISH;
     Role editor = SystemRole.EDITOR;
 
     // Create the security context
@@ -229,43 +229,43 @@ public class PermissionSecurityContextTest extends TestCase {
 
     // Test (write, editor) - expected: success
     if (!context.check(write, editor)) {
-      fail("Check for permission " + write + " and role " + editor + " failed while it shouldn't");
+      fail("Check for Action " + write + " and role " + editor + " failed while it shouldn't");
     }
 
     // Test (publish, editor) - expected: failure
     if (context.check(publish, editor)) {
-      fail("Check for permission " + write + " and role " + editor + " passed while it shouldn't");
+      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
     }
 
   }
 
   /**
-   * Test for boolean getAllowed(Permission)
+   * Test for boolean getAllowed(Action)
    */
   @Test
   public final void testGetAllowed() {
-    Permission write = SystemPermission.WRITE;
-    Permission manage = SystemPermission.MANAGE;
+    Action write = SystemAction.WRITE;
+    Action manage = SystemAction.MANAGE;
 
     // Create the security context
     SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
-    // Test write permission - expected: 3
+    // Test write Action - expected: 3
     Authority[] authorities = context.getAllowed(write);
     int expected = 3;
     if (authorities.length != expected) {
       fail("Allowed authorities should be " + expected + " but found " + authorities.length);
     }
 
-    // Test undefined manage permission - expected: 0
+    // Test undefined manage Action - expected: 0
     authorities = context.getAllowed(manage);
     expected = 0;
     if (authorities.length != expected) {
       fail("Allowed authorities should be " + expected + " but found " + authorities.length);
     }
 
-    // Test null permission - expected: 0
+    // Test null Action - expected: 0
     authorities = context.getAllowed(null);
     expected = 0;
     if (authorities.length != expected) {
@@ -275,24 +275,24 @@ public class PermissionSecurityContextTest extends TestCase {
   }
 
   /**
-   * Test for boolean getDenied(Permission)
+   * Test for boolean getDenied(Action)
    */
   @Test
   public final void testGetDenied() {
-    Permission write = SystemPermission.WRITE;
+    Action write = SystemAction.WRITE;
 
     // Create the security context
     SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
-    // Test write permission - expected: 0
+    // Test write Action - expected: 0
     Authority[] authorities = context.getDenied(write);
     int expected = 0;
     if (authorities.length != expected) {
       fail("Denied authorities should be " + expected + " but found " + authorities.length);
     }
 
-    // Test null permission - expected: 0
+    // Test null Action - expected: 0
     authorities = context.getDenied(null);
     expected = 0;
     if (authorities.length != expected) {
@@ -302,11 +302,11 @@ public class PermissionSecurityContextTest extends TestCase {
   }
 
   /**
-   * Test checkOne(Permission, Authority[])
+   * Test checkOne(Action, Authority[])
    */
   @Test
   public final void testCheckOneOf() {
-    Permission publish = SystemPermission.PUBLISH;
+    Action publish = SystemAction.PUBLISH;
     Role editor = SystemRole.EDITOR;
     Role guest = SystemRole.GUEST;
     Role publisher = SystemRole.PUBLISHER;
@@ -329,12 +329,12 @@ public class PermissionSecurityContextTest extends TestCase {
   }
 
   /**
-   * Test checkAll(Permission, Authority[])
+   * Test checkAll(Action, Authority[])
    */
   @Test
   public final void testCheckAllOf() {
-    Permission write = SystemPermission.WRITE;
-    Permission publish = SystemPermission.PUBLISH;
+    Action write = SystemAction.WRITE;
+    Action publish = SystemAction.PUBLISH;
     Role editor = SystemRole.EDITOR;
     Role publisher = SystemRole.PUBLISHER;
 
@@ -355,7 +355,7 @@ public class PermissionSecurityContextTest extends TestCase {
   }
 
   /**
-   * Test for permissions()
+   * Test for actions()
    */
   @Test
   public final void testPermissions() {
@@ -364,14 +364,14 @@ public class PermissionSecurityContextTest extends TestCase {
     context.init(path, config);
 
     int expected = 2;
-    Permission[] p = context.permissions();
-    if (p.length != expected) {
-      fail("Found " + p.length + " permissions while " + expected + " were expected");
+    Action[] actions = context.actions();
+    if (actions.length != expected) {
+      fail("Found " + actions.length + " actions while " + expected + " were expected");
     }
   }
 
   /*
-   * Class under test for Authority getAuthorization(Permission)
+   * Class under test for Authority getAuthorization(Action)
    */
   @Test
   public final void testGetAuthorizationPermission() {
@@ -379,7 +379,7 @@ public class PermissionSecurityContextTest extends TestCase {
   }
 
   /*
-   * Class under test for Authority[] getAuthorization(Permission[])
+   * Class under test for Authority[] getAuthorization(Action[])
    */
   @Test
   public final void testGetAuthorizationPermissionArray() {

@@ -29,7 +29,7 @@ import ch.entwine.weblounge.common.impl.content.WebloungeContentReader;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -230,15 +230,15 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#allow(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
   @Override
-  protected void allow(Permission permission, Authority authority) {
+  protected void allow(Action action, Authority authority) {
     if (parserContext.equals(ParserContext.Pagelet))
-      pageletReader.allow(permission, authority);
+      pageletReader.allow(action, authority);
     else
-      page.allow(permission, authority);
+      page.allow(action, authority);
   }
 
   /**

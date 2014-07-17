@@ -30,9 +30,9 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -798,70 +798,70 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void allow(Permission permission, Authority authority) {
+  public void allow(Action action, Authority authority) {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void deny(Permission permission, Authority authority) {
+  public void deny(Action action, Authority authority) {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(Permission permission, Authority authority) {
+  public boolean check(Action action, Authority authority) {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.PermissionSet,
+   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.ActionSet,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(PermissionSet permissions, Authority authority) {
+  public boolean check(ActionSet actions, Authority authority) {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority[])
    */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
+  public boolean checkOne(Action action, Authority... authorities) {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority[])
    */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
+  public boolean checkAll(Action action, Authority... authorities) {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#permissions()
+   * @see ch.entwine.weblounge.common.security.Securable#actions()
    */
-  public Permission[] permissions() {
-    return Resource.permissions;
+  public Action[] actions() {
+    return Resource.actions;
   }
 
   /**

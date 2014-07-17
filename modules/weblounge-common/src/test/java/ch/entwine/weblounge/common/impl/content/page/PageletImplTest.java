@@ -32,10 +32,10 @@ import ch.entwine.weblounge.common.impl.language.LanguageImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.Permission;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.SecurityListener;
-import ch.entwine.weblounge.common.security.SystemPermission;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -311,7 +311,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#check(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority)}
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#check(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)}
    * .
    */
   @Test
@@ -322,7 +322,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#check(ch.entwine.weblounge.common.security.PermissionSet, ch.entwine.weblounge.common.security.Authority)}
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#check(ch.entwine.weblounge.common.security.ActionSet, ch.entwine.weblounge.common.security.Authority)}
    * .
    */
   @Test
@@ -333,7 +333,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#checkOne(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority[])}
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#checkOne(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority[])}
    * .
    */
   @Test
@@ -344,7 +344,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#checkAll(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority[])}
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#checkAll(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority[])}
    * .
    */
   @Test
@@ -355,7 +355,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#permissions()}
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#actions()}
    * .
    */
   @Test
@@ -378,12 +378,12 @@ public class PageletImplTest {
         result.add("Owner changed");
       }
 
-      public void permissionChanged(Securable source, Permission p) {
-        result.add("Permission changed");
+      public void actionChanged(Securable source, Action p) {
+        result.add("Action changed");
       }
     });
     pagelet.setOwner(john);
-    pagelet.allow(SystemPermission.READ, SystemRole.EDITOR);
+    pagelet.allow(SystemAction.READ, SystemRole.EDITOR);
     assertEquals(2, result.size());
   }
 
@@ -400,14 +400,14 @@ public class PageletImplTest {
         result.add("Owner changed");
       }
 
-      public void permissionChanged(Securable source, Permission p) {
-        result.add("Permission changed");
+      public void actionChanged(Securable source, Action p) {
+        result.add("Action changed");
       }
     };
     pagelet.addSecurityListener(listener);
     pagelet.removeSecurityListener(listener);
     pagelet.setOwner(john);
-    pagelet.allow(SystemPermission.READ, SystemRole.EDITOR);
+    pagelet.allow(SystemAction.READ, SystemRole.EDITOR);
     assertEquals(0, result.size());
   }
 

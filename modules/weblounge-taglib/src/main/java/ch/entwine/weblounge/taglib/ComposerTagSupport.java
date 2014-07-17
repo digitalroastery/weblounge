@@ -703,12 +703,12 @@ public class ComposerTagSupport extends WebloungeTag {
       String rendererId = pagelet.getIdentifier();
 
       // Check access rights
-      // Permission p = SystemPermission.READ;
-      // if (!pagelet.checkOne(p, user.getRoleClosure()) &&
-      // !pagelet.check(p, user)) {
+      // Action action = SystemPermission.READ;
+      // if (!pagelet.checkOne(action, user.getRoleClosure()) &&
+      // !pagelet.check(action, user)) {
       // logger.debug("Skipping pagelet " + i + " in composer " + composer
       // + " due to insufficient rights");
-      // continue p;
+      // continue action;
       // }
 
       // Check publishing dates

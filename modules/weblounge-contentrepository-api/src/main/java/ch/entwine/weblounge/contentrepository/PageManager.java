@@ -63,7 +63,7 @@ public interface PageManager {
    * 
    * @return <code>true</code> if locking was successful
    * @throws SecurityException
-   *           if access is denied for the given user and permission
+   *           if access is denied for the given user and action
    * @throws IOException
    *           if locking fails due to a database error
    */
@@ -75,7 +75,7 @@ public interface PageManager {
    * 
    * @return <code>true</code> if unlocking was successful
    * @throws SecurityException
-   *           if access is denied for the given user and permission
+   *           if access is denied for the given user and action
    * @throws IOException
    *           if unlocking fails due to a database error
    */

@@ -25,7 +25,7 @@ import ch.entwine.weblounge.common.language.Localizable;
 import java.security.Principal;
 
 /**
- * A role models an entity that can be assigned a number of permissions.
+ * A role models an entity that can be assigned a number of actions.
  */
 public interface Role extends Principal, Authority, Localizable {
 

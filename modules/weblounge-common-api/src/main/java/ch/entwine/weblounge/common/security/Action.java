@@ -18,34 +18,26 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.page;
-
-import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
-import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.security.SystemAction;
-
+package ch.entwine.weblounge.common.security;
 
 /**
- * Specialized security context for a pagelet. This implementation adds the
- * proper name and default values.
+ * This interface represents an action that can be taken on entities like
+ * resources in Weblounge.
  */
-public class PageletSecurityContext extends SecurityContextImpl {
+public interface Action {
 
   /**
-   * Creates a new security context for a pagelet with the specified url.
+   * Returns the action identifier.
+   * 
+   * @return the action identifier
    */
-  public PageletSecurityContext() {
-    addDefaultValues();
-  }
+  String getIdentifier();
 
   /**
-   * Adds the default authorities to their respective actions.
+   * Returns the action context.
+   * 
+   * @return the action context
    */
-  private void addDefaultValues() {
-    allowDefault(SystemAction.READ, SystemRole.GUEST);
-    allowDefault(SystemAction.WRITE, SystemRole.EDITOR);
-    allowDefault(SystemAction.MANAGE, SystemRole.EDITOR);
-    allowDefault(SystemAction.PUBLISH, SystemRole.PUBLISHER);
-  }
+  String getContext();
 
 }
