@@ -20,12 +20,21 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+import ch.entwine.weblounge.common.security.User;
+
 /**
  * Guest user, which is automatically taken as the user object if no valid user
  * is found in the current session. The guest user normally has the smallest set
  * of rights.
  */
 public class Guest extends UserImpl {
+
+  /**
+   * Creates a new guest user for the default realm.
+   */
+  public Guest() {
+    this(User.DefaultRealm);
+  }
 
   /**
    * Creates a new guest user for the given site.
