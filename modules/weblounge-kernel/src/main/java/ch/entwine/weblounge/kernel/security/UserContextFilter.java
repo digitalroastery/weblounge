@@ -22,11 +22,11 @@ package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.impl.security.Guest;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.Security;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -59,18 +59,11 @@ public class UserContextFilter implements Filter {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(UserContextFilter.class);
 
-  /** The security service */
-  protected SecurityService securityService = null;
-
   /**
    * Creates a new weblounge security filter, which is populating the required
    * fields for the current request in the security service.
-   * 
-   * @param securityService
-   *          the security service
    */
-  public UserContextFilter(SecurityService securityService) {
-    this.securityService = securityService;
+  public UserContextFilter() {
   }
 
   /**
@@ -92,7 +85,7 @@ public class UserContextFilter implements Filter {
       FilterChain chain) throws IOException, ServletException {
 
     // Make sure we have a site
-    Site site = securityService.getSite();
+    Site site = SecurityUtils.getSite();
     if (site == null)
       throw new IllegalStateException("Site context is not available at user lookup");
 
@@ -109,12 +102,12 @@ public class UserContextFilter implements Filter {
     }
 
     // Set the site and the user on the request
-    securityService.setUser(user);
+    SecurityUtils.setUser(user);
 
     chain.doFilter(request, response);
 
     // Make sure the thread is not associated with the site or the user anymore
-    securityService.setUser(null);
+    SecurityUtils.setUser(null);
   }
 
   /**
@@ -139,7 +132,7 @@ public class UserContextFilter implements Filter {
     User user = null;
     Set<Role> roles = new HashSet<Role>();
 
-    if (!securityService.isEnabled()) {
+    if (!SecurityUtils.isEnabled()) {
       user = new UserImpl(Security.ADMIN_USER, Security.SYSTEM_CONTEXT, Security.ADMIN_NAME);
       roles.add(SystemRole.SYSTEMADMIN);
       roles.add(getLocalRole(site, SystemRole.SYSTEMADMIN));

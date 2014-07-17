@@ -21,8 +21,8 @@
 package ch.entwine.weblounge.kernel.endpoint;
 
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
@@ -69,9 +69,6 @@ public class RuntimeInformationEndpoint {
   /** List of runtime information provider */
   protected Map<String, RuntimeInformationProvider> runtimeInfoProviders = null;
 
-  /** The security service */
-  protected SecurityService securityService = null;
-
   /** The request environment */
   protected Environment environment = Environment.Production;
 
@@ -99,7 +96,7 @@ public class RuntimeInformationEndpoint {
 
     if (sites != null) {
       Site site = getSite(request);
-      User user = securityService.getUser();
+      User user = SecurityUtils.getUser();
       Language language = LanguageUtils.getPreferredLanguage(request, site);
 
       for (Map.Entry<String, RuntimeInformationProvider> entry : runtimeInfoProviders.entrySet()) {
@@ -137,7 +134,7 @@ public class RuntimeInformationEndpoint {
 
     if (sites != null) {
       Site site = getSite(request);
-      User user = securityService.getExtendedUser();
+      User user = SecurityUtils.getExtendedUser();
       Language language = LanguageUtils.getPreferredLanguage(request, site);
       RuntimeInformationProvider provider = runtimeInfoProviders.get(component);
       if (provider == null)
@@ -240,16 +237,6 @@ public class RuntimeInformationEndpoint {
    */
   void removeRuntimeInformationProvider(RuntimeInformationProvider provider) {
     runtimeInfoProviders.remove(provider);
-  }
-
-  /**
-   * Callback from OSGi to set the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
   /**

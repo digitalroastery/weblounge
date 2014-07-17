@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-	name="Weblounge Security Service">
-	
-  <implementation class="ch.entwine.weblounge.kernel.security.SpringSecurityServiceImpl" />
+	name="Weblounge Security Service"
+	immediate="true"
+	activate="activate"
+	deactivate="deactivate">
+
+  <implementation class="ch.entwine.weblounge.kernel.security.SecurityServiceImpl" />
   <property name="service.description" value="Weblounge Security Service" />
-  <service>
-    <provide interface="ch.entwine.weblounge.common.security.SecurityService" />
-    <provide interface="ch.entwine.weblounge.kernel.security.SpringSecurityServiceImpl" />
-  </service>
+
+  <reference name="securityManager" interface="java.lang.SecurityManager" cardinality="0..1" policy="dynamic" bind="setSecurityManager" unbind="removeSecurityManager" /> 
 
 </scr:component>

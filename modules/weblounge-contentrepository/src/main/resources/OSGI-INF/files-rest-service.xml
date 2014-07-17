@@ -11,7 +11,6 @@
   </service>
 
   <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" />
-  <reference name="security" interface="ch.entwine.weblounge.common.security.SecurityService" cardinality="1..1" policy="static" bind="setSecurityService" />
   <reference name="serializer" interface="ch.entwine.weblounge.common.repository.ResourceSerializerService" cardinality="1..1" policy="static" bind="setResourceSerializer" />
 
 </scr:component>

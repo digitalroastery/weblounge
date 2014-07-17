@@ -19,7 +19,7 @@
  */
 package ch.entwine.weblounge.kernel.security;
 
-import ch.entwine.weblounge.common.security.SecurityService;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.site.SiteManager;
@@ -65,9 +65,6 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
   /** Site specific security configurations */
   private Map<Site, Filter> siteFilters = null;
 
-  /** The security service implementation */
-  private SecurityService securityService = null;
-
   /** The sites that are online */
   protected SiteManager sites = null;
 
@@ -75,16 +72,12 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
    * Creates a new security filter that will apply the default filter to those
    * sites that don't register a filter on their own.
    * 
-   * @param securityService
-   *          the security service
    * @param sites
    *          the sites manager
    * @param filter
    *          the filter
    */
-  public SecurityFilter(SecurityService securityService, SiteManager sites,
-      Filter filter) {
-    this.securityService = securityService;
+  public SecurityFilter(SiteManager sites, Filter filter) {
     this.sites = sites;
     this.defaultSecurityFilter = filter;
     this.siteFilters = new HashMap<Site, Filter>();
@@ -145,7 +138,7 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
     // Set the site in the security service
     try {
       logger.trace("Request to {} mapped to site '{}'", httpRequest.getRequestURL(), site.getIdentifier());
-      securityService.setSite(site);
+      SecurityUtils.setSite(site);
 
       // Select appropriate security filter and apply it
       Filter siteSecurityFilter = siteFilters.get(site);
@@ -157,7 +150,7 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
         defaultSecurityFilter.doFilter(request, response, chain);
       }
     } finally {
-      securityService.setSite(null);
+      SecurityUtils.setSite(null);
     }
 
   }

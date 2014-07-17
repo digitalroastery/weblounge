@@ -51,7 +51,6 @@ import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -124,9 +123,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
   /** Mime type detector */
   private final Tika mimeTypeDetector = new Tika();
-
-  /** The security service */
-  protected SecurityService securityService = null;
 
   /** The resource serializer service */
   private ResourceSerializerService serializerService = null;
@@ -223,19 +219,19 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       else if (filter.startsWith("creator:") && filter.length() > "creator:".length()) {
         String creator = StringUtils.trim(filter.substring("creator:".length()));
         if ("me".equals(creator))
-          q.withCreator(securityService.getUser());
+          q.withCreator(SecurityUtils.getUser());
         else
           q.withCreator(new UserImpl(creator));
       } else if (filter.startsWith("modifier:") && filter.length() > "modifier:".length()) {
         String modifier = StringUtils.trim(filter.substring("modifier:".length()));
         if ("me".equals(modifier))
-          q.withModifier(securityService.getUser());
+          q.withModifier(SecurityUtils.getUser());
         else
           q.withModifier(new UserImpl(modifier));
       } else if (filter.startsWith("publisher:") && filter.length() > "publisher:".length()) {
         String publisher = StringUtils.trim(filter.substring("publisher:".length()));
         if ("me".equals(publisher))
-          q.withPublisher(securityService.getUser());
+          q.withPublisher(SecurityUtils.getUser());
         else
           q.withPublisher(new UserImpl(publisher));
       }
@@ -626,7 +622,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       }
 
       // Get the current user
-      User user = securityService.getUser();
+      User user = SecurityUtils.getUser();
       if (user == null)
         throw new WebApplicationException(Status.UNAUTHORIZED);
 
@@ -735,7 +731,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
 
     // Get the current user
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (user == null)
       throw new WebApplicationException(Status.UNAUTHORIZED);
 
@@ -837,7 +833,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Get the current user
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (user == null)
       throw new WebApplicationException(Status.UNAUTHORIZED);
 
@@ -907,7 +903,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Get the current user
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (user == null)
       throw new WebApplicationException(Status.UNAUTHORIZED);
 
@@ -993,7 +989,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Get the current user
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (user == null)
       throw new WebApplicationException(Status.UNAUTHORIZED);
 
@@ -1172,7 +1168,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       }
 
       // Set owner and date created
-      User user = securityService.getUser();
+      User user = SecurityUtils.getUser();
       if (user == null)
         throw new WebApplicationException(Status.UNAUTHORIZED);
 
@@ -1319,16 +1315,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       docs = FilesEndpointDocs.createDocumentation(servicePath);
     }
     return docs;
-  }
-
-  /**
-   * Callback from OSGi to set the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
   /**

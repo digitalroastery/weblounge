@@ -28,7 +28,6 @@ import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.security.DigestType;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.security.UserExistsException;
 import ch.entwine.weblounge.common.security.UserShadowedException;
@@ -81,9 +80,6 @@ public class SQLDirectoryProviderEndpoint {
   /** The cache configuration factory */
   private SQLDirectoryProvider directory = null;
 
-  /** The security service */
-  protected SecurityService securityService = null;
-
   /** The sites that are online */
   protected SiteManager sites = null;
 
@@ -112,7 +108,7 @@ public class SQLDirectoryProviderEndpoint {
     Site site = getSite(request);
 
     // Make sure that the user owns the roles required for this operation
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
       return Response.status(Status.FORBIDDEN).build();
 
@@ -134,7 +130,7 @@ public class SQLDirectoryProviderEndpoint {
     Site site = getSite(request);
 
     // Make sure that the user owns the roles required for this operation
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
       return Response.status(Status.FORBIDDEN).build();
 
@@ -254,7 +250,7 @@ public class SQLDirectoryProviderEndpoint {
       @Context HttpServletRequest request) {
 
     // Make sure that the user owns the roles required for this operation
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN) && !user.getLogin().equals(login))
       return Response.status(Status.FORBIDDEN).build();
 
@@ -309,7 +305,7 @@ public class SQLDirectoryProviderEndpoint {
       @Context HttpServletRequest request) {
 
     // Make sure that the user owns the roles required for this operation
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN) && !user.getLogin().equals(login))
       return Response.status(Status.FORBIDDEN).build();
 
@@ -344,7 +340,7 @@ public class SQLDirectoryProviderEndpoint {
       @Context HttpServletRequest request) {
 
     // Make sure that the user owns the roles required for this operation
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN) && !user.getLogin().equals(login))
       return Response.status(Status.FORBIDDEN).build();
 
@@ -380,7 +376,7 @@ public class SQLDirectoryProviderEndpoint {
       @Context HttpServletRequest request) {
 
     // Make sure that the user owns the roles required for this operation
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN) && !user.getLogin().equals(login))
       return Response.status(Status.FORBIDDEN).build();
 
@@ -404,7 +400,7 @@ public class SQLDirectoryProviderEndpoint {
       @Context HttpServletRequest request) {
 
     // Make sure that the user owns the roles required for this operation
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
       return Response.status(Status.FORBIDDEN).build();
 
@@ -431,7 +427,7 @@ public class SQLDirectoryProviderEndpoint {
       @Context HttpServletRequest request) {
 
     // Make sure that the user owns the roles required for this operation
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
       return Response.status(Status.FORBIDDEN).build();
 
@@ -459,7 +455,7 @@ public class SQLDirectoryProviderEndpoint {
       @Context HttpServletRequest request) {
 
     // Make sure that the user owns the roles required for this operation
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
       return Response.status(Status.FORBIDDEN).build();
 
@@ -497,7 +493,7 @@ public class SQLDirectoryProviderEndpoint {
       @Context HttpServletRequest request) {
 
     // Make sure that the user owns the roles required for this operation
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
       return Response.status(Status.FORBIDDEN).build();
 
@@ -588,16 +584,6 @@ public class SQLDirectoryProviderEndpoint {
    */
   void setDiretoryProvider(SQLDirectoryProvider directoryProvider) {
     this.directory = directoryProvider;
-  }
-
-  /**
-   * Callback from OSGi to set the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
   /**

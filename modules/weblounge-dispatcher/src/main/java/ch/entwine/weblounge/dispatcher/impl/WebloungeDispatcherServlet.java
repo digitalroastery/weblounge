@@ -26,11 +26,11 @@ import ch.entwine.weblounge.cache.CacheService;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.request.RequestListener;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.dispatcher.DispatchListener;
@@ -86,9 +86,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
   /** The sites that are online */
   private transient SiteDispatcherService sites = null;
-
-  /** The security service */
-  private SecurityService securityService = null;
 
   /** List of request listeners */
   private List<RequestListener> requestListeners = null;
@@ -269,10 +266,10 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     logger.debug("Serving {}", httpRequest.getRequestURI());
 
     // Get the site dispatcher
-    Site site = securityService.getSite();
+    Site site = SecurityUtils.getSite();
     if (site == null) {
       site = getSiteByRequest(httpRequest);
-      securityService.setSite(site);
+      SecurityUtils.setSite(site);
     }
 
     boolean isSpecialRequest = StringUtils.isNotBlank(httpRequest.getHeader("X-Weblounge-Special"));
@@ -337,8 +334,8 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     // Ask the registered request handler if they are willing to handle
     // the request.
     try {
-      securityService.setSite(site);
-      request.setUser(securityService.getUser());
+      SecurityUtils.setSite(site);
+      request.setUser(SecurityUtils.getUser());
       for (RequestHandler handler : requestHandler) {
         try {
           logger.trace("Asking {} to serve {}", handler, request);
@@ -369,7 +366,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         }
       }
     } finally {
-      securityService.setSite(null);
+      SecurityUtils.setSite(null);
       if (requestServed) {
         response.endResponse();
         response.flushBuffer();
@@ -581,16 +578,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    */
   void removeSiteDispatcher(SiteDispatcherService siteDispatcher) {
     this.sites = null;
-  }
-
-  /**
-   * Sets the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
   /**

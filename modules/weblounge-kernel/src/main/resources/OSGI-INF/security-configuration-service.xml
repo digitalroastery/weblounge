@@ -13,7 +13,6 @@
     <provide interface="ch.entwine.weblounge.kernel.security.SpringSecurityConfigurationService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
-  <reference name="security" interface="ch.entwine.weblounge.kernel.security.SpringSecurityServiceImpl" cardinality="1..1" policy="static" bind="setSecurityService" /> 
   <reference name="sites" interface="ch.entwine.weblounge.kernel.site.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" unbind="removeSiteManager" />
   <reference name="userdetails" interface="org.springframework.security.core.userdetails.UserDetailsService" cardinality="1..1" policy="static" /> 
 

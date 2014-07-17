@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.impl.security.PasswordEncoder;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.DirectoryProvider;
@@ -28,7 +29,6 @@ import ch.entwine.weblounge.common.security.DirectoryService;
 import ch.entwine.weblounge.common.security.LoginListener;
 import ch.entwine.weblounge.common.security.Password;
 import ch.entwine.weblounge.common.security.Role;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.SiteDirectory;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -71,16 +71,13 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
   /** The list of login listeners */
   protected List<LoginListener> loginListeners = new ArrayList<LoginListener>();
 
-  /** The security service */
-  protected SecurityService securityService = null;
-
   /**
    * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.security.DirectoryService#getRoles()
    */
   public Role[] getRoles() throws IllegalStateException {
-    Site site = securityService.getSite();
+    Site site = SecurityUtils.getSite();
 
     if (site == null)
       throw new IllegalStateException("No site set in security context");
@@ -145,7 +142,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
   public UserDetails loadUserByUsername(String name)
       throws UsernameNotFoundException, DataAccessException {
 
-    Site site = securityService.getSite();
+    Site site = SecurityUtils.getSite();
     if (site == null) {
       logger.error("Site context not available during user lookup");
       throw new UsernameNotFoundException("No site context available");
@@ -233,7 +230,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
    * @see ch.entwine.weblounge.common.security.DirectoryService#getLocalRole(ch.entwine.weblounge.common.security.Role)
    */
   public Role getLocalRole(Role role) {
-    Site site = securityService.getSite();
+    Site site = SecurityUtils.getSite();
 
     if (site == null)
       throw new IllegalStateException("No site set in security context");
@@ -262,7 +259,7 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
    * @see ch.entwine.weblounge.common.security.DirectoryService#getSystemRoles(ch.entwine.weblounge.common.security.Role)
    */
   public Role[] getSystemRoles(Role role) {
-    Site site = securityService.getSite();
+    Site site = SecurityUtils.getSite();
 
     if (site == null)
       throw new IllegalStateException("No site set in security context");
@@ -284,16 +281,6 @@ public class DirectoryServiceImpl implements DirectoryService, UserDetailsServic
     }
 
     return systemRoles.toArray(new Role[systemRoles.size()]);
-  }
-
-  /**
-   * Sets the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
   /**

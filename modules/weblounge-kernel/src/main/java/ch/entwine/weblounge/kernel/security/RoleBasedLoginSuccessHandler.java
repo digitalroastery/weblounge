@@ -23,7 +23,6 @@ package ch.entwine.weblounge.kernel.security;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
 import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 
 import org.apache.commons.lang.StringUtils;
@@ -54,9 +53,6 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
 
   /** Saved request key. Unfortunately, the spring constant is not accessible */
   private static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
-
-  /** The security service */
-  protected SecurityService securityService = null;
 
   /** The maps of roles to welcome pages */
   protected Map<String, String> welcomePages = new HashMap<String, String>();
@@ -142,16 +138,6 @@ public class RoleBasedLoginSuccessHandler extends SavedRequestAwareAuthenticatio
    */
   public void setWelcomePages(Map<String, String> welcomePages) {
     this.welcomePages = welcomePages;
-  }
-
-  /**
-   * Callback from spring security which will set the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
 }

@@ -11,6 +11,5 @@
   </service>
   <reference name="directoryprovider" interface="ch.entwine.weblounge.common.security.DirectoryProvider" cardinality="0..n" policy="dynamic" bind="addDirectoryProvider" unbind="removeDirectoryProvider" />
   <reference name="loginlistener" interface="ch.entwine.weblounge.common.security.LoginListener" cardinality="0..n" policy="dynamic" bind="addLoginListener" unbind="removeLoginListener" />
-  <reference name="securityservice" interface="ch.entwine.weblounge.common.security.SecurityService" cardinality="1..1" policy="static" bind="setSecurityService" />
 
 </scr:component>
