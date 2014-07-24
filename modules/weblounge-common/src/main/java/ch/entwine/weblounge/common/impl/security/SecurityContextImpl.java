@@ -22,8 +22,8 @@ package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.security.Action;
-import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
+import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.User;
 
 import org.slf4j.Logger;
@@ -57,16 +57,25 @@ import javax.xml.xpath.XPath;
  * 		&lt;/security&gt;
  * </pre>
  */
-public class SecurityContextImpl extends AbstractSecurityContext implements Cloneable {
+public class SecurityContextImpl extends AbstractSecurityContext implements Securable, Cloneable {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SecurityContextImpl.class);
 
   /** Allowed authorizations */
-  private Map<Action, Set<Authority>> context = null;
+  private Map<Action, Set<Authority>> aclAllow = null;
 
-  /** Allowed default authorizations */
-  private Map<Action, Set<Authority>> defaultContext = null;
+  /** Denied authorizations */
+  private Map<Action, Set<Authority>> aclDeny = null;
+
+  /** Default allowed authorizations */
+  private Map<Action, Set<Authority>> aclAllowDefaults = null;
+
+  /** Default denied authorizations */
+  private Map<Action, Set<Authority>> aclDenyDefaults = null;
+
+  /** Order in which to evaluate allow and deny rules */
+  protected Order evaluationOrder = Order.AllowDeny;
 
   /** The actions */
   private Action[] actions = null;
@@ -88,8 +97,34 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    */
   public SecurityContextImpl(User owner) {
     super(owner);
-    context = new HashMap<Action, Set<Authority>>();
-    defaultContext = new HashMap<Action, Set<Authority>>();
+    aclAllow = new HashMap<Action, Set<Authority>>();
+    aclAllowDefaults = new HashMap<Action, Set<Authority>>();
+    aclDeny = new HashMap<Action, Set<Authority>>();
+    aclDenyDefaults = new HashMap<Action, Set<Authority>>();
+  }
+
+  /**
+   * Sets the order in which to evaluate allow and deny access rules.
+   * 
+   * @param order
+   *          the evaluation order
+   * @throws IllegalArgumentException
+   *           if <code>order</code> is <code>null</code>
+   */
+  protected void setAllowDenyOrder(Order order) {
+    if (order == null)
+      throw new IllegalArgumentException("Order must not be null");
+    this.evaluationOrder = order;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  @Override
+  public Order getAllowDenyOrder() {
+    return evaluationOrder;
   }
 
   /**
@@ -114,42 +149,89 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
         authority,
         action });
 
-    Set<Authority> a = context.get(action);
-    if (a == null) {
-      a = new HashSet<Authority>();
-      context.put(action, a);
-      actions = null;
+    Set<Authority> authorities = aclAllow.get(action);
+    if (authorities == null) {
+      authorities = new HashSet<Authority>();
+      aclAllow.put(action, authorities);
     }
-    a.add(authority);
-    defaultContext.remove(action);
+    authorities.add(authority);
+    aclAllowDefaults.remove(action);
+    actions = null;
   }
 
   /**
-   * Adds <code>authority</code> to the default authorized authorities regarding
-   * the given permission. Default authorities will not be stored in the
-   * database, thus saving lots of space and speeding things up.
+   * Allows to action on this object in all ways defined by {@link #actions()}
+   * by any authority.
+   */
+  public void allowAll() {
+    for (Action action : actions()) {
+      allow(action, ANY_AUTHORITY);
+    }
+  }
+
+  /**
+   * Denies everyone and everything regarding action <code>action</code> .
+   * 
+   * @param action
+   *          the action
+   */
+  public void allowAll(Action action) {
+    allow(action, ANY_AUTHORITY);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action,
+   *      ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean isAllowed(Action action, Authority authority) {
+    if (action == null)
+      throw new IllegalArgumentException("Action must not be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority must not be null");
+
+    // Check if the action is explicitly authorized
+    Authority[] authorities = getAllowed(action);
+    for (Authority a : authorities) {
+      if (authority.matches(a)) {
+        return true;
+      }
+    }
+
+    // No?
+    return false;
+  }
+
+  /**
+   * Adds <code>authority</code> to the authorities that are allowed access by
+   * default regarding the given action.
+   * <p>
+   * Note that default authorities will not be serialized as part of the
+   * security context, thus saving space and speeding things up.
    * 
    * @param action
    *          the permission
    * @param authority
-   *          the item that is allowed to obtain the permission
+   *          the item that is allowed
    */
   public void allowDefault(Action action, Authority authority) {
     if (action == null)
-      throw new IllegalArgumentException("Permission cannot be null");
+      throw new IllegalArgumentException("Action cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {
+    logger.debug("Security context '{}' requires '{}' for action '{}'", new Object[] {
         this,
         authority,
         action });
-    Set<Authority> a = defaultContext.get(action);
+    Set<Authority> a = aclAllowDefaults.get(action);
     if (a == null) {
       a = new HashSet<Authority>();
-      defaultContext.put(action, a);
-      actions = null;
+      aclAllowDefaults.put(action, a);
     }
     a.add(authority);
+    actions = null;
   }
 
   /**
@@ -164,154 +246,96 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    */
   public void deny(Action action, Authority authority) {
     if (action == null)
-      throw new IllegalArgumentException("Action cannot be null");
+      throw new IllegalArgumentException("Action must not be null");
     if (authority == null)
-      throw new IllegalArgumentException("Authority cannot be null");
+      throw new IllegalArgumentException("Authority must not be null");
     logger.debug("Security context '{}' requires '{}' for action '{}'", new Object[] {
         this,
         authority,
         action });
 
-    deny(action, authority, context);
-    deny(action, authority, defaultContext);
+    Set<Authority> authorities = aclDeny.get(action);
+    if (authorities == null) {
+      authorities = new HashSet<Authority>();
+      aclDeny.put(action, authorities);
+    }
+    authorities.add(authority);
+    aclDenyDefaults.remove(action);
+    actions = null;
   }
 
   /**
-   * Removes <code>authority</code> from the denied authorities found in
-   * <code>context</code> regarding the given action.
+   * Adds <code>authority</code> to the authorities that are denied access by
+   * default regarding the given action.
+   * <p>
+   * Note that default authorities will not be serialized as part of the
+   * security context, thus saving space and speeding things up.
    * 
    * @param action
-   *          the action
+   *          the permission
    * @param authority
-   *          the authorization to deny
-   * @param context
-   *          the authorities context
+   *          the item that is denied the action
    */
-  private void deny(Action action, Authority authority,
-      Map<Action, Set<Authority>> context) {
-    Set<Authority> authorities = context.get(action);
-
-    // If the authorities have been found, iterate over them to find a matching
-    // authority. We have to do this instead of directly calling
-    // authorities.remove(authority) because the context may contain AuthorityImpl
-    // instances which will equal a matching role (after casting them to an authority)
-    // but not vice versa.
-    if (authorities != null) {
-      for (Authority a : authorities) {
-        if (a.isAuthorizedBy(authority)) {
-          authorities.remove(a);
-          return;
-        }
-      }
-      if (authorities.size() == 0) {
-        context.remove(action);
-      }
+  public void denyDefault(Action action, Authority authority) {
+    if (action == null)
+      throw new IllegalArgumentException("Action cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
+    logger.debug("Security context '{}' denies '{}' for action '{}'", new Object[] {
+        this,
+        authority,
+        action });
+    Set<Authority> a = aclDenyDefaults.get(action);
+    if (a == null) {
+      a = new HashSet<Authority>();
+      aclDenyDefaults.put(action, a);
     }
+    a.add(authority);
+    actions = null;
   }
 
   /**
-   * Denies everyone and everything regarding action <code>action</code>
-   * .
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action,
+   *      ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean isDenied(Action action, Authority authority) {
+    if (action == null)
+      throw new IllegalArgumentException("Action must not be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority must not be null");
+
+    // Check if the action is explicitly denied
+    Authority[] authorities = getDenied(action);
+    for (Authority a : authorities) {
+      if (authority.matches(a)) {
+        return true;
+      }
+    }
+
+    // No?
+    return false;
+  }
+
+  /**
+   * Denies everyone and everything regarding action <code>action</code> .
    * 
    * @param action
    *          the action
    */
   public void denyAll(Action action) {
-    denyAll(action, context);
-    denyAll(action, defaultContext);
-  }
-
-  /**
-   * Denies everyone and everything regarding action <code>action</code>
-   * in the specified context.
-   * 
-   * @param action
-   *          the action
-   * @param context
-   *          the context
-   */
-  private void denyAll(Action action,
-      Map<Action, Set<Authority>> context) {
-    Set<Authority> authorities = context.get(action);
-    if (authorities != null) {
-      authorities.clear();
-    }
+    deny(action, ANY_AUTHORITY);
   }
 
   /**
    * Denies everyone and everything.
    */
   public void denyAll() {
-    context.clear();
-    defaultContext.clear();
-  }
-
-  /**
-   * Checks whether the roles that the caller currently owns satisfy the
-   * constraints of this context ion the given action.
-   * 
-   * @param action
-   *          the action to obtain
-   * @param authority
-   *          the object claiming the action
-   * @return <code>true</code> if the item may obtain the action
-   */
-  public boolean check(Action action, Authority authority) {
-    if (action == null)
-      throw new IllegalArgumentException("Action cannot be null");
-    if (authority == null)
-      throw new IllegalArgumentException("Authority cannot be null");
-    logger.debug("Request to check action '{}' for authority '{}' at {}", new Object[] {
-        action,
-        authority,
-        this });
-
-    return check(action, authority, defaultContext) || check(action, authority, context);
-  }
-
-  /**
-   * Checks whether the roles that the caller currently owns satisfy the
-   * constraints of the given context regarding the given action.
-   * 
-   * @param action
-   *          the action to obtain
-   * @param authority
-   *          the object claiming the action
-   * @param context
-   *          the context
-   * @return <code>true</code> if the item may obtain the action
-   */
-  private boolean check(Action action, Authority authority,
-      Map<Action, Set<Authority>> context) {
-    Set<Authority> authorities = context.get(action);
-    if (authorities != null) {
-      for (Authority a : authorities) {
-        if (authority.isAuthorizedBy(a))
-          return true;
-      }
+    for (Action action : actions()) {
+      deny(action, ANY_AUTHORITY);
     }
-    return false;
-  }
-
-  /**
-   * Returns <code>true</code> if the object <code>o</code> is allowed to act on
-   * the secured object in a way that satisfies the given action set
-   * <code>p</code>.
-   * 
-   * @param actions
-   *          the required set of actions
-   * @param authority
-   *          the object claiming the actions
-   * @return <code>true</code> if the object may obtain the actions
-   */
-  public boolean check(ActionSet actions, Authority authority) {
-    if (actions == null)
-      throw new IllegalArgumentException("Actions cannot be null");
-    if (authority == null)
-      throw new IllegalArgumentException("Authority cannot be null");
-    logger.debug("Request to check action set for authorization '{}' at {}", authority, this);
-
-    return checkOneOf(actions, authority) && checkAllOf(actions, authority);
   }
 
   /**
@@ -320,9 +344,9 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    * @see ch.entwine.weblounge.common.security.SecurityContext#getAllowed(ch.entwine.weblounge.common.security.Action)
    */
   public Authority[] getAllowed(Action p) {
-    Set<Authority> authorities = defaultContext.get(p);
+    Set<Authority> authorities = aclAllowDefaults.get(p);
     if (authorities == null) {
-      authorities = context.get(p);
+      authorities = aclAllow.get(p);
     }
     if (authorities != null) {
       Authority[] a = new Authority[authorities.size()];
@@ -334,53 +358,21 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
 
   /**
    * Returns all authorities that are explicitly denied by this security
-   * context. Since this context only defines allowed items, the returned array
-   * will always be empty.
+   * context.
    * 
    * @see ch.entwine.weblounge.common.security.SecurityContext#getDenied(ch.entwine.weblounge.common.security.Action)
    */
   public Authority[] getDenied(Action p) {
-    return new Authority[] {};
-  }
-
-  /**
-   * Returns <code>true</code> if the authorization is sufficient to obtain the
-   * "oneof" action set.
-   * 
-   * @param p
-   *          the action set
-   * @param authorization
-   *          the authorization to check
-   * @return <code>true</code> if the user has one of the actions
-   */
-  protected boolean checkOneOf(ActionSet p, Authority authorization) {
-    Action[] actions = p.some();
-    for (int i = 0; i < actions.length; i++) {
-      if (check(actions[i], authorization)) {
-        return true;
-      }
+    Set<Authority> authorities = aclDenyDefaults.get(p);
+    if (authorities == null) {
+      authorities = aclDeny.get(p);
     }
-    return (actions.length == 0);
-  }
-
-  /**
-   * Returns <code>true</code> if the authorization is sufficient to obtain the
-   * "allof" action set.
-   * 
-   * @param p
-   *          the action set
-   * @param authorization
-   *          the authorization to check
-   * @return <code>true</code> if the user has all of the actions
-   */
-  protected boolean checkAllOf(ActionSet p, Authority authorization) {
-    Action[] actions = p.all();
-    for (int i = 0; i < actions.length; i++) {
-      if (!check(actions[i], authorization)) {
-        return false;
-      }
+    if (authorities != null) {
+      Authority[] a = new Authority[authorities.size()];
+      return authorities.toArray(a);
+    } else {
+      return new Authority[] {};
     }
-    return true;
   }
 
   /**
@@ -390,11 +382,12 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    */
   public Action[] actions() {
     if (actions == null) {
-      actions = new Action[context.size() + defaultContext.size()];
       List<Action> permissionList = new ArrayList<Action>();
-      permissionList.addAll(context.keySet());
-      permissionList.addAll(defaultContext.keySet());
-      permissionList.toArray(actions);
+      permissionList.addAll(aclAllow.keySet());
+      permissionList.addAll(aclAllowDefaults.keySet());
+      permissionList.addAll(aclDeny.keySet());
+      permissionList.addAll(aclDenyDefaults.keySet());
+      actions = permissionList.toArray(new Action[permissionList.size()]);
     }
     return actions;
   }
@@ -408,13 +401,21 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    *          the XPath object used to parse the configuration
    */
   public void init(XPath path, Node context) {
-    this.context.clear();
+    this.aclAllow.clear();
+    this.aclDeny.clear();
     actions = null;
 
-    // Read permissions
-    NodeList permissions = XPathHelper.selectList(context, "/security/permission", path);
-    for (int i = 0; i < permissions.getLength(); i++) {
-      Node p = permissions.item(i);
+    // Order
+    String evaluationOrder = XPathHelper.valueOf(context, "security/acl/@order", path);
+    if ("deny,allow".equals(evaluationOrder))
+      this.evaluationOrder = Securable.Order.DenyAllow;
+    else
+      this.evaluationOrder = Securable.Order.AllowDeny;
+
+    // Read allow permissions
+    NodeList allows = XPathHelper.selectList(context, "/security/acl/allow", path);
+    for (int i = 0; i < allows.getLength(); i++) {
+      Node p = allows.item(i);
       String id = XPathHelper.valueOf(p, "@id", path);
       Action action = new ActionImpl(id);
 
@@ -436,6 +437,32 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
       }
 
     }
+
+    // Read allow permissions
+    NodeList denies = XPathHelper.selectList(context, "/security/acl/deny", path);
+    for (int i = 0; i < denies.getLength(); i++) {
+      Node p = denies.item(i);
+      String id = XPathHelper.valueOf(p, "@id", path);
+      Action action = new ActionImpl(id);
+
+      // Authority name
+      String require = XPathHelper.valueOf(p, "text()", path);
+      if (require == null) {
+        continue;
+      }
+
+      // Authority type
+      String type = XPathHelper.valueOf(p, "@type", path);
+
+      // Check for multiple authorities
+      StringTokenizer tok = new StringTokenizer(require, " ,;");
+      while (tok.hasMoreTokens()) {
+        String authorityId = tok.nextToken();
+        Authority authority = new AuthorityImpl(resolveAuthorityTypeShortcut(type), authorityId);
+        deny(action, authority);
+      }
+
+    }
   }
 
   /**
@@ -454,27 +481,68 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
       b.append("</owner>");
     }
 
-    // Permissions
-    for (Action p : context.keySet()) {
-      Map<String, Set<Authority>> authorities = groupByType(context.get(p));
-      for (Map.Entry<String, Set<Authority>> entry : authorities.entrySet()) {
-        String type = entry.getKey();
-        b.append("<permission id=\"");
-        b.append(p.getContext() + ":" + p.getIdentifier());
-        b.append("\" type=\"");
-        b.append(getAuthorityTypeShortcut(type));
-        b.append("\">");
-        boolean first = true;
-        for (Authority authority : entry.getValue()) {
-          if (!first) {
-            b.append(",");
-          }
-          b.append(authority.getAuthorityId());
-          first = false;
-        }
-        b.append("</permission>");
+    // Access control
+    if (aclAllow.size() > 0 || aclDeny.size() > 0) {
+
+      switch (evaluationOrder) {
+        case AllowDeny:
+          b.append("<acl order=\"allow,deny\"/>");
+          break;
+        case DenyAllow:
+          b.append("<acl order=\"deny,allow\"/>");
+          break;
+        default:
+          break;
       }
+
+      // Allows
+      for (Action p : aclAllow.keySet()) {
+        Map<String, Set<Authority>> authorities = groupByType(aclAllow.get(p));
+        for (Map.Entry<String, Set<Authority>> entry : authorities.entrySet()) {
+          String type = entry.getKey();
+          b.append("<allow id=\"");
+          b.append(p.getContext() + ":" + p.getIdentifier());
+          b.append("\" type=\"");
+          b.append(getAuthorityTypeShortcut(type));
+          b.append("\">");
+          boolean first = true;
+          for (Authority authority : entry.getValue()) {
+            if (!first) {
+              b.append(",");
+            }
+            b.append(authority.getAuthorityId());
+            first = false;
+          }
+          b.append("</allow>");
+        }
+      }
+
+      // Allows
+      for (Action p : aclDeny.keySet()) {
+        Map<String, Set<Authority>> authorities = groupByType(aclDeny.get(p));
+        for (Map.Entry<String, Set<Authority>> entry : authorities.entrySet()) {
+          String type = entry.getKey();
+          b.append("<deny id=\"");
+          b.append(p.getContext() + ":" + p.getIdentifier());
+          b.append("\" type=\"");
+          b.append(getAuthorityTypeShortcut(type));
+          b.append("\">");
+          boolean first = true;
+          for (Authority authority : entry.getValue()) {
+            if (!first) {
+              b.append(",");
+            }
+            b.append(authority.getAuthorityId());
+            first = false;
+          }
+          b.append("</deny>");
+        }
+      }
+
+      b.append("</acl>");
+
     }
+
     b.append("</security>");
     return b.toString();
   }
@@ -507,8 +575,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
   public Object clone() throws CloneNotSupportedException {
     SecurityContextImpl ctxt = (SecurityContextImpl) super.clone();
     ctxt.owner = owner;
-    ctxt.context.putAll(context);
-    ctxt.defaultContext.putAll(defaultContext);
+    ctxt.aclAllow.putAll(aclAllow);
+    ctxt.aclAllowDefaults.putAll(aclAllowDefaults);
     ctxt.actions = actions;
     ctxt.owner = owner;
     return ctxt;

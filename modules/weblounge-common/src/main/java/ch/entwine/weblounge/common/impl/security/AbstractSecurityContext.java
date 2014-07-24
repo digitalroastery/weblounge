@@ -47,6 +47,9 @@ public abstract class AbstractSecurityContext {
 
   /** Type mappings */
   protected static final Map<String, String> qualifier = new HashMap<String, String>();
+  
+  /** Singleton for any authority */
+  protected static final Authority ANY_AUTHORITY = new AnyAuthority();
 
   /**
    * Initializes the static shortcut mappings.
@@ -196,48 +199,6 @@ public abstract class AbstractSecurityContext {
   }
 
   public abstract void deny(Action action, Authority authoriy);
-
-  /**
-   * Checks whether at least one of the given authorities pass with respect to
-   * the given action.
-   * 
-   * @param action
-   *          the action
-   * @param authorities
-   *          the object claiming the action
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkOne(Action action, Authority... authorities) {
-    if (authorities == null || authorities.length == 0)
-      return true;
-    for (Authority authority : authorities) {
-      if (check(action, authority))
-        return true;
-    }
-    return false;
-  }
-  
-  public abstract boolean check(Action action, Authority authority);
-
-  /**
-   * Checks whether all of the given authorities pass with respect to the given
-   * action.
-   * 
-   * @param action
-   *          the action
-   * @param authorities
-   *          the object claiming the action
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkAll(Action action, Authority... authorities) {
-    if (authorities == null || authorities.length == 0)
-      return true;
-    for (Authority authority : authorities) {
-      if (!check(action, authority))
-        return false;
-    }
-    return true;
-  }
 
   /**
    * Adds the security listener to the pagelets security context.

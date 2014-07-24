@@ -26,7 +26,7 @@ import ch.entwine.weblounge.common.site.Site;
 /**
  * Utility methods around security.
  */
-public final class SecurityUtils {
+public final class WebloungeSecurityUtils {
 
   /** Holds the site associated with the current thread */
   static final ThreadLocal<Site> siteHolder = new ThreadLocal<Site>();
@@ -46,7 +46,7 @@ public final class SecurityUtils {
   /**
    * Private constructor to prevent instantiation.
    */
-  private SecurityUtils() {
+  private WebloungeSecurityUtils() {
     // Nothing to do
   }
 
@@ -59,7 +59,7 @@ public final class SecurityUtils {
    *          <code>true</code> if the security policy has been determined
    */
   public static void setConfigured(boolean configured) {
-    SecurityUtils.configured = configured;
+    WebloungeSecurityUtils.configured = configured;
   }
 
   /**
@@ -69,7 +69,7 @@ public final class SecurityUtils {
    * TODO: Should be determined per site
    */
   public static boolean isConfigured() {
-    return SecurityUtils.configured;
+    return WebloungeSecurityUtils.configured;
   }
 
   /**
@@ -80,7 +80,7 @@ public final class SecurityUtils {
    *          <code>true</code> if there is a security policy in place
    */
   public static void setRestricted(boolean enabled) {
-    SecurityUtils.restricted = enabled;
+    WebloungeSecurityUtils.restricted = enabled;
   }
 
   /**
@@ -90,7 +90,7 @@ public final class SecurityUtils {
    * @return <code>true</code> if security constraints have been configured
    */
   public static boolean isRestricted() {
-    return SecurityUtils.restricted;
+    return WebloungeSecurityUtils.restricted;
   }
 
   /**

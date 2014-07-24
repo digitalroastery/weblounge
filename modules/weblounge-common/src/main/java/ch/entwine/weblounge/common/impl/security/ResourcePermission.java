@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2014 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -17,90 +17,117 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
 package ch.entwine.weblounge.common.impl.security;
 
-import ch.entwine.weblounge.common.security.Securable;
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.SystemAction;
 
+import java.security.BasicPermission;
 import java.security.Permission;
 
 /**
- * TODO: Comment ResourcePermission
+ * A permission object for a {@link Resource} that can be accessed using a
+ * specific {@link Action}.
  */
-public class ResourcePermission extends Permission {
+public final class ResourcePermission extends BasicPermission {
 
   /** Serial version UID */
-  private static final long serialVersionUID = 1073544616602445043L;
-  
-  /** The action that is to be executed on the resource */
-  private String action = null;
-  
-  /** The securable */
-  private Securable resource = null;
+  private static final long serialVersionUID = 4306908026063283597L;
+
+  /** The resource */
+  private final Resource<?> securable;
+
+  /** The action that is about to be performed */
+  private final Action action;
 
   /**
-   * Creates a new resource permission with the given name.
+   * Creates a new permission object that can be used to validate the permission
+   * to execute <code>action</code> on <code>resource</code>.
    * 
-   * @param name
-   *          the permission name
-   * @param action
-   *          the action that is to be taken
    * @param resource
-   *          the resource that is to be accessed
+   *          the resource to be accessed
+   * @param action
+   *          the action to be performed
    */
-  public ResourcePermission(String name, String action, Securable resource) {
-    super(name);
+  public ResourcePermission(Resource<?> resource, Action action) {
+    super("Resource " + action.getIdentifier() + " permission");
+    this.securable = resource;
     this.action = action;
-    if (resource == null)
-      throw new IllegalArgumentException("Resource cannot be null");
-    this.resource = resource;
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see java.security.Permission#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof ResourcePermission) {
-      ResourcePermission p = (ResourcePermission)obj;
-      return getName().equals(p.getName())
-        && (resource.equals(p.resource))
-        && ((action == null && p.action == null) || action.equals(p.action));
-    }
-    return false;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
+   *
    * @see java.security.Permission#getActions()
    */
   @Override
   public String getActions() {
-    return action;
+    return null;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
+   * @see java.security.Permission#implies(java.security.Permission)
+   */
+  @Override
+  public boolean implies(Permission p) {
+    if (!(p instanceof ResourcePermission))
+      return false;
+
+    ResourcePermission pp = (ResourcePermission) p;
+    Action impliedAction = pp.getAction();
+
+    // Write action contains read
+    if (SystemAction.WRITE.equals(action)) {
+      return SystemAction.READ.equals(impliedAction);
+    }
+
+    // TODO Finalize implementation of implied roles
+
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.security.Permission#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object p) {
+    if (!(p instanceof ResourcePermission))
+      return false;
+    ResourcePermission pp = (ResourcePermission) p;
+    return securable.equals(pp.securable) && action.equals(pp.action);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see java.security.Permission#hashCode()
    */
   @Override
   public int hashCode() {
-    return getName().hashCode();
+    return securable.getURI().hashCode();
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the resource that is being accessed.
    * 
-   * @see java.security.Permission#implies(java.security.Permission)
+   * @return the resource
    */
-  @Override
-  public boolean implies(Permission permission) {
-    // TODO: Finish implementation
-    return false;
+  public Resource<?> getResource() {
+    return securable;
+  }
+
+  /**
+   * Returns the action that is to be applied to the resource.
+   * 
+   * @return the action
+   */
+  public Action getAction() {
+    return action;
   }
 
 }

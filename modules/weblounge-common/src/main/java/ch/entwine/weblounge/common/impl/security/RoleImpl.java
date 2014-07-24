@@ -262,6 +262,18 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#matches(ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean matches(Authority authority) {
+    if (ANY_TYPE.equals(authority.getAuthorityType()) && ANY_AUTHORITY.equals(authority.getAuthorityId()))
+      return true;
+    return getAuthorityType().equals(authority.getAuthorityType()) && getAuthorityId().equals(authority.getAuthorityId());
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see java.lang.Object#hashCode()
    */

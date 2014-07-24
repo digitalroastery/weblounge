@@ -77,12 +77,4 @@ public class AuthorizationImplTest {
     assertTrue(authority.equals(a));
   }
 
-  /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.security.AuthorityImpl#isAuthorizedBy(ch.entwine.weblounge.common.security.Authority)}.
-   */
-  @Test
-  public void testIsAuthorizedBy() {
-    assertTrue(authority.isAuthorizedBy(authority));
-  }
-
 }

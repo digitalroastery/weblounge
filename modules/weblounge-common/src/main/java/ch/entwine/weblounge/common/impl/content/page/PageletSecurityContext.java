@@ -46,6 +46,10 @@ public class PageletSecurityContext extends SecurityContextImpl {
     allowDefault(SystemAction.WRITE, SystemRole.EDITOR);
     allowDefault(SystemAction.MANAGE, SystemRole.EDITOR);
     allowDefault(SystemAction.PUBLISH, SystemRole.PUBLISHER);
+    denyDefault(SystemAction.READ, ANY_AUTHORITY);
+    denyDefault(SystemAction.WRITE, ANY_AUTHORITY);
+    denyDefault(SystemAction.MANAGE, ANY_AUTHORITY);
+    denyDefault(SystemAction.PUBLISH, ANY_AUTHORITY);
   }
 
 }

@@ -27,7 +27,7 @@ import java.net.URL;
 /**
  * Resource content represents the actual content of a resource.
  */
-public interface ResourceContent extends Creatable {
+public interface ResourceContent extends Creatable, Comparable<ResourceContent> {
 
   /**
    * Sets the resource name.

@@ -21,7 +21,6 @@
 package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.security.Action;
-import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.SecurityListener;
@@ -40,6 +39,9 @@ public class SecuredObject implements Securable {
 
   /** Security listener */
   protected List<SecurityListener> listeners = null;
+
+  /** Order in which to evaluate allow and deny rules */
+  protected Order evaluationOrder = Order.AllowDeny;
 
   /**
    * Creates a secured object with no security constraints applied to it, except
@@ -69,6 +71,30 @@ public class SecuredObject implements Securable {
   }
 
   /**
+   * Sets the order in which to evaluate allow and deny access rules.
+   * 
+   * @param order
+   *          the evaluation order
+   * @throws IllegalArgumentException
+   *           if <code>order</code> is <code>null</code>
+   */
+  protected void setAllowDenyOrder(Order order) {
+    if (order == null)
+      throw new IllegalArgumentException("Order must not be null");
+    this.evaluationOrder = order;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  @Override
+  public Order getAllowDenyOrder() {
+    return evaluationOrder;
+  }
+
+  /**
    * Sets a new owner for this context.
    * 
    * @param owner
@@ -87,75 +113,6 @@ public class SecuredObject implements Securable {
    */
   public User getOwner() {
     return securityCtx.getOwner();
-  }
-
-  /**
-   * Checks whether the authorization satisfy the constraints of this context on
-   * the given action.
-   * 
-   * @param action
-   *          the action
-   * @param authorization
-   *          the object used to obtain the action
-   * @return <code>true</code> if the authorization is sufficient
-   */
-  public boolean check(Action action, Authority authorization) {
-    return securityCtx.check(action, authorization);
-  }
-
-  /**
-   * Returns <code>true</code> if the authorization <code>authorization</code>
-   * is sufficient to act on the secured object in a way that requires the given
-   * action set <code>actions</code>.
-   * 
-   * @param actions
-   *          the required set of actions
-   * @param authorization
-   *          the object executing the actions
-   * @return <code>true</code> if the object may execute the actions
-   */
-  public boolean check(ActionSet actions, Authority authorization) {
-    return securityCtx.check(actions, authorization);
-  }
-
-  /**
-   * Checks whether at least one of the given authorities pass with respect to
-   * the given action.
-   * 
-   * @param action
-   *          the action to obtain
-   * @param authorities
-   *          the object claiming the action
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkOne(Action action, Authority... authorities) {
-    if (authorities == null || authorities.length == 0)
-      return true;
-    for (Authority authority : authorities) {
-      if (check(action, authority))
-        return true;
-    }
-    return false;
-  }
-
-  /**
-   * Checks whether all of the given authorities pass with respect to the given
-   * action.
-   * 
-   * @param action
-   *          the action
-   * @param authorities
-   *          the object claiming the action
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkAll(Action action, Authority... authorities) {
-    if (authorities == null || authorities.length == 0)
-      return true;
-    for (Authority authority : authorities) {
-      if (!check(action, authority))
-        return false;
-    }
-    return true;
   }
 
   /**
@@ -183,8 +140,21 @@ public class SecuredObject implements Securable {
   }
 
   /**
-   * Removes the action and any associated role requirements from this
-   * context.
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean isAllowed(Action action, Authority authority) {
+    if (action == null)
+      throw new IllegalArgumentException("Action must not be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority must not be null");
+    return securityCtx.isAllowed(action, authority);
+  }
+  
+  /**
+   * Removes the action and any associated role requirements from this context.
    * 
    * @param action
    *          the action
@@ -192,6 +162,20 @@ public class SecuredObject implements Securable {
   public void deny(Action action, Authority authorization) {
     securityCtx.deny(action, authorization);
     firePermissionChanged(action);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean isDenied(Action action, Authority authority) {
+    if (action == null)
+      throw new IllegalArgumentException("Action must not be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority must not be null");
+    return securityCtx.isDenied(action, authority);
   }
 
   /**

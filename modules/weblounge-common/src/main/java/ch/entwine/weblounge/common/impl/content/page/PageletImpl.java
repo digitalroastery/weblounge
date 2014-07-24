@@ -33,7 +33,6 @@ import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.security.Action;
-import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
@@ -281,12 +280,30 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  public Order getAllowDenyOrder() {
+    return securityCtx.getAllowDenyOrder();
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
   public void allow(Action action, Authority authority) {
     securityCtx.allow(action, authority);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  public boolean isAllowed(Action action, Authority authority) {
+    return securityCtx.isAllowed(action, authority);
   }
 
   /**
@@ -301,42 +318,11 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(Action action, Authority a) {
-    return securityCtx.check(action, a);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.ActionSet,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public boolean check(ActionSet actions, Authority a) {
-    return securityCtx.check(actions, a);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkOne(Action action, Authority... authorities) {
-    return securityCtx.checkOne(action, authorities);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkAll(Action action, Authority... authorities) {
-    return securityCtx.checkAll(action, authorities);
+  public boolean isDenied(Action action, Authority authority) {
+    return securityCtx.isDenied(action, authority);
   }
 
   /**

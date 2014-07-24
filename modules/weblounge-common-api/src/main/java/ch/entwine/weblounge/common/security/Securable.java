@@ -26,6 +26,11 @@ package ch.entwine.weblounge.common.security;
  */
 public interface Securable {
 
+  /** The order in which to evaluate allow and deny rules */
+  public enum Order {
+    AllowDeny, DenyAllow
+  };
+
   /**
    * Sets the object owner.
    * 
@@ -42,6 +47,14 @@ public interface Securable {
   User getOwner();
 
   /**
+   * Returns the {@link Order} in which allow and deny rules are to be
+   * evaluated.
+   * 
+   * @return the order
+   */
+  Order getAllowDenyOrder();
+
+  /**
    * Adds <code>authority</code> to the authorized authorities regarding the
    * given action.
    * <p>
@@ -56,6 +69,18 @@ public interface Securable {
   void allow(Action action, Authority authority);
 
   /**
+   * Returns <code>true</code> if <code>authority</code> is authorized to apply
+   * the the given action.
+   * 
+   * @param action
+   *          the action
+   * @param authority
+   *          the item that is allowed to obtain the action
+   * @return <code>true</code> if the authority is authorized
+   */
+  boolean isAllowed(Action action, Authority authority);
+
+  /**
    * Removes <code>authority</code> from the denied authorities regarding the
    * given action. This method will remove the authority from both the
    * explicitly allowed and the default authorities.
@@ -68,53 +93,16 @@ public interface Securable {
   void deny(Action action, Authority authority);
 
   /**
-   * Checks whether the authorization satisfy the constraints of this context on
+   * Returns <code>true</code> if <code>authority</code> is denied to apply the
    * the given action.
    * 
    * @param action
    *          the action
    * @param authority
-   *          the object used to obtain the action
-   * @return <code>true</code> if the authorization is sufficient
+   *          the item that is allowed to obtain the action
+   * @return <code>true</code> if the authority is denied
    */
-  boolean check(Action action, Authority authority);
-
-  /**
-   * Returns <code>true</code> if the authorization <code>authorization</code>
-   * is sufficient to act on the secured object in a way that requires the given
-   * {@link ActionSet} <code>p</code>.
-   * 
-   * @param actions
-   *          the required set of actions
-   * @param authority
-   *          the object claiming the actions
-   * @return <code>true</code> if the object may obtain the actions
-   */
-  boolean check(ActionSet actions, Authority authority);
-
-  /**
-   * Checks whether at least one of the given authorities pass with respect to
-   * the given action.
-   * 
-   * @param action
-   *          the action
-   * @param authorities
-   *          the objects claiming the action
-   * @return <code>true</code> if all authorities pass
-   */
-  boolean checkOne(Action action, Authority... authorities);
-
-  /**
-   * Checks whether all of the given authorities pass with respect to the given
-   * action.
-   * 
-   * @param action
-   *          the action to obtain
-   * @param authorities
-   *          the objects claiming the action
-   * @return <code>true</code> if all authorities pass
-   */
-  boolean checkAll(Action action, Authority... authorities);
+  boolean isDenied(Action action, Authority authority);
 
   /**
    * Returns the actions that may be acquired on this object.

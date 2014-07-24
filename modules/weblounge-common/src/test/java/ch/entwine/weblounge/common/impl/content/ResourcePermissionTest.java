@@ -23,6 +23,7 @@ import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
+import ch.entwine.weblounge.common.impl.security.ResourcePermission;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
@@ -58,7 +59,7 @@ public class ResourcePermissionTest {
   
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.ResourcePermission#getActions()}
+   * {@link ch.entwine.weblounge.common.impl.security.ResourcePermission#getActions()}
    * .
    */
   @Test
@@ -68,7 +69,7 @@ public class ResourcePermissionTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.ResourcePermission#implies(java.security.Permission)}
+   * {@link ch.entwine.weblounge.common.impl.security.ResourcePermission#implies(java.security.Permission)}
    * .
    */
   @Test
@@ -78,7 +79,7 @@ public class ResourcePermissionTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.ResourcePermission#getPage()}
+   * {@link ch.entwine.weblounge.common.impl.security.ResourcePermission#getPage()}
    * .
    */
   @Test
@@ -88,7 +89,7 @@ public class ResourcePermissionTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.ResourcePermission#getUser()}
+   * {@link ch.entwine.weblounge.common.impl.security.ResourcePermission#getUser()}
    * .
    */
   @Test
@@ -98,7 +99,7 @@ public class ResourcePermissionTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.ResourcePermission#getAction()}
+   * {@link ch.entwine.weblounge.common.impl.security.ResourcePermission#getAction()}
    * .
    */
   @Test

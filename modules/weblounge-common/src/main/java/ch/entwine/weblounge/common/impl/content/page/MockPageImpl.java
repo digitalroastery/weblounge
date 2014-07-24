@@ -31,7 +31,6 @@ import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.security.Action;
-import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
@@ -797,6 +796,16 @@ public class MockPageImpl implements Page {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  @Override
+  public Order getAllowDenyOrder() {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
@@ -805,6 +814,16 @@ public class MockPageImpl implements Page {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean isAllowed(Action action, Authority authority) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -817,41 +836,11 @@ public class MockPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(Action action, Authority authority) {
-    throw new UnsupportedOperationException("Not implemented in mock page");
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.ActionSet,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public boolean check(ActionSet actions, Authority authority) {
-    throw new UnsupportedOperationException("Not implemented in mock page");
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkOne(Action action, Authority... authorities) {
-    throw new UnsupportedOperationException("Not implemented in mock page");
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkAll(Action action, Authority... authorities) {
+  @Override
+  public boolean isDenied(Action action, Authority authority) {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 

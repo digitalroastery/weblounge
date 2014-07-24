@@ -29,11 +29,11 @@ package ch.entwine.weblounge.common.security;
  * interface, thereby allowing for one signature on the secured objects.
  * <p>
  * The implementations then need to make sure they can recognize the authority
- * and resolve the actions that were applied. For example, if a secured
- * object <code>o</code> is told to only allow access to {@link Role}
- * <code>r</code>, and then <code>o</code> is being accessed by
- * {@link ch.entwine.weblounge.common.security.User} <code>u</code> who happens to have
- * role <code>r</code> assigned, access should be granted.
+ * and resolve the actions that were applied. For example, if a secured object
+ * <code>o</code> is told to only allow access to {@link Role} <code>r</code>,
+ * and then <code>o</code> is being accessed by
+ * {@link ch.entwine.weblounge.common.security.User} <code>u</code> who happens
+ * to have role <code>r</code> assigned, access should be granted.
  * <p>
  * Known authorities are:
  * <ul>
@@ -43,6 +43,12 @@ package ch.entwine.weblounge.common.security;
  * </ul>
  */
 public interface Authority {
+
+  /** Identifier for any type */
+  String ANY_TYPE = "any";
+
+  /** Identifier for any authority */
+  String ANY_AUTHORITY = "*";
 
   /**
    * Returns the authority type, e. g.
@@ -61,19 +67,17 @@ public interface Authority {
   String getAuthorityId();
 
   /**
-   * Returns <code>true</code> if this authority and <code>authority</code>
-   * match by means of the respective authority.
+   * Whether this authority matches <code>authority</code> with respect to its
+   * type and identifier.
    * <p>
-   * Like this, a {@link Securable} that is configured to allow access to
-   * {@link RoleOwner}s owning {@link Role} <code>r</code> only may call
-   * <code>isAuthorizedBy(r)</code> on a {@link User} that wants to access the
-   * object. The method will return <code>true</code> if the user owns the role
-   * or belongs to a group that does.
+   * This method must return <code>true</code> when this authority is matched
+   * against the wild card authority with type <code>{@link #ANY_TYPE}</code>
+   * and identifier <code>{@link #ANY_AUTHORITY}</code>.
    * 
    * @param authority
-   *          the authority to test
-   * @return <code>true</code> if the authorities match
+   *          the authority
+   * @return <code>true</code> if the authority matches
    */
-  boolean isAuthorizedBy(Authority authority);
+  boolean matches(Authority authority);
 
 }

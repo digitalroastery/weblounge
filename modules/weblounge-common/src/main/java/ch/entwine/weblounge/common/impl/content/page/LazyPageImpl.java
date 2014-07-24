@@ -29,7 +29,6 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.security.Action;
-import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
@@ -1188,6 +1187,17 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  public Order getAllowDenyOrder() {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.getAllowDenyOrder();
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
@@ -1200,52 +1210,15 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(Action action, Authority authority) {
+  public boolean isAllowed(Action action, Authority authority) {
     if (!isHeaderLoaded)
       loadPageHeader();
-    return page.check(action, authority);
+    return page.isAllowed(action, authority);
   }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.ActionSet,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public boolean check(ActionSet actions, Authority authority) {
-    if (!isHeaderLoaded)
-      loadPageHeader();
-    return page.check(actions, authority);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkAll(Action action, Authority... authorities) {
-    if (!isHeaderLoaded)
-      loadPageHeader();
-    return page.checkAll(action, authorities);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkOne(Action action, Authority... authorities) {
-    if (!isHeaderLoaded)
-      loadPageHeader();
-    return page.checkOne(action, authorities);
-  }
-
+  
   /**
    * {@inheritDoc}
    * 
@@ -1258,6 +1231,17 @@ public class LazyPageImpl implements Page {
     page.deny(action, authority);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  public boolean isDenied(Action action, Authority authority) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.isDenied(action, authority);
+  }
+  
   /**
    * {@inheritDoc}
    * 

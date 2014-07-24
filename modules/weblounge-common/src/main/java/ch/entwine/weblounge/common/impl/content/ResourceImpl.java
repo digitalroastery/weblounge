@@ -35,7 +35,6 @@ import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.security.Action;
-import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
@@ -547,6 +546,15 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  public Order getAllowDenyOrder() {
+    return securityCtx.getAllowDenyOrder();
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
@@ -557,6 +565,15 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  public boolean isAllowed(Action action, Authority authority) {
+    return securityCtx.isAllowed(action, authority);
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
@@ -564,62 +581,14 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   public void deny(Action action, Authority authority) {
     securityCtx.deny(action, authority);
   }
-
+  
   /**
-   * Returns <code>true</code> if the user <code>u</code> is allowed to do
-   * actions that require action <code>p</code> on this pagelet.
-   * 
-   * @param action
-   *          the required action
-   * @param a
-   *          the authorization used to access to this pagelet
-   * @return <code>true</code> if the user has the required action
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(Action action, Authority a) {
-    return securityCtx.check(action, a);
-  }
-
-  /**
-   * Returns <code>true</code> if the user <code>u</code> is allowed to act on
-   * the secured object in a way that satisfies the given {@link ActionSet}
-   * <code>p</code>.
-   * 
-   * @param actions
-   *          the required set of actions
-   * @param a
-   *          the authorization used to access to the secured object
-   * @return <code>true</code> if the user owns the required actions
-   */
-  public boolean check(ActionSet actions, Authority a) {
-    return securityCtx.check(actions, a);
-  }
-
-  /**
-   * Checks whether at least one of the given authorities pass with respect to
-   * the given action.
-   * 
-   * @param action
-   *          the action to obtain
-   * @param authorities
-   *          the objects claiming the action
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkOne(Action action, Authority... authorities) {
-    return securityCtx.checkOne(action, authorities);
-  }
-
-  /**
-   * Checks whether all of the given authorities pass with respect to the given
-   * action.
-   * 
-   * @param action
-   *          the action to obtain
-   * @param authorities
-   *          the object claiming the action
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkAll(Action action, Authority... authorities) {
-    return securityCtx.checkAll(action, authorities);
+  public boolean isDenied(Action action, Authority authority) {
+    return securityCtx.isDenied(action, authority);
   }
 
   /**
@@ -1175,7 +1144,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    *          the string buffer
    */
   protected StringBuffer toXmlBody(StringBuffer buffer) {
-    for (ResourceContent content : this.content.values()) {
+    List<T> orderedContentList = new ArrayList<T>(this.content.size());
+    orderedContentList.addAll(this.content.values());
+    Collections.sort(orderedContentList);
+    for (ResourceContent content : orderedContentList) {
       buffer.append(content.toXml());
     }
     return buffer;

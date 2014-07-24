@@ -153,6 +153,7 @@
               ch.entwine.weblounge.common.impl.language;version="${project.version}",
               ch.entwine.weblounge.common.impl.request;version="${project.version}",
               ch.entwine.weblounge.common.impl.scheduler;version="${project.version}",
+              ch.entwine.weblounge.common.impl.security;version="${project.version}",
               ch.entwine.weblounge.common.impl.site;version="${project.version}",
               ch.entwine.weblounge.common.impl.testing;version="${project.version}",
               ch.entwine.weblounge.common.impl.url;version="${project.version}",

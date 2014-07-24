@@ -20,8 +20,6 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
-
-import ch.entwine.weblounge.common.impl.content.page.PageSecurityContext;
 import ch.entwine.weblounge.common.impl.util.xml.XMLUtils;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
@@ -68,175 +66,6 @@ public class PermissionSecurityContextTest extends TestCase {
     super.setUp();
     config = createSecurityContext();
     path = XMLUtils.getXPath();
-  }
-
-  /**
-   * Test for void allow(Action, Authority)
-   */
-  @Test
-  public final void testPermitPermissionAuthority() {
-    Action publish = SystemAction.PUBLISH;
-    Role editor = SystemRole.EDITOR;
-
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
-
-    // Deny all
-    context.allow(publish, editor);
-
-    // Test (publish, translator) - expected: success
-    if (!context.check(publish, editor)) {
-      fail("Check for Action " + publish + " and role " + editor + " failed while it shouldn't");
-    }
-  }
-
-  /**
-   * Test for void allow(Action, Authority[])
-   */
-  @Test
-  public final void testPermitPermissionAuthorityArray() {
-    Action publish = SystemAction.PUBLISH;
-    Role editor = SystemRole.EDITOR;
-
-    // Initialize the weblounge admin
-    // WebloungeAdminImpl.init("admin", "weblounge".getBytes(),
-    // "admin@weblounge.org");
-
-    // Create the security context
-    SecurityContextImpl context = new PageSecurityContext();
-    context.init(path, config);
-
-    // Deny all
-    context.allow(publish, editor);
-
-    // Test (publish, editor) - expected: success
-    if (!context.check(publish, editor)) {
-      fail("Check for Action " + publish + " and role " + editor + " failed while it shouldn't");
-    }
-  }
-
-  /**
-   * Test for void deny(Action, Authority)
-   */
-  @Test
-  public final void testDenyPermissionAuthority() {
-    Action write = SystemAction.WRITE;
-    Role editor = SystemRole.EDITOR;
-
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
-
-    // Deny all
-    context.deny(write, editor);
-
-    // Test (write, editor) - expected: failure
-    if (context.check(write, editor)) {
-      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
-    }
-  }
-
-  /**
-   * Test for void deny(Action, Authority[])
-   */
-  @Test
-  public final void testDenyPermissionAuthorityArray() {
-    Action write = SystemAction.WRITE;
-    Role editor = SystemRole.EDITOR;
-
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
-
-    // Deny all
-    context.deny(write, editor);
-
-    // Test (write, editor) - expected: failure
-    if (context.check(write, editor)) {
-      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
-    }
-  }
-
-  /**
-   * Test for denyAll()
-   */
-  @Test
-  public final void testDenyAll() {
-    Action write = SystemAction.WRITE;
-    Action publish = SystemAction.PUBLISH;
-    Role editor = SystemRole.EDITOR;
-    Role publisher = SystemRole.PUBLISHER;
-
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
-
-    // Deny all
-    context.denyAll();
-
-    // Test (write, editor) - expected: failure
-    if (context.check(write, editor)) {
-      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
-    }
-
-    // Test (publish, publisher) - expected: success
-    if (context.check(publish, publisher)) {
-      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
-    }
-  }
-
-  /**
-   * Test for denyAll(Action)
-   */
-  @Test
-  public final void testDenyAllPermission() {
-    Action write = SystemAction.WRITE;
-    Action publish = SystemAction.PUBLISH;
-    Role editor = SystemRole.EDITOR;
-    Role publisher = SystemRole.PUBLISHER;
-
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
-
-    // Deny all
-    context.denyAll(write);
-
-    // Test (write, editor) - expected: failure
-    if (context.check(write, editor)) {
-      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
-    }
-
-    // Test (publish, publisher) - expected: success
-    if (!context.check(publish, publisher)) {
-      fail("Check for Action " + write + " and role " + editor + " failed while it shouldn't");
-    }
-  }
-
-  /**
-   * Test for boolean check(Action, Authority)
-   */
-  @Test
-  public final void testCheckPermissionAuthority() {
-    Action write = SystemAction.WRITE;
-    Action publish = SystemAction.PUBLISH;
-    Role editor = SystemRole.EDITOR;
-
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
-
-    // Test (write, editor) - expected: success
-    if (!context.check(write, editor)) {
-      fail("Check for Action " + write + " and role " + editor + " failed while it shouldn't");
-    }
-
-    // Test (publish, editor) - expected: failure
-    if (context.check(publish, editor)) {
-      fail("Check for Action " + write + " and role " + editor + " passed while it shouldn't");
-    }
-
   }
 
   /**
@@ -302,59 +131,6 @@ public class PermissionSecurityContextTest extends TestCase {
   }
 
   /**
-   * Test checkOne(Action, Authority[])
-   */
-  @Test
-  public final void testCheckOneOf() {
-    Action publish = SystemAction.PUBLISH;
-    Role editor = SystemRole.EDITOR;
-    Role guest = SystemRole.GUEST;
-    Role publisher = SystemRole.PUBLISHER;
-
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
-
-    // Test one of (editor, publisher) - expected: success
-    Authority[] authorities = new Authority[] { editor, publisher };
-    if (!context.checkOne(publish, authorities)) {
-      fail(publisher + " was expected to pass but failed");
-    }
-
-    // Test one of (translator, editor) - expected: failure
-    authorities = new Authority[] { guest, editor };
-    if (context.checkOne(publish, authorities)) {
-      fail("Neither " + guest + " nor " + editor + " were expected to pass");
-    }
-  }
-
-  /**
-   * Test checkAll(Action, Authority[])
-   */
-  @Test
-  public final void testCheckAllOf() {
-    Action write = SystemAction.WRITE;
-    Action publish = SystemAction.PUBLISH;
-    Role editor = SystemRole.EDITOR;
-    Role publisher = SystemRole.PUBLISHER;
-
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
-
-    // Test one of (editor, publisher) - expected: success
-    Authority[] authorities = new Authority[] { editor, publisher };
-    if (!context.checkAll(write, authorities)) {
-      fail("Both " + editor + " and " + publisher + " were expected to pass but failed");
-    }
-
-    // Test one of (editor, publisher) - expected: failure
-    if (context.checkAll(publish, authorities)) {
-      fail(editor + " was expected to fail");
-    }
-  }
-
-  /**
    * Test for actions()
    */
   @Test
@@ -400,10 +176,12 @@ public class PermissionSecurityContextTest extends TestCase {
     StringBuffer xml = new StringBuffer();
     xml.append("<security>");
     xml.append("<owner>tobias.wunden</owner>");
-    xml.append("<permission id=\"weblounge:publish\" type=\"role\">weblounge:publisher</permission>");
-    xml.append("<permission id=\"weblounge:write\" type=\"" + Role.class.getName() + "\">weblounge:editor</permission>");
-    xml.append("<permission id=\"weblounge:write\" type=\"role\">weblounge:editor,weblounge:translator</permission>");
-    xml.append("<permission id=\"weblounge:write\" type=\"user\">tobias.wunden</permission>");
+    xml.append("<acl order=\"allow,deny\">");
+    xml.append("<allow id=\"weblounge:publish\" type=\"role\">weblounge:publisher</allow>");
+    xml.append("<allow id=\"weblounge:write\" type=\"" + Role.class.getName() + "\">weblounge:editor</allow>");
+    xml.append("<allow id=\"weblounge:write\" type=\"role\">weblounge:editor,weblounge:translator</allow>");
+    xml.append("<allow id=\"weblounge:write\" type=\"user\">tobias.wunden</allow>");
+    xml.append("</acl>");
     xml.append("</security>");
 
     // Create xml builder

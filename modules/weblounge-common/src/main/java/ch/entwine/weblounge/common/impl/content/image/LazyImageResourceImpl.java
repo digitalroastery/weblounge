@@ -27,7 +27,6 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.security.Action;
-import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
@@ -934,6 +933,17 @@ public class LazyImageResourceImpl implements ImageResource {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  public Order getAllowDenyOrder() {
+    if (!isHeaderLoaded)
+      loadImageHeader();
+    return image.getAllowDenyOrder();
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
@@ -946,50 +956,13 @@ public class LazyImageResourceImpl implements ImageResource {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(Action action, Authority authority) {
+  public boolean isAllowed(Action action, Authority authority) {
     if (!isHeaderLoaded)
       loadImageHeader();
-    return image.check(action, authority);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.ActionSet,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public boolean check(ActionSet action, Authority authority) {
-    if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.check(action, authority);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkAll(Action action, Authority... authorities) {
-    if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.checkAll(action, authorities);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkOne(Action action, Authority... authorities) {
-    if (!isHeaderLoaded)
-      loadImageHeader();
-    return image.checkOne(action, authorities);
+    return image.isAllowed(action, authority);
   }
 
   /**
@@ -1002,6 +975,17 @@ public class LazyImageResourceImpl implements ImageResource {
     if (!isHeaderLoaded)
       loadImageHeader();
     image.deny(action, authority);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  public boolean isDenied(Action action, Authority authority) {
+    if (!isHeaderLoaded)
+      loadImageHeader();
+    return image.isDenied(action, authority);
   }
 
   /**

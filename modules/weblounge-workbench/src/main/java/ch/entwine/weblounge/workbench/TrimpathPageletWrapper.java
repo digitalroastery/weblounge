@@ -25,7 +25,6 @@ import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.security.Action;
-import ch.entwine.weblounge.common.security.ActionSet;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
@@ -176,12 +175,31 @@ public class TrimpathPageletWrapper implements Pagelet {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  public Order getAllowDenyOrder() {
+    return pagelet.getAllowDenyOrder();
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
   public void allow(Action action, Authority authority) {
     pagelet.allow(action, authority);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action,
+   *      ch.entwine.weblounge.common.security.Authority)
+   */
+  public boolean isAllowed(Action action, Authority authority) {
+    return pagelet.isAllowed(action, authority);
   }
 
   /**
@@ -250,6 +268,16 @@ public class TrimpathPageletWrapper implements Pagelet {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action,
+   *      ch.entwine.weblounge.common.security.Authority)
+   */
+  public boolean isDenied(Action action, Authority authority) {
+    return pagelet.isDenied(action, authority);
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.Publishable#isPublished()
    */
@@ -300,16 +328,6 @@ public class TrimpathPageletWrapper implements Pagelet {
    */
   public String getIdentifier() {
     return pagelet.getIdentifier();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public boolean check(Action action, Authority authority) {
-    return pagelet.check(action, authority);
   }
 
   /**
@@ -380,16 +398,6 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.ActionSet,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public boolean check(ActionSet actions, Authority authority) {
-    return pagelet.check(actions, authority);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.page.Pagelet#getProperty(java.lang.String)
    */
   public String getProperty(String key) {
@@ -426,16 +434,6 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkOne(Action action, Authority... authorities) {
-    return pagelet.checkOne(action, authorities);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.page.Pagelet#setContent(java.lang.Object)
    */
   public void setContent(Object content) {
@@ -467,16 +465,6 @@ public class TrimpathPageletWrapper implements Pagelet {
    */
   public Language switchTo(Language language) {
     return pagelet.switchTo(language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkAll(Action action, Authority... authorities) {
-    return pagelet.checkAll(action, authorities);
   }
 
   /**

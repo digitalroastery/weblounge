@@ -20,10 +20,16 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +39,9 @@ import java.util.Set;
  * Utility methods around security.
  */
 public final class SecurityUtils {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
 
   /** Holds the site associated with the current thread */
   static final ThreadLocal<Site> siteHolder = new ThreadLocal<Site>();
@@ -250,6 +259,96 @@ public final class SecurityUtils {
       roles.add((Role) o);
     }
     return roles.toArray(new Role[roles.size()]);
+  }
+
+  /**
+   * Checks whether an action may be performed on a resource based on an
+   * authority like a role.
+   * 
+   * @param securable
+   *          the resource that is about to be actioned on
+   * @param action
+   *          the action to perform
+   * @param authority
+   *          the credential used to obtain access
+   * @return <code>true</code> if <code>action</code> may be performed
+   */
+  public static boolean checkAuthorization(Securable securable, Action action,
+      Authority authority) {
+    if (action == null)
+      throw new IllegalArgumentException("Action cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
+    logger.trace("Request to check action '{}' for authority '{}' on {}", new Object[] {
+        action,
+        authority,
+        securable });
+
+    switch (securable.getAllowDenyOrder()) {
+      case AllowDeny:
+        if (securable.isAllowed(action, authority))
+          return true;
+        if (securable.isDenied(action, authority))
+          return false;
+        return false;
+      case DenyAllow:
+        if (securable.isDenied(action, authority))
+          return false;
+        if (securable.isAllowed(action, authority))
+          return true;
+        return false;
+      default:
+        throw new IllegalStateException("Allow/deny order " + securable.getAllowDenyOrder() + " unsupported");
+    }
+
+  }
+
+  /**
+   * Returns <code>true</code> if the authorization is sufficient to obtain the
+   * "oneof" action set.
+   * 
+   * @param securable
+   *          the resource that is about to be actioned on
+   * @param actions
+   *          the set of actions
+   * @param authorization
+   *          the authorization to check
+   * @return <code>true</code> if the user has one of the actions
+   */
+  public static boolean checkAuthorizationForSome(Securable securable,
+      Set<Action> actions, Authority authorization) {
+    if (actions.size() == 0)
+      return true;
+    for (Action action : actions) {
+      if (checkAuthorization(securable, action, authorization)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns <code>true</code> if the authorization is sufficient to obtain the
+   * "allof" action set.
+   * 
+   * @param securable
+   *          the resource that is about to be actioned on
+   * @param actions
+   *          the set of actions
+   * @param authorization
+   *          the authorization to check
+   * @return <code>true</code> if the user has all of the actions
+   */
+  public static boolean checkAuthorizationForAll(Securable securable,
+      Set<Action> actions, Authority authorization) {
+    if (actions.size() == 0)
+      return true;
+    for (Action action : actions) {
+      if (!checkAuthorization(securable, action, authorization)) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }

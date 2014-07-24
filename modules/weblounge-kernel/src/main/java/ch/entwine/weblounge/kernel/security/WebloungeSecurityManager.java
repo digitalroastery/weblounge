@@ -19,12 +19,25 @@
  */
 package ch.entwine.weblounge.kernel.security;
 
+import ch.entwine.weblounge.common.impl.security.ResourcePermission;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Securable;
+import ch.entwine.weblounge.common.security.User;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.security.Permission;
 
 /**
  * A security manager that can handle access to Weblounge resources.
  */
-public class WebloungeSecurityManager extends SecurityManager {
+public class WebloungeSecurityManager extends NullSecurityManager {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(WebloungeSecurityManager.class);
 
   /** The security manager to delegate to */
   private SecurityManager deleageSecurityManager = null;
@@ -48,23 +61,47 @@ public class WebloungeSecurityManager extends SecurityManager {
    */
   @Override
   public void checkPermission(Permission permission) {
-
-    //
-    // if (permission instanceof ResourcePermission) {
-    // User user = SecurityUtils.getUser();
-    // ResourcePermission pm = (ResourcePermission)permission;
-    // ResourcePermission action = pm.getAction();
-    // Page page = pm.getPage();
-    // page.checkOne(pm.getAction(), user.getPrivateCredentials(Role.class));
-    // } else if (permission instanceof ImagePermission) {
-    //
-    // }
-
-    // Actions
-
-    if (deleageSecurityManager != null)
+    if (permission instanceof ResourcePermission) {
+      checkResourcePermission((ResourcePermission) permission);
+    } else if (deleageSecurityManager != null) {
       deleageSecurityManager.checkPermission(permission);
-
+    }
   }
 
+  /**
+   * Checks access to a Weblounge resource by the current user.
+   * 
+   * @param permission
+   *          the resource permission
+   * @throws SecurityException
+   *           if access to the resource is denied
+   */
+  private void checkResourcePermission(ResourcePermission permission)
+      throws SecurityException {
+    User user = SecurityUtils.getUser();
+    ResourcePermission pm = (ResourcePermission) permission;
+    Action action = pm.getAction();
+    Securable resource = pm.getResource();
+
+    // Check if the current user holds a credential that allows access to
+    // the object in question as defined by the permission
+    for (Object o : user.getPublicCredentials(Role.class)) {
+      if (SecurityUtils.checkAuthorization(resource, action, (Role) o)) {
+        logger.debug("Access of type '{}' on {} granted to {} due to role '{}'", new Object[] {
+            action,
+            resource,
+            user,
+            o });
+        return;
+      }
+    }
+
+    // If the above loop was exited other than
+    logger.debug("Access of type '{}' on {} denied to {}", new Object[] {
+        action,
+        resource,
+        user });
+    throw new SecurityException("Access of type " + action + " denied to " + resource);
+  }
+  
 }
