@@ -295,6 +295,15 @@ public class ResourceContentImpl implements ResourceContent {
 
   /**
    * {@inheritDoc}
+   *
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(ResourceContent o) {
+    return language.getIdentifier().compareTo(o.getLanguage().getIdentifier());
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see java.lang.Object#hashCode()
    */

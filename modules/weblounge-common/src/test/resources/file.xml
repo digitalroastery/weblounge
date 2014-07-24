@@ -40,15 +40,6 @@
     </locked>
   </head>
   <body>
-    <content language="en">
-      <created>
-        <user id="amelie" realm="testland"><![CDATA[Amélie Poulard]]></user>
-        <date>2009-02-18T22:06:40Z</date>
-      </created>
-      <filename><![CDATA[image.jpg]]></filename>
-      <mimetype>image/jpeg</mimetype>
-      <size>745569</size>
-    </content>
     <content language="de">
       <created>
         <user id="hans" realm="testland"><![CDATA[Hans Muster]]></user>
@@ -57,6 +48,15 @@
       <filename><![CDATA[image.png]]></filename>
       <mimetype>image/png</mimetype>
       <size>520894</size>
+    </content>
+    <content language="en">
+      <created>
+        <user id="amelie" realm="testland"><![CDATA[Amélie Poulard]]></user>
+        <date>2009-02-18T22:06:40Z</date>
+      </created>
+      <filename><![CDATA[image.jpg]]></filename>
+      <mimetype>image/jpeg</mimetype>
+      <size>745569</size>
     </content>
   </body>
 </file>
