@@ -209,6 +209,18 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#implies(ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean implies(Authority authority) {
+    if (authority instanceof Role)
+      return isExtensionOf((Role) authority);
+    return false;
+  }
+
+  /**
    * Sets the role name in the given language.
    * 
    * @param name

@@ -88,6 +88,16 @@ public class AuthorityImpl implements Authority {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#implies(ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean implies(Authority authority) {
+    return false;
+  }
+
+  /**
    * Returns <code>true<code> if the authority matches <code>o</code> with
    * respect to type and identifier.
    */

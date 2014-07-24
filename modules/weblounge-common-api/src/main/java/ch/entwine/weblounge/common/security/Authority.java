@@ -67,6 +67,16 @@ public interface Authority {
   String getAuthorityId();
 
   /**
+   * Returns <code>true</code> if this authority implies <code>authority</code>,
+   * which would typically be the case for inherited roles.
+   * 
+   * @param authority
+   *          the implied authority
+   * @return <code>true</code> if this authority implies <code>authority</code>
+   */
+  boolean implies(Authority authority);
+
+  /**
    * Whether this authority matches <code>authority</code> with respect to its
    * type and identifier.
    * <p>

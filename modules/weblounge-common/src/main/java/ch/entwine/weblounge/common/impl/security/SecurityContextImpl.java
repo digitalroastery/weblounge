@@ -195,7 +195,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
     // Check if the action is explicitly authorized
     Authority[] authorities = getAllowed(action);
     for (Authority a : authorities) {
-      if (authority.matches(a)) {
+      if (authority.matches(a) || authority.implies(a)) {
         return true;
       }
     }
