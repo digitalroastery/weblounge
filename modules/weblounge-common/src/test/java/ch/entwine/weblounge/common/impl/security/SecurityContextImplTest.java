@@ -20,41 +20,27 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
-import ch.entwine.weblounge.common.impl.util.xml.XMLUtils;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Securable.Order;
 import ch.entwine.weblounge.common.security.SystemAction;
+import ch.entwine.weblounge.common.security.User;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import junit.framework.TestCase;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
 
 /**
  * Test case for {@link SecurityContextImpl}.
  */
 
-public class PermissionSecurityContextTest extends TestCase {
+public class SecurityContextImplTest extends TestCase {
 
-  /** The xml context definition */
-  private Node config;
+  /** The context definition */
+  protected SecurityContextImpl context;
 
-  /** the XPath object used to parse the configuration */
-  private XPath path;
-
-  public static void main(String[] args) {
-    junit.textui.TestRunner.run(PermissionSecurityContextTest.class);
-  }
+  private User owner = new UserImpl("john.doe", "testland");
 
   /**
    * {@inheritDoc}
@@ -64,8 +50,14 @@ public class PermissionSecurityContextTest extends TestCase {
   @Before
   protected void setUp() throws Exception {
     super.setUp();
-    config = createSecurityContext();
-    path = XMLUtils.getXPath();
+    context = new SecurityContextImpl(owner);
+    context.setAllowDenyOrder(Order.AllowDeny);
+    context.allow(SystemAction.WRITE, SystemRole.EDITOR);
+    context.allow(SystemAction.WRITE, new RoleImpl("weblounge:translator"));
+    context.allow(SystemAction.WRITE, owner);
+    context.allow(SystemAction.PUBLISH, owner);
+    context.denyAll(SystemAction.WRITE);
+    context.denyAll(SystemAction.PUBLISH);
   }
 
   /**
@@ -75,10 +67,6 @@ public class PermissionSecurityContextTest extends TestCase {
   public final void testGetAllowed() {
     Action write = SystemAction.WRITE;
     Action manage = SystemAction.MANAGE;
-
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
 
     // Test write Action - expected: 3
     Authority[] authorities = context.getAllowed(write);
@@ -110,13 +98,9 @@ public class PermissionSecurityContextTest extends TestCase {
   public final void testGetDenied() {
     Action write = SystemAction.WRITE;
 
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
-
     // Test write Action - expected: 0
     Authority[] authorities = context.getDenied(write);
-    int expected = 0;
+    int expected = 1;
     if (authorities.length != expected) {
       fail("Denied authorities should be " + expected + " but found " + authorities.length);
     }
@@ -134,62 +118,12 @@ public class PermissionSecurityContextTest extends TestCase {
    * Test for actions()
    */
   @Test
-  public final void testPermissions() {
-    // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, config);
-
-    int expected = 2;
+  public final void testActions() {
+    int expected = 4;
     Action[] actions = context.actions();
     if (actions.length != expected) {
       fail("Found " + actions.length + " actions while " + expected + " were expected");
     }
-  }
-
-  /*
-   * Class under test for Authority getAuthorization(Action)
-   */
-  @Test
-  public final void testGetAuthorizationPermission() {
-    // TODO Implement getAuthorization().
-  }
-
-  /*
-   * Class under test for Authority[] getAuthorization(Action[])
-   */
-  @Test
-  public final void testGetAuthorizationPermissionArray() {
-    // TODO Implement getAuthorization().
-  }
-
-  /**
-   * Creates a simple security context definition.
-   * 
-   * @return the security context definition
-   * @throws ParserConfigurationException
-   * @throws SAXException
-   * @throws IOException
-   */
-  private Node createSecurityContext() throws ParserConfigurationException,
-      SAXException, IOException {
-    Node root;
-    StringBuffer xml = new StringBuffer();
-    xml.append("<security>");
-    xml.append("<owner>tobias.wunden</owner>");
-    xml.append("<acl order=\"allow,deny\">");
-    xml.append("<allow id=\"weblounge:publish\" type=\"role\">weblounge:publisher</allow>");
-    xml.append("<allow id=\"weblounge:write\" type=\"" + Role.class.getName() + "\">weblounge:editor</allow>");
-    xml.append("<allow id=\"weblounge:write\" type=\"role\">weblounge:editor,weblounge:translator</allow>");
-    xml.append("<allow id=\"weblounge:write\" type=\"user\">tobias.wunden</allow>");
-    xml.append("</acl>");
-    xml.append("</security>");
-
-    // Create xml builder
-    DocumentBuilder builder = XMLUtils.getDocumentBuilder();
-
-    // Read document and create xml node
-    root = builder.parse(new ByteArrayInputStream(xml.toString().getBytes()));
-    return root;
   }
 
 }

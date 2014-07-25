@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Defines a user with login, realm and name.
  */
-public interface User extends Cloneable {
+public interface User extends Authority, Cloneable {
 
   /** Default realm for weblounge users */
   String DefaultRealm = "weblounge";

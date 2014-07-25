@@ -24,7 +24,7 @@ package ch.entwine.weblounge.common.security;
  * This interface represents an action that can be taken on entities like
  * resources in Weblounge.
  */
-public interface Action {
+public interface Action extends Comparable<Action> {
 
   /**
    * Returns the action identifier.

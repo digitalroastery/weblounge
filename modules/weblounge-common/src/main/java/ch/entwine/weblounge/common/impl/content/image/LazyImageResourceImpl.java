@@ -934,6 +934,18 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    *
+   * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  public void setAllowDenyOrder(Order order) {
+    if (!isHeaderLoaded)
+      loadImageHeader();
+    image.setAllowDenyOrder(order);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
    */
   public Order getAllowDenyOrder() {

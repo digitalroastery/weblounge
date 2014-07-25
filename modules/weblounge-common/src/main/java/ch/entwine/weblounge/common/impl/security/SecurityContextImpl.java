@@ -37,9 +37,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * This class models the security constraints that apply to an arbitrary object
@@ -111,7 +114,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
    * @throws IllegalArgumentException
    *           if <code>order</code> is <code>null</code>
    */
-  protected void setAllowDenyOrder(Order order) {
+  public void setAllowDenyOrder(Order order) {
     if (order == null)
       throw new IllegalArgumentException("Order must not be null");
     this.evaluationOrder = order;
@@ -393,76 +396,119 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
   }
 
   /**
-   * Initializes this context from an xml node.
+   * Initializes this context from an XML node that was generated using
+   * {@link #toXml()}.
+   * <p>
+   * To speed things up, you might consider using the second signature that uses
+   * an existing <code>XPath</code> instance instead of creating a new one.
    * 
    * @param context
-   *          the security context node
-   * @param path
-   *          the XPath object used to parse the configuration
+   *          the publish context node
+   * @throws IllegalStateException
+   *           if the context cannot be parsed
+   * @see #fromXml(Node, XPath)
+   * @see #toXml()
    */
-  public void init(XPath path, Node context) {
-    this.aclAllow.clear();
-    this.aclDeny.clear();
-    actions = null;
+  public static SecurityContextImpl fromXml(Node context)
+      throws IllegalStateException {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return fromXml(context, xpath);
+  }
+
+  /**
+   * Initializes this context from an XML node that was generated using
+   * {@link #toXml()}.
+   * 
+   * @param context
+   *          the publish context node
+   * @param xpath
+   *          the xpath processor
+   * @throws IllegalStateException
+   *           if the context cannot be parsed
+   * @see #toXml()
+   */
+  public static SecurityContextImpl fromXml(Node context, XPath xpath)
+      throws IllegalStateException {
+
+    Node contextRoot = XPathHelper.select(context, "/security", xpath);
+    if (contextRoot == null)
+      return new SecurityContextImpl();
+    
+    SecurityContextImpl securityCtx = new SecurityContextImpl();
+    securityCtx.aclAllow.clear();
+    securityCtx.aclDeny.clear();
+
+    // Owner
+    Node ownerNode = XPathHelper.select(contextRoot, "owner/user");
+    if (ownerNode != null) {
+      String login = XPathHelper.valueOf(ownerNode, "@id", xpath);
+      if (login == null)
+        throw new IllegalStateException("Found owner node without id");
+      String realm = XPathHelper.valueOf(ownerNode, "@realm", xpath);
+      String name = XPathHelper.valueOf(ownerNode, "text()", xpath);
+      securityCtx.setOwner(new UserImpl(login, realm, name));
+    }
 
     // Order
-    String evaluationOrder = XPathHelper.valueOf(context, "security/acl/@order", path);
+    String evaluationOrder = XPathHelper.valueOf(contextRoot, "acl/@order", xpath);
     if ("deny,allow".equals(evaluationOrder))
-      this.evaluationOrder = Securable.Order.DenyAllow;
+      securityCtx.setAllowDenyOrder(Securable.Order.DenyAllow);
     else
-      this.evaluationOrder = Securable.Order.AllowDeny;
+      securityCtx.setAllowDenyOrder(Securable.Order.AllowDeny);
 
     // Read allow permissions
-    NodeList allows = XPathHelper.selectList(context, "/security/acl/allow", path);
+    NodeList allows = XPathHelper.selectList(contextRoot, "acl/allow", xpath);
     for (int i = 0; i < allows.getLength(); i++) {
       Node p = allows.item(i);
-      String id = XPathHelper.valueOf(p, "@id", path);
+      String id = XPathHelper.valueOf(p, "@id", xpath);
       Action action = new ActionImpl(id);
 
       // Authority name
-      String require = XPathHelper.valueOf(p, "text()", path);
+      String require = XPathHelper.valueOf(p, "text()", xpath);
       if (require == null) {
         continue;
       }
 
       // Authority type
-      String type = XPathHelper.valueOf(p, "@type", path);
+      String type = XPathHelper.valueOf(p, "@type", xpath);
 
       // Check for multiple authorities
       StringTokenizer tok = new StringTokenizer(require, " ,;");
       while (tok.hasMoreTokens()) {
         String authorityId = tok.nextToken();
         Authority authority = new AuthorityImpl(resolveAuthorityTypeShortcut(type), authorityId);
-        allow(action, authority);
+        securityCtx.allow(action, authority);
       }
 
     }
 
     // Read allow permissions
-    NodeList denies = XPathHelper.selectList(context, "/security/acl/deny", path);
+    NodeList denies = XPathHelper.selectList(contextRoot, "acl/deny", xpath);
     for (int i = 0; i < denies.getLength(); i++) {
       Node p = denies.item(i);
-      String id = XPathHelper.valueOf(p, "@id", path);
+      String id = XPathHelper.valueOf(p, "@id", xpath);
       Action action = new ActionImpl(id);
 
       // Authority name
-      String require = XPathHelper.valueOf(p, "text()", path);
+      String require = XPathHelper.valueOf(p, "text()", xpath);
       if (require == null) {
         continue;
       }
 
       // Authority type
-      String type = XPathHelper.valueOf(p, "@type", path);
+      String type = XPathHelper.valueOf(p, "@type", xpath);
 
       // Check for multiple authorities
       StringTokenizer tok = new StringTokenizer(require, " ,;");
       while (tok.hasMoreTokens()) {
         String authorityId = tok.nextToken();
         Authority authority = new AuthorityImpl(resolveAuthorityTypeShortcut(type), authorityId);
-        deny(action, authority);
+        securityCtx.deny(action, authority);
       }
 
     }
+    
+    return securityCtx;
   }
 
   /**
@@ -486,17 +532,18 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
 
       switch (evaluationOrder) {
         case AllowDeny:
-          b.append("<acl order=\"allow,deny\"/>");
+          b.append("<acl order=\"allow,deny\">");
           break;
         case DenyAllow:
-          b.append("<acl order=\"deny,allow\"/>");
+          b.append("<acl order=\"deny,allow\">");
           break;
         default:
           break;
       }
 
       // Allows
-      for (Action p : aclAllow.keySet()) {
+      SortedSet<Action> aclAllowList = new TreeSet<Action>(aclAllow.keySet());
+      for (Action p : aclAllowList) {
         Map<String, Set<Authority>> authorities = groupByType(aclAllow.get(p));
         for (Map.Entry<String, Set<Authority>> entry : authorities.entrySet()) {
           String type = entry.getKey();
@@ -518,7 +565,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
       }
 
       // Allows
-      for (Action p : aclDeny.keySet()) {
+      SortedSet<Action> aclDenyList = new TreeSet<Action>(aclDeny.keySet());
+      for (Action p : aclDenyList) {
         Map<String, Set<Authority>> authorities = groupByType(aclDeny.get(p));
         for (Map.Entry<String, Set<Authority>> entry : authorities.entrySet()) {
           String type = entry.getKey();

@@ -33,9 +33,12 @@ import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
+import ch.entwine.weblounge.common.impl.security.AnyAuthority;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -159,6 +162,8 @@ public class PageImplTest {
     page.lock(amelie);
     page.setModified(amelie, frenchModificationDate);
     page.setOwner(hans);
+    page.allow(SystemAction.READ, SystemRole.SITEADMIN);
+    page.deny(SystemAction.READ, new AnyAuthority());
     page.setPublished(hans, publishingStartDate, publishingEndDate);
     page.setRights(germanRights, german);
     page.setTemplate(template);

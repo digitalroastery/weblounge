@@ -83,6 +83,15 @@ public class WebloungeSecurityManager extends NullSecurityManager {
     Action action = pm.getAction();
     Securable resource = pm.getResource();
 
+    // Check the user itself
+    if (SecurityUtils.checkAuthorization(resource, action, user)) {
+      logger.debug("Access of type '{}' on {} granted to {}", new Object[] {
+          action,
+          resource,
+          user });
+      return;
+    }
+
     // Check if the current user holds a credential that allows access to
     // the object in question as defined by the permission
     for (Object o : user.getPublicCredentials(Role.class)) {
@@ -103,5 +112,5 @@ public class WebloungeSecurityManager extends NullSecurityManager {
         user });
     throw new SecurityException("Access of type " + action + " denied to " + resource);
   }
-  
+
 }

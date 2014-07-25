@@ -545,6 +545,16 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   }
 
   /**
+   * Sets the order of evaluation for access control lists.
+   * 
+   * @param order
+   *          the order in which to evaluate the access control entries
+   */
+  public void setAllowDenyOrder(Order order) {
+    securityCtx.setAllowDenyOrder(order);
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
@@ -566,12 +576,13 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action,
+   *      ch.entwine.weblounge.common.security.Authority)
    */
   public boolean isAllowed(Action action, Authority authority) {
     return securityCtx.isAllowed(action, authority);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -581,11 +592,12 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   public void deny(Action action, Authority authority) {
     securityCtx.deny(action, authority);
   }
-  
+
   /**
    * {@inheritDoc}
    *
-   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action,
+   *      ch.entwine.weblounge.common.security.Authority)
    */
   public boolean isDenied(Action action, Authority authority) {
     return securityCtx.isDenied(action, authority);

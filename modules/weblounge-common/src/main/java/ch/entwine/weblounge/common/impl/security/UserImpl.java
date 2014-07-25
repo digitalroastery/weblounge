@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.User;
 
 import org.w3c.dom.Node;
@@ -401,6 +402,48 @@ public class UserImpl implements User {
 
     buf.append("</user>");
     return buf.toString();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#getAuthorityType()
+   */
+  @Override
+  public String getAuthorityType() {
+    return User.class.getName();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#getAuthorityId()
+   */
+  @Override
+  public String getAuthorityId() {
+    return realm + ":" + login;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#implies(ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean implies(Authority authority) {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#matches(ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean matches(Authority authority) {
+    if (!User.class.getName().equals(authority.getAuthorityType()))
+      return false;
+    return (realm + ":" + login).matches(authority.getAuthorityId());
   }
 
 }

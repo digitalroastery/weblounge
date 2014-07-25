@@ -47,6 +47,14 @@ public interface Securable {
   User getOwner();
 
   /**
+   * Sets the {@link Order} in which allow and deny rules are to be evaluated.
+   * 
+   * @param order
+   *          the order
+   */
+  void setAllowDenyOrder(Order order);
+
+  /**
    * Returns the {@link Order} in which allow and deny rules are to be
    * evaluated.
    * 

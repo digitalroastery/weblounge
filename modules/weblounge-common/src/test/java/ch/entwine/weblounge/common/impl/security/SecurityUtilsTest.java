@@ -27,7 +27,6 @@ import static ch.entwine.weblounge.common.impl.security.SystemRole.PUBLISHER;
 import static ch.entwine.weblounge.common.security.SystemAction.PUBLISH;
 import static ch.entwine.weblounge.common.security.SystemAction.WRITE;
 
-import ch.entwine.weblounge.common.impl.content.page.PageSecurityContext;
 import ch.entwine.weblounge.common.impl.util.xml.XMLUtils;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Role;
@@ -85,8 +84,7 @@ public class SecurityUtilsTest extends TestCase {
    */
   @Test
   public final void testPermitPermissionAuthority() {
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, allowConfig);
+    SecurityContextImpl context = SecurityContextImpl.fromXml(allowConfig, path);
 
     // Deny all
     context.allow(PUBLISH, EDITOR);
@@ -102,8 +100,7 @@ public class SecurityUtilsTest extends TestCase {
    */
   @Test
   public final void testPermitPermissionAuthorityArray() {
-    SecurityContextImpl context = new PageSecurityContext();
-    context.init(path, allowConfig);
+    SecurityContextImpl context = SecurityContextImpl.fromXml(allowConfig, path);
 
     // Deny all
     context.allow(PUBLISH, EDITOR);
@@ -119,8 +116,7 @@ public class SecurityUtilsTest extends TestCase {
    */
   @Test
   public final void testDenyPermissionAuthority() {
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, denyConfig);
+    SecurityContextImpl context = SecurityContextImpl.fromXml(denyConfig, path);
 
     // Deny all
     context.deny(WRITE, EDITOR);
@@ -136,8 +132,7 @@ public class SecurityUtilsTest extends TestCase {
    */
   @Test
   public final void testDenyPermissionAuthorityArray() {
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, denyConfig);
+    SecurityContextImpl context = SecurityContextImpl.fromXml(denyConfig, path);
 
     // Deny all
     context.deny(WRITE, EDITOR);
@@ -153,8 +148,7 @@ public class SecurityUtilsTest extends TestCase {
    */
   @Test
   public final void testDenyAll() {
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, denyConfig);
+    SecurityContextImpl context = SecurityContextImpl.fromXml(denyConfig, path);
 
     // Deny all
     context.denyAll();
@@ -175,8 +169,7 @@ public class SecurityUtilsTest extends TestCase {
    */
   @Test
   public final void testDenyAllPermission() {
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, denyConfig);
+    SecurityContextImpl context = SecurityContextImpl.fromXml(denyConfig, path);
 
     // Deny all
     context.denyAll(WRITE);
@@ -197,8 +190,7 @@ public class SecurityUtilsTest extends TestCase {
    */
   @Test
   public final void testCheckPermissionAuthority() {
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, allowConfig);
+    SecurityContextImpl context = SecurityContextImpl.fromXml(allowConfig, path);
 
     // Test (write, editor) - expected: success
     if (!SecurityUtils.checkAuthorization(context, WRITE, EDITOR)) {
@@ -222,8 +214,7 @@ public class SecurityUtilsTest extends TestCase {
     actions.add(PUBLISH);
 
     // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, allowConfig);
+    SecurityContextImpl context = SecurityContextImpl.fromXml(allowConfig, path);
 
     // Test one of (editor, publisher) - expected: success
     if (!SecurityUtils.checkAuthorizationForSome(context, actions, EDITOR)) {
@@ -246,8 +237,7 @@ public class SecurityUtilsTest extends TestCase {
     actions.add(PUBLISH);
 
     // Create the security context
-    SecurityContextImpl context = new SecurityContextImpl();
-    context.init(path, allowConfig);
+    SecurityContextImpl context = SecurityContextImpl.fromXml(allowConfig, path);
 
     // Test one of (editor, publisher) - expected: success
     if (SecurityUtils.checkAuthorizationForAll(context, actions, PUBLISHER)) {

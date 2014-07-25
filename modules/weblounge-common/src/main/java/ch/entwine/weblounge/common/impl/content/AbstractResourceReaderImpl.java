@@ -26,8 +26,9 @@ import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Authority;
+import ch.entwine.weblounge.common.security.Securable.Order;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -230,6 +231,16 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  protected void setAllowDenyOrder(Order order) {
+    resource.setAllowDenyOrder(order);
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
@@ -239,6 +250,16 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
     resource.allow(action, authority);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#deny(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  protected void deny(Action action, Authority authority) {
+    resource.deny(action, authority);
+  }
+  
   /**
    * {@inheritDoc}
    * 

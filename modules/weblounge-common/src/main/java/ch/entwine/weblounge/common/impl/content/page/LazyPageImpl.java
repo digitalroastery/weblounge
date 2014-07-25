@@ -1188,6 +1188,18 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    *
+   * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  public void setAllowDenyOrder(Order order) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    page.setAllowDenyOrder(order);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
    */
   public Order getAllowDenyOrder() {

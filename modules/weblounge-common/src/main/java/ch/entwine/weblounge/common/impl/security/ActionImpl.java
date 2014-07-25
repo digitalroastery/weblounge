@@ -82,6 +82,16 @@ public class ActionImpl extends LocalizableContent<String> implements Action {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @Override
+  public int compareTo(Action o) {
+    return (context + identifier).compareTo(o.getContext() + o.getIdentifier());
+  }
+
+  /**
    * Returns the hash code for this action object.
    * 
    * @return the hash code

@@ -172,6 +172,16 @@ public class TrimpathPageletWrapper implements Pagelet {
   public Date getPublishFrom() {
     return pagelet.getPublishFrom();
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  public void setAllowDenyOrder(Order order) {
+    pagelet.setAllowDenyOrder(order);
+  }
 
   /**
    * {@inheritDoc}

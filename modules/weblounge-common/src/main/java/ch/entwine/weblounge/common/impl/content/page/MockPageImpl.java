@@ -797,6 +797,16 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    *
+   * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  public void setAllowDenyOrder(Order order) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
    */
   @Override

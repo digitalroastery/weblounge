@@ -78,7 +78,7 @@ public class SecuredObject implements Securable {
    * @throws IllegalArgumentException
    *           if <code>order</code> is <code>null</code>
    */
-  protected void setAllowDenyOrder(Order order) {
+  public void setAllowDenyOrder(Order order) {
     if (order == null)
       throw new IllegalArgumentException("Order must not be null");
     this.evaluationOrder = order;

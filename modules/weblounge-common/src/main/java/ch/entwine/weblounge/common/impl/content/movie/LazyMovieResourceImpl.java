@@ -935,6 +935,18 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    *
+   * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  public void setAllowDenyOrder(Order order) {
+    if (!isHeaderLoaded)
+      loadAudioVisualHeader();
+    audioVisual.setAllowDenyOrder(order);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
    */
   public Order getAllowDenyOrder() {

@@ -24,8 +24,9 @@ import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.WebloungeContentReader;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Authority;
+import ch.entwine.weblounge.common.security.Securable.Order;
 import ch.entwine.weblounge.common.security.User;
 
 import org.slf4j.Logger;
@@ -252,6 +253,18 @@ public final class PageletReader extends WebloungeContentReader {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  protected void setAllowDenyOrder(Order order) {
+    if (pagelet == null)
+      return;
+    pagelet.securityCtx.setAllowDenyOrder(order);
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
@@ -263,6 +276,18 @@ public final class PageletReader extends WebloungeContentReader {
     pagelet.securityCtx.allow(action, authority);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#deny(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  protected void deny(Action action, Authority authority) {
+    if (pagelet == null)
+      return;
+    pagelet.securityCtx.deny(action, authority);
+  }
+  
   /**
    * {@inheritDoc}
    * 

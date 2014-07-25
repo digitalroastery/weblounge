@@ -281,6 +281,16 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    *
+   * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  public void setAllowDenyOrder(Order order) {
+    securityCtx.setAllowDenyOrder(order);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
    */
   public Order getAllowDenyOrder() {

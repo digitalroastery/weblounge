@@ -95,6 +95,16 @@ public final class SystemAction implements Action {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @Override
+  public int compareTo(Action o) {
+    return (Security.SYSTEM_CONTEXT + identifier).compareTo(o.getContext() + o.getIdentifier());
+  }
+
+  /**
    * Returns the hash code for this action object.
    * 
    * @return the hash code
