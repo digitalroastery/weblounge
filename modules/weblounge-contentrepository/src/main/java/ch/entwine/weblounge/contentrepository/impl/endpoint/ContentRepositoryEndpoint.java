@@ -28,10 +28,12 @@ import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.site.SiteManager;
@@ -349,6 +351,21 @@ public class ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
     }
     return site;
+  }
+
+  /**
+   * Returns the current user or throws a {@link WebApplicationException} if no
+   * user is available.
+   * 
+   * @return the current user
+   * @throws WebApplicationException
+   *           if the user cannot be determined
+   */
+  protected User getUser() throws WebApplicationException {
+    User user = SecurityUtils.getUser();
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+    return user;
   }
 
   /**
