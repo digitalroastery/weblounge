@@ -184,11 +184,7 @@ public final class SecurityUtils {
   public static boolean isAuthenticated(User user) {
     if (user == null)
       throw new IllegalArgumentException("User must not be null");
-    Set<Object> roles = user.getPublicCredentials(Role.class);
-
-    // Assuming that every user has the GUEST role, so everything in addition
-    // means authenticated
-    return roles.size() > 1;
+    return user.isAuthenticated();
   }
 
   /**

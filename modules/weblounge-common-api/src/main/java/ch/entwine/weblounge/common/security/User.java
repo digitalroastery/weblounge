@@ -52,6 +52,23 @@ public interface User extends Authority, Cloneable {
   String getRealm();
 
   /**
+   * Sets the flag to indicate whether the user has been logged in or not.
+   * 
+   * @param authenticated
+   *          whether the user has been authenticated
+   */
+  void setAuthenticated(boolean authenticated);
+
+  /**
+   * Returns <code>true</code> if this user was created as part of an
+   * authentication process or has either been created programmatically for some
+   * deferred action or to represent an anonymous (unauthenticated) user.
+   * 
+   * @return <code>true</code> if the user is authenticated
+   */
+  boolean isAuthenticated();
+
+  /**
    * Adds the private credentials to this user. A private credentials would be
    * for example the private key of an RSA keypair.
    * 

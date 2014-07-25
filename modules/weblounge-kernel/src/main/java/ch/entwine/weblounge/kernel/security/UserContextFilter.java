@@ -68,7 +68,7 @@ public class UserContextFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
    */
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -77,7 +77,7 @@ public class UserContextFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
    *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
    */
@@ -112,7 +112,7 @@ public class UserContextFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#destroy()
    */
   public void destroy() {
@@ -121,7 +121,7 @@ public class UserContextFilter implements Filter {
 
   /**
    * Loads the user from the given site.
-   * 
+   *
    * @param site
    *          the site
    * @return the user
@@ -150,10 +150,13 @@ public class UserContextFilter implements Filter {
         roles.add(getLocalRole(site, SystemRole.GUEST));
       } else if (principal instanceof SpringSecurityUser) {
         user = ((SpringSecurityUser) principal).getUser();
+        user.setAuthenticated(true);
+        addRoles(roles, auth.getAuthorities());
         logger.debug("Principal was identified as '{}'", user.getLogin());
       } else if (principal instanceof UserDetails) {
         UserDetails userDetails = (UserDetails) principal;
-        user = new UserImpl(userDetails.getUsername());
+        user = new UserImpl(userDetails.getUsername(), true);
+        addRoles(roles, auth.getAuthorities());
         logger.debug("Principal was identified as '{}'", user.getLogin());
 
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
@@ -184,7 +187,7 @@ public class UserContextFilter implements Filter {
   /**
    * Returns the local role for the given system role or the system role itself,
    * if no local role was defined.
-   * 
+   *
    * @param site
    *          the site
    * @param role
