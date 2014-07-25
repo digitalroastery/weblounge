@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import static ch.entwine.weblounge.common.Times.MS_PER_DAY;
+import static ch.entwine.weblounge.common.security.SystemAction.READ;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
@@ -29,6 +30,7 @@ import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.ResourcePermission;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -189,9 +191,9 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Can the image be accessed by the current user?
     User user = request.getUser();
     try {
-      // TODO: Check permission
-      // PagePermission p = new PagePermission(page, user);
-      // AccessController.checkPermission(p);
+      ResourcePermission readPermission = new ResourcePermission(imageResource, READ);
+      if (System.getSecurityManager() != null)
+        System.getSecurityManager().checkPermission(readPermission);
     } catch (SecurityException e) {
       logger.warn("Access to image {} denied for user {}", imageURI, user);
       DispatchUtils.sendAccessDenied(request, response);

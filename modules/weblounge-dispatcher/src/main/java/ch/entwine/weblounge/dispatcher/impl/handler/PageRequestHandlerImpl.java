@@ -272,7 +272,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         if (System.getSecurityManager() != null)
           System.getSecurityManager().checkPermission(readPermission);
       } catch (SecurityException e) {
-        logger.warn("Accessed to page {} denied for user {}", pageURI, user);
+        logger.warn("Accesse to page {} denied for user {}", pageURI, user);
         DispatchUtils.sendAccessDenied(request, response);
         return true;
       }

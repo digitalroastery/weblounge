@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import static ch.entwine.weblounge.common.Times.MS_PER_DAY;
+import static ch.entwine.weblounge.common.security.SystemAction.READ;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
@@ -30,6 +31,7 @@ import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.ResourcePermission;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -187,9 +189,9 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     // Can the page be accessed by the current user?
     User user = request.getUser();
     try {
-      // TODO: Check permission
-      // PagePermission p = new PagePermission(page, user);
-      // AccessController.checkPermission(p);
+      ResourcePermission readPermission = new ResourcePermission(fileResource, READ);
+      if (System.getSecurityManager() != null)
+        System.getSecurityManager().checkPermission(readPermission);
     } catch (SecurityException e) {
       logger.warn("Access to file {} denied for user {}", fileURI, user);
       DispatchUtils.sendAccessDenied(request, response);

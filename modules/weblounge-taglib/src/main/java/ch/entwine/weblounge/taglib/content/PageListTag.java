@@ -34,11 +34,13 @@ import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.ResourcePermission;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -103,7 +105,7 @@ public class PageListTag extends WebloungeTag {
   /**
    * Returns the current page. This method serves as a way for embedded tags
    * like the {@link PagePreviewTag} to get to their data.
-   * 
+   *
    * @return the page
    */
   public Page getPage() {
@@ -113,7 +115,7 @@ public class PageListTag extends WebloungeTag {
   /**
    * Returns the current preview. This method serves as a way for embedded tags
    * like the {@link PagePreviewTag} to get to their data.
-   * 
+   *
    * @return the current page preview
    */
   public Composer getPagePreview() {
@@ -123,7 +125,7 @@ public class PageListTag extends WebloungeTag {
   /**
    * Returns the current page's url. This method serves as a way for embedded
    * tags like the {@link PagePreviewTag} to get to their data.
-   * 
+   *
    * @return the page's url
    */
   public WebUrl getPageUrl() {
@@ -133,7 +135,7 @@ public class PageListTag extends WebloungeTag {
   /**
    * Sets the number of page headers to load. If this attribute is omitted, then
    * all headers are returned.
-   * 
+   *
    * @param count
    *          the number of page headers
    */
@@ -150,7 +152,7 @@ public class PageListTag extends WebloungeTag {
   /**
    * Sets the list of page keywords to look up. The keywords must consist of a
    * list of strings, separated by either ",", ";" or " ".
-   * 
+   *
    * @param value
    *          the keywords
    */
@@ -166,11 +168,11 @@ public class PageListTag extends WebloungeTag {
   /**
    * Indicates the required headlines. The headline element types need to be
    * passed in as comma separated strings, e. g.
-   * 
+   *
    * <pre>
    * text/title, repository/image
    * </pre>
-   * 
+   *
    * @param value
    *          the headlines
    */
@@ -187,7 +189,7 @@ public class PageListTag extends WebloungeTag {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
   @Override
@@ -219,7 +221,7 @@ public class PageListTag extends WebloungeTag {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.jsp.tagext.BodyTagSupport#doAfterBody()
    */
   @Override
@@ -240,7 +242,7 @@ public class PageListTag extends WebloungeTag {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.entwine.weblounge.taglib.WebloungeTag#doEndTag()
    */
   @Override
@@ -253,7 +255,7 @@ public class PageListTag extends WebloungeTag {
   /**
    * Loads the next page, puts it into the request and returns <code>true</code>
    * if a suitable page was found, false otherwise.
-   * 
+   *
    * @return <code>true</code> if a suitable page was found
    * @throws ContentRepositoryException
    *           if loading the pages fails
@@ -320,7 +322,19 @@ public class PageListTag extends WebloungeTag {
       url = item.getUrl();
       page = item.getPage();
 
-      // TODO security check
+      // Check access to this resource
+      if (System.getSecurityManager() != null) {
+        try {
+          ResourcePermission permission = new ResourcePermission(page, SystemAction.READ);
+          System.getSecurityManager().checkPermission(permission);
+        } catch (SecurityException e) {
+          logger.debug("Access to list resource {} denied for '{}'", page, request.getUser());
+          continue;
+        }
+      }
+
+      pageItem = (PageSearchResultItem) item;
+      page = pageItem.getPage();
 
       found = true;
     }
@@ -332,12 +346,12 @@ public class PageListTag extends WebloungeTag {
       this.url = url;
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW_PAGE, page);
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW, preview);
-      
+
       // Add cache tags
       response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
       if (url != null)
         response.addTag(CacheTag.Url, url.getPath());
-      
+
       // Adjust modification date
       response.setModificationDate(page.getLastModified());
     }
@@ -347,7 +361,7 @@ public class PageListTag extends WebloungeTag {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.entwine.weblounge.taglib.WebloungeTag#reset()
    */
   @Override
