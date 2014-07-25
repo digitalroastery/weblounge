@@ -126,6 +126,7 @@ public class SearchEndpoint {
       query.withVersion(Resource.LIVE);
       query.withOffset(offset);
       query.withLimit(limit);
+      // TODO: Filter out pages that can't be accessed due to security constraints
     } catch (UnsupportedEncodingException e) {
       throw new WebApplicationException(e);
     }

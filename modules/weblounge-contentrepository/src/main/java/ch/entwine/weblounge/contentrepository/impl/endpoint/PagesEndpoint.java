@@ -20,6 +20,10 @@
 
 package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
+import static ch.entwine.weblounge.common.security.SystemAction.READ;
+import static ch.entwine.weblounge.common.security.SystemAction.WRITE;
+
+import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
@@ -47,6 +51,7 @@ import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -291,7 +296,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Load the result
-    String result = loadResultSet(q, details);
+    String result = loadResultSet(q, READ, details);
 
     return Response.ok(result).build();
   }
@@ -358,7 +363,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Load the result
-    String result = loadResultSet(q, details);
+    String result = loadResultSet(q, READ, details);
 
     // Return the response
     return Response.ok(result).build();
@@ -395,6 +400,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
+
+    // Check access
+    checkPermission(page, READ);
 
     // Is there an up-to-date, cached version on the client side?
     if (!ResourceUtils.hasChanged(request, page)) {
@@ -433,6 +441,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
 
+    // Check access
+    checkPermission(page, READ);
+
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
     q.withVersion(Resource.LIVE);
@@ -451,8 +462,18 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     for (SearchResultItem item : result.getItems()) {
       if (pageId.equals(item.getId()))
         continue;
-      String headerXml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
-      buf.append(headerXml);
+      PageSearchResultItemImpl pageResultItem = (PageSearchResultItemImpl) item;
+      try {
+        Page childPage = pageResultItem.getPage();
+
+        // Check the access
+        checkPermission(childPage, READ);
+
+        String headerXml = pageResultItem.getPageHeaderXml();
+        buf.append(headerXml);
+      } catch (WebApplicationException e) {
+        // Simply skip this page
+      }
     }
     buf.append("</pages>");
 
@@ -495,8 +516,15 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     StringBuffer buf = new StringBuffer("<pages>");
     for (SearchResultItem item : result.getItems()) {
-      String headerXml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
-      buf.append(headerXml);
+      PageSearchResultItem pageResultItem = (PageSearchResultItem) item;
+      Page page = pageResultItem.getPage();
+      try {
+        checkPermission(page, READ);
+        String headerXml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
+        buf.append(headerXml);
+      } catch (WebApplicationException e) {
+        // Simply skip this page
+      }
     }
     buf.append("</pages>");
 
@@ -560,6 +588,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Error lookup up page {} from repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+
+    // Check access
+    checkPermission(currentPage, WRITE);
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
@@ -813,6 +844,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     if (user == null)
       throw new WebApplicationException(Status.UNAUTHORIZED);
 
+    // Check access
+    checkPermission(page, WRITE);
+
     // Make sure the user has editing rights
     if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
       throw new WebApplicationException(Status.UNAUTHORIZED);
@@ -886,6 +920,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
 
+    // Check access
+    checkPermission(page, READ);
+
     // Is there an up-to-date, cached version on the client side?
     if (!ResourceUtils.hasChanged(request, page)) {
       return Response.notModified().build();
@@ -934,6 +971,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
+
+    // Check access
+    checkPermission(page, READ);
 
     // Is there an up-to-date, cached version on the client side?
     if (!ResourceUtils.hasChanged(request, page)) {
@@ -1001,6 +1041,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Error looking up page {} from repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+    
+    // Check access
+    checkPermission(workPage, WRITE);
 
     // Make sure we have a work page. If it doesn't exist yet, it needs
     // to be created as a result of the lock operation
@@ -1135,6 +1178,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
+    // Check access
+    checkPermission(page, WRITE);
+
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
       String etag = ResourceUtils.getETagValue(page);
@@ -1248,6 +1294,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Error looking up page {} from repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+
+    // Check access
+    checkPermission(workPage, WRITE);
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
@@ -1425,6 +1474,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
+    // Check access
+    checkPermission(livePage, WRITE);
+
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
       String etag = ResourceUtils.getETagValue(livePage);
@@ -1515,12 +1567,14 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    *          the search query
    * @param details
    *          whether to display detailed information or just the header
+   * @param action
+   *          the action to apply
    * @return the files
    * @throws WebApplicationException
    *           if the content repository is unavailable or if the content can't
    *           be loaded
    */
-  private String loadResultSet(SearchQuery q, boolean details)
+  private String loadResultSet(SearchQuery q, Action action, boolean details)
       throws WebApplicationException {
     ContentRepository repository = getContentRepository(q.getSite(), false);
     if (repository == null)
@@ -1550,6 +1604,10 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
     buf.append(">");
     if (pageByPath != null) {
+
+      // Check access
+      checkPermission(pageByPath, action);
+
       String xml = pageByPath.toXml();
       if (!details) {
         xml = xml.replaceAll("<body>.*</body>", "");
@@ -1558,12 +1616,22 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       buf.append(xml);
     } else {
       for (SearchResultItem item : result.getItems()) {
-        String xml = null;
-        if (details)
-          xml = ((PageSearchResultItemImpl) item).getResourceXml();
-        else
-          xml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
-        buf.append(xml);
+        PageSearchResultItemImpl pageResultItem = (PageSearchResultItemImpl) item;
+        Page page = pageResultItem.getPage();
+
+        // Check access
+        try {
+          checkPermission(page, action);
+
+          String xml = null;
+          if (details)
+            xml = pageResultItem.getResourceXml();
+          else
+            xml = pageResultItem.getPageHeaderXml();
+          buf.append(xml);
+        } catch (WebApplicationException e) {
+          // simply skip the entry
+        }
       }
     }
     buf.append("</pages>");

@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
+import static ch.entwine.weblounge.common.security.SystemAction.READ;
+
 import ch.entwine.weblounge.common.content.MalformedResourceURIException;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
@@ -28,11 +30,13 @@ import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.ResourcePermission;
 import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -366,6 +370,33 @@ public class ContentRepositoryEndpoint {
     if (user == null)
       throw new WebApplicationException(Status.UNAUTHORIZED);
     return user;
+  }
+
+  /**
+   * Checks whether the current user is allowed to apply action to the resource.
+   * If that is not the case, a {@link WebApplicationException} is thrown.
+   * 
+   * @param resource
+   *          the resource
+   * @param action
+   *          the action to apply
+   * @throws WebApplicationException
+   *           if access is denied
+   */
+  protected void checkPermission(Resource<?> resource, Action action)
+      throws WebApplicationException {
+    try {
+      ResourcePermission permission = new ResourcePermission(resource, READ);
+      if (System.getSecurityManager() != null)
+        System.getSecurityManager().checkPermission(permission);
+    } catch (SecurityException e) {
+      User user = getUser();
+      logger.warn("Action '{}' to resource {} was denied for user '{}'", new Object[] {
+          action,
+          resource.getURI(),
+          user });
+      throw new WebApplicationException(Status.UNAUTHORIZED);
+    }
   }
 
   /**
