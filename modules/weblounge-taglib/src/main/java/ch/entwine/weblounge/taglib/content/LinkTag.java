@@ -23,14 +23,19 @@ package ch.entwine.weblounge.taglib.content;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.security.ResourcePermission;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.security.SystemAction;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.security.Permission;
 import java.util.Map;
 
 import javax.servlet.jsp.JspException;
@@ -108,7 +113,7 @@ public class LinkTag extends WebloungeTag {
         response.invalidate();
         return SKIP_BODY;
       }
-      
+
       ResourceURI pageURI = new PageURIImpl(request.getSite(), null, resourceid);
       Page page = (Page) repository.get(pageURI);
       if (page == null) {
@@ -116,10 +121,21 @@ public class LinkTag extends WebloungeTag {
         return SKIP_BODY;
       }
 
+      // Check access
+      if (System.getSecurityManager() != null) {
+        User user = SecurityUtils.getUser();
+        try {
+          Permission permission = new ResourcePermission(page, SystemAction.READ);
+          System.getSecurityManager().checkPermission(permission);
+        } catch (SecurityException e) {
+          logger.debug("Linking to page {} denied for user '{}'", page, user);
+        }
+      }
+
       // Add cache tag
       response.addTag(CacheTag.Resource, page.getURI().getIdentifier());
       response.addTag(CacheTag.Url, page.getURI().getPath());
-      
+
       // Adjust modification date
       response.setModificationDate(page.getLastModified());
 
