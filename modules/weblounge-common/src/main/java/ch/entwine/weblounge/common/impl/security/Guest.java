@@ -39,16 +39,6 @@ public class Guest extends UserImpl {
   }
 
   /**
-   * Creates a new guest user for the default realm.
-   * 
-   * @param authenticated
-   *          whether this user has been authenticated
-   */
-  public Guest(boolean authenticated) {
-    this(DefaultRealm, authenticated);
-  }
-
-  /**
    * Creates a new guest user for the given site.
    * 
    * @param realm
