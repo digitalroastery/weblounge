@@ -523,7 +523,26 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
     // Owner
     if (owner != null) {
       b.append("<owner>");
-      b.append((new UserImpl(owner)).toXml());
+
+      // id
+      b.append(" id=\"");
+      b.append(owner.getLogin());
+      b.append("\"");
+
+      // realm
+      if (owner.getRealm() != null) {
+        b.append(" realm=\"");
+        b.append(owner.getRealm());
+        b.append("\"");
+      }
+
+      b.append(">");
+
+      // name
+      if (owner.getName() != null) {
+        b.append("<![CDATA[").append(owner.getName()).append("]]>");
+      }
+
       b.append("</owner>");
     }
 
