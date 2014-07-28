@@ -596,7 +596,7 @@ public class WebloungeUserImpl extends UserImpl implements WebloungeUser {
       b.append(role.getContext());
       b.append("\"><![CDATA[");
       b.append(role.getName());
-      b.append("]]></password>");
+      b.append("]]></role>");
     }
 
     // challenge - response
