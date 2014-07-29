@@ -523,6 +523,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
     // Owner
     if (owner != null) {
       b.append("<owner>");
+      
+      b.append("<user");
 
       // id
       b.append(" id=\"");
@@ -542,6 +544,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
       if (owner.getName() != null) {
         b.append("<![CDATA[").append(owner.getName()).append("]]>");
       }
+      
+      b.append("</user>");
 
       b.append("</owner>");
     }
