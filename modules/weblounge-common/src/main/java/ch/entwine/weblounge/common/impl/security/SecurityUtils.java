@@ -271,6 +271,8 @@ public final class SecurityUtils {
    */
   public static boolean checkAuthorization(Securable securable, Action action,
       Authority authority) {
+    if (securable == null)
+      throw new IllegalArgumentException("Securable cannot be null");
     if (action == null)
       throw new IllegalArgumentException("Action cannot be null");
     if (authority == null)
