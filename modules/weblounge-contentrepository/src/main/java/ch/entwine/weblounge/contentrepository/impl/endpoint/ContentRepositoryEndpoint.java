@@ -20,8 +20,6 @@
 
 package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
-import static ch.entwine.weblounge.common.security.SystemAction.READ;
-
 import ch.entwine.weblounge.common.content.MalformedResourceURIException;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
@@ -386,7 +384,7 @@ public class ContentRepositoryEndpoint {
   protected void checkPermission(Resource<?> resource, Action action)
       throws WebApplicationException {
     try {
-      ResourcePermission permission = new ResourcePermission(resource, READ);
+      ResourcePermission permission = new ResourcePermission(resource, action);
       if (System.getSecurityManager() != null)
         System.getSecurityManager().checkPermission(permission);
     } catch (SecurityException e) {
