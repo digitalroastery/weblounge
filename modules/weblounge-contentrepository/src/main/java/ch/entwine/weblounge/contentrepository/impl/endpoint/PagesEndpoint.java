@@ -1041,9 +1041,6 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Error looking up page {} from repository: {}", workURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
-    
-    // Check access
-    checkPermission(workPage, WRITE);
 
     // Make sure we have a work page. If it doesn't exist yet, it needs
     // to be created as a result of the lock operation
@@ -1076,6 +1073,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Error reading live page {} from repository: {}", liveURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+    
+    // Check access
+    checkPermission(workPage, WRITE);
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
