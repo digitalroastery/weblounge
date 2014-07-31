@@ -94,13 +94,13 @@ public interface HTMLAction extends Action {
   int SKIP_PAGELET = 1;
 
   /** Request parameter name for information messages */
-  String WARNINGS = "webl:warnings";
+  String WARNINGS = "weblwarnings";
 
   /** Request parameter name for information messages */
-  String INFOS = "webl:infos";
+  String INFOS = "weblinfos";
 
   /** Request parameter name for information messages */
-  String ERRORS = "webl:errors";
+  String ERRORS = "weblerrors";
 
   /**
    * This method is called by the target page and gives the action the
