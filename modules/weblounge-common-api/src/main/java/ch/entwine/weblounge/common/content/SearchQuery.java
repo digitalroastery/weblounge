@@ -99,7 +99,7 @@ public interface SearchQuery {
    * 
    * @return the search query
    */
-  SearchQuery withRececyPriority();
+  SearchQuery withRecencyPriority();
 
   /**
    * Returns whether priority boosting has been enabled.

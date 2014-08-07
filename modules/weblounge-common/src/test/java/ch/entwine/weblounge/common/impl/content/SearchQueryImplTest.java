@@ -636,7 +636,7 @@ public class SearchQueryImplTest {
   public void testWithRecencyPriority() {
     query = new SearchQueryImpl(site);
     assertFalse(query.getRecencyPriority());
-    query.withRececyPriority();
+    query.withRecencyPriority();
     assertTrue(query.getRecencyPriority());
   }
 

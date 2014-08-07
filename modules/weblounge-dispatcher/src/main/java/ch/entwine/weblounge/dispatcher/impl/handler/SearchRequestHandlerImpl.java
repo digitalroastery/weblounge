@@ -166,7 +166,7 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
     SearchQuery q = new SearchQueryImpl(site);
     q.withText(true, queryString);
     q.withVersion(Resource.LIVE);
-    q.withRececyPriority();
+    q.withRecencyPriority();
     q.withOffset(offset);
     q.withLimit(limit);
     q.withTypes(Page.TYPE);

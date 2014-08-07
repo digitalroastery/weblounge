@@ -276,10 +276,10 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#withRececyPriority()
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withRecencyPriority()
    */
   @Override
-  public SearchQuery withRececyPriority() {
+  public SearchQuery withRecencyPriority() {
     this.recencyBoost = true;
     return this;
   }
