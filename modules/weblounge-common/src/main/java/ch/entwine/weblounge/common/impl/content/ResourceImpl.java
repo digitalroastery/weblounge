@@ -34,6 +34,7 @@ import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
@@ -52,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * A <code>Resource</code> encapsulates all data that is attached with a
@@ -565,14 +567,24 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
    */
-  public void allow(Action action, Authority authority) {
-    securityCtx.allow(action, authority);
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    securityCtx.addAccessRule(rule);
   }
-
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
+    return securityCtx.getAccessRules();
+  }
+  
   /**
    * {@inheritDoc}
    *
@@ -581,16 +593,6 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    */
   public boolean isAllowed(Action action, Authority authority) {
     return securityCtx.isAllowed(action, authority);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public void deny(Action action, Authority authority) {
-    securityCtx.deny(action, authority);
   }
 
   /**
@@ -613,9 +615,9 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * </ul>
    * 
    * @return the actions that can be set on the pagelet
-   * @see ch.entwine.weblounge.api.security.Secured#actions()
+   * @see ch.entwine.weblounge.api.security.Secured#getActions()
    */
-  public Action[] actions() {
+  public Action[] getActions() {
     return actions;
   }
 

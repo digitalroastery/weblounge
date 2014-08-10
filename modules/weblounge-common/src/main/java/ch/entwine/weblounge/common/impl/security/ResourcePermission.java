@@ -27,8 +27,8 @@ import java.security.BasicPermission;
 import java.security.Permission;
 
 /**
- * A permission object for a {@link Resource} that can be accessed using a
- * specific {@link Action}.
+ * A permission object for a {@link Resource} that may or may not be accessed
+ * using a specific {@link Action} depending on the {@link AccessRuleImpl}.
  */
 public final class ResourcePermission extends BasicPermission {
 

@@ -29,10 +29,11 @@ import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
+import ch.entwine.weblounge.common.impl.security.AllowAccessRule;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.SystemAction;
@@ -355,7 +356,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#actions()}
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageletImpl#getActions()}
    * .
    */
   @Test
@@ -378,12 +379,12 @@ public class PageletImplTest {
         result.add("Owner changed");
       }
 
-      public void actionChanged(Securable source, Action p) {
-        result.add("Action changed");
+      public void accessChanged(Securable source, AccessRule rule) {
+        result.add("Access changed");
       }
     });
     pagelet.setOwner(john);
-    pagelet.allow(SystemAction.READ, SystemRole.EDITOR);
+    pagelet.addAccessRule(new AllowAccessRule(SystemRole.EDITOR, SystemAction.READ));
     assertEquals(2, result.size());
   }
 
@@ -400,14 +401,14 @@ public class PageletImplTest {
         result.add("Owner changed");
       }
 
-      public void actionChanged(Securable source, Action p) {
-        result.add("Action changed");
+      public void accessChanged(Securable source, AccessRule rule) {
+        result.add("Access changed");
       }
     };
     pagelet.addSecurityListener(listener);
     pagelet.removeSecurityListener(listener);
     pagelet.setOwner(john);
-    pagelet.allow(SystemAction.READ, SystemRole.EDITOR);
+    pagelet.addAccessRule(new AllowAccessRule(SystemRole.EDITOR, SystemAction.READ));
     assertEquals(0, result.size());
   }
 

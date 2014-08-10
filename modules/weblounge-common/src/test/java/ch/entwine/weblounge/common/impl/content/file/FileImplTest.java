@@ -481,8 +481,8 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#allow(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)}
-   * .
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)}
+   * . .
    */
   @Test
   @Ignore
@@ -492,8 +492,8 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#deny(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)}
-   * .
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)}
+   * . .
    */
   @Test
   @Ignore
@@ -547,7 +547,7 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#actions()}
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#getActions()}
    * .
    */
   @Test

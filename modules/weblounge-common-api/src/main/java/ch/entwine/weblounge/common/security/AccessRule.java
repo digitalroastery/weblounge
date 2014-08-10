@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2014 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -17,36 +17,34 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
 package ch.entwine.weblounge.common.security;
 
 /**
- * Listener interface for those who are interested in changes of object owners
- * and actions.
+ * An access rule relates an authority (e. g. a user or a role) to a given
+ * action and in addition defines whether that authority is allowed or denied
+ * that action.
  */
-public interface SecurityListener {
+public interface AccessRule {
 
   /**
-   * Notifies the listener about a new object owner.
+   * Returns the authority.
    * 
-   * @param source
-   *          the the secured object
-   * @param newOwner
-   *          the new object owner
-   * @param oldOwner
-   *          the former object owner
+   * @return the authority
    */
-  void ownerChanged(Securable source, User newOwner, User oldOwner);
+  Authority getAuthority();
 
   /**
-   * Notifies the listener about a change in access rules on object
-   * <code>source</code>.
+   * Returns the action.
    * 
-   * @param source
-   *          the the secured object
-   * @param rule
-   *          the new access rule
+   * @return the action
    */
-  void accessChanged(Securable source, AccessRule rule);
+  Action getAction();
+
+  /**
+   * Returns the rule.
+   * 
+   * @return the rule
+   */
+  Rule getRule();
 
 }

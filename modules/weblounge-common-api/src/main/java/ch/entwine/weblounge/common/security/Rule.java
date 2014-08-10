@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2014 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -17,36 +17,17 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
 package ch.entwine.weblounge.common.security;
 
 /**
- * Listener interface for those who are interested in changes of object owners
- * and actions.
+ * Mode to identify whether this permission is allowed or denied
  */
-public interface SecurityListener {
+public enum Rule {
 
-  /**
-   * Notifies the listener about a new object owner.
-   * 
-   * @param source
-   *          the the secured object
-   * @param newOwner
-   *          the new object owner
-   * @param oldOwner
-   *          the former object owner
-   */
-  void ownerChanged(Securable source, User newOwner, User oldOwner);
+  /** Access is allowed */
+  Allow,
 
-  /**
-   * Notifies the listener about a change in access rules on object
-   * <code>source</code>.
-   * 
-   * @param source
-   *          the the secured object
-   * @param rule
-   *          the new access rule
-   */
-  void accessChanged(Securable source, AccessRule rule);
+  /** Access is denied */
+  Deny
 
 }

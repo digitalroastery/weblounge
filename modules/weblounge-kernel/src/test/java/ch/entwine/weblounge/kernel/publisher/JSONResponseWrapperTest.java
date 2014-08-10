@@ -26,6 +26,7 @@ import static org.junit.Assert.assertNotNull;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,7 +73,10 @@ public class JSONResponseWrapperTest {
     jsonResponse.getWriter().write(xml);
     jsonResponse.finishResponse();
     assertNotNull(response.getContentAsString());
-    assertEquals(json, response.getContentAsString());
+    
+    // Compare the contents
+    JSONObject jsonObject = new JSONObject(json);
+    assertEquals(jsonObject.toString(), response.getContentAsString());
   }
 
 }

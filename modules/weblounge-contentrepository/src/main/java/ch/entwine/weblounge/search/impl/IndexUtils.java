@@ -20,6 +20,10 @@
 
 package ch.entwine.weblounge.search.impl;
 
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Authority;
+import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.security.User;
 
 import java.text.DateFormat;
@@ -162,6 +166,66 @@ public final class IndexUtils {
     if (user == null)
       return null;
     return user.getName();
+  }
+
+  /**
+   * Returns the serialized version of a passepartout permission for the owner
+   * of a resource.
+   * 
+   * @param owner
+   *          the resource owner
+   * @return the serialized permission
+   */
+  public static String serializeOwnerAccess(User owner) {
+    return serializeAuthorityAccess(owner, SystemAction.ANY);
+  }
+
+  /**
+   * Returns the serialized version of the permission for the given user to
+   * action on the resource in question in the specified
+   * 
+   * @param user
+   *          the user
+   * @param action
+   *          the action to be applied to the resource
+   * @return the serialized permission
+   */
+  public static String serializeUserAccess(User user, Action action) {
+    return serializeAuthorityAccess(user, action);
+  }
+
+  /**
+   * Returns the serialized version of the permission for a user owning the
+   * given role to action on the resource in question in the specified
+   * 
+   * @param role
+   *          the role
+   * @param action
+   *          the action to be applied to the resource
+   * @return the serialized permission
+   */
+  public static String serializeRoleAccess(Role role, Action action) {
+    return serializeAuthorityAccess(role, action);
+  }
+
+  /**
+   * Returns the serialized version of the permission for a user owning the
+   * given role to action on the resource in question in the specified
+   * 
+   * @param authority
+   *          the role
+   * @param action
+   *          the action to be applied to the resource
+   * @return the serialized permission
+   */
+  public static String serializeAuthorityAccess(Authority authority, Action action) {
+    StringBuilder permission = new StringBuilder();
+    permission.append(authority.getAuthorityType().toLowerCase());
+    permission.append(":");
+    permission.append(authority.getAuthorityId());
+    permission.append(":");
+    permission.append(action.getContext()).append(":").append(action.getIdentifier());
+    return permission.toString();
   }
 
 }

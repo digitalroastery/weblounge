@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -185,6 +186,9 @@ public class SearchQueryImpl implements SearchQuery {
   /** The query limit */
   protected int limit = -1;
 
+  /** The required actions */
+  protected List<Action> actions = new ArrayList<Action>();
+
   /** True to boost more recent documents */
   protected boolean recencyBoost = false;
 
@@ -330,6 +334,29 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public int getOffset() {
     return offset;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withAction(ch.entwine.weblounge.common.security.Action)
+   */
+  public SearchQuery withAction(Action action) {
+    if (action == null)
+      throw new IllegalArgumentException("Action cannot be null");
+    clearExpectations();
+    actions.add(action);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getActions()
+   */
+  @Override
+  public Action[] getActions() {
+    return actions.toArray(new Action[actions.size()]);
   }
 
   /**

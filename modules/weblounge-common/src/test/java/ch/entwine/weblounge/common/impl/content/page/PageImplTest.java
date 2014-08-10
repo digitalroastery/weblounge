@@ -33,7 +33,9 @@ import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
+import ch.entwine.weblounge.common.impl.security.AllowAccessRule;
 import ch.entwine.weblounge.common.impl.security.AnyAuthority;
+import ch.entwine.weblounge.common.impl.security.DenyAccessRule;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
@@ -162,8 +164,8 @@ public class PageImplTest {
     page.lock(amelie);
     page.setModified(amelie, frenchModificationDate);
     page.setOwner(hans);
-    page.allow(SystemAction.READ, SystemRole.SITEADMIN);
-    page.deny(SystemAction.READ, new AnyAuthority());
+    page.addAccessRule(new AllowAccessRule(SystemRole.SITEADMIN, SystemAction.READ));
+    page.addAccessRule(new DenyAccessRule(new AnyAuthority(), SystemAction.READ));
     page.setPublished(hans, publishingStartDate, publishingEndDate);
     page.setRights(germanRights, german);
     page.setTemplate(template);
@@ -423,7 +425,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#allow(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)}.
    */
   @Test
   @Ignore
@@ -432,7 +434,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#deny(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)}.
    */
   @Test
   @Ignore
@@ -477,7 +479,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#actions()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#getActions()}.
    */
   @Test
   @Ignore

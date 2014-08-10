@@ -39,6 +39,7 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_COMPOSER
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_POSITION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PATH_PREFIX;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PERMISSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_FROM;
 import static ch.entwine.weblounge.search.impl.IndexSchema.SERIES;
@@ -58,6 +59,9 @@ import ch.entwine.weblounge.common.content.SearchTerms;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.search.impl.IndexSchema;
 import ch.entwine.weblounge.search.impl.IndexUtils;
@@ -140,7 +144,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /**
    * Creates a new elastic search query based on the Weblounge query.
-   * 
+   *
    * @param query
    *          the weblounge query
    */
@@ -151,7 +155,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.elasticsearch.index.query.BaseQueryBuilder#doXContent(org.elasticsearch.common.xcontent.XContentBuilder,
    *      org.elasticsearch.common.xcontent.ToXContent.Params)
    */
@@ -274,6 +278,37 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
         andNotEmpty(LOCKED_BY);
       else
         and(LOCKED_BY, IndexUtils.serializeUserId(user), true);
+    }
+
+    // Access rights
+    if (query.getActions().length > 1) {
+      User user = SecurityUtils.getUser();
+      Role[] roles = SecurityUtils.getRoles(user);
+
+      // The way this works is as follows: For every action that was supplied,
+      // the requesting user must either be the resource owner and/or have a
+      // matching role with the corresponding applicable action.
+
+      // TODO: Handle allow/deny order
+
+      for (Action action : query.getActions()) {
+        List<String> permissions = new ArrayList<String>();
+
+        // Access by the owner of the resource
+        permissions.add(IndexUtils.serializeOwnerAccess(user));
+
+        // Access as the user
+        permissions.add(IndexUtils.serializeUserAccess(user, action));
+
+        // Access by role owners
+        for (Role role : roles) {
+          permissions.add(IndexUtils.serializeRoleAccess(role, action));
+        }
+
+        if (groups == null)
+          groups = new ArrayList<ValueGroup>();
+        groups.add(new ValueGroup(PERMISSION, (Object[]) permissions.toArray(new String[permissions.size()])));
+      }
     }
 
     // Pagelet elements
@@ -554,7 +589,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Stores <code>fieldValue</code> as a search term on the
    * <code>fieldName</code> field.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param fieldValue
@@ -584,7 +619,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Stores <code>fieldValues</code> as search terms on the
    * <code>fieldName</code> field.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param fieldValues
@@ -602,7 +637,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Stores <code>fieldValue</code> as a search term on the
    * <code>fieldName</code> field.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param startDate
@@ -627,7 +662,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Stores <code>fieldValue</code> as a negative search term on the
    * <code>fieldName</code> field.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param fieldValue
@@ -657,7 +692,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Stores <code>fieldValues</code> as negative search terms on the
    * <code>fieldName</code> field.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param fieldValues
@@ -675,7 +710,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Encodes the field name as part of the AND clause of a solr query:
    * <tt>AND -fieldName : [* TO *]</tt>.
-   * 
+   *
    * @param fieldName
    *          the field name
    */
@@ -688,7 +723,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Encodes the field name as part of the AND clause of a solr query:
    * <tt>AND fieldName : ["" TO *]</tt>.
-   * 
+   *
    * @param fieldName
    *          the field name
    */
@@ -700,7 +735,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.elasticsearch.common.xcontent.ToXContent#toXContent(org.elasticsearch.common.xcontent.XContentBuilder,
    *      org.elasticsearch.common.xcontent.ToXContent.Params)
    */
@@ -712,7 +747,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.elasticsearch.index.query.QueryBuilder#buildAsBytes()
    */
   @Override
@@ -722,7 +757,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.elasticsearch.index.query.QueryBuilder#buildAsBytes(org.elasticsearch.common.xcontent.XContentType)
    */
   @Override
@@ -749,7 +784,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
      * Creates a new date range specification with the given field name, start
      * and end dates. <code>null</code> may be passed in for start or end dates
      * that should remain unspecified.
-     * 
+     *
      * @param field
      *          the field name
      * @param start
@@ -765,7 +800,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * Returns the range query that is represented by this date range.
-     * 
+     *
      * @return the range query builder
      */
     QueryBuilder getQueryBuilder() {
@@ -779,7 +814,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -792,7 +827,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -815,7 +850,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * Creates a new value group for the given field and values.
-     * 
+     *
      * @param field
      *          the field name
      * @param values
@@ -829,7 +864,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     /**
      * Returns the filter that will make sure only documents are returned that
      * match all of the values at once.
-     * 
+     *
      * @return the filter builder
      */
     List<FilterBuilder> getFilterBuilders() {
@@ -842,7 +877,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -855,7 +890,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override

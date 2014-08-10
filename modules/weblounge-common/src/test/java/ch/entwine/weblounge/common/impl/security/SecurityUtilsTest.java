@@ -86,8 +86,8 @@ public class SecurityUtilsTest extends TestCase {
   public final void testPermitPermissionAuthority() {
     SecurityContextImpl context = SecurityContextImpl.fromXml(allowConfig, path);
 
-    // Deny all
-    context.allow(PUBLISH, EDITOR);
+    // Allow editor
+    context.addAccessRule(new AllowAccessRule(EDITOR, PUBLISH));
 
     // Test (publish, translator) - expected: success
     if (!SecurityUtils.checkAuthorization(context, PUBLISH, EDITOR)) {
@@ -102,8 +102,8 @@ public class SecurityUtilsTest extends TestCase {
   public final void testPermitPermissionAuthorityArray() {
     SecurityContextImpl context = SecurityContextImpl.fromXml(allowConfig, path);
 
-    // Deny all
-    context.allow(PUBLISH, EDITOR);
+    // Allow editor
+    context.addAccessRule(new AllowAccessRule(EDITOR, PUBLISH));
 
     // Test (publish, editor) - expected: success
     if (!SecurityUtils.checkAuthorization(context, PUBLISH, EDITOR)) {
@@ -118,8 +118,8 @@ public class SecurityUtilsTest extends TestCase {
   public final void testDenyPermissionAuthority() {
     SecurityContextImpl context = SecurityContextImpl.fromXml(denyConfig, path);
 
-    // Deny all
-    context.deny(WRITE, EDITOR);
+    // Deny editor
+    context.addAccessRule(new DenyAccessRule(EDITOR, WRITE));
 
     // Test (write, editor) - expected: failure
     if (SecurityUtils.checkAuthorization(context, WRITE, EDITOR)) {
@@ -134,8 +134,8 @@ public class SecurityUtilsTest extends TestCase {
   public final void testDenyPermissionAuthorityArray() {
     SecurityContextImpl context = SecurityContextImpl.fromXml(denyConfig, path);
 
-    // Deny all
-    context.deny(WRITE, EDITOR);
+    // Deny editor
+    context.addAccessRule(new DenyAccessRule(EDITOR, WRITE));
 
     // Test (write, editor) - expected: failure
     if (SecurityUtils.checkAuthorization(context, WRITE, EDITOR)) {
@@ -172,7 +172,7 @@ public class SecurityUtilsTest extends TestCase {
     SecurityContextImpl context = SecurityContextImpl.fromXml(denyConfig, path);
 
     // Deny all
-    context.denyAll(WRITE);
+    context.addAccessRule(new DenyAllAccessRule(WRITE));
 
     // Test (write, editor) - expected: failure
     if (SecurityUtils.checkAuthorization(context, WRITE, EDITOR)) {

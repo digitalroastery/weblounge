@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
@@ -40,6 +41,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Mock implementation of a page that can be used to satisfy components that
@@ -816,11 +818,21 @@ public class MockPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
    */
-  public void allow(Action action, Authority authority) {
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
@@ -836,16 +848,6 @@ public class MockPageImpl implements Page {
   
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public void deny(Action action, Authority authority) {
-    throw new UnsupportedOperationException("Not implemented in mock page");
-  }
-
-  /**
-   * {@inheritDoc}
    *
    * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
    */
@@ -853,13 +855,13 @@ public class MockPageImpl implements Page {
   public boolean isDenied(Action action, Authority authority) {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
-
+  
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#actions()
+   * @see ch.entwine.weblounge.common.security.Securable#getActions()
    */
-  public Action[] actions() {
+  public Action[] getActions() {
     return Resource.actions;
   }
 

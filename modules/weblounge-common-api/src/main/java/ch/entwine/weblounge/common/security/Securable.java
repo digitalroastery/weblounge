@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.security;
 
+import java.util.SortedSet;
+
 /**
  * The <code>Secured</code> interface defines the required methods for a secured
  * object.
@@ -63,18 +65,18 @@ public interface Securable {
   Order getAllowDenyOrder();
 
   /**
-   * Adds <code>authority</code> to the authorized authorities regarding the
-   * given action.
+   * Adds <code>rule</code> to the list of access rules that define which
+   * authority is either allowed or denied access to the {@link Securable}
    * <p>
-   * <b>Note:</b> Calling this method replaces any default authorities on the
-   * given action, so if you want to keep them, add them here explicitly.
+   * <b>Note:</b> Calling this method replaces any default rules on the action
+   * specified by the rule.
    * 
    * @param action
    *          the action
    * @param authority
    *          the item that is allowed to obtain the action
    */
-  void allow(Action action, Authority authority);
+  void addAccessRule(AccessRule rule);
 
   /**
    * Returns <code>true</code> if <code>authority</code> is authorized to apply
@@ -87,18 +89,6 @@ public interface Securable {
    * @return <code>true</code> if the authority is authorized
    */
   boolean isAllowed(Action action, Authority authority);
-
-  /**
-   * Removes <code>authority</code> from the denied authorities regarding the
-   * given action. This method will remove the authority from both the
-   * explicitly allowed and the default authorities.
-   * 
-   * @param action
-   *          the action
-   * @param authority
-   *          the authorization to deny
-   */
-  void deny(Action action, Authority authority);
 
   /**
    * Returns <code>true</code> if <code>authority</code> is denied to apply the
@@ -117,7 +107,15 @@ public interface Securable {
    * 
    * @return the available actions
    */
-  Action[] actions();
+  Action[] getActions();
+
+  /**
+   * Returns the access rules in the order which has been specified by means of
+   * {@link #setAllowDenyOrder(Order)}.
+   * 
+   * @return the rules
+   */
+  SortedSet<AccessRule> getAccessRules();
 
   /**
    * Adds <code>listener</code> to the list of security listeners that will be

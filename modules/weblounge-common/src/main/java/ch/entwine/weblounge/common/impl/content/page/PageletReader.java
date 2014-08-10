@@ -23,6 +23,8 @@ package ch.entwine.weblounge.common.impl.content.page;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.WebloungeContentReader;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.security.AllowAccessRule;
+import ch.entwine.weblounge.common.impl.security.DenyAccessRule;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
@@ -273,7 +275,7 @@ public final class PageletReader extends WebloungeContentReader {
   protected void allow(Action action, Authority authority) {
     if (pagelet == null)
       return;
-    pagelet.securityCtx.allow(action, authority);
+    pagelet.securityCtx.addAccessRule(new AllowAccessRule(authority, action));
   }
 
   /**
@@ -285,7 +287,7 @@ public final class PageletReader extends WebloungeContentReader {
   protected void deny(Action action, Authority authority) {
     if (pagelet == null)
       return;
-    pagelet.securityCtx.deny(action, authority);
+    pagelet.securityCtx.addAccessRule(new DenyAccessRule(authority, action));
   }
   
   /**

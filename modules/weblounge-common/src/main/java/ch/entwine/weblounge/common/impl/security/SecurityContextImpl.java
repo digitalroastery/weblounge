@@ -21,8 +21,10 @@
 package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
+import ch.entwine.weblounge.common.security.Rule;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.User;
 
@@ -80,6 +82,9 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
   /** Order in which to evaluate allow and deny rules */
   protected Order evaluationOrder = Order.AllowDeny;
 
+  /** The comparator used to sort the set of access rules */
+  private AccessRuleComparator accessRuleComparator = new AccessRuleComparator(evaluationOrder);
+  
   /** The actions */
   private Action[] actions = null;
 
@@ -118,6 +123,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
     if (order == null)
       throw new IllegalArgumentException("Order must not be null");
     this.evaluationOrder = order;
+    accessRuleComparator.setOrder(order);
   }
 
   /**
@@ -129,20 +135,54 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
   public Order getAllowDenyOrder() {
     return evaluationOrder;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
+   */
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    if (rule == null)
+      throw new IllegalArgumentException("Rule must be null");
+    if (Rule.Allow.equals(rule.getRule())) {
+      allow(rule.getAuthority(), rule.getAction());
+    } else {
+      deny(rule.getAuthority(), rule.getAction());
+    }
+  }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
+    TreeSet<AccessRule> rules = new TreeSet<AccessRule>(accessRuleComparator);
+    for (Action action: getActions()) {
+      for (Authority authority : getAllowed(action)) {
+        rules.add(new AllowAccessRule(authority, action));
+      }
+      for (Authority authority : getDenied(action)) {
+        rules.add(new DenyAccessRule(authority, action));
+      }
+    }
+    return rules;
+  }
+  
   /**
    * Adds <code>authority</code> to the authorized authorities regarding the
    * given permission.
    * <p>
    * <b>Note:</b> Calling this method replaces any default authorities on the
    * given permission, so if you want to keep them, add them here explicitly.
-   * 
    * @param action
    *          the permission
    * @param authority
    *          the item that is allowed to obtain the permission
    */
-  public void allow(Action action, Authority authority) {
+  public void allow(Authority authority, Action action) {
     if (action == null)
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
@@ -163,12 +203,12 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
   }
 
   /**
-   * Allows to action on this object in all ways defined by {@link #actions()}
+   * Allows to action on this object in all ways defined by {@link #getActions()}
    * by any authority.
    */
   public void allowAll() {
-    for (Action action : actions()) {
-      allow(action, ANY_AUTHORITY);
+    for (Action action : getActions()) {
+      addAccessRule(new AllowAllAccessRule(action));
     }
   }
 
@@ -179,7 +219,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
    *          the action
    */
   public void allowAll(Action action) {
-    allow(action, ANY_AUTHORITY);
+    addAccessRule(new DenyAccessRule(ANY_AUTHORITY, action));
   }
 
   /**
@@ -241,13 +281,12 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
    * Removes <code>authority</code> from the denied authorities regarding the
    * given action. This method will remove the authority from both the
    * explicitly allowed and the default authorities.
-   * 
    * @param action
    *          the action
    * @param authority
    *          the authorization to deny
    */
-  public void deny(Action action, Authority authority) {
+  public void deny(Authority authority, Action action) {
     if (action == null)
       throw new IllegalArgumentException("Action must not be null");
     if (authority == null)
@@ -329,15 +368,15 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
    *          the action
    */
   public void denyAll(Action action) {
-    deny(action, ANY_AUTHORITY);
+    addAccessRule(new DenyAllAccessRule(action));
   }
 
   /**
    * Denies everyone and everything.
    */
   public void denyAll() {
-    for (Action action : actions()) {
-      deny(action, ANY_AUTHORITY);
+    for (Action action : getActions()) {
+      addAccessRule(new DenyAllAccessRule(action));
     }
   }
 
@@ -377,13 +416,13 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
       return new Authority[] {};
     }
   }
-
+  
   /**
    * Returns the actions that are defined in this security context.
    * 
    * @return the actions
    */
-  public Action[] actions() {
+  public Action[] getActions() {
     if (actions == null) {
       List<Action> permissionList = new ArrayList<Action>();
       permissionList.addAll(aclAllow.keySet());
@@ -477,7 +516,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
       while (tok.hasMoreTokens()) {
         String authorityId = tok.nextToken();
         Authority authority = new AuthorityImpl(resolveAuthorityTypeShortcut(type), authorityId);
-        securityCtx.allow(action, authority);
+        securityCtx.addAccessRule(new AllowAccessRule(authority, action));
       }
 
     }
@@ -503,7 +542,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
       while (tok.hasMoreTokens()) {
         String authorityId = tok.nextToken();
         Authority authority = new AuthorityImpl(resolveAuthorityTypeShortcut(type), authorityId);
-        securityCtx.deny(action, authority);
+        securityCtx.addAccessRule(new DenyAccessRule(authority, action));
       }
 
     }

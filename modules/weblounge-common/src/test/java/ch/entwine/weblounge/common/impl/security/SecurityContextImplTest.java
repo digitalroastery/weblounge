@@ -52,12 +52,12 @@ public class SecurityContextImplTest extends TestCase {
     super.setUp();
     context = new SecurityContextImpl(owner);
     context.setAllowDenyOrder(Order.AllowDeny);
-    context.allow(SystemAction.WRITE, SystemRole.EDITOR);
-    context.allow(SystemAction.WRITE, new RoleImpl("weblounge:translator"));
-    context.allow(SystemAction.WRITE, owner);
-    context.allow(SystemAction.PUBLISH, owner);
-    context.denyAll(SystemAction.WRITE);
-    context.denyAll(SystemAction.PUBLISH);
+    context.addAccessRule(new AllowAccessRule(SystemRole.EDITOR, SystemAction.WRITE));
+    context.addAccessRule(new AllowAccessRule(new RoleImpl("weblounge:translator"), SystemAction.WRITE));
+    context.addAccessRule(new AllowAccessRule(owner, SystemAction.WRITE));
+    context.addAccessRule(new AllowAccessRule(owner, SystemAction.PUBLISH));
+    context.addAccessRule(new DenyAllAccessRule(SystemAction.WRITE));
+    context.addAccessRule(new DenyAllAccessRule(SystemAction.PUBLISH));
   }
 
   /**
@@ -120,7 +120,7 @@ public class SecurityContextImplTest extends TestCase {
   @Test
   public final void testActions() {
     int expected = 4;
-    Action[] actions = context.actions();
+    Action[] actions = context.getActions();
     if (actions.length != expected) {
       fail("Found " + actions.length + " actions while " + expected + " were expected");
     }

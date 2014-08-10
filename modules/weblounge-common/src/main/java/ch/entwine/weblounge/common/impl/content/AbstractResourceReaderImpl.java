@@ -25,6 +25,8 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.security.AllowAccessRule;
+import ch.entwine.weblounge.common.impl.security.DenyAccessRule;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
@@ -247,7 +249,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    */
   @Override
   protected void allow(Action action, Authority authority) {
-    resource.allow(action, authority);
+    resource.addAccessRule(new AllowAccessRule(authority, action));
   }
 
   /**
@@ -257,7 +259,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    */
   @Override
   protected void deny(Action action, Authority authority) {
-    resource.deny(action, authority);
+    resource.addAccessRule(new DenyAccessRule(authority, action));
   }
   
   /**

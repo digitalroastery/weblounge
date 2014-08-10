@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.content.page.PageContentListener;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Implementation of a lazy loading page.
@@ -1210,14 +1212,26 @@ public class LazyPageImpl implements Page {
   
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
    */
-  public void allow(Action action, Authority authority) {
+  @Override
+  public void addAccessRule(AccessRule rule) {
     if (!isHeaderLoaded)
       loadPageHeader();
-    page.allow(action, authority);
+    page.addAccessRule(rule);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.getAccessRules();
   }
 
   /**
@@ -1231,18 +1245,6 @@ public class LazyPageImpl implements Page {
     return page.isAllowed(action, authority);
   }
   
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public void deny(Action action, Authority authority) {
-    if (!isHeaderLoaded)
-      loadPageHeader();
-    page.deny(action, authority);
-  }
-
   /**
    * {@inheritDoc}
    *
@@ -1268,12 +1270,12 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#actions()
+   * @see ch.entwine.weblounge.common.security.Securable#getActions()
    */
-  public Action[] actions() {
+  public Action[] getActions() {
     if (!isHeaderLoaded)
       loadPageHeader();
-    return page.actions();
+    return page.getActions();
   }
 
   /**

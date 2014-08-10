@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.content;
 
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -92,6 +93,30 @@ public interface SearchQuery {
    * @return the offset
    */
   int getOffset();
+
+  /**
+   * Specifies the action that is going to applied to the search results. As a
+   * result, this method will only return entries that allow the requesting user
+   * the corresponding access to the resource.
+   * <p>
+   * Note that if this action is called multiple times, only items are being
+   * returned that allow for <i>all<>/i> actions by the current user.
+   * 
+   * @param action
+   *          the action to be applied
+   * @return the search query
+   */
+  SearchQuery withAction(Action action);
+
+  /**
+   * Returns the actions that have been specified as requirements for the
+   * individual items of the search result.
+   * <p>
+   * If no actions have been specified, an empty array is returned.
+   * 
+   * @return the list of required actions
+   */
+  Action[] getActions();
 
   /**
    * Enables boosting based on creation/modification date of resources so that

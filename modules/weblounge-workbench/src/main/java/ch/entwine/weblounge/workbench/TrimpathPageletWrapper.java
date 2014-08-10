@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Wrapper around a {@link ch.entwine.weblounge.common.content.page.Pagelet}
@@ -194,14 +196,14 @@ public class TrimpathPageletWrapper implements Pagelet {
   
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
    */
-  public void allow(Action action, Authority authority) {
-    pagelet.allow(action, authority);
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    pagelet.addAccessRule(rule);
   }
-
+  
   /**
    * {@inheritDoc}
    *
@@ -268,22 +270,22 @@ public class TrimpathPageletWrapper implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public void deny(Action action, Authority authority) {
-    pagelet.deny(action, authority);
-  }
-
-  /**
-   * {@inheritDoc}
    *
    * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
   public boolean isDenied(Action action, Authority authority) {
     return pagelet.isDenied(action, authority);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
+    return pagelet.getAccessRules();
   }
 
   /**
@@ -499,10 +501,10 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#actions()
+   * @see ch.entwine.weblounge.common.security.Securable#getActions()
    */
-  public Action[] actions() {
-    return pagelet.actions();
+  public Action[] getActions() {
+    return pagelet.getActions();
   }
 
   /**

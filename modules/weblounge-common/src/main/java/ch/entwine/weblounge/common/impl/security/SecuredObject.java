@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Securable;
@@ -28,6 +29,7 @@ import ch.entwine.weblounge.common.security.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * This is the base implementation for secured objects.
@@ -120,23 +122,31 @@ public class SecuredObject implements Securable {
    * 
    * @return the available actions
    */
-  public Action[] actions() {
-    return securityCtx.actions();
+  public Action[] getActions() {
+    return securityCtx.getActions();
   }
 
   /**
-   * Sets the action to require the object <code>item</code>.
-   * 
-   * @param action
-   *          the action
-   * @param authorization
-   *          the item that is allowed to obtain the action
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
    */
-  public void allow(Action action, Authority authorization) {
-    if (action == null)
-      throw new IllegalArgumentException("Action must not be null");
-    securityCtx.allow(action, authorization);
-    firePermissionChanged(action);
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    if (rule == null)
+      throw new IllegalArgumentException("Rule must not be null");
+    securityCtx.addAccessRule(rule);
+    fireAccessRuleChanged(rule);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
+    return securityCtx.getAccessRules();
   }
 
   /**
@@ -154,17 +164,6 @@ public class SecuredObject implements Securable {
   }
   
   /**
-   * Removes the action and any associated role requirements from this context.
-   * 
-   * @param action
-   *          the action
-   */
-  public void deny(Action action, Authority authorization) {
-    securityCtx.deny(action, authorization);
-    firePermissionChanged(action);
-  }
-
-  /**
    * {@inheritDoc}
    *
    * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
@@ -177,7 +176,7 @@ public class SecuredObject implements Securable {
       throw new IllegalArgumentException("Authority must not be null");
     return securityCtx.isDenied(action, authority);
   }
-
+  
   /**
    * Adds <code>listener</code> to the list of security listeners that will be
    * notified in case of ownership or action changes.
@@ -221,17 +220,17 @@ public class SecuredObject implements Securable {
   }
 
   /**
-   * Fires the <code>actionChanged</code> event to all registered security
+   * Fires the <code>accessRuleChanged</code> event to all registered security
    * listeners.
    * 
-   * @param action
-   *          the changing action
+   * @param rule
+   *          the changing access rule
    */
-  protected void firePermissionChanged(Action action) {
+  protected void fireAccessRuleChanged(AccessRule rule) {
     if (listeners == null)
       return;
     for (int i = 0; i < listeners.size(); i++) {
-      (listeners.get(i)).actionChanged(this, action);
+      (listeners.get(i)).accessChanged(this, rule);
     }
   }
 

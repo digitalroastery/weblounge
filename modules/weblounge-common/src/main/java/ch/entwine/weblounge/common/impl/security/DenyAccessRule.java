@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2014 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -17,36 +17,31 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+package ch.entwine.weblounge.common.impl.security;
 
-package ch.entwine.weblounge.common.security;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Authority;
+import ch.entwine.weblounge.common.security.Rule;
 
 /**
- * Listener interface for those who are interested in changes of object owners
- * and actions.
+ * Rule describing which authority is denied applying a given action.
  */
-public interface SecurityListener {
+public class DenyAccessRule extends AccessRuleImpl {
 
   /**
-   * Notifies the listener about a new object owner.
+   * Creates an access rule specifying which authority is denied applying a
+   * certain action.
    * 
-   * @param source
-   *          the the secured object
-   * @param newOwner
-   *          the new object owner
-   * @param oldOwner
-   *          the former object owner
+   * @param authority
+   *          the authority
+   * @param action
+   *          the action
+   * @throws IllegalArgumentException
+   *           if any of the arguments are <code>null</code>
    */
-  void ownerChanged(Securable source, User newOwner, User oldOwner);
-
-  /**
-   * Notifies the listener about a change in access rules on object
-   * <code>source</code>.
-   * 
-   * @param source
-   *          the the secured object
-   * @param rule
-   *          the new access rule
-   */
-  void accessChanged(Securable source, AccessRule rule);
+  public DenyAccessRule(Authority authority, Action action)
+      throws IllegalArgumentException {
+    super(authority, action, Rule.Deny);
+  }
 
 }

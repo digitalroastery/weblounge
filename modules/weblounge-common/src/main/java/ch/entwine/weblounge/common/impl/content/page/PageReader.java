@@ -27,6 +27,8 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.WebloungeContentReader;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.security.AllowAccessRule;
+import ch.entwine.weblounge.common.impl.security.DenyAccessRule;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
@@ -252,7 +254,7 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
     if (parserContext.equals(ParserContext.Pagelet))
       pageletReader.allow(action, authority);
     else
-      page.allow(action, authority);
+      page.addAccessRule(new AllowAccessRule(authority, action));
   }
 
   /**
@@ -265,7 +267,7 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
     if (parserContext.equals(ParserContext.Pagelet))
       pageletReader.deny(action, authority);
     else
-      page.deny(action, authority);
+      page.addAccessRule(new DenyAccessRule(authority, action));
   }
   
   /**

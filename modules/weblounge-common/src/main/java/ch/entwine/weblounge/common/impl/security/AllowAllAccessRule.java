@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2014 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -17,36 +17,31 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+package ch.entwine.weblounge.common.impl.security;
 
-package ch.entwine.weblounge.common.security;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Authority;
+import ch.entwine.weblounge.common.security.Rule;
 
 /**
- * Listener interface for those who are interested in changes of object owners
- * and actions.
+ * Rule describing that anyone and anything is allowed the given action.
  */
-public interface SecurityListener {
+public class AllowAllAccessRule extends AccessRuleImpl {
+
+  /** Singleton for any authority */
+  private static final Authority ANY_AUTHORITY = new AnyAuthority();
 
   /**
-   * Notifies the listener about a new object owner.
+   * Creates an access rule specifying that anyone and anything is allowed the
+   * given action.
    * 
-   * @param source
-   *          the the secured object
-   * @param newOwner
-   *          the new object owner
-   * @param oldOwner
-   *          the former object owner
+   * @param action
+   *          the action
+   * @throws IllegalArgumentException
+   *           if the action is <code>null</code>
    */
-  void ownerChanged(Securable source, User newOwner, User oldOwner);
-
-  /**
-   * Notifies the listener about a change in access rules on object
-   * <code>source</code>.
-   * 
-   * @param source
-   *          the the secured object
-   * @param rule
-   *          the new access rule
-   */
-  void accessChanged(Securable source, AccessRule rule);
+  public AllowAllAccessRule(Action action) throws IllegalArgumentException {
+    super(ANY_AUTHORITY, action, Rule.Allow);
+  }
 
 }

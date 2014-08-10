@@ -46,6 +46,7 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.OWNED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.OWNED_BY_NAME;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PATH_PREFIX;
+import static ch.entwine.weblounge.search.impl.IndexSchema.PERMISSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_BY_NAME;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_FROM;
@@ -92,6 +93,11 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     addField(PATH, uri.getPath(), true, true);
     addField(TYPE, uri.getType(), true, false);
     addField(VERSION, uri.getVersion(), false, false);
+    
+    // Access
+    addField(PERMISSION, IndexUtils.serializeOwnerAccess(resource.getOwner()), false, false);
+    
+    // TODO Add check for access by authority, respecting allows/denies
 
     // Path elements
     if (!StringUtils.isBlank(uri.getPath())) {

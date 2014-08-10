@@ -177,10 +177,10 @@ public abstract class AbstractSecurityContext {
     if (authorities == null)
       throw new IllegalStateException("Authorities set is null!");
     for (Authority authority : authorities)
-      allow(action, authority);
+      allow(authority, action);
   }
   
-  public abstract void allow(Action action, Authority authoriy);
+  public abstract void allow(Authority authoriy, Action action);
 
   /**
    * Adds <code>authorities</code> to the denied authorities regarding the given
@@ -195,10 +195,10 @@ public abstract class AbstractSecurityContext {
     if (authorities == null)
       throw new IllegalStateException("Authorities set is null!");
     for (Authority authority : authorities)
-      deny(action, authority);
+      deny(authority, action);
   }
 
-  public abstract void deny(Action action, Authority authoriy);
+  public abstract void deny(Authority authoriy, Action action);
 
   /**
    * Adds the security listener to the pagelets security context.

@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.SecurityListener;
@@ -296,17 +297,27 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   public Order getAllowDenyOrder() {
     return securityCtx.getAllowDenyOrder();
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
+   */
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    securityCtx.addAccessRule(rule);
+  }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
    */
-  public void allow(Action action, Authority authority) {
-    securityCtx.allow(action, authority);
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
+    return securityCtx.getAccessRules();
   }
-
+  
   /**
    * {@inheritDoc}
    *
@@ -314,16 +325,6 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public boolean isAllowed(Action action, Authority authority) {
     return securityCtx.isAllowed(action, authority);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Action,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public void deny(Action action, Authority authority) {
-    securityCtx.deny(action, authority);
   }
 
   /**
@@ -338,9 +339,9 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#actions()
+   * @see ch.entwine.weblounge.common.security.Securable#getActions()
    */
-  public Action[] actions() {
+  public Action[] getActions() {
     return actions;
   }
 

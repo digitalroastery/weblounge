@@ -55,8 +55,14 @@ public final class SystemAction implements Action {
   /** Publish action */
   public static final Action PUBLISH = new SystemAction("publish");
 
+  /** Any action */
+  public static final Action ANY = new SystemAction("*", "*");
+
   /** Action identifier */
   private String identifier = null;
+
+  /** The context */
+  private String context = Security.SYSTEM_CONTEXT;
 
   /** The action titles */
   private Map<Language, String> titles = null;
@@ -72,7 +78,21 @@ public final class SystemAction implements Action {
    *          the action name
    */
   private SystemAction(String action) {
-    identifier = action;
+    this(action, Security.SYSTEM_CONTEXT);
+  }
+
+  /**
+   * Creates a new system action. Use the defined constants to access instances
+   * of this class.
+   * 
+   * @param action
+   *          the action name
+   * @param context
+   *          the action's context
+   */
+  private SystemAction(String action, String context) {
+    this.identifier = action;
+    this.context = context;
     titles = new HashMap<Language, String>();
   }
 
@@ -91,7 +111,7 @@ public final class SystemAction implements Action {
    * @return the action context
    */
   public String getContext() {
-    return Security.SYSTEM_CONTEXT;
+    return context;
   }
 
   /**
@@ -101,7 +121,7 @@ public final class SystemAction implements Action {
    */
   @Override
   public int compareTo(Action o) {
-    return (Security.SYSTEM_CONTEXT + identifier).compareTo(o.getContext() + o.getIdentifier());
+    return (context + identifier).compareTo(o.getContext() + o.getIdentifier());
   }
 
   /**
@@ -133,14 +153,14 @@ public final class SystemAction implements Action {
   }
 
   /**
-   * Returns the string representation of this action object, which is equal
-   * to the action identifier.
+   * Returns the string representation of this action object, which is equal to
+   * the action identifier.
    * 
    * @return the action identifier
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    return Security.SYSTEM_CONTEXT + ":" + identifier;
+    return context + ":" + identifier;
   }
 
   /**

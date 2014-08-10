@@ -76,7 +76,7 @@ public class PageReaderTest {
 
   @Test
   public void testSecurity() throws Exception {
-    assertEquals(4, page.actions().length);
+    assertEquals(4, page.getActions().length);
     assertFalse(page.isAllowed(SystemAction.READ, SystemRole.GUEST));
     assertTrue(page.isAllowed(SystemAction.READ, SystemRole.SITEADMIN));
   }
