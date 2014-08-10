@@ -62,7 +62,7 @@
   <xsd:element name="email">
     <xsd:simpleType>
       <xsd:restriction base="xsd:string">
-        <xsd:pattern value="" />
+        <xsd:pattern value="[^@]+@[^\.]+\..+" />
       </xsd:restriction>
     </xsd:simpleType>
   </xsd:element>
