@@ -49,9 +49,6 @@ public final class SecurityUtils {
   /** Holds the user associated with the current thread */
   static final ThreadLocal<User> userHolder = new ThreadLocal<User>();
 
-  /** Holds the extended user associated with the current thread */
-  static final ThreadLocal<User> extendedUserHolder = new ThreadLocal<User>();
-
   /** The default system administrator */
   private static final User systemAdmin = new WebloungeAdminImpl("admin");
 
@@ -139,16 +136,6 @@ public final class SecurityUtils {
       return userHolder.get();
     else
       return systemAdmin;
-  }
-
-  /**
-   * Gets the current user including all the details, or the local
-   * organization's anonymous user if the user has not been authenticated.
-   * 
-   * @return the user
-   */
-  public static User getExtendedUser() {
-    return extendedUserHolder.get();
   }
 
   /**
