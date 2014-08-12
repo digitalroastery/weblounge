@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2014 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -17,33 +17,16 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+package ch.entwine.weblounge.common.impl.security;
 
-package ch.entwine.weblounge.common.security;
+import ch.entwine.weblounge.common.security.Authority;
 
 /**
- * This interface represents an action that can be taken on entities like
- * resources in Weblounge.
+ * List of system authorities.
  */
-public interface Action extends Comparable<Action> {
+public final class SystemAuthorities {
 
-  /** Identifier for the action wild card */
-  String CONTEXT_WILDCARD = "*";
-
-  /** Identifier for the action wild card */
-  String ACTION_WILDCARD = "*";
-
-  /**
-   * Returns the action identifier.
-   * 
-   * @return the action identifier
-   */
-  String getIdentifier();
-
-  /**
-   * Returns the action context.
-   * 
-   * @return the action context
-   */
-  String getContext();
+  /** Any authority */
+  public static final Authority ANY = new AuthorityImpl(AuthorityImpl.ANY_TYPE, AuthorityImpl.ANY_AUTHORITY);
 
 }

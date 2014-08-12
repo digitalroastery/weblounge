@@ -49,8 +49,11 @@ public interface IndexSchema {
   /** Subjects field name */
   String SUBJECT = "subjects";
 
-  /** Permissions field name */
-  String PERMISSION = "permissions";
+  /** Granted permissions field name */
+  String GRANTED_PERMISSION = "granted_permissions";
+
+  /** Denied permissions field name */
+  String DENIED_PERMISSION = "denied_permissions";
 
   /** Template field name */
   String TEMPLATE = "template";

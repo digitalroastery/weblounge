@@ -34,8 +34,10 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.COVERAGE_LOCALIZED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED_BY_NAME;
+import static ch.entwine.weblounge.search.impl.IndexSchema.DENIED_PERMISSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.DESCRIPTION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.DESCRIPTION_LOCALIZED;
+import static ch.entwine.weblounge.search.impl.IndexSchema.GRANTED_PERMISSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.HEADER_XML;
 import static ch.entwine.weblounge.search.impl.IndexSchema.LOCKED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.LOCKED_BY_NAME;
@@ -46,7 +48,6 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.OWNED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.OWNED_BY_NAME;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PATH_PREFIX;
-import static ch.entwine.weblounge.search.impl.IndexSchema.PERMISSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_BY_NAME;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_FROM;
@@ -66,7 +67,11 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.XML;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.SystemAction;
+import ch.entwine.weblounge.common.security.User;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -78,7 +83,7 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
 
   /**
    * Populates this input document with the resource data.
-   * 
+   *
    * @param resource
    *          the resource
    */
@@ -93,11 +98,28 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     addField(PATH, uri.getPath(), true, true);
     addField(TYPE, uri.getType(), true, false);
     addField(VERSION, uri.getVersion(), false, false);
-    
-    // Access
-    addField(PERMISSION, IndexUtils.serializeOwnerAccess(resource.getOwner()), false, false);
-    
-    // TODO Add check for access by authority, respecting allows/denies
+
+    // Access by owner and site admin
+    addField(GRANTED_PERMISSION, IndexUtils.serializeOwnerAccess(resource.getOwner()), false, false);
+    User siteAdministrator = resource.getURI().getSite().getAdministrator();
+    if (siteAdministrator != null)
+      addField(GRANTED_PERMISSION, IndexUtils.serializeOwnerAccess(siteAdministrator), false, false);
+    addField(GRANTED_PERMISSION, IndexUtils.serializeAuthorityAccess(SystemRole.SITEADMIN, SystemAction.ANY), false, false);
+    addField(GRANTED_PERMISSION, IndexUtils.serializeAuthorityAccess(SystemRole.SYSTEMADMIN, SystemAction.ANY), false, false);
+
+    // Access by roles
+    for (AccessRule access : resource.getAccessRules()) {
+      switch (access.getRule()) {
+        case Allow:
+          addField(GRANTED_PERMISSION, IndexUtils.serializeAuthorityAccess(access.getAuthority(), access.getAction()), false, false);
+          break;
+        case Deny:
+          addField(DENIED_PERMISSION, IndexUtils.serializeAuthorityAccess(access.getAuthority(), access.getAction()), false, false);
+          break;
+        default:
+          throw new IllegalStateException("Unsupported access type '" + access.getRule() + "'");
+      }
+    }
 
     // Path elements
     if (!StringUtils.isBlank(uri.getPath())) {

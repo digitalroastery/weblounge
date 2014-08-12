@@ -100,7 +100,7 @@ public class AccessRuleImpl implements AccessRule {
    * @return the serialized rule
    */
   private String getSerializedRule(AccessRule rule) {
-    return rule.toString().toLowerCase() + ":" + authority.toString().toLowerCase() + ":" + action.toString().toLowerCase();
+    return rule.getRule().toString().toLowerCase() + ":" + rule.getAuthority().toString().toLowerCase() + ":" + rule.getAction().toString().toLowerCase();
   }
 
   /**

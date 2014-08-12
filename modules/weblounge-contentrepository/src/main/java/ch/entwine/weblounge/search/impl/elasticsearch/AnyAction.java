@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  Copyright (c) 2014 The Weblounge Team
  *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
@@ -17,33 +17,34 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+package ch.entwine.weblounge.search.impl.elasticsearch;
 
-package ch.entwine.weblounge.common.security;
+import ch.entwine.weblounge.common.impl.security.ActionImpl;
+import ch.entwine.weblounge.common.security.Action;
 
 /**
- * This interface represents an action that can be taken on entities like
- * resources in Weblounge.
+ * This is a convenience implementation for any action in either all or inside
+ * of a given context.
  */
-public interface Action extends Comparable<Action> {
-
-  /** Identifier for the action wild card */
-  String CONTEXT_WILDCARD = "*";
-
-  /** Identifier for the action wild card */
-  String ACTION_WILDCARD = "*";
+public class AnyAction extends ActionImpl {
 
   /**
-   * Returns the action identifier.
-   * 
-   * @return the action identifier
+   * Creates an action that reflects any possible action inside of any possible
+   * context.
    */
-  String getIdentifier();
+  public AnyAction() {
+    super(Action.CONTEXT_WILDCARD, Action.ACTION_WILDCARD);
+  }
 
   /**
-   * Returns the action context.
+   * Creates an action that reflects any possible action inside of the given
+   * context.
    * 
-   * @return the action context
+   * @param context
+   *          the context identifier
    */
-  String getContext();
+  public AnyAction(String context) {
+    super(context, Action.ACTION_WILDCARD);
+  }
 
 }

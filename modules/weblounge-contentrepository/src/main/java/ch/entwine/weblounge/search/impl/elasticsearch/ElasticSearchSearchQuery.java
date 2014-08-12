@@ -39,7 +39,6 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_COMPOSER
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_POSITION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PATH_PREFIX;
-import static ch.entwine.weblounge.search.impl.IndexSchema.PERMISSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PUBLISHED_FROM;
 import static ch.entwine.weblounge.search.impl.IndexSchema.SERIES;
@@ -59,9 +58,6 @@ import ch.entwine.weblounge.common.content.SearchTerms;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
-import ch.entwine.weblounge.common.impl.security.SecurityUtils;
-import ch.entwine.weblounge.common.security.Action;
-import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.search.impl.IndexSchema;
 import ch.entwine.weblounge.search.impl.IndexUtils;
@@ -281,35 +277,43 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     }
 
     // Access rights
-    if (query.getActions().length > 1) {
-      User user = SecurityUtils.getUser();
-      Role[] roles = SecurityUtils.getRoles(user);
-
-      // The way this works is as follows: For every action that was supplied,
-      // the requesting user must either be the resource owner and/or have a
-      // matching role with the corresponding applicable action.
-
-      // TODO: Handle allow/deny order
-
-      for (Action action : query.getActions()) {
-        List<String> permissions = new ArrayList<String>();
-
-        // Access by the owner of the resource
-        permissions.add(IndexUtils.serializeOwnerAccess(user));
-
-        // Access as the user
-        permissions.add(IndexUtils.serializeUserAccess(user, action));
-
-        // Access by role owners
-        for (Role role : roles) {
-          permissions.add(IndexUtils.serializeRoleAccess(role, action));
-        }
-
-        if (groups == null)
-          groups = new ArrayList<ValueGroup>();
-        groups.add(new ValueGroup(PERMISSION, (Object[]) permissions.toArray(new String[permissions.size()])));
-      }
-    }
+//    if (query.getActions().length > 1) {
+//      User user = SecurityUtils.getUser();
+//      Role[] roles = SecurityUtils.getRoles(user);
+//
+//      // The way this works is as follows: For every action that was supplied,
+//      // the requesting user must either be the resource owner or the site
+//      // administrator and/or have a matching role with the corresponding
+//      // applicable action.
+//
+//      for (Action action : query.getActions()) {
+//        List<String> permissions = new ArrayList<String>();
+//
+//        // Access by the owner of the resource
+//        permissions.add(IndexUtils.serializeOwnerAccess(user));
+//
+//        // Access as the user
+//        permissions.add(IndexUtils.serializeUserAccess(user, action));
+//
+//        // Access by role owners
+//        for (Role role : roles) {
+//          permissions.add(IndexUtils.serializeRoleAccess(role, action));
+//        }
+//
+//        // Access if all actions of the given context are allowed
+//        permissions.add(IndexUtils.serializeAuthorityAccess(SystemAuthorities.ANY, new AnyAction(action.getContext())));
+//
+//        // Access if all actions of any context are allowed
+//        permissions.add(IndexUtils.serializeAuthorityAccess(SystemAuthorities.ANY, SystemAction.ANY));
+//
+//        if (groups == null)
+//          groups = new ArrayList<ValueGroup>();
+//
+//        groups.add(new ValueGroup(GRANTED_PERMISSION, (Object[]) permissions.toArray(new String[permissions.size()])));
+//        groups.add(new ValueGroup(DENIED_PERMISSION, (Object[]) permissions.toArray(new String[permissions.size()])));
+//
+//      }
+//    }
 
     // Pagelet elements
     // for (Map.Entry<String, String> entry : query.getElements().entrySet()) {
