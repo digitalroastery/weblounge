@@ -19,7 +19,6 @@
  */
 package ch.entwine.weblounge.common.impl.security;
 
-import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.SystemAction;
@@ -51,7 +50,7 @@ public final class SecurablePermission extends BasicPermission {
    * @param action
    *          the action to be performed
    */
-  public SecurablePermission(Resource<?> securable, Action action) {
+  public SecurablePermission(Securable securable, Action action) {
     super("Securable " + action.getIdentifier() + " permission");
     this.securable = securable;
     this.action = action;
