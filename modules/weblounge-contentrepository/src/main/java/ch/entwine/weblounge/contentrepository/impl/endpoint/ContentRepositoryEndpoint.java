@@ -28,7 +28,7 @@ import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
-import ch.entwine.weblounge.common.impl.security.ResourcePermission;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
@@ -384,7 +384,7 @@ public class ContentRepositoryEndpoint {
   protected void checkPermission(Resource<?> resource, Action action)
       throws WebApplicationException {
     try {
-      ResourcePermission permission = new ResourcePermission(resource, action);
+      SecurablePermission permission = new SecurablePermission(resource, action);
       if (System.getSecurityManager() != null)
         System.getSecurityManager().checkPermission(permission);
     } catch (SecurityException e) {

@@ -23,7 +23,7 @@ package ch.entwine.weblounge.taglib.content;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
-import ch.entwine.weblounge.common.impl.security.ResourcePermission;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.request.CacheTag;
@@ -125,7 +125,7 @@ public class LinkTag extends WebloungeTag {
       if (System.getSecurityManager() != null) {
         User user = SecurityUtils.getUser();
         try {
-          Permission permission = new ResourcePermission(page, SystemAction.READ);
+          Permission permission = new SecurablePermission(page, SystemAction.READ);
           System.getSecurityManager().checkPermission(permission);
         } catch (SecurityException e) {
           logger.debug("Linking to page {} denied for user '{}'", page, user);

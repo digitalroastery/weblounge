@@ -33,7 +33,7 @@ import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
-import ch.entwine.weblounge.common.impl.security.ResourcePermission;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -208,7 +208,7 @@ public final class PreviewRequestHandlerImpl implements RequestHandler {
     // Can the resource be accessed by the current user?
     User user = request.getUser();
     try {
-      ResourcePermission readPermission = new ResourcePermission(resource, READ);
+      SecurablePermission readPermission = new SecurablePermission(resource, READ);
       if (System.getSecurityManager() != null)
         System.getSecurityManager().checkPermission(readPermission);
     } catch (SecurityException e) {

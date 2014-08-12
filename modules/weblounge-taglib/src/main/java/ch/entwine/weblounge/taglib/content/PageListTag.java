@@ -34,7 +34,7 @@ import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
-import ch.entwine.weblounge.common.impl.security.ResourcePermission;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ContentRepositoryUnavailableException;
@@ -325,7 +325,7 @@ public class PageListTag extends WebloungeTag {
       // Check access to this resource
       if (System.getSecurityManager() != null) {
         try {
-          ResourcePermission permission = new ResourcePermission(page, SystemAction.READ);
+          SecurablePermission permission = new SecurablePermission(page, SystemAction.READ);
           System.getSecurityManager().checkPermission(permission);
         } catch (SecurityException e) {
           logger.debug("Access to list resource {} denied for '{}'", page, request.getUser());

@@ -30,7 +30,7 @@ import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
-import ch.entwine.weblounge.common.impl.security.ResourcePermission;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -191,7 +191,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Can the image be accessed by the current user?
     User user = request.getUser();
     try {
-      ResourcePermission readPermission = new ResourcePermission(imageResource, READ);
+      SecurablePermission readPermission = new SecurablePermission(imageResource, READ);
       if (System.getSecurityManager() != null)
         System.getSecurityManager().checkPermission(readPermission);
     } catch (SecurityException e) {

@@ -21,38 +21,39 @@ package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.SystemAction;
 
 import java.security.BasicPermission;
 import java.security.Permission;
 
 /**
- * A permission object for a {@link Resource} that may or may not be accessed
- * using a specific {@link Action} depending on the {@link AccessRuleImpl}.
+ * A permission object for a {@link Securable} that may or may not be accessed
+ * using a specific {@link Action}.
  */
-public final class ResourcePermission extends BasicPermission {
+public final class SecurablePermission extends BasicPermission {
 
   /** Serial version UID */
   private static final long serialVersionUID = 4306908026063283597L;
 
   /** The resource */
-  private final Resource<?> securable;
+  private final Securable securable;
 
   /** The action that is about to be performed */
   private final Action action;
 
   /**
    * Creates a new permission object that can be used to validate the permission
-   * to execute <code>action</code> on <code>resource</code>.
+   * to execute <code>action</code> on <code>securable</code>.
    * 
-   * @param resource
-   *          the resource to be accessed
+   * @param securable
+   *          the securable to be accessed
    * @param action
    *          the action to be performed
    */
-  public ResourcePermission(Resource<?> resource, Action action) {
-    super("Resource " + action.getIdentifier() + " permission");
-    this.securable = resource;
+  public SecurablePermission(Resource<?> securable, Action action) {
+    super("Securable " + action.getIdentifier() + " permission");
+    this.securable = securable;
     this.action = action;
   }
 
@@ -73,10 +74,10 @@ public final class ResourcePermission extends BasicPermission {
    */
   @Override
   public boolean implies(Permission p) {
-    if (!(p instanceof ResourcePermission))
+    if (!(p instanceof SecurablePermission))
       return false;
 
-    ResourcePermission pp = (ResourcePermission) p;
+    SecurablePermission pp = (SecurablePermission) p;
     Action impliedAction = pp.getAction();
 
     // Write action contains read
@@ -96,9 +97,9 @@ public final class ResourcePermission extends BasicPermission {
    */
   @Override
   public boolean equals(Object p) {
-    if (!(p instanceof ResourcePermission))
+    if (!(p instanceof SecurablePermission))
       return false;
-    ResourcePermission pp = (ResourcePermission) p;
+    SecurablePermission pp = (SecurablePermission) p;
     return securable.equals(pp.securable) && action.equals(pp.action);
   }
 
@@ -109,15 +110,15 @@ public final class ResourcePermission extends BasicPermission {
    */
   @Override
   public int hashCode() {
-    return securable.getURI().hashCode();
+    return securable.hashCode();
   }
 
   /**
-   * Returns the resource that is being accessed.
+   * Returns the securable that is being accessed.
    * 
    * @return the resource
    */
-  public Resource<?> getResource() {
+  public Securable getSecurable() {
     return securable;
   }
 

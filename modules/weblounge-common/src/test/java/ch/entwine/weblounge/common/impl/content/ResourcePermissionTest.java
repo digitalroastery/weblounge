@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
-import ch.entwine.weblounge.common.impl.security.ResourcePermission;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
@@ -34,7 +34,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * Test case for {@link ResourcePermission}.
+ * Test case for {@link SecurablePermission}.
  */
 @Ignore
 public class ResourcePermissionTest {
@@ -46,7 +46,7 @@ public class ResourcePermissionTest {
   private Action action = null;
 
   /** The page permission to test */
-  private ResourcePermission permission = null;
+  private SecurablePermission permission = null;
   
   @Before
   public void setUp() {
@@ -54,12 +54,12 @@ public class ResourcePermissionTest {
     EasyMock.replay(site);
     page = new PageImpl(new ResourceURIImpl(Page.TYPE, site, "/"));
     action = SystemAction.READ;
-    permission = new ResourcePermission(page, action);
+    permission = new SecurablePermission(page, action);
   }
   
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.security.ResourcePermission#getActions()}
+   * {@link ch.entwine.weblounge.common.impl.security.SecurablePermission#getActions()}
    * .
    */
   @Test
@@ -69,7 +69,7 @@ public class ResourcePermissionTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.security.ResourcePermission#implies(java.security.Permission)}
+   * {@link ch.entwine.weblounge.common.impl.security.SecurablePermission#implies(java.security.Permission)}
    * .
    */
   @Test
@@ -79,7 +79,7 @@ public class ResourcePermissionTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.security.ResourcePermission#getPage()}
+   * {@link ch.entwine.weblounge.common.impl.security.SecurablePermission#getPage()}
    * .
    */
   @Test
@@ -89,7 +89,7 @@ public class ResourcePermissionTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.security.ResourcePermission#getUser()}
+   * {@link ch.entwine.weblounge.common.impl.security.SecurablePermission#getUser()}
    * .
    */
   @Test
@@ -99,7 +99,7 @@ public class ResourcePermissionTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.security.ResourcePermission#getAction()}
+   * {@link ch.entwine.weblounge.common.impl.security.SecurablePermission#getAction()}
    * .
    */
   @Test

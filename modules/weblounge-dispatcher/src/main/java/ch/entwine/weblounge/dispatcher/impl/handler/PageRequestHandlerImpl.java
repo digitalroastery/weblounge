@@ -37,7 +37,7 @@ import ch.entwine.weblounge.common.impl.request.Http11Constants;
 import ch.entwine.weblounge.common.impl.request.Http11Utils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
-import ch.entwine.weblounge.common.impl.security.ResourcePermission;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
@@ -268,7 +268,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       // Can the page be accessed by the current user?
       User user = request.getUser();
       try {
-        ResourcePermission readPermission = new ResourcePermission(page, READ);
+        SecurablePermission readPermission = new SecurablePermission(page, READ);
         if (System.getSecurityManager() != null)
           System.getSecurityManager().checkPermission(readPermission);
       } catch (SecurityException e) {

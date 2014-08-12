@@ -19,7 +19,7 @@
  */
 package ch.entwine.weblounge.kernel.security;
 
-import ch.entwine.weblounge.common.impl.security.ResourcePermission;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Role;
@@ -61,8 +61,8 @@ public class WebloungeSecurityManager extends NullSecurityManager {
    */
   @Override
   public void checkPermission(Permission permission) {
-    if (permission instanceof ResourcePermission) {
-      checkResourcePermission((ResourcePermission) permission);
+    if (permission instanceof SecurablePermission) {
+      checkResourcePermission((SecurablePermission) permission);
     } else if (deleageSecurityManager != null) {
       deleageSecurityManager.checkPermission(permission);
     }
@@ -76,12 +76,12 @@ public class WebloungeSecurityManager extends NullSecurityManager {
    * @throws SecurityException
    *           if access to the resource is denied
    */
-  private void checkResourcePermission(ResourcePermission permission)
+  private void checkResourcePermission(SecurablePermission permission)
       throws SecurityException {
     User user = SecurityUtils.getUser();
-    ResourcePermission pm = (ResourcePermission) permission;
+    SecurablePermission pm = (SecurablePermission) permission;
     Action action = pm.getAction();
-    Securable resource = pm.getResource();
+    Securable resource = pm.getSecurable();
 
     // Check the user itself
     if (SecurityUtils.checkAuthorization(resource, action, user)) {
