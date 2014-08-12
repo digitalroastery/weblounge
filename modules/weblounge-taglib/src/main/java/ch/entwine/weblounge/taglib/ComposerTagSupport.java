@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -349,9 +350,11 @@ public class ComposerTagSupport extends WebloungeTag {
             logger.warn("No page was found while processing composer on " + url);
             return;
           }
-        } catch (SecurityException e) {
-          logger.warn("Composer '" + id + "' was unable to choose homepage as fallback: " + e.getMessage());
-          return;
+          if (!SecurityUtils.userHasReadPermission(request.getUser(), targetPage)) {
+            logger.debug("User {} has no read permissions on {}", SecurityUtils.getUser(), targetPage);
+            targetPage = null;
+            return;
+          }
         } catch (ContentRepositoryException e) {
           logger.warn("Composer '" + id + "' was unable to choose homepage as fallback: " + e.getMessage());
           return;
@@ -381,9 +384,10 @@ public class ComposerTagSupport extends WebloungeTag {
             if ("".equals(pageUrl))
               pageUrl = "/";
             ResourceURI pageURI = new PageURIImpl(site, pageUrl);
-            try {
-              contentPage = (Page) contentRepository.get(pageURI);
-            } catch (SecurityException e) {
+            contentPage = (Page) contentRepository.get(pageURI);
+
+            if (!SecurityUtils.userHasReadPermission(request.getUser(), contentPage)) {
+              contentPage = null;
               logger.debug("Prevented loading of protected content from inherited page {} for composer {}", pageURI, id);
             }
 

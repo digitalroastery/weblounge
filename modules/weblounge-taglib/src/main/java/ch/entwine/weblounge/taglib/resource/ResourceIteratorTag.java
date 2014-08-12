@@ -28,6 +28,7 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -356,7 +357,10 @@ public class ResourceIteratorTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    // TODO: Check the permissions
+    if (!SecurityUtils.userHasReadPermission(request.getUser(), resource)) {
+      logger.debug("User {} has no read permission on resource {}", SecurityUtils.getUser(), resource);
+      return SKIP_BODY;
+    }
 
     // Store the resource and the resource content in the request
     stashAndSetAttribute(ResourceIteratorTagExtraInfo.RESOURCE, resource);

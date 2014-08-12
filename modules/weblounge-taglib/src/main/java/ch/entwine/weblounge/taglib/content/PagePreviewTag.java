@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -297,10 +298,13 @@ public class PagePreviewTag extends WebloungeTag {
           logger.error("No data available for page {}", pageURI);
           return EVAL_PAGE;
         }
-      } catch (SecurityException e) {
-        throw new JspException("Security exception while trying to load " + pageUrl, e);
       } catch (ContentRepositoryException e) {
         throw new JspException("Exception while trying to load " + pageUrl, e);
+      }
+
+      if (!SecurityUtils.userHasReadPermission(request.getUser(), page)) {
+        logger.debug("User {} has no read permission on page {}", SecurityUtils.getUser(), page);
+        return EVAL_PAGE;
       }
 
       pageUrl = new WebUrlImpl(site, page.getURI().getPath());

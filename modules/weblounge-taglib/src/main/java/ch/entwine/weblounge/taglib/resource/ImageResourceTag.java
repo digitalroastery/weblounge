@@ -32,6 +32,7 @@ import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -255,6 +256,11 @@ public class ImageResourceTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
+    if (!SecurityUtils.userHasReadPermission(request.getUser(), image)) {
+      logger.debug("User {} has no read permission on image {}", SecurityUtils.getUser(), image);
+      return SKIP_BODY;
+    }
+
     // Find the image style
     if (StringUtils.isNotBlank(imageStyle)) {
       style = ImageStyleUtils.findStyle(imageStyle, site);
@@ -267,8 +273,6 @@ public class ImageResourceTag extends WebloungeTag {
         logger.warn("Image style '{}' not found to render on {}", imageStyle, request.getUrl());
       }
     }
-
-    // TODO: Check the permissions
 
     // Store the image and the image content in the request
     stashAndSetAttribute(ImageResourceTagExtraInfo.IMAGE, image);
