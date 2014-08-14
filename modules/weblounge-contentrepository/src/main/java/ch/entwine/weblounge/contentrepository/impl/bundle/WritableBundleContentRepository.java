@@ -192,10 +192,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
             throw new ContentRepositoryException("Error adding resource " + uri + " to repository: a resource with id '" + uri.getIdentifier() + "' or path '" + uri.getPath() + "' already exists");
           }
 
-          logger.info("Loading {} {}:{}", new Object[] {
-              uri.getType(),
-              site,
-              uri });
+          logger.info("Loading {} {}", uri.getType(), uri);
           Set<? extends ResourceContent> content = resource.contents();
           if (content.size() == 0) {
             put(resource);
