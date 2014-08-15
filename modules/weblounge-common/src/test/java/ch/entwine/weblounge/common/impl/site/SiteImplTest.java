@@ -29,9 +29,11 @@ import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.Times;
 import ch.entwine.weblounge.common.content.Renderer;
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageImpl;
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.SiteAdminImpl;
@@ -190,6 +192,11 @@ public class SiteImplTest {
     site.addLocalRole(Security.EDITOR_ROLE, editorRole);
     site.addLocalRole(Security.GUEST_ROLE, guestRole);
     site.setSecurity(new URL(securityConfigPath));
+    site.setOption(SiteImpl.OPT_NAME_ERROR_PAGES, ":/bar");
+    site.setOption(SiteImpl.OPT_NAME_ERROR_PAGES, "/a:/bar");
+    site.setOption(SiteImpl.OPT_NAME_ERROR_PAGES, "/b:/bar/");
+    site.setOption(SiteImpl.OPT_NAME_ERROR_PAGES, "/c:");
+    site.setOption(SiteImpl.OPT_NAME_ERROR_PAGES, "/d:bar");
   }
 
   /**
@@ -538,12 +545,23 @@ public class SiteImplTest {
   
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getSecurity()}
-   * .
+   * {@link ch.entwine.weblounge.common.impl.site.SiteImpl#getSecurity()} .
    */
   @Test
   public void testGetSecurity() {
     assertEquals(securityConfigPath, site.getSecurity().toExternalForm());
+  }
+
+  /**
+   * Test method for {@link SiteImpl#getErrorPage(String)}
+   */
+  @Test
+  public void testGetErrorPage() {
+    PageURIImpl errorpage = new PageURIImpl(site, "/bar", Resource.LIVE);
+    assertEquals(errorpage, site.getErrorPage("/a"));
+    assertEquals(errorpage, site.getErrorPage("/b"));
+    assertEquals(null, site.getErrorPage("/c"));
+    assertEquals(errorpage, site.getErrorPage("/d"));
   }
 
 }

@@ -51,5 +51,13 @@
       <name>media.url</name>
       <value><![CDATA[http://media.swissunihockey.ch/dev]]></value>
     </option>
+    <option>
+      <name>weblounge.errorpages</name>
+      <value><![CDATA[/a:/bar]]></value>
+      <value><![CDATA[/b:/bar/]]></value>
+      <value><![CDATA[/c:]]></value>
+      <value><![CDATA[/d:bar]]></value>
+      <value><![CDATA[:/bar]]></value>
+    </option>
   </options>
 </site>

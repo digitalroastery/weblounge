@@ -20,10 +20,16 @@
 
 package ch.entwine.weblounge.common.impl.site;
 
+import static org.apache.commons.lang.StringUtils.split;
+
+import ch.entwine.weblounge.common.content.MalformedResourceURIException;
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.page.PageLayout;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.impl.content.page.PageTemplateImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJob;
 import ch.entwine.weblounge.common.impl.scheduler.QuartzJobTrigger;
@@ -118,6 +124,9 @@ public class SiteImpl implements Site {
 
   /** Bundle property name of the site identifier */
   public static final String PROP_IDENTIFIER = "site.identifier";
+
+  /** The error pages site option */
+  public static final String OPT_NAME_ERROR_PAGES = "weblounge.errorpages";
 
   /** Xml namespace for the site */
   public static final String SITE_XMLNS = "http://www.entwinemedia.com/weblounge/3.2/site";
@@ -921,6 +930,32 @@ public class SiteImpl implements Site {
   @Override
   public DigestType getDigestType() {
     return digestType;
+  }
+
+  @Override
+  public ResourceURI getErrorPage(String path) {
+    if (!this.hasOption(OPT_NAME_ERROR_PAGES))
+      return null;
+
+    for (String errorpage : this.getOptionValues(OPT_NAME_ERROR_PAGES)) {
+      String[] pathErrPage = split(errorpage, ":");
+      if (pathErrPage.length != 2)
+        continue;
+
+      if (!path.startsWith(pathErrPage[0]))
+        continue;
+
+      try {
+        return new PageURIImpl(this, pathErrPage[1], Resource.LIVE);
+      } catch (MalformedResourceURIException e) {
+        logger.warn("Error creatig error page URI for path prefix '{}' with path '{}': {}", new Object[] {
+            pathErrPage[0],
+            pathErrPage[1],
+            e });
+      }
+    }
+
+    return null;
   }
 
   /**

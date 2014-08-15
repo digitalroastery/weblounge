@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.site;
 
 import ch.entwine.weblounge.common.Customizable;
+import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.PageLayout;
 import ch.entwine.weblounge.common.content.page.PageTemplate;
 import ch.entwine.weblounge.common.language.Language;
@@ -429,6 +430,17 @@ public interface Site extends Customizable, RequestListener, Serializable {
    *          the digest
    */
   void setDigestType(DigestType digest);
+
+  /**
+   * Returns the error page which should be displayed in case no other resource
+   * nor an action with the given path could be found.
+   * 
+   * @param path
+   *          the requested path
+   * @return the uri of the error page or {@code null} if there is no error
+   *         page
+   */
+  ResourceURI getErrorPage(String path);
 
   /**
    * Starts this site.

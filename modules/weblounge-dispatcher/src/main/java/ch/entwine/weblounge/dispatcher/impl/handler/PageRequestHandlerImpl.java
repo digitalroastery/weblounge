@@ -221,14 +221,14 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
           // Did we find a matching uri?
           if (pageURI == null) {
-            DispatchUtils.sendNotFound(request, response);
-            return true;
+            logger.debug("Page '{}' not found", requestURI);
+            return false;
           }
 
           page = (Page) contentRepository.get(pageURI);
           if (page == null) {
-            DispatchUtils.sendNotFound(request, response);
-            return true;
+            logger.debug("Page '{}' not found", pageURI);
+            return false;
           }
         } catch (ContentRepositoryException e) {
           logger.error("Unable to load page {} from {}: {}", new Object[] {
