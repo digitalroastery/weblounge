@@ -774,7 +774,7 @@ public class SiteImpl implements Site {
 
     if (url.isDefault()) {
       defaultURLByEnvironment.put(url.getEnvironment(), url);
-      if (Environment.Production.equals(url.getEnvironment()))
+      if (environment.equals(url.getEnvironment()))
         defaultURL = url;
     }
 
