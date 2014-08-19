@@ -94,7 +94,7 @@ public class NotFoundRequestHandlerImpl implements RequestHandler {
     }
 
     if (page == null) {
-      logger.warn("The 404 error page '{}' could not be found in the content repository");
+      logger.warn("The 404 error page '{}' could not be found in the content repository", pageUri);
       DispatchUtils.sendError(HttpServletResponse.SC_NOT_FOUND, request, response);
       return true;
     }
