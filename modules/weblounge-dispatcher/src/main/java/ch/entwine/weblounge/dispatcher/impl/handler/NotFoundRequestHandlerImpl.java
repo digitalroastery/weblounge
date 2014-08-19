@@ -70,7 +70,7 @@ public class NotFoundRequestHandlerImpl implements RequestHandler {
       response.setContentLength(0);
       return true;
     } else if (!"GET".equals(requestMethod)) {
-      logger.debug("Feed request handler does not support {} requests", url, requestMethod);
+      logger.debug("404 Not Found Request Handler does not support {} requests", url, requestMethod);
       DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
       return true;
     }
