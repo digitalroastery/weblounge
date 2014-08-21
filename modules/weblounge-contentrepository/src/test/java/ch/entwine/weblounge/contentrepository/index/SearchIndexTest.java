@@ -94,10 +94,16 @@ public class SearchIndexTest {
   protected static PageTemplate template = null;
 
   /** The mock site */
-  protected static Site site = null;
+  protected static Site testSite = null;
 
-  /** The sample pages */
-  protected Page[] pages = null;
+  /** The second mock site */
+  protected static Site demoSite = null;
+
+  /** The sample pages of the test site */
+  protected Page[] testPages = null;
+  
+  /** The sample pages of the demo site */
+  protected Page[] demoPages = null;
 
   /** The sample file */
   protected FileResource file = null;
@@ -157,13 +163,21 @@ public class SearchIndexTest {
     languages.add(LanguageUtils.getLanguage("de"));
 
     // Site
-    site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
-    EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
-    EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
-    EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
-    EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("testsite")).anyTimes();
-    EasyMock.replay(site);
+    testSite = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(testSite.getIdentifier()).andReturn("test").anyTimes();
+    EasyMock.expect(testSite.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
+    EasyMock.expect(testSite.getDefaultTemplate()).andReturn(template).anyTimes();
+    EasyMock.expect(testSite.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
+    EasyMock.expect(testSite.getAdministrator()).andReturn(new SiteAdminImpl("testsite")).anyTimes();
+    EasyMock.replay(testSite);
+
+    demoSite = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(demoSite.getIdentifier()).andReturn("demo").anyTimes();
+    EasyMock.expect(demoSite.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
+    EasyMock.expect(demoSite.getDefaultTemplate()).andReturn(template).anyTimes();
+    EasyMock.expect(demoSite.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
+    EasyMock.expect(demoSite.getAdministrator()).andReturn(new SiteAdminImpl("demosite")).anyTimes();
+    EasyMock.replay(demoSite);
 
     // Resource serializer
     serializer = new ResourceSerializerServiceImpl();
@@ -204,23 +218,29 @@ public class SearchIndexTest {
   public void setUp() throws Exception {
     // Prepare the pages
     PageReader pageReader = new PageReader();
-    pages = new Page[2];
-    for (int i = 0; i < pages.length; i++) {
+    testPages = new Page[2];
+    for (int i = 0; i < testPages.length; i++) {
       InputStream is = this.getClass().getResourceAsStream("/page" + (i + 1) + ".xml");
-      pages[i] = pageReader.read(is, site);
+      testPages[i] = pageReader.read(is, testSite);
+      IOUtils.closeQuietly(is);
+    }
+    demoPages = new Page[2];
+    for (int i = 0; i < demoPages.length; i++) {
+      InputStream is = this.getClass().getResourceAsStream("/page" + (i + 1) + ".xml");
+      demoPages[i] = pageReader.read(is, demoSite);
       IOUtils.closeQuietly(is);
     }
 
     // Prepare the sample file
     FileResourceReader fileReader = new FileResourceReader();
     InputStream fileIs = this.getClass().getResourceAsStream("/file.xml");
-    file = fileReader.read(fileIs, site);
+    file = fileReader.read(fileIs, testSite);
     IOUtils.closeQuietly(fileIs);
 
     // Prepare the sample image
     ImageResourceReader imageReader = new ImageResourceReader();
     InputStream imageIs = this.getClass().getResourceAsStream("/image.xml");
-    image = imageReader.read(imageIs, site);
+    image = imageReader.read(imageIs, testSite);
     IOUtils.closeQuietly(imageIs);
   }
 
@@ -251,7 +271,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithId() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withIdentifier(uuid1);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withIdentifier(uuid1);
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
@@ -263,7 +283,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithPath() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(path1);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withPath(path1);
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
@@ -280,20 +300,20 @@ public class SearchIndexTest {
     for (int i = 0; i < 10; i++) {
       String id = UUID.randomUUID().toString();
       String path = PathUtils.concat(path1, id);
-      ResourceURI uri = new PageURIImpl(site, path, id);
+      ResourceURI uri = new PageURIImpl(testSite, path, id);
       Page p = new PageImpl(uri);
       p.setTemplate(template.getIdentifier());
       idx.add(p);
 
       String subPageId = UUID.randomUUID().toString();
       String subPath = PathUtils.concat(path, subPageId);
-      uri = new PageURIImpl(site, subPath, subPageId);
+      uri = new PageURIImpl(testSite, subPath, subPageId);
       p = new PageImpl(uri);
       p.setTemplate(template.getIdentifier());
       idx.add(p);
     }
 
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPathPrefix(path1);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withPathPrefix(path1);
     q.withLimit(100);
     assertEquals(21, idx.getByQuery(q).getDocumentCount());
   }
@@ -306,42 +326,42 @@ public class SearchIndexTest {
   @Test
   public void testGetWithPagelet() throws Exception {
     populateIndex();
-    Pagelet[] mainPagelets = pages[0].getPagelets("main");
+    Pagelet[] mainPagelets = testPages[0].getPagelets("main");
     Pagelet titlePagelet = new PageletImpl(mainPagelets[0].getModule(), mainPagelets[0].getIdentifier());
     Pagelet imagePagelet = new PageletImpl(mainPagelets[1].getModule(), mainPagelets[1].getIdentifier());
 
     // Search for pages containing a pagelet (pages 1 and 2)
-    SearchQuery q = new SearchQueryImpl(site).withPagelet(titlePagelet);
+    SearchQuery q = new SearchQueryImpl(testSite).withPagelet(titlePagelet);
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
 
     // Search for pages containing an image pagelet (only page 1)
-    q = new SearchQueryImpl(site).withPagelet(imagePagelet);
+    q = new SearchQueryImpl(testSite).withPagelet(imagePagelet);
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
 
     // Search for pages containing the title pagelet in the correct position
     // (only page 1)
-    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("main");
+    q = new SearchQueryImpl(testSite).withPagelet(titlePagelet).inComposer("main");
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
-    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("main").atPosition(0);
+    q = new SearchQueryImpl(testSite).withPagelet(titlePagelet).inComposer("main").atPosition(0);
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
-    q = new SearchQueryImpl(site).withPagelet(titlePagelet).atPosition(0);
+    q = new SearchQueryImpl(testSite).withPagelet(titlePagelet).atPosition(0);
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
 
     // Search for pages containing the title pagelet in the correct position
     // (only page 1)
-    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("test");
+    q = new SearchQueryImpl(testSite).withPagelet(titlePagelet).inComposer("test");
     assertEquals(0, idx.getByQuery(q).getDocumentCount());
-    q = new SearchQueryImpl(site).withPagelet(titlePagelet).atPosition(2);
+    q = new SearchQueryImpl(testSite).withPagelet(titlePagelet).atPosition(2);
     assertEquals(0, idx.getByQuery(q).getDocumentCount());
-    q = new SearchQueryImpl(site).withPagelet(titlePagelet).inComposer("main").atPosition(1);
+    q = new SearchQueryImpl(testSite).withPagelet(titlePagelet).inComposer("main").atPosition(1);
     assertEquals(0, idx.getByQuery(q).getDocumentCount());
 
     // Find documents with both pagelets on one page
-    q = new SearchQueryImpl(site).withPagelets(All, titlePagelet, imagePagelet);
+    q = new SearchQueryImpl(testSite).withPagelets(All, titlePagelet, imagePagelet);
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
 
     // Find documents with both pagelets on one page and in the same composer
-    q = new SearchQueryImpl(site).withPagelets(All, titlePagelet, imagePagelet).inComposer("main");
+    q = new SearchQueryImpl(testSite).withPagelets(All, titlePagelet, imagePagelet).inComposer("main");
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
@@ -353,7 +373,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithTemplate() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withTemplate("default");
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withTemplate("default");
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
@@ -365,7 +385,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithText() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext(true, "Technik");
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withFulltext(true, "Technik");
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
   }
 
@@ -377,7 +397,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithWildcardText() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withFulltext(true, "Techn");
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withFulltext(true, "Techn");
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
   }
 
@@ -390,10 +410,10 @@ public class SearchIndexTest {
   public void testGetWithAuthor() throws Exception {
     populateIndex();
     User amelie = new UserImpl("amelie");
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withAuthor(amelie);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withAuthor(amelie);
     SearchResult result = idx.getByQuery(q);
-    assertEquals(pages.length, result.getDocumentCount());
-    assertEquals(pages.length, result.getDocumentCount());
+    assertEquals(testPages.length, result.getDocumentCount());
+    assertEquals(testPages.length, result.getDocumentCount());
   }
 
   /**
@@ -405,10 +425,10 @@ public class SearchIndexTest {
   public void testGetWithCreator() throws Exception {
     populateIndex();
     User hans = new UserImpl("hans");
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withCreator(hans);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withCreator(hans);
     SearchResult result = idx.getByQuery(q);
-    assertEquals(pages.length, result.getDocumentCount());
-    assertEquals(pages.length, result.getDocumentCount());
+    assertEquals(testPages.length, result.getDocumentCount());
+    assertEquals(testPages.length, result.getDocumentCount());
   }
 
   /**
@@ -420,7 +440,7 @@ public class SearchIndexTest {
   public void testGetWithCreationDate() throws Exception {
     populateIndex();
     Date date = WebloungeDateFormat.parseStatic("2009-01-07T20:05:41Z");
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withCreationDate(date);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withCreationDate(date);
     SearchResult result = idx.getByQuery(q);
     assertEquals(1, result.getDocumentCount());
     assertEquals(1, result.getDocumentCount());
@@ -435,10 +455,10 @@ public class SearchIndexTest {
   public void testGetWithModifier() throws Exception {
     populateIndex();
     User amelie = new UserImpl("amelie");
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withModifier(amelie);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withModifier(amelie);
     SearchResult result = idx.getByQuery(q);
-    assertEquals(pages.length, result.getDocumentCount());
-    assertEquals(pages.length, result.getDocumentCount());
+    assertEquals(testPages.length, result.getDocumentCount());
+    assertEquals(testPages.length, result.getDocumentCount());
   }
 
   /**
@@ -450,7 +470,7 @@ public class SearchIndexTest {
   public void testGetWithModificationDate() throws Exception {
     populateIndex();
     Date date = WebloungeDateFormat.parseStatic("2009-02-18T22:06:40Z");
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withModificationDate(date);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withModificationDate(date);
     SearchResult result = idx.getByQuery(q);
     assertEquals(1, result.getDocumentCount());
     assertEquals(1, result.getDocumentCount());
@@ -464,10 +484,10 @@ public class SearchIndexTest {
   @Test
   public void testGetSortedByPublicationDate() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).sortByPublishingDate(Order.Descending);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).sortByPublishingDate(Order.Descending);
     SearchResult result = idx.getByQuery(q);
-    assertEquals(pages.length, result.getDocumentCount());
-    assertEquals(pages.length, result.getDocumentCount());
+    assertEquals(testPages.length, result.getDocumentCount());
+    assertEquals(testPages.length, result.getDocumentCount());
   }
 
   /**
@@ -479,7 +499,7 @@ public class SearchIndexTest {
   public void testGetWithPublisher() throws Exception {
     populateIndex();
     User amelie = new UserImpl("amelie");
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPublisher(amelie);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withPublisher(amelie);
     SearchResult result = idx.getByQuery(q);
     assertEquals(1, result.getDocumentCount());
     assertEquals(1, result.getDocumentCount());
@@ -494,7 +514,7 @@ public class SearchIndexTest {
   public void testGetWithPublishingDate() throws Exception {
     populateIndex();
     Date date = WebloungeDateFormat.parseStatic("2006-05-05T17:58:21Z");
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPublishingDate(date);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withPublishingDate(date);
     SearchResult result = idx.getByQuery(q);
     assertEquals(1, result.getDocumentCount());
     assertEquals(1, result.getDocumentCount());
@@ -508,7 +528,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithSubjects() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE);
     String[] subjects = new String[] { "Other topic", "Topic a" };
     for (String subject : subjects)
       q.withSubject(subject);
@@ -523,7 +543,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithAllSubjects() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE);
     q.withSubjects(Quantifier.All, "Topic a", "This subject");
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
@@ -536,7 +556,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithContent() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE);
     q.withElement(elementId, elementValue);
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
   }
@@ -549,7 +569,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithProperty() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE);
     q.withProperty("resourceid", imageid);
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
@@ -562,7 +582,7 @@ public class SearchIndexTest {
   @Test
   public void testGetWithFilename() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site);
+    SearchQuery q = new SearchQueryImpl(testSite);
     q.withFilename(filename);
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
   }
@@ -575,9 +595,22 @@ public class SearchIndexTest {
   @Test
   public void testGetWithMimetype() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site);
+    SearchQuery q = new SearchQueryImpl(testSite);
     q.withMimetype(mimetype);
     assertEquals(2, idx.getByQuery(q).getDocumentCount());
+  }
+  
+  @Test
+  public void testClearWithSite() throws Exception {
+    populateIndex();
+    
+    idx.clear(demoSite);
+    
+    SearchQuery countDemoSite = new SearchQueryImpl(demoSite).withTypes(Page.TYPE);
+    assertEquals(0, idx.getByQuery(countDemoSite).getDocumentCount());
+    
+    SearchQuery countTestSite = new SearchQueryImpl(testSite).withTypes(Page.TYPE);
+    assertEquals(2, idx.getByQuery(countTestSite).getDocumentCount());
   }
 
   /**
@@ -591,7 +624,7 @@ public class SearchIndexTest {
     idx.clear();
 
     // Run a query and see if we get anything back
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE);
     assertEquals(0, idx.getByQuery(q).getDocumentCount());
   }
 
@@ -605,11 +638,11 @@ public class SearchIndexTest {
     populateIndex();
 
     // Delete a page
-    idx.delete(pages[0].getURI());
+    idx.delete(testPages[0].getURI());
 
     // Test if we can query for the added document
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
-    assertEquals(pages.length - 1, idx.getByQuery(q).getDocumentCount());
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE);
+    assertEquals(testPages.length - 1, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -620,8 +653,8 @@ public class SearchIndexTest {
   @Test
   public void testAdd() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
-    assertEquals(pages.length, idx.getByQuery(q).getDocumentCount());
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE);
+    assertEquals(testPages.length, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -633,14 +666,14 @@ public class SearchIndexTest {
   public void testUpdate() throws Exception {
     populateIndex();
     String subject = "testsubject";
-    Page page = pages[0];
+    Page page = testPages[0];
     page.addSubject(subject);
 
     // Post the update
     idx.update(page);
 
     // Check if the index actually reflects the updated data
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withSubject(subject);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withSubject(subject);
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
   }
 
@@ -655,15 +688,15 @@ public class SearchIndexTest {
     String newPath = "/new/path/test";
 
     // Post the update
-    idx.move(pages[0].getURI(), newPath);
+    idx.move(testPages[0].getURI(), newPath);
 
     // Make sure there is a page with the new path
-    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE).withPath(newPath);
+    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE).withPath(newPath);
     assertEquals(1, idx.getByQuery(q).getDocumentCount());
 
     // Make sure the number of pages remains the same
-    q = new SearchQueryImpl(site).withTypes(Page.TYPE);
-    assertEquals(pages.length, idx.getByQuery(q).getDocumentCount());
+    q = new SearchQueryImpl(testSite).withTypes(Page.TYPE);
+    assertEquals(testPages.length, idx.getByQuery(q).getDocumentCount());
   }
 
   /**
@@ -712,7 +745,11 @@ public class SearchIndexTest {
     int count = 0;
 
     // Add the pages
-    for (Page page : pages) {
+    for (Page page : testPages) {
+      idx.add(page);
+      count++;
+    }
+    for (Page page : demoPages) {
       idx.add(page);
       count++;
     }

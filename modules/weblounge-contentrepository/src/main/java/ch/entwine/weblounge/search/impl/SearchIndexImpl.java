@@ -56,6 +56,8 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -348,6 +350,29 @@ public class SearchIndexImpl implements SearchIndex {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.search.SearchIndex#clear(ch.entwine.weblounge.common.site.Site)
+   */
+  @Override
+  public void clear(Site site) throws IOException {
+    try {
+      IndicesExistsResponse indicesExistsResponse = nodeClient.admin().indices().exists(new IndicesExistsRequest(site.getIdentifier())).actionGet();
+      if (indicesExistsResponse.exists()) {
+        DeleteIndexResponse delete = nodeClient.admin().indices().delete(new DeleteIndexRequest(site.getIdentifier())).actionGet();
+        if (!delete.acknowledged())
+          logger.error("Index of site '{}' could not be deleted", site);
+      } else {
+        logger.error("Cannot clear not existing index of site '{}'", site);
+      }
+    } catch (Throwable t) {
+      throw new IOException("Cannot clear index", t);
+    }
+
+    preparedIndices.remove(site.getIdentifier());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.search.impl.SearchIndex#clear()
    */
   @Override
@@ -359,7 +384,7 @@ public class SearchIndexImpl implements SearchIndex {
     } catch (Throwable t) {
       throw new IOException("Cannot clear index", t);
     }
-    
+
     preparedIndices.clear();
   }
 
