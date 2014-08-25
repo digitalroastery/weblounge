@@ -66,7 +66,7 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
   private final Map<String, Boolean> supportedFormats = new HashMap<String, Boolean>();
 
   /** Flag to indicate whether format detection is supported */
-  private boolean formatDecetionSupported = true;
+  private boolean formatDetectionSupported = true;
 
   /** The image magic temp directory */
   private File imageMagickDir = null;
@@ -102,7 +102,7 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
     if (format == null)
       throw new IllegalArgumentException("Format cannot be null");
 
-    if (!formatDecetionSupported)
+    if (!formatDetectionSupported)
       return true;
 
     // Check for verified support
@@ -131,7 +131,7 @@ public final class ImageMagickPreviewGenerator implements ImagePreviewGenerator 
       return supported[0];
     } catch (Throwable t) {
       logger.warn("Error looking up formats supported by ImageMagick: {}", t.getMessage());
-      formatDecetionSupported = false;
+      formatDetectionSupported = false;
       logger.info("ImageMagick format lookup failed, assuming support for all formats");
       return true;
     }
