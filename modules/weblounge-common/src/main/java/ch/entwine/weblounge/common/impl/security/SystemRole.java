@@ -38,6 +38,7 @@ public final class SystemRole extends RoleImpl {
   public static final Role GUEST = new SystemRole("guest", "Guest");
 
   /** Editor */
+  // FIXME: The editor role should *not* include GUEST.
   public static final Role EDITOR = new SystemRole("editor", GUEST, "Editor");
 
   /** Publisher */

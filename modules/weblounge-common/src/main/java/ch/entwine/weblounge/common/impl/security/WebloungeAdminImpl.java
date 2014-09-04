@@ -41,12 +41,18 @@ public final class WebloungeAdminImpl extends UserImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.entwine.weblounge.common.impl.security.UserImpl#setRealm(java.lang.String)
    */
   @Override
   public void setRealm(String realm) {
     throw new UnsupportedOperationException("The admin user realm cannot be changed");
+  }
+
+  @Override
+  public boolean implies(Authority authority) {
+    // The system administrator should have all authorities by default
+    return true;
   }
 
 }
