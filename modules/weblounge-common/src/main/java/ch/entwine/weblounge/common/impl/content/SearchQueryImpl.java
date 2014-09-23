@@ -181,10 +181,10 @@ public class SearchQueryImpl implements SearchQuery {
   protected String filter = null;
 
   /** The query offset */
-  protected int offset = -1;
+  protected int offset = 0;
 
   /** The query limit */
-  protected int limit = -1;
+  protected int limit = 10;
 
   /** The required actions */
   protected List<Action> actions = new ArrayList<Action>();
@@ -304,6 +304,9 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withLimit(int)
    */
   public SearchQuery withLimit(int limit) {
+    if (limit < 1)
+      throw new IllegalArgumentException("The limit must not be less then 1");
+
     this.limit = limit;
     return this;
   }
@@ -323,7 +326,10 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withOffset(int)
    */
   public SearchQuery withOffset(int offset) {
-    this.offset = Math.max(0, offset);
+    if (offset < 0)
+      throw new IllegalArgumentException("The offset must not be less than 0");
+    
+    this.offset = offset;
     return this;
   }
 
