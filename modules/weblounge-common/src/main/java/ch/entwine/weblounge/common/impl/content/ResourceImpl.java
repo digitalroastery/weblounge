@@ -545,6 +545,16 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     }
     securityCtx.setOwner(owner);
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    return securityCtx.isDefaultAccess();
+  }
 
   /**
    * Sets the order of evaluation for access control lists.

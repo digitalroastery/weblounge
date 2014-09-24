@@ -73,6 +73,16 @@ public class SecuredObject implements Securable {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    return securityCtx.isDefaultAccess();
+  }
+
+  /**
    * Sets the order in which to evaluate allow and deny access rules.
    * 
    * @param order

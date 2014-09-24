@@ -941,6 +941,18 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    if (!isHeaderLoaded)
+      loadFileHeader();
+    return file.isDefaultAccess();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
    */
   @Override

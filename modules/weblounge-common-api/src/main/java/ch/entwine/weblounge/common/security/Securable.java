@@ -49,6 +49,16 @@ public interface Securable {
   User getOwner();
 
   /**
+   * Returns <code>true</code> if the access rules enforced by this
+   * {@link Securable} represent the default set of rules, i. e. the
+   * {@link Securable} does not define any custom access rules of its own.
+   * 
+   * @return <code>true</code> if this object is secured by the default rather
+   *         than a custom set of access rules
+   */
+  boolean isDefaultAccess();
+
+  /**
    * Sets the {@link Order} in which allow and deny rules are to be evaluated.
    * 
    * @param order

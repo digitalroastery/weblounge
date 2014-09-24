@@ -21,6 +21,9 @@
 package ch.entwine.weblounge.taglib.content;
 
 import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
+import static ch.entwine.weblounge.common.impl.request.RequestUtils.isPrecompileRequest;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.trim;
 
 import ch.entwine.weblounge.common.content.PageSearchResultItem;
 import ch.entwine.weblounge.common.content.Resource;
@@ -35,12 +38,15 @@ import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.security.SecurablePermission;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.security.SystemAction;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -309,11 +315,11 @@ public class PageListTag extends WebloungeTag {
     Page page = null;
     WebUrl url = null;
 
-    // Look for the next header
-    while (!found && index < pages.getItems().length) {
-      SearchResultItem candidateItem = pages.getItems()[index];
-      if (!(candidateItem instanceof PageSearchResultItem)) {
-        index++;
+    User user = SecurityUtils.getUser();
+
+    // Finally Load the pages
+    for (SearchResultItem item : repository.find(query).getItems()) {
+      if (!(item instanceof PageSearchResultItem)) {
         continue;
       }
       item = (PageSearchResultItem) candidateItem;
@@ -322,8 +328,22 @@ public class PageListTag extends WebloungeTag {
       url = item.getUrl();
       page = item.getPage();
 
+      pageItem = (PageSearchResultItem) item;
+      page = pageItem.getPage();
+
       // Check access to this resource
       if (System.getSecurityManager() != null) {
+
+        // Hide pages with no access rules
+        if (page.isDefaultAccess()) {
+          logger.debug("Resource {} has default access", page);
+          if (!SecurityUtils.userHasRole(user, SystemRole.SYSTEMADMIN)) {
+            logger.debug("Access to unsecured resource {} denied for '{}'", page, request.getUser());
+            continue;
+          }
+        }
+
+        // Hide pages that the current user does not allow access to
         try {
           SecurablePermission permission = new SecurablePermission(page, SystemAction.READ);
           System.getSecurityManager().checkPermission(permission);

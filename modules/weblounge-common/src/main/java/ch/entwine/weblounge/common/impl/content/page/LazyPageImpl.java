@@ -1190,6 +1190,18 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.isDefaultAccess();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
    */
   @Override

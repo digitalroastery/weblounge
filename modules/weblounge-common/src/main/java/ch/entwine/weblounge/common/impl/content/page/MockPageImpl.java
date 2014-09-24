@@ -799,6 +799,16 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
    */
   @Override

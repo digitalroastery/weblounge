@@ -112,6 +112,16 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Secu
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    return aclAllow.isEmpty() && aclDeny.isEmpty();
+  }
+
+  /**
    * Sets the order in which to evaluate allow and deny access rules.
    * 
    * @param order

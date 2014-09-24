@@ -937,6 +937,18 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    if (!isHeaderLoaded)
+      loadAudioVisualHeader();
+    return audioVisual.isDefaultAccess();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
    */
   @Override

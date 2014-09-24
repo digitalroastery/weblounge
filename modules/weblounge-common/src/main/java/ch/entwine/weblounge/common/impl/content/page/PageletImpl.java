@@ -282,6 +282,16 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    return securityCtx.isDefaultAccess();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
    */
   @Override
