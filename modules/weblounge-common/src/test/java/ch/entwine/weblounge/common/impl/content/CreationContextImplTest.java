@@ -91,6 +91,19 @@ public class CreationContextImplTest {
     calendar.set(Calendar.MILLISECOND, 0);
     assertTrue(calendar.getTime().equals(ctx.getCreationDate()));
   }
+  
+  /** Test method for {@link CreationContext#setCreationDate(Date)} */
+  @Test(expected = NullPointerException.class)
+  public void testSetCreationDateWithNull() throws Exception {
+    ctx.setCreationDate(null);
+  }
+  
+  /** Test method for {@link CreationContext#setCreated(User, Date)} */
+  @Test(expected = NullPointerException.class)
+  public void testSetCreatedWithNullDate() throws Exception {
+    User u = new UserImpl("james", "testland");
+    ctx.setCreated(u, null);
+  }
 
   /**
    * Test method for
