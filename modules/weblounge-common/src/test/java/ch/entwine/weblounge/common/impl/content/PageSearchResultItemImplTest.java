@@ -36,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +63,9 @@ public class PageSearchResultItemImplTest extends SearchResultItemImplTest {
   public void setUp() throws Exception {
     setUpPrerequisites();
     metadata = new ArrayList<ResourceMetadata<?>>();
-    pageXml = IOUtils.toString(getClass().getResourceAsStream("/page.xml"));
+    try (InputStream is = getClass().getResourceAsStream("/page.xml")) {
+      pageXml = IOUtils.toString(is);
+    }
     ResourceURI uri = new PageURIImpl(site, path, id, Resource.LIVE);
     pageItem = new PageSearchResultItemImpl(uri, url, relevance, source, metadata);
     item = pageItem;
