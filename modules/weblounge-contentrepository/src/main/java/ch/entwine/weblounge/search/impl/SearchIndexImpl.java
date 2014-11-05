@@ -42,6 +42,7 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.search.SearchIndex;
+import ch.entwine.weblounge.common.security.Securable.Order;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchDocument;
@@ -440,6 +441,10 @@ public class SearchIndexImpl implements SearchIndex {
       } catch (IOException e) {
         throw new ContentRepositoryException(e);
       }
+    }
+    
+    if (Order.DenyAllow.equals(resource.getAllowDenyOrder())) {
+      throw new UnsupportedOperationException("The index does not (yet) support resources with DENY-ALLOW ACL order");
     }
 
     // Have the serializer create an input document

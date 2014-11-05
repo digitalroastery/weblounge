@@ -149,7 +149,7 @@ public class SearchIndexAccessControlTest {
    * Make sure no-one can access a resource that does not have an ACL but its
    * order set to {@link Order#DenyAllow}.
    */
-  @Test
+  @Test(expected = UnsupportedOperationException.class)
   public void testDenyAllowWithoutAcl() throws Exception {
     idx.add(pageDenyAllow);
 
@@ -183,7 +183,7 @@ public class SearchIndexAccessControlTest {
    * accessible to a user having the role in the allow-rule but NOT having the
    * role of the deny-rule.
    */
-  @Test
+  @Test(expected = UnsupportedOperationException.class)
   public void testDenyAllowOneAllowOneDeny() throws Exception {
     pageDenyAllow.addAccessRule(ROLE_STUDENT_ALLOW_READ);
     pageDenyAllow.addAccessRule(ROLE_TEACHER_DENY_READ);
@@ -218,7 +218,7 @@ public class SearchIndexAccessControlTest {
    * rule should be allowed to access the resource. There is not difference
    * between {@link Order#AllowDeny} and {@value Order#DenyAllow}.
    */
-  @Test
+  @Test(expected = UnsupportedOperationException.class)
   public void testDenyAllowOneAllow() throws Exception {
     pageDenyAllow.addAccessRule(ROLE_STUDENT_ALLOW_READ);
     idx.add(pageDenyAllow);
@@ -252,7 +252,7 @@ public class SearchIndexAccessControlTest {
    * must be prevented to access the resource. There is not difference between
    * {@link Order#AllowDeny} and {@value Order#DenyAllow}.
    */
-  @Test
+  @Test(expected = UnsupportedOperationException.class)
   public void testDenyAllowOneDeny() throws Exception {
     pageDenyAllow.addAccessRule(ROLE_STUDENT_DENY_READ);
     idx.add(pageDenyAllow);
@@ -287,7 +287,7 @@ public class SearchIndexAccessControlTest {
    * matching a allow rule must be allowed to access the resource. There is not
    * difference between {@link Order#AllowDeny} and {@value Order#DenyAllow}.
    */
-  @Test
+  @Test(expected = UnsupportedOperationException.class)
   public void testDenyAllowTwoAllow() throws Exception {
     pageDenyAllow.addAccessRule(ROLE_STUDENT_ALLOW_READ);
     pageDenyAllow.addAccessRule(ROLE_TEACHER_ALLOW_READ);
@@ -323,7 +323,7 @@ public class SearchIndexAccessControlTest {
    * matching a allow rule must be prevented to access the resource. There is
    * not difference between {@link Order#AllowDeny} and {@value Order#DenyAllow}
    */
-  @Test
+  @Test(expected = UnsupportedOperationException.class)
   public void testDenyAllowTwoDeny() throws Exception {
     pageDenyAllow.addAccessRule(ROLE_STUDENT_DENY_READ);
     pageDenyAllow.addAccessRule(ROLE_TEACHER_DENY_READ);
