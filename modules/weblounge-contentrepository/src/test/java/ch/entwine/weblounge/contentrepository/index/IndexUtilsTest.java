@@ -20,8 +20,11 @@
 
 package ch.entwine.weblounge.contentrepository.index;
 
+import static org.junit.Assert.assertNull;
+
 import static org.junit.Assert.assertEquals;
 
+import ch.entwine.weblounge.common.impl.security.RoleImpl;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.search.impl.IndexUtils;
@@ -96,6 +99,14 @@ public class IndexUtilsTest {
   public void testSerializeUser() {
     User user = new WebloungeUserImpl("heiri");
     assertEquals("heiri", IndexUtils.serializeUserId(user));
+  }
+  
+  /** Test method for {@link IndexUtils#serializeAuthority(ch.entwine.weblounge.common.security.Authority)} */
+  @Test
+  public void testSerializeAuthority() {
+    assertNull(IndexUtils.serializeAuthority(null));
+    assertEquals("weblounge:tom", IndexUtils.serializeAuthority(new WebloungeUserImpl("tom")));
+    assertEquals("bigsite:vip", IndexUtils.serializeAuthority(new RoleImpl("bigsite", "vip")));
   }
 
 }

@@ -20,10 +20,17 @@
 
 package ch.entwine.weblounge.search.impl;
 
+import static ch.entwine.weblounge.common.impl.util.Errors.notImplemented;
+import static ch.entwine.weblounge.common.impl.util.Errors.unexpectedMatch;
+import static java.util.Objects.requireNonNull;
+
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.Rule;
+import ch.entwine.weblounge.common.security.Securable.Order;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -96,6 +103,35 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
    */
   protected String getLocalizedFieldName(String fieldName, Language language) {
     return MessageFormat.format(fieldName, language.getIdentifier());
+  }
+
+  /**
+   * Returns the name of an index field in which the access information for a
+   * given {@link AccessRule} and a specific {@link Order} should be put into.
+   * 
+   * @param order
+   *          the allow-deny order
+   * @param rule
+   *          the access rule
+   * @return the field name
+   */
+  protected final String getAccessRuleFieldName(Order order, AccessRule rule) {
+    requireNonNull(order);
+    requireNonNull(rule);
+
+    if (Order.AllowDeny.equals(order)) {
+      if (Rule.Allow.equals(rule.getRule())) {
+        return MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, rule.getAction().getIdentifier());
+      } else if (Rule.Deny.equals(rule.getRule())) {
+        return MessageFormat.format(IndexSchema.ALLOWDENY_DENY_BY_ACTION, rule.getAction().getIdentifier());
+      } else {
+        return unexpectedMatch();
+      }
+    } else if (Order.DenyAllow.equals(order)) {
+      return notImplemented("Deny-Allow order is not yet supported");
+    } else {
+      return unexpectedMatch();
+    }
   }
 
   /**

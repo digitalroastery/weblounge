@@ -50,10 +50,10 @@ public interface IndexSchema {
   String SUBJECT = "subjects";
 
   /** Granted permissions field name */
-  String GRANTED_PERMISSION = "granted_permissions";
+  String ALLOWDENY_ALLOW_BY_ACTION = "allowdeny_allow_{0}";
 
   /** Denied permissions field name */
-  String DENIED_PERMISSION = "denied_permissions";
+  String ALLOWDENY_DENY_BY_ACTION = "allowdeny_deny_{0}";
 
   /** Template field name */
   String TEMPLATE = "template";
