@@ -294,11 +294,16 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     }
 
     // Access rights
+    // -------------
+    // Take all required actions of the query into account for building the
+    // request
     for (Action action : query.getActions()) {
       actions.add(action.getContext() + action.getIdentifier());
     }
-
+    // Make sure we always check for the 'any'-authority
     authorities.add(SystemAuthorities.ANY.getAuthorityId());
+    // Take all other authorities of the current user into account for building
+    // the request
     for (Role role : SecurityUtils.getRoles(SecurityUtils.getUser())) {
       authorities.add(role.getAuthorityId());
     }
@@ -532,19 +537,17 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     QueryBuilder unfilteredQuery = queryBuilder;
     List<FilterBuilder> filters = new ArrayList<FilterBuilder>();
 
-    // Access conrol
+    // Access control
+    // --------------
+    // Build general access control filter which may consists of many of several
+    // filters combined by logical AND
     boolean filterByAccessControl = false;
     AndFilterBuilder actionsFilter = new AndFilterBuilder();
 
+    // Add filter for each action to check if the user's authorities are part of
+    // it
     for (String action : actions) {
-      TermsFilterBuilder allow = new TermsFilterBuilder(MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, action), authorities);
-      TermsFilterBuilder deny = new TermsFilterBuilder(MessageFormat.format(IndexSchema.ALLOWDENY_DENY_BY_ACTION, action), authorities);
-
-      OrFilterBuilder actionFilter = new OrFilterBuilder();
-      actionFilter.add(allow);
-      actionFilter.add(new NotFilterBuilder(deny));
-
-      actionsFilter.add(actionFilter);
+      actionsFilter.add(new TermsFilterBuilder(MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, action), authorities));
       filterByAccessControl = true;
     }
     if (filterByAccessControl)
