@@ -73,7 +73,7 @@ public class PageInputDocumentTest {
     assertEquals(page.getURI().getType(), metadata.get(IndexSchema.TYPE).getValue());
     assertEquals(page.getURI().getVersion(), metadata.get(IndexSchema.VERSION).getValue());
     
-    List<?> values = metadata.get("allowdeny_deny_read").getValues();
+    List<?> values = metadata.get("allowdeny_deny_webloungeread").getValues();
     assertEquals(1, values.size());
   }
 

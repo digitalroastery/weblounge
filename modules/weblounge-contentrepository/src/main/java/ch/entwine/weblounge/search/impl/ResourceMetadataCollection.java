@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Rule;
 import ch.entwine.weblounge.common.security.Securable.Order;
 
@@ -120,10 +121,11 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
     requireNonNull(rule);
 
     if (Order.AllowDeny.equals(order)) {
+      final Action action = rule.getAction();
       if (Rule.Allow.equals(rule.getRule())) {
-        return MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, rule.getAction().getIdentifier());
+        return MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, action.getContext() + action.getIdentifier());
       } else if (Rule.Deny.equals(rule.getRule())) {
-        return MessageFormat.format(IndexSchema.ALLOWDENY_DENY_BY_ACTION, rule.getAction().getIdentifier());
+        return MessageFormat.format(IndexSchema.ALLOWDENY_DENY_BY_ACTION, action.getContext() + action.getIdentifier());
       } else {
         return unexpectedMatch();
       }
