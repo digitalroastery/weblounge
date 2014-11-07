@@ -28,14 +28,17 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.security.AccessRuleImpl;
+import ch.entwine.weblounge.common.impl.security.AllowAllAccessRule;
+import ch.entwine.weblounge.common.impl.security.DenyAllAccessRule;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.entwine.weblounge.common.impl.site.SiteImpl;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.Rule;
 import ch.entwine.weblounge.common.security.Securable.Order;
-import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -45,7 +48,6 @@ import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
-import ch.entwine.weblounge.kernel.security.WebloungeSecurityUtils;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 
 import org.junit.Before;
@@ -73,6 +75,8 @@ public class SearchIndexAccessControlTest {
   private static final Role ROLE_TEACHER = new RoleImpl("weblounge:teacher");
 
   /* the access rules */
+  private static final AccessRule ALL_ALLOW_READ = new AllowAllAccessRule(SystemAction.READ);
+  private static final AccessRule ALL_DENY_READ = new DenyAllAccessRule(SystemAction.READ);
   private static final AccessRule ROLE_STUDENT_ALLOW_READ = new AccessRuleImpl(ROLE_STUDENT, SystemAction.READ, Rule.Allow);
   private static final AccessRule ROLE_STUDENT_DENY_READ = new AccessRuleImpl(ROLE_STUDENT, SystemAction.READ, Rule.Deny);
   private static final AccessRule ROLE_TEACHER_ALLOW_READ = new AccessRuleImpl(ROLE_TEACHER, SystemAction.READ, Rule.Allow);
@@ -98,7 +102,7 @@ public class SearchIndexAccessControlTest {
     site = new SiteImpl();
     site.setIdentifier("test");
 
-    q = new SearchQueryImpl(site).withAction(SystemAction.READ);
+    q = new SearchQueryImpl(site).withAction(SystemAction.READ).withTypes(Page.TYPE);
 
     // Resource serializer
     ResourceSerializerServiceImpl serializer = new ResourceSerializerServiceImpl();
@@ -130,12 +134,26 @@ public class SearchIndexAccessControlTest {
     }
   }
 
-  /**
-   * Make sure each and every user can access a resource without an ACL and the
-   * order set to {@link Order#AllowDeny}.
-   */
+  // ##########################################################################
+  // Unit tests for resources with Allow-Deny order
+  // ##########################################################################
+
+  /** Unit test for test case A.01 */
   @Test
   public void testAllowDenyWithoutAcl() throws Exception {
+    idx.add(pageAllowDeny);
+
+    boolean[] accessDecisions = getAccessDecisionsForUsers(q);
+    assertFalse(accessDecisions[0]);
+    assertFalse(accessDecisions[1]);
+    assertFalse(accessDecisions[2]);
+    assertFalse(accessDecisions[3]);
+  }
+
+  /** Unit test for test case A.02 */
+  @Test
+  public void testAllowDenyAllowAll() throws Exception {
+    pageAllowDeny.addAccessRule(ALL_ALLOW_READ);
     idx.add(pageAllowDeny);
 
     boolean[] accessDecisions = getAccessDecisionsForUsers(q);
@@ -145,62 +163,7 @@ public class SearchIndexAccessControlTest {
     assertTrue(accessDecisions[3]);
   }
 
-  /**
-   * Make sure no-one can access a resource that does not have an ACL but its
-   * order set to {@link Order#DenyAllow}.
-   */
-  @Test(expected = UnsupportedOperationException.class)
-  public void testDenyAllowWithoutAcl() throws Exception {
-    idx.add(pageDenyAllow);
-
-    boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertFalse(accessDecisions[0]);
-    assertFalse(accessDecisions[1]);
-    assertFalse(accessDecisions[2]);
-    assertFalse(accessDecisions[3]);
-  }
-
-  /**
-   * A resource with an allow- as well as a deny-rule and
-   * {@link Order#AllowDeny} must be returned to a user with a role matching the
-   * allow-rule regardless if the user also owns the role of the deny-rule.
-   */
-  @Test
-  public void testAllowDenyOneAllowOneDeny() throws Exception {
-    pageAllowDeny.addAccessRule(ROLE_STUDENT_ALLOW_READ);
-    pageAllowDeny.addAccessRule(ROLE_TEACHER_DENY_READ);
-    idx.add(pageAllowDeny);
-
-    boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertFalse(accessDecisions[0]);
-    assertTrue(accessDecisions[1]);
-    assertFalse(accessDecisions[2]);
-    assertTrue(accessDecisions[3]);
-  }
-
-  /**
-   * If the order is set to {@link Order#DenyAllow} a resource must only be
-   * accessible to a user having the role in the allow-rule but NOT having the
-   * role of the deny-rule.
-   */
-  @Test(expected = UnsupportedOperationException.class)
-  public void testDenyAllowOneAllowOneDeny() throws Exception {
-    pageDenyAllow.addAccessRule(ROLE_STUDENT_ALLOW_READ);
-    pageDenyAllow.addAccessRule(ROLE_TEACHER_DENY_READ);
-    idx.add(pageDenyAllow);
-
-    boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertFalse(accessDecisions[0]);
-    assertTrue(accessDecisions[1]);
-    assertFalse(accessDecisions[2]);
-    assertFalse(accessDecisions[3]);
-  }
-
-  /**
-   * If there is only one allow-rule, each user having the role in the allow
-   * rule should be allowed to access the resource. There is not difference
-   * between {@link Order#AllowDeny} and {@value Order#DenyAllow}.
-   */
+  /** Unit test for test case A.03 */
   @Test
   public void testAllowDenyOneAllow() throws Exception {
     pageAllowDeny.addAccessRule(ROLE_STUDENT_ALLOW_READ);
@@ -213,62 +176,7 @@ public class SearchIndexAccessControlTest {
     assertTrue(accessDecisions[3]);
   }
 
-  /**
-   * If there is only one allow-rule, each user having the role in the allow
-   * rule should be allowed to access the resource. There is not difference
-   * between {@link Order#AllowDeny} and {@value Order#DenyAllow}.
-   */
-  @Test(expected = UnsupportedOperationException.class)
-  public void testDenyAllowOneAllow() throws Exception {
-    pageDenyAllow.addAccessRule(ROLE_STUDENT_ALLOW_READ);
-    idx.add(pageDenyAllow);
-
-    boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertFalse(accessDecisions[0]);
-    assertTrue(accessDecisions[1]);
-    assertFalse(accessDecisions[2]);
-    assertTrue(accessDecisions[3]);
-  }
-
-  /**
-   * If there is only one deny-rule, each user having the role in the deny-rule
-   * must be prevented to access the resource.There is not difference between
-   * {@link Order#AllowDeny} and {@value Order#DenyAllow}.
-   */
-  @Test
-  public void testAllowDenyOneDeny() throws Exception {
-    pageAllowDeny.addAccessRule(ROLE_STUDENT_DENY_READ);
-    idx.add(pageAllowDeny);
-
-    boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertTrue(accessDecisions[0]);
-    assertFalse(accessDecisions[1]);
-    assertTrue(accessDecisions[2]);
-    assertFalse(accessDecisions[3]);
-  }
-
-  /**
-   * If there is only one deny-rule, each user having the role in the deny-rule
-   * must be prevented to access the resource. There is not difference between
-   * {@link Order#AllowDeny} and {@value Order#DenyAllow}.
-   */
-  @Test(expected = UnsupportedOperationException.class)
-  public void testDenyAllowOneDeny() throws Exception {
-    pageDenyAllow.addAccessRule(ROLE_STUDENT_DENY_READ);
-    idx.add(pageDenyAllow);
-
-    boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertTrue(accessDecisions[0]);
-    assertFalse(accessDecisions[1]);
-    assertTrue(accessDecisions[2]);
-    assertFalse(accessDecisions[3]);
-  }
-
-  /**
-   * If there are more than one allow-rules, each user having at least one role
-   * matching a allow rule must be allowed to access the resource. There is not
-   * difference between {@link Order#AllowDeny} and {@value Order#DenyAllow}.
-   */
+  /** Unit test for test case A.03 */
   @Test
   public void testAllowDenyTwoAllow() throws Exception {
     pageAllowDeny.addAccessRule(ROLE_STUDENT_ALLOW_READ);
@@ -281,48 +189,53 @@ public class SearchIndexAccessControlTest {
     assertTrue(accessDecisions[2]);
     assertTrue(accessDecisions[3]);
   }
+  
 
-  /**
-   * If there are more than one allow-rules, each user having at least one role
-   * matching a allow rule must be allowed to access the resource. There is not
-   * difference between {@link Order#AllowDeny} and {@value Order#DenyAllow}.
-   */
+  
+  // ##########################################################################
+  // Unit tests for resources with Deny-Allow order
+  // ##########################################################################
+  
+
+  /** Unit test for test case D.01 */
   @Test(expected = UnsupportedOperationException.class)
-  public void testDenyAllowTwoAllow() throws Exception {
-    pageDenyAllow.addAccessRule(ROLE_STUDENT_ALLOW_READ);
-    pageDenyAllow.addAccessRule(ROLE_TEACHER_ALLOW_READ);
+  public void testDenyAllowWithoutAcl() throws Exception {
     idx.add(pageDenyAllow);
 
     boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertFalse(accessDecisions[0]);
+    assertTrue(accessDecisions[0]);
     assertTrue(accessDecisions[1]);
     assertTrue(accessDecisions[2]);
     assertTrue(accessDecisions[3]);
   }
-
-  /**
-   * If there are more than one deny-rules, each user having at least one role
-   * matching a allow rule must be prevented to access the resource. There is
-   * not difference between {@link Order#AllowDeny} and {@value Order#DenyAllow}
-   */
-  @Test
-  public void testAllowDenyTwoDeny() throws Exception {
-    pageAllowDeny.addAccessRule(ROLE_STUDENT_DENY_READ);
-    pageAllowDeny.addAccessRule(ROLE_TEACHER_DENY_READ);
-    idx.add(pageAllowDeny);
-
+ 
+  /** Unit test for test case D.02 */
+  @Test(expected = UnsupportedOperationException.class)
+  public void testDenyAllowDenyAll() throws Exception {
+    pageDenyAllow.addAccessRule(ALL_DENY_READ);
+    idx.add(pageDenyAllow);
+    
     boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertTrue(accessDecisions[0]);
+    assertFalse(accessDecisions[0]);
     assertFalse(accessDecisions[1]);
     assertFalse(accessDecisions[2]);
     assertFalse(accessDecisions[3]);
   }
 
-  /**
-   * If there are more than one deny-rules, each user having at least one role
-   * matching a allow rule must be prevented to access the resource. There is
-   * not difference between {@link Order#AllowDeny} and {@value Order#DenyAllow}
-   */
+  /** Unit test for test case D.03 */
+  @Test(expected = UnsupportedOperationException.class)
+  public void testDenyAllowOneDeny() throws Exception {
+    pageDenyAllow.addAccessRule(ROLE_STUDENT_DENY_READ);
+    idx.add(pageDenyAllow);
+
+    boolean[] accessDecisions = getAccessDecisionsForUsers(q);
+    assertTrue(accessDecisions[0]);
+    assertFalse(accessDecisions[1]);
+    assertTrue(accessDecisions[2]);
+    assertFalse(accessDecisions[3]);
+  }
+
+  /** Unit test for test case D.04 */
   @Test(expected = UnsupportedOperationException.class)
   public void testDenyAllowTwoDeny() throws Exception {
     pageDenyAllow.addAccessRule(ROLE_STUDENT_DENY_READ);
@@ -330,7 +243,7 @@ public class SearchIndexAccessControlTest {
     idx.add(pageDenyAllow);
 
     boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertFalse(accessDecisions[0]);
+    assertTrue(accessDecisions[0]);
     assertFalse(accessDecisions[1]);
     assertFalse(accessDecisions[2]);
     assertFalse(accessDecisions[3]);
@@ -349,12 +262,14 @@ public class SearchIndexAccessControlTest {
    */
   private SearchResult runQueryWithUser(User user, SearchQuery q)
       throws ContentRepositoryException {
-    final User originalUser = WebloungeSecurityUtils.getUser();
+    SecurityUtils.setConfigured(true);
+    final User originalUser = SecurityUtils.getUser();
     try {
-      WebloungeSecurityUtils.setUser(user);
+      SecurityUtils.setUser(user);
       return idx.getByQuery(q);
     } finally {
-      WebloungeSecurityUtils.setUser(originalUser);
+      SecurityUtils.setUser(originalUser);
+      SecurityUtils.setConfigured(false);
     }
   }
 
