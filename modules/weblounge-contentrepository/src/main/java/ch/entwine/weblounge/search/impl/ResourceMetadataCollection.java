@@ -28,7 +28,6 @@ import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.security.AccessRule;
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Rule;
 import ch.entwine.weblounge.common.security.Securable.Order;
@@ -113,18 +112,20 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
    * @param order
    *          the allow-deny order
    * @param rule
-   *          the access rule
+   *          the rule (allow, deny)
+   * @param action
+   *          the action
    * @return the field name
    */
-  protected final String getAccessRuleFieldName(Order order, AccessRule rule) {
+  protected final String getAccessRuleFieldName(final Order order,
+      final Rule rule, final Action action) {
     requireNonNull(order);
     requireNonNull(rule);
 
     if (Order.AllowDeny.equals(order)) {
-      final Action action = rule.getAction();
-      if (Rule.Allow.equals(rule.getRule())) {
+      if (Rule.Allow.equals(rule)) {
         return MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, action.getContext() + action.getIdentifier());
-      } else if (Rule.Deny.equals(rule.getRule())) {
+      } else if (Rule.Deny.equals(rule)) {
         return MessageFormat.format(IndexSchema.ALLOWDENY_DENY_BY_ACTION, action.getContext() + action.getIdentifier());
       } else {
         return unexpectedMatch();

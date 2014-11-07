@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.search.impl;
 
+import static ch.entwine.weblounge.common.impl.util.Errors.unexpectedMatch;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_CREATED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_CREATED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_EXTERNAL_REPRESENTATION;
@@ -65,16 +66,25 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.XML;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.impl.security.SystemAuthorities;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Rule;
+import ch.entwine.weblounge.common.security.Securable.Order;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
  * posting weblounge resources to solr.
  */
 public class ResourceInputDocument extends ResourceMetadataCollection {
+  
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(ResourceInputDocument.class);
 
   /**
    * Populates this input document with the resource data.
@@ -95,8 +105,32 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     addField(VERSION, uri.getVersion(), false, false);
 
     // Access by roles
+    final Order order = resource.getAllowDenyOrder();
     for (AccessRule access : resource.getAccessRules()) {
-      addField(getAccessRuleFieldName(resource.getAllowDenyOrder(), access), IndexUtils.serializeAuthority(access.getAuthority()), false, false);
+      if (Order.AllowDeny.equals(order)) {
+        if (Rule.Deny.equals(access.getRule())) {
+          logger.error("Resource '{}' has allow-deny order '{}' and contains illegal access rule '{}' - the access rule is not added!", new Object[] {resource, order, access});
+        } else {
+          addField(getAccessRuleFieldName(order, Rule.Allow, access.getAction()), IndexUtils.serializeAuthority(access.getAuthority()), false, false);
+        }
+      } else if (Order.DenyAllow.equals(order)) {
+        if (Rule.Deny.equals(access.getRule())) {
+          logger.error("Resource '{}' has allow-deny order '{}' and contains illegal access rule '{}' - the access rule is not added!", new Object[] {resource, order, access});
+        } else {
+          addField(getAccessRuleFieldName(order, Rule.Deny, access.getAction()), IndexUtils.serializeAuthority(access.getAuthority()), false, false);
+        }
+      } else {
+        unexpectedMatch();
+      }
+    }
+    for (Action action : resource.getActions()) {
+      if (Order.AllowDeny.equals(order)) {
+        addField(getAccessRuleFieldName(order, Rule.Deny, action), IndexUtils.serializeAuthority(SystemAuthorities.ANY), false, false);
+      } else if (Order.DenyAllow.equals(order)) {
+        addField(getAccessRuleFieldName(order, Rule.Allow, action), IndexUtils.serializeAuthority(SystemAuthorities.ANY), false, false);
+      } else {
+        unexpectedMatch();
+      }
     }
 
     // Path elements
@@ -187,5 +221,4 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     }
 
   }
-
 }
