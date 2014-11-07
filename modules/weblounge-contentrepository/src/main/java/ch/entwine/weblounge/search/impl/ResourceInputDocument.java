@@ -82,7 +82,7 @@ import org.slf4j.LoggerFactory;
  * posting weblounge resources to solr.
  */
 public class ResourceInputDocument extends ResourceMetadataCollection {
-  
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ResourceInputDocument.class);
 
@@ -107,20 +107,32 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     // Access by roles
     final Order order = resource.getAllowDenyOrder();
     for (AccessRule access : resource.getAccessRules()) {
-      if (Order.AllowDeny.equals(order)) {
-        if (Rule.Deny.equals(access.getRule())) {
-          logger.error("Resource '{}' has allow-deny order '{}' and contains illegal access rule '{}' - the access rule is not added!", new Object[] {resource, order, access});
-        } else {
-          addField(getAccessRuleFieldName(order, Rule.Allow, access.getAction()), IndexUtils.serializeAuthority(access.getAuthority()), false, false);
+      switch (order) {
+        case AllowDeny: {
+          if (Rule.Deny.equals(access.getRule())) {
+            logger.error("Resource '{}' has allow-deny order '{}' and contains illegal access rule '{}' - the access rule is not added!", new Object[] {
+                resource,
+                order,
+                access });
+          } else {
+            addField(getAccessRuleFieldName(order, Rule.Allow, access.getAction()), IndexUtils.serializeAuthority(access.getAuthority()), false, false);
+          }
+          break;
         }
-      } else if (Order.DenyAllow.equals(order)) {
-        if (Rule.Deny.equals(access.getRule())) {
-          logger.error("Resource '{}' has allow-deny order '{}' and contains illegal access rule '{}' - the access rule is not added!", new Object[] {resource, order, access});
-        } else {
-          addField(getAccessRuleFieldName(order, Rule.Deny, access.getAction()), IndexUtils.serializeAuthority(access.getAuthority()), false, false);
+        case DenyAllow: {
+          if (Rule.Deny.equals(access.getRule())) {
+            logger.error("Resource '{}' has allow-deny order '{}' and contains illegal access rule '{}' - the access rule is not added!", new Object[] {
+                resource,
+                order,
+                access });
+          } else {
+            addField(getAccessRuleFieldName(order, Rule.Deny, access.getAction()), IndexUtils.serializeAuthority(access.getAuthority()), false, false);
+          }
+          break;
         }
-      } else {
-        unexpectedMatch();
+        default: {
+          unexpectedMatch();
+        }
       }
     }
     for (Action action : resource.getActions()) {
