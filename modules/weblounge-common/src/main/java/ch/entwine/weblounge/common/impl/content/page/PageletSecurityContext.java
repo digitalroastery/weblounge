@@ -42,7 +42,6 @@ public class PageletSecurityContext extends SecurityContextImpl {
    * Adds the default authorities to their respective actions.
    */
   private void addDefaultValues() {
-    allowDefault(SystemAction.READ, SystemRole.GUEST);
     allowDefault(SystemAction.WRITE, SystemRole.EDITOR);
     allowDefault(SystemAction.MANAGE, SystemRole.EDITOR);
     allowDefault(SystemAction.PUBLISH, SystemRole.PUBLISHER);
