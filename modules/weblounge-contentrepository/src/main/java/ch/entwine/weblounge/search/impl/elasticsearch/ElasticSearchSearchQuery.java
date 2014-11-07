@@ -58,6 +58,10 @@ import ch.entwine.weblounge.common.content.SearchTerms;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
+import ch.entwine.weblounge.common.impl.security.SystemAuthorities;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.search.impl.IndexSchema;
 import ch.entwine.weblounge.search.impl.IndexUtils;
@@ -66,16 +70,20 @@ import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.AndFilterBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.FuzzyLikeThisQueryBuilder;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.NotFilterBuilder;
+import org.elasticsearch.index.query.OrFilterBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilderException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermsFilterBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +106,15 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ElasticSearchSearchQuery.class);
+
+  /** The access control actions to check for */
+  private Set<String> actions = new HashSet<>();;
+
+  /**
+   * The set of authorities against which the access control lists have to be
+   * checked
+   */
+  private Set<String> authorities = new HashSet<>();;
 
   /** Term queries on fields */
   private Map<String, Set<Object>> searchTerms = null;
@@ -277,53 +294,14 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     }
 
     // Access rights
-//    if (query.getActions().length > 1) {
-//      User user = SecurityUtils.getUser();
-//      Role[] roles = SecurityUtils.getRoles(user);
-//
-//      // The way this works is as follows: For every action that was supplied,
-//      // the requesting user must either be the resource owner or the site
-//      // administrator and/or have a matching role with the corresponding
-//      // applicable action.
-//
-//      for (Action action : query.getActions()) {
-//        List<String> permissions = new ArrayList<String>();
-//
-//        // Access by the owner of the resource
-//        permissions.add(IndexUtils.serializeOwnerAccess(user));
-//
-//        // Access as the user
-//        permissions.add(IndexUtils.serializeUserAccess(user, action));
-//
-//        // Access by role owners
-//        for (Role role : roles) {
-//          permissions.add(IndexUtils.serializeRoleAccess(role, action));
-//        }
-//
-//        // Access if all actions of the given context are allowed
-//        permissions.add(IndexUtils.serializeAuthorityAccess(SystemAuthorities.ANY, new AnyAction(action.getContext())));
-//
-//        // Access if all actions of any context are allowed
-//        permissions.add(IndexUtils.serializeAuthorityAccess(SystemAuthorities.ANY, SystemAction.ANY));
-//
-//        if (groups == null)
-//          groups = new ArrayList<ValueGroup>();
-//
-//        groups.add(new ValueGroup(GRANTED_PERMISSION, (Object[]) permissions.toArray(new String[permissions.size()])));
-//        groups.add(new ValueGroup(DENIED_PERMISSION, (Object[]) permissions.toArray(new String[permissions.size()])));
-//
-//      }
-//    }
+    for (Action action : query.getActions()) {
+      actions.add(action.getContext() + action.getIdentifier());
+    }
 
-    // Pagelet elements
-    // for (Map.Entry<String, String> entry : query.getElements().entrySet()) {
-    // TODO: Language?
-    // solrQuery.append(" ").append(PAGELET_CONTENTS).append(":");
-    // solrQuery.append("\"").append(entry.getKey()).append("=\"");
-    // for (String contentValue : StringUtils.split(entry.getValue())) {
-    // solrQuery.append(" \"").append(IndexUtils.clean(contentValue)).append("\"");
-    // }
-    // }
+    authorities.add(SystemAuthorities.ANY.getAuthorityId());
+    for (Role role : SecurityUtils.getRoles(SecurityUtils.getUser())) {
+      authorities.add(role.getAuthorityId());
+    }
 
     // Pagelet properties
     for (Map.Entry<String, String> entry : query.getProperties().entrySet()) {
@@ -553,6 +531,24 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     QueryBuilder unfilteredQuery = queryBuilder;
     List<FilterBuilder> filters = new ArrayList<FilterBuilder>();
+
+    // Access conrol
+    boolean filterByAccessControl = false;
+    AndFilterBuilder actionsFilter = new AndFilterBuilder();
+
+    for (String action : actions) {
+      TermsFilterBuilder allow = new TermsFilterBuilder(MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, action), authorities);
+      TermsFilterBuilder deny = new TermsFilterBuilder(MessageFormat.format(IndexSchema.ALLOWDENY_DENY_BY_ACTION, action), authorities);
+
+      OrFilterBuilder actionFilter = new OrFilterBuilder();
+      actionFilter.add(allow);
+      actionFilter.add(new NotFilterBuilder(deny));
+
+      actionsFilter.add(actionFilter);
+      filterByAccessControl = true;
+    }
+    if (filterByAccessControl)
+      filters.add(actionsFilter);
 
     // Add filtering for AND terms
     if (groups != null) {
