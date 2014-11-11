@@ -68,13 +68,6 @@
                  }
              },
              {
-             "allowdeny_deny_template" : {
-                 "match" : "allowdeny_deny_*",
-                 "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
-                 }
-             },
-             {
              "description_template" : {
                  "match" : "description_*",
                  "match_mapping_type" : "string",

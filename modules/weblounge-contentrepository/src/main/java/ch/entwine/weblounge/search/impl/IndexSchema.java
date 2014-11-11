@@ -52,9 +52,6 @@ public interface IndexSchema {
   /** Granted permissions field name */
   String ALLOWDENY_ALLOW_BY_ACTION = "allowdeny_allow_{0}";
 
-  /** Denied permissions field name */
-  String ALLOWDENY_DENY_BY_ACTION = "allowdeny_deny_{0}";
-
   /** Template field name */
   String TEMPLATE = "template";
 

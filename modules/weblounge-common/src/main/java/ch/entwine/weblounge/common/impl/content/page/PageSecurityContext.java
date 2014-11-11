@@ -20,10 +20,11 @@
 
 package ch.entwine.weblounge.common.impl.content.page;
 
+import static ch.entwine.weblounge.common.impl.util.Errors.unexpectedMatch;
+
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.security.SystemAction;
-
 
 /**
  * Specialized security context for a page. This implementation adds the proper
@@ -42,13 +43,22 @@ public class PageSecurityContext extends SecurityContextImpl {
    * Adds the default authorities to their respective actions.
    */
   private void addDefaultValues() {
-    allowDefault(SystemAction.WRITE, SystemRole.EDITOR);
-    allowDefault(SystemAction.MANAGE, SystemRole.EDITOR);
-    allowDefault(SystemAction.PUBLISH, SystemRole.PUBLISHER);
-    denyDefault(SystemAction.READ, ANY_AUTHORITY);
-    denyDefault(SystemAction.WRITE, ANY_AUTHORITY);
-    denyDefault(SystemAction.MANAGE, ANY_AUTHORITY);
-    denyDefault(SystemAction.PUBLISH, ANY_AUTHORITY);
+    switch (getAllowDenyOrder()) {
+      case AllowDeny:
+        allowDefault(SystemAction.WRITE, SystemRole.EDITOR);
+        allowDefault(SystemAction.MANAGE, SystemRole.EDITOR);
+        allowDefault(SystemAction.PUBLISH, SystemRole.PUBLISHER);
+        break;
+      case DenyAllow:
+        denyDefault(SystemAction.READ, ANY_AUTHORITY);
+        denyDefault(SystemAction.WRITE, ANY_AUTHORITY);
+        denyDefault(SystemAction.MANAGE, ANY_AUTHORITY);
+        denyDefault(SystemAction.PUBLISH, ANY_AUTHORITY);
+        break;
+      default:
+        unexpectedMatch();
+        break;
+    }
   }
 
 }

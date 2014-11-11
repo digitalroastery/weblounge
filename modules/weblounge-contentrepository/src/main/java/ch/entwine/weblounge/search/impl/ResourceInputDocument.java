@@ -135,15 +135,6 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
         }
       }
     }
-    for (Action action : resource.getActions()) {
-      if (Order.AllowDeny.equals(order)) {
-        addField(getAccessRuleFieldName(order, Rule.Deny, action), IndexUtils.serializeAuthority(SystemAuthorities.ANY), false, false);
-      } else if (Order.DenyAllow.equals(order)) {
-        addField(getAccessRuleFieldName(order, Rule.Allow, action), IndexUtils.serializeAuthority(SystemAuthorities.ANY), false, false);
-      } else {
-        unexpectedMatch();
-      }
-    }
 
     // Path elements
     if (!StringUtils.isBlank(uri.getPath())) {

@@ -126,7 +126,7 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
       if (Rule.Allow.equals(rule)) {
         return MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, action.getContext() + action.getIdentifier());
       } else if (Rule.Deny.equals(rule)) {
-        return MessageFormat.format(IndexSchema.ALLOWDENY_DENY_BY_ACTION, action.getContext() + action.getIdentifier());
+        throw new IllegalArgumentException("Deny-rules are not supported with order AllowDeny");
       } else {
         return unexpectedMatch();
       }
