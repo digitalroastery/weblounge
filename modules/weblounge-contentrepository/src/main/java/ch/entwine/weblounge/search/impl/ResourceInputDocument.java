@@ -121,7 +121,7 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
         }
         case DenyAllow: {
           if (Rule.Deny.equals(access.getRule())) {
-            logger.error("Resource '{}' has allow-deny order '{}' and contains illegal access rule '{}' - the access rule is not added!", new Object[] {
+            logger.error("Resource '{}' has deny-allow order '{}' and contains illegal access rule '{}' - the access rule is not added!", new Object[] {
                 resource,
                 order,
                 access });
