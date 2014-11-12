@@ -122,18 +122,21 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
     requireNonNull(order);
     requireNonNull(rule);
 
-    if (Order.AllowDeny.equals(order)) {
-      if (Rule.Allow.equals(rule)) {
-        return MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, action.getContext() + action.getIdentifier());
-      } else if (Rule.Deny.equals(rule)) {
-        throw new IllegalArgumentException("Deny-rules are not supported with order AllowDeny");
-      } else {
-        throw new UnexpectedMatchError(rule.toString());
+    switch (order) {
+      case AllowDeny: {
+        switch (rule) {
+          case Allow:
+            return MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, action.getContext() + action.getIdentifier());
+          case Deny:
+            throw new IllegalArgumentException("Deny-rules are not supported with order AllowDeny");
+          default:
+            throw new UnexpectedMatchError(rule.toString());
+        }
       }
-    } else if (Order.DenyAllow.equals(order)) {
-      throw new NotImplementedException("Deny-Allow order is not yet supported");
-    } else {
-      throw new UnexpectedMatchError(order.toString());
+      case DenyAllow:
+        throw new NotImplementedException("Deny-Allow order is not yet supported");
+      default:
+        throw new UnexpectedMatchError(order.toString());
     }
   }
 
