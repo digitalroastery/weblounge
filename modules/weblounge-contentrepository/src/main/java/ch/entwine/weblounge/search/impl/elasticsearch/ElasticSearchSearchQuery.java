@@ -77,8 +77,6 @@ import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.FuzzyLikeThisQueryBuilder;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.NotFilterBuilder;
-import org.elasticsearch.index.query.OrFilterBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilderException;
 import org.elasticsearch.index.query.QueryBuilders;
