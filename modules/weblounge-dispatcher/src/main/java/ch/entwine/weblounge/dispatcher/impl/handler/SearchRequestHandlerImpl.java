@@ -50,6 +50,7 @@ import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.HTMLAction;
 import ch.entwine.weblounge.common.site.Site;
@@ -164,6 +165,7 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
 
     // Create the search expression and the query
     SearchQuery q = new SearchQueryImpl(site);
+    q.withAction(SystemAction.READ);
     q.withText(true, queryString);
     q.withVersion(Resource.LIVE);
     q.withRecencyPriority();

@@ -282,6 +282,7 @@ public class PageListTag extends WebloungeTag {
 
       // Specify which pages to load
       SearchQuery query = new SearchQueryImpl(site);
+      query.withAction(SystemAction.READ);
       query.withVersion(Resource.LIVE);
 
       // Add the keywords (or)
@@ -315,8 +316,6 @@ public class PageListTag extends WebloungeTag {
     Page page = null;
     WebUrl url = null;
 
-    User user = SecurityUtils.getUser();
-
     // Finally Load the pages
     for (SearchResultItem item : repository.find(query).getItems()) {
       if (!(item instanceof PageSearchResultItem)) {
@@ -330,28 +329,6 @@ public class PageListTag extends WebloungeTag {
 
       pageItem = (PageSearchResultItem) item;
       page = pageItem.getPage();
-
-      // Check access to this resource
-      if (System.getSecurityManager() != null) {
-
-        // Hide pages with no access rules
-        if (page.isDefaultAccess()) {
-          logger.debug("Resource {} has default access", page);
-          if (!SecurityUtils.userHasRole(user, SystemRole.SYSTEMADMIN)) {
-            logger.debug("Access to unsecured resource {} denied for '{}'", page, request.getUser());
-            continue;
-          }
-        }
-
-        // Hide pages that the current user does not allow access to
-        try {
-          SecurablePermission permission = new SecurablePermission(page, SystemAction.READ);
-          System.getSecurityManager().checkPermission(permission);
-        } catch (SecurityException e) {
-          logger.debug("Access to list resource {} denied for '{}'", page, request.getUser());
-          continue;
-        }
-      }
 
       pageItem = (PageSearchResultItem) item;
       page = pageItem.getPage();

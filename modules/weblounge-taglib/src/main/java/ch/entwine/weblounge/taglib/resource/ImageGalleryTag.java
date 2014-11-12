@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -134,6 +135,7 @@ public class ImageGalleryTag extends WebloungeTag {
     }
 
     SearchQuery query = new SearchQueryImpl(site);
+    query.withAction(SystemAction.READ);
     query.withVersion(Resource.LIVE);
     query.withTypes(ImageResource.TYPE);
     for (int i = 0; i < imageSubjects.size(); i++)

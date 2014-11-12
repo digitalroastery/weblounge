@@ -263,6 +263,7 @@ public class ResourceIteratorTag extends WebloungeTag {
     // First time search resources
     if (searchResult == null) {
       SearchQuery q = new SearchQueryImpl(site);
+      q.withAction(SystemAction.READ);
       if (includeTypes != null)
         q.withTypes(includeTypes.toArray(new String[includeTypes.size()]));
 

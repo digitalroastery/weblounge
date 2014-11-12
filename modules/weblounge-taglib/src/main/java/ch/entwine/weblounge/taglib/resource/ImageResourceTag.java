@@ -184,6 +184,7 @@ public class ImageResourceTag extends WebloungeTag {
       uri = new ImageResourceURIImpl(site, imagePath, null);
     if (uri == null && imageSubjects != null && imageSubjects.size() > 0) {
       SearchQuery query = new SearchQueryImpl(site);
+      query.withAction(SystemAction.READ);
       query.withVersion(Resource.LIVE);
       query.withTypes(ImageResource.TYPE);
       query.withSubjects(SearchQuery.Quantifier.All, imageSubjects.toArray(new String[imageSubjects.size()]));
