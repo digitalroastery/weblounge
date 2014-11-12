@@ -20,10 +20,10 @@
 
 package ch.entwine.weblounge.search.impl;
 
-import static ch.entwine.weblounge.common.impl.util.Errors.notImplemented;
 import static ch.entwine.weblounge.search.impl.IndexSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
 
+import ch.entwine.weblounge.common.NotImplementedException;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
@@ -445,7 +445,7 @@ public class SearchIndexImpl implements SearchIndex {
     }
     
     if (Order.DenyAllow.equals(resource.getAllowDenyOrder())) {
-      notImplemented("The index does not (yet) support resources with DENY-ALLOW ACL order");
+      throw new NotImplementedException("The index does not (yet) support resources with DENY-ALLOW ACL order");
     }
 
     // Have the serializer create an input document

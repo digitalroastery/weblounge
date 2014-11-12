@@ -20,8 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.content.page;
 
-import static ch.entwine.weblounge.common.impl.util.Errors.unexpectedMatch;
-
+import ch.entwine.weblounge.common.UnexpectedMatchError;
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.security.SystemAction;
@@ -56,8 +55,7 @@ public class PageSecurityContext extends SecurityContextImpl {
         denyDefault(SystemAction.PUBLISH, ANY_AUTHORITY);
         break;
       default:
-        unexpectedMatch();
-        break;
+        throw new UnexpectedMatchError(getAllowDenyOrder().toString());
     }
   }
 

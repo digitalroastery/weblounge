@@ -20,10 +20,10 @@
 
 package ch.entwine.weblounge.search.impl;
 
-import static ch.entwine.weblounge.common.impl.util.Errors.notImplemented;
-import static ch.entwine.weblounge.common.impl.util.Errors.unexpectedMatch;
 import static java.util.Objects.requireNonNull;
 
+import ch.entwine.weblounge.common.NotImplementedException;
+import ch.entwine.weblounge.common.UnexpectedMatchError;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
@@ -128,12 +128,12 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
       } else if (Rule.Deny.equals(rule)) {
         throw new IllegalArgumentException("Deny-rules are not supported with order AllowDeny");
       } else {
-        return unexpectedMatch();
+        throw new UnexpectedMatchError(rule.toString());
       }
     } else if (Order.DenyAllow.equals(order)) {
-      return notImplemented("Deny-Allow order is not yet supported");
+      throw new NotImplementedException("Deny-Allow order is not yet supported");
     } else {
-      return unexpectedMatch();
+      throw new UnexpectedMatchError(order.toString());
     }
   }
 

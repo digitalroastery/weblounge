@@ -20,7 +20,6 @@
 
 package ch.entwine.weblounge.search.impl;
 
-import static ch.entwine.weblounge.common.impl.util.Errors.unexpectedMatch;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_CREATED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_CREATED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_EXTERNAL_REPRESENTATION;
@@ -63,13 +62,12 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.UID;
 import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.XML;
 
+import ch.entwine.weblounge.common.UnexpectedMatchError;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.impl.security.SystemAuthorities;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.AccessRule;
-import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Rule;
 import ch.entwine.weblounge.common.security.Securable.Order;
 
@@ -131,7 +129,7 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
           break;
         }
         default: {
-          unexpectedMatch();
+          throw new UnexpectedMatchError(order.toString());
         }
       }
     }
