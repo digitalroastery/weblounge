@@ -55,9 +55,6 @@ public final class SystemAction implements Action {
   /** Publish action */
   public static final Action PUBLISH = new SystemAction("publish");
 
-  /** Any action */
-  public static final Action ANY = new SystemAction(Action.CONTEXT_WILDCARD, Action.ACTION_WILDCARD);
-
   /** Action identifier */
   private String identifier = null;
 
