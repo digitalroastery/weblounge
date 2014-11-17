@@ -38,7 +38,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 /** Test cases for {@link PageInputDocument} */
