@@ -302,8 +302,10 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     authorities.add(SystemAuthorities.ANY.getAuthorityId());
     // Take all other authorities of the current user into account for building
     // the request
-    for (Role role : SecurityUtils.getRoles(SecurityUtils.getUser())) {
-      authorities.add(role.getAuthorityId());
+    if (SecurityUtils.getUser() != null) {
+      for (Role role : SecurityUtils.getRoles(SecurityUtils.getUser())) {
+        authorities.add(role.getAuthorityId());
+      }
     }
 
     // Pagelet properties
