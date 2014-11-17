@@ -44,6 +44,7 @@ public class PageSecurityContext extends SecurityContextImpl {
   private void addDefaultValues() {
     switch (getAllowDenyOrder()) {
       case AllowDeny:
+        allowDefault(SystemAction.READ, ANY_AUTHORITY);
         allowDefault(SystemAction.WRITE, SystemRole.EDITOR);
         allowDefault(SystemAction.MANAGE, SystemRole.EDITOR);
         allowDefault(SystemAction.PUBLISH, SystemRole.PUBLISHER);

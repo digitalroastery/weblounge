@@ -145,10 +145,10 @@ public class SearchIndexAccessControlTest {
     idx.add(pageAllowDeny);
 
     boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertFalse(accessDecisions[0]);
-    assertFalse(accessDecisions[1]);
-    assertFalse(accessDecisions[2]);
-    assertFalse(accessDecisions[3]);
+    assertTrue(accessDecisions[0]);
+    assertTrue(accessDecisions[1]);
+    assertTrue(accessDecisions[2]);
+    assertTrue(accessDecisions[3]);
   }
 
   /** Unit test for test case A.02 */
@@ -204,10 +204,10 @@ public class SearchIndexAccessControlTest {
     idx.add(pageDenyAllow);
 
     boolean[] accessDecisions = getAccessDecisionsForUsers(q);
-    assertTrue(accessDecisions[0]);
-    assertTrue(accessDecisions[1]);
-    assertTrue(accessDecisions[2]);
-    assertTrue(accessDecisions[3]);
+    assertFalse(accessDecisions[0]);
+    assertFalse(accessDecisions[1]);
+    assertFalse(accessDecisions[2]);
+    assertFalse(accessDecisions[3]);
   }
  
   /** Unit test for test case D.02 */
