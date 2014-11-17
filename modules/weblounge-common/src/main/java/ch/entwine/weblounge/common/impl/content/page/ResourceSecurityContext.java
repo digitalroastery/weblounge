@@ -29,12 +29,12 @@ import ch.entwine.weblounge.common.security.SystemAction;
  * Specialized security context for a page. This implementation adds the proper
  * name and default values.
  */
-public class PageSecurityContext extends SecurityContextImpl {
+public class ResourceSecurityContext extends SecurityContextImpl {
 
   /**
    * Creates a new security context for a page.
    */
-  public PageSecurityContext() {
+  public ResourceSecurityContext() {
     addDefaultValues();
   }
 

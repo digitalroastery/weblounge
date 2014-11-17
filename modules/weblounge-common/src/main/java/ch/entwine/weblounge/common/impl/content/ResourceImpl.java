@@ -26,7 +26,7 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.impl.content.page.PageSecurityContext;
+import ch.entwine.weblounge.common.impl.content.page.ResourceSecurityContext;
 import ch.entwine.weblounge.common.impl.language.LocalizableContent;
 import ch.entwine.weblounge.common.impl.language.LocalizableObject;
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
@@ -126,7 +126,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     this.creationCtx = new CreationContext();
     this.modificationCtx = new ModificationContext();
     this.publishingCtx = new PublishingContext();
-    this.securityCtx = new PageSecurityContext();
+    this.securityCtx = new ResourceSecurityContext();
     this.subjects = new ArrayList<String>();
     this.series = new ArrayList<String>();
     this.title = new LocalizableContent<String>(this);
