@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.index;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import ch.entwine.weblounge.common.NotImplementedException;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.page.Page;
@@ -198,7 +199,7 @@ public class SearchIndexAccessControlTest {
   
 
   /** Unit test for test case D.01 */
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expected = NotImplementedException.class)
   public void testDenyAllowWithoutAcl() throws Exception {
     idx.add(pageDenyAllow);
 
@@ -210,7 +211,7 @@ public class SearchIndexAccessControlTest {
   }
  
   /** Unit test for test case D.02 */
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expected = NotImplementedException.class)
   public void testDenyAllowDenyAll() throws Exception {
     pageDenyAllow.addAccessRule(ALL_DENY_READ);
     idx.add(pageDenyAllow);
@@ -223,7 +224,7 @@ public class SearchIndexAccessControlTest {
   }
 
   /** Unit test for test case D.03 */
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expected = NotImplementedException.class)
   public void testDenyAllowOneDeny() throws Exception {
     pageDenyAllow.addAccessRule(ROLE_STUDENT_DENY_READ);
     idx.add(pageDenyAllow);
@@ -236,7 +237,7 @@ public class SearchIndexAccessControlTest {
   }
 
   /** Unit test for test case D.04 */
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expected = NotImplementedException.class)
   public void testDenyAllowTwoDeny() throws Exception {
     pageDenyAllow.addAccessRule(ROLE_STUDENT_DENY_READ);
     pageDenyAllow.addAccessRule(ROLE_TEACHER_DENY_READ);
