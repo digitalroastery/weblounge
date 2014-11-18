@@ -26,12 +26,6 @@ package ch.entwine.weblounge.common.security;
  */
 public interface Action extends Comparable<Action> {
 
-  /** Identifier for the action wild card */
-  String CONTEXT_WILDCARD = "*";
-
-  /** Identifier for the action wild card */
-  String ACTION_WILDCARD = "*";
-
   /**
    * Returns the action identifier.
    * 
