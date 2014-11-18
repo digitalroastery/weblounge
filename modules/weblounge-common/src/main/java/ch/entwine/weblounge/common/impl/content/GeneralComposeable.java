@@ -297,5 +297,10 @@ public class GeneralComposeable implements Composeable {
   public void setEnvironment(Environment environment) {
     this.environment = environment;
   }
+  
+  @Override
+  public Environment getEnvironment() {
+    return environment;
+  }
 
 }
