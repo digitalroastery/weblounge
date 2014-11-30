@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -357,7 +358,7 @@ public class ResourceIteratorTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    if (!SecurityUtils.userHasReadPermission(request.getUser(), resource)) {
+    if (!SecurityUtils.userHasPermission(request.getUser(), resource, SystemAction.READ)) {
       logger.debug("User {} has no read permission on resource {}", SecurityUtils.getUser(), resource);
       return SKIP_BODY;
     }

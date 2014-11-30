@@ -35,6 +35,7 @@ import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
@@ -302,7 +303,7 @@ public class PagePreviewTag extends WebloungeTag {
         throw new JspException("Exception while trying to load " + pageUrl, e);
       }
 
-      if (!SecurityUtils.userHasReadPermission(request.getUser(), page)) {
+      if (!SecurityUtils.userHasPermission(request.getUser(), page, SystemAction.READ)) {
         logger.debug("User {} has no read permission on page {}", SecurityUtils.getUser(), page);
         return EVAL_PAGE;
       }

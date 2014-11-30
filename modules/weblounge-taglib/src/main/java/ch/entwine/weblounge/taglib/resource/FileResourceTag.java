@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -149,7 +150,7 @@ public class FileResourceTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    if (!SecurityUtils.userHasReadPermission(request.getUser(), file)) {
+    if (!SecurityUtils.userHasPermission(request.getUser(), file, SystemAction.READ)) {
       logger.debug("User {} has no rights to read file {}", SecurityUtils.getUser(), file);
       return SKIP_BODY;
     }

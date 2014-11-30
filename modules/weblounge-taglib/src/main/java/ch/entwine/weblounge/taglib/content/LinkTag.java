@@ -26,6 +26,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
 import org.slf4j.Logger;
@@ -117,7 +118,7 @@ public class LinkTag extends WebloungeTag {
         return SKIP_BODY;
       }
 
-      if (!SecurityUtils.userHasReadPermission(request.getUser(), page)) {
+      if (!SecurityUtils.userHasPermission(request.getUser(), page, SystemAction.READ)) {
         logger.debug("User {} has no read permission on page {}", SecurityUtils.getUser(), page);
         return SKIP_BODY;
       }

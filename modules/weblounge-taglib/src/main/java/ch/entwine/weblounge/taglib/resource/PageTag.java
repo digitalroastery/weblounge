@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -134,7 +135,7 @@ public class PageTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    if (!SecurityUtils.userHasReadPermission(request.getUser(), page)) {
+    if (!SecurityUtils.userHasPermission(request.getUser(), page, SystemAction.READ)) {
       logger.debug("User {} has no read permission on page {}", SecurityUtils.getUser(), page);
       return SKIP_BODY;
     }

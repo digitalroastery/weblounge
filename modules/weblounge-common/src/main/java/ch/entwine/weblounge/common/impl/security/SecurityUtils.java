@@ -25,7 +25,6 @@ import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.Security;
-import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -252,34 +251,6 @@ public final class SecurityUtils {
     }
 
     return true;
-  }
-
-  /**
-   * Returns {@code true} if the {@code user} has the permission to read from
-   * the {@link Securable} object.
-   * 
-   * @param user
-   *          the user
-   * @param securable
-   *          the securable object
-   * @return {@code true} if the user has the read permission
-   */
-  public static boolean userHasReadPermission(User user, Securable securable) {
-    return userHasPermission(user, securable, SystemAction.READ);
-  }
-
-  /**
-   * Returns {@code true} if the {@code user} has the permission to write on the
-   * {@link Securable} object.
-   * 
-   * @param user
-   *          the user
-   * @param securable
-   *          the securable object
-   * @return {@code true} if the user has the write permission
-   */
-  public static boolean userHasWritePermission(User user, Securable securable) {
-    return userHasPermission(user, securable, SystemAction.WRITE);
   }
 
   /**

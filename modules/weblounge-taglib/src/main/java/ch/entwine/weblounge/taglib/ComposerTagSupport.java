@@ -40,6 +40,7 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.HTMLAction;
 import ch.entwine.weblounge.common.site.Module;
@@ -350,7 +351,7 @@ public class ComposerTagSupport extends WebloungeTag {
             logger.warn("No page was found while processing composer on " + url);
             return;
           }
-          if (!SecurityUtils.userHasReadPermission(request.getUser(), targetPage)) {
+          if (!SecurityUtils.userHasPermission(request.getUser(), targetPage, SystemAction.READ)) {
             logger.debug("User {} has no read permissions on {}", SecurityUtils.getUser(), targetPage);
             targetPage = null;
             return;
@@ -386,7 +387,7 @@ public class ComposerTagSupport extends WebloungeTag {
             ResourceURI pageURI = new PageURIImpl(site, pageUrl);
             contentPage = (Page) contentRepository.get(pageURI);
 
-            if (!SecurityUtils.userHasReadPermission(request.getUser(), contentPage)) {
+            if (!SecurityUtils.userHasPermission(request.getUser(), contentPage, SystemAction.READ)) {
               contentPage = null;
               logger.debug("Prevented loading of protected content from inherited page {} for composer {}", pageURI, id);
             }
