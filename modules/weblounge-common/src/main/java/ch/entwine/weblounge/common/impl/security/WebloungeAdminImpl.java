@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Security;
 
 /**
