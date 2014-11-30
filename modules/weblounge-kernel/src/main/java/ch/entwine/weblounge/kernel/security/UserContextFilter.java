@@ -185,6 +185,24 @@ public class UserContextFilter implements Filter {
   }
 
   /**
+   * Translates SpringSecurity authorities from Spring Security to Weblounge
+   * Roles.
+   * 
+   * @param roles
+   *          the set of roles
+   * @param authorities
+   *          the authorities
+   */
+  protected void addRoles(Set<Role> roles,
+      final Collection<? extends GrantedAuthority> authorities) {
+    if (authorities != null && authorities.size() > 0) {
+      for (GrantedAuthority ga : authorities) {
+        roles.add(new RoleImpl(ga.getAuthority()));
+      }
+    }
+  }
+
+  /**
    * Returns the local role for the given system role or the system role itself,
    * if no local role was defined.
    *
