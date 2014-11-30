@@ -621,20 +621,20 @@ public class SearchIndexTest {
   @Test
   public void testAdd() throws Exception {
     populateIndex();
-    SearchQuery q = new SearchQueryImpl(testSite).withTypes(Page.TYPE);
-    assertEquals(testPages.length, idx.getByQuery(q).getDocumentCount());
+    SearchQuery q = new SearchQueryImpl(site).withTypes(Page.TYPE);
+    assertEquals(pages.length, idx.getByQuery(q).getDocumentCount());
   }
 
   @Test(expected = NotImplementedException.class)
   public void testAddWithNotSupportedAclOrder() throws Exception {
-    Page page = testPages[0];
+    Page page = pages[0];
     page.setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order.DenyAllow);
     idx.add(page);
   }
 
   @Test(expected = NotImplementedException.class)
   public void testUpdateWithNotSupportedAclOrder() throws Exception {
-    Page page = testPages[0];
+    Page page = pages[0];
     page.setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order.DenyAllow);
     idx.update(page);
   }
