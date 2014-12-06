@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.site;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.split;
 
 import ch.entwine.weblounge.common.content.MalformedResourceURIException;
@@ -934,6 +935,9 @@ public class SiteImpl implements Site {
 
   @Override
   public ResourceURI getErrorPage(String path) {
+    if (isBlank(path))
+      throw new IllegalArgumentException("Path must not be null nor empty");
+    
     if (!this.hasOption(OPT_NAME_ERROR_PAGES))
       return null;
 
