@@ -36,6 +36,7 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED_BY_NAME;
 import static ch.entwine.weblounge.search.impl.IndexSchema.DESCRIPTION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.DESCRIPTION_LOCALIZED;
+import static ch.entwine.weblounge.search.impl.IndexSchema.FLAVOR;
 import static ch.entwine.weblounge.search.impl.IndexSchema.HEADER_XML;
 import static ch.entwine.weblounge.search.impl.IndexSchema.LOCKED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.LOCKED_BY_NAME;
@@ -124,6 +125,8 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
 
     for (String series : resource.getSeries())
       addField(SERIES, series, true, true);
+    
+    addField(FLAVOR, resource.getFlavor(), true, false);
 
     // Creation, modification and publishing information
     addField(OWNED_BY, IndexUtils.serializeUserId(resource.getOwner()), false, false);

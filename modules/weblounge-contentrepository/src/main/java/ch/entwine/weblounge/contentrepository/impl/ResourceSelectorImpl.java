@@ -163,7 +163,7 @@ public class ResourceSelectorImpl implements ResourceSelector {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.ResourceSelector#getType()
+   * @see ch.entwine.weblounge.common.content.ResourceSelector#getTypes()
    */
   public String[] getTypes() {
     return types.toArray(new String[types.size()]);

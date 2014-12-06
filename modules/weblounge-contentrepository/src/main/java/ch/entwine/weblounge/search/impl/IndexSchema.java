@@ -51,6 +51,9 @@ public interface IndexSchema {
 
   /** Template field name */
   String TEMPLATE = "template";
+  
+  /** Flavor field name */
+  String FLAVOR = "flavor";
 
   /** Stationary field name */
   String STATIONARY = "stationary";

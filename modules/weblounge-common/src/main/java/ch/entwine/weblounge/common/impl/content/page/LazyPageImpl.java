@@ -572,7 +572,7 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.Page#getTitle(ch.entwine.weblounge.common.language.Language,
+   * @see ch.entwine.weblounge.common.content.Resource#getTitle(ch.entwine.weblounge.common.language.Language,
    *      boolean)
    */
   public String getTitle(Language language, boolean force) {
@@ -584,18 +584,18 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.Page#getType()
+   * @see ch.entwine.weblounge.common.content.Resource#getFlavor()
    */
-  public String getType() {
+  public String getFlavor() {
     if (!isHeaderLoaded)
       loadPageHeader();
-    return page.getType();
+    return page.getFlavor();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.Page#getURI()
+   * @see ch.entwine.weblounge.common.content.Resource#getURI()
    */
   public ResourceURI getURI() {
     return uri;
@@ -884,18 +884,18 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.Page#setType(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.Resource#setFlavor(java.lang.String)
    */
-  public void setType(String type) {
+  public void setFlavor(String flavor) {
     if (!isHeaderLoaded)
       loadPageHeader();
-    page.setType(type);
+    page.setFlavor(flavor);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.Page#unlock()
+   * @see ch.entwine.weblounge.common.content.Resource#unlock()
    */
   public User unlock() {
     if (!isHeaderLoaded)
@@ -915,7 +915,7 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.page.Page#toXml()
+   * @see ch.entwine.weblounge.common.content.Resource#toXml()
    */
   public String toXml() {
     if (!isBodyLoaded)

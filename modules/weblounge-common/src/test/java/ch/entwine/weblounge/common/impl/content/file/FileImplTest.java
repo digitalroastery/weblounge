@@ -72,8 +72,8 @@ public class FileImplTest {
   /** The site */
   protected Site site = null;
 
-  /** The file type */
-  protected String fileType = "File";
+  /** The file flavor */
+  protected String fileFlavor = "Letter";
 
   /** Anchor file */
   protected boolean isPromoted = true;
@@ -170,7 +170,7 @@ public class FileImplTest {
     file.setRights(germanRights, german);
     file.setTitle(germanTitle, german);
     file.setTitle(frenchTitle, french);
-    file.setType(fileType);
+    file.setFlavor(fileFlavor);
     for (String subject : subjects)
       file.addSubject(subject);
     for (String series : this.series)
@@ -209,12 +209,12 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#getType()}
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#getFlavor()}
    * .
    */
   @Test
   public void testGetType() {
-    assertEquals(fileType, file.getType());
+    assertEquals(fileFlavor, file.getFlavor());
   }
 
   /**

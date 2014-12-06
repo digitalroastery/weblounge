@@ -346,9 +346,9 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
         resource.setPromoted("true".equals(characters.toString()));
       }
 
-      // Type
-      else if ("type".equals(raw)) {
-        resource.setType(characters.toString());
+      // Flavor
+      else if ("flavor".equals(raw)) {
+        resource.setFlavor(characters.toString());
       }
 
       // Title

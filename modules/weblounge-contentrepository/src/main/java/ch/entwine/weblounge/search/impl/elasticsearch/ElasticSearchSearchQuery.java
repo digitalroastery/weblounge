@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.search.impl.elasticsearch;
 
+import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
 import static ch.entwine.weblounge.search.impl.IndexSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_EXTERNAL_REPRESENTATION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_FILENAME;
@@ -27,11 +28,14 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_MIMETYPE;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_SOURCE;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.FLAVOR;
 import static ch.entwine.weblounge.search.impl.IndexSchema.FULLTEXT;
 import static ch.entwine.weblounge.search.impl.IndexSchema.FULLTEXT_FUZZY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.LOCKED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGIN;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGINAL_IDENTIFIER;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_PROPERTIES;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_COMPOSER;
@@ -49,8 +53,6 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.TEXT;
 import static ch.entwine.weblounge.search.impl.IndexSchema.TEXT_FUZZY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.TYPE;
 import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
-
-import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
 
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Quantifier;
@@ -140,7 +142,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /**
    * Creates a new elastic search query based on the Weblounge query.
-   * 
+   *
    * @param query
    *          the weblounge query
    */
@@ -151,7 +153,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.elasticsearch.index.query.BaseQueryBuilder#doXContent(org.elasticsearch.common.xcontent.XContentBuilder,
    *      org.elasticsearch.common.xcontent.ToXContent.Params)
    */
@@ -210,6 +212,10 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     // Template
     if (query.getTemplate() != null) {
       and(TEMPLATE, query.getTemplate(), true);
+    }
+
+    if (query.getFlavor() != null) {
+      and(FLAVOR, query.getFlavor(), true);
     }
 
     // Stationary
@@ -554,7 +560,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Stores <code>fieldValue</code> as a search term on the
    * <code>fieldName</code> field.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param fieldValue
@@ -584,7 +590,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Stores <code>fieldValues</code> as search terms on the
    * <code>fieldName</code> field.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param fieldValues
@@ -602,7 +608,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Stores <code>fieldValue</code> as a search term on the
    * <code>fieldName</code> field.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param startDate
@@ -627,7 +633,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Stores <code>fieldValue</code> as a negative search term on the
    * <code>fieldName</code> field.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param fieldValue
@@ -657,7 +663,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Stores <code>fieldValues</code> as negative search terms on the
    * <code>fieldName</code> field.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param fieldValues
@@ -675,7 +681,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Encodes the field name as part of the AND clause of a solr query:
    * <tt>AND -fieldName : [* TO *]</tt>.
-   * 
+   *
    * @param fieldName
    *          the field name
    */
@@ -688,7 +694,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
   /**
    * Encodes the field name as part of the AND clause of a solr query:
    * <tt>AND fieldName : ["" TO *]</tt>.
-   * 
+   *
    * @param fieldName
    *          the field name
    */
@@ -700,7 +706,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.elasticsearch.common.xcontent.ToXContent#toXContent(org.elasticsearch.common.xcontent.XContentBuilder,
    *      org.elasticsearch.common.xcontent.ToXContent.Params)
    */
@@ -712,7 +718,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.elasticsearch.index.query.QueryBuilder#buildAsBytes()
    */
   @Override
@@ -722,7 +728,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.elasticsearch.index.query.QueryBuilder#buildAsBytes(org.elasticsearch.common.xcontent.XContentType)
    */
   @Override
@@ -749,7 +755,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
      * Creates a new date range specification with the given field name, start
      * and end dates. <code>null</code> may be passed in for start or end dates
      * that should remain unspecified.
-     * 
+     *
      * @param field
      *          the field name
      * @param start
@@ -765,7 +771,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * Returns the range query that is represented by this date range.
-     * 
+     *
      * @return the range query builder
      */
     QueryBuilder getQueryBuilder() {
@@ -779,7 +785,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -792,7 +798,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -815,7 +821,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * Creates a new value group for the given field and values.
-     * 
+     *
      * @param field
      *          the field name
      * @param values
@@ -829,7 +835,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     /**
      * Returns the filter that will make sure only documents are returned that
      * match all of the values at once.
-     * 
+     *
      * @return the filter builder
      */
     List<FilterBuilder> getFilterBuilders() {
@@ -842,7 +848,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -855,7 +861,7 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override

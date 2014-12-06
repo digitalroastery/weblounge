@@ -92,6 +92,9 @@ public class SearchQueryImpl implements SearchQuery {
   /** The layout */
   protected String layout = null;
 
+  /* The flavor */
+  protected String flavor = null;
+
   /** Stationary flag */
   protected boolean stationary = false;
 
@@ -415,6 +418,27 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withFlavor(java.lang.String)
+   */
+  @Override
+  public SearchQuery withFlavor(String flavor) {
+    this.flavor = flavor;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getFlavor()
+   */
+  @Override
+  public String getFlavor() {
+    return flavor;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#withStationary()
    */
   public SearchQuery withStationary() {
@@ -458,7 +482,7 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#getType()
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getTypes()
    */
   public String[] getTypes() {
     return types.toArray(new String[types.size()]);
