@@ -453,7 +453,7 @@ public interface Site extends Customizable, RequestListener, Serializable {
   /**
    * Returns <code>true</code> if the site has been started.
    * 
-   * @return <code>true</code> if the site is online
+   * @return <code>true</code> if the site has been started
    */
   boolean isStarted();
 
