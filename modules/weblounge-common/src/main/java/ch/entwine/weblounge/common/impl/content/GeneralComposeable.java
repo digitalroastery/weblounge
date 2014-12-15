@@ -118,6 +118,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#setIdentifier(java.lang.String)
    */
+  @Override
   public void setIdentifier(String identifier) {
     if (identifier == null)
       throw new IllegalArgumentException("Identifier cannot be null");
@@ -129,6 +130,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#getIdentifier()
    */
+  @Override
   public String getIdentifier() {
     return identifier;
   }
@@ -138,6 +140,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#setName(java.lang.String)
    */
+  @Override
   public void setName(String name) {
     this.name = name;
   }
@@ -147,6 +150,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#getName()
    */
+  @Override
   public String getName() {
     return name;
   }
@@ -156,6 +160,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#setComposeable(boolean)
    */
+  @Override
   public void setComposeable(boolean composeable) {
     this.composeable = composeable;
   }
@@ -165,6 +170,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#isComposeable()
    */
+  @Override
   public boolean isComposeable() {
     return composeable;
   }
@@ -174,6 +180,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#setClientRevalidationTime(long)
    */
+  @Override
   public void setClientRevalidationTime(long time) {
     if (time < 0)
       throw new IllegalArgumentException("Recheck time must be greater than or equal to zero");
@@ -185,6 +192,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#getClientRevalidationTime()
    */
+  @Override
   public long getClientRevalidationTime() {
     return Math.min(clientRevalidationTime, cacheExpirationTime);
   }
@@ -194,6 +202,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#setCacheExpirationTime(long)
    */
+  @Override
   public void setCacheExpirationTime(long time) {
     if (time < 0)
       throw new IllegalArgumentException("Valid time must be greater than or equal to zero");
@@ -205,6 +214,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#getCacheExpirationTime()
    */
+  @Override
   public long getCacheExpirationTime() {
     return cacheExpirationTime;
   }
@@ -214,6 +224,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#addHTMLHeader(HTMLHeadElement)
    */
+  @Override
   public void addHTMLHeader(HTMLHeadElement header) {
     if (!headers.contains(header))
       headers.add(header);
@@ -224,6 +235,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#removeHTMLHeader(HTMLHeadElement)
    */
+  @Override
   public void removeHTMLHeader(HTMLHeadElement header) {
     headers.remove(header);
   }
@@ -233,6 +245,7 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#getHTMLHeaders()
    */
+  @Override
   public HTMLHeadElement[] getHTMLHeaders() {
     return headers.toArray(new HTMLHeadElement[headers.size()]);
   }
@@ -280,8 +293,14 @@ public class GeneralComposeable implements Composeable {
    * 
    * @see ch.entwine.weblounge.common.content.Composeable#setEnvironment(ch.entwine.weblounge.common.site.Environment)
    */
+  @Override
   public void setEnvironment(Environment environment) {
     this.environment = environment;
+  }
+  
+  @Override
+  public Environment getEnvironment() {
+    return environment;
   }
 
 }

@@ -118,6 +118,9 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory<Action> {
     
     // Name
     action.setName(blueprint.getName());
+    
+    // Environment
+    action.setEnvironment(blueprint.getEnvironment());
 
     return action;
   }

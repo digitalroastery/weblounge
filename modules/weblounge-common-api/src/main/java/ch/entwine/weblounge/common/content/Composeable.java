@@ -167,4 +167,11 @@ public interface Composeable {
    */
   void setEnvironment(Environment environment);
 
+  /**
+   * Return current execution environment.
+   * 
+   * @return the environment
+   */
+  Environment getEnvironment();
+
 }
