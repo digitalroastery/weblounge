@@ -150,7 +150,7 @@ public class SitesEndpoint {
 
     // Process changes in site
     if (StringUtils.isNotBlank(status)) {
-      if (!site.isOnline() && ConfigurationUtils.isEnabled(status)) {
+      if (!site.isStarted() && ConfigurationUtils.isEnabled(status)) {
         try {
           site.start();
         } catch (IllegalStateException e) {
@@ -158,7 +158,7 @@ public class SitesEndpoint {
         } catch (SiteException e) {
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
-      } else if (site.isOnline() && ConfigurationUtils.isDisabled(status)) {
+      } else if (site.isStarted() && ConfigurationUtils.isDisabled(status)) {
         site.stop();
       } else {
         throw new WebApplicationException(Status.BAD_REQUEST);

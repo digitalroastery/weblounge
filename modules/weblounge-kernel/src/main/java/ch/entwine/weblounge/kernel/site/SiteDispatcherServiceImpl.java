@@ -459,7 +459,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
           // Did we already miss the "siteStarted()" event? If so, we trigger it
           // for ourselves, so the modules are being started.
           site.addSiteListener(SiteDispatcherServiceImpl.this);
-          if (site.isOnline()) {
+          if (site.isStarted()) {
             siteStarted(site);
           }
 

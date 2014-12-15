@@ -112,7 +112,7 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
           break;
         }
       }
-      if (siteUrl == null || !site.isOnline()) {
+      if (siteUrl == null || !site.isStarted()) {
         try {
           logger.debug("Request to site '{}' cannot acces {}", site, this);
           response.sendError(HttpServletResponse.SC_NOT_FOUND);

@@ -216,7 +216,7 @@ public class WorkbenchEndpoint {
     Site site = sites.findSiteByURL(UrlUtils.toURL(request, false, false));
     if (site == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
-    } else if (!site.isOnline()) {
+    } else if (!site.isStarted()) {
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
     }
     return site;

@@ -285,7 +285,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
       }
       httpResponse.sendError(SC_NOT_FOUND);
       return;
-    } else if (!site.isOnline() && !isSpecialRequest) {
+    } else if (!site.isStarted() && !isSpecialRequest) {
       if (site.getContentRepository() == null) {
         if (!missingRepositoryWarnings.contains(site.getIdentifier())) {
           logger.warn("No content repository connected to site '{}'", site);
