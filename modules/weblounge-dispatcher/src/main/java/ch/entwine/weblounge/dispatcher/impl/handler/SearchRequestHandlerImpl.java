@@ -113,7 +113,7 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
 
     // Is this request intended for the search handler?
     if (!path.startsWith(URI_PREFIX)) {
-      logger.debug("Skipping request for {}, request path does not start with {}", URI_PREFIX);
+      logger.debug("Skipping request for {}, request path does not start with {}", url, URI_PREFIX);
       return false;
     }
 

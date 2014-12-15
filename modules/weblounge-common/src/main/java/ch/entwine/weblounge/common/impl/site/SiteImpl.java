@@ -371,12 +371,12 @@ public class SiteImpl implements Site {
           for (Action a : m.getActions()) {
             for (Action action : module.getActions()) {
               if (action.getIdentifier().equals(a.getIdentifier())) {
-                logger.warn("Module '{}' of site '{}' already defines an action with id '{}'", new String[] {
+                logger.warn("Module '{}' of site '{}' already defines an action with id '{}'", new Object[] {
                     m.getIdentifier(),
                     identifier,
                     a.getIdentifier() });
               } else if (action.getPath().equals(a.getPath())) {
-                logger.warn("Module '{}' of site '{}' already defines an action at '{}'", new String[] {
+                logger.warn("Module '{}' of site '{}' already defines an action at '{}'", new Object[] {
                     m.getIdentifier(),
                     identifier,
                     a.getPath() });
@@ -390,7 +390,7 @@ public class SiteImpl implements Site {
           for (ImageStyle s : m.getImageStyles()) {
             for (ImageStyle style : module.getImageStyles()) {
               if (style.getIdentifier().equals(s.getIdentifier())) {
-                logger.warn("Module '{}' of site '{}' already defines an image style with id '{}'", new String[] {
+                logger.warn("Module '{}' of site '{}' already defines an image style with id '{}'", new Object[] {
                     m.getIdentifier(),
                     identifier,
                     s.getIdentifier() });
@@ -402,7 +402,7 @@ public class SiteImpl implements Site {
           for (Job j : m.getJobs()) {
             for (Job job : module.getJobs()) {
               if (job.getIdentifier().equals(j.getIdentifier())) {
-                logger.warn("Module '{}' of site '{}' already defines a job with id '{}'", new String[] {
+                logger.warn("Module '{}' of site '{}' already defines a job with id '{}'", new Object[] {
                     m.getIdentifier(),
                     identifier,
                     j.getIdentifier() });

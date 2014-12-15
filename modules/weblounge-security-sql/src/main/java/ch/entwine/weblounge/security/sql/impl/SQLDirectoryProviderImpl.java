@@ -93,7 +93,7 @@ public class SQLDirectoryProviderImpl implements SQLDirectoryProvider {
     try {
       jpaAccount = persistence.getAccount(site.getIdentifier(), login, true);
     } catch (Throwable e) {
-      logger.error("Error loading user '{}' from the database: {}", login, e.getMessage());
+      logger.error("Error loading user '{}' from the database: {}", login, e);
       return null;
     }
 

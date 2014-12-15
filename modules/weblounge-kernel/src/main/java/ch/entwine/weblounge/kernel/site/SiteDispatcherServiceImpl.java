@@ -533,7 +533,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     } catch (IllegalStateException e) {
       // Never mind, the service has been unregistered already
     } catch (Throwable t) {
-      logger.error("Unregistering site '{}' failed: {}", site.getIdentifier(), t.getMessage());
+      logger.error("Unregistering site '{}' failed: {}", site.getIdentifier(), t);
     }
 
     // We are no longer interested in site events
