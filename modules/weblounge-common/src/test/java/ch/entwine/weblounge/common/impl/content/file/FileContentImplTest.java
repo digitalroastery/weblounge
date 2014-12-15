@@ -81,7 +81,6 @@ public class FileContentImplTest {
   public void setUp() throws Exception {
     content = new FileContentImpl(filename, german, mimetype, size);
     content.setMimetype(mimetype);
-    content.setSource(source);
     content.setExternalLocation(new URL(externalLocation));
     content.setAuthor(author);
     ((FileContentImpl) content).setCreated(creationDate, amelie);
@@ -115,16 +114,6 @@ public class FileContentImplTest {
   @Test
   public void testGetFilename() {
     assertEquals(filename, content.getFilename());
-  }
-
-  /**
-   * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileContentImpl#getSource()}
-   * .
-   */
-  @Test
-  public void testGetSource() {
-    assertEquals(source, content.getSource());
   }
 
   /**

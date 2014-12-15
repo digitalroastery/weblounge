@@ -453,6 +453,30 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.entwine.weblounge.common.content.Resource#getOrigin()
+   */
+  @Override
+  public String getOrigin() {
+    if (!isHeaderLoaded)
+      loadFileHeader();
+    return file.getOrigin();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#getOriginalIdentifier()
+   */
+  @Override
+  public String getOriginalIdentifier() {
+    if (!isHeaderLoaded)
+      loadFileHeader();
+    return file.getOriginalIdentifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.file.Page#hasSubject(java.lang.String)
    */
   public boolean hasSubject(String subject) {
@@ -547,6 +571,30 @@ public class LazyFileResourceImpl implements FileResource {
    */
   public void setIdentifier(String identifier) {
     uri.setIdentifier(identifier);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#setOrigin(java.lang.String)
+   */
+  @Override
+  public void setOrigin(String origin) {
+    if (!isHeaderLoaded)
+      loadFileHeader();
+    file.setOrigin(origin);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#setOriginalIdentifier(java.lang.String)
+   */
+  @Override
+  public void setOriginalIdentifier(String identifier) {
+    if (!isHeaderLoaded)
+      loadFileHeader();
+    file.setOriginalIdentifier(identifier);
   }
 
   /**

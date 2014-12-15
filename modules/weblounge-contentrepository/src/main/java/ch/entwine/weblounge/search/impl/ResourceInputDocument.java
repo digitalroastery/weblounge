@@ -27,7 +27,6 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_FILENAME;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_FILENAME_LOCALIZED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_MIMETYPE;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_MIMETYPE_LOCALIZED;
-import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_SOURCE;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_XML;
 import static ch.entwine.weblounge.search.impl.IndexSchema.COVERAGE;
 import static ch.entwine.weblounge.search.impl.IndexSchema.COVERAGE_LOCALIZED;
@@ -42,6 +41,8 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.LOCKED_BY_NAME;
 import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED_BY_NAME;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGIN;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGINAL_IDENTIFIER;
 import static ch.entwine.weblounge.search.impl.IndexSchema.OWNED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.OWNED_BY_NAME;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PATH;
@@ -159,6 +160,9 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
       }
     }
 
+    addField(ORIGIN, resource.getOrigin(), true, false);
+    addField(ORIGINAL_IDENTIFIER, resource.getOriginalIdentifier(), true, false);
+
     // Resource-level
     for (String subject : resource.getSubjects())
       addField(SUBJECT, subject, true, false);
@@ -213,7 +217,6 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
       addField(getLocalizedFieldName(CONTENT_XML, l), content.toXml(), false, false);
       addField(getLocalizedFieldName(CONTENT_CREATED, l), IndexUtils.serializeDate(content.getCreationDate()), false, false);
       addField(getLocalizedFieldName(CONTENT_CREATED_BY, l), IndexUtils.serializeUserId(content.getCreator()), false, false);
-      addField(CONTENT_SOURCE, content.getSource(), true, false);
       addField(CONTENT_EXTERNAL_REPRESENTATION, content.getExternalLocation(), true, false);
       addField(CONTENT_FILENAME, content.getFilename(), true, true);
       addField(getLocalizedFieldName(CONTENT_FILENAME_LOCALIZED, l), content.getFilename(), true, true);

@@ -43,6 +43,12 @@ public interface IndexSchema {
   /** Version field name */
   String VERSION = "version";
 
+  /** Resource origin field name */
+  String ORIGIN = "origin";
+  
+  /** Resource original identifier field name */
+  String ORIGINAL_IDENTIFIER = "original_identifier";
+
   /** Alternate version field name */
   String ALTERNATE_VERSION = "alternate_version";
 
@@ -165,9 +171,6 @@ public interface IndexSchema {
 
   /** Pagelet type field name (position within composer) */
   String PAGELET_TYPE_COMPOSER_POSITION = "pagelet_type_composer_{0}_position_{1}";
-
-  /** Resource content source field name */
-  String CONTENT_SOURCE = "content_source";
 
   /** Resource content external representation field name */
   String CONTENT_EXTERNAL_REPRESENTATION = "content_external_representation";

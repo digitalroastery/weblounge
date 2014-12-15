@@ -185,6 +185,26 @@ public class SearchQueryImplTest {
     query.withStationary();
     assertTrue(query.isStationary());
   }
+  
+  /**
+   * Test method for {@link SearchQueryImpl#withOrigin(String)
+   */
+  @Test
+  public void testWithOrigin() throws Exception {
+    String origin = "test-origin";
+    query.withOrigin(origin);
+    assertEquals(origin, query.getOrigin());
+  }
+  
+  /**
+   * Test method for {@link SearchQueryImpl#withOrigin(String)
+   */
+  @Test
+  public void testWithOriginalIdentifier() throws Exception {
+    String originId = "test-origin-id";
+    query.withOriginalIdentifier(originId);
+    assertEquals(originId, query.getOriginalIdentifier());
+  }
 
   /**
    * Test method for

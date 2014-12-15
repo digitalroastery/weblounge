@@ -67,6 +67,12 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /** The uri */
   protected ResourceURI uri = null;
 
+  /** The resource origin */
+  protected String origin = null;
+
+  /** The resource origin identifier */
+  protected String originIdentifier = null;
+
   /** Resource type */
   protected String type = null;
 
@@ -227,6 +233,46 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    */
   public void setVersion(long version) {
     uri.setVersion(version);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#setOrigin(java.lang.String)
+   */
+  @Override
+  public void setOrigin(String origin) {
+    this.origin = origin;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#getOrigin()
+   */
+  @Override
+  public String getOrigin() {
+    return this.origin;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#setOriginalIdentifier(java.lang.String)
+   */
+  @Override
+  public void setOriginalIdentifier(String identifier) {
+    this.originIdentifier = identifier;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.Resource#getOriginalIdentifier()
+   */
+  @Override
+  public String getOriginalIdentifier() {
+    return this.originIdentifier;
   }
 
   /**
@@ -1030,6 +1076,14 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     b.append("<index>");
     b.append(Boolean.toString(isIndexed));
     b.append("</index>");
+
+    b.append("<origin>");
+    b.append(origin);
+    b.append("</origin>");
+
+    b.append("<original-identifier>");
+    b.append(originIdentifier);
+    b.append("</original-identifier>");
 
     // Metadata
     b.append("<metadata>");

@@ -436,6 +436,16 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
       else if ("promote".equals(raw)) {
         page.setPromoted("true".equals(getCharacters()));
       }
+      
+      // Origin
+      if ("origin".equals(raw)) {
+        page.setOrigin(characters.toString());
+      }
+      
+      // Original identifier
+      if ("original-identifier".equals(raw)) {
+        page.setOriginalIdentifier(characters.toString());
+      }
 
       // Type
       else if ("type".equals(raw)) {

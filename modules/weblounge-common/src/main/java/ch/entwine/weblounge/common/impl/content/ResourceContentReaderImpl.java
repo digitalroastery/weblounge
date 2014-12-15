@@ -172,12 +172,6 @@ public abstract class ResourceContentReaderImpl<T extends ResourceContent> exten
       logger.trace("Content's filename is '{}'", content.getFilename());
     }
 
-    // source
-    else if ("source".equals(raw)) {
-      content.setSource(getCharacters());
-      logger.trace("Content's source is '{}'", content.getSource());
-    }
-
     // external
     else if ("external".equals(raw)) {
       try {
@@ -185,7 +179,7 @@ public abstract class ResourceContentReaderImpl<T extends ResourceContent> exten
       } catch (MalformedURLException e) {
         throw new SAXException(e);
       }
-      logger.trace("Content's external location is '{}'", content.getSource());
+      logger.trace("Content's external location is '{}'", content.getExternalLocation());
     }
 
     // author
