@@ -24,6 +24,7 @@ import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import ch.entwine.weblounge.common.NotImplementedException;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
@@ -141,7 +142,7 @@ public class SearchIndexTest {
   /**
    * Sets up the solr search index. Since solr sometimes has a hard time
    * shutting down cleanly, it's done only once for all the tests.
-   * 
+   *
    * @throws Exception
    */
   @BeforeClass
@@ -196,7 +197,7 @@ public class SearchIndexTest {
 
   /**
    * Creates the test setup.
-   * 
+   *
    * @throws java.lang.Exception
    *           if setup of the index fails
    */
@@ -624,6 +625,20 @@ public class SearchIndexTest {
     assertEquals(pages.length, idx.getByQuery(q).getDocumentCount());
   }
 
+  @Test(expected = NotImplementedException.class)
+  public void testAddWithNotSupportedAclOrder() throws Exception {
+    Page page = pages[0];
+    page.setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order.DenyAllow);
+    idx.add(page);
+  }
+
+  @Test(expected = NotImplementedException.class)
+  public void testUpdateWithNotSupportedAclOrder() throws Exception {
+    Page page = pages[0];
+    page.setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order.DenyAllow);
+    idx.update(page);
+  }
+
   /**
    * Test method for
    * {@link ch.entwine.weblounge.search.impl.SearchIndexImpl#update(ch.entwine.weblounge.common.content.page.Page)}
@@ -705,7 +720,7 @@ public class SearchIndexTest {
   /**
    * Adds sample pages to the search index and returns the number of documents
    * added.
-   * 
+   *
    * @return the number of pages added
    */
   protected int populateIndex() throws Exception {

@@ -22,6 +22,7 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import static ch.entwine.weblounge.common.request.RequestFlavor.ANY;
 import static ch.entwine.weblounge.common.request.RequestFlavor.HTML;
+import static ch.entwine.weblounge.common.security.SystemAction.READ;
 
 import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Resource;
@@ -36,6 +37,7 @@ import ch.entwine.weblounge.common.impl.request.Http11Constants;
 import ch.entwine.weblounge.common.impl.request.Http11Utils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
 import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
@@ -266,11 +268,11 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       // Can the page be accessed by the current user?
       User user = request.getUser();
       try {
-        // TODO: Check permission
-        // PagePermission p = new PagePermission(page, user);
-        // AccessController.checkPermission(p);
+        SecurablePermission readPermission = new SecurablePermission(page, READ);
+        if (System.getSecurityManager() != null)
+          System.getSecurityManager().checkPermission(readPermission);
       } catch (SecurityException e) {
-        logger.warn("Accessed to page {} denied for user {}", pageURI, user);
+        logger.warn("Accesse to page {} denied for user {}", pageURI, user);
         DispatchUtils.sendAccessDenied(request, response);
         return true;
       }

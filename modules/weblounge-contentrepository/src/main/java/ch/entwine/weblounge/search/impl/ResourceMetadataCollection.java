@@ -20,10 +20,17 @@
 
 package ch.entwine.weblounge.search.impl;
 
+import static java.util.Objects.requireNonNull;
+
+import ch.entwine.weblounge.common.NotImplementedException;
+import ch.entwine.weblounge.common.UnexpectedMatchError;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Rule;
+import ch.entwine.weblounge.common.security.Securable.Order;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -96,6 +103,41 @@ public class ResourceMetadataCollection implements Collection<ResourceMetadata<?
    */
   protected String getLocalizedFieldName(String fieldName, Language language) {
     return MessageFormat.format(fieldName, language.getIdentifier());
+  }
+
+  /**
+   * Returns the name of an index field in which the access information for a
+   * given {@link AccessRule} and a specific {@link Order} should be put into.
+   * 
+   * @param order
+   *          the allow-deny order
+   * @param rule
+   *          the rule (allow, deny)
+   * @param action
+   *          the action
+   * @return the field name
+   */
+  protected final String getAccessRuleFieldName(final Order order,
+      final Rule rule, final Action action) {
+    requireNonNull(order);
+    requireNonNull(rule);
+
+    switch (order) {
+      case AllowDeny: {
+        switch (rule) {
+          case Allow:
+            return MessageFormat.format(IndexSchema.ALLOWDENY_ALLOW_BY_ACTION, action.getContext() + action.getIdentifier());
+          case Deny:
+            throw new IllegalArgumentException("Deny-rules are not supported with order AllowDeny");
+          default:
+            throw new UnexpectedMatchError(rule.toString());
+        }
+      }
+      case DenyAllow:
+        throw new NotImplementedException("Deny-Allow order is not yet supported");
+      default:
+        throw new UnexpectedMatchError(order.toString());
+    }
   }
 
   /**

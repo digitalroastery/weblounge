@@ -20,8 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
@@ -47,6 +47,9 @@ public abstract class AbstractSecurityContext {
 
   /** Type mappings */
   protected static final Map<String, String> qualifier = new HashMap<String, String>();
+  
+  /** Singleton for any authority */
+  protected static final Authority ANY_AUTHORITY = new AnyAuthority();
 
   /**
    * Initializes the static shortcut mappings.
@@ -163,81 +166,39 @@ public abstract class AbstractSecurityContext {
 
   /**
    * Adds <code>authorities</code> to the authorized authorities regarding the
-   * given permission.
+   * given action.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authorities
    *          the authorities that are allowed
    */
-  public void allow(Permission permission, Authority[] authorities) {
+  public void allow(Action action, Authority... authorities) {
     if (authorities == null)
       throw new IllegalStateException("Authorities set is null!");
     for (Authority authority : authorities)
-      allow(permission, authority);
+      allow(authority, action);
   }
   
-  public abstract void allow(Permission permission, Authority authoriy);
+  public abstract void allow(Authority authoriy, Action action);
 
   /**
    * Adds <code>authorities</code> to the denied authorities regarding the given
-   * permission.
+   * action.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authorities
    *          the authorities to deny
    */
-  public void deny(Permission permission, Authority[] authorities) {
+  public void deny(Action action, Authority... authorities) {
     if (authorities == null)
       throw new IllegalStateException("Authorities set is null!");
     for (Authority authority : authorities)
-      deny(permission, authority);
+      deny(authority, action);
   }
 
-  public abstract void deny(Permission permission, Authority authoriy);
-
-  /**
-   * Checks whether at least one of the given authorities pass with respect to
-   * the given permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the object claiming the permission
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
-    if (authorities == null || authorities.length == 0)
-      return true;
-    for (Authority authority : authorities) {
-      if (check(permission, authority))
-        return true;
-    }
-    return false;
-  }
-  
-  public abstract boolean check(Permission permission, Authority authority);
-
-  /**
-   * Checks whether all of the given authorities pass with respect to the given
-   * permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the object claiming the permission
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
-    if (authorities == null || authorities.length == 0)
-      return true;
-    for (Authority authority : authorities) {
-      if (!check(permission, authority))
-        return false;
-    }
-    return true;
-  }
+  public abstract void deny(Authority authoriy, Action action);
 
   /**
    * Adds the security listener to the pagelets security context.

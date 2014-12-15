@@ -20,9 +20,10 @@
 
 package ch.entwine.weblounge.common.impl.content.page;
 
+import ch.entwine.weblounge.common.UnexpectedMatchError;
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.security.SystemPermission;
+import ch.entwine.weblounge.common.security.SystemAction;
 
 
 /**
@@ -39,13 +40,25 @@ public class PageletSecurityContext extends SecurityContextImpl {
   }
 
   /**
-   * Adds the default authorities to their respective permissions.
+   * Adds the default authorities to their respective actions.
    */
   private void addDefaultValues() {
-    allowDefault(SystemPermission.READ, SystemRole.GUEST);
-    allowDefault(SystemPermission.WRITE, SystemRole.EDITOR);
-    allowDefault(SystemPermission.MANAGE, SystemRole.EDITOR);
-    allowDefault(SystemPermission.PUBLISH, SystemRole.PUBLISHER);
+    switch (getAllowDenyOrder()) {
+      case AllowDeny:
+        allowDefault(SystemAction.READ, ANY_AUTHORITY);
+        allowDefault(SystemAction.WRITE, SystemRole.EDITOR);
+        allowDefault(SystemAction.MANAGE, SystemRole.EDITOR);
+        allowDefault(SystemAction.PUBLISH, SystemRole.PUBLISHER);
+        break;
+      case DenyAllow:
+        denyDefault(SystemAction.READ, ANY_AUTHORITY);
+        denyDefault(SystemAction.WRITE, ANY_AUTHORITY);
+        denyDefault(SystemAction.MANAGE, ANY_AUTHORITY);
+        denyDefault(SystemAction.PUBLISH, ANY_AUTHORITY);
+        break;
+      default:
+        throw new UnexpectedMatchError(getAllowDenyOrder().toString());
+    }
   }
 
 }

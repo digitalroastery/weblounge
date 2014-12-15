@@ -27,9 +27,12 @@ import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.impl.content.WebloungeContentReader;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.security.AllowAccessRule;
+import ch.entwine.weblounge.common.impl.security.DenyAccessRule;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
+import ch.entwine.weblounge.common.security.Securable.Order;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -229,18 +232,44 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  protected void setAllowDenyOrder(Order order) {
+    if (parserContext.equals(ParserContext.Pagelet))
+      pageletReader.setAllowDenyOrder(order);
+    else
+      page.setAllowDenyOrder(order);
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#allow(ch.entwine.weblounge.common.security.Permission,
+   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#allow(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
   @Override
-  protected void allow(Permission permission, Authority authority) {
+  protected void allow(Action action, Authority authority) {
     if (parserContext.equals(ParserContext.Pagelet))
-      pageletReader.allow(permission, authority);
+      pageletReader.allow(action, authority);
     else
-      page.allow(permission, authority);
+      page.addAccessRule(new AllowAccessRule(authority, action));
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.impl.content.WebloungeContentReader#deny(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  protected void deny(Action action, Authority authority) {
+    if (parserContext.equals(ParserContext.Pagelet))
+      pageletReader.deny(action, authority);
+    else
+      page.addAccessRule(new DenyAccessRule(authority, action));
+  }
+  
   /**
    * {@inheritDoc}
    * 

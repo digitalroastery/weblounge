@@ -209,6 +209,18 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#implies(ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean implies(Authority authority) {
+    if (authority instanceof Role)
+      return isExtensionOf((Role) authority);
+    return false;
+  }
+
+  /**
    * Sets the role name in the given language.
    * 
    * @param name
@@ -258,6 +270,18 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
     if (divider <= 0 || divider >= (role.length() - 1))
       throw new IllegalArgumentException("Role must be of the form 'context:id'!");
     return role.substring(divider + 1);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#matches(ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean matches(Authority authority) {
+    if (ANY_TYPE.equals(authority.getAuthorityType()) && ANY_AUTHORITY.equals(authority.getAuthorityId()))
+      return true;
+    return getAuthorityType().equals(authority.getAuthorityType()) && getAuthorityId().equals(authority.getAuthorityId());
   }
 
   /**

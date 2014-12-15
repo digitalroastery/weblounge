@@ -28,10 +28,12 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -261,6 +263,7 @@ public class ResourceIteratorTag extends WebloungeTag {
     // First time search resources
     if (searchResult == null) {
       SearchQuery q = new SearchQueryImpl(site);
+      q.withAction(SystemAction.READ);
       if (includeTypes != null)
         q.withTypes(includeTypes.toArray(new String[includeTypes.size()]));
 
@@ -356,7 +359,10 @@ public class ResourceIteratorTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    // TODO: Check the permissions
+    if (!SecurityUtils.userHasPermission(request.getUser(), resource, SystemAction.READ)) {
+      logger.debug("User {} has no read permission on resource {}", SecurityUtils.getUser(), resource);
+      return SKIP_BODY;
+    }
 
     // Store the resource and the resource content in the request
     stashAndSetAttribute(ResourceIteratorTagExtraInfo.RESOURCE, resource);

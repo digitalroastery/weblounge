@@ -18,34 +18,31 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.entwine.weblounge.common.impl.content.page;
-
-import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
-import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.security.SystemPermission;
-
+package ch.entwine.weblounge.common.security;
 
 /**
- * Specialized security context for a page. This implementation adds the proper
- * name and default values.
+ * This interface defines the methods to deal with a set of actions.
  */
-public class PageSecurityContext extends SecurityContextImpl {
+public interface ActionSet {
+
+  /** Value identifying conditions that have to match all */
+  int MATCH_ALL = 0;
+
+  /** Value identifying conditions where one of the have to be matched */
+  int MATCH_SOME = 1;
 
   /**
-   * Creates a new security context for a page.
+   * Returns the actions all of which have to be matched.
+   * 
+   * @return the actions to match
    */
-  public PageSecurityContext() {
-    addDefaultValues();
-  }
+  Action[] all();
 
   /**
-   * Adds the default authorities to their respective permissions.
+   * Returns the actions that require one or more to be matched.
+   * 
+   * @return the actions to match
    */
-  private void addDefaultValues() {
-    allowDefault(SystemPermission.READ, SystemRole.GUEST);
-    allowDefault(SystemPermission.WRITE, SystemRole.EDITOR);
-    allowDefault(SystemPermission.MANAGE, SystemRole.EDITOR);
-    allowDefault(SystemPermission.PUBLISH, SystemRole.PUBLISHER);
-  }
+  Action[] some();
 
 }

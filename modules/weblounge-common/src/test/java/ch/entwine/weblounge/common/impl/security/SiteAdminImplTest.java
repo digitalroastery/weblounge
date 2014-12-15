@@ -20,7 +20,9 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+import static org.junit.Assert.assertFalse;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import ch.entwine.weblounge.common.security.Security;
@@ -122,6 +124,17 @@ public class SiteAdminImplTest extends WebloungeUserImplTest {
     user.setLastName("Joyce");
     assertEquals("Joyce", user.getLastName());
     assertEquals(adminName, user.getName());
+  }
+
+  /**
+   * Test method for
+   * {@link SiteAdminImpl#implies(ch.entwine.weblounge.common.security.Authority)}
+   */
+  @Test
+  public void testImpliesSystemAdministratorRole() {
+    assertFalse(user.implies(SystemRole.SYSTEMADMIN));
+    assertTrue(user.implies(SystemRole.GUEST));
+    assertTrue(user.implies(new RoleImpl("foo", "bar")));
   }
 
 }

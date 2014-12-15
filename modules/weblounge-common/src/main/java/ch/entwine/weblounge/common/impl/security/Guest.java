@@ -20,12 +20,23 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+
 /**
  * Guest user, which is automatically taken as the user object if no valid user
  * is found in the current session. The guest user normally has the smallest set
  * of rights.
  */
 public class Guest extends UserImpl {
+
+  /** The login for the anonymous user */
+  public static final String ID = "anonymous";
+  
+  /**
+   * Creates a new guest user for the default realm.
+   */
+  public Guest() {
+    this(DefaultRealm, false);
+  }
 
   /**
    * Creates a new guest user for the given site.
@@ -34,8 +45,19 @@ public class Guest extends UserImpl {
    *          the user context
    */
   public Guest(String realm) {
-    super("anonymous", realm);
-    setName("Guest");
+    this(realm, false);
+  }
+
+  /**
+   * Creates a new guest user for the given site.
+   * 
+   * @param realm
+   *          the user context
+   * @param authenticated
+   *          whether this user has been authenticated
+   */
+  public Guest(String realm, boolean authenticated) {
+    super(ID, realm, "Guest", authenticated);
     addPublicCredentials(SystemRole.GUEST);
   }
 

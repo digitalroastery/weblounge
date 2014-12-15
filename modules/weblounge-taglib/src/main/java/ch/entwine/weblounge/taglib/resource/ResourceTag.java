@@ -26,10 +26,12 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -151,7 +153,10 @@ public class ResourceTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    // TODO: Check the permissions
+    if (!SecurityUtils.userHasPermission(request.getUser(), resource, SystemAction.READ)) {
+      logger.debug("User {} has no read permission on resource {}", SecurityUtils.getUser(), resource);
+      return SKIP_BODY;
+    }
 
     // Store the resource and the resource content in the request
     stashAndSetAttribute(ResourceTagExtraInfo.RESOURCE, resource);

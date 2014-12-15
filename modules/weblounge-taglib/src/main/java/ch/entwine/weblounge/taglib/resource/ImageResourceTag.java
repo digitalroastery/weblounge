@@ -32,10 +32,12 @@ import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.taglib.WebloungeTag;
@@ -182,6 +184,7 @@ public class ImageResourceTag extends WebloungeTag {
       uri = new ImageResourceURIImpl(site, imagePath, null);
     if (uri == null && imageSubjects != null && imageSubjects.size() > 0) {
       SearchQuery query = new SearchQueryImpl(site);
+      query.withAction(SystemAction.READ);
       query.withVersion(Resource.LIVE);
       query.withTypes(ImageResource.TYPE);
       query.withSubjects(SearchQuery.Quantifier.All, imageSubjects.toArray(new String[imageSubjects.size()]));
@@ -255,6 +258,11 @@ public class ImageResourceTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
+    if (!SecurityUtils.userHasPermission(request.getUser(), image, SystemAction.READ)) {
+      logger.debug("User {} has no read permission on image {}", SecurityUtils.getUser(), image);
+      return SKIP_BODY;
+    }
+
     // Find the image style
     if (StringUtils.isNotBlank(imageStyle)) {
       style = ImageStyleUtils.findStyle(imageStyle, site);
@@ -267,8 +275,6 @@ public class ImageResourceTag extends WebloungeTag {
         logger.warn("Image style '{}' not found to render on {}", imageStyle, request.getUrl());
       }
     }
-
-    // TODO: Check the permissions
 
     // Store the image and the image content in the request
     stashAndSetAttribute(ImageResourceTagExtraInfo.IMAGE, image);

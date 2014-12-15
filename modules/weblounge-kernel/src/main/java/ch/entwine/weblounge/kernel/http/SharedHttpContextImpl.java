@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.kernel.http;
 
-import ch.entwine.weblounge.common.security.SecurityService;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -46,9 +46,6 @@ public class SharedHttpContextImpl implements HttpContext {
 
   /** The bundle context */
   protected BundleContext bundleContext = null;
-
-  /** The security service */
-  protected SecurityService securityService = null;
 
   /**
    * Callback from OSGi on component activation.
@@ -81,7 +78,7 @@ public class SharedHttpContextImpl implements HttpContext {
    */
   public boolean handleSecurity(HttpServletRequest request,
       HttpServletResponse response) throws IOException {
-    return securityService != null;
+    return SecurityUtils.isConfigured();
   }
 
   /**
@@ -100,28 +97,6 @@ public class SharedHttpContextImpl implements HttpContext {
    */
   public String getMimeType(String name) {
     return null;
-  }
-
-  /**
-   * Callback from OSGi to set the security service once it has been published.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-    logger.info("Enabling requests to protected resources");
-  }
-
-  /**
-   * Callback from OSGi to set the security service once it has been published.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void removeSecurityService(SecurityService securityService) {
-    this.securityService = null;
-    logger.info("Disabling requests to protected resources");
   }
 
   /**

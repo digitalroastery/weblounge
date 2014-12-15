@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Defines a user with login, realm and name.
  */
-public interface User extends Cloneable {
+public interface User extends Authority, Cloneable {
 
   /** Default realm for weblounge users */
   String DefaultRealm = "weblounge";
@@ -50,6 +50,23 @@ public interface User extends Cloneable {
    * @return the realm
    */
   String getRealm();
+
+  /**
+   * Sets the flag to indicate whether the user has been logged in or not.
+   * 
+   * @param authenticated
+   *          whether the user has been authenticated
+   */
+  void setAuthenticated(boolean authenticated);
+
+  /**
+   * Returns <code>true</code> if this user was created as part of an
+   * authentication process or has either been created programmatically for some
+   * deferred action or to represent an anonymous (unauthenticated) user.
+   * 
+   * @return <code>true</code> if the user is authenticated
+   */
+  boolean isAuthenticated();
 
   /**
    * Adds the private credentials to this user. A private credentials would be

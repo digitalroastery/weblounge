@@ -93,9 +93,7 @@
   </sec:http>
 
   <!-- Instantiates the weblounge user filter that will map requests to users -->
-  <bean id="userContextFilter" class="ch.entwine.weblounge.kernel.security.UserContextFilter">
-    <constructor-arg ref="securityService"/>
-  </bean>
+  <bean id="userContextFilter" class="ch.entwine.weblounge.kernel.security.UserContextFilter"/>
 
   <!-- Authentication Entry and Exit Points -->
 
@@ -105,7 +103,6 @@
   </bean>
 
   <bean id="loginSuccessHandler" class="ch.entwine.weblounge.kernel.security.RoleBasedLoginSuccessHandler">
-    <property name="securityService" ref="securityService" />
     <property name="welcomePages">
       <map>
         <entry key="weblounge:editor" value="/weblounge/login/success.html" />
@@ -119,7 +116,6 @@
  
   <!-- Obtain services from the OSGI service registry -->
   <osgi:reference id="userDetailsService" cardinality="1..1" interface="org.springframework.security.core.userdetails.UserDetailsService"/>
-  <osgi:reference id="securityService" cardinality="1..1" interface="ch.entwine.weblounge.common.security.SecurityService"/>
 
   <!-- Spring Security Internals -->
 

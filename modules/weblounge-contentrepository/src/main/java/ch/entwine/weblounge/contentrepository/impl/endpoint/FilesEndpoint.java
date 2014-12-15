@@ -20,11 +20,13 @@
 
 package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
+import static ch.entwine.weblounge.common.security.SystemAction.READ;
+import static ch.entwine.weblounge.common.security.SystemAction.WRITE;
+
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceReader;
-import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.SearchQuery;
@@ -37,6 +39,7 @@ import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
+import ch.entwine.weblounge.common.impl.content.file.FileResourceSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageSearchResultItemImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.security.SecurityUtils;
@@ -51,7 +54,8 @@ import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.repository.ResourceSerializer;
 import ch.entwine.weblounge.common.repository.ResourceSerializerService;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
-import ch.entwine.weblounge.common.security.SecurityService;
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -124,9 +128,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
   /** Mime type detector */
   private final Tika mimeTypeDetector = new Tika();
-
-  /** The security service */
-  protected SecurityService securityService = null;
 
   /** The resource serializer service */
   private ResourceSerializerService serializerService = null;
@@ -223,19 +224,19 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       else if (filter.startsWith("creator:") && filter.length() > "creator:".length()) {
         String creator = StringUtils.trim(filter.substring("creator:".length()));
         if ("me".equals(creator))
-          q.withCreator(securityService.getUser());
+          q.withCreator(SecurityUtils.getUser());
         else
           q.withCreator(new UserImpl(creator));
       } else if (filter.startsWith("modifier:") && filter.length() > "modifier:".length()) {
         String modifier = StringUtils.trim(filter.substring("modifier:".length()));
         if ("me".equals(modifier))
-          q.withModifier(securityService.getUser());
+          q.withModifier(SecurityUtils.getUser());
         else
           q.withModifier(new UserImpl(modifier));
       } else if (filter.startsWith("publisher:") && filter.length() > "publisher:".length()) {
         String publisher = StringUtils.trim(filter.substring("publisher:".length()));
         if ("me".equals(publisher))
-          q.withPublisher(securityService.getUser());
+          q.withPublisher(SecurityUtils.getUser());
         else
           q.withPublisher(new UserImpl(publisher));
       }
@@ -304,7 +305,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Load the result
-    String result = loadResultSet(q);
+    String result = loadResultSet(q, READ);
 
     // Return the response
     return Response.ok(result).build();
@@ -374,7 +375,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Load the result
-    String result = loadResultSet(q);
+    String result = loadResultSet(q, SystemAction.READ);
 
     // Return the response
     return Response.ok(result).build();
@@ -406,6 +407,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     if (resource == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
+
+    // Check the permission
+    checkPermission(resource, READ);
 
     // Is there an up-to-date, cached version on the client side?
     if (!ResourceUtils.hasChanged(request, resource)) {
@@ -457,7 +461,15 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     for (SearchResultItem item : result.getItems()) {
       if (resourceId.equals(item.getId()))
         continue;
-      String headerXml = ((PageSearchResultItemImpl) item).getPageHeaderXml();
+
+      // Instantiate the resource
+      PageSearchResultItemImpl pageResultItem = (PageSearchResultItemImpl) item;
+      Page page = pageResultItem.getPage();
+      String headerXml = pageResultItem.getPageHeaderXml();
+
+      // Check the permission
+      checkPermission(page, READ);
+
       buf.append(headerXml);
     }
     buf.append("</pages>");
@@ -505,6 +517,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
+    // Check the permission
+    checkPermission(resource, READ);
+
     return getResourceContent(request, resource, language);
   }
 
@@ -530,6 +545,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       @PathParam("language") String languageId) {
 
     Site site = getSite(request);
+    User user = getUser();
+
+    if (user == null)
+      throw new WebApplicationException(Status.UNAUTHORIZED);
 
     // Check the parameters
     if (resourceId == null)
@@ -546,6 +565,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     if (resource == null || resource.contents().isEmpty()) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
+
+    // Check the permission
+    checkPermission(resource, WRITE);
 
     String fileName = null;
     String mimeType = null;
@@ -624,11 +646,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         if (mimeType == null)
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
-
-      // Get the current user
-      User user = securityService.getUser();
-      if (user == null)
-        throw new WebApplicationException(Status.UNAUTHORIZED);
 
       // Make sure the user has editing rights
       if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
@@ -709,6 +726,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       @PathParam("resource") String resourceId,
       @PathParam("language") String languageId) {
 
+    // Get the current user
+    User user = getUser();
+
     // Check the parameters
     if (resourceId == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
@@ -725,6 +745,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
+    // Check the permission
+    checkPermission(resource, WRITE);
+
     // Get the resource content
     ResourceContent content = resource.getContent(language);
     if (content == null) {
@@ -733,11 +756,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     ResourceURI uri = resource.getURI();
     Site site = getSite(request);
-
-    // Get the current user
-    User user = securityService.getUser();
-    if (user == null)
-      throw new WebApplicationException(Status.UNAUTHORIZED);
 
     // Make sure the user has editing rights
     if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
@@ -820,6 +838,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
+    // Load the resource
     Resource<?> currentResource;
     try {
       currentResource = contentRepository.get(resourceURI);
@@ -837,9 +856,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Get the current user
-    User user = securityService.getUser();
-    if (user == null)
-      throw new WebApplicationException(Status.UNAUTHORIZED);
+    User user = getUser();
 
     // Make sure the user has editing rights
     if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
@@ -855,6 +872,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       resource.setModified(user, new Date());
       contentRepository.put(resource, false);
+
+      // Check the permission
+      checkPermission(resource, READ);
 
       // Check if the resource has been moved
       String currentPath = currentResource.getURI().getPath();
@@ -907,9 +927,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Get the current user
-    User user = securityService.getUser();
-    if (user == null)
-      throw new WebApplicationException(Status.UNAUTHORIZED);
+    User user = getUser();
 
     // Make sure the user has editing rights
     if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
@@ -993,9 +1011,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Get the current user
-    User user = securityService.getUser();
-    if (user == null)
-      throw new WebApplicationException(Status.UNAUTHORIZED);
+    User user = getUser();
 
     // Make sure the user has editing rights
     if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
@@ -1014,6 +1030,18 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("File lookup {} failed for site '{}'", resourceURI, site);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+
+    // Load the resource
+    Resource<?> resource;
+    try {
+      resource = contentRepository.get(resourceURI);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error reading current resource {} from repository: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Check the permission
+    checkPermission(resource, WRITE);
 
     // Delete the resource
     try {
@@ -1172,9 +1200,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       }
 
       // Set owner and date created
-      User user = securityService.getUser();
-      if (user == null)
-        throw new WebApplicationException(Status.UNAUTHORIZED);
+      User user = getUser();
 
       // Make sure the user has editing rights
       if (!SecurityUtils.userHasRole(user, SystemRole.EDITOR))
@@ -1322,16 +1348,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   }
 
   /**
-   * Callback from OSGi to set the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
-  /**
    * Try to detect the mimetype from filename or file.
    * 
    * @param fileName
@@ -1371,12 +1387,15 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    * 
    * @param q
    *          the search query
+   * @param action
+   *          the action that is to be performed on the result set
    * @return the files
    * @throws WebApplicationException
    *           if the content repository is unavailable or if the content can't
    *           be loaded
    */
-  private String loadResultSet(SearchQuery q) throws WebApplicationException {
+  private String loadResultSet(SearchQuery q, Action action)
+      throws WebApplicationException {
     ContentRepository repository = getContentRepository(q.getSite(), false);
     if (repository == null)
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
@@ -1398,12 +1417,16 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
     buf.append(">");
     for (SearchResultItem item : result.getItems()) {
-      String xml = ((ResourceSearchResultItem) item).getResourceXml();
 
-      // TODO: Remove this hack once the importer is fixed
-      xml = xml.replace("292278994-08-17T07:12:55Z", "2010-08-17T07:12:55Z");
+      // Instantiate the resource
+      FileResourceSearchResultItemImpl fileResultItem = (FileResourceSearchResultItemImpl) item;
+      FileResource fileResource = (fileResultItem).getFileResource();
 
-      buf.append(xml);
+      // Check the permission
+      checkPermission(fileResource, READ);
+
+      String fileXml = fileResultItem.getResourceXml();
+      buf.append(fileXml);
     }
     buf.append("</files>");
     return buf.toString();

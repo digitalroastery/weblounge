@@ -32,10 +32,10 @@ import ch.entwine.weblounge.common.impl.content.page.MockPageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.entwine.weblounge.common.impl.security.Guest;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.site.PrecompileHttpServletRequest;
 import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
@@ -79,9 +79,6 @@ public class Precompiler {
   /** The default environment */
   protected Environment environment = Environment.Any;
 
-  /** The security service */
-  protected SecurityService security = null;
-
   /** The key used to identify this compilation process */
   protected String compilerKey = null;
 
@@ -94,17 +91,14 @@ public class Precompiler {
    *          the site servlet
    * @param environment
    *          the environment to use
-   * @param security
-   *          the security service
    * @param logErrors
    *          <code>true</code> to log precompilation errors
    */
   public Precompiler(String key, SiteServlet servlet, Environment environment,
-      SecurityService security, boolean logErrors) {
+      boolean logErrors) {
     this.compilerKey = key;
     this.servlet = servlet;
     this.environment = environment;
-    this.security = security;
     this.logErrors = logErrors;
   }
 
@@ -222,8 +216,8 @@ public class Precompiler {
       }
 
       // Make sure there is a user
-      security.setUser(new Guest(site.getIdentifier()));
-      security.setSite(site);
+      SecurityUtils.setUser(new Guest(site.getIdentifier()));
+      SecurityUtils.setSite(site);
 
       logger.info("Precompiling java server pages for '{}'", site);
       int errorCount = 0;
@@ -271,8 +265,8 @@ public class Precompiler {
 
       isRunning = false;
 
-      security.setUser(null);
-      security.setSite(null);
+      SecurityUtils.setUser(null);
+      SecurityUtils.setSite(null);
 
       // Log the precompilation results
       if (!keepGoing) {

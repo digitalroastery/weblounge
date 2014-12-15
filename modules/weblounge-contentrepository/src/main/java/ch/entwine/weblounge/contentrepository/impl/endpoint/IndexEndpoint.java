@@ -32,7 +32,6 @@ import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -60,9 +59,6 @@ public class IndexEndpoint extends ContentRepositoryEndpoint {
   /** Logging facility */
   static final Logger logger = LoggerFactory.getLogger(IndexEndpoint.class);
 
-  /** The security service */
-  protected SecurityService securityService = null;
-
   /** The endpoint documentation */
   private String docs = null;
 
@@ -78,7 +74,7 @@ public class IndexEndpoint extends ContentRepositoryEndpoint {
   public Response getstatistics(@Context HttpServletRequest request) {
 
     // Make sure the user has site administrator rights
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
       throw new WebApplicationException(Status.FORBIDDEN);
 
@@ -127,7 +123,7 @@ public class IndexEndpoint extends ContentRepositoryEndpoint {
   public Response reindex(@Context HttpServletRequest request) {
 
     // Make sure the user has site administrator rights
-    User user = securityService.getUser();
+    User user = SecurityUtils.getUser();
     if (!SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
       throw new WebApplicationException(Status.FORBIDDEN);
 
@@ -176,16 +172,6 @@ public class IndexEndpoint extends ContentRepositoryEndpoint {
       docs = IndexEndpointDocs.createDocumentation(servicePath);
     }
     return docs;
-  }
-
-  /**
-   * Callback from OSGi to set the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
   /**

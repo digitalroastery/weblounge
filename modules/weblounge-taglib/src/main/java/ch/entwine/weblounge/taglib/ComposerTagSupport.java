@@ -33,12 +33,14 @@ import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.HTMLAction;
 import ch.entwine.weblounge.common.site.Module;
@@ -349,9 +351,11 @@ public class ComposerTagSupport extends WebloungeTag {
             logger.warn("No page was found while processing composer on " + url);
             return;
           }
-        } catch (SecurityException e) {
-          logger.warn("Composer '" + id + "' was unable to choose homepage as fallback: " + e.getMessage());
-          return;
+          if (!SecurityUtils.userHasPermission(request.getUser(), targetPage, SystemAction.READ)) {
+            logger.debug("User {} has no read permissions on {}", SecurityUtils.getUser(), targetPage);
+            targetPage = null;
+            return;
+          }
         } catch (ContentRepositoryException e) {
           logger.warn("Composer '" + id + "' was unable to choose homepage as fallback: " + e.getMessage());
           return;
@@ -381,9 +385,10 @@ public class ComposerTagSupport extends WebloungeTag {
             if ("".equals(pageUrl))
               pageUrl = "/";
             ResourceURI pageURI = new PageURIImpl(site, pageUrl);
-            try {
-              contentPage = (Page) contentRepository.get(pageURI);
-            } catch (SecurityException e) {
+            contentPage = (Page) contentRepository.get(pageURI);
+
+            if (!SecurityUtils.userHasPermission(request.getUser(), contentPage, SystemAction.READ)) {
+              contentPage = null;
               logger.debug("Prevented loading of protected content from inherited page {} for composer {}", pageURI, id);
             }
 
@@ -703,12 +708,12 @@ public class ComposerTagSupport extends WebloungeTag {
       String rendererId = pagelet.getIdentifier();
 
       // Check access rights
-      // Permission p = SystemPermission.READ;
-      // if (!pagelet.checkOne(p, user.getRoleClosure()) &&
-      // !pagelet.check(p, user)) {
+      // Action action = SystemPermission.READ;
+      // if (!pagelet.checkOne(action, user.getRoleClosure()) &&
+      // !pagelet.check(action, user)) {
       // logger.debug("Skipping pagelet " + i + " in composer " + composer
       // + " due to insufficient rights");
-      // continue p;
+      // continue action;
       // }
 
       // Check publishing dates

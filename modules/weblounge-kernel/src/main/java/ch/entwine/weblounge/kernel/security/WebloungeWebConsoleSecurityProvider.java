@@ -22,7 +22,6 @@ package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 
 import org.apache.felix.webconsole.WebConsoleSecurityProvider2;
@@ -39,20 +38,6 @@ import javax.ws.rs.core.Response.Status;
  */
 public class WebloungeWebConsoleSecurityProvider implements WebConsoleSecurityProvider2 {
 
-  /** The security service */
-  private SecurityService securityService = null;
-
-  /**
-   * Creates a new console security provider, based on the Weblounge security
-   * service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  public WebloungeWebConsoleSecurityProvider(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
   /**
    * {@inheritDoc}
    * 
@@ -61,9 +46,7 @@ public class WebloungeWebConsoleSecurityProvider implements WebConsoleSecurityPr
    */
   public boolean authenticate(HttpServletRequest request,
       HttpServletResponse response) {
-    if (securityService == null)
-      return false;
-    User webloungeUser = securityService.getUser();
+    User webloungeUser = SecurityUtils.getUser();
     boolean authenticated = SecurityUtils.userHasRole(webloungeUser, SystemRole.SYSTEMADMIN);
     if (!authenticated) {
       try {
@@ -82,9 +65,7 @@ public class WebloungeWebConsoleSecurityProvider implements WebConsoleSecurityPr
    *      java.lang.String)
    */
   public Object authenticate(String username, String password) {
-    if (securityService == null)
-      return null;
-    User webloungeUser = securityService.getUser();
+    User webloungeUser = SecurityUtils.getUser();
     return SecurityUtils.userHasRole(webloungeUser, SystemRole.SYSTEMADMIN);
   }
 
@@ -95,9 +76,7 @@ public class WebloungeWebConsoleSecurityProvider implements WebConsoleSecurityPr
    *      java.lang.String)
    */
   public boolean authorize(Object user, String role) {
-    if (securityService == null)
-      return false;
-    User webloungeUser = securityService.getUser();
+    User webloungeUser = SecurityUtils.getUser();
     return SecurityUtils.userHasRole(webloungeUser, SystemRole.SYSTEMADMIN);
   }
 

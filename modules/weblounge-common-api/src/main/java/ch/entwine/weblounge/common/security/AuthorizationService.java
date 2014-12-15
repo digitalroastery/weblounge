@@ -50,11 +50,11 @@ public interface AuthorizationService {
   boolean hasPermission(Resource<?> resource, String action);
 
   /**
-   * Gets the permissions associated with this resource.
+   * Gets the actions associated with this resource.
    * 
    * @param resource
    *          the resource
-   * @return the set of permissions and explicit denials
+   * @return the set of actions and explicit denials
    */
   AccessControlList getAccessControlList(Resource<?> resource);
 

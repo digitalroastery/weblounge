@@ -25,6 +25,7 @@ import static ch.entwine.weblounge.dispatcher.SharedHttpContext.PATTERN;
 import static ch.entwine.weblounge.dispatcher.SharedHttpContext.SERVICE_RANKING;
 import static ch.entwine.weblounge.dispatcher.SharedHttpContext.WEBLOUNGE_CONTEXT_ID;
 
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.kernel.site.SiteManager;
@@ -69,9 +70,6 @@ public class SpringSecurityConfigurationService implements ManagedService {
 
   /** Configuration key for the enabled/disabled configuration */
   public static final String OPT_ENABLED = "security.enabled";
-
-  /** The related spring security service */
-  protected SpringSecurityServiceImpl securityService = null;
 
   /** The current bundle context */
   protected BundleContext bundleCtx = null;
@@ -134,10 +132,10 @@ public class SpringSecurityConfigurationService implements ManagedService {
 
     // Get the security filter chain from the spring context
     Filter defaultSecurityFilter = (Filter) springContext.getBean("springSecurityFilterChain");
-    securityFilter = new SecurityFilter(securityService, sites, defaultSecurityFilter);
+    securityFilter = new SecurityFilter(sites, defaultSecurityFilter);
 
     // Create the web console security provider
-    webConsoleProvider = new WebloungeWebConsoleSecurityProvider(securityService);
+    webConsoleProvider = new WebloungeWebConsoleSecurityProvider();
 
     // Activate the security filters
     if (securityEnabled) {
@@ -147,7 +145,8 @@ public class SpringSecurityConfigurationService implements ManagedService {
     }
 
     // Tell the security service abut the current policy
-    securityService.setEnabled(securityEnabled);
+    SecurityUtils.setConfigured(true);
+    SecurityUtils.setEnabled(securityEnabled);
 
     // Register the security marker
     publishSecurityMarker();
@@ -161,6 +160,9 @@ public class SpringSecurityConfigurationService implements ManagedService {
    */
   void deactivate(ComponentContext ctx) {
     logger.info("Tearing down spring security");
+
+    // Tell the security service
+    SecurityUtils.setConfigured(false);
 
     // Unregister the security filters
     if (securityFilterRegistration != null) {
@@ -205,7 +207,7 @@ public class SpringSecurityConfigurationService implements ManagedService {
     }
 
     // Tell the security service abut the current policy
-    securityService.setEnabled(isEnabled);
+    SecurityUtils.setEnabled(isEnabled);
 
     // Store the security enabled setting
     this.securityEnabled = isEnabled;
@@ -275,16 +277,6 @@ public class SpringSecurityConfigurationService implements ManagedService {
         logger.error("Unregistering web console security provider", t.getMessage());
       }
     }
-  }
-
-  /**
-   * Callback from OSGi to set the spring security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SpringSecurityServiceImpl securityService) {
-    this.securityService = securityService;
   }
 
   /**

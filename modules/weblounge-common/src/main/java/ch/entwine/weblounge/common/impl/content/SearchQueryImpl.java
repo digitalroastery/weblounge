@@ -31,6 +31,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -180,10 +181,13 @@ public class SearchQueryImpl implements SearchQuery {
   protected String filter = null;
 
   /** The query offset */
-  protected int offset = -1;
+  protected int offset = 0;
 
   /** The query limit */
-  protected int limit = -1;
+  protected int limit = 10;
+
+  /** The required actions */
+  protected List<Action> actions = new ArrayList<Action>();
 
   /** True to boost more recent documents */
   protected boolean recencyBoost = false;
@@ -276,10 +280,10 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.SearchQuery#withRececyPriority()
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withRecencyPriority()
    */
   @Override
-  public SearchQuery withRececyPriority() {
+  public SearchQuery withRecencyPriority() {
     this.recencyBoost = true;
     return this;
   }
@@ -300,6 +304,9 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withLimit(int)
    */
   public SearchQuery withLimit(int limit) {
+    if (limit < 1)
+      throw new IllegalArgumentException("The limit must not be less then 1");
+
     this.limit = limit;
     return this;
   }
@@ -319,7 +326,10 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.entwine.weblounge.common.content.SearchQuery#withOffset(int)
    */
   public SearchQuery withOffset(int offset) {
-    this.offset = Math.max(0, offset);
+    if (offset < 0)
+      throw new IllegalArgumentException("The offset must not be less than 0");
+    
+    this.offset = offset;
     return this;
   }
 
@@ -330,6 +340,29 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public int getOffset() {
     return offset;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withAction(ch.entwine.weblounge.common.security.Action)
+   */
+  public SearchQuery withAction(Action action) {
+    if (action == null)
+      throw new IllegalArgumentException("Action cannot be null");
+    clearExpectations();
+    actions.add(action);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getActions()
+   */
+  @Override
+  public Action[] getActions() {
+    return actions.toArray(new Action[actions.size()]);
   }
 
   /**

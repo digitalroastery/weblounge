@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<security>
+  <owner>
+    <user id="john.doe" realm="testland"><![CDATA[John Doe]]></user>
+  </owner>
+  <acl order="allow,deny">
+    <allow id="weblounge:publish" type="role">weblounge:publisher</allow>
+    <allow id="weblounge:write" type="role">weblounge:editor,weblounge:translator</allow>
+    <allow id="weblounge:write" type="user">testland:john.doe</allow>
+    <deny id="weblounge:publish" type="any">*</deny>
+    <deny id="weblounge:write" type="any">*</deny>
+  </acl>
+</security>

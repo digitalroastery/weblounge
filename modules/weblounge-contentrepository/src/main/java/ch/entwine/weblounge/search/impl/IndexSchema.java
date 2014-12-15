@@ -49,6 +49,9 @@ public interface IndexSchema {
   /** Subjects field name */
   String SUBJECT = "subjects";
 
+  /** Granted permissions field name */
+  String ALLOWDENY_ALLOW_BY_ACTION = "allowdeny_allow_{0}";
+
   /** Template field name */
   String TEMPLATE = "template";
 

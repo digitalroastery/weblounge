@@ -20,12 +20,18 @@
 
 package ch.entwine.weblounge.common.security;
 
+import java.util.SortedSet;
 
 /**
  * The <code>Secured</code> interface defines the required methods for a secured
  * object.
  */
 public interface Securable {
+
+  /** The order in which to evaluate allow and deny rules */
+  public enum Order {
+    AllowDeny, DenyAllow
+  };
 
   /**
    * Sets the object owner.
@@ -43,86 +49,83 @@ public interface Securable {
   User getOwner();
 
   /**
-   * Adds <code>authority</code> to the authorized authorities regarding the
-   * given permission.
+   * Returns <code>true</code> if the access rules enforced by this
+   * {@link Securable} represent the default set of rules, i. e. the
+   * {@link Securable} does not define any custom access rules of its own.
+   * 
+   * @return <code>true</code> if this object is secured by the default rather
+   *         than a custom set of access rules
+   */
+  boolean isDefaultAccess();
+
+  /**
+   * Sets the {@link Order} in which allow and deny rules are to be evaluated.
+   * 
+   * @param order
+   *          the order
+   */
+  void setAllowDenyOrder(Order order);
+
+  /**
+   * Returns the {@link Order} in which allow and deny rules are to be
+   * evaluated.
+   * 
+   * @return the order
+   */
+  Order getAllowDenyOrder();
+
+  /**
+   * Adds <code>rule</code> to the list of access rules that define which
+   * authority is either allowed or denied access to the {@link Securable}
    * <p>
-   * <b>Note:</b> Calling this method replaces any default authorities on the
-   * given permission, so if you want to keep them, add them here explicitly.
+   * <b>Note:</b> Calling this method replaces any default rules on the action
+   * specified by the rule.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authority
-   *          the item that is allowed to obtain the permission
+   *          the item that is allowed to obtain the action
    */
-  void allow(Permission permission, Authority authority);
+  void addAccessRule(AccessRule rule);
 
   /**
-   * Removes <code>authority</code> from the denied authorities regarding the
-   * given permission. This method will remove the authority from both the
-   * explicitly allowed and the default authorities.
+   * Returns <code>true</code> if <code>authority</code> is authorized to apply
+   * the the given action.
    * 
-   * @param permission
-   *          the permission
+   * @param action
+   *          the action
    * @param authority
-   *          the authorization to deny
+   *          the item that is allowed to obtain the action
+   * @return <code>true</code> if the authority is authorized
    */
-  void deny(Permission permission, Authority authority);
+  boolean isAllowed(Action action, Authority authority);
 
   /**
-   * Checks whether the authorization satisfy the constraints of this context on
-   * the given permission.
+   * Returns <code>true</code> if <code>authority</code> is denied to apply the
+   * the given action.
    * 
-   * @param permission
-   *          the permission to obtain
+   * @param action
+   *          the action
    * @param authority
-   *          the object used to obtain the permission
-   * @return <code>true</code> if the authorization is sufficient
+   *          the item that is allowed to obtain the action
+   * @return <code>true</code> if the authority is denied
    */
-  boolean check(Permission permission, Authority authority);
+  boolean isDenied(Action action, Authority authority);
 
   /**
-   * Returns <code>true</code> if the authorization <code>authorization</code>
-   * is sufficient to act on the secured object in a way that requires the given
-   * {@link PermissionSet} <code>p</code>.
+   * Returns the actions that may be acquired on this object.
    * 
-   * @param permissions
-   *          the required set of permissions
-   * @param authority
-   *          the object claiming the permissions
-   * @return <code>true</code> if the object may obtain the permissions
+   * @return the available actions
    */
-  boolean check(PermissionSet permissions, Authority authority);
+  Action[] getActions();
 
   /**
-   * Checks whether at least one of the given authorities pass with respect to
-   * the given permission.
+   * Returns the access rules in the order which has been specified by means of
+   * {@link #setAllowDenyOrder(Order)}.
    * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the objects claiming the permission
-   * @return <code>true</code> if all authorities pass
+   * @return the rules
    */
-  boolean checkOne(Permission permission, Authority[] authorities);
-
-  /**
-   * Checks whether all of the given authorities pass with respect to the given
-   * permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the objects claiming the permission
-   * @return <code>true</code> if all authorities pass
-   */
-  boolean checkAll(Permission permission, Authority[] authorities);
-
-  /**
-   * Returns the permissions that may be acquired on this object.
-   * 
-   * @return the available permissions
-   */
-  Permission[] permissions();
+  SortedSet<AccessRule> getAccessRules();
 
   /**
    * Adds <code>listener</code> to the list of security listeners that will be

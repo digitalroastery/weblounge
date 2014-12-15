@@ -22,11 +22,11 @@ package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.impl.security.Guest;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.Security;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -59,23 +59,16 @@ public class UserContextFilter implements Filter {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(UserContextFilter.class);
 
-  /** The security service */
-  protected SecurityService securityService = null;
-
   /**
    * Creates a new weblounge security filter, which is populating the required
    * fields for the current request in the security service.
-   * 
-   * @param securityService
-   *          the security service
    */
-  public UserContextFilter(SecurityService securityService) {
-    this.securityService = securityService;
+  public UserContextFilter() {
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
    */
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -84,7 +77,7 @@ public class UserContextFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
    *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
    */
@@ -92,7 +85,7 @@ public class UserContextFilter implements Filter {
       FilterChain chain) throws IOException, ServletException {
 
     // Make sure we have a site
-    Site site = securityService.getSite();
+    Site site = SecurityUtils.getSite();
     if (site == null)
       throw new IllegalStateException("Site context is not available at user lookup");
 
@@ -109,17 +102,17 @@ public class UserContextFilter implements Filter {
     }
 
     // Set the site and the user on the request
-    securityService.setUser(user);
+    SecurityUtils.setUser(user);
 
     chain.doFilter(request, response);
 
     // Make sure the thread is not associated with the site or the user anymore
-    securityService.setUser(null);
+    SecurityUtils.setUser(null);
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#destroy()
    */
   public void destroy() {
@@ -128,7 +121,7 @@ public class UserContextFilter implements Filter {
 
   /**
    * Loads the user from the given site.
-   * 
+   *
    * @param site
    *          the site
    * @return the user
@@ -139,7 +132,7 @@ public class UserContextFilter implements Filter {
     User user = null;
     Set<Role> roles = new HashSet<Role>();
 
-    if (!securityService.isEnabled()) {
+    if (!SecurityUtils.isEnabled()) {
       user = new UserImpl(Security.ADMIN_USER, Security.SYSTEM_CONTEXT, Security.ADMIN_NAME);
       roles.add(SystemRole.SYSTEMADMIN);
       roles.add(getLocalRole(site, SystemRole.SYSTEMADMIN));
@@ -157,10 +150,13 @@ public class UserContextFilter implements Filter {
         roles.add(getLocalRole(site, SystemRole.GUEST));
       } else if (principal instanceof SpringSecurityUser) {
         user = ((SpringSecurityUser) principal).getUser();
+        user.setAuthenticated(true);
+        addRoles(roles, auth.getAuthorities());
         logger.debug("Principal was identified as '{}'", user.getLogin());
       } else if (principal instanceof UserDetails) {
         UserDetails userDetails = (UserDetails) principal;
-        user = new UserImpl(userDetails.getUsername());
+        user = new UserImpl(userDetails.getUsername(), true);
+        addRoles(roles, auth.getAuthorities());
         logger.debug("Principal was identified as '{}'", user.getLogin());
 
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
@@ -189,9 +185,27 @@ public class UserContextFilter implements Filter {
   }
 
   /**
+   * Translates SpringSecurity authorities from Spring Security to Weblounge
+   * Roles.
+   * 
+   * @param roles
+   *          the set of roles
+   * @param authorities
+   *          the authorities
+   */
+  protected void addRoles(Set<Role> roles,
+      final Collection<? extends GrantedAuthority> authorities) {
+    if (authorities != null && authorities.size() > 0) {
+      for (GrantedAuthority ga : authorities) {
+        roles.add(new RoleImpl(ga.getAuthority()));
+      }
+    }
+  }
+
+  /**
    * Returns the local role for the given system role or the system role itself,
    * if no local role was defined.
-   * 
+   *
    * @param site
    *          the site
    * @param role

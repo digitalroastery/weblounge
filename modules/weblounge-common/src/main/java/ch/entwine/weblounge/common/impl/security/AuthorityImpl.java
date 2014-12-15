@@ -74,29 +74,48 @@ public class AuthorityImpl implements Authority {
   }
 
   /**
-   * Returns <code>true<code> if the authority matches <code>o</code> with
-   * respect to type and identifier.
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#matches(ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean equals(Object o) {
-    if (o != null && o instanceof Authority) {
-      return isAuthorizedBy((Authority) o);
-    }
-    return false;
+  @Override
+  public boolean matches(Authority authority) {
+    if (ANY_TYPE.equals(type) && ANY_AUTHORITY.equals(id))
+      return true;
+    if (ANY_TYPE.equals(authority.getAuthorityType()) && ANY_AUTHORITY.equals(authority.getAuthorityId()))
+      return true;
+    return type.equals(authority.getAuthorityType()) && id.equals(authority.getAuthorityId());
   }
 
   /**
    * {@inheritDoc}
-   * <p>
-   * This default implementation only authorizes authorities with matching type
-   * and id.
-   * 
-   * @see ch.entwine.weblounge.common.security.Authority#isAuthorizedBy(ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#implies(ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean isAuthorizedBy(Authority authority) {
-    if (authority != null) {
-      return type.equals(authority.getAuthorityType()) && id.equals(authority.getAuthorityId());
-    }
+  @Override
+  public boolean implies(Authority authority) {
     return false;
+  }
+
+  /**
+   * Returns <code>true<code> if the authority matches <code>o</code> with
+   * respect to type and identifier.
+   */
+  public boolean equals(Object o) {
+    if (!(o instanceof Authority))
+      return false;
+    Authority authority = (Authority) o;
+    return type.equals(authority.getAuthorityType()) && id.equals(authority.getAuthorityId());
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return type + ":" + id;
   }
 
 }

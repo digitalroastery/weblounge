@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.User;
 
 import org.w3c.dom.Node;
@@ -44,6 +45,9 @@ public class UserImpl implements User {
   /** The user domain */
   protected String realm = null;
 
+  /** Flag indicating whether the user is logged in or not */
+  protected boolean isAuthenticated = false;
+
   /** The user's name */
   protected String name = null;
 
@@ -60,7 +64,19 @@ public class UserImpl implements User {
    *          the login
    */
   public UserImpl(String login) {
-    this(login, null, null);
+    this(login, null, null, false);
+  }
+
+  /**
+   * Creates a new user with the given login.
+   * 
+   * @param login
+   *          the login
+   * @param authenticated
+   *          whether this user has been authenticated
+   */
+  public UserImpl(String login, boolean authenticated) {
+    this(login, null, null, authenticated);
   }
 
   /**
@@ -72,7 +88,21 @@ public class UserImpl implements User {
    *          the user realm
    */
   public UserImpl(String login, String realm) {
-    this(login, realm, null);
+    this(login, realm, null, false);
+  }
+
+  /**
+   * Creates a new user with the given login and realm.
+   * 
+   * @param login
+   *          the login
+   * @param realm
+   *          the user realm
+   * @param authenticated
+   *          whether this user has been authenticated
+   */
+  public UserImpl(String login, String realm, boolean authenticated) {
+    this(login, realm, null, authenticated);
   }
 
   /**
@@ -86,11 +116,28 @@ public class UserImpl implements User {
    *          the name
    */
   public UserImpl(String login, String realm, String name) {
+    this(login, realm, name, false);
+  }
+
+  /**
+   * Creates a new user with the given login, realm and name.
+   * 
+   * @param login
+   *          the login
+   * @param realm
+   *          the user realm
+   * @param name
+   *          the name
+   * @param authenticated
+   *          whether this user has been authenticated
+   */
+  public UserImpl(String login, String realm, String name, boolean authenticated) {
     if (login == null)
       throw new IllegalStateException("Cannot create user without id");
     this.login = login;
     this.realm = realm;
     this.name = name;
+    this.isAuthenticated = authenticated;
   }
 
   /**
@@ -104,12 +151,33 @@ public class UserImpl implements User {
     this.login = user.getLogin();
     this.realm = user.getRealm();
     this.name = user.getName();
+    this.isAuthenticated = user.isAuthenticated();
     for (Object o : user.getPublicCredentials())
       addPublicCredentials(o);
     for (Object o : user.getPrivateCredentials())
       addPrivateCredentials(o);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.User#setAuthenticated(boolean)
+   */
+  @Override
+  public void setAuthenticated(boolean authenticated) {
+    this.isAuthenticated = authenticated;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.User#isAuthenticated()
+   */
+  @Override
+  public boolean isAuthenticated() {
+    return isAuthenticated;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -401,6 +469,48 @@ public class UserImpl implements User {
 
     buf.append("</user>");
     return buf.toString();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#getAuthorityType()
+   */
+  @Override
+  public String getAuthorityType() {
+    return User.class.getName();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#getAuthorityId()
+   */
+  @Override
+  public String getAuthorityId() {
+    return realm + ":" + login;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#implies(ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean implies(Authority authority) {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Authority#matches(ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean matches(Authority authority) {
+    if (!User.class.getName().equals(authority.getAuthorityType()))
+      return false;
+    return (realm + ":" + login).matches(authority.getAuthorityId());
   }
 
 }

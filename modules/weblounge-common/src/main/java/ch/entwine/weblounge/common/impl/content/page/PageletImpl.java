@@ -32,9 +32,9 @@ import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 
@@ -281,71 +281,78 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
    */
-  public void allow(Permission permission, Authority authority) {
-    securityCtx.allow(permission, authority);
+  @Override
+  public boolean isDefaultAccess() {
+    return securityCtx.isDefaultAccess();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  public void setAllowDenyOrder(Order order) {
+    securityCtx.setAllowDenyOrder(order);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  public Order getAllowDenyOrder() {
+    return securityCtx.getAllowDenyOrder();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
+   */
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    securityCtx.addAccessRule(rule);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
+    return securityCtx.getAccessRules();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  public boolean isAllowed(Action action, Authority authority) {
+    return securityCtx.isAllowed(action, authority);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  public boolean isDenied(Action action, Authority authority) {
+    return securityCtx.isDenied(action, authority);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
+   * @see ch.entwine.weblounge.common.security.Securable#getActions()
    */
-  public void deny(Permission permission, Authority authority) {
-    securityCtx.deny(permission, authority);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public boolean check(Permission p, Authority a) {
-    return securityCtx.check(p, a);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.PermissionSet,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public boolean check(PermissionSet p, Authority a) {
-    return securityCtx.check(p, a);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
-    return securityCtx.checkOne(permission, authorities);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
-    return securityCtx.checkAll(permission, authorities);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#permissions()
-   */
-  public Permission[] permissions() {
-    return permissions;
+  public Action[] getActions() {
+    return actions;
   }
 
   /**

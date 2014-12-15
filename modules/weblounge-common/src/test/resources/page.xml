@@ -35,7 +35,11 @@
       <owner>
         <user id="hans" realm="testland"><![CDATA[Hans Muster]]></user>
       </owner>
-    </security>
+	  <acl order="allow,deny">
+		<allow id="weblounge:read" type="role">weblounge:siteadministrator</allow>
+		<deny id="weblounge:read" type="any">*</deny>
+	  </acl>
+	</security>
     <locked>
       <user id="amelie" realm="testland"><![CDATA[Amélie Poulard]]></user>
     </locked>

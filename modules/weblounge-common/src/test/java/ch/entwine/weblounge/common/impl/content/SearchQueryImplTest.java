@@ -64,7 +64,7 @@ public class SearchQueryImplTest {
   protected int offset = 30;
 
   /** The maximum number of result items to include */
-  protected int limit = 10;
+  protected int limit = 20;
 
   /** The test pagelet */
   protected Pagelet pagelet = null;
@@ -110,8 +110,17 @@ public class SearchQueryImplTest {
    */
   @Test
   public void testWithLimit() {
+    // Check default value
+    assertEquals(10, query.getLimit());
+    
     query.withLimit(limit);
     assertEquals(limit, query.getLimit());
+  }
+  
+  /** Test method for {@link SearchQueryImpl#withLimit(int)} */
+  @Test(expected = IllegalArgumentException.class)
+  public void testWithLimitInvalidLimit() {
+    query.withLimit(0);
   }
 
   /**
@@ -121,8 +130,17 @@ public class SearchQueryImplTest {
    */
   @Test
   public void testWithOffset() {
+    // Check default value
+    assertEquals(0, query.getOffset());
+    
     query.withOffset(offset);
     assertEquals(offset, query.getOffset());
+  }
+  
+  /** Test method for {@link SearchQueryImpl#withOffset(int)} */
+  @Test(expected = IllegalArgumentException.class)
+  public void testWithOffsetInvalidLimit() {
+    query.withOffset(-1);
   }
 
   /**
@@ -636,7 +654,7 @@ public class SearchQueryImplTest {
   public void testWithRecencyPriority() {
     query = new SearchQueryImpl(site);
     assertFalse(query.getRecencyPriority());
-    query.withRececyPriority();
+    query.withRecencyPriority();
     assertTrue(query.getRecencyPriority());
   }
 

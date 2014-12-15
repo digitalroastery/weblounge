@@ -65,6 +65,9 @@ public class PageContentTest extends IntegrationTestBase {
   /** The paths to test */
   private static final String requestPath = "/test/pagecontent";
 
+  /** The paths to test */
+  private static final String protectedPath = "/test/protected";
+
   /** The expected text */
   private static final Map<Language, String> texts = new HashMap<Language, String>();
 
@@ -97,8 +100,9 @@ public class PageContentTest extends IntegrationTestBase {
       throws Exception {
     testPage(serverUrl);
     testNonExistingPage(serverUrl);
-    testWorkPage(serverUrl);
-    testPageAsEditor(serverUrl);
+    //testWorkPage(serverUrl);
+    //testPageAsEditor(serverUrl);
+    testProtectedPage(serverUrl);
     testComposerInheritance(serverUrl);
   }
 
@@ -258,7 +262,7 @@ public class PageContentTest extends IntegrationTestBase {
     // Prepare the request
     logger.info("Testing regular page output as an editor");
 
-    String requestUrl = UrlUtils.concat(serverUrl, requestPath, "work.html");
+    String requestUrl = UrlUtils.concat(serverUrl, requestPath, "work.html") + "&edit=true";
 
     logger.info("Sending request to the work version of {}", requestUrl);
     HttpGet request = new HttpGet(requestUrl);
@@ -323,6 +327,37 @@ public class PageContentTest extends IntegrationTestBase {
       assertNotNull("Content of pagelet property 'headline' not found", property);
       assertEquals("Element property does not match", "false", property);
 
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+  }
+
+  /**
+   * Tests that the work version of a page is returned.
+   * 
+   * @param serverUrl
+   *          the base server url
+   * @throws Exception
+   *           if the test fails
+   */
+  private void testProtectedPage(String serverUrl) throws Exception {
+    logger.info("Preparing test of protected page content");
+
+    // Prepare the request
+    logger.info("Testing access of protected page");
+
+    String requestUrl = UrlUtils.concat(serverUrl, protectedPath);
+
+    logger.info("Sending request to the protected page at {}", requestUrl);
+    HttpGet request = new HttpGet(requestUrl);
+
+    // Send and the request and examine the response
+    logger.debug("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }

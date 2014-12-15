@@ -26,7 +26,7 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
-import ch.entwine.weblounge.common.impl.content.page.PageSecurityContext;
+import ch.entwine.weblounge.common.impl.content.page.ResourceSecurityContext;
 import ch.entwine.weblounge.common.impl.language.LocalizableContent;
 import ch.entwine.weblounge.common.impl.language.LocalizableObject;
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
@@ -34,9 +34,9 @@ import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -53,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * A <code>Resource</code> encapsulates all data that is attached with a
@@ -125,7 +126,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     this.creationCtx = new CreationContext();
     this.modificationCtx = new ModificationContext();
     this.publishingCtx = new PublishingContext();
-    this.securityCtx = new PageSecurityContext();
+    this.securityCtx = new ResourceSecurityContext();
     this.subjects = new ArrayList<String>();
     this.series = new ArrayList<String>();
     this.title = new LocalizableContent<String>(this);
@@ -544,86 +545,78 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     }
     securityCtx.setOwner(owner);
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    return securityCtx.isDefaultAccess();
+  }
+
+  /**
+   * Sets the order of evaluation for access control lists.
+   * 
+   * @param order
+   *          the order in which to evaluate the access control entries
+   */
+  public void setAllowDenyOrder(Order order) {
+    securityCtx.setAllowDenyOrder(order);
+  }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
    */
-  public void allow(Permission permission, Authority authority) {
-    securityCtx.allow(permission, authority);
+  public Order getAllowDenyOrder() {
+    return securityCtx.getAllowDenyOrder();
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
+   */
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    securityCtx.addAccessRule(rule);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
+    return securityCtx.getAccessRules();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void deny(Permission permission, Authority authority) {
-    securityCtx.deny(permission, authority);
+  public boolean isAllowed(Action action, Authority authority) {
+    return securityCtx.isAllowed(action, authority);
   }
 
   /**
-   * Returns <code>true</code> if the user <code>u</code> is allowed to do
-   * actions that require permission <code>p</code> on this pagelet.
-   * 
-   * @param p
-   *          the required permission
-   * @param a
-   *          the authorization used to access to this pagelet
-   * @return <code>true</code> if the user has the required permission
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action,
+   *      ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(Permission p, Authority a) {
-    return securityCtx.check(p, a);
+  public boolean isDenied(Action action, Authority authority) {
+    return securityCtx.isDenied(action, authority);
   }
 
   /**
-   * Returns <code>true</code> if the user <code>u</code> is allowed to act on
-   * the secured object in a way that satisfies the given {@link PermissionSet}
-   * <code>p</code>.
-   * 
-   * @param p
-   *          the required set of permissions
-   * @param a
-   *          the authorization used to access to the secured object
-   * @return <code>true</code> if the user owns the required permissions
-   */
-  public boolean check(PermissionSet p, Authority a) {
-    return securityCtx.check(p, a);
-  }
-
-  /**
-   * Checks whether at least one of the given authorities pass with respect to
-   * the given permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the objects claiming the permission
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
-    return securityCtx.checkOne(permission, authorities);
-  }
-
-  /**
-   * Checks whether all of the given authorities pass with respect to the given
-   * permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the object claiming the permission
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
-    return securityCtx.checkAll(permission, authorities);
-  }
-
-  /**
-   * Returns the pagelets permissions, which are
+   * Returns the pagelets actions, which are
    * <ul>
    * <li>READ</li>
    * <li>WRITE</li>
@@ -631,11 +624,11 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * <li>MANAGE</li>
    * </ul>
    * 
-   * @return the permissions that can be set on the pagelet
-   * @see ch.entwine.weblounge.api.security.Secured#permissions()
+   * @return the actions that can be set on the pagelet
+   * @see ch.entwine.weblounge.api.security.Secured#getActions()
    */
-  public Permission[] permissions() {
-    return permissions;
+  public Action[] getActions() {
+    return actions;
   }
 
   /**
@@ -1175,7 +1168,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    *          the string buffer
    */
   protected StringBuffer toXmlBody(StringBuffer buffer) {
-    for (ResourceContent content : this.content.values()) {
+    List<T> orderedContentList = new ArrayList<T>(this.content.size());
+    orderedContentList.addAll(this.content.values());
+    Collections.sort(orderedContentList);
+    for (ResourceContent content : orderedContentList) {
       buffer.append(content.toXml());
     }
     return buffer;

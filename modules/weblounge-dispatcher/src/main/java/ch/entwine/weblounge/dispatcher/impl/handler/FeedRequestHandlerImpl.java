@@ -44,6 +44,7 @@ import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.ResponseCache;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
@@ -364,6 +365,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     // TODO: Add more feed metadata, ask site
 
     SearchQuery query = new SearchQueryImpl(site);
+    query.withAction(SystemAction.READ);
     query.withVersion(Resource.LIVE);
     query.withTypes(Page.TYPE);
     query.withLimit(limit);

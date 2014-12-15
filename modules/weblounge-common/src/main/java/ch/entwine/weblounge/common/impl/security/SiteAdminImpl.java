@@ -25,8 +25,10 @@ import ch.entwine.weblounge.common.impl.site.SiteImpl;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Password;
+import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -49,7 +51,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
   /**
    * Creates a new SiteAdminImpl user with the {@link SystemRole.SITEADMIN} role
    * assigned.
-   * 
+   *
    * @param login
    *          the login name
    */
@@ -61,7 +63,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.entwine.weblounge.common.impl.security.UserImpl#setRealm(java.lang.String)
    */
   @Override
@@ -69,9 +71,23 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
     throw new UnsupportedOperationException("The admin user realm cannot be changed");
   }
 
+  @Override
+  public boolean implies(Authority authority) {
+    // The site administrator should have all authorities -- except the system
+    // administrator role -- by default
+
+    if (authority instanceof Role) {
+      Role authRole = (Role) authority;
+      if (SystemRole.SYSTEMADMIN.equals(authRole))
+        return false;
+    }
+
+    return true;
+  }
+
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.entwine.weblounge.common.impl.security.AuthenticatedUserImpl#equals(java.lang.Object)
    */
   @Override
@@ -82,7 +98,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.entwine.weblounge.common.impl.security.AuthenticatedUserImpl#hashCode()
    */
   @Override
@@ -94,7 +110,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
   /**
    * Initializes this admin object by reading all information from the
    * <code>XML</code> configuration node.
-   * 
+   *
    * @param userNode
    *          the <code>XML</code> node containing the admin configuration
    * @param site
@@ -119,7 +135,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
   /**
    * Initializes this admin object by reading all information from the
    * <code>XML</code> configuration node.
-   * 
+   *
    * @param userNode
    *          the <code>XML</code> node containing the admin configuration
    * @param site
@@ -133,7 +149,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
     if (userNode == null)
       return null;
 
-    String login = XPathHelper.valueOf(userNode, "ns:login", xpath);      
+    String login = XPathHelper.valueOf(userNode, "ns:login", xpath);
     SiteAdminImpl user = new SiteAdminImpl(login);
 
     Node enabledAttribute = userNode.getAttributes().getNamedItem("enabled");
@@ -187,7 +203,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
 
   /**
    * Returns an <code>XML</code> representation of this user.
-   * 
+   *
    * @return the user as an <code>XML</code> document fragment
    */
   public String toXml() {
@@ -199,7 +215,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
       b.append(" enabled=\"" + enabled + "\"");
     }
     b.append(">");
-    
+
     // Login
     b.append("<login>").append(login).append("</login>");
 

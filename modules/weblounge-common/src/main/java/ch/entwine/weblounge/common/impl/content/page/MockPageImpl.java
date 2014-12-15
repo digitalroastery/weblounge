@@ -30,9 +30,9 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Mock implementation of a page that can be used to satisfy components that
@@ -797,71 +798,81 @@ public class MockPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
    */
-  public void allow(Permission permission, Authority authority) {
+  @Override
+  public boolean isDefaultAccess() {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
    */
-  public void deny(Permission permission, Authority authority) {
+  @Override
+  public void setAllowDenyOrder(Order order) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  @Override
+  public Order getAllowDenyOrder() {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
    */
-  public boolean check(Permission permission, Authority authority) {
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.PermissionSet,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean check(PermissionSet permissions, Authority authority) {
+  @Override
+  public boolean isAllowed(Action action, Authority authority) {
     throw new UnsupportedOperationException("Not implemented in mock page");
   }
-
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  @Override
+  public boolean isDenied(Action action, Authority authority) {
+    throw new UnsupportedOperationException("Not implemented in mock page");
+  }
+  
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority[])
+   * @see ch.entwine.weblounge.common.security.Securable#getActions()
    */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
-    throw new UnsupportedOperationException("Not implemented in mock page");
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
-    throw new UnsupportedOperationException("Not implemented in mock page");
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#permissions()
-   */
-  public Permission[] permissions() {
-    return Resource.permissions;
+  public Action[] getActions() {
+    return Resource.actions;
   }
 
   /**

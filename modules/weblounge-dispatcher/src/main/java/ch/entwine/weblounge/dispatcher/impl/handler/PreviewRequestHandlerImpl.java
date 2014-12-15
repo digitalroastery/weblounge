@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import static ch.entwine.weblounge.common.Times.MS_PER_DAY;
+import static ch.entwine.weblounge.common.security.SystemAction.READ;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
@@ -32,6 +33,7 @@ import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -206,9 +208,9 @@ public final class PreviewRequestHandlerImpl implements RequestHandler {
     // Can the resource be accessed by the current user?
     User user = request.getUser();
     try {
-      // TODO: Check permission
-      // PagePermission p = new PagePermission(page, user);
-      // AccessController.checkPermission(p);
+      SecurablePermission readPermission = new SecurablePermission(resource, READ);
+      if (System.getSecurityManager() != null)
+        System.getSecurityManager().checkPermission(readPermission);
     } catch (SecurityException e) {
       logger.warn("Access to resource {} denied for user {}", resourceURI, user);
       DispatchUtils.sendAccessDenied(request, response);

@@ -21,10 +21,14 @@
 package ch.entwine.weblounge.common.impl.content;
 
 import ch.entwine.weblounge.common.Times;
+import ch.entwine.weblounge.common.impl.security.AbstractSecurityContext;
+import ch.entwine.weblounge.common.impl.security.ActionImpl;
+import ch.entwine.weblounge.common.impl.security.AuthorityImpl;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.util.xml.WebloungeSAXHandler;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
+import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.User;
 
 import org.xml.sax.Attributes;
@@ -33,6 +37,7 @@ import org.xml.sax.SAXException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 /**
  * Utility class used to parse generic content including language sensitive
@@ -106,14 +111,32 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
   protected abstract void setOwner(User owner);
 
   /**
-   * This method is called if a permission was found.
+   * Defines the evaluation order for allow/deny rules.
    * 
-   * @param permission
-   *          the permission to grant
-   * @param authority
-   *          the authority that this permission is granted to
+   * @param order
+   *          the evaluation order
    */
-  protected abstract void allow(Permission permission, Authority authority);
+  protected abstract void setAllowDenyOrder(Securable.Order order);
+
+  /**
+   * This method is called if an allow rule was found.
+   * 
+   * @param action
+   *          the action to grant
+   * @param authority
+   *          the authority that this action is granted to
+   */
+  protected abstract void allow(Action action, Authority authority);
+
+  /**
+   * This method is called if a deny rule was found.
+   * 
+   * @param action
+   *          the action to deny
+   * @param authority
+   *          the authority that this action is denied
+   */
+  protected abstract void deny(Action action, Authority authority);
 
   /**
    * {@inheritDoc}
@@ -140,12 +163,21 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
       return;
     }
 
-    // permission
-    else if (contentReaderContext == Context.Security && "permission".equals(raw)) {
-      // String id = attrs.getValue("id");
-      // String type = attrs.getValue("type");
-      // clipboard.put("id", id);
-      // clipboard.put("type", type);
+    // access control list
+    else if (contentReaderContext == Context.Security && "acl".equals(raw)) {
+      clipboard.put("order", attrs.getValue("order"));
+    }
+
+    // allow rules
+    else if (contentReaderContext == Context.Security && "allow".equals(raw)) {
+      clipboard.put("id", attrs.getValue("id"));
+      clipboard.put("type", attrs.getValue("type"));
+    }
+
+    // deny rules
+    else if (contentReaderContext == Context.Security && "deny".equals(raw)) {
+      clipboard.put("id", attrs.getValue("id"));
+      clipboard.put("type", attrs.getValue("type"));
     }
 
     // creation context
@@ -262,21 +294,46 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
       setOwner(owner);
     }
 
-    // permissions
-    else if (contentReaderContext == Context.Security && "permission".equals(raw)) {
-      // TODO: Finish this code
-      /*
-       * String id = (String) clipboard.remove("id"); Permission permission = new
-       * PermissionImpl(id); String type = (String) clipboard.remove("type"); if
-       * (type != null) { type =
-       * AbstractSecurityContext.resolveAuthorityTypeShortcut(type);
-       * StringTokenizer tok = new StringTokenizer(getCharacters(), " ,;");
-       * while (tok.hasMoreTokens()) { String authorityId = tok.nextToken();
-       * Authority authority = new AuthorityImpl(type, authorityId);
-       * allow(permission, authority); } }
-       */
+    // access control list
+    else if (contentReaderContext == Context.Security && "acl".equals(raw)) {
+      String order = (String) clipboard.remove("order");
+      if ("deny,allow".equalsIgnoreCase(order))
+        setAllowDenyOrder(Securable.Order.DenyAllow);
+      else
+        setAllowDenyOrder(Securable.Order.AllowDeny);
+    }
+    
+    // allow rule
+    else if (contentReaderContext == Context.Security && "allow".equals(raw)) {
+      String id = (String) clipboard.remove("id");
+      Action action = new ActionImpl(id);
+      String type = (String) clipboard.remove("type");
+      if (type != null) {
+        type = AbstractSecurityContext.resolveAuthorityTypeShortcut(type);
+        StringTokenizer tok = new StringTokenizer(getCharacters(), " ,;");
+        while (tok.hasMoreTokens()) {
+          String authorityId = tok.nextToken();
+          Authority authority = new AuthorityImpl(type, authorityId);
+          allow(action, authority);
+        }
+      }
+    }
+
+    // deny rule
+    else if (contentReaderContext == Context.Security && "deny".equals(raw)) {
+      String id = (String) clipboard.remove("id");
+      Action action = new ActionImpl(id);
+      String type = (String) clipboard.remove("type");
+      if (type != null) {
+        type = AbstractSecurityContext.resolveAuthorityTypeShortcut(type);
+        StringTokenizer tok = new StringTokenizer(getCharacters(), " ,;");
+        while (tok.hasMoreTokens()) {
+          String authorityId = tok.nextToken();
+          Authority authority = new AuthorityImpl(type, authorityId);
+          deny(action, authority);
+        }
+      }
     }
 
   }
-
 }

@@ -21,11 +21,15 @@
 package ch.entwine.weblounge.common.impl.content.page;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
+import ch.entwine.weblounge.common.impl.security.SystemRole;
 import ch.entwine.weblounge.common.impl.util.TestUtils;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.easymock.EasyMock;
@@ -35,10 +39,11 @@ import org.junit.Test;
 import java.net.URL;
 
 /**
- * Test case to test {@link ch.entwine.weblounge.common.impl.content.page.PageReader}.
+ * Test case to test
+ * {@link ch.entwine.weblounge.common.impl.content.page.PageReader}.
  */
 public class PageReaderTest {
-  
+
   /** The page that was read in */
   protected Page page = null;
 
@@ -56,7 +61,7 @@ public class PageReaderTest {
 
   /** The page reader */
   protected PageReader reader = null;
-  
+
   /**
    * @throws java.lang.Exception
    */
@@ -66,10 +71,20 @@ public class PageReaderTest {
     EasyMock.replay(site);
     pageURI = new PageURIImpl(site, "/test", Resource.LIVE);
     reader = new PageReader();
+    page = reader.read(this.getClass().getResource(testFile).openStream(), site);
+  }
+
+  @Test
+  public void testSecurity() throws Exception {
+    assertEquals(4, page.getActions().length);
+    assertFalse(page.isAllowed(SystemAction.READ, SystemRole.GUEST));
+    assertTrue(page.isAllowed(SystemAction.READ, SystemRole.SITEADMIN));
   }
   
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageReader#read(ch.entwine.weblounge.common.content.PageURI, java.io.InputStream)}.
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.page.PageReader#read(ch.entwine.weblounge.common.content.PageURI, java.io.InputStream)}
+   * .
    */
   @Test
   public void testResetPageReader() throws Exception {
@@ -80,7 +95,6 @@ public class PageReaderTest {
     String otherTestXml = TestUtils.loadXmlFromResource(otherTestFile);
 
     // Read test page
-    page = reader.read(testContext.openStream(), site);
     assertEquals(testXml, new String(page.toXml().getBytes("utf-8"), "utf-8"));
 
     // Read other test page
@@ -90,6 +104,6 @@ public class PageReaderTest {
     // Read test page again
     page = reader.read(testContext.openStream(), site);
     assertEquals(testXml, new String(page.toXml().getBytes("utf-8"), "utf-8"));
-}
+  }
 
 }

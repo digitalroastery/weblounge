@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.search.impl;
 
+import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.User;
 
 import java.text.DateFormat;
@@ -164,4 +165,17 @@ public final class IndexUtils {
     return user.getName();
   }
 
+  /**
+   * Serializes the authority to a string or to {@code null} if {@code null} was
+   * passed to this method.
+   * 
+   * @param authority
+   *          the authority to serialize
+   * @return the serialized authority
+   */
+  public static String serializeAuthority(Authority authority) {
+    if (authority == null)
+      return null;
+    return authority.getAuthorityId();
+  }
 }

@@ -25,10 +25,12 @@ import ch.entwine.weblounge.common.content.movie.MovieContent;
 import ch.entwine.weblounge.common.content.movie.MovieResource;
 import ch.entwine.weblounge.common.impl.content.movie.MovieResourceURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -139,7 +141,10 @@ public class VideoResourceTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    // TODO: Check the permissions
+    if (!SecurityUtils.userHasPermission(request.getUser(), video, SystemAction.READ)) {
+      logger.debug("User {} has no read permission on video {}", SecurityUtils.getUser(), video);
+      return SKIP_BODY;
+    }
 
     // Store the resource and the resource content in the request
     stashAndSetAttribute(VideoResourceTagExtraInfo.VIDEO, video);

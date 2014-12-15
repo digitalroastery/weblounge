@@ -22,11 +22,11 @@ package ch.entwine.weblounge.kernel.security;
 
 import ch.entwine.weblounge.common.impl.security.PasswordImpl;
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.security.DigestType;
 import ch.entwine.weblounge.common.security.Password;
 import ch.entwine.weblounge.common.security.Role;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.security.SiteDirectory;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
@@ -91,12 +91,9 @@ public class DirectoryServiceImplTest {
     EasyMock.expect(directoryB.loadUser((String) EasyMock.anyObject(), (Site) EasyMock.anyObject())).andReturn(johnAlterEgo).anyTimes();
     EasyMock.replay(directoryB);
 
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getSite()).andReturn(site).anyTimes();
-    EasyMock.replay(securityService);
+    SecurityUtils.setSite(site);
 
     directory = new DirectoryServiceImpl();
-    directory.setSecurityService(securityService);
     directory.addDirectoryProvider(directoryA);
     directory.addDirectoryProvider(directoryB);
   }

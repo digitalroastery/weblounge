@@ -62,12 +62,18 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.UID;
 import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.XML;
 
+import ch.entwine.weblounge.common.UnexpectedMatchError;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.Rule;
+import ch.entwine.weblounge.common.security.Securable.Order;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
@@ -75,9 +81,12 @@ import org.apache.commons.lang.StringUtils;
  */
 public class ResourceInputDocument extends ResourceMetadataCollection {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(ResourceInputDocument.class);
+
   /**
    * Populates this input document with the resource data.
-   * 
+   *
    * @param resource
    *          the resource
    */
@@ -92,6 +101,38 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     addField(PATH, uri.getPath(), true, true);
     addField(TYPE, uri.getType(), true, false);
     addField(VERSION, uri.getVersion(), false, false);
+
+    // Access by roles
+    final Order order = resource.getAllowDenyOrder();
+    for (AccessRule access : resource.getAccessRules()) {
+      switch (order) {
+        case AllowDeny: {
+          if (Rule.Deny.equals(access.getRule())) {
+            logger.error("Resource '{}' has allow-deny order '{}' and contains illegal access rule '{}' - the access rule is not added!", new Object[] {
+                resource,
+                order,
+                access });
+          } else {
+            addField(getAccessRuleFieldName(order, Rule.Allow, access.getAction()), IndexUtils.serializeAuthority(access.getAuthority()), false, false);
+          }
+          break;
+        }
+        case DenyAllow: {
+          if (Rule.Deny.equals(access.getRule())) {
+            logger.error("Resource '{}' has deny-allow order '{}' and contains illegal access rule '{}' - the access rule is not added!", new Object[] {
+                resource,
+                order,
+                access });
+          } else {
+            addField(getAccessRuleFieldName(order, Rule.Deny, access.getAction()), IndexUtils.serializeAuthority(access.getAuthority()), false, false);
+          }
+          break;
+        }
+        default: {
+          throw new UnexpectedMatchError(order.toString());
+        }
+      }
+    }
 
     // Path elements
     if (!StringUtils.isBlank(uri.getPath())) {
@@ -181,5 +222,4 @@ public class ResourceInputDocument extends ResourceMetadataCollection {
     }
 
   }
-
 }

@@ -20,10 +20,9 @@
 
 package ch.entwine.weblounge.common.security;
 
-
 /**
  * Listener interface for those who are interested in changes of object owners
- * and permissions.
+ * and actions.
  */
 public interface SecurityListener {
 
@@ -40,14 +39,14 @@ public interface SecurityListener {
   void ownerChanged(Securable source, User newOwner, User oldOwner);
 
   /**
-   * Notifies the listener about a permission change on object
+   * Notifies the listener about a change in access rules on object
    * <code>source</code>.
    * 
    * @param source
    *          the the secured object
-   * @param p
-   *          the new permission
+   * @param rule
+   *          the new access rule
    */
-  void permissionChanged(Securable source, Permission p);
+  void accessChanged(Securable source, AccessRule rule);
 
 }

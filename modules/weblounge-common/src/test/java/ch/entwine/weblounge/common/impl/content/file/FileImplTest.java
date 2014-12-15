@@ -481,8 +481,8 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#allow(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority)}
-   * .
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)}
+   * . .
    */
   @Test
   @Ignore
@@ -492,8 +492,8 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#deny(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority)}
-   * .
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)}
+   * . .
    */
   @Test
   @Ignore
@@ -503,7 +503,7 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#check(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority)}
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#check(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)}
    * .
    */
   @Test
@@ -514,7 +514,7 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#check(ch.entwine.weblounge.common.security.PermissionSet, ch.entwine.weblounge.common.security.Authority)}
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#check(ch.entwine.weblounge.common.security.ActionSet, ch.entwine.weblounge.common.security.Authority)}
    * .
    */
   @Test
@@ -525,7 +525,7 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#checkOne(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority[])}
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#checkOne(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority[])}
    * .
    */
   @Test
@@ -536,7 +536,7 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#checkAll(ch.entwine.weblounge.common.security.Permission, ch.entwine.weblounge.common.security.Authority[])}
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#checkAll(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority[])}
    * .
    */
   @Test
@@ -547,7 +547,7 @@ public class FileImplTest {
 
   /**
    * Test method for
-   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#permissions()}
+   * {@link ch.entwine.weblounge.common.impl.content.file.FileResourceImpl#getActions()}
    * .
    */
   @Test

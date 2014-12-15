@@ -233,7 +233,7 @@ public class SearchIndexRecencyPriorityTest {
     assertEquals(otherLivePageId, items[1].getId());
 
     // Search with recency boosting
-    q.withRececyPriority();
+    q.withRecencyPriority();
     items = idx.getByQuery(q).getItems();
     assertEquals(2, items.length);
     assertEquals(otherLivePageId, items[0].getId());

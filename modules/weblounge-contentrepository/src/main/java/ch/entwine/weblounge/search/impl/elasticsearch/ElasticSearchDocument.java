@@ -91,6 +91,7 @@ public final class ElasticSearchDocument extends HashMap<String, Object> {
    * @param localizedFulltextFieldName
    *          the localized fulltext field name
    */
+  @SuppressWarnings("unchecked")
   private void addToFulltext(ResourceMetadata<?> item,
       String fulltextFieldName, String localizedFulltextFieldName) {
 

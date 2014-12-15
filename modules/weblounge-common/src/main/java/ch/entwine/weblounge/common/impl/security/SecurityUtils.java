@@ -20,9 +20,16 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.Authority;
 import ch.entwine.weblounge.common.security.Role;
+import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.Security;
 import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Site;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +40,121 @@ import java.util.Set;
  */
 public final class SecurityUtils {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
+
+  /** Holds the site associated with the current thread */
+  static final ThreadLocal<Site> siteHolder = new ThreadLocal<Site>();
+
+  /** Holds the user associated with the current thread */
+  static final ThreadLocal<User> userHolder = new ThreadLocal<User>();
+
+  /** The default system administrator */
+  private static final User systemAdmin = new WebloungeAdminImpl("admin");
+
+  /** The default system administrator */
+  private static final User anonymous = new Guest();
+
+  /** Whether the security status is determined */
+  private static boolean configured = false;
+
+  /** Whether the system administrator has configured a no-security policy */
+  private static boolean enabled = true;
+
   /**
    * Private constructor to prevent instantiation.
    */
   private SecurityUtils() {
     // Nothing to do
+  }
+
+  /**
+   * Define whether the security policy has been determined.
+   * 
+   * TODO: Should be determined per site
+   * 
+   * @param configured
+   *          <code>true</code> if the security policy has been determined
+   */
+  public static void setConfigured(boolean configured) {
+    SecurityUtils.configured = configured;
+  }
+
+  /**
+   * Whether the security policy for this Weblounge installation has been
+   * determined.
+   * 
+   * TODO: Determine per site
+   */
+  public static boolean isConfigured() {
+    return SecurityUtils.configured;
+  }
+
+  /**
+   * Whether the user has configured a no-security policy.
+   * 
+   * @param enabled
+   *          <code>true</code> if there is a security policy in place
+   */
+  public static void setEnabled(boolean enabled) {
+    SecurityUtils.enabled = enabled;
+  }
+
+  /**
+   * Returns <code>true</code> if the user has enabled a security policy. When
+   * <code>false</code> is returned, no security policy is enforced.
+   * 
+   * TODO: Determine per site
+   * 
+   * @return <code>true</code> if a security policy has been defined
+   */
+  public static boolean isEnabled() {
+    return SecurityUtils.enabled;
+  }
+
+  /**
+   * Sets the current thread's user context to another user. This is useful when
+   * spawning new threads that must contain the parent thread's user context.
+   * 
+   * @param user
+   *          the user to set for the current user context
+   */
+  public static void setUser(User user) {
+    userHolder.set(user);
+  }
+
+  /**
+   * Gets the current user in a generic form ({@link User}), or the local
+   * organization's anonymous user if the user has not been authenticated.
+   * 
+   * @return the user
+   */
+  public static User getUser() {
+    if (!configured)
+      return anonymous;
+    if (enabled)
+      return userHolder.get();
+    else
+      return systemAdmin;
+  }
+
+  /**
+   * Sets the site for the calling thread.
+   * 
+   * @param site
+   *          the site
+   */
+  public static void setSite(Site organization) {
+    siteHolder.set(organization);
+  }
+
+  /**
+   * Gets the site associated with the current thread context.
+   * 
+   * @return the site
+   */
+  public static Site getSite() {
+    return siteHolder.get();
   }
 
   /**
@@ -54,11 +171,7 @@ public final class SecurityUtils {
   public static boolean isAuthenticated(User user) {
     if (user == null)
       throw new IllegalArgumentException("User must not be null");
-    Set<Object> roles = user.getPublicCredentials(Role.class);
-
-    // Assuming that every user has the GUEST role, so everything in addition
-    // means authenticated
-    return roles.size() > 1;
+    return user.isAuthenticated();
   }
 
   /**
@@ -115,6 +228,32 @@ public final class SecurityUtils {
   }
 
   /**
+   * Returns {@code true} if the {@code user} has the permission to execute the
+   * requested {@code action} on the {@link Securable} object.
+   * 
+   * @param user
+   *          the user
+   * @param securable
+   *          the securable object
+   * @param action
+   *          the action to check
+   * @return {@code true} if the user has the permission
+   */
+  public static boolean userHasPermission(User user, Securable securable,
+      Action action) {
+    SecurablePermission permission = new SecurablePermission(securable, action);
+
+    try {
+      if (System.getSecurityManager() != null)
+        System.getSecurityManager().checkPermission(permission);
+    } catch (SecurityException e) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Returns a user's roles.
    * 
    * @param user
@@ -129,6 +268,98 @@ public final class SecurityUtils {
       roles.add((Role) o);
     }
     return roles.toArray(new Role[roles.size()]);
+  }
+
+  /**
+   * Checks whether an action may be performed on a resource based on an
+   * authority like a role.
+   * 
+   * @param securable
+   *          the resource that is about to be actioned on
+   * @param action
+   *          the action to perform
+   * @param authority
+   *          the credential used to obtain access
+   * @return <code>true</code> if <code>action</code> may be performed
+   */
+  public static boolean checkAuthorization(Securable securable, Action action,
+      Authority authority) {
+    if (securable == null)
+      throw new IllegalArgumentException("Securable cannot be null");
+    if (action == null)
+      throw new IllegalArgumentException("Action cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
+    logger.trace("Request to check action '{}' for authority '{}' on {}", new Object[] {
+        action,
+        authority,
+        securable });
+
+    switch (securable.getAllowDenyOrder()) {
+      case AllowDeny:
+        if (securable.isAllowed(action, authority))
+          return true;
+        if (securable.isDenied(action, authority))
+          return false;
+        return false;
+      case DenyAllow:
+        if (securable.isDenied(action, authority))
+          return false;
+        if (securable.isAllowed(action, authority))
+          return true;
+        return false;
+      default:
+        throw new IllegalStateException("Allow/deny order " + securable.getAllowDenyOrder() + " unsupported");
+    }
+
+  }
+
+  /**
+   * Returns <code>true</code> if the authorization is sufficient to obtain the
+   * "oneof" action set.
+   * 
+   * @param securable
+   *          the resource that is about to be actioned on
+   * @param actions
+   *          the set of actions
+   * @param authorization
+   *          the authorization to check
+   * @return <code>true</code> if the user has one of the actions
+   */
+  public static boolean checkAuthorizationForSome(Securable securable,
+      Set<Action> actions, Authority authorization) {
+    if (actions.size() == 0)
+      return true;
+    for (Action action : actions) {
+      if (checkAuthorization(securable, action, authorization)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns <code>true</code> if the authorization is sufficient to obtain the
+   * "allof" action set.
+   * 
+   * @param securable
+   *          the resource that is about to be actioned on
+   * @param actions
+   *          the set of actions
+   * @param authorization
+   *          the authorization to check
+   * @return <code>true</code> if the user has all of the actions
+   */
+  public static boolean checkAuthorizationForAll(Securable securable,
+      Set<Action> actions, Authority authorization) {
+    if (actions.size() == 0)
+      return true;
+    for (Action action : actions) {
+      if (!checkAuthorization(securable, action, authorization)) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }

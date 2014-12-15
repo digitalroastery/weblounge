@@ -23,7 +23,6 @@ package ch.entwine.weblounge.kernel.site;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.repository.ContentRepository;
-import ch.entwine.weblounge.common.security.SecurityService;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Module;
@@ -127,9 +126,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /** The site servlet registrations */
   private Map<Site, ServiceRegistration> servletRegistrations = null;
 
-  /** The security service */
-  private SecurityService securityService = null;
-
   /** The preferences service */
   private PreferencesService preferencesService = null;
 
@@ -156,7 +152,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    *           if service configuration fails
    */
   void activate(ComponentContext context) throws IOException,
-  ConfigurationException {
+      ConfigurationException {
 
     BundleContext bundleContext = context.getBundleContext();
     logger.info("Starting site dispatcher");
@@ -426,7 +422,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
         try {
           // Create and register the site servlet
           SiteServlet siteServlet = new SiteServlet(site, siteBundle, environment);
-          siteServlet.setSecurityService(securityService);
           Dictionary<String, String> servletRegistrationProperties = new Hashtable<String, String>();
           servletRegistrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
           servletRegistrationProperties.put(SharedHttpContext.ALIAS, siteRoot);
@@ -496,7 +491,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
             // Let's do the work anyways
             if (needsCompilation) {
-              Precompiler precompiler = new Precompiler(compilationKey, siteServlet, environment, securityService, logCompileErrors);
+              Precompiler precompiler = new Precompiler(compilationKey, siteServlet, environment, logCompileErrors);
               precompilers.put(site, precompiler);
               precompiler.precompile();
             }
@@ -749,16 +744,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     for (SiteServlet servlet : siteServlets.values()) {
       servlet.setEnvironment(environment);
     }
-  }
-
-  /**
-   * Sets the security service.
-   * 
-   * @param securityService
-   *          the security service
-   */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
   /**

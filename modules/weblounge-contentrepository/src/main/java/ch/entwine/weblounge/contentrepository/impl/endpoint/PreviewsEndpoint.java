@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
 import static ch.entwine.weblounge.common.impl.content.image.ImageStyleUtils.DEFAULT_PREVIEW_FORMAT;
+import static ch.entwine.weblounge.common.security.SystemAction.READ;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
@@ -140,6 +141,9 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     if (resource == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
+    // Check access
+    checkPermission(resource, READ);
+    
     // Extract the language
     Language language = null;
     try {

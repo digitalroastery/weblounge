@@ -26,9 +26,9 @@ import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 
@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Implementation of a lazy loading image.
@@ -934,76 +935,85 @@ public class LazyImageResourceImpl implements ImageResource {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
    */
-  public void allow(Permission permission, Authority authority) {
+  @Override
+  public boolean isDefaultAccess() {
     if (!isHeaderLoaded)
       loadImageHeader();
-    image.allow(permission, authority);
+    return image.isDefaultAccess();
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
    */
-  public boolean check(Permission permission, Authority authority) {
+  @Override
+  public void setAllowDenyOrder(Order order) {
     if (!isHeaderLoaded)
       loadImageHeader();
-    return image.check(permission, authority);
+    image.setAllowDenyOrder(order);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  public Order getAllowDenyOrder() {
+    if (!isHeaderLoaded)
+      loadImageHeader();
+    return image.getAllowDenyOrder();
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.PermissionSet,
-   *      ch.entwine.weblounge.common.security.Authority)
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
    */
-  public boolean check(PermissionSet permissions, Authority authority) {
+  @Override
+  public void addAccessRule(AccessRule rule) {
     if (!isHeaderLoaded)
       loadImageHeader();
-    return image.check(permissions, authority);
+    image.addAccessRule(rule);
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority[])
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
    */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
     if (!isHeaderLoaded)
       loadImageHeader();
-    return image.checkAll(permission, authorities);
+    return image.getAccessRules();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
+   */
+  public boolean isAllowed(Action action, Authority authority) {
+    if (!isHeaderLoaded)
+      loadImageHeader();
+    return image.isAllowed(action, authority);
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority[])
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
+  public boolean isDenied(Action action, Authority authority) {
     if (!isHeaderLoaded)
       loadImageHeader();
-    return image.checkOne(permission, authorities);
+    return image.isDenied(action, authority);
   }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public void deny(Permission permission, Authority authority) {
-    if (!isHeaderLoaded)
-      loadImageHeader();
-    image.deny(permission, authority);
-  }
-
+  
   /**
    * {@inheritDoc}
    * 
@@ -1018,12 +1028,12 @@ public class LazyImageResourceImpl implements ImageResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#permissions()
+   * @see ch.entwine.weblounge.common.security.Securable#getActions()
    */
-  public Permission[] permissions() {
+  public Action[] getActions() {
     if (!isHeaderLoaded)
       loadImageHeader();
-    return image.permissions();
+    return image.getActions();
   }
 
   /**

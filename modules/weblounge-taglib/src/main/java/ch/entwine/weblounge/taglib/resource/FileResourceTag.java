@@ -26,10 +26,12 @@ import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
@@ -148,7 +150,10 @@ public class FileResourceTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    // TODO: Check the permissions
+    if (!SecurityUtils.userHasPermission(request.getUser(), file, SystemAction.READ)) {
+      logger.debug("User {} has no rights to read file {}", SecurityUtils.getUser(), file);
+      return SKIP_BODY;
+    }
 
     // Store the file and the file content in the request
     stashAndSetAttribute(FileResourceTagExtraInfo.FILE, file);

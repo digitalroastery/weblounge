@@ -29,11 +29,13 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurityUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
@@ -297,10 +299,13 @@ public class PagePreviewTag extends WebloungeTag {
           logger.error("No data available for page {}", pageURI);
           return EVAL_PAGE;
         }
-      } catch (SecurityException e) {
-        throw new JspException("Security exception while trying to load " + pageUrl, e);
       } catch (ContentRepositoryException e) {
         throw new JspException("Exception while trying to load " + pageUrl, e);
+      }
+
+      if (!SecurityUtils.userHasPermission(request.getUser(), page, SystemAction.READ)) {
+        logger.debug("User {} has no read permission on page {}", SecurityUtils.getUser(), page);
+        return EVAL_PAGE;
       }
 
       pageUrl = new WebUrlImpl(site, page.getURI().getPath());
@@ -467,13 +472,13 @@ public class PagePreviewTag extends WebloungeTag {
 
           // Check access rights
           // TODO: Check access
-          // Permission p = SystemPermission.READ;
-          // if (!pagelet.checkOne(p, user.getRoleClosure()) &&
-          // !pagelet.check(p, user)) {
+          // Action action = SystemPermission.READ;
+          // if (!pagelet.checkOne(action, user.getRoleClosure()) &&
+          // !pagelet.check(action, user)) {
           // logger.debug("Skipping pagelet " + i + " in composer " + composer_
           // +
           // " due to insufficient rights");
-          // continue p;
+          // continue action;
           // }
 
           // Check publishing dates

@@ -24,9 +24,9 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletURI;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 
@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Wrapper around a {@link ch.entwine.weblounge.common.content.page.Pagelet}
@@ -173,15 +174,54 @@ public class TrimpathPageletWrapper implements Pagelet {
   public Date getPublishFrom() {
     return pagelet.getPublishFrom();
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    return pagelet.isDefaultAccess();
+  }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order)
+   */
+  @Override
+  public void setAllowDenyOrder(Order order) {
+    pagelet.setAllowDenyOrder(order);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  public Order getAllowDenyOrder() {
+    return pagelet.getAllowDenyOrder();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
+   */
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    pagelet.addAccessRule(rule);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void allow(Permission permission, Authority authority) {
-    pagelet.allow(permission, authority);
+  public boolean isAllowed(Action action, Authority authority) {
+    return pagelet.isAllowed(action, authority);
   }
 
   /**
@@ -240,12 +280,22 @@ public class TrimpathPageletWrapper implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action,
    *      ch.entwine.weblounge.common.security.Authority)
    */
-  public void deny(Permission permission, Authority authority) {
-    pagelet.deny(permission, authority);
+  public boolean isDenied(Action action, Authority authority) {
+    return pagelet.isDenied(action, authority);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
+    return pagelet.getAccessRules();
   }
 
   /**
@@ -300,16 +350,6 @@ public class TrimpathPageletWrapper implements Pagelet {
    */
   public String getIdentifier() {
     return pagelet.getIdentifier();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public boolean check(Permission permission, Authority authority) {
-    return pagelet.check(permission, authority);
   }
 
   /**
@@ -380,16 +420,6 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.PermissionSet,
-   *      ch.entwine.weblounge.common.security.Authority)
-   */
-  public boolean check(PermissionSet permissions, Authority authority) {
-    return pagelet.check(permissions, authority);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.page.Pagelet#getProperty(java.lang.String)
    */
   public String getProperty(String key) {
@@ -421,16 +451,6 @@ public class TrimpathPageletWrapper implements Pagelet {
    */
   public User getModifier() {
     return pagelet.getModifier();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
-    return pagelet.checkOne(permission, authorities);
   }
 
   /**
@@ -472,16 +492,6 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Permission,
-   *      ch.entwine.weblounge.common.security.Authority[])
-   */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
-    return pagelet.checkAll(permission, authorities);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.entwine.weblounge.common.content.page.Pagelet#getContentNames(ch.entwine.weblounge.common.language.Language)
    */
   public String[] getContentNames(Language language) {
@@ -501,10 +511,10 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.security.Securable#permissions()
+   * @see ch.entwine.weblounge.common.security.Securable#getActions()
    */
-  public Permission[] permissions() {
-    return pagelet.permissions();
+  public Action[] getActions() {
+    return pagelet.getActions();
   }
 
   /**

@@ -20,15 +20,16 @@
 
 package ch.entwine.weblounge.common.impl.security;
 
+import ch.entwine.weblounge.common.security.AccessRule;
+import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
-import ch.entwine.weblounge.common.security.Permission;
-import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * This is the base implementation for secured objects.
@@ -40,6 +41,9 @@ public class SecuredObject implements Securable {
 
   /** Security listener */
   protected List<SecurityListener> listeners = null;
+
+  /** Order in which to evaluate allow and deny rules */
+  protected Order evaluationOrder = Order.AllowDeny;
 
   /**
    * Creates a secured object with no security constraints applied to it, except
@@ -69,6 +73,40 @@ public class SecuredObject implements Securable {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDefaultAccess()
+   */
+  @Override
+  public boolean isDefaultAccess() {
+    return securityCtx.isDefaultAccess();
+  }
+
+  /**
+   * Sets the order in which to evaluate allow and deny access rules.
+   * 
+   * @param order
+   *          the evaluation order
+   * @throws IllegalArgumentException
+   *           if <code>order</code> is <code>null</code>
+   */
+  public void setAllowDenyOrder(Order order) {
+    if (order == null)
+      throw new IllegalArgumentException("Order must not be null");
+    this.evaluationOrder = order;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAllowDenyOrder()
+   */
+  @Override
+  public Order getAllowDenyOrder() {
+    return evaluationOrder;
+  }
+
+  /**
    * Sets a new owner for this context.
    * 
    * @param owner
@@ -90,114 +128,68 @@ public class SecuredObject implements Securable {
   }
 
   /**
-   * Checks whether the authorization satisfy the constraints of this context on
-   * the given permission.
+   * Returns the actions that may be acquired on this object.
    * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorization
-   *          the object used to obtain the permission
-   * @return <code>true</code> if the authorization is sufficient
+   * @return the available actions
    */
-  public boolean check(Permission permission, Authority authorization) {
-    return securityCtx.check(permission, authorization);
+  public Action[] getActions() {
+    return securityCtx.getActions();
   }
 
   /**
-   * Returns <code>true</code> if the authorization <code>authorization</code>
-   * is sufficient to act on the secured object in a way that requires the given
-   * permissionset <code>p</code>.
-   * 
-   * @param permissions
-   *          the required set of permissions
-   * @param authorization
-   *          the object claiming the permissions
-   * @return <code>true</code> if the object may obtain the permissions
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#addAccessRule(ch.entwine.weblounge.common.security.AccessRule)
    */
-  public boolean check(PermissionSet permissions, Authority authorization) {
-    return securityCtx.check(permissions, authorization);
+  @Override
+  public void addAccessRule(AccessRule rule) {
+    if (rule == null)
+      throw new IllegalArgumentException("Rule must not be null");
+    securityCtx.addAccessRule(rule);
+    fireAccessRuleChanged(rule);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#getAccessRules()
+   */
+  @Override
+  public SortedSet<AccessRule> getAccessRules() {
+    return securityCtx.getAccessRules();
   }
 
   /**
-   * Checks whether at least one of the given authorities pass with respect to
-   * the given permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the object claiming the permission
-   * @return <code>true</code> if all authorities pass
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isAllowed(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean checkOne(Permission permission, Authority[] authorities) {
-    if (authorities == null || authorities.length == 0)
-      return true;
-    for (Authority authority : authorities) {
-      if (check(permission, authority))
-        return true;
-    }
-    return false;
+  @Override
+  public boolean isAllowed(Action action, Authority authority) {
+    if (action == null)
+      throw new IllegalArgumentException("Action must not be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority must not be null");
+    return securityCtx.isAllowed(action, authority);
   }
-
+  
   /**
-   * Checks whether all of the given authorities pass with respect to the given
-   * permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the object claiming the permission
-   * @return <code>true</code> if all authorities pass
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.security.Securable#isDenied(ch.entwine.weblounge.common.security.Action, ch.entwine.weblounge.common.security.Authority)
    */
-  public boolean checkAll(Permission permission, Authority[] authorities) {
-    if (authorities == null || authorities.length == 0)
-      return true;
-    for (Authority authority : authorities) {
-      if (!check(permission, authority))
-        return false;
-    }
-    return true;
+  @Override
+  public boolean isDenied(Action action, Authority authority) {
+    if (action == null)
+      throw new IllegalArgumentException("Action must not be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority must not be null");
+    return securityCtx.isDenied(action, authority);
   }
-
-  /**
-   * Returns the permissions that may be acquired on this object.
-   * 
-   * @return the available permissions
-   */
-  public Permission[] permissions() {
-    return securityCtx.permissions();
-  }
-
-  /**
-   * Sets the permission <code>permission</code> to require the object
-   * <code>item</code>.
-   * 
-   * @param permission
-   *          the permission
-   * @param authorization
-   *          the item that is allowed to obtain the permission
-   */
-  public void allow(Permission permission, Authority authorization) {
-    if (permission == null)
-      throw new IllegalArgumentException("permission");
-    securityCtx.allow(permission, authorization);
-    firePermissionChanged(permission);
-  }
-
-  /**
-   * Removes the permission and any associated role requirements from this
-   * context.
-   * 
-   * @param permission
-   *          the permission
-   */
-  public void deny(Permission permission, Authority authorization) {
-    securityCtx.deny(permission, authorization);
-    firePermissionChanged(permission);
-  }
-
+  
   /**
    * Adds <code>listener</code> to the list of security listeners that will be
-   * notified in case of ownership or permission changes.
+   * notified in case of ownership or action changes.
    * 
    * @param listener
    *          the new security listener
@@ -238,17 +230,17 @@ public class SecuredObject implements Securable {
   }
 
   /**
-   * Fires the <code>permissionChanged</code> event to all registered security
+   * Fires the <code>accessRuleChanged</code> event to all registered security
    * listeners.
    * 
-   * @param p
-   *          the changing permission
+   * @param rule
+   *          the changing access rule
    */
-  protected void firePermissionChanged(Permission p) {
+  protected void fireAccessRuleChanged(AccessRule rule) {
     if (listeners == null)
       return;
     for (int i = 0; i < listeners.size(); i++) {
-      (listeners.get(i)).permissionChanged(this, p);
+      (listeners.get(i)).accessChanged(this, rule);
     }
   }
 

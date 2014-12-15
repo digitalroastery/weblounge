@@ -22,6 +22,7 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import static ch.entwine.weblounge.common.request.RequestFlavor.ANY;
 import static ch.entwine.weblounge.common.request.RequestFlavor.HTML;
+import static ch.entwine.weblounge.common.security.SystemAction.READ;
 
 import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Resource;
@@ -39,6 +40,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -48,6 +50,8 @@ import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.security.SystemAction;
+import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.HTMLAction;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
@@ -161,9 +165,10 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
 
     // Create the search expression and the query
     SearchQuery q = new SearchQueryImpl(site);
+    q.withAction(SystemAction.READ);
     q.withText(true, queryString);
     q.withVersion(Resource.LIVE);
-    q.withRececyPriority();
+    q.withRecencyPriority();
     q.withOffset(offset);
     q.withLimit(limit);
     q.withTypes(Page.TYPE);
@@ -241,6 +246,18 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
       // Load the resource
       Resource<?> resource = serializer.toResource(site, resourceItem.getMetadata());
 
+      // Can the item be accessed by the current user?
+      User user = request.getUser();
+      try {
+        SecurablePermission readPermission = new SecurablePermission(resource, READ);
+        if (System.getSecurityManager() != null)
+          System.getSecurityManager().checkPermission(readPermission);
+      } catch (SecurityException e) {
+        logger.warn("Accesse to resource {} denied for user {}", resourceItem.getUrl(), user);
+        DispatchUtils.sendAccessDenied(request, response);
+        return true;
+      }
+      
       // Get the renderer and make sure it's a pagelet renderer. First check
       // the item itself, there may already be a renderer attached. If not,
       // use the serializer to get the appropriate renderer
