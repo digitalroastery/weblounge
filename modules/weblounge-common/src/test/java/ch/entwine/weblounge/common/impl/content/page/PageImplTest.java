@@ -75,8 +75,8 @@ public class PageImplTest {
   /** The site */
   protected Site site = null;
   
-  /** The page type */
-  protected String pageType = "Text";
+  /** The page flavor */
+  protected String pageFlavor = "Text";
 
   /** The page template */
   protected String template = "home";
@@ -171,7 +171,7 @@ public class PageImplTest {
     page.setTemplate(template);
     page.setTitle(germanTitle, german);
     page.setTitle(frenchTitle, french);
-    page.setType(pageType);
+    page.setFlavor(pageFlavor);
     for (String subject : subjects)
       page.addSubject(subject);
     page.addPagelet(new PageletImpl(module, pagelet), composer);
@@ -202,11 +202,11 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#getType()}.
+   * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PageImpl#getFlavor()}.
    */
   @Test
   public void testGetType() {
-    assertEquals(pageType, page.getType());
+    assertEquals(pageFlavor, page.getFlavor());
   }
 
   /**

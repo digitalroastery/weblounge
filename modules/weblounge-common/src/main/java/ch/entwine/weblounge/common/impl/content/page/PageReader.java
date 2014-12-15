@@ -448,8 +448,8 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
       }
 
       // Type
-      else if ("type".equals(raw)) {
-        page.setType(getCharacters());
+      else if ("flavor".equals(raw)) {
+        page.setFlavor(getCharacters());
       }
 
       // Title

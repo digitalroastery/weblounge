@@ -420,12 +420,12 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Resource#getType()
+   * @see ch.entwine.weblounge.common.content.Resource#getFlavor()
    */
-  public String getType() {
+  public String getFlavor() {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
-    return audioVisual.getType();
+    return audioVisual.getFlavor();
   }
 
   /**
@@ -678,12 +678,12 @@ public class LazyMovieResourceImpl implements MovieResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.Resource#setType(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.Resource#setFlavor(java.lang.String)
    */
-  public void setType(String type) {
+  public void setFlavor(String flavor) {
     if (!isHeaderLoaded)
       loadAudioVisualHeader();
-    audioVisual.setType(type);
+    audioVisual.setFlavor(flavor);
   }
 
   /**

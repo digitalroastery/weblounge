@@ -60,12 +60,12 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
   ResourceURI getURI();
 
   /**
-   * Sets the resource type.
+   * Sets the resource flavor.
    * 
-   * @param type
-   *          the resource type
+   * @param flavor
+   *          the resource flavor
    */
-  void setType(String type);
+  void setFlavor(String flavor);
 
   /**
    * Returns the resource type, which is used to include this resource into news
@@ -73,7 +73,7 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
    * 
    * @return the resource type
    */
-  String getType();
+  String getFlavor();
 
   /**
    * Sets the resource identifier.

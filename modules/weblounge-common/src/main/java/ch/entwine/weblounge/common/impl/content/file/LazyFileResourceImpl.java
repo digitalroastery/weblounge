@@ -424,18 +424,18 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getType()
+   * @see ch.entwine.weblounge.common.content.Resource#getFlavor()
    */
-  public String getType() {
+  public String getFlavor() {
     if (!isHeaderLoaded)
       loadFileHeader();
-    return file.getType();
+    return file.getFlavor();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#getResourceURI()
+   * @see ch.entwine.weblounge.common.content.Resource#getResourceURI()
    */
   public ResourceURI getURI() {
     return uri;
@@ -682,12 +682,12 @@ public class LazyFileResourceImpl implements FileResource {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.file.Page#setType(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.Resource#setFlavor(java.lang.String)
    */
-  public void setType(String type) {
+  public void setFlavor(String flavor) {
     if (!isHeaderLoaded)
       loadFileHeader();
-    file.setType(type);
+    file.setFlavor(flavor);
   }
 
   /**

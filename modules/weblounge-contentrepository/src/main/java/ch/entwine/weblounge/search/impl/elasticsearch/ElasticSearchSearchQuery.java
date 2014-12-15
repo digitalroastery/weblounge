@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.search.impl.elasticsearch;
 
+import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
 import static ch.entwine.weblounge.search.impl.IndexSchema.ALTERNATE_VERSION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_EXTERNAL_REPRESENTATION;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CONTENT_FILENAME;
@@ -28,11 +29,14 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGIN;
 import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGINAL_IDENTIFIER;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.CREATED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.FLAVOR;
 import static ch.entwine.weblounge.search.impl.IndexSchema.FULLTEXT;
 import static ch.entwine.weblounge.search.impl.IndexSchema.FULLTEXT_FUZZY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.LOCKED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED_BY;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGIN;
+import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGINAL_IDENTIFIER;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_PROPERTIES;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_COMPOSER;
@@ -50,8 +54,6 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.TEXT;
 import static ch.entwine.weblounge.search.impl.IndexSchema.TEXT_FUZZY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.TYPE;
 import static ch.entwine.weblounge.search.impl.IndexSchema.VERSION;
-
-import static ch.entwine.weblounge.common.content.SearchQuery.Quantifier.All;
 
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchQuery.Quantifier;
@@ -226,6 +228,10 @@ public class ElasticSearchSearchQuery implements QueryBuilder {
     // Template
     if (query.getTemplate() != null) {
       and(TEMPLATE, query.getTemplate(), true);
+    }
+
+    if (query.getFlavor() != null) {
+      and(FLAVOR, query.getFlavor(), true);
     }
 
     // Stationary

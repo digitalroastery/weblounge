@@ -12,7 +12,7 @@
       <description language="fr"><![CDATA[Déscription]]></description>
       <subject><![CDATA[Other topic]]></subject>
       <subject><![CDATA[This subject]]></subject>
-      <type><![CDATA[File]]></type>
+      <flavor><![CDATA[File]]></flavor>
       <coverage language="de"><![CDATA[Zürich]]></coverage>
       <coverage language="fr"><![CDATA[Zurich]]></coverage>
       <rights language="de"><![CDATA[Copyright 2009 by T. Wunden]]></rights>

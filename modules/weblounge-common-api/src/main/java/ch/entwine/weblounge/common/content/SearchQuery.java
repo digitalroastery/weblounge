@@ -196,22 +196,22 @@ public interface SearchQuery {
   boolean isStationary();
 
   /**
-   * Return the resources with the given origin.
+   * Return the resources with the given source.
    * 
-   * @param origin
-   *          the origin to look up
+   * @param source
+   *          the source to look up
    * @return the query extended by this criterion
    */
-  SearchQuery withOrigin(String origin);
+  SearchQuery withSource(String source);
   
   /**
-   * Return the resources with the given original identifier.
+   * Returns the source or <code>null</code> if no source was specified.
    * 
    * @param originalIdentifier
    *          the original identifier to look up
-   * @return the query extended by this criterion
+   * @return the source
    */
-  SearchQuery withOriginalIdentifier(String originalIdentifier);
+  String getSource();
 
   /**
    * Returns the origin or <code>null</code> if no origin was specified.
@@ -260,6 +260,22 @@ public interface SearchQuery {
    * @return the layout
    */
   String getLayout();
+
+  /**
+   * Return the resources with the given flavor.
+   *
+   * @param flavor
+   *          the flavor to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withFlavor(String flavor);
+
+  /**
+   * Returns the flavor or {@code null} if no flavor was specified.
+   *
+   * @return the flavor
+   */
+  String getFlavor();
 
   /**
    * Return the resources with the given types.
