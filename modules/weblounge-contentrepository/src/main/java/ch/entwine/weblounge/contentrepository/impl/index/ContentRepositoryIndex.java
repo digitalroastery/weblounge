@@ -407,7 +407,7 @@ public class ContentRepositoryIndex {
    *           if clearing the index fails
    */
   public synchronized void clear() throws IOException {
-    searchIdx.clear();
+    searchIdx.clear(site);
   }
 
   /**

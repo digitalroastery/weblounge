@@ -5,6 +5,7 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.site.Site;
 
 import java.io.IOException;
 import java.util.List;
@@ -84,9 +85,17 @@ public interface SearchIndex {
    */
   List<String> suggest(String dictionary, String seed, boolean onlyMorePopular,
       int count, boolean collate) throws ContentRepositoryException;
+  
+  /**
+   * Clears the search index of the given site.
+   * 
+   * @param site the site
+   * @throws IOException if clearing of the site index fails
+   */
+  void clear(Site site) throws IOException;
 
   /**
-   * Clears the search index.
+   * Clears the search indices of all sites.
    * 
    * @throws IOException
    *           if clearing the index fails
