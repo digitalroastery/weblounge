@@ -35,8 +35,6 @@ import static ch.entwine.weblounge.search.impl.IndexSchema.FULLTEXT_FUZZY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.LOCKED_BY;
 import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED;
 import static ch.entwine.weblounge.search.impl.IndexSchema.MODIFIED_BY;
-import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGIN;
-import static ch.entwine.weblounge.search.impl.IndexSchema.ORIGINAL_IDENTIFIER;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_PROPERTIES;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE;
 import static ch.entwine.weblounge.search.impl.IndexSchema.PAGELET_TYPE_COMPOSER;

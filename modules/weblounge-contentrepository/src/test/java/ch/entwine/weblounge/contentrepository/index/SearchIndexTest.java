@@ -660,14 +660,14 @@ public class SearchIndexTest {
 
   @Test(expected = NotImplementedException.class)
   public void testAddWithNotSupportedAclOrder() throws Exception {
-    Page page = pages[0];
+    Page page = testPages[0];
     page.setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order.DenyAllow);
     idx.add(page);
   }
 
   @Test(expected = NotImplementedException.class)
   public void testUpdateWithNotSupportedAclOrder() throws Exception {
-    Page page = pages[0];
+    Page page = testPages[0];
     page.setAllowDenyOrder(ch.entwine.weblounge.common.security.Securable.Order.DenyAllow);
     idx.update(page);
   }
