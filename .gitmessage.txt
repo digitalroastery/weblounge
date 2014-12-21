@@ -1,0 +1,37 @@
+# ISSUE-NUMBER [Feature|Improvement|Bugfix] Subject/title
+
+# Detailed information about the changes this commit introduces. All information
+# should be written in present tense.
+
+# 1.) What will change to the code? E.g.:
+
+# Example:
+# --------
+# Add a new method '#getChildren(int)' to the interface UserService which allows
+# to get all children of an existing user.
+#
+# Change the two implementation classes UserServiceImpl as well as
+# UserServiceRemoteImpl accordingly.
+
+# 2.) Does the change require any updates to the configuration?
+
+# Example:
+# --------
+# There is a new property 'userservice.enable' in the service configuration. The
+# key needs to be added. If it is not available, a ConfigurationException will be
+# thrown.
+
+# 3.) Does the change require any updates to the database?
+
+# Example:
+# --------
+# A new column 'parent' needs to be added to the table 'users'. There's an update
+# DDL script for MySQL as well as for Postgres which can both be found under
+# 'scripts/ddl/updates/V1_5_0_1__Add_parent_to_users.sql'.
+
+# Feel free to uncomment one of the tags beneath. This will help to find the
+# relevant commit message when doing the release/deployment.
+# Available tags:
+# +Configuration
+# +Database
+# +3rdPartyTools
