@@ -1,4 +1,4 @@
-# ISSUE-NUMBER [Feature|Improvement|Bugfix] Subject/title
+# [Feature|Improvement|Bugfix] Subject/title (#ISSUE-NUMBER)
 
 # Detailed information about the changes this commit introduces. All information
 # should be written in present tense.
