@@ -3,3 +3,11 @@ language: java
 jdk:
   - openjdk7
   - oraclejdk7
+
+# Run the builds in Travis' container based infrastructure
+sudo: false
+
+# Enable caching for the Maven dependencies
+cache:
+  directories:
+  - $HOME/.m2
