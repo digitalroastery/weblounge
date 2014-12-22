@@ -151,10 +151,10 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
         Resource<MovieContent> resource = parseResource(record);
         resource.getURI().setIdentifier(movieResource.getIdentifier());
         resource.setPublished(harvesterUser, date, null);
+        resource.setOriginalIdentifier(recordIdentifier);
         removeContents(resource);
 
         MovieContent content = parseResourceContent(record);
-        content.setSource(recordIdentifier);
         resource.addContent(content);
 
         addResource(resource);
@@ -164,13 +164,13 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
       } else {
         Resource<?> resource = parseResource(record);
         resource.setPublished(harvesterUser, date, null);
+        resource.setOriginalIdentifier(recordIdentifier);
         ResourceContent content = parseResourceContent(record);
 
         if (resource == null || content == null)
           return;
 
         addResource(resource);
-        content.setSource(recordIdentifier);
         addContent(resource.getURI(), content);
         logger.info("Harvesting resource " + recordIdentifier);
       }
@@ -180,18 +180,18 @@ public abstract class AbstractWebloungeRecordHandler implements RecordHandler {
   /**
    * Search a page with the resource identifier.
    * 
-   * @param sourceIdentifier
+   * @param originalIdentifier
    *          the record identifier
    * @return the search result
    */
-  private SearchResult searchSource(String sourceIdentifier) {
+  private SearchResult searchSource(String originalIdentifier) {
     SearchResult searchResult;
     SearchQuery q = new SearchQueryImpl(site);
-    q.withSource(sourceIdentifier);
+    q.withOriginalIdentifier(originalIdentifier);
     try {
       searchResult = contentRepository.find(q);
     } catch (ContentRepositoryException e) {
-      logger.error("Error searching for resources with given subject: " + sourceIdentifier);
+      logger.error("Error searching for resources with given subject: " + originalIdentifier);
       throw new RuntimeException(e);
     }
     return searchResult;
