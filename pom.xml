@@ -303,7 +303,7 @@
       </plugin>
 
       <!-- Create an OSGi bundle -->
-      <!-- explicitly define maven-bundle-plugin after others to force exec 
+      <!-- explicitly define maven-bundle-plugin after others to force exec
         order -->
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -312,7 +312,7 @@
 
       <!-- Deploy the build artifacts -->
       <!-- only executed during deployment -->
-      <!-- explicitly define maven-deploy-plugin after others to force exec 
+      <!-- explicitly define maven-deploy-plugin after others to force exec
         order -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -900,7 +900,7 @@
   <pluginRepositories>
 
     <pluginRepository>
-      <id>central</id>
+      <id>entwinemedia</id>
       <url>http://maven.entwinemedia.com/content/groups/public</url>
       <releases>
         <enabled>true</enabled>
@@ -911,7 +911,7 @@
     </pluginRepository>
 
     <pluginRepository>
-      <id>snapshots</id>
+      <id>entwinemedia-snapshots</id>
       <url>http://maven.entwinemedia.com/content/groups/public-snapshots</url>
       <releases>
         <enabled>false</enabled>
@@ -926,7 +926,7 @@
   <repositories>
 
     <repository>
-      <id>central</id>
+      <id>entwinemedia</id>
       <url>http://maven.entwinemedia.com/content/groups/public</url>
       <releases>
         <enabled>true</enabled>
@@ -937,7 +937,7 @@
     </repository>
 
     <repository>
-      <id>snapshots</id>
+      <id>entwinemedia-snapshots</id>
       <url>http://maven.entwinemedia.com/content/groups/public-snapshots</url>
       <releases>
         <enabled>false</enabled>
