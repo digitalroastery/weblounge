@@ -89,8 +89,6 @@ public final class ImageMetadataUtils {
     try {
       meta = ImageMetadataReader.readMetadata(img);
     } catch (ImageProcessingException e) {
-      if ("File is not the correct format".equals(e.getMessage()))
-        return null;
       logger.warn("Failed to extract image metadata from image: {}", e.getMessage());
       return null;
     }
