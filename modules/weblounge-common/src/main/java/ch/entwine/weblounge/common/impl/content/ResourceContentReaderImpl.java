@@ -78,11 +78,7 @@ public abstract class ResourceContentReaderImpl<T extends ResourceContent> exten
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.ResourceContentReader#createFromXml(java.io.InputStream)
-   */
+  @Override
   public T createFromXml(InputStream is) throws SAXException, IOException,
       ParserConfigurationException {
 

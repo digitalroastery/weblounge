@@ -72,19 +72,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
 
-  /**
-   * This method is called to parse the serialized XML of a
-   * {@link ch.entwine.weblounge.common.content.ResourceContent}.
-   * 
-   * @param is
-   *          the content data
-   * @throws ParserConfigurationException
-   *           if the SAX parser setup failed
-   * @throws IOException
-   *           if reading the input stream fails
-   * @throws SAXException
-   *           if an error occurs while parsing
-   */
+  @Override
   public ImageContent createFromXml(InputStream is) throws SAXException,
       IOException, ParserConfigurationException {
 
@@ -97,12 +85,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     return content;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.ResourceContentReader#createFromContent(java.io.InputStream,
-   *      ch.entwine.weblounge.common.language.Language, long, java.lang.String)
-   */
+  @Override
   public ImageContent createFromContent(InputStream is, User user,
       Language language, long size, String fileName, String mimeType)
       throws IOException {
