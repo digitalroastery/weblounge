@@ -26,8 +26,6 @@ import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 
-import com.sun.media.jai.codec.MemoryCacheSeekableStream;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -35,15 +33,16 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.Date;
 
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
+import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 
@@ -98,32 +97,20 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     // Set the creation date
     content.setCreationDate(new Date());
 
-    MemoryCacheSeekableStream mcss = new MemoryCacheSeekableStream(is);
-    UnclosableInputStream bis = new UnclosableInputStream(mcss);
+    final byte[] imgData = IOUtils.toByteArray(is);
 
-    // Read the Exif metadata (if available)
-    try {
-      readExifMetadata(content, bis);
+    try (final ByteArrayInputStream bais = new ByteArrayInputStream(imgData)) {
+      readDimensions(content, bais);
+    } catch (Throwable t) {
+      logger.warn("Error extracting metadata using java advanced imaging (jai) from {}: {}", fileName, t.getMessage());
+      throw new IOException(t);
+    }
+
+    try (final ByteArrayInputStream bais = new ByteArrayInputStream(imgData)) {
+      readExifMetadata(content, bais);
     } catch (Throwable t) {
       logger.warn("Error extracting Exif metadata from {}: {}", fileName, t.getMessage());
     }
-
-    // Read the JAI metadata
-    if (content.getWidth() <= 0 || content.getHeight() <= 0) {
-      try {
-        mcss.seek(0);
-        readJAIMetadata(content, mcss);
-      } catch (Throwable t) {
-        logger.warn("Error extracting metadata using java advanced imaging (jai) from {}: {}", fileName, t.getMessage());
-        throw new IOException(t);
-      } finally {
-        IOUtils.closeQuietly(is);
-      }
-    }
-
-    // Close the input stream
-    IOUtils.closeQuietly(mcss);
-    bis = null;
 
     return content;
   }
@@ -250,21 +237,12 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     }
   }
 
-  /**
-   * Extracts the Exif metadata from the image.
-   * 
-   * @param content
-   *          the resource content
-   * @param is
-   *          the input stream
-   * @return the Exif metadata
-   */
-  protected ImageMetadata readExifMetadata(ImageContent content, InputStream is) {
+  private void readExifMetadata(ImageContent content, InputStream is) {
     BufferedInputStream bis = new BufferedInputStream(is);
     ImageMetadata exifMetadata = ImageMetadataUtils.extractMetadata(bis);
 
     if (exifMetadata == null)
-      return null;
+      return;
 
     if (exifMetadata.getDateTaken() != null) {
       content.setDateTaken(exifMetadata.getDateTaken());
@@ -297,59 +275,15 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     if (exifMetadata.getExposureTime() != 0) {
       content.setExposureTime(exifMetadata.getExposureTime());
     }
-
-    return exifMetadata;
   }
 
-  /**
-   * Extracts image metadata from the image using Java Advanced Imaging (JAI).
-   * 
-   * @param content
-   *          the resource content
-   * @param is
-   *          the input stream
-   * @return the image metadata
-   */
-  protected RenderedOp readJAIMetadata(ImageContent content, InputStream is) {
-    MemoryCacheSeekableStream imageInputStream = new MemoryCacheSeekableStream(is);
-    RenderedOp jaiMetadata = JAI.create("stream", imageInputStream);
-
-    if (jaiMetadata == null)
-      return null;
-
-    content.setWidth(jaiMetadata.getWidth());
-    content.setHeight(jaiMetadata.getHeight());
-
-    return jaiMetadata;
-  }
-
-  /**
-   * Implementation of an input stream that ignores calls to
-   * {@link java.io.InputStream#close()}.
-   */
-  private static class UnclosableInputStream extends BufferedInputStream {
-
-    /**
-     * Creates a new input stream which will be fully consumed before being
-     * closed.
-     * 
-     * @param is
-     *          the input stream to be consumed from
-     */
-    public UnclosableInputStream(InputStream is) {
-      super(is);
+  private void readDimensions(ImageContent content, InputStream is)
+      throws IOException {
+    BufferedImage bimg = ImageIO.read(is);
+    if (bimg != null) {
+      content.setWidth(bimg.getWidth());
+      content.setHeight(bimg.getHeight());
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.io.BufferedInputStream#close()
-     */
-    @Override
-    public void close() throws IOException {
-      // Don't do anything, we still need this input stream
-    }
-
   }
 
 }
