@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.content;
 
+import static java.util.Objects.requireNonNull;
+
 import static ch.entwine.weblounge.common.language.Localizable.LanguageResolution.Original;
 
 import ch.entwine.weblounge.common.content.Resource;
@@ -743,14 +745,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    *      java.util.Date)
    */
   public void setCreated(User creator, Date creationDate) {
-    if (creator == null) {
-      logger.warn("Someone tried to set the creator of '{}' to null", this);
-      return;
-    } else if (creationDate == null) {
-      logger.warn("Someone tried to set the creation date of '{}' to null", this);
-      return;
-    }
-    creationCtx.setCreated(creator, creationDate);
+    creationCtx.setCreated(creator, requireNonNull(creationDate, "Creation date must not be null"));
   }
 
   /**
@@ -759,11 +754,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @see ch.entwine.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
    */
   public void setCreationDate(Date date) {
-    if (date == null) {
-      logger.warn("Someone tried to set creation date of '{}' to null", this);
-      return;
-    }
-    creationCtx.setCreationDate(date);
+    creationCtx.setCreationDate(requireNonNull(date, "Creation date must not be null"));
   }
 
   /**
