@@ -86,20 +86,12 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
     super(MovieResource.TYPE);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
-   */
+  @Override
   public String getMimeType(MovieContent resourceContent) {
     return resourceContent.getMimetype();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#supports(java.lang.String)
-   */
+  @Override
   public boolean supports(String mimeType) {
     if (mimeType == null)
       return false;
@@ -110,22 +102,12 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
-   */
+  @Override
   public Resource<MovieContent> newResource(Site site) {
     return new MovieResourceImpl(new MovieResourceURIImpl(site));
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
-   *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
-   *      ch.entwine.weblounge.common.language.Language)
-   */
+  @Override
   public Resource<MovieContent> newResource(Site site, InputStream is,
       User user, Language language) {
 
@@ -137,22 +119,13 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
     return avResource;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractResourceSerializer#createNewReader()
-   */
   @Override
   protected MovieResourceReader createNewReader()
       throws ParserConfigurationException, SAXException {
     return new MovieResourceReader();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
-   */
+  @Override
   public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
     if (resource != null) {
       return new MovieInputDocument((MovieResource) resource).getMetadata();
@@ -160,12 +133,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
-   *      java.util.List)
-   */
+  @Override
   public Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata) {
     for (ResourceMetadata<?> metadataItem : metadata) {
       if (XML.equals(metadataItem.getName())) {
@@ -189,12 +157,7 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
-   *      double, List)
-   */
+  @Override
   public SearchResultItem toSearchResultItem(Site site, double relevance,
       List<ResourceMetadata<?>> metadata) {
 
@@ -241,24 +204,16 @@ public class MovieResourceSerializer extends AbstractResourceSerializer<MovieCon
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getContentReader()
-   */
+  @Override
   public ResourceContentReader<MovieContent> getContentReader()
       throws ParserConfigurationException, SAXException {
     return new MovieContentReader();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getPreviewGenerator(Resource)
-   */
-  public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
+  @Override
+  public PreviewGenerator getPreviewGenerator(Resource<?> resource, Language language) {
     for (MoviePreviewGenerator generator : previewGenerators) {
-      if (generator.supports(resource)) {
+      if (generator.supports(resource, language)) {
         logger.trace("Movie preview generator {} agrees to handle {}", generator, resource);
         return generator;
       }
