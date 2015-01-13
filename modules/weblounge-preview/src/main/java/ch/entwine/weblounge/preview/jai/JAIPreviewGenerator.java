@@ -60,35 +60,19 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(JAIPreviewGenerator.class);
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(ch.entwine.weblounge.common.content.Resource)
-   */
-  public boolean supports(Resource<?> resource) {
+  @Override
+  public boolean supports(Resource<?> resource, Language language) {
     return (resource instanceof ImageResource);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(java.lang.String)
-   */
+  @Override
   public boolean supports(String format) {
     if (format == null)
       throw new IllegalArgumentException("Format cannot be null");
     return ImageIO.getImageWritersBySuffix(format.toLowerCase()).hasNext();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(ch.entwine.weblounge.common.content.Resource,
-   *      ch.entwine.weblounge.common.site.Environment,
-   *      ch.entwine.weblounge.common.language.Language,
-   *      ch.entwine.weblounge.common.content.image.ImageStyle, String,
-   *      java.io.InputStream, java.io.OutputStream)
-   */
+  @Override
   public void createPreview(Resource<?> resource, Environment environment,
       Language language, ImageStyle style, String format, InputStream is,
       OutputStream os) throws IOException {
@@ -106,15 +90,7 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
     style(is, os, format, style);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.image.ImagePreviewGenerator#createPreview(java.io.File,
-   *      ch.entwine.weblounge.common.site.Environment,
-   *      ch.entwine.weblounge.common.language.Language,
-   *      ch.entwine.weblounge.common.content.image.ImageStyle,
-   *      java.lang.String, java.io.InputStream, java.io.OutputStream)
-   */
+  @Override
   public void createPreview(File imageFile, Environment environment,
       Language language, ImageStyle style, String format, InputStream is,
       OutputStream os) throws IOException {
@@ -129,26 +105,14 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
     style(is, os, format, style);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getContentType(ch.entwine.weblounge.common.content.Resource,
-   *      ch.entwine.weblounge.common.language.Language,
-   *      ch.entwine.weblounge.common.content.image.ImageStyle)
-   */
+  @Override
   public String getContentType(Resource<?> resource, Language language,
       ImageStyle style) {
     String mimetype = resource.getContent(language).getMimetype();
     return mimetype;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getSuffix(ch.entwine.weblounge.common.content.Resource,
-   *      ch.entwine.weblounge.common.language.Language,
-   *      ch.entwine.weblounge.common.content.image.ImageStyle)
-   */
+  @Override
   public String getSuffix(Resource<?> resource, Language language,
       ImageStyle style) {
 
@@ -177,11 +141,7 @@ public final class JAIPreviewGenerator implements ImagePreviewGenerator {
     return FilenameUtils.getExtension(filename);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getPriority()
-   */
+  @Override
   public int getPriority() {
     return 0;
   }

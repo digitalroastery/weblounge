@@ -171,9 +171,11 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * 
    * @param resource
    *          the resource
+   * @param language
+   *          the language
    * @return the preview generator
    */
-  PreviewGenerator getPreviewGenerator(Resource<?> resource);
+  PreviewGenerator getPreviewGenerator(Resource<?> resource, Language language);
 
   /**
    * Returns a renderer that can be used to display the resource, e. g as part
