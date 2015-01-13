@@ -62,9 +62,6 @@ import javax.xml.validation.SchemaFactory;
  */
 public class SiteActivator {
 
-  /** Site identifier OSGi service property */
-  private static final String SITE_IDENTIFIER_SERVICE_PROPERTY = "site.identifier";
-
   /** The logging facility */
   static final Logger logger = LoggerFactory.getLogger(SiteActivator.class);
 
@@ -280,7 +277,6 @@ public class SiteActivator {
                 // Register the site as a service
                 logger.debug("Registering site '{}' in the service registry", site);
                 Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
-                serviceProperties.put(SITE_IDENTIFIER_SERVICE_PROPERTY, site.getIdentifier());
                 for (Map.Entry<String, String> entry : properties.entrySet()) {
                   serviceProperties.put(entry.getKey(), entry.getValue());
                 }
