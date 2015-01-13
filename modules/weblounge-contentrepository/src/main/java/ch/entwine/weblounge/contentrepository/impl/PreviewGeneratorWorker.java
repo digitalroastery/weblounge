@@ -112,28 +112,16 @@ class PreviewGeneratorWorker implements Runnable {
     this.canceled = true;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.lang.Runnable#run()
-   */
+  @Override
   public void run() {
     ResourceURI resourceURI = resource.getURI();
     String resourceType = resourceURI.getType();
 
     try {
-
       // Find the resource serializer
       ResourceSerializer<?, ?> serializer = contentRepository.getSerializerByType(resourceType);
       if (serializer == null) {
         logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
-        return;
-      }
-
-      // Does the serializer come with a preview generator?
-      PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource);
-      if (previewGenerator == null) {
-        logger.debug("Resource type '{}' does not support previews", resourceType);
         return;
       }
 
@@ -158,6 +146,14 @@ class PreviewGeneratorWorker implements Runnable {
 
       // Now scale the original preview according to the existing styles
       for (Language l : languages) {
+        
+        // Does the serializer come with a preview generator?
+        PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource, l);
+        if (previewGenerator == null) {
+          logger.debug("No preview generator found for resource '{}' with language '{}'", resource, l);
+          continue;
+        }
+        
         if (!resource.supportsContentLanguage(l))
           continue;
 

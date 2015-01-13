@@ -109,6 +109,9 @@ public class ModuleImpl implements Module {
 
   /** List of module listeners */
   protected List<ModuleListener> moduleListeners = null;
+  
+  /** Lock for the access to moduleListener */
+  protected final Object moduleListenersLock = new Object();
 
   /** The environment */
   protected Environment environment = Environment.Production;
@@ -205,7 +208,7 @@ public class ModuleImpl implements Module {
   public void addModuleListener(ModuleListener listener) {
     if (moduleListeners == null)
       moduleListeners = new ArrayList<ModuleListener>();
-    synchronized (moduleListeners) {
+    synchronized (moduleListenersLock) {
       moduleListeners.add(listener);
     }
   }
@@ -217,7 +220,7 @@ public class ModuleImpl implements Module {
    */
   public void removeModuleListener(ModuleListener listener) {
     if (moduleListeners != null) {
-      synchronized (moduleListeners) {
+      synchronized (moduleListenersLock) {
         moduleListeners.remove(listener);
       }
     }

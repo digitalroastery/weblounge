@@ -238,17 +238,11 @@ public class SiteActivator {
         return;
       }
 
-      // Start loading the site in a new thread in order to enable parallel
-      // loading of sites
-      Thread siteLoader = new Thread() {
-        public void run() {
+      logger.info("Loading site from bundle '{}'", bundleName);
+
           final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
-          try {
             ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
               public Void call() throws Exception {
-
-                logger.info("Loading site from bundle '{}'", bundleName);
-
                 site = SiteImpl.fromXml(siteXml.getFirstChild());
 
                 // Make sure the system admin account is not shadowed
@@ -291,13 +285,6 @@ public class SiteActivator {
                 return null;
               }
             });
-          } catch (Throwable e) {
-            logger.error("Error loading site from bundle '{}': {}", bundleName, e);
-          }
-        }
-      };
-
-      siteLoader.start();
 
     } else {
       logger.warn("Site activator was unable to locate site.xml");

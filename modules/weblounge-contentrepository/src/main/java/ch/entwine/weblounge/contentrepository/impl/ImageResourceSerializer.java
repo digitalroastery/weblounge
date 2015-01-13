@@ -97,40 +97,22 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     super(ImageResource.TYPE);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
-   */
+  @Override
   public String getMimeType(ImageContent resourceContent) {
     return resourceContent.getMimetype();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#supports(java.lang.String)
-   */
+  @Override
   public boolean supports(String mimeType) {
     return mimeType != null && mimeType.toLowerCase().startsWith("image/");
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
-   */
+  @Override
   public Resource<ImageContent> newResource(Site site) {
     return new ImageResourceImpl(new ImageResourceURIImpl(site));
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
-   *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
-   *      ch.entwine.weblounge.common.language.Language)
-   */
+  @Override
   public Resource<ImageContent> newResource(Site site, InputStream is,
       User user, Language language) {
     ImageMetadata imageMetadata = ImageMetadataUtils.extractMetadata(new BufferedInputStream(is));
@@ -155,22 +137,13 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     return imageResource;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractResourceSerializer#createNewReader()
-   */
   @Override
   protected ImageResourceReader createNewReader()
       throws ParserConfigurationException, SAXException {
     return new ImageResourceReader();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
-   */
+  @Override
   public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
     if (resource != null) {
       return new ImageInputDocument((ImageResource) resource).getMetadata();
@@ -178,12 +151,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
-   *      java.util.List)
-   */
+  @Override
   public Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata) {
     for (ResourceMetadata<?> metadataItem : metadata) {
       if (XML.equals(metadataItem.getName())) {
@@ -207,12 +175,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
-   *      double, List)
-   */
+  @Override
   public SearchResultItem toSearchResultItem(Site site, double relevance,
       List<ResourceMetadata<?>> metadata) {
 
@@ -260,24 +223,16 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getContentReader()
-   */
+  @Override
   public ResourceContentReader<ImageContent> getContentReader()
       throws ParserConfigurationException, SAXException {
     return new ImageContentReader();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getPreviewGenerator(Resource)
-   */
-  public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
+  @Override
+  public PreviewGenerator getPreviewGenerator(Resource<?> resource, Language language) {
     for (ImagePreviewGenerator generator : previewGenerators) {
-      if (generator.supports(resource)) {
+      if (generator.supports(resource, language)) {
         logger.trace("Image preview generator {} agrees to handle {}", generator, resource);
         return generator;
       }

@@ -207,7 +207,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
 
     // Does the serializer come with a preview generator?
-    PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource);
+    PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource, language);
     if (previewGenerator == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
@@ -559,7 +559,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
 
     // Does the serializer come with a preview generator?
-    PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource);
+    PreviewGenerator previewGenerator = serializer.getPreviewGenerator(resource, language);
     if (previewGenerator == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
