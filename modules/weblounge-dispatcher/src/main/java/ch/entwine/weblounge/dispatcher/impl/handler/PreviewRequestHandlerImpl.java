@@ -247,7 +247,7 @@ public final class PreviewRequestHandlerImpl implements RequestHandler {
     PreviewGenerator previewGenerator = null;
     synchronized (previewGenerators) {
       for (PreviewGenerator generator : previewGenerators) {
-        if (generator.supports(resource)) {
+        if (generator.supports(resource, language)) {
           previewGenerator = generator;
           break;
         }
@@ -257,7 +257,7 @@ public final class PreviewRequestHandlerImpl implements RequestHandler {
     // If we did not find a preview generator, we need to let go
     if (previewGenerator == null) {
       logger.debug("Unable to generate preview for {} since no suitable preview generator is available", resource);
-      DispatchUtils.sendServiceUnavailable(request, response);
+      DispatchUtils.sendNotFound(request, response);
       return true;
     }
 

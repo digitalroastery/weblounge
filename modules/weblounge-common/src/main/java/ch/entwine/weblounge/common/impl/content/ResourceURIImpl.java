@@ -203,7 +203,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
     String parentPath = getParentPath();
     if (parentPath == null)
       return null;
-    return new ResourceURIImpl(type, site, parentPath, id, version);
+    return new ResourceURIImpl(type, site, parentPath, null, version);
   }
 
   /**

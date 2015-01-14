@@ -46,13 +46,17 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
   protected Set<Role> ancestors = null;
 
   /**
-   * Creates a new role from the parameter context::id.
+   * Creates a new role from the parameter context:id.
    * 
    * @param role
    *          the role
+   * @throws IllegalArgumentException
+   *           if role is {@code null}
    */
   public RoleImpl(String role) {
-    assert role != null;
+    if (role == null)
+      throw new IllegalArgumentException("Role must not be null");
+
     this.context = extractContext(role);
     this.identifier = extractIdentifier(role);
     this.ancestors = new HashSet<Role>();
@@ -65,8 +69,15 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    *          the role context
    * @param identifier
    *          the role identifier
+   * @throws IllegalArgumentException
+   *           if context or identifier is {@code null}
    */
   public RoleImpl(String context, String identifier) {
+    if (context == null)
+      throw new IllegalArgumentException("Context must not be null");
+    if (identifier == null)
+      throw new IllegalArgumentException("Identifier must not be null");
+
     this.context = context;
     this.identifier = identifier;
     this.ancestors = new HashSet<Role>();
@@ -80,6 +91,8 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    *          the role context
    * @param identifier
    *          the role identifier
+   * @throws IllegalArgumentException
+   *           if context or identifier is {@code null}
    */
   public RoleImpl(String context, String identifier, Role ancestor) {
     this(context, identifier);

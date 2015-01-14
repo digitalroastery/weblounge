@@ -355,7 +355,7 @@ public class PublishingContext implements Cloneable {
    * @see #fromXml(Node, XPath)
    */
   public String toXml() {
-    if (publisher == null || startDate == null)
+    if (startDate == null)
       return "";
 
     StringBuffer b = new StringBuffer();

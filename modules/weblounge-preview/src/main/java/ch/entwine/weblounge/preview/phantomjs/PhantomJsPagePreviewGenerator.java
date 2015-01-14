@@ -123,20 +123,12 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
     FileUtils.deleteQuietly(phantomTmpDir);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(ch.entwine.weblounge.common.content.Resource)
-   */
-  public boolean supports(Resource<?> resource) {
+  @Override
+  public boolean supports(Resource<?> resource, Language language) {
     return (resource instanceof Page);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#supports(java.lang.String)
-   */
+  @Override
   public boolean supports(String format) {
     for (ImagePreviewGenerator generator : previewGenerators) {
       if (generator.supports(PREVIEW_FORMAT) && generator.supports(format))
@@ -145,15 +137,7 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(ch.entwine.weblounge.common.content.Resource,
-   *      ch.entwine.weblounge.common.site.Environment,
-   *      ch.entwine.weblounge.common.language.Language,
-   *      ch.entwine.weblounge.common.content.image.ImageStyle, String,
-   *      java.io.InputStream, java.io.OutputStream)
-   */
+  @Override
   public void createPreview(Resource<?> resource, Environment environment,
       Language language, ImageStyle style, String format, InputStream is,
       OutputStream os) throws IOException {
@@ -255,35 +239,19 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
 
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getContentType(ch.entwine.weblounge.common.content.Resource,
-   *      ch.entwine.weblounge.common.language.Language,
-   *      ch.entwine.weblounge.common.content.image.ImageStyle)
-   */
+  @Override
   public String getContentType(Resource<?> resource, Language language,
       ImageStyle style) {
     return PREVIEW_CONTENT_TYPE;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getSuffix(ch.entwine.weblounge.common.content.Resource,
-   *      ch.entwine.weblounge.common.language.Language,
-   *      ch.entwine.weblounge.common.content.image.ImageStyle)
-   */
+  @Override
   public String getSuffix(Resource<?> resource, Language language,
       ImageStyle style) {
     return PREVIEW_FORMAT;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getPriority()
-   */
+  @Override
   public int getPriority() {
     return 100;
   }
@@ -381,11 +349,6 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
       super(ctx, ImagePreviewGenerator.class.getName(), null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.osgi.util.tracker.ServiceTracker#addingService(org.osgi.framework.ServiceReference)
-     */
     @Override
     public Object addingService(ServiceReference reference) {
       ImagePreviewGenerator previewGenerator = (ImagePreviewGenerator) super.addingService(reference);
@@ -393,12 +356,6 @@ public class PhantomJsPagePreviewGenerator implements PagePreviewGenerator {
       return previewGenerator;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.osgi.util.tracker.ServiceTracker#removedService(org.osgi.framework.ServiceReference,
-     *      java.lang.Object)
-     */
     @Override
     public void removedService(ServiceReference reference, Object service) {
       removePreviewGenerator((ImagePreviewGenerator) service);

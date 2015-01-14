@@ -82,71 +82,39 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
     super(Page.TYPE);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
-   */
+  @Override
   public String getMimeType(ResourceContent resourceContent) {
     return "text/html";
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#supports(java.lang.String)
-   */
+  @Override
   public boolean supports(String mimeType) {
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site)
-   */
+  @Override
   public Resource<ResourceContent> newResource(Site site) {
     return new PageImpl(new PageURIImpl(site));
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#newResource(ch.entwine.weblounge.common.site.Site,
-   *      java.io.InputStream, ch.entwine.weblounge.common.security.User,
-   *      ch.entwine.weblounge.common.language.Language)
-   */
+  @Override
   public Resource<ResourceContent> newResource(Site site, InputStream is,
       User user, Language language) {
     return newResource(site);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractResourceSerializer#createNewReader()
-   */
   @Override
   protected PageReader createNewReader() throws ParserConfigurationException,
       SAXException {
     return new PageReader();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toMetadata(ch.entwine.weblounge.common.content.Resource)
-   */
+  @Override
   public List<ResourceMetadata<?>> toMetadata(Resource<?> resource) {
     return new PageInputDocument((Page) resource).getMetadata();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toResource(ch.entwine.weblounge.common.site.Site,
-   *      java.util.List)
-   */
+  @Override
   public Resource<?> toResource(Site site, List<ResourceMetadata<?>> metadata) {
     for (ResourceMetadata<?> metadataItem : metadata) {
       if (XML.equals(metadataItem.getName())) {
@@ -170,12 +138,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#toSearchResultItem(ch.entwine.weblounge.common.site.Site,
-   *      double, List)
-   */
+  @Override
   public SearchResultItem toSearchResultItem(Site site, double relevance,
       List<ResourceMetadata<?>> metadata) {
 
@@ -209,24 +172,16 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getContentReader()
-   */
+  @Override
   public ResourceContentReader<ResourceContent> getContentReader()
       throws ParserConfigurationException, SAXException {
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ResourceSerializer#getPreviewGenerator(Resource)
-   */
-  public PreviewGenerator getPreviewGenerator(Resource<?> resource) {
+  @Override
+  public PreviewGenerator getPreviewGenerator(Resource<?> resource, Language language) {
     for (PagePreviewGenerator generator : previewGenerators) {
-      if (generator.supports(resource)) {
+      if (generator.supports(resource, language)) {
         logger.trace("Page preview generator {} agrees to handle {}", generator, resource);
         return generator;
       }

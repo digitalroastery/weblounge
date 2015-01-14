@@ -91,6 +91,7 @@ public class LanguageUtilsTest {
   @Test
   public void testGetLanguageString() {
     assertEquals(italian, LanguageUtils.getLanguage("it"));
+    assertEquals(italian, LanguageUtils.getLanguage("ita"));
     try {
       LanguageUtils.getLanguage("xyz");
       fail("Language xyz should not be resolved");

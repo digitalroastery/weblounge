@@ -203,12 +203,21 @@ public class SiteImpl implements Site {
 
   /** Request listeners */
   private List<RequestListener> requestListeners = null;
+  
+  /** Lock for the access to requestListeners */
+  private final Object requestListenersLock = new Object();
 
   /** Site listeners */
   private List<SiteListener> siteListeners = null;
+  
+  /** Lock for the access to siteListeners */
+  private final Object siteListenersLock = new Object();
 
   /** User listeners */
   private List<UserListener> userListeners = null;
+  
+  /** Lock for the access to userListeners */
+  private final Object userListenersLock = new Object();
 
   /** Scheduling service tracker */
   private SchedulingServiceTracker schedulingServiceTracker = null;
@@ -992,7 +1001,7 @@ public class SiteImpl implements Site {
   public void addRequestListener(RequestListener listener) {
     if (requestListeners == null)
       requestListeners = new ArrayList<RequestListener>();
-    synchronized (requestListeners) {
+    synchronized (requestListenersLock) {
       requestListeners.add(listener);
     }
   }
@@ -1004,7 +1013,7 @@ public class SiteImpl implements Site {
    */
   public void removeRequestListener(RequestListener listener) {
     if (requestListeners != null) {
-      synchronized (requestListeners) {
+      synchronized (requestListenersLock) {
         requestListeners.remove(listener);
       }
     }
@@ -1018,7 +1027,7 @@ public class SiteImpl implements Site {
   public void addSiteListener(SiteListener listener) {
     if (siteListeners == null)
       siteListeners = new ArrayList<SiteListener>();
-    synchronized (siteListeners) {
+    synchronized (siteListenersLock) {
       siteListeners.add(listener);
     }
   }
@@ -1030,7 +1039,7 @@ public class SiteImpl implements Site {
    */
   public void removeSiteListener(SiteListener listener) {
     if (siteListeners != null) {
-      synchronized (siteListeners) {
+      synchronized (siteListenersLock) {
         siteListeners.remove(listener);
       }
     }
@@ -1044,7 +1053,7 @@ public class SiteImpl implements Site {
   public void addUserListener(UserListener listener) {
     if (userListeners == null)
       userListeners = new ArrayList<UserListener>();
-    synchronized (userListeners) {
+    synchronized (userListenersLock) {
       userListeners.add(listener);
     }
   }
@@ -1056,7 +1065,7 @@ public class SiteImpl implements Site {
    */
   public void removeUserListener(UserListener listener) {
     if (userListeners != null) {
-      synchronized (userListeners) {
+      synchronized (userListenersLock) {
         userListeners.remove(listener);
       }
     }

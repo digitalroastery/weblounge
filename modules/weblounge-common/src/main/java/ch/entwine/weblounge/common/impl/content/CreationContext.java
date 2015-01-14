@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.content;
 
+import static java.util.Objects.requireNonNull;
+
 import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
@@ -100,7 +102,7 @@ public class CreationContext implements Cloneable {
    */
   public void setCreated(User user, Date date) {
     this.creator = user;
-    this.creationDate = cutOffMillis(date);
+    this.creationDate = cutOffMillis(requireNonNull(date, "The creation date must not be null"));
   }
 
   /**
@@ -113,7 +115,7 @@ public class CreationContext implements Cloneable {
    *          the creation date
    */
   public void setCreationDate(Date date) {
-    this.creationDate = cutOffMillis(date);
+    this.creationDate = cutOffMillis(requireNonNull(date, "The creation date must not be null"));
   }
 
   /**

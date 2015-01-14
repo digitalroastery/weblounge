@@ -39,9 +39,11 @@ public interface PreviewGenerator {
    * 
    * @param resource
    *          the resource
+   * @param language
+   *          the language
    * @return <code>true</code> if creating a preview is supported
    */
-  boolean supports(Resource<?> resource);
+  boolean supports(Resource<?> resource, Language language);
 
   /**
    * Returns <code>true</code> if the preview generator supports creating a
