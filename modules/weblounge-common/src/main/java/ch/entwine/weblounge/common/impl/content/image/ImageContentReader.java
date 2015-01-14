@@ -102,7 +102,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     try (final ByteArrayInputStream bais = new ByteArrayInputStream(imgData)) {
       readDimensions(content, bais);
     } catch (Throwable t) {
-      logger.warn("Error extracting metadata using java advanced imaging (jai) from {}: {}", fileName, t.getMessage());
+      logger.warn("Error extracting metadata using ImageIO from {}: {}", fileName, t.getMessage());
       throw new IOException(t);
     }
 
