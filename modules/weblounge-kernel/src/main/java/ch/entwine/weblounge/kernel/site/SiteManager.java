@@ -69,6 +69,9 @@ public class SiteManager {
 
   /** The sites */
   private List<Site> sites = new ArrayList<Site>();
+  
+  /** Lock object for access to 'sites' list */
+  private final Object sitesLock = new Object();
 
   /** Maps server names to sites */
   private Map<String, Site> sitesByServerName = new HashMap<String, Site>();
@@ -87,6 +90,9 @@ public class SiteManager {
 
   /** Registered site listeners */
   private List<SiteServiceListener> listeners = new ArrayList<SiteServiceListener>();
+  
+  /** Lock object for access to 'listeners' list */
+  private final Object listenersLock = new Object();
 
   /**
    * Adds <code>listener</code> to the list of site listeners.
@@ -95,7 +101,7 @@ public class SiteManager {
    *          the site listener
    */
   public void addSiteListener(SiteServiceListener listener) {
-    synchronized (listeners) {
+    synchronized (listenersLock) {
       listeners.add(listener);
     }
   }
@@ -107,7 +113,7 @@ public class SiteManager {
    *          the site listener
    */
   public void removeSiteListener(SiteServiceListener listener) {
-    synchronized (listeners) {
+    synchronized (listenersLock) {
       listeners.remove(listener);
     }
   }
@@ -162,7 +168,7 @@ public class SiteManager {
    * @return the site
    */
   public Site findSiteByIdentifier(String identifier) {
-    synchronized (sites) {
+    synchronized (sitesLock) {
       for (Site site : sites) {
         if (site.getIdentifier().equals(identifier)) {
           return site;
@@ -191,7 +197,7 @@ public class SiteManager {
 
     // There is obviously no direct match. Therefore, try to find a
     // wildcard match
-    synchronized (sites) {
+    synchronized (sitesLock) {
       for (Map.Entry<String, Site> e : sitesByServerName.entrySet()) {
         String siteUrl = e.getKey();
 
@@ -228,7 +234,7 @@ public class SiteManager {
    * @return the site
    */
   public Site findSiteByBundle(Bundle bundle) {
-    synchronized (sites) {
+    synchronized (sitesLock) {
       for (Map.Entry<Site, Bundle> entry : siteBundles.entrySet()) {
         if (bundle.equals(entry.getValue()))
           return entry.getKey();
@@ -270,7 +276,7 @@ public class SiteManager {
    */
   void addSite(Site site, ServiceReference reference) {
 
-    synchronized (sites) {
+    synchronized (sitesLock) {
       sites.add(site);
       siteBundles.put(site, reference.getBundle());
 
@@ -334,7 +340,7 @@ public class SiteManager {
     logger.debug("Site '{}' registered", site);
 
     // Inform site listeners
-    synchronized (listeners) {
+    synchronized (listenersLock) {
       for (SiteServiceListener listener : listeners) {
         try {
           listener.siteAppeared(site, reference);
@@ -407,7 +413,7 @@ public class SiteManager {
   void removeSite(Site site) {
 
     // Inform site listeners
-    synchronized (listeners) {
+    synchronized (listenersLock) {
       for (SiteServiceListener listener : listeners) {
         listener.siteDisappeared(site);
       }
@@ -439,7 +445,7 @@ public class SiteManager {
     }
 
     // Remove it from the registry
-    synchronized (sites) {
+    synchronized (sitesLock) {
       sites.remove(site);
       siteBundles.remove(site);
       Iterator<Site> si = sitesByServerName.values().iterator();
