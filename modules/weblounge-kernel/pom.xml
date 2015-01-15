@@ -651,6 +651,7 @@
               OSGI-INF/fop-service.xml,
               OSGI-INF/healthcheck-filter.xml,
               OSGI-INF/https-request-filter.xml,
+              OSGI-INF/instance-information-service.xml,
               OSGI-INF/kernel-service.xml,
               OSGI-INF/language-runtime-information.xml,
               OSGI-INF/resource-publishing-service.xml,
