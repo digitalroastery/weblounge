@@ -200,19 +200,6 @@
       </build>
     </profile>
 
-    <!-- Importer -->
-    <profile>
-      <id>importer</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>modules/weblounge-importer</module>
-        <module>modules/weblounge-common-api</module>
-        <module>modules/weblounge-common</module>
-      </modules>
-    </profile>
-
     <!-- Mygengo i18n plugin -->
     <profile>
       <id>mygengo</id>
