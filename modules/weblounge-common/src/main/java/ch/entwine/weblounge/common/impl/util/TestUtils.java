@@ -80,11 +80,9 @@ public final class TestUtils {
   public static String loadXmlFromResource(String path) {
     File templateFile = new File(TestUtils.class.getResource(path).getPath());
     String template = null;
-    try {
+    try (FileInputStream f = new FileInputStream(templateFile)) {
       byte[] buffer = new byte[(int) templateFile.length()];
-      FileInputStream f = new FileInputStream(templateFile);
       f.read(buffer);
-      f.close();
       template = new String(buffer, "utf-8").replaceFirst("<\\?.*?>", "");
       template = template.replaceAll("(>\\s*)+", ">").replaceAll("(\\s*<)+", "<");
     } catch (IOException e) {
@@ -105,11 +103,9 @@ public final class TestUtils {
   public static String loadJsonFromResource(String path) {
     File templateFile = new File(TestUtils.class.getResource(path).getPath());
     String template = null;
-    try {
+    try (FileInputStream f = new FileInputStream(templateFile)) {
       byte[] buffer = new byte[(int) templateFile.length()];
-      FileInputStream f = new FileInputStream(templateFile);
       f.read(buffer);
-      f.close();
       template = new String(buffer, "utf-8");
       template = template.replaceAll("(\"\\s*)", "\"").replaceAll("(\\s*\")+", "\"");
       template = template.replaceAll("(\\s*\\{\\s*)", "{").replaceAll("(\\s*\\}\\s*)", "}");

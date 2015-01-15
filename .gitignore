@@ -18,5 +18,8 @@ target
 .settings/
 .metadata/
 
+# Tools
+.checkstyle
+
 # Mac OS X
 .DS_Store
