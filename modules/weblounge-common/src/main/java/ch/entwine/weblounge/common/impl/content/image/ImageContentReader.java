@@ -100,16 +100,21 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     final byte[] imgData = IOUtils.toByteArray(is);
 
     try (final ByteArrayInputStream bais = new ByteArrayInputStream(imgData)) {
-      readDimensions(content, bais);
+      BufferedImage bimg = ImageIO.read(bais);
+      if (bimg != null) {
+        content.setWidth(bimg.getWidth());
+        content.setHeight(bimg.getHeight());
+      } else {
+        logger.warn("No ImageReader is able to read image '{}', dimensions could not be evaluated.", fileName);
+      }
     } catch (Throwable t) {
-      logger.warn("Error extracting metadata using ImageIO from {}: {}", fileName, t.getMessage());
-      throw new IOException(t);
+      logger.error("Error extracting image dimensions from {}: {}", fileName, t.getMessage());
     }
 
     try (final ByteArrayInputStream bais = new ByteArrayInputStream(imgData)) {
       readExifMetadata(content, bais);
     } catch (Throwable t) {
-      logger.warn("Error extracting Exif metadata from {}: {}", fileName, t.getMessage());
+      logger.error("Error extracting Exif metadata from {}: {}", fileName, t.getMessage());
     }
 
     return content;
@@ -274,15 +279,6 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
 
     if (exifMetadata.getExposureTime() != 0) {
       content.setExposureTime(exifMetadata.getExposureTime());
-    }
-  }
-
-  private void readDimensions(ImageContent content, InputStream is)
-      throws IOException {
-    BufferedImage bimg = ImageIO.read(is);
-    if (bimg != null) {
-      content.setWidth(bimg.getWidth());
-      content.setHeight(bimg.getHeight());
     }
   }
 
