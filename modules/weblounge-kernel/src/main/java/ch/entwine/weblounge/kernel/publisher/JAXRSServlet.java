@@ -101,13 +101,13 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
     // If a site registered this endpoint, other sites should not be able to
     // access it
     if (site != null) {
-      String requestPath = request.getRequestURL().toString();
+      String requestHostName = request.getServerName();
       SiteURL siteUrl = null;
       logger.trace("Making sure the endpoint should be accessible through site '{}'", site);
       for (SiteURL url : site.getHostnames()) {
         if (environment != null && !environment.equals(url.getEnvironment()))
           continue;
-        if (requestPath.startsWith(url.toExternalForm())) {
+        if (requestHostName.equals(url.getURL().getHost())) {
           siteUrl = url;
           break;
         }

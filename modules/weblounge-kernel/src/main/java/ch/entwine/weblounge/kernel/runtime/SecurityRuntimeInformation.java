@@ -120,7 +120,7 @@ public class SecurityRuntimeInformation implements RuntimeInformationProvider {
       rolesXml.append("<role context=\"").append(r.getContext()).append("\" ");
       rolesXml.append("id=\"").append(r.getIdentifier()).append("\">");
       rolesXml.append("<name><![CDATA[");
-      rolesXml.append(r.toString(language));
+      rolesXml.append(r.getName());
       rolesXml.append("]]></name>");
       rolesXml.append("</role>");
     }
