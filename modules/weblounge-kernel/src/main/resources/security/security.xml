@@ -53,7 +53,7 @@
     <sec:intercept-url pattern="^/system/weblounge/.*" access="weblounge:editor"/>
     
     <!-- Secure the management URLs -->
-    <sec:intercept-url pattern="^/system/console/.*" access="weblounge:systemadministrator"/>
+    <sec:intercept-url pattern="^/system/console(/.)?*" access="weblounge:systemadministrator"/>
 
     <!-- Trigger authentication on editing entry point by appending [?|&]edit(=true) -->
     <sec:intercept-url pattern="^/.*?(\x3F|\x26)edit(=true|\x26.*)?(\x26.*)?$" access="weblounge:editor"/>

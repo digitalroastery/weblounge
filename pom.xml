@@ -103,7 +103,6 @@
         <module>modules/weblounge-contentrepository</module>
         <module>modules/weblounge-dispatcher-api</module>
         <module>modules/weblounge-dispatcher</module>
-        <module>modules/weblounge-i18n-mygengo</module>
         <module>modules/weblounge-kernel</module>
         <module>modules/weblounge-preview</module>
         <module>modules/weblounge-runtime</module>
@@ -162,7 +161,6 @@
         <module>modules/weblounge-contentrepository-api</module>
         <module>modules/weblounge-dispatcher</module>
         <module>modules/weblounge-dispatcher-api</module>
-        <module>modules/weblounge-i18n-mygengo</module>
         <module>modules/weblounge-kernel</module>
         <module>modules/weblounge-maven-s3-deploy-plugin</module>
         <module>modules/weblounge-preview</module>
@@ -207,17 +205,6 @@
         <module>modules/weblounge-importer</module>
         <module>modules/weblounge-common-api</module>
         <module>modules/weblounge-common</module>
-      </modules>
-    </profile>
-
-    <!-- Mygengo i18n plugin -->
-    <profile>
-      <id>mygengo</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>modules/weblounge-i18n-mygengo</module>
       </modules>
     </profile>
 

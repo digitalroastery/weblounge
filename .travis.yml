@@ -11,3 +11,7 @@ sudo: false
 cache:
   directories:
   - $HOME/.m2
+
+notifications:
+  slack:
+    secure: eOe9t0xp2/C7imReX3XZAfAXpLuyjuuoSAf4e6fYgZe0KmYLd6cZ/GWZfqOwlXeHuYrlVcbIgGUaBtJoHSaTdQoR+mbyb/ec3YqcWjrm/THh+MAhR81J1gPqq3h//dPJp6yaNbfvW9TT/jQ7VldueJH+xaCVXu4IJnNfivRa1Yg=

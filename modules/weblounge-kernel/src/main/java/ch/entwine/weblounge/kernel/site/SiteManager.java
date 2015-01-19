@@ -69,6 +69,9 @@ public class SiteManager {
 
   /** The sites */
   private List<Site> sites = new ArrayList<Site>();
+  
+  /** Lock object for access to 'sites' list */
+  private final Object sitesLock = new Object();
 
   /** Maps server names to sites */
   private Map<String, Site> sitesByServerName = new HashMap<String, Site>();
@@ -87,6 +90,9 @@ public class SiteManager {
 
   /** Registered site listeners */
   private List<SiteServiceListener> listeners = new ArrayList<SiteServiceListener>();
+  
+  /** Lock object for access to 'listeners' list */
+  private final Object listenersLock = new Object();
 
   /**
    * Adds <code>listener</code> to the list of site listeners.
@@ -95,7 +101,7 @@ public class SiteManager {
    *          the site listener
    */
   public void addSiteListener(SiteServiceListener listener) {
-    synchronized (listeners) {
+    synchronized (listenersLock) {
       listeners.add(listener);
     }
   }
@@ -107,7 +113,7 @@ public class SiteManager {
    *          the site listener
    */
   public void removeSiteListener(SiteServiceListener listener) {
-    synchronized (listeners) {
+    synchronized (listenersLock) {
       listeners.remove(listener);
     }
   }
@@ -162,7 +168,7 @@ public class SiteManager {
    * @return the site
    */
   public Site findSiteByIdentifier(String identifier) {
-    synchronized (sites) {
+    synchronized (sitesLock) {
       for (Site site : sites) {
         if (site.getIdentifier().equals(identifier)) {
           return site;
@@ -191,7 +197,7 @@ public class SiteManager {
 
     // There is obviously no direct match. Therefore, try to find a
     // wildcard match
-    synchronized (sites) {
+    synchronized (sitesLock) {
       for (Map.Entry<String, Site> e : sitesByServerName.entrySet()) {
         String siteUrl = e.getKey();
 
@@ -228,7 +234,7 @@ public class SiteManager {
    * @return the site
    */
   public Site findSiteByBundle(Bundle bundle) {
-    synchronized (sites) {
+    synchronized (sitesLock) {
       for (Map.Entry<Site, Bundle> entry : siteBundles.entrySet()) {
         if (bundle.equals(entry.getValue()))
           return entry.getKey();
@@ -270,7 +276,7 @@ public class SiteManager {
    */
   void addSite(Site site, ServiceReference reference) {
 
-    synchronized (sites) {
+    synchronized (sitesLock) {
       sites.add(site);
       siteBundles.put(site, reference.getBundle());
 
@@ -333,17 +339,25 @@ public class SiteManager {
 
     logger.debug("Site '{}' registered", site);
 
+    // Inform site listeners
+    synchronized (listenersLock) {
+      for (SiteServiceListener listener : listeners) {
+        try {
+          listener.siteAppeared(site, reference);
+        } catch (Throwable t) {
+          logger.error("Error during notifaction of site '{}': {}", site.getIdentifier(), t.getMessage());
+          return;
+        }
+      }
+    }
+
     // Look for content repositories
     ContentRepository repository = repositoriesBySite.get(site.getIdentifier());
-    if (repository != null && site.getContentRepository() == null) {
-      try {
-        repository.connect(site);
-        site.setContentRepository(repository);
-        logger.info("Site '{}' connected to content repository at {}", site, repository);
-      } catch (ContentRepositoryException e) {
-        logger.warn("Error connecting content repository " + repository + " to site '" + site + "'", e);
-      }
-    } else {
+
+    if (repository == null && site.getContentRepository() == null) {
+      // There's no content repository yet.
+
+      // Register configuration for this site's content repository
       try {
         Configuration config = configurationAdmin.createFactoryConfiguration("ch.entwine.weblounge.contentrepository.factory", null);
         Dictionary<Object, Object> properties = new Hashtable<Object, Object>();
@@ -361,18 +375,16 @@ public class SiteManager {
       } catch (IOException e) {
         logger.error("Unable to create configuration for content repository of site '" + site + "'", e);
       }
+
+      return;
     }
 
-    // Inform site listeners
-    synchronized (listeners) {
-      for (SiteServiceListener listener : listeners) {
-        try {
-          listener.siteAppeared(site, reference);
-        } catch (Throwable t) {
-          logger.error("Error during notifaction of site '{}': {}", site.getIdentifier(), t.getMessage());
-          return;
-        }
-      }
+    try {
+      repository.connect(site);
+      site.setContentRepository(repository);
+      logger.info("Site '{}' connected to content repository at {}", site, repository);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error connecting content repository " + repository + " to site '" + site + "'", e);
     }
 
     // Start the site
@@ -401,7 +413,7 @@ public class SiteManager {
   void removeSite(Site site) {
 
     // Inform site listeners
-    synchronized (listeners) {
+    synchronized (listenersLock) {
       for (SiteServiceListener listener : listeners) {
         listener.siteDisappeared(site);
       }
@@ -433,7 +445,7 @@ public class SiteManager {
     }
 
     // Remove it from the registry
-    synchronized (sites) {
+    synchronized (sitesLock) {
       sites.remove(site);
       siteBundles.remove(site);
       Iterator<Site> si = sitesByServerName.values().iterator();
@@ -471,9 +483,15 @@ public class SiteManager {
         repository.connect(site);
         logger.info("Site '{}' connected to content repository at {}", site, repository);
         site.setContentRepository(repository);
+        
+        site.start();
       } catch (ContentRepositoryException e) {
         logger.warn("Error connecting content repository " + repository + " to site '" + site + "'", e);
         throw e;
+      } catch (IllegalStateException e) {
+        logger.error("Site '{}' could not be started: {}", e.getMessage(), e);
+      } catch (SiteException e) {
+        logger.error("Site '{}' could not be started: {}", e.getMessage(), e);
       }
     }
 
@@ -505,8 +523,9 @@ public class SiteManager {
       repositoriesBySite.remove(siteIdentifier);
 
       // Tell the repository to clean up
-      if (site != null && site.getContentRepository() != null) {
+      if (site != null) {
         try {
+          site.stop();
           site.setContentRepository(null);
           repository.disconnect();
         } catch (ContentRepositoryException e) {

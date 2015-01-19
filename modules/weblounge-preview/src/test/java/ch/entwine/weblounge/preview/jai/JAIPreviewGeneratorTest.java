@@ -24,8 +24,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.entwine.weblounge.common.content.Resource;
-import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
+import ch.entwine.weblounge.common.impl.content.image.ImageContentImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.language.Language;
@@ -78,7 +79,7 @@ public class JAIPreviewGeneratorTest {
   protected static List<ImageStyle> styles = null;
 
   /** The resource */
-  protected Resource<?> resource = null;
+  protected Resource<ImageContent> resource = null;
 
   /**
    * @throws java.lang.Exception
@@ -100,12 +101,11 @@ public class JAIPreviewGeneratorTest {
     System.setProperty("weblounge.jai", Boolean.TRUE.toString());
   }
 
+  @SuppressWarnings("unchecked")
   public void setUp() {
-    ResourceContent resourceContent = EasyMock.createNiceMock(ResourceContent.class);
-    EasyMock.expect(resourceContent.getMimetype()).andReturn("image/png");
-    EasyMock.replay(resourceContent);
+    ImageContent resourceContent = new ImageContentImpl("image.png", LanguageUtils.getLanguage("en"), "image/png");
     resource = EasyMock.createNiceMock(Resource.class);
-    EasyMock.expect(resource.getContent((Language) EasyMock.anyObject())).andStubReturn(resourceContent);
+    EasyMock.expect(resource.getContent((Language) EasyMock.anyObject())).andReturn(resourceContent);
     EasyMock.replay(resource);
   }
 
