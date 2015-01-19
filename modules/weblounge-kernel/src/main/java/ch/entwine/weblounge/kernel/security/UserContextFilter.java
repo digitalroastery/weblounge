@@ -158,15 +158,6 @@ public class UserContextFilter implements Filter {
         user = new UserImpl(userDetails.getUsername(), true);
         addRoles(roles, auth.getAuthorities());
         logger.debug("Principal was identified as '{}'", user.getLogin());
-
-        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-        if (authorities != null && authorities.size() > 0) {
-          for (GrantedAuthority ga : authorities) {
-            logger.debug("Principal '{}' gained role '{}'", user.getLogin(), ga.getAuthority());
-            roles.add(new RoleImpl(ga.getAuthority()));
-          }
-        }
-
       } else if (Security.ANONYMOUS_USER.equals(principal)) {
         user = new Guest(site.getIdentifier());
         roles.add(getLocalRole(site, SystemRole.GUEST));
@@ -178,6 +169,7 @@ public class UserContextFilter implements Filter {
     }
 
     for (Role role : roles) {
+      logger.debug("Principal '{}' gained role '{}'", user.getLogin(), role);
       user.addPublicCredentials(role);
     }
 
@@ -194,7 +186,7 @@ public class UserContextFilter implements Filter {
    *          the authorities
    */
   protected void addRoles(Set<Role> roles,
-      final Collection<? extends GrantedAuthority> authorities) {
+      Collection<? extends GrantedAuthority> authorities) {
     if (authorities != null && authorities.size() > 0) {
       for (GrantedAuthority ga : authorities) {
         roles.add(new RoleImpl(ga.getAuthority()));
