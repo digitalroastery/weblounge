@@ -26,8 +26,6 @@ import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 
-import com.sun.media.jai.codec.MemoryCacheSeekableStream;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -35,15 +33,16 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.Date;
 
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
+import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 
@@ -72,19 +71,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
 
-  /**
-   * This method is called to parse the serialized XML of a
-   * {@link ch.entwine.weblounge.common.content.ResourceContent}.
-   * 
-   * @param is
-   *          the content data
-   * @throws ParserConfigurationException
-   *           if the SAX parser setup failed
-   * @throws IOException
-   *           if reading the input stream fails
-   * @throws SAXException
-   *           if an error occurs while parsing
-   */
+  @Override
   public ImageContent createFromXml(InputStream is) throws SAXException,
       IOException, ParserConfigurationException {
 
@@ -97,12 +84,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     return content;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.ResourceContentReader#createFromContent(java.io.InputStream,
-   *      ch.entwine.weblounge.common.language.Language, long, java.lang.String)
-   */
+  @Override
   public ImageContent createFromContent(InputStream is, User user,
       Language language, long size, String fileName, String mimeType)
       throws IOException {
@@ -115,32 +97,25 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     // Set the creation date
     content.setCreationDate(new Date());
 
-    MemoryCacheSeekableStream mcss = new MemoryCacheSeekableStream(is);
-    UnclosableInputStream bis = new UnclosableInputStream(mcss);
+    final byte[] imgData = IOUtils.toByteArray(is);
 
-    // Read the Exif metadata (if available)
-    try {
-      readExifMetadata(content, bis);
-    } catch (Throwable t) {
-      logger.warn("Error extracting Exif metadata from {}: {}", fileName, t.getMessage());
-    }
-
-    // Read the JAI metadata
-    if (content.getWidth() <= 0 || content.getHeight() <= 0) {
-      try {
-        mcss.seek(0);
-        readJAIMetadata(content, mcss);
-      } catch (Throwable t) {
-        logger.warn("Error extracting metadata using java advanced imaging (jai) from {}: {}", fileName, t.getMessage());
-        throw new IOException(t);
-      } finally {
-        IOUtils.closeQuietly(is);
+    try (final ByteArrayInputStream bais = new ByteArrayInputStream(imgData)) {
+      BufferedImage bimg = ImageIO.read(bais);
+      if (bimg != null) {
+        content.setWidth(bimg.getWidth());
+        content.setHeight(bimg.getHeight());
+      } else {
+        logger.warn("No ImageReader is able to read image '{}', dimensions could not be evaluated.", fileName);
       }
+    } catch (Throwable t) {
+      logger.error("Error extracting image dimensions from {}: {}", fileName, t.getMessage());
     }
 
-    // Close the input stream
-    IOUtils.closeQuietly(mcss);
-    bis = null;
+    try (final ByteArrayInputStream bais = new ByteArrayInputStream(imgData)) {
+      readExifMetadata(content, bais);
+    } catch (Throwable t) {
+      logger.error("Error extracting Exif metadata from {}: {}", fileName, t.getMessage());
+    }
 
     return content;
   }
@@ -267,21 +242,12 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     }
   }
 
-  /**
-   * Extracts the Exif metadata from the image.
-   * 
-   * @param content
-   *          the resource content
-   * @param is
-   *          the input stream
-   * @return the Exif metadata
-   */
-  protected ImageMetadata readExifMetadata(ImageContent content, InputStream is) {
+  private void readExifMetadata(ImageContent content, InputStream is) {
     BufferedInputStream bis = new BufferedInputStream(is);
     ImageMetadata exifMetadata = ImageMetadataUtils.extractMetadata(bis);
 
     if (exifMetadata == null)
-      return null;
+      return;
 
     if (exifMetadata.getDateTaken() != null) {
       content.setDateTaken(exifMetadata.getDateTaken());
@@ -314,59 +280,6 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
     if (exifMetadata.getExposureTime() != 0) {
       content.setExposureTime(exifMetadata.getExposureTime());
     }
-
-    return exifMetadata;
-  }
-
-  /**
-   * Extracts image metadata from the image using Java Advanced Imaging (JAI).
-   * 
-   * @param content
-   *          the resource content
-   * @param is
-   *          the input stream
-   * @return the image metadata
-   */
-  protected RenderedOp readJAIMetadata(ImageContent content, InputStream is) {
-    MemoryCacheSeekableStream imageInputStream = new MemoryCacheSeekableStream(is);
-    RenderedOp jaiMetadata = JAI.create("stream", imageInputStream);
-
-    if (jaiMetadata == null)
-      return null;
-
-    content.setWidth(jaiMetadata.getWidth());
-    content.setHeight(jaiMetadata.getHeight());
-
-    return jaiMetadata;
-  }
-
-  /**
-   * Implementation of an input stream that ignores calls to
-   * {@link java.io.InputStream#close()}.
-   */
-  private static class UnclosableInputStream extends BufferedInputStream {
-
-    /**
-     * Creates a new input stream which will be fully consumed before being
-     * closed.
-     * 
-     * @param is
-     *          the input stream to be consumed from
-     */
-    public UnclosableInputStream(InputStream is) {
-      super(is);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.io.BufferedInputStream#close()
-     */
-    @Override
-    public void close() throws IOException {
-      // Don't do anything, we still need this input stream
-    }
-
   }
 
 }
