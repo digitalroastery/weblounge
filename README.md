@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/entwinemedia/weblounge.svg?branch=develop)](https://travis-ci.org/entwinemedia/weblounge)
+
 # Welcome to Weblounge!
 
 Weblounge is a full-featured web content management system (aka CMS) written in Java and licensed under the LGPL.
