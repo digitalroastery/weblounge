@@ -1383,7 +1383,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
             }
           }
         }
-      });
+      }, "Weblounge Content Repository (" + repository + ") Operation Processor");
       processorWorker.start();
     }
 
