@@ -1449,8 +1449,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
      *          the operation
      */
     public void enqueue(ContentRepositoryOperation<?> operation) {
-      operations.add(operation);
       synchronized (operations) {
+        operations.add(operation);
         operations.notifyAll();
       }
     }
