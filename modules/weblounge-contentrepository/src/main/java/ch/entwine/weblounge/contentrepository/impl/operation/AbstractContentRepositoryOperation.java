@@ -188,7 +188,7 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
    */
   public T get() throws ContentRepositoryException, IOException {
     synchronized (internalListener) {
-      if (isRunning) {
+      while (isRunning) {
         try {
           internalListener.wait();
         } catch (InterruptedException e) {
