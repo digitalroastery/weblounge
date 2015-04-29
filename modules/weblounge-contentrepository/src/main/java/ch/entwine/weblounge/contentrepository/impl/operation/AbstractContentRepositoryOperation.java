@@ -123,7 +123,8 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
       throw new IllegalArgumentException("Repository must not be null");
     this.repository = repository;
     try {
-      isRunning = true;
+      if (!isRunning)
+        throw new IllegalStateException("Operation has already been executed");
       CurrentOperation.set(this);
       result = run(repository);
       synchronized (internalListener) {
@@ -187,7 +188,7 @@ public abstract class AbstractContentRepositoryOperation<T> implements ContentRe
    */
   public T get() throws ContentRepositoryException, IOException {
     synchronized (internalListener) {
-      if (isRunning) {
+      while (isRunning) {
         try {
           internalListener.wait();
         } catch (InterruptedException e) {
