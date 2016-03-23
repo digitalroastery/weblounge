@@ -151,7 +151,6 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
-        <module>modules/weblounge-aws</module>
         <module>modules/weblounge-bridge</module>
         <module>modules/weblounge-cache</module>
         <module>modules/weblounge-cache-api</module>
