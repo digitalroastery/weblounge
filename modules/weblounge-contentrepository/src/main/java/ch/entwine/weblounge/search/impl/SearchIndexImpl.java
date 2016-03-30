@@ -124,6 +124,9 @@ public class SearchIndexImpl implements SearchIndex {
   /** Client for talking to elastic search */
   private Client nodeClient = null;
 
+  /** Lock object for {@code preparedIndices} */
+  private final Object preparedIndicesLock = new Object();
+
   /** List of sites with prepared index */
   private List<String> preparedIndices = new ArrayList<String>();
 
@@ -188,13 +191,7 @@ public class SearchIndexImpl implements SearchIndex {
   public SearchResult getByQuery(SearchQuery query)
       throws ContentRepositoryException {
 
-    if (!preparedIndices.contains(query.getSite().getIdentifier())) {
-      try {
-        createIndex(query.getSite());
-      } catch (IOException e) {
-        throw new ContentRepositoryException(e);
-      }
-    }
+    ensureSiteIndexExists(query.getSite());
 
     logger.debug("Searching index using query '{}'", query);
 
@@ -401,13 +398,7 @@ public class SearchIndexImpl implements SearchIndex {
   @Override
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
 
-    if (!preparedIndices.contains(uri.getSite().getIdentifier())) {
-      try {
-        createIndex(uri.getSite());
-      } catch (IOException e) {
-        throw new ContentRepositoryException(e);
-      }
-    }
+    ensureSiteIndexExists(uri.getSite());
 
     logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
 
@@ -464,14 +455,8 @@ public class SearchIndexImpl implements SearchIndex {
   private void addToIndex(Resource<?> resource)
       throws ContentRepositoryException {
 
-    if (!preparedIndices.contains(resource.getURI().getSite().getIdentifier())) {
-      try {
-        createIndex(resource.getURI().getSite());
-      } catch (IOException e) {
-        throw new ContentRepositoryException(e);
-      }
-    }
-    
+    ensureSiteIndexExists(resource.getURI().getSite());
+
     if (Order.DenyAllow.equals(resource.getAllowDenyOrder())) {
       throw new NotImplementedException("The index does not (yet) support resources with DENY-ALLOW ACL order");
     }
@@ -494,6 +479,18 @@ public class SearchIndexImpl implements SearchIndex {
 
     // Adjust the version information
     updateVersions(uri);
+  }
+
+  private void ensureSiteIndexExists(Site site) throws ContentRepositoryException {
+    synchronized (preparedIndicesLock) {
+      if (!preparedIndices.contains(site.getIdentifier())) {
+        try {
+          createIndex(site);
+        } catch (IOException e) {
+          throw new ContentRepositoryException(e);
+        }
+      }
+    }
   }
 
   /**
@@ -614,13 +611,7 @@ public class SearchIndexImpl implements SearchIndex {
   public boolean move(ResourceURI uri, String path)
       throws ContentRepositoryException {
 
-    if (!preparedIndices.contains(uri.getSite().getIdentifier())) {
-      try {
-        createIndex(uri.getSite());
-      } catch (IOException e) {
-        throw new ContentRepositoryException(e);
-      }
-    }
+    ensureSiteIndexExists(uri.getSite());
 
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
 
