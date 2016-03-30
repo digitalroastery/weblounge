@@ -112,11 +112,17 @@ public class SearchIndexImpl implements SearchIndex {
   /** Type of the document containing the index version information */
   private static final String VERSION_TYPE = "version";
 
+  /** Lock object for {@code elasticSearch} */
+  private static final Object elasticSearchLock = new Object();
+
   /** The local elastic search node */
   private static Node elasticSearch = null;
 
   /** List of clients to the local node */
   private static List<Client> elasticSearchClients = new ArrayList<Client>();
+
+  /** Lock object for {@code nodeClient} */
+  private final Object nodeClientLock = new Object();
 
   /** Client for talking to elastic search */
   private Client nodeClient = null;
@@ -694,7 +700,7 @@ public class SearchIndexImpl implements SearchIndex {
    *           if loading of settings fails
    */
   protected void init() throws IOException {
-    synchronized (this) {
+    synchronized (elasticSearchLock) {
       if (elasticSearch == null) {
         logger.info("Starting local Elasticsearch node");
 
@@ -710,7 +716,7 @@ public class SearchIndexImpl implements SearchIndex {
     }
 
     // Create the client
-    synchronized (elasticSearch) {
+    synchronized (nodeClientLock) {
       nodeClient = elasticSearch.client();
       elasticSearchClients.add(nodeClient);
     }
@@ -726,11 +732,11 @@ public class SearchIndexImpl implements SearchIndex {
     try {
       if (nodeClient != null) {
         nodeClient.close();
-        synchronized (elasticSearch) {
+        synchronized (nodeClientLock) {
           elasticSearchClients.remove(nodeClient);
         }
 
-        synchronized (this) {
+        synchronized (elasticSearchLock) {
           if (elasticSearchClients.isEmpty()) {
             logger.info("Stopping local Elasticsearch node");
             elasticSearch.stop();
