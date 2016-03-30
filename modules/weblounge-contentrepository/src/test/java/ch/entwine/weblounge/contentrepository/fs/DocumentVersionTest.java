@@ -141,7 +141,7 @@ public class DocumentVersionTest {
     EasyMock.replay(site);
 
     // Search Index
-    searchIndex = new SearchIndexImplStub();
+    searchIndex = SearchIndexImplStub.mkSearchIndexImplStub();
     searchIndex.bindResourceSerializerService(serializer);
 
     // Connect to the repository

@@ -51,6 +51,9 @@ import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -116,14 +119,18 @@ public class SearchIndexAccessControlTest {
     idxRoot = new File(rootPath);
     System.setProperty("weblounge.home", rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
-    idx = new SearchIndexImplStub();
+    idx = SearchIndexImplStub.mkSearchIndexImplStub();
     idx.bindResourceSerializerService(serializer);
+  }
+
+  @AfterClass
+  public static void tearDownClass() throws Exception {
+    idx.close();
+    FileUtils.deleteQuietly(idxRoot);
   }
 
   @Before
   public void setUp() throws Exception {
-    idx.clear();
-
     PageReader reader = new PageReader();
     try (InputStream is = getClass().getResourceAsStream("/page.xml")) {
       pageAllowDeny = reader.read(is, site);
@@ -133,6 +140,11 @@ public class SearchIndexAccessControlTest {
       pageDenyAllow = reader.read(is, site);
       pageDenyAllow.setAllowDenyOrder(Order.DenyAllow);
     }
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    idx.clear();
   }
 
   // ##########################################################################

@@ -144,7 +144,7 @@ public class SearchIndexRecencyPriorityTest {
     idxRoot = new File(rootPath);
     System.setProperty("weblounge.home", rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
-    idx = new SearchIndexImplStub();
+    idx = SearchIndexImplStub.mkSearchIndexImplStub();
     idx.bindResourceSerializerService(serializer);
   }
 

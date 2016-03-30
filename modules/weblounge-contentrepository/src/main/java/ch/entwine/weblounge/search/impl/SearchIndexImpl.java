@@ -112,6 +112,9 @@ public class SearchIndexImpl implements SearchIndex {
   /** Type of the document containing the index version information */
   private static final String VERSION_TYPE = "version";
 
+  /** Lock object for {@code elasticSearch} */
+  private static final Object elasticSearchLock = new Object();
+
   /** The local elastic search node */
   private static Node elasticSearch = null;
 
@@ -120,6 +123,9 @@ public class SearchIndexImpl implements SearchIndex {
 
   /** Client for talking to elastic search */
   private Client nodeClient = null;
+
+  /** Lock object for {@code preparedIndices} */
+  private final Object preparedIndicesLock = new Object();
 
   /** List of sites with prepared index */
   private List<String> preparedIndices = new ArrayList<String>();
@@ -185,13 +191,7 @@ public class SearchIndexImpl implements SearchIndex {
   public SearchResult getByQuery(SearchQuery query)
       throws ContentRepositoryException {
 
-    if (!preparedIndices.contains(query.getSite().getIdentifier())) {
-      try {
-        createIndex(query.getSite());
-      } catch (IOException e) {
-        throw new ContentRepositoryException(e);
-      }
-    }
+    ensureSiteIndexExists(query.getSite());
 
     logger.debug("Searching index using query '{}'", query);
 
@@ -398,13 +398,7 @@ public class SearchIndexImpl implements SearchIndex {
   @Override
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
 
-    if (!preparedIndices.contains(uri.getSite().getIdentifier())) {
-      try {
-        createIndex(uri.getSite());
-      } catch (IOException e) {
-        throw new ContentRepositoryException(e);
-      }
-    }
+    ensureSiteIndexExists(uri.getSite());
 
     logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
 
@@ -461,14 +455,8 @@ public class SearchIndexImpl implements SearchIndex {
   private void addToIndex(Resource<?> resource)
       throws ContentRepositoryException {
 
-    if (!preparedIndices.contains(resource.getURI().getSite().getIdentifier())) {
-      try {
-        createIndex(resource.getURI().getSite());
-      } catch (IOException e) {
-        throw new ContentRepositoryException(e);
-      }
-    }
-    
+    ensureSiteIndexExists(resource.getURI().getSite());
+
     if (Order.DenyAllow.equals(resource.getAllowDenyOrder())) {
       throw new NotImplementedException("The index does not (yet) support resources with DENY-ALLOW ACL order");
     }
@@ -491,6 +479,18 @@ public class SearchIndexImpl implements SearchIndex {
 
     // Adjust the version information
     updateVersions(uri);
+  }
+
+  private void ensureSiteIndexExists(Site site) throws ContentRepositoryException {
+    synchronized (preparedIndicesLock) {
+      if (!preparedIndices.contains(site.getIdentifier())) {
+        try {
+          createIndex(site);
+        } catch (IOException e) {
+          throw new ContentRepositoryException(e);
+        }
+      }
+    }
   }
 
   /**
@@ -611,13 +611,7 @@ public class SearchIndexImpl implements SearchIndex {
   public boolean move(ResourceURI uri, String path)
       throws ContentRepositoryException {
 
-    if (!preparedIndices.contains(uri.getSite().getIdentifier())) {
-      try {
-        createIndex(uri.getSite());
-      } catch (IOException e) {
-        throw new ContentRepositoryException(e);
-      }
-    }
+    ensureSiteIndexExists(uri.getSite());
 
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
 
@@ -694,7 +688,7 @@ public class SearchIndexImpl implements SearchIndex {
    *           if loading of settings fails
    */
   protected void init() throws IOException {
-    synchronized (this) {
+    synchronized (elasticSearchLock) {
       if (elasticSearch == null) {
         logger.info("Starting local Elasticsearch node");
 
@@ -707,12 +701,12 @@ public class SearchIndexImpl implements SearchIndex {
         elasticSearch = nodeBuilder.local(TestUtils.isTest()).build();
         elasticSearch.start();
       }
-    }
 
-    // Create the client
-    synchronized (elasticSearch) {
-      nodeClient = elasticSearch.client();
-      elasticSearchClients.add(nodeClient);
+      if (nodeClient == null) {
+        // Create the client
+        nodeClient = elasticSearch.client();
+        elasticSearchClients.add(nodeClient);
+      }
     }
   }
 
@@ -726,17 +720,18 @@ public class SearchIndexImpl implements SearchIndex {
     try {
       if (nodeClient != null) {
         nodeClient.close();
-        synchronized (elasticSearch) {
+
+        synchronized (elasticSearchLock) {
           elasticSearchClients.remove(nodeClient);
         }
+      }
 
-        synchronized (this) {
-          if (elasticSearchClients.isEmpty()) {
-            logger.info("Stopping local Elasticsearch node");
-            elasticSearch.stop();
-            elasticSearch.close();
-            elasticSearch = null;
-          }
+      synchronized (elasticSearchLock) {
+        if (elasticSearchClients.isEmpty()) {
+          logger.info("Stopping local Elasticsearch node");
+          elasticSearch.stop();
+          elasticSearch.close();
+          elasticSearch = null;
         }
       }
     } catch (Throwable t) {

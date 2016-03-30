@@ -149,7 +149,7 @@ public class ContentRepositoryIndexTest {
     TestUtils.startTesting();
 
     // Search index
-    searchIdx = new SearchIndexImplStub();
+    searchIdx = SearchIndexImplStub.mkSearchIndexImplStub();
     searchIdx.bindResourceSerializerService(serializer);
     
     idx = new ContentRepositoryIndex(site, searchIdx);
