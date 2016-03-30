@@ -90,6 +90,9 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /** True if the page contents should be indexed */
   protected boolean isIndexed = true;
 
+  /** Lock object for {@code lockOwner} */
+  protected final Object lockOwnerLock = new Object();
+
   /** Current page editor (and owner) */
   protected User lockOwner = null;
 
@@ -873,9 +876,11 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    *          the locking user
    */
   public void lock(User user) throws IllegalStateException {
-    if (lockOwner != null && !lockOwner.equals(user) && !SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
-      throw new IllegalStateException("The page is already locked by " + lockOwner);
-    lockOwner = user;
+    synchronized (lockOwnerLock) {
+      if (lockOwner != null && !lockOwner.equals(user) && !SecurityUtils.userHasRole(user, SystemRole.SITEADMIN))
+        throw new IllegalStateException("The page is already locked by " + lockOwner);
+      lockOwner = user;
+    }
   }
 
   /**
@@ -884,9 +889,11 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @see ch.entwine.weblounge.common.content.Resource#unlock()
    */
   public User unlock() {
-    User previousLockOwner = lockOwner;
-    lockOwner = null;
-    return previousLockOwner;
+    synchronized (lockOwnerLock) {
+      User previousLockOwner = lockOwner;
+      lockOwner = null;
+      return previousLockOwner;
+    }
   }
 
   /**
