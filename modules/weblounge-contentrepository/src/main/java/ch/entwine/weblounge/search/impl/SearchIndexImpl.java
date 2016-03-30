@@ -121,9 +121,6 @@ public class SearchIndexImpl implements SearchIndex {
   /** List of clients to the local node */
   private static List<Client> elasticSearchClients = new ArrayList<Client>();
 
-  /** Lock object for {@code nodeClient} */
-  private final Object nodeClientLock = new Object();
-
   /** Client for talking to elastic search */
   private Client nodeClient = null;
 
@@ -713,12 +710,12 @@ public class SearchIndexImpl implements SearchIndex {
         elasticSearch = nodeBuilder.local(TestUtils.isTest()).build();
         elasticSearch.start();
       }
-    }
 
-    // Create the client
-    synchronized (nodeClientLock) {
-      nodeClient = elasticSearch.client();
-      elasticSearchClients.add(nodeClient);
+      if (nodeClient == null) {
+        // Create the client
+        nodeClient = elasticSearch.client();
+        elasticSearchClients.add(nodeClient);
+      }
     }
   }
 
@@ -732,17 +729,18 @@ public class SearchIndexImpl implements SearchIndex {
     try {
       if (nodeClient != null) {
         nodeClient.close();
-        synchronized (nodeClientLock) {
-          elasticSearchClients.remove(nodeClient);
-        }
 
         synchronized (elasticSearchLock) {
-          if (elasticSearchClients.isEmpty()) {
-            logger.info("Stopping local Elasticsearch node");
-            elasticSearch.stop();
-            elasticSearch.close();
-            elasticSearch = null;
-          }
+          elasticSearchClients.remove(nodeClient);
+        }
+      }
+
+      synchronized (elasticSearchLock) {
+        if (elasticSearchClients.isEmpty()) {
+          logger.info("Stopping local Elasticsearch node");
+          elasticSearch.stop();
+          elasticSearch.close();
+          elasticSearch = null;
         }
       }
     } catch (Throwable t) {
