@@ -25,6 +25,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
@@ -53,21 +68,6 @@ import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
-
-import org.apache.commons.io.FileUtils;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Test case for the {@link ContentRepositoryIndex}.
@@ -149,7 +149,7 @@ public class ContentRepositoryIndexTest {
     TestUtils.startTesting();
 
     // Search index
-    searchIdx = new SearchIndexImplStub();
+    searchIdx = SearchIndexImplStub.mkSearchIndexImplStub();
     searchIdx.bindResourceSerializerService(serializer);
     
     idx = new ContentRepositoryIndex(site, searchIdx);

@@ -22,6 +22,14 @@ package ch.entwine.weblounge.contentrepository.index;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.InputStream;
+import java.util.UUID;
+
 import ch.entwine.weblounge.common.NotImplementedException;
 import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
@@ -50,14 +58,6 @@ import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
 import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
 import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.UUID;
 
 /**
  * Unit tests to ensure only resources a given user has the appropriate access
@@ -116,7 +116,7 @@ public class SearchIndexAccessControlTest {
     idxRoot = new File(rootPath);
     System.setProperty("weblounge.home", rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
-    idx = new SearchIndexImplStub();
+    idx = SearchIndexImplStub.mkSearchIndexImplStub();
     idx.bindResourceSerializerService(serializer);
   }
 

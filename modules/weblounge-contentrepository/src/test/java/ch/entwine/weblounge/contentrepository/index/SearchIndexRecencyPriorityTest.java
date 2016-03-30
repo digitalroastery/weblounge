@@ -23,24 +23,6 @@ package ch.entwine.weblounge.contentrepository.index;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.entwine.weblounge.common.content.SearchQuery;
-import ch.entwine.weblounge.common.content.SearchResultItem;
-import ch.entwine.weblounge.common.content.page.Page;
-import ch.entwine.weblounge.common.content.page.PageTemplate;
-import ch.entwine.weblounge.common.content.page.Pagelet;
-import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
-import ch.entwine.weblounge.common.impl.content.page.PageReader;
-import ch.entwine.weblounge.common.impl.language.LanguageUtils;
-import ch.entwine.weblounge.common.language.Language;
-import ch.entwine.weblounge.common.site.Site;
-import ch.entwine.weblounge.common.url.PathUtils;
-import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
-import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
-import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
-import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
-import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
-import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -59,6 +41,24 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+
+import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchResultItem;
+import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.PageTemplate;
+import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageReader;
+import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.PathUtils;
+import ch.entwine.weblounge.contentrepository.impl.FileResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.MovieResourceSerializer;
+import ch.entwine.weblounge.contentrepository.impl.PageSerializer;
+import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
+import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 
 /**
  * Test case for {@link SearchIndexImpl}.
@@ -144,7 +144,7 @@ public class SearchIndexRecencyPriorityTest {
     idxRoot = new File(rootPath);
     System.setProperty("weblounge.home", rootPath);
     ElasticSearchUtils.createIndexConfigurationAt(idxRoot);
-    idx = new SearchIndexImplStub();
+    idx = SearchIndexImplStub.mkSearchIndexImplStub();
     idx.bindResourceSerializerService(serializer);
   }
 

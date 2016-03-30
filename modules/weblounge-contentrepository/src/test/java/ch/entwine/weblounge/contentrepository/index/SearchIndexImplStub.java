@@ -19,18 +19,31 @@
  */
 package ch.entwine.weblounge.contentrepository.index;
 
-import ch.entwine.weblounge.search.impl.SearchIndexImpl;
-
 import java.io.IOException;
+
+import ch.entwine.weblounge.search.impl.SearchIndexImpl;
 
 /**
  * SearchIndexImplStub
  */
 public class SearchIndexImplStub extends SearchIndexImpl {
 
-  public SearchIndexImplStub() throws IOException {
+  public static SearchIndexImplStub mkSearchIndexImplStub() throws IOException {
+    SearchIndexImplStub si = new SearchIndexImplStub();
+    si.init();
+    return si;
+  }
+
+  private SearchIndexImplStub() {
+
+  }
+
+  @Override
+  public void init() throws IOException {
     super.init();
   }
+
+
 
   /**
    * Calls the underlying deactivate-method.
