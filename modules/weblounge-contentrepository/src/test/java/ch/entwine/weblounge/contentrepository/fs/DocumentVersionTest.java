@@ -25,21 +25,6 @@ import static ch.entwine.weblounge.common.content.Resource.WORK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.apache.commons.io.FileUtils;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Dictionary;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Set;
-import java.util.UUID;
-
 import ch.entwine.weblounge.common.content.ResourceSearchResultItem;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
@@ -68,6 +53,21 @@ import ch.entwine.weblounge.contentrepository.impl.ResourceSerializerServiceImpl
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 import ch.entwine.weblounge.contentrepository.index.SearchIndexImplStub;
 import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
+
+import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Test case for {@link DocumentVersionTest}.

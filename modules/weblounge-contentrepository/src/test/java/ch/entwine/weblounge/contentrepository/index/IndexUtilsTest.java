@@ -20,9 +20,8 @@
 
 package ch.entwine.weblounge.contentrepository.index;
 
-import static org.junit.Assert.assertNull;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import ch.entwine.weblounge.common.impl.security.RoleImpl;
 import ch.entwine.weblounge.common.impl.security.WebloungeUserImpl;
