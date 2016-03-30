@@ -200,12 +200,6 @@ public class FileSystemContentRepositoryTest {
   /** the search index */
   private static SearchIndexImplStub searchIndex = null;
 
-  /**
-   * Sets up everything valid for all test runs.
-   * 
-   * @throws Exception
-   *           if setup fails
-   */
   @BeforeClass
   public static void setUpClass() throws Exception {
     jpegContentURL = FileSystemContentRepositoryTest.class.getResource(jpegContentPath);
@@ -262,9 +256,13 @@ public class FileSystemContentRepositoryTest {
     repository.connect(site);
   }
 
-  /**
-   * @throws java.lang.Exception
-   */
+  @AfterClass
+  public static void tearDownAfterClass() throws Exception {
+    repository.disconnect();
+    searchIndex.close();
+    FileUtils.deleteQuietly(testRoot);
+  }
+
   @Before
   public void setUp() throws Exception {
 
@@ -298,33 +296,9 @@ public class FileSystemContentRepositoryTest {
     pngContent = new ImageContentImpl(pngContentURL.getFile(), english, "text/pdf", 1000, 666);
   }
 
-  /**
-   * Does the cleanup after each test.
-   * 
-   * @throws ContentRepositoryException
-   *           if clearing the content repository fails
-   */
   @After
   public void tearDown() throws ContentRepositoryException {
     repository.clear();
-  }
-
-  /**
-   * Does the cleanup after all tests.
-   * 
-   * @throws ContentRepositoryException
-   */
-  @AfterClass
-  public static void tearDownAfterClass() throws ContentRepositoryException {
-    repository.disconnect();
-    FileUtils.deleteQuietly(testRoot);
-
-    try {
-      searchIndex.clear();
-      searchIndex.close();
-    } catch (IOException e) {
-      fail("Error clearing & closing search index: " + e.getMessage());
-    }
   }
 
   /**

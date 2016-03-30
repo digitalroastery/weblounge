@@ -22,6 +22,9 @@ package ch.entwine.weblounge.contentrepository.index;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -120,10 +123,14 @@ public class SearchIndexAccessControlTest {
     idx.bindResourceSerializerService(serializer);
   }
 
+  @AfterClass
+  public static void tearDownClass() throws Exception {
+    idx.close();
+    FileUtils.deleteQuietly(idxRoot);
+  }
+
   @Before
   public void setUp() throws Exception {
-    idx.clear();
-
     PageReader reader = new PageReader();
     try (InputStream is = getClass().getResourceAsStream("/page.xml")) {
       pageAllowDeny = reader.read(is, site);
@@ -133,6 +140,11 @@ public class SearchIndexAccessControlTest {
       pageDenyAllow = reader.read(is, site);
       pageDenyAllow.setAllowDenyOrder(Order.DenyAllow);
     }
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    idx.clear();
   }
 
   // ##########################################################################
