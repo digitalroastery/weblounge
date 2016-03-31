@@ -277,6 +277,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Check if resource is in temporary cache and wait until it's clear which
     // version is the latest one
     Resource<?> resource = super.get(uri);
+    if (resource == null)
+      logger.info("Could not find resource '{}' in index", uri);
+    else
+      logger.info("Index did return resource '{}' for uri '{}'", resource, uri);
 
     // Iterate over the resources that are currently being processed
     synchronized (processor) {
@@ -288,11 +292,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
         // Apply the changes to the original resource
         ContentRepositoryResourceOperation<?> resourceOp = (ContentRepositoryResourceOperation<?>) op;
+        logger.info("Oustanding operation found, trying to apply changes to {}", resource);
         resource = resourceOp.apply(uri, resource);
+        logger.info("Changes might have been applied to resource '{}", resource);
       }
     }
 
     // If we found a resource, let's return it
+    logger.info("Finally return resource: {}", resource);
     return (R) resource;
   }
 

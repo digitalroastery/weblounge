@@ -397,6 +397,7 @@ public class FileSystemContentRepositoryTest {
       repository.delete(imageURI);
       fail("Managed to remove referenced resource");
     } catch (ReferentialIntegrityException e) {
+      System.out.println("This is expected, resource must not be deleted!");
       // Expected
     }
 
