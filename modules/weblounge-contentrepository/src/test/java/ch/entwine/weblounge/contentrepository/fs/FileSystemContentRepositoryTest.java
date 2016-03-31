@@ -102,10 +102,10 @@ import java.util.UUID;
 public class FileSystemContentRepositoryTest {
 
   /** The content repository */
-  protected static FileSystemContentRepository repository = null;
+  protected FileSystemContentRepository repository = null;
 
   /** The repository root directory */
-  protected static File repositoryRoot = null;
+  protected File repositoryRoot = null;
 
   /** The mock site */
   protected static Site site = null;
@@ -195,7 +195,7 @@ public class FileSystemContentRepositoryTest {
   private static ResourceSerializerServiceImpl serializer = null;
 
   /** Root directory for index configuration and test data */
-  private static File testRoot = null;
+  private File testRoot = null;
 
   /** the search index */
   private static SearchIndexImplStub searchIndex = null;
@@ -211,14 +211,6 @@ public class FileSystemContentRepositoryTest {
     serializer.addSerializer(new FileResourceSerializer());
     serializer.addSerializer(new ImageResourceSerializer());
     serializer.addSerializer(new MovieResourceSerializer());
-
-    testRoot = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
-    repositoryRoot = new File(testRoot, "repository");
-
-    // Set weblounge.home so that search index can properly be created
-    System.setProperty("weblounge.home", testRoot.getAbsolutePath());
-    TestUtils.startTesting();
-    ElasticSearchUtils.createIndexConfigurationAt(testRoot);
 
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
@@ -240,7 +232,19 @@ public class FileSystemContentRepositoryTest {
     EasyMock.expect(site.getDefaultLanguage()).andReturn(LanguageUtils.getLanguage("de")).anyTimes();
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin")).anyTimes();
     EasyMock.replay(site);
-    
+  }
+
+  @Before
+  public void setUp() throws Exception {
+
+    testRoot = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
+    repositoryRoot = new File(testRoot, "repository");
+
+    // Set weblounge.home so that search index can properly be created
+    System.setProperty("weblounge.home", testRoot.getAbsolutePath());
+    TestUtils.startTesting();
+    ElasticSearchUtils.createIndexConfigurationAt(testRoot);
+
     // Search Index
     searchIndex = SearchIndexImplStub.mkSearchIndexImplStub();
     searchIndex.bindResourceSerializerService(serializer);
@@ -254,17 +258,6 @@ public class FileSystemContentRepositoryTest {
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
     repository.updated(repositoryProperties);
     repository.connect(site);
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-    repository.disconnect();
-    searchIndex.close();
-    FileUtils.deleteQuietly(testRoot);
-  }
-
-  @Before
-  public void setUp() throws Exception {
 
     // Setup uris
     page1URI = new PageURIImpl(site, page1path, page1uuid);
@@ -297,8 +290,10 @@ public class FileSystemContentRepositoryTest {
   }
 
   @After
-  public void tearDown() throws ContentRepositoryException {
-    repository.clear();
+  public void tearDown() throws Exception {
+    repository.disconnect();
+    searchIndex.close();
+    FileUtils.deleteQuietly(testRoot);
   }
 
   /**
