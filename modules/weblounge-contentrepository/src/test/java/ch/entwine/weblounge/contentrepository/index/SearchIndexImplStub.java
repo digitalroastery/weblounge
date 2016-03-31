@@ -19,14 +19,14 @@
  */
 package ch.entwine.weblounge.contentrepository.index;
 
-import java.io.IOException;
-
 import ch.entwine.weblounge.search.impl.SearchIndexImpl;
+
+import java.io.IOException;
 
 /**
  * SearchIndexImplStub
  */
-public class SearchIndexImplStub extends SearchIndexImpl {
+public final class SearchIndexImplStub extends SearchIndexImpl {
 
   public static SearchIndexImplStub mkSearchIndexImplStub() throws IOException {
     SearchIndexImplStub si = new SearchIndexImplStub();

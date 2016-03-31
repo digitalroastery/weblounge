@@ -127,11 +127,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     super(type);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#connect(ch.entwine.weblounge.common.site.Site)
-   */
   @Override
   public void connect(Site site) throws ContentRepositoryException {
     processor = new OperationProcessor(this);
@@ -151,11 +146,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#disconnect()
-   */
   @Override
   public void disconnect() throws ContentRepositoryException {
 
@@ -221,11 +211,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI)
-   */
   @Override
   public boolean exists(ResourceURI uri) throws ContentRepositoryException {
     for (ResourceURI u : getVersions(uri)) {
@@ -235,22 +220,12 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#existsInAnyVersion(ch.entwine.weblounge.common.content.ResourceURI)
-   */
   @Override
   public boolean existsInAnyVersion(ResourceURI uri)
       throws ContentRepositoryException {
     return getVersions(uri).length > 0;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#getVersions(ch.entwine.weblounge.common.content.ResourceURI)
-   */
   @Override
   public ResourceURI[] getVersions(ResourceURI uri)
       throws ContentRepositoryException {
@@ -292,12 +267,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return uris.toArray(new ResourceURI[uris.size()]);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
-   */
-  @SuppressWarnings("unchecked")
   @Override
   public <R extends Resource<?>> R get(ResourceURI uri)
       throws ContentRepositoryException {
@@ -308,6 +277,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Check if resource is in temporary cache and wait until it's clear which
     // version is the latest one
     Resource<?> resource = super.get(uri);
+    if (resource == null)
+      logger.info("Could not find resource '{}' in index", uri);
+    else
+      logger.info("Index did return resource '{}' for uri '{}'", resource, uri);
 
     // Iterate over the resources that are currently being processed
     synchronized (processor) {
@@ -319,20 +292,18 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
         // Apply the changes to the original resource
         ContentRepositoryResourceOperation<?> resourceOp = (ContentRepositoryResourceOperation<?>) op;
+        logger.info("Oustanding operation found, trying to apply changes to {}", resource);
         resource = resourceOp.apply(uri, resource);
+        logger.info("Changes might have been applied to resource '{}", resource);
       }
     }
 
     // If we found a resource, let's return it
+    logger.info("Finally return resource: {}", resource);
     return (R) resource;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#lock(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.security.User)
-   */
+  @Override
   public Resource<?> lock(ResourceURI uri, User user)
       throws IllegalStateException, ContentRepositoryException, IOException {
 
@@ -373,12 +344,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return resource;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#lockAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.security.User)
-   */
+  @Override
   public LockOperation lockAsynchronously(final ResourceURI uri, final User user)
       throws IOException, ContentRepositoryException, IllegalStateException {
 
@@ -390,12 +356,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return lockOperation;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#unlock(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.security.User)
-   */
+  @Override
   public Resource<?> unlock(ResourceURI uri, User user)
       throws ContentRepositoryException, IllegalStateException, IOException {
 
@@ -433,12 +394,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#unlockAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.security.User)
-   */
+  @Override
   public UnlockOperation unlockAsynchronously(final ResourceURI uri,
       final User user) throws IOException, ContentRepositoryException {
 
@@ -451,11 +407,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return lockOperation;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#isLocked(ch.entwine.weblounge.common.content.ResourceURI)
-   */
+  @Override
   public boolean isLocked(ResourceURI uri) throws ContentRepositoryException {
 
     if (!isStarted())
@@ -471,32 +423,19 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return r.isLocked();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI)
-   */
+  @Override
   public boolean delete(ResourceURI uri) throws ContentRepositoryException,
       IOException {
     return delete(uri, false);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#deleteAsynchronously(ch.entwine.weblounge.common.content.ResourceURI)
-   */
+  @Override
   public DeleteOperation deleteAsynchronously(final ResourceURI uri)
       throws ContentRepositoryException, IOException {
     return deleteAsynchronously(uri, false);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#delete(ch.entwine.weblounge.common.content.ResourceURI,
-   *      boolean)
-   */
+  @Override
   public boolean delete(ResourceURI uri, boolean allRevisions)
       throws ContentRepositoryException, IOException {
     if (!isStarted())
@@ -562,12 +501,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#deleteAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
-   *      boolean)
-   */
+  @Override
   public DeleteOperation deleteAsynchronously(ResourceURI uri,
       boolean allRevisions) throws ContentRepositoryException, IOException {
 
@@ -583,12 +517,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return deleteOperation;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#move(ch.entwine.weblounge.common.content.ResourceURI,
-   *      String, boolean)
-   */
+  @Override
   public void move(ResourceURI uri, String targetPath, boolean moveChildren)
       throws IOException, ContentRepositoryException {
 
@@ -696,12 +625,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#moveAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
-   *      java.lang.String, boolean)
-   */
+  @Override
   public MoveOperation moveAsynchronously(final ResourceURI uri,
       final String path, final boolean moveChildren)
       throws ContentRepositoryException, IOException {
@@ -715,22 +639,14 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return moveOperation;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#put(ch.entwine.weblounge.common.content.Resource)
-   */
+  @Override
   public Resource<?> put(Resource<?> resource)
       throws ContentRepositoryException, IOException, IllegalStateException {
 
     return put(resource, true);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#putAsynchronously(ch.entwine.weblounge.common.content.Resource)
-   */
+  @Override
   public PutOperation putAsynchronously(Resource<?> resource)
       throws ContentRepositoryException, IOException, IllegalStateException {
 
@@ -743,11 +659,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return putOperation;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#putAsynchronously(ch.entwine.weblounge.common.content.Resource)
-   */
+  @Override
   public PutOperation putAsynchronously(Resource<?> resource,
       boolean updatePreviews) throws ContentRepositoryException, IOException,
       IllegalStateException {
@@ -761,12 +673,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return putOperation;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#put(ch.entwine.weblounge.common.content.Resource,
-   *      boolean)
-   */
+  @Override
   public Resource<?> put(Resource<?> resource, boolean updatePreviews)
       throws ContentRepositoryException, IOException, IllegalStateException {
 
@@ -820,13 +727,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return resource;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#putContent(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.content.ResourceContent,
-   *      java.io.InputStream)
-   */
+  @Override
   public Resource<?> putContent(ResourceURI uri, ResourceContent content,
       InputStream is) throws ContentRepositoryException, IOException,
       IllegalStateException {
@@ -883,13 +784,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return resource;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#putContentAsynchronously(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.content.ResourceContent,
-   *      java.io.InputStream)
-   */
+  @Override
   public PutContentOperation putContentAsynchronously(final ResourceURI uri,
       final ResourceContent content, final InputStream is)
       throws ContentRepositoryException, IOException, IllegalStateException {
@@ -903,12 +798,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return putOperation;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#deleteContent(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.content.ResourceContent)
-   */
+  @Override
   public Resource<?> deleteContent(ResourceURI uri, ResourceContent content)
       throws ContentRepositoryException, IOException, IllegalStateException {
 
@@ -957,13 +847,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return resource;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#deleteContent(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.content.ResourceContent,
-   *      ch.entwine.weblounge.common.repository.ContentRepositoryOperationListener)
-   */
+  @Override
   public DeleteContentOperation deleteContentAsynchronously(
       final ResourceURI uri, final ResourceContent content)
       throws ContentRepositoryException, IOException, IllegalStateException {
@@ -977,11 +861,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return deleteContentOperation;
   };
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#index()
-   */
+  @Override
   public void index() throws ContentRepositoryException {
 
     if (indexing || indexingOffsite) {
@@ -1036,11 +916,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#indexAsynchronously()
-   */
+  @Override
   public IndexOperation indexAsynchronously() throws ContentRepositoryException {
     IndexOperation op = new IndexOperationImpl();
     processor.enqueue(op);
@@ -1218,11 +1094,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     return resourceCount;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.contentrepository.impl.AbstractContentRepository#loadIndex()
-   */
   @Override
   protected ContentRepositoryIndex loadIndex() throws IOException,
       ContentRepositoryException {

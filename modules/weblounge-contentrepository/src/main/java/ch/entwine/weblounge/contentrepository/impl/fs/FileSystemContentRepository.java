@@ -147,35 +147,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   }
 
   /**
-   * Removes all content.
-   * 
-   * @throws ContentRepositoryException
-   *           if clearing the repository fails
-   */
-  public void clear() throws ContentRepositoryException {
-    logger.info("Clearing the content repository at {}", repositorySiteRoot);
-
-    // Clear the index
-    try {
-      index.clear();
-    } catch (IOException e) {
-      logger.error("Error while clearing the search index: {}", e.getMessage());
-    }
-
-    // Clear those directories that aren't the home to the index
-    File[] filesToDelete = repositorySiteRoot.listFiles();
-    if (filesToDelete != null) {
-      for (File f : filesToDelete) {
-        logger.debug("Removing {}", f.getAbsolutePath());
-        FileUtils.deleteQuietly(f);
-      }
-    }
-
-    // The home page needs to come back
-    super.createHomepage();
-  }
-
-  /**
    * Returns the root directory for this repository.
    * <p>
    * The root is either equal to the repository's filesystem root or, in case
