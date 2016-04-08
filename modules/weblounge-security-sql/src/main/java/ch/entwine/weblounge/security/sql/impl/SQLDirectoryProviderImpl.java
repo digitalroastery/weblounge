@@ -43,7 +43,7 @@ import ch.entwine.weblounge.security.sql.SQLDirectoryProviderPersistence;
 import ch.entwine.weblounge.security.sql.entities.JpaAccount;
 import ch.entwine.weblounge.security.sql.entities.JpaRole;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;

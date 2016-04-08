@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.workbench.suggest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Base class for suggestions with support for hint highlighting.

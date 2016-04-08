@@ -36,7 +36,7 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteURL;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;

@@ -22,7 +22,7 @@ package ch.entwine.weblounge.search.impl.elasticsearch;
 
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.List;

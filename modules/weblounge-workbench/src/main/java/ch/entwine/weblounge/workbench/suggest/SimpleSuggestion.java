@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.workbench.suggest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A subject suggestion includes everything that is needed to display a

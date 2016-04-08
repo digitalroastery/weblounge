@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.common.content.movie;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * The scan format of a video is either interlaced or progressive. In interlaced

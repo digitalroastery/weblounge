@@ -27,7 +27,7 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.site.SiteException;
 import ch.entwine.weblounge.kernel.site.SiteManager;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Iterator;
 

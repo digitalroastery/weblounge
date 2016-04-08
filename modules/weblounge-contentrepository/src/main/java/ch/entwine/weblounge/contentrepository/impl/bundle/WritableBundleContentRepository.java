@@ -36,7 +36,7 @@ import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepositor
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;

@@ -23,7 +23,7 @@ package ch.entwine.weblounge.common.impl.util;
 import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpResponse;
@@ -130,7 +130,7 @@ public final class TestUtils {
   public static Document parseXMLResponse(HttpResponse response)
       throws Exception {
     String responseXml = EntityUtils.toString(response.getEntity(), "utf-8");
-    responseXml = StringEscapeUtils.unescapeHtml(responseXml);
+    responseXml = StringEscapeUtils.unescapeHtml4(responseXml);
 
     // Depending on whether it's an HTML page, let's make sure we end up with a
     // valid DOM
@@ -177,7 +177,7 @@ public final class TestUtils {
    */
   public static String unescapeHtml(String responseHTML) {
     String responseXML = responseHTML.replaceAll("\\r", "").replaceAll("\\n", "").replaceAll("\\t", "");
-    responseXML = StringEscapeUtils.unescapeHtml(responseXML);
+    responseXML = StringEscapeUtils.unescapeHtml4(responseXML);
     return responseXML;
   }
 

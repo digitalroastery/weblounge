@@ -30,7 +30,7 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider;
 import ch.entwine.weblounge.kernel.site.SiteManager;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URL;
 import java.util.Map;

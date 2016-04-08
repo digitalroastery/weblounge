@@ -52,7 +52,7 @@ import ch.entwine.weblounge.search.impl.elasticsearch.ElasticSearchUtils;
 import ch.entwine.weblounge.search.impl.elasticsearch.SuggestRequest;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.ElasticSearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;

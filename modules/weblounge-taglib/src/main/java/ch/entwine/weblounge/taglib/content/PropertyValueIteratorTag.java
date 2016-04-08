@@ -24,7 +24,7 @@ import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.jsp.JspException;
 

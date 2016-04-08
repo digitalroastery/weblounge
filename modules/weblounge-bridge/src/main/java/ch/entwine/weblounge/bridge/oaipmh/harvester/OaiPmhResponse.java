@@ -16,7 +16,7 @@
 
 package ch.entwine.weblounge.bridge.oaipmh.harvester;
 
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 
 import org.opencastproject.util.data.Option;
 import org.w3c.dom.Document;

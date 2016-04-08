@@ -31,7 +31,7 @@ import ch.entwine.weblounge.common.repository.MoveOperation;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.url.UrlUtils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 

@@ -2,7 +2,7 @@ package ch.entwine.weblounge.security.sql.entities;
 
 import ch.entwine.weblounge.common.language.Language;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;

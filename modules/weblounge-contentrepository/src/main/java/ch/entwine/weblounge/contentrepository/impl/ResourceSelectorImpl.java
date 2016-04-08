@@ -24,7 +24,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ResourceSelector;
 import ch.entwine.weblounge.common.site.Site;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

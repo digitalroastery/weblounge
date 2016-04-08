@@ -31,7 +31,7 @@ import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.WebloungeUser;
 import ch.entwine.weblounge.common.site.Site;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;

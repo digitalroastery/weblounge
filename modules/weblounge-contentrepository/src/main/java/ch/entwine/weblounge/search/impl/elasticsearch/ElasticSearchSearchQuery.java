@@ -67,7 +67,7 @@ import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.search.impl.IndexSchema;
 import ch.entwine.weblounge.search.impl.IndexUtils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;

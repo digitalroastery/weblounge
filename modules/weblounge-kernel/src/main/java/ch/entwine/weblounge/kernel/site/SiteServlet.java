@@ -37,7 +37,7 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.ops4j.pax.web.jsp.JspServletWrapper;
 import org.osgi.framework.Bundle;

@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.common.content.page;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * The page preview enumeration defines whether a pagelet will be part of the
