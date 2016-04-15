@@ -627,13 +627,13 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       page.setVersion(Resource.WORK);
 
       // TODO: Preview generation disabled due to performance problems
-      contentRepository.putAsynchronously(page, false);
+      contentRepository.put(page, false);
 
       // Check if the page has been moved
       String currentPath = currentPage.getURI().getPath();
       String newPath = page.getURI().getPath();
       if ((currentPath != null && !currentPath.equals(newPath) || (currentPath == null && newPath != null))) {
-        contentRepository.moveAsynchronously(currentPage.getURI(), newPath, true);
+        contentRepository.move(currentPage.getURI(), newPath, true);
       }
     } catch (SecurityException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", workURI, site);
@@ -1053,7 +1053,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         Page livePage = (Page) contentRepository.get(liveURI);
         workPage = reader.read(IOUtils.toInputStream(livePage.toXml(), "utf-8"), site);
         workPage.setVersion(Resource.WORK);
-        contentRepository.putAsynchronously(workPage, false);
+        contentRepository.put(workPage, false);
       } else {
         workURI.setPath(workPage.getURI().getPath());
       }
@@ -1103,7 +1103,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Finally, perform the lock operation (on all resource versions)
     try {
-      contentRepository.lockAsynchronously(workURI, user);
+      contentRepository.lock(workURI, user);
       logger.info("Page {} has been locked by {}", workURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to lock page {} of site '{}' without permission", workURI, site);
@@ -1207,7 +1207,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Finally, perform the lock operation (on all resource versions)
     try {
-      contentRepository.unlockAsynchronously(pageURI, user);
+      contentRepository.unlock(pageURI, user);
       logger.info("Page {} has been unlocked by {}", pageURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);
@@ -1388,8 +1388,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         livePage.setModified(user, new Date());
       if (!livePage.isPublished())
         livePage.setPublished(user, startDate, endDate);
-      contentRepository.putAsynchronously(livePage);
-      contentRepository.deleteAsynchronously(workURI);
+      contentRepository.put(livePage);
+      contentRepository.delete(workURI);
       logger.info("Page {} has been published by {}", workURI, user);
     } catch (SecurityException e) {
       logger.warn("Tried to publish page {} of site '{}' without permission", workURI, site);
@@ -1512,7 +1512,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         Page workPage = reader.read(IOUtils.toInputStream(livePage.toXml(), "utf-8"), site);
         workPage.setVersion(Resource.WORK);
         workPage.setPublished(null, null, null);
-        contentRepository.putAsynchronously(workPage);
+        contentRepository.put(workPage);
       }
       logger.info("Page {} has been unpublished by {}", liveURI, user);
     } catch (SecurityException e) {
