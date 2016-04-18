@@ -425,7 +425,7 @@ public class FileSystemContentRepositoryTest {
     try {
       repository.move(documentURI, null, false);
       fail("Managed to move a resource to a null path");
-    } catch (ContentRepositoryException e) {
+    } catch (IllegalArgumentException e) {
       // Expected
     }
 
@@ -434,7 +434,7 @@ public class FileSystemContentRepositoryTest {
       documentURI.setPath(null);
       repository.move(documentURI, newPath, false);
       fail("Managed to move a resource from a null path");
-    } catch (ContentRepositoryException e) {
+    } catch (IllegalArgumentException e) {
       // Expected
     }
 
@@ -882,7 +882,7 @@ public class FileSystemContentRepositoryTest {
     try {
       repository.lock(uriLive, editor2);
       fail("Managed to lock an already locked resource ");
-    } catch (ContentRepositoryException e) {
+    } catch (IllegalStateException e) {
       // just what we expected
     }
 
