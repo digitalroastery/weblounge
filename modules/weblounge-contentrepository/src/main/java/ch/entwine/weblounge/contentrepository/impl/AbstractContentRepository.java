@@ -244,31 +244,19 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#isIndexing()
-   */
+  @Override
   public boolean isIndexing() {
     return indexing;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#exists(ch.entwine.weblounge.common.content.ResourceURI)
-   */
+  @Override
   public boolean exists(ResourceURI uri) throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
     return index.exists(uri);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#existsInAnyVersion(ch.entwine.weblounge.common.content.ResourceURI)
-   */
+  @Override
   public boolean existsInAnyVersion(ResourceURI uri)
       throws ContentRepositoryException {
     if (!isStarted())
@@ -276,11 +264,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     return index.existsInAnyVersion(uri);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#getResourceURI(java.lang.String)
-   */
+  @Override
   public ResourceURI getResourceURI(String resourceId)
       throws ContentRepositoryException {
     if (!isStarted())
@@ -293,25 +277,14 @@ public abstract class AbstractContentRepository implements ContentRepository {
     return uri;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#find(ch.entwine.weblounge.common.content.SearchQuery)
-   */
+  @Override
   public SearchResult find(SearchQuery query) throws ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
     return searchIndex.getByQuery(query);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @throws ContentRepositoryException
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#suggest(java.lang.String,
-   *      java.lang.String, int)
-   */
+  @Override
   public List<String> suggest(String dictionary, String seed, int count)
       throws ContentRepositoryException {
     if (!isStarted())
@@ -319,12 +292,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     return searchIndex.suggest(dictionary, seed, false, count, false);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#get(ch.entwine.weblounge.common.content.ResourceURI)
-   */
-  @SuppressWarnings("unchecked")
+  @Override
   public <R extends Resource<?>> R get(ResourceURI uri)
       throws ContentRepositoryException {
     if (!isStarted())
@@ -402,22 +370,13 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#getContent(ch.entwine.weblounge.common.content.ResourceURI,
-   *      ch.entwine.weblounge.common.language.Language)
-   */
+  @Override
   public InputStream getContent(ResourceURI uri, Language language)
       throws ContentRepositoryException, IOException {
     return loadResourceContent(uri, language);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#getVersions(ch.entwine.weblounge.common.content.ResourceURI)
-   */
+  @Override
   public ResourceURI[] getVersions(ResourceURI uri)
       throws ContentRepositoryException {
     if (!isStarted())
@@ -432,20 +391,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
     return uris;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#getResourceCount()
-   */
+  @Override
   public long getResourceCount() throws ContentRepositoryException {
     return index != null ? index.getResourceCount() : -1;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.ContentRepository#getVersionCount()
-   */
+  @Override
   public long getVersionCount() throws ContentRepositoryException {
     return index != null ? index.getRevisionCount() : -1;
   }
@@ -632,11 +583,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
   protected abstract ContentRepositoryIndex loadIndex() throws IOException,
       ContentRepositoryException;
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
     if (site != null)
@@ -645,11 +591,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
       return super.hashCode();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof AbstractContentRepository) {
@@ -787,11 +728,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.repository.WritableContentRepository#createPreviews()
-   */
   @Override
   public void createPreviews() throws ContentRepositoryException {
     Collection<ResourceURI> uris = null;
