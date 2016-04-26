@@ -25,7 +25,7 @@ import ch.entwine.weblounge.common.impl.content.file.FileContentImpl;
 import ch.entwine.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.entwine.weblounge.common.language.Language;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;

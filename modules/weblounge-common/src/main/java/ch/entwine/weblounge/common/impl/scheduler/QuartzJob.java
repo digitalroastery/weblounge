@@ -28,7 +28,7 @@ import ch.entwine.weblounge.common.scheduler.JobTrigger;
 import ch.entwine.weblounge.common.scheduler.JobWorker;
 import ch.entwine.weblounge.common.site.Environment;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 
 import java.util.Dictionary;

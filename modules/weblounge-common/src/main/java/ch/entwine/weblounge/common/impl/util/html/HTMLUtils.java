@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.util.html;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.StringWriter;
 
@@ -82,7 +82,7 @@ public final class HTMLUtils {
    * @see #escapeHtml(String)
    */
   public static String unescape(String str) {
-    return StringEscapeUtils.unescapeHtml(str);
+    return StringEscapeUtils.unescapeHtml4(str);
   }
 
   /**

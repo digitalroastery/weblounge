@@ -20,8 +20,8 @@
 
 package ch.entwine.weblounge.common.impl.util.doc;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -348,7 +348,7 @@ public class Endpoint {
             sb.append("}");
           }
         }
-        qs = StringEscapeUtils.escapeHtml(sb.toString());
+        qs = StringEscapeUtils.escapeHtml4(sb.toString());
       }
     }
     return qs;

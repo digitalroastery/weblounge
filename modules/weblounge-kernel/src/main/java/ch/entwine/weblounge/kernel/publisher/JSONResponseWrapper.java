@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.kernel.publisher;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;

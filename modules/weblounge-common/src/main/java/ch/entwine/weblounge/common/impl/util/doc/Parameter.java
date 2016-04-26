@@ -20,7 +20,7 @@
 
 package ch.entwine.weblounge.common.impl.util.doc;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -213,7 +213,7 @@ public class Parameter {
    * @return the escaped default value
    */
   public String getDefaultValueHtml() {
-    return StringEscapeUtils.escapeHtml(defaultValue);
+    return StringEscapeUtils.escapeHtml4(defaultValue);
   }
 
   /**

@@ -22,7 +22,7 @@ package ch.entwine.weblounge.common.url;
 
 import ch.entwine.weblounge.common.site.Site;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;

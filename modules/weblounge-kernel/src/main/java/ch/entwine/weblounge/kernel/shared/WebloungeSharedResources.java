@@ -22,7 +22,7 @@ package ch.entwine.weblounge.kernel.shared;
 
 import ch.entwine.weblounge.dispatcher.SharedHttpContext;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;

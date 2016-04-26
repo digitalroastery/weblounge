@@ -27,7 +27,7 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.I18nDictionary;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -144,7 +144,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
    */
   public String getAsHTML(String key) {
     String value = get(key);
-    return value != null ? StringEscapeUtils.escapeHtml(value) : null;
+    return value != null ? StringEscapeUtils.escapeHtml4(value) : null;
   }
 
   /**
@@ -155,7 +155,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
    */
   public String getAsHTML(String key, Language language) {
     String value = get(key, language);
-    return value != null ? StringEscapeUtils.escapeHtml(value) : null;
+    return value != null ? StringEscapeUtils.escapeHtml4(value) : null;
   }
 
   /**

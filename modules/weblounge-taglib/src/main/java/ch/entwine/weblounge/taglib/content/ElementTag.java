@@ -32,7 +32,7 @@ import ch.entwine.weblounge.taglib.TagVariableDefinitionParser;
 import ch.entwine.weblounge.taglib.TagVariableDefinitions;
 import ch.entwine.weblounge.taglib.WebloungeTag;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -251,7 +251,7 @@ public class ElementTag extends WebloungeTag {
     if (element == null)
       element = "";
     if (encode)
-      element = StringEscapeUtils.escapeHtml(element);
+      element = StringEscapeUtils.escapeHtml4(element);
     if (templates)
       element = Templates.format(element, encode, site);
     return element;

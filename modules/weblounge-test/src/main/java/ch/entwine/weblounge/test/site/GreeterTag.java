@@ -22,7 +22,7 @@ package ch.entwine.weblounge.test.site;
 
 import ch.entwine.weblounge.test.util.TestSiteUtils;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -69,7 +69,7 @@ public class GreeterTag extends TagSupport {
         language = languages[(int)Math.random() * languages.length];
         greeting = greetings.get(language);
       }
-      String encodedGreeting = StringEscapeUtils.escapeHtml(greeting);
+      String encodedGreeting = StringEscapeUtils.escapeHtml4(greeting);
       pageContext.getOut().print("<div id=\"greeting\">");
       pageContext.getOut().print(encodedGreeting);
       pageContext.getOut().println("</div>");

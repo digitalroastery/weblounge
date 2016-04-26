@@ -23,7 +23,7 @@ package ch.entwine.weblounge.common.impl.content.movie;
 import ch.entwine.weblounge.common.content.movie.AudioStream;
 import ch.entwine.weblounge.common.content.movie.VideoStream;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 

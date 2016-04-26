@@ -22,7 +22,7 @@ package ch.entwine.weblounge.cache.impl.filter;
 
 import ch.entwine.weblounge.cache.StreamFilter;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * This {@link StreamFilter} removes special characters from the output stream
@@ -36,7 +36,7 @@ public class SpecialChars implements StreamFilter {
    */
   public StringBuffer filter(StringBuffer buffer, String contentType) {
     if ("text/html".equals(contentType))
-      return new StringBuffer(StringEscapeUtils.escapeHtml(buffer.toString()));
+      return new StringBuffer(StringEscapeUtils.escapeHtml4(buffer.toString()));
     return buffer;
   }
 

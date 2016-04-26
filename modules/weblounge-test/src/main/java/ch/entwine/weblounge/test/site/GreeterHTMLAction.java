@@ -34,8 +34,8 @@ import ch.entwine.weblounge.common.site.HTMLAction;
 import ch.entwine.weblounge.test.util.TestSiteUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -138,7 +138,7 @@ public class GreeterHTMLAction extends HTMLActionSupport {
   public int startStage(WebloungeRequest request, WebloungeResponse response,
       Composer composer) throws ActionException {
     try {
-      String htmlGreeting = StringEscapeUtils.escapeHtml(greeting);
+      String htmlGreeting = StringEscapeUtils.escapeHtml4(greeting);
       IOUtils.write("<h1>" + htmlGreeting + "</h1>", response.getWriter());
 
       // Include another pagelet

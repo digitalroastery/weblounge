@@ -27,7 +27,7 @@ import ch.entwine.weblounge.common.language.Localizable;
 import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.site.Site;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;

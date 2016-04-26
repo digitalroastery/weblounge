@@ -28,7 +28,7 @@ import ch.entwine.weblounge.common.search.SearchIndex;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
