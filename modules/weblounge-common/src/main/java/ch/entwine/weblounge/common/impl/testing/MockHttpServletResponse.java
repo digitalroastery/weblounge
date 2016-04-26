@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -79,7 +80,7 @@ public class MockHttpServletResponse implements HttpServletResponse {
   private PrintWriter writer = null;
 
   /** The content length */
-  private int contentLength = 0;
+  private long contentLength = 0;
 
   /** The content mime type */
   private String contentType = null;
@@ -222,22 +223,14 @@ public class MockHttpServletResponse implements HttpServletResponse {
     return (this.characterEncoding != null) ? this.response.toString(this.characterEncoding) : this.response.toString();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see javax.servlet.ServletResponse#setContentLength(int)
-   */
+  @Override
   public void setContentLength(int contentLength) {
     this.contentLength = contentLength;
   }
-
-  /**
-   * Returns the value that was set as the content length.
-   * 
-   * @return the content length
-   */
-  public int getContentLength() {
-    return this.contentLength;
+  
+  @Override
+  public void setContentLengthLong(long contentLength) {
+    this.contentLength = contentLength;
   }
 
   /**
@@ -436,21 +429,15 @@ public class MockHttpServletResponse implements HttpServletResponse {
    *          the name of the header
    * @return the associated header value, or <code>null if none
    */
-  public Object getHeader(String name) {
+  public String getHeader(String name) {
     HeaderValueCollection header = HeaderValueCollection.getByName(this.headers, name);
     return (header != null ? header.getValue() : null);
   }
 
-  /**
-   * Return all values for the given header as a List of value objects.
-   * 
-   * @param name
-   *          the name of the header
-   * @return the associated header values, or an empty List if none
-   */
-  public List<Object> getHeaderValues(String name) {
+  @Override
+  public Collection<String> getHeaders(String name) {
     HeaderValueCollection header = HeaderValueCollection.getByName(this.headers, name);
-    return (header != null ? header.getValues() : new ArrayList<Object>());
+    return (header != null ? header.getValues() : new ArrayList<String>());
   }
 
   /**
@@ -652,9 +639,9 @@ public class MockHttpServletResponse implements HttpServletResponse {
       this.headers.put(name, header);
     }
     if (replace) {
-      header.setValue(value);
+      header.setValue(value.toString());
     } else {
-      header.addValue(value);
+      header.addValue(value.toString());
     }
   }
 

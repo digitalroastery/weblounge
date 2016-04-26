@@ -35,16 +35,24 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
+import javax.servlet.ServletRegistration.Dynamic;
+import javax.servlet.SessionCookieConfig;
+import javax.servlet.SessionTrackingMode;
+import javax.servlet.descriptor.JspConfigDescriptor;
 
 /**
  * Mock implementation of the {@link javax.servlet.ServletContext} interface.
@@ -70,13 +78,13 @@ public class MockServletContext implements ServletContext {
   private String contextPath = "";
 
   /** The servlet contexts */
-  private final Map<String, ServletContext> contexts = new HashMap<String, ServletContext>();
+  private final Map<String, ServletContext> contexts = new HashMap<>();
 
   /** The init parameters */
-  private final Properties initParameters = new Properties();
+  private final Hashtable<String, String> initParameters = new Hashtable<>();
 
   /** The context attributes */
-  private final Hashtable<String, Object> attributes = new Hashtable<String, Object>();
+  private final Hashtable<String, Object> attributes = new Hashtable<>();
 
   /** Name of this context */
   private String servletContextName = "MockServletContext";
@@ -396,7 +404,7 @@ public class MockServletContext implements ServletContext {
   public String getInitParameter(String name) {
     if (name == null)
       throw new IllegalArgumentException("Parameter name must not be null");
-    return this.initParameters.getProperty(name);
+    return this.initParameters.get(name);
   }
 
   /**
@@ -410,7 +418,7 @@ public class MockServletContext implements ServletContext {
   public void addInitParameter(String name, String value) {
     if (name == null)
       throw new IllegalArgumentException("Parameter name must not be null");
-    this.initParameters.setProperty(name, value);
+    this.initParameters.put(name, value);
   }
 
   /**
@@ -418,8 +426,7 @@ public class MockServletContext implements ServletContext {
    * 
    * @see javax.servlet.ServletContext#getInitParameterNames()
    */
-  @SuppressWarnings("rawtypes")
-  public Enumeration getInitParameterNames() {
+  public Enumeration<String> getInitParameterNames() {
     return this.initParameters.keys();
   }
 
@@ -439,8 +446,7 @@ public class MockServletContext implements ServletContext {
    * 
    * @see javax.servlet.ServletContext#getAttributeNames()
    */
-  @SuppressWarnings("rawtypes")
-  public Enumeration getAttributeNames() {
+  public Enumeration<String> getAttributeNames() {
     return this.attributes.keys();
   }
 
@@ -513,6 +519,176 @@ public class MockServletContext implements ServletContext {
       // TODO Reactive java action framework (and solve bundle management)
       // return FileTypeMap.getDefaultFileTypeMap().getContentType(filePath);
     }
+  }
+
+  @Override
+  public int getEffectiveMajorVersion() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int getEffectiveMinorVersion() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public boolean setInitParameter(String name, String value) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public Dynamic addServlet(String servletName, String className) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Dynamic addServlet(String servletName, Servlet servlet) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Dynamic addServlet(String servletName,
+      Class<? extends Servlet> servletClass) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public <T extends Servlet> T createServlet(Class<T> clazz)
+      throws ServletException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public ServletRegistration getServletRegistration(String servletName) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName,
+      String className) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName,
+      Filter filter) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName,
+      Class<? extends Filter> filterClass) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public <T extends Filter> T createFilter(Class<T> clazz)
+      throws ServletException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public FilterRegistration getFilterRegistration(String filterName) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public SessionCookieConfig getSessionCookieConfig() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void setSessionTrackingModes(
+      Set<SessionTrackingMode> sessionTrackingModes) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void addListener(String className) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public <T extends EventListener> void addListener(T t) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void addListener(Class<? extends EventListener> listenerClass) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public <T extends EventListener> T createListener(Class<T> clazz)
+      throws ServletException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public JspConfigDescriptor getJspConfigDescriptor() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public ClassLoader getClassLoader() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void declareRoles(String... roleNames) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public String getVirtualServerName() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

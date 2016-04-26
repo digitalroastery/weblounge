@@ -21,10 +21,11 @@
 package ch.entwine.weblounge.common.impl.request;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 /**
  * Extension to the <code>ServletOutputStream</code> that allows to copy the
- * output that has been written to a <code>HtttpServletResponse</code> to the
+ * output that has been written to a <code>HttpServletResponse</code> to the
  * response cache as well as to the client.
  */
 public final class CachedOutputStream extends ServletOutputStream {
@@ -38,11 +39,6 @@ public final class CachedOutputStream extends ServletOutputStream {
   /** Write position in the output buffer */
   private int pos = 0;
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.OutputStream#write(int)
-   */
   @Override
   public synchronized void write(int b) {
     int newpos = pos + 1;
@@ -52,11 +48,6 @@ public final class CachedOutputStream extends ServletOutputStream {
     pos = newpos;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.OutputStream#write(byte[], int, int)
-   */
   @Override
   public synchronized void write(byte[] b, int off, int len) {
     int newpos = pos + len;
@@ -88,6 +79,16 @@ public final class CachedOutputStream extends ServletOutputStream {
     byte[] newbuf = new byte[pos];
     System.arraycopy(buf, 0, newbuf, 0, pos);
     return newbuf;
+  }
+
+  @Override
+  public boolean isReady() {
+    throw new UnsupportedOperationException("NIO not supported yet.");
+  }
+
+  @Override
+  public void setWriteListener(WriteListener writeListener) {
+    throw new UnsupportedOperationException("NIO not supported yet.");
   }
 
 }

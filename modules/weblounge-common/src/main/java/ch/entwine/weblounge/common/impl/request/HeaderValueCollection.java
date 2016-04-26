@@ -34,7 +34,7 @@ import java.util.Map;
 public class HeaderValueCollection {
 
   /** The list of header values */
-  private final List<Object> values = new LinkedList<Object>();
+  private final List<String> values = new LinkedList<>();
 
   /**
    * Sets the header values to <code>value</code>. Any existing values are
@@ -43,7 +43,7 @@ public class HeaderValueCollection {
    * @param value
    *          the new header value
    */
-  public void setValue(Object value) {
+  public void setValue(String value) {
     this.values.clear();
     this.values.add(value);
   }
@@ -54,7 +54,7 @@ public class HeaderValueCollection {
    * @param value
    *          the value to add
    */
-  public void addValue(Object value) {
+  public void addValue(String value) {
     this.values.add(value);
   }
 
@@ -64,7 +64,7 @@ public class HeaderValueCollection {
    * @param values
    *          the values to add
    */
-  public void addValues(Collection<Object> values) {
+  public void addValues(Collection<String> values) {
     this.values.addAll(values);
   }
 
@@ -74,8 +74,8 @@ public class HeaderValueCollection {
    * @param values
    */
   public void addValueArray(Object values) {
-    if (values instanceof Object[]) {
-      this.values.addAll(Arrays.asList((Object[]) values));
+    if (values instanceof String[]) {
+      this.values.addAll(Arrays.asList((String[]) values));
     }
   }
 
@@ -84,7 +84,7 @@ public class HeaderValueCollection {
    * 
    * @return the header values
    */
-  public List<Object> getValues() {
+  public List<String> getValues() {
     return Collections.unmodifiableList(this.values);
   }
 
@@ -94,7 +94,7 @@ public class HeaderValueCollection {
    * 
    * @return the header value
    */
-  public Object getValue() {
+  public String getValue() {
     return (!this.values.isEmpty() ? this.values.get(0) : null);
   }
 
