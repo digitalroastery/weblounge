@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 /**
  * This servlet output stream keeps everything that is written to it in a byte
@@ -41,41 +42,21 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
     outputStream = new ByteArrayOutputStream();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.OutputStream#write(int)
-   */
   @Override
   public void write(int b) throws IOException {
     outputStream.write(b);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.OutputStream#write(byte[])
-   */
   @Override
   public void write(byte[] b) throws IOException {
     outputStream.write(b);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.OutputStream#write(byte[], int, int)
-   */
   @Override
   public void write(byte[] b, int off, int len) throws IOException {
     outputStream.write(b, off, len);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.OutputStream#close()
-   */
   @Override
   public void close() throws IOException {
     outputStream.close();
@@ -88,6 +69,16 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
    */
   public byte[] getBytes() {
     return outputStream.toByteArray();
+  }
+
+  @Override
+  public boolean isReady() {
+    throw new UnsupportedOperationException("NIO not supported yet.");
+  }
+
+  @Override
+  public void setWriteListener(WriteListener writeListener) {
+    throw new UnsupportedOperationException("NIO not supported yet.");
   }
 
 }

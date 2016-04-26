@@ -27,6 +27,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
@@ -246,16 +247,12 @@ public final class Http11Utils implements Http11Constants {
     /** the number of bytes that have been written to this stream */
     private int bytesWritten = 0;
 
-    /**
-     * @see java.io.OutputStream#write(byte[], int, int)
-     */
+    @Override
     public void write(byte[] b, int off, int len) throws IOException {
       bytesWritten += len;
     }
 
-    /**
-     * @see java.io.OutputStream#write(int)
-     */
+    @Override
     public void write(int b) throws IOException {
       bytesWritten++;
     }
@@ -267,6 +264,16 @@ public final class Http11Utils implements Http11Constants {
      */
     protected int getBytesWritten() {
       return bytesWritten;
+    }
+
+    @Override
+    public boolean isReady() {
+      throw new UnsupportedOperationException("NIO not supported yet.");
+    }
+
+    @Override
+    public void setWriteListener(WriteListener writeListener) {
+      throw new UnsupportedOperationException("NIO not supported yet.");
     }
 
   }

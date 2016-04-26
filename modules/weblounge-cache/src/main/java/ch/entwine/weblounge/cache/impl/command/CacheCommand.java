@@ -256,7 +256,7 @@ public class CacheCommand {
       return;
     }
 
-    Dictionary<Object, Object> properties = configuration.getProperties();
+    Dictionary<String, Object> properties = configuration.getProperties();
     String id = (String) properties.get(CacheServiceImpl.OPT_ID);
     properties.put(CacheServiceImpl.OPT_CLEAR, "true");
 

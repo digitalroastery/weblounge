@@ -23,6 +23,7 @@ package ch.entwine.weblounge.common.impl.request;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
 /**
@@ -54,23 +55,30 @@ public class DelegatingServletInputStream extends ServletInputStream {
     return this.sourceStream;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.InputStream#read()
-   */
+  @Override
   public int read() throws IOException {
     return this.sourceStream.read();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.InputStream#close()
-   */
+  @Override
   public void close() throws IOException {
     super.close();
     this.sourceStream.close();
+  }
+
+  @Override
+  public boolean isFinished() {
+    throw new UnsupportedOperationException("NIO not supported yet.");
+  }
+
+  @Override
+  public boolean isReady() {
+    throw new UnsupportedOperationException("NIO not supported yet.");
+  }
+
+  @Override
+  public void setReadListener(ReadListener readListener) {
+    throw new UnsupportedOperationException("NIO not supported yet.");
   }
 
 }

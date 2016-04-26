@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 /**
  * Delegating implementation of {@link javax.servlet.ServletOutputStream} that
@@ -53,33 +54,31 @@ public class DelegatingServletOutputStream extends ServletOutputStream {
     return this.targetStream;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.OutputStream#write(int)
-   */
+  @Override
   public void write(int b) throws IOException {
     this.targetStream.write(b);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.OutputStream#flush()
-   */
+  @Override
   public void flush() throws IOException {
     super.flush();
     this.targetStream.flush();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.io.OutputStream#close()
-   */
+  @Override
   public void close() throws IOException {
     super.close();
     this.targetStream.close();
+  }
+
+  @Override
+  public boolean isReady() {
+    throw new UnsupportedOperationException("NIO not supported yet.");
+  }
+
+  @Override
+  public void setWriteListener(WriteListener writeListener) {
+    throw new UnsupportedOperationException("NIO not supported yet.");
   }
 
 }
