@@ -81,7 +81,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
   private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryServiceFactory.class);
 
   /** Service registrations per configuration pid */
-  private final Map<String, ServiceRegistration> services = new HashMap<String, ServiceRegistration>();
+  private final Map<String, ServiceRegistration<?>> services = new HashMap<>();
 
   /** Default content repository type */
   private String repositoryType = null;
@@ -110,7 +110,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
     this.bundleCtx = ctx.getBundleContext();
 
     // Configure the service
-    Dictionary<?, ?> configuration = loadConfiguration(SERVICE_PID);
+    Dictionary<String, ?> configuration = loadConfiguration(SERVICE_PID);
     if (configuration != null) {
       try {
         updated(configuration);
@@ -121,21 +121,13 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
 
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.service.cm.ManagedServiceFactory#getName()
-   */
+  @Override
   public String getName() {
     return "Content repository service factory";
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
-   */
-  public void updated(Dictionary properties) throws ConfigurationException {
+  @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     String repositoryType = (String) properties.get(OPT_TYPE);
     if (StringUtils.isBlank(repositoryType))
       repositoryType = DEFAULT_REPOSITORY_TYPE;
@@ -145,18 +137,14 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String,
-   *      java.util.Dictionary)
-   */
+  @Override
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public void updated(String pid, Dictionary properties)
       throws ConfigurationException {
 
     // is this an update to an existing service?
     if (services.containsKey(pid)) {
-      ServiceRegistration registration = services.get(pid);
+      ServiceRegistration<?> registration = services.get(pid);
       ManagedService service = (ManagedService) bundleCtx.getService(registration.getReference());
       service.updated(properties);
     }
@@ -180,13 +168,13 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
         // before the site is connected
 
         if (repository instanceof ManagedService) {
-          Dictionary<Object, Object> finalProperties = new Hashtable<Object, Object>();
+          Dictionary<String, Object> finalProperties = new Hashtable<>();
 
           // Add the default configuration according to the repository type
-          Dictionary<Object, Object> configuration = loadConfiguration(repository.getType());
+          Dictionary<String, Object> configuration = loadConfiguration(repository.getType());
           if (configuration != null) {
-            for (Enumeration<Object> keys = configuration.keys(); keys.hasMoreElements();) {
-              Object key = keys.nextElement();
+            for (Enumeration<String> keys = configuration.keys(); keys.hasMoreElements();) {
+              String key = keys.nextElement();
               Object value = configuration.get(key);
               if (value instanceof String)
                 value = ConfigurationUtils.processTemplate((String) value);
@@ -195,8 +183,8 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
           }
 
           // Overwrite the default configuration with what was passed in
-          for (Enumeration<Object> keys = properties.keys(); keys.hasMoreElements();) {
-            Object key = keys.nextElement();
+          for (Enumeration<String> keys = properties.keys(); keys.hasMoreElements();) {
+            String key = keys.nextElement();
             Object value = properties.get(key);
             if (value instanceof String)
               value = ConfigurationUtils.processTemplate((String) value);
@@ -222,13 +210,9 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.service.cm.ManagedServiceFactory#deleted(java.lang.String)
-   */
+  @Override
   public void deleted(String pid) {
-    ServiceRegistration registration = services.remove(pid);
+    ServiceRegistration<?> registration = services.remove(pid);
     ContentRepository repository = (ContentRepository) bundleCtx.getService(registration.getReference());
     try {
       repository.disconnect();
@@ -253,19 +237,18 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
    *          the service pid
    * @return the configuration properties
    */
-  @SuppressWarnings({ "cast" })
-  private Dictionary<Object, Object> loadConfiguration(String pid) {
+  private Dictionary<String, Object> loadConfiguration(String pid) {
     if (StringUtils.isBlank(pid))
       return null;
 
-    ServiceReference ref = bundleCtx.getServiceReference(ConfigurationAdmin.class.getName());
+    ServiceReference<?> ref = bundleCtx.getServiceReference(ConfigurationAdmin.class.getName());
     if (ref != null) {
       ConfigurationAdmin configurationAdmin = (ConfigurationAdmin) bundleCtx.getService(ref);
       Configuration config;
       try {
         config = configurationAdmin.getConfiguration(pid);
         if (config != null)
-          return (Dictionary<Object, Object>) config.getProperties();
+          return config.getProperties();
       } catch (IOException e) {
         logger.error("Error trying to look up content repository service factory configuration", e);
       }

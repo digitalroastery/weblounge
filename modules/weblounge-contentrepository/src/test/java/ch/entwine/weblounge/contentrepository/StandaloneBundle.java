@@ -27,9 +27,11 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -77,8 +79,7 @@ public class StandaloneBundle implements Bundle {
    * @see org.osgi.framework.Bundle#findEntries(java.lang.String,
    *      java.lang.String, boolean)
    */
-  @SuppressWarnings("rawtypes")
-  public Enumeration findEntries(String path, String filePattern, boolean recurse) {
+  public Enumeration<URL> findEntries(String path, String filePattern, boolean recurse) {
     List<URL> result = new ArrayList<URL>();
     for (URL url : entries) {
       String urlPath = url.getPath();
@@ -116,13 +117,12 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#getEntryPaths(java.lang.String)
    */
-  @SuppressWarnings("rawtypes")
-  public Enumeration getEntryPaths(String path) {
-    List<URL> result = new ArrayList<URL>();
+  public Enumeration<String> getEntryPaths(String path) {
+    List<String> result = new ArrayList<>();
     for (URL url : entries) {
       String urlPath = url.getPath();
       if (urlPath.startsWith(path) && path.indexOf("/", path.length()) == -1)
-        result.add(url);
+        result.add(url.toExternalForm());
     }
     return Collections.enumeration(result);
   }
@@ -132,9 +132,8 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#getHeaders()
    */
-  @SuppressWarnings("rawtypes")
-  public Dictionary getHeaders() {
-    return new Hashtable();
+  public Dictionary<String, String> getHeaders() {
+    return new Hashtable<>();
   }
 
   /**
@@ -142,9 +141,8 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#getHeaders(java.lang.String)
    */
-  @SuppressWarnings("rawtypes")
-  public Dictionary getHeaders(String locale) {
-    return new Hashtable();
+  public Dictionary<String, String> getHeaders(String locale) {
+    return new Hashtable<>();
   }
 
   /**
@@ -170,7 +168,7 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#getRegisteredServices()
    */
-  public ServiceReference[] getRegisteredServices() {
+  public ServiceReference<?>[] getRegisteredServices() {
     return new ServiceReference[] {};
   }
 
@@ -188,8 +186,7 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#getResources(java.lang.String)
    */
-  @SuppressWarnings("rawtypes")
-  public Enumeration getResources(String name) throws IOException {
+  public Enumeration<URL> getResources(String name) throws IOException {
     return classLoader.getResources(name);
   }
 
@@ -198,7 +195,7 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#getServicesInUse()
    */
-  public ServiceReference[] getServicesInUse() {
+  public ServiceReference<?>[] getServicesInUse() {
     return new ServiceReference[] {};
   }
 
@@ -293,7 +290,7 @@ public class StandaloneBundle implements Bundle {
    *
    * @see org.osgi.framework.Bundle#getSignerCertificates(int)
    */
-  public Map<?,?> getSignerCertificates(int signersType) {
+  public Map<X509Certificate, List<X509Certificate>> getSignerCertificates(int signersType) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -315,7 +312,6 @@ public class StandaloneBundle implements Bundle {
    */
   public void start(int options) throws BundleException {
     // TODO Auto-generated method stub
-    
   }
 
   /**
@@ -325,7 +321,21 @@ public class StandaloneBundle implements Bundle {
    */
   public void stop(int options) throws BundleException {
     // TODO Auto-generated method stub
-    
+  }
+
+  @Override
+  public int compareTo(Bundle o) {
+    return 0;
+  }
+
+  @Override
+  public <A> A adapt(Class<A> type) {
+    return null;
+  }
+
+  @Override
+  public File getDataFile(String filename) {
+    return null;
   }
 
 }

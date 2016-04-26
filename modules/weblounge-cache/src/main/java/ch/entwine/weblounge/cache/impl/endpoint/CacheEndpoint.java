@@ -184,7 +184,7 @@ public class CacheEndpoint {
 
     // Clear the cache
     try {
-      Dictionary<Object, Object> properties = cache.getProperties();
+      Dictionary<String, Object> properties = cache.getProperties();
       properties.put(CacheServiceImpl.OPT_CLEAR, "true");
 
       // Tell the configuration admin service to update the service
