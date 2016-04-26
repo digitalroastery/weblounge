@@ -23,7 +23,7 @@ public class CacheConfiguration {
   private boolean enabled = false;
 
   /** The configuration properties */
-  private Dictionary<Object, Object> properties = null;
+  private Dictionary<String, Object> properties = null;
 
   /**
    * Creates a new cache configuration for the cache with identifier
@@ -92,7 +92,7 @@ public class CacheConfiguration {
    * 
    * @return the properties
    */
-  public Dictionary<Object, Object> getProperties() {
+  public Dictionary<String, Object> getProperties() {
     return properties;
   }
 
@@ -102,7 +102,7 @@ public class CacheConfiguration {
    * @param properties
    *          the properties
    */
-  public void setProperties(Dictionary<Object, Object> properties) {
+  public void setProperties(Dictionary<String, Object> properties) {
     this.properties = properties;
   }
   

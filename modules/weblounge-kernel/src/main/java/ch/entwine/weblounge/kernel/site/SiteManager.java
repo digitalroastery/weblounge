@@ -274,7 +274,7 @@ public class SiteManager {
    * @see ch.entwine.weblounge.dispatcher.SiteDispatcherService#addSite(ch.entwine.weblounge.common.site.Site,
    *      org.osgi.framework.ServiceReference)
    */
-  void addSite(Site site, ServiceReference reference) {
+  void addSite(Site site, ServiceReference<?> reference) {
 
     synchronized (sitesLock) {
       sites.add(site);
@@ -360,7 +360,7 @@ public class SiteManager {
       // Register configuration for this site's content repository
       try {
         Configuration config = configurationAdmin.createFactoryConfiguration("ch.entwine.weblounge.contentrepository.factory", null);
-        Dictionary<Object, Object> properties = new Hashtable<Object, Object>();
+        Dictionary<String, Object> properties = new Hashtable<String, Object>();
         properties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
         for (String name : site.getOptionNames()) {
           String[] values = site.getOptionValues(name);

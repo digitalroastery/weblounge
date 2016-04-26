@@ -762,7 +762,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     if (ctx == null)
       return null;
     try {
-      ServiceReference serviceRef = ctx.getServiceReference(className);
+      ServiceReference<?> serviceRef = ctx.getServiceReference(className);
       if (serviceRef == null) {
         logger.debug("No service for class {} found", className);
         return null;

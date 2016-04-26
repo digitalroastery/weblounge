@@ -64,7 +64,7 @@ public class CacheConfigurationFactory implements ManagedService {
   private ConfigurationAdmin configurationAdmin = null;
 
   /** The cache configuration */
-  private Dictionary<Object, Object> cacheConfiguration = null;
+  private Dictionary<String, Object> cacheConfiguration = null;
 
   /**
    * {@inheritDoc}
@@ -121,13 +121,13 @@ public class CacheConfigurationFactory implements ManagedService {
    *          the site name
    * @return the configuration
    */
-  private Dictionary<Object, Object> createConfiguration(String id, String name) {
-    Hashtable<Object, Object> configuration = new Hashtable<Object, Object>();
+  private Dictionary<String, Object> createConfiguration(String id, String name) {
+    Hashtable<String, Object> configuration = new Hashtable<>();
 
     // Add the default properties
     if (cacheConfiguration != null) {
-      for (Enumeration<Object> e = cacheConfiguration.keys(); e.hasMoreElements();) {
-        Object key = e.nextElement();
+      for (Enumeration<String> e = cacheConfiguration.keys(); e.hasMoreElements();) {
+        String key = e.nextElement();
         configuration.put(key, cacheConfiguration.get(key));
       }
     }
