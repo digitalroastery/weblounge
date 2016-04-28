@@ -20,9 +20,9 @@
 
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
+import static ch.entwine.weblounge.common.impl.security.WebloungePermissionUtils.checkResourceReadPermission;
 import static ch.entwine.weblounge.common.request.RequestFlavor.ANY;
 import static ch.entwine.weblounge.common.request.RequestFlavor.HTML;
-import static ch.entwine.weblounge.common.security.SystemAction.READ;
 
 import ch.entwine.weblounge.common.content.Renderer;
 import ch.entwine.weblounge.common.content.Resource;
@@ -40,7 +40,6 @@ import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
 import ch.entwine.weblounge.common.impl.request.CacheTagSet;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
-import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -50,6 +49,7 @@ import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.RequestFlavor;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.security.PermissionException;
 import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.HTMLAction;
@@ -249,10 +249,8 @@ public final class SearchRequestHandlerImpl implements RequestHandler {
       // Can the item be accessed by the current user?
       User user = request.getUser();
       try {
-        SecurablePermission readPermission = new SecurablePermission(resource, READ);
-        if (System.getSecurityManager() != null)
-          System.getSecurityManager().checkPermission(readPermission);
-      } catch (SecurityException e) {
+        checkResourceReadPermission(user, resource);
+      } catch (PermissionException e) {
         logger.warn("Accesse to resource {} denied for user {}", resourceItem.getUrl(), user);
         DispatchUtils.sendAccessDenied(request, response);
         return true;

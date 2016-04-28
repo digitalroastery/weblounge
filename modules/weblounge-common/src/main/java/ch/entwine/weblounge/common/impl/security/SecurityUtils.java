@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.impl.security;
 
 import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Authority;
+import ch.entwine.weblounge.common.security.PermissionException;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.Security;
@@ -144,8 +145,8 @@ public final class SecurityUtils {
    * @param site
    *          the site
    */
-  public static void setSite(Site organization) {
-    siteHolder.set(organization);
+  public static void setSite(Site site) {
+    siteHolder.set(site);
   }
 
   /**
@@ -206,7 +207,7 @@ public final class SecurityUtils {
    * 
    * @param user
    *          the user
-   * @param role
+   * @param roleId
    *          the weblounge role identifier
    * @return <code>true</code> if the user has the given role
    */
@@ -244,9 +245,8 @@ public final class SecurityUtils {
     SecurablePermission permission = new SecurablePermission(securable, action);
 
     try {
-      if (System.getSecurityManager() != null)
-        System.getSecurityManager().checkPermission(permission);
-    } catch (SecurityException e) {
+      WebloungePermissionUtils.checkResourcePermission(user, permission);
+    } catch (PermissionException e) {
       return false;
     }
 

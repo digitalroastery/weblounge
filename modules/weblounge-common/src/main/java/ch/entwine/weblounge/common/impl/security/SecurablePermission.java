@@ -23,14 +23,11 @@ import ch.entwine.weblounge.common.security.Action;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.SystemAction;
 
-import java.security.BasicPermission;
-import java.security.Permission;
-
 /**
  * A permission object for a {@link Securable} that may or may not be accessed
  * using a specific {@link Action}.
  */
-public final class SecurablePermission extends BasicPermission {
+public final class SecurablePermission {
 
   /** Serial version UID */
   private static final long serialVersionUID = 4306908026063283597L;
@@ -51,33 +48,12 @@ public final class SecurablePermission extends BasicPermission {
    *          the action to be performed
    */
   public SecurablePermission(Securable securable, Action action) {
-    super("Securable " + action.getIdentifier() + " permission");
     this.securable = securable;
     this.action = action;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see java.security.Permission#getActions()
-   */
-  @Override
-  public String getActions() {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see java.security.Permission#implies(java.security.Permission)
-   */
-  @Override
-  public boolean implies(Permission p) {
-    if (!(p instanceof SecurablePermission))
-      return false;
-
-    SecurablePermission pp = (SecurablePermission) p;
-    Action impliedAction = pp.getAction();
+  public boolean implies(SecurablePermission p) {
+    Action impliedAction = p.getAction();
 
     // Write action contains read
     if (SystemAction.WRITE.equals(action)) {
@@ -89,11 +65,6 @@ public final class SecurablePermission extends BasicPermission {
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see java.security.Permission#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object p) {
     if (!(p instanceof SecurablePermission))
@@ -102,11 +73,6 @@ public final class SecurablePermission extends BasicPermission {
     return securable.equals(pp.securable) && action.equals(pp.action);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see java.security.Permission#hashCode()
-   */
   @Override
   public int hashCode() {
     return securable.hashCode();

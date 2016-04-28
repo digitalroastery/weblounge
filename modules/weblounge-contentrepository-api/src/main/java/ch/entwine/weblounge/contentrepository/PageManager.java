@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.page.PageListener;
+import ch.entwine.weblounge.common.security.PermissionException;
 import ch.entwine.weblounge.common.security.User;
 
 import java.io.IOException;
@@ -62,53 +63,53 @@ public interface PageManager {
    * successful, <code>false</code> otherwise.
    * 
    * @return <code>true</code> if locking was successful
-   * @throws SecurityException
+   * @throws PermissionException
    *           if access is denied for the given user and action
    * @throws IOException
    *           if locking fails due to a database error
    */
-  boolean lock(ResourceURI uri, User user) throws SecurityException, IOException;
+  boolean lock(ResourceURI uri, User user) throws PermissionException, IOException;
 
   /**
    * Unlocks the given page if it has been locked by this user and returns
    * <code>true</code> otherwise <code>false</code> is returned.
    * 
    * @return <code>true</code> if unlocking was successful
-   * @throws SecurityException
+   * @throws PermissionException
    *           if access is denied for the given user and action
    * @throws IOException
    *           if unlocking fails due to a database error
    */
-  boolean unlock(ResourceURI uri, User user) throws SecurityException, IOException;
+  boolean unlock(ResourceURI uri, User user) throws PermissionException, IOException;
 
   /**
    * This method copies the work page to the live version if the user has
    * publishing rights on the page.
    * 
-   * @param url
-   *          the url to publish
+   * @param uri
+   *          the URI to publish
    * @param user
    *          the user
-   * @throws SecurityException
+   * @throws PermissionException
    *           if the user is not entitled to publish the page
    * @throws IOException
    *           if publishing fails due to a database error
    */
-  boolean publish(ResourceURI uri, User user) throws SecurityException, IOException;
+  boolean publish(ResourceURI uri, User user) throws PermissionException, IOException;
 
   /**
    * This method removes the current live version from the database.
    * 
-   * @param url
-   *          the url to unpublish
+   * @param uri
+   *          the URI to unpublish
    * @param user
    *          the user
-   * @throws SecurityException
+   * @throws PermissionException
    *           if the user is not entitled to unpublish the page
    * @throws IOException
    *           if unpublishing fails due to a database error
    */
-  boolean unpublish(ResourceURI uri, User user) throws SecurityException,
+  boolean unpublish(ResourceURI uri, User user) throws PermissionException,
       IOException;
 
 }
