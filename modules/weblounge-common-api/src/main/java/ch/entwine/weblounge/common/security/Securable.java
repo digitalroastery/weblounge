@@ -29,7 +29,7 @@ import java.util.SortedSet;
 public interface Securable {
 
   /** The order in which to evaluate allow and deny rules */
-  public enum Order {
+  enum Order {
     AllowDeny, DenyAllow
   };
 

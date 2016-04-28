@@ -52,6 +52,7 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ReferentialIntegrityException;
 import ch.entwine.weblounge.common.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.PermissionException;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.UrlUtils;
@@ -635,7 +636,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       if ((currentPath != null && !currentPath.equals(newPath) || (currentPath == null && newPath != null))) {
         contentRepository.move(currentPage.getURI(), newPath, true);
       }
-    } catch (SecurityException e) {
+    } catch (PermissionException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", workURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
@@ -766,7 +767,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     } catch (URISyntaxException e) {
       logger.warn("Error creating a uri for page {}: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    } catch (SecurityException e) {
+    } catch (PermissionException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
@@ -865,7 +866,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Delete the page
     try {
       contentRepository.delete(page.getURI(), true);
-    } catch (SecurityException e) {
+    } catch (PermissionException e) {
       logger.warn("Tried to delete page {} of site '{}' without permission", livePageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (ReferentialIntegrityException e) {
@@ -1105,7 +1106,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     try {
       contentRepository.lock(workURI, user);
       logger.info("Page {} has been locked by {}", workURI, user);
-    } catch (SecurityException e) {
+    } catch (PermissionException e) {
       logger.warn("Tried to lock page {} of site '{}' without permission", workURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
@@ -1209,7 +1210,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     try {
       contentRepository.unlock(pageURI, user);
       logger.info("Page {} has been unlocked by {}", pageURI, user);
-    } catch (SecurityException e) {
+    } catch (PermissionException e) {
       logger.warn("Tried to unlock page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
@@ -1391,7 +1392,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       contentRepository.put(livePage);
       contentRepository.delete(workURI);
       logger.info("Page {} has been published by {}", workURI, user);
-    } catch (SecurityException e) {
+    } catch (PermissionException e) {
       logger.warn("Tried to publish page {} of site '{}' without permission", workURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
@@ -1515,7 +1516,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
         contentRepository.put(workPage);
       }
       logger.info("Page {} has been unpublished by {}", liveURI, user);
-    } catch (SecurityException e) {
+    } catch (PermissionException e) {
       logger.warn("Tried to unpublish page {} of site '{}' without permission", liveURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {

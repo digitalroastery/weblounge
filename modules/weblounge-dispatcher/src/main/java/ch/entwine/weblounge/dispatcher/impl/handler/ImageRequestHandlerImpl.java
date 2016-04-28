@@ -21,7 +21,7 @@
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import static ch.entwine.weblounge.common.Times.MS_PER_DAY;
-import static ch.entwine.weblounge.common.security.SystemAction.READ;
+import static ch.entwine.weblounge.common.impl.security.WebloungePermissionUtils.checkResourceReadPermission;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
@@ -30,12 +30,12 @@ import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
-import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.security.PermissionException;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Environment;
 import ch.entwine.weblounge.common.site.Site;
@@ -191,10 +191,8 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Can the image be accessed by the current user?
     User user = request.getUser();
     try {
-      SecurablePermission readPermission = new SecurablePermission(imageResource, READ);
-      if (System.getSecurityManager() != null)
-        System.getSecurityManager().checkPermission(readPermission);
-    } catch (SecurityException e) {
+      checkResourceReadPermission(user, imageResource);
+    } catch (PermissionException e) {
       logger.warn("Access to image {} denied for user {}", imageURI, user);
       DispatchUtils.sendAccessDenied(request, response);
       return true;

@@ -17,11 +17,13 @@
  *  along with this program; if not, write to the Free Software Foundation
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package ch.entwine.weblounge.kernel.security;
+package ch.entwine.weblounge.common.impl.security;
 
-import ch.entwine.weblounge.common.impl.security.SecurablePermission;
-import ch.entwine.weblounge.common.impl.security.SecurityUtils;
+import static ch.entwine.weblounge.common.security.SystemAction.READ;
+
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.security.Action;
+import ch.entwine.weblounge.common.security.PermissionException;
 import ch.entwine.weblounge.common.security.Role;
 import ch.entwine.weblounge.common.security.Securable;
 import ch.entwine.weblounge.common.security.User;
@@ -29,59 +31,42 @@ import ch.entwine.weblounge.common.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.Permission;
-
 /**
  * A security manager that can handle access to Weblounge resources.
  */
-public class WebloungeSecurityManager extends NullSecurityManager {
+public class WebloungePermissionUtils {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(WebloungeSecurityManager.class);
-
-  /** The security manager to delegate to */
-  private SecurityManager deleageSecurityManager = null;
+  private static final Logger logger = LoggerFactory.getLogger(WebloungePermissionUtils.class);
 
   /**
-   * Creates a new security manager that implements the security constraints
-   * specific to Weblounge and otherwise delegates to the system security
-   * manager.
-   * 
-   * @param delegate
-   *          the security manager to delegate to
-   */
-  public WebloungeSecurityManager(SecurityManager delegate) {
-    this.deleageSecurityManager = delegate;
-  }
-
-  /**
-   * {@inheritDoc}
+   * Checks read access to a Weblounge resource by the given user.
    *
-   * @see java.lang.SecurityManager#checkPermission(java.security.Permission)
-   */
-  @Override
-  public void checkPermission(Permission permission) {
-    if (permission instanceof SecurablePermission) {
-      checkResourcePermission((SecurablePermission) permission);
-    } else if (deleageSecurityManager != null) {
-      deleageSecurityManager.checkPermission(permission);
-    }
-  }
-
-  /**
-   * Checks access to a Weblounge resource by the current user.
-   * 
-   * @param permission
-   *          the resource permission
-   * @throws SecurityException
+   * @param user
+   *          the user whose permissions need to be checked
+   * @param resource
+   *          the resource to check
+   * @throws PermissionException
    *           if access to the resource is denied
    */
-  private void checkResourcePermission(SecurablePermission permission)
-      throws SecurityException {
-    User user = SecurityUtils.getUser();
-    SecurablePermission pm = (SecurablePermission) permission;
-    Action action = pm.getAction();
-    Securable resource = pm.getSecurable();
+  public static void checkResourceReadPermission(final User user, final Resource<?> resource) throws PermissionException {
+    checkResourcePermission(user, new SecurablePermission(resource, READ));
+  }
+
+  /**
+   * Checks access to a Weblounge resource by the given user.
+   *
+   * @param user
+   *          the user whose permissions need to be checked
+   * @param permission
+   *          the resource permission
+   * @throws PermissionException
+   *           if access to the resource is denied
+   */
+  public static void checkResourcePermission(final User user, final SecurablePermission permission)
+      throws PermissionException {
+    Action action = permission.getAction();
+    Securable resource = permission.getSecurable();
 
     // Check the user itself
     if (SecurityUtils.checkAuthorization(resource, action, user)) {
@@ -110,7 +95,6 @@ public class WebloungeSecurityManager extends NullSecurityManager {
         action,
         resource,
         user });
-    throw new SecurityException("Access of type " + action + " denied to " + resource);
+    throw new PermissionException(user, action, permission.getSecurable());
   }
-
 }

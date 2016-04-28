@@ -40,6 +40,7 @@ import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.repository.ContentRepositoryUnavailableException;
 import ch.entwine.weblounge.common.request.CacheTag;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.security.PermissionException;
 import ch.entwine.weblounge.common.security.SystemAction;
 import ch.entwine.weblounge.common.site.Action;
 import ch.entwine.weblounge.common.site.HTMLAction;
@@ -321,15 +322,15 @@ public class ComposerTagSupport extends WebloungeTag {
    * and returned from a parent page.
    * 
    * @return the page that provided the content
-   * @throws SecurityException
+   * @throws PermissionException
    *           if access to the content is denied
    * @throws ContentRepositoryException
    *           if reading content from the repository fails
    * @throws ContentRepositoryUnavailableException
    *           if the content repository is offline
    */
-  private void loadContent(boolean inheritFromParent) throws SecurityException,
-  ContentRepositoryException, ContentRepositoryUnavailableException {
+  private void loadContent(boolean inheritFromParent) throws PermissionException,
+      ContentRepositoryException, ContentRepositoryUnavailableException {
 
     try {
       WebUrl url = getRequest().getUrl();
@@ -492,11 +493,11 @@ public class ComposerTagSupport extends WebloungeTag {
    *           if loading the content fails
    * @throws ContentRepositoryUnavailableException
    *           if the content repository is offline
-   * @throws SecurityException
+   * @throws PermissionException
    *           if accessing the content is forbidden
    */
-  protected Pagelet[] getContent() throws SecurityException,
-  ContentRepositoryException, ContentRepositoryUnavailableException {
+  protected Pagelet[] getContent() throws PermissionException,
+      ContentRepositoryException, ContentRepositoryUnavailableException {
     if (contentProvider == null)
       loadContent(contentInheritanceEnabled);
     if (pagelets == null)
@@ -513,11 +514,11 @@ public class ComposerTagSupport extends WebloungeTag {
    *           if loading the content fails
    * @throws ContentRepositoryUnavailableException
    *           if the content repository is offline
-   * @throws SecurityException
+   * @throws PermissionException
    *           if accessing the content is forbidden
    */
-  protected Pagelet[] getGhostContent() throws SecurityException,
-  ContentRepositoryException, ContentRepositoryUnavailableException {
+  protected Pagelet[] getGhostContent() throws PermissionException,
+      ContentRepositoryException, ContentRepositoryUnavailableException {
     if (ghostContentProvider == null)
       loadContent(contentInheritanceEnabled);
     if (ghostContentProvider == null)

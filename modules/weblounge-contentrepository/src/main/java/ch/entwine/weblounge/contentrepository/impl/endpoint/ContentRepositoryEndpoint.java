@@ -28,8 +28,10 @@ import ch.entwine.weblounge.common.content.ResourceUtils;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.security.PermissionException;
 import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.impl.security.SecurityUtils;
+import ch.entwine.weblounge.common.impl.security.WebloungePermissionUtils;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
@@ -383,12 +385,16 @@ public class ContentRepositoryEndpoint {
    */
   protected void checkPermission(Resource<?> resource, Action action)
       throws WebApplicationException {
+    if (resource == null)
+      throw new IllegalArgumentException("Resource must not be null");
+    if (action == null)
+      throw new IllegalArgumentException("Action must not be null");
+
+    User user = getUser();
     try {
       SecurablePermission permission = new SecurablePermission(resource, action);
-      if (System.getSecurityManager() != null)
-        System.getSecurityManager().checkPermission(permission);
-    } catch (SecurityException e) {
-      User user = getUser();
+      WebloungePermissionUtils.checkResourcePermission(user, permission);
+    } catch (PermissionException e) {
       logger.warn("Action '{}' to resource {} was denied for user '{}'", new Object[] {
           action,
           resource.getURI(),

@@ -21,7 +21,7 @@
 package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import static ch.entwine.weblounge.common.Times.MS_PER_DAY;
-import static ch.entwine.weblounge.common.security.SystemAction.READ;
+import static ch.entwine.weblounge.common.impl.security.WebloungePermissionUtils.checkResourceReadPermission;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceURI;
@@ -31,12 +31,12 @@ import ch.entwine.weblounge.common.impl.content.GeneralResourceURIImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
 import ch.entwine.weblounge.common.impl.request.RequestUtils;
-import ch.entwine.weblounge.common.impl.security.SecurablePermission;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.repository.ContentRepository;
 import ch.entwine.weblounge.common.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.security.PermissionException;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
@@ -189,10 +189,8 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     // Can the page be accessed by the current user?
     User user = request.getUser();
     try {
-      SecurablePermission readPermission = new SecurablePermission(fileResource, READ);
-      if (System.getSecurityManager() != null)
-        System.getSecurityManager().checkPermission(readPermission);
-    } catch (SecurityException e) {
+      checkResourceReadPermission(user, fileResource);
+    } catch (PermissionException e) {
       logger.warn("Access to file {} denied for user {}", fileURI, user);
       DispatchUtils.sendAccessDenied(request, response);
       return true;
