@@ -37,12 +37,12 @@ import org.osgi.framework.ServiceReference;
 public interface SiteServiceListener {
 
   /**
-   * Informs listeners about a new site, located in the given bundle. Note that
-   * upon this callback, the site has not yet been started.
+   * Informs listeners about a new site and the corresponding service reference.
+   * Note that upon this callback, the site has not yet been started.
    * 
    * @param site
    *          the site
-   * @param bundle
+   * @param reference
    *          the site's service reference
    */
   void siteAppeared(Site site, ServiceReference reference);
