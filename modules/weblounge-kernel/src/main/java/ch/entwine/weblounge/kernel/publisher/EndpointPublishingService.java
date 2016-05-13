@@ -266,8 +266,6 @@ public class EndpointPublishingService implements ManagedService, SiteServiceLis
    *          the http context
    * @param bundle
    *          the registering bundle
-   * @param the
-   *          endpoint's path
    */
   protected void registerEndpoint(Object service, String contextPath,
       String endpointPath, Bundle bundle) {

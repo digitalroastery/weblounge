@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.dispatcher.impl;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
+
 import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.request.WebloungeResponse;
 import ch.entwine.weblounge.dispatcher.DispatchListener;
@@ -327,8 +329,8 @@ public final class DispatchUtils {
       if (!response.isCommitted()) {
         response.setStatus(status);
       }
-    } catch (Throwable t) {
-      logger.debug("Unable to send response status {} to client", status);
+    } catch (Exception e) {
+      logger.debug("Unable to send response status {} to client: {}", status, getMessage(e));
     }
   }
 
@@ -338,8 +340,6 @@ public final class DispatchUtils {
    * 
    * @param status
    *          the http status code
-   * @param msg
-   *          the error message
    * @param request
    *          the servlet request
    * @param response
@@ -371,8 +371,8 @@ public final class DispatchUtils {
       if (!response.isCommitted()) {
         response.sendError(status, msg);
       }
-    } catch (Throwable t) {
-      logger.debug("Error when sending back error message {}: {}", status, t.getMessage());
+    } catch (Exception e) {
+      logger.debug("Error when sending back error message {}: {}", status, getMessage(e));
     }
   }
 
