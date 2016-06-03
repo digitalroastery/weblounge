@@ -43,7 +43,7 @@ public class LanguageImpl implements Language {
    * because language objects should be instantiated using
    * <code>getLanguage</code> of class <code>LanguageRegistry</code>.
    * 
-   * @param identifier
+   * @param locale
    *          the identifier for this language, e.g. <code>en</code>
    */
   public LanguageImpl(Locale locale) {
