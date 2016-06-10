@@ -230,7 +230,7 @@
     </module>
     <module name="IllegalCatch">
       <property name="severity" value="warning" />
-      <property name="illegalClassNames" value="java.lang.Exception, java.lang.RuntimeException" />
+      <property name="illegalClassNames" value="java.lang.RuntimeException" />
     </module>
     <module name="IllegalThrows">
       <property name="severity" value="error" />
