@@ -422,7 +422,6 @@
           <version>2.16</version>
           <configuration>
             <useFile>false</useFile>
-            <encoding>UTF-8</encoding>
             <systemProperties>
               <property>
                 <name>file.encoding</name>
