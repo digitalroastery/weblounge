@@ -124,44 +124,6 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.cache</Bundle-SymbolicName>
-            <Import-Package>
-              ch.entwine.weblounge.cache;version=${project.version},
-              ch.entwine.weblounge.common;version=${project.version},
-              ch.entwine.weblounge.common.content;version=${project.version},
-              ch.entwine.weblounge.common.impl.request;version=${project.version},
-              ch.entwine.weblounge.common.impl.url;version=${project.version},
-              ch.entwine.weblounge.common.impl.util.config;version=${project.version},
-              ch.entwine.weblounge.common.impl.util.datatype;version=${project.version},
-              ch.entwine.weblounge.common.impl.util.doc;version=${project.version}, 
-              ch.entwine.weblounge.common.language;version=${project.version},
-              ch.entwine.weblounge.common.request;version=${project.version},
-              ch.entwine.weblounge.common.security;version=${project.version},
-              ch.entwine.weblounge.common.site;version=${project.version},
-              ch.entwine.weblounge.common.url;version=${project.version},
-              ch.entwine.weblounge.kernel;version=${project.version},
-              ch.entwine.weblounge.kernel.site;version=${project.version},
-              org.apache.commons.io;version="2.0",
-              org.apache.commons.io.output;version="2.0",
-              org.apache.commons.lang;version="2.6",
-              org.slf4j;version="[1.5.0,1.6.0)",
-              javax.servlet;version="2.5",
-              javax.servlet.http;version="2.5",
-              net.sf.ehcache;version="2.3.0",
-              net.sf.ehcache.config;version="2.3.0",
-              javax.management,
-              javax.management.openmbean,
-              javax.naming,
-              javax.transaction;resolution:=optional,
-              javax.transaction.xa;resolution:=optional, 
-              javax.ws.rs;version="1.0",
-              javax.ws.rs.core;version="1.0",
-              javax.xml.parsers,
-              org.xml.sax.helpers,
-              org.osgi.framework,
-              org.osgi.service.cm;version="1.3.0",
-              org.osgi.service.component;version="1.1.0"
-            </Import-Package>
             <Export-Package>
               ch.entwine.weblounge.cache.impl;version=${project.version},
               ch.entwine.weblounge.cache.impl.command;version=${project.version},

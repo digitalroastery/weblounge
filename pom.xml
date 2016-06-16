@@ -478,7 +478,8 @@
               <Bundle-DocURL>http://github.com/entwinemedia/weblounge</Bundle-DocURL>
               <Bundle-Vendor>Entwine</Bundle-Vendor>
               <Bundle-Name>${project.name}</Bundle-Name>
-              <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+              <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+              <Build-Version>${buildNumber}</Build-Version>
             </instructions>
           </configuration>
         </plugin>
