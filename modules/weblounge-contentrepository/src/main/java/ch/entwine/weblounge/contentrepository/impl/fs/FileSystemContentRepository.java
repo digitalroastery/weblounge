@@ -32,7 +32,6 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.contentrepository.impl.AbstractWritableContentRepository;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -349,7 +348,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      ch.entwine.weblounge.common.language.Language)
    */
   @Override
-  protected InputStream loadResourceContent(ResourceURI uri, Language language)
+  protected InputStream loadResourceContent(ResourceURI uri, final Language language)
       throws ContentRepositoryException, IOException {
     File resourceFile = uriToFile(uri);
     if (resourceFile == null)
@@ -357,10 +356,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     // Look for the localized file
     File resourceDirectory = resourceFile.getParentFile();
-    final String filenamePrefix = language.getIdentifier() + ".";
     File[] localizedFiles = resourceDirectory.listFiles(new FileFilter() {
+      private final String filename = language.getIdentifier();
+      private final String filenamePrefix = language.getIdentifier() + ".";
       public boolean accept(File f) {
-        return f.isFile() && f.getName().startsWith(filenamePrefix);
+        return f.isFile() && (f.getName().startsWith(filenamePrefix) || f.getName().equals(filename));
       }
     });
 
