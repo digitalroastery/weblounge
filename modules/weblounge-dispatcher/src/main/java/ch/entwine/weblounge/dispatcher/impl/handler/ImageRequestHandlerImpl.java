@@ -22,6 +22,7 @@ package ch.entwine.weblounge.dispatcher.impl.handler;
 
 import static ch.entwine.weblounge.common.Times.MS_PER_DAY;
 import static ch.entwine.weblounge.common.impl.security.WebloungePermissionUtils.checkResourceReadPermission;
+import static java.lang.String.format;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.ResourceUtils;
@@ -43,7 +44,6 @@ import ch.entwine.weblounge.common.url.PathUtils;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.dispatcher.RequestHandler;
 import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -289,6 +289,10 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
           t.getMessage() });
       logger.error(t.getMessage(), t);
       IOUtils.closeQuietly(imageInputStream);
+      return false;
+    }
+    if (imageInputStream == null) {
+      DispatchUtils.sendNotFound(format("Image %s not found", imageURI.getIdentifier()), request, response);
       return false;
     }
 
