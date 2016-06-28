@@ -357,8 +357,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     // Look for the localized file
     File resourceDirectory = resourceFile.getParentFile();
     File[] localizedFiles = resourceDirectory.listFiles(new FileFilter() {
-      final String filename = language.getIdentifier();
-      final String filenamePrefix = language.getIdentifier() + ".";
+      private final String filename = language.getIdentifier();
+      private final String filenamePrefix = language.getIdentifier() + ".";
       public boolean accept(File f) {
         return f.isFile() && (f.getName().startsWith(filenamePrefix) || f.getName().equals(filename));
       }
