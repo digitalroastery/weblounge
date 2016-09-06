@@ -25,7 +25,6 @@ import ch.entwine.weblounge.common.url.UrlUtils;
 import ch.entwine.weblounge.kernel.site.SiteManager;
 import ch.entwine.weblounge.kernel.site.SiteServiceListener;
 
-import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
@@ -36,9 +35,9 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -60,13 +59,13 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
   public static final Logger logger = LoggerFactory.getLogger(SecurityFilter.class);
 
   /** The default security configuration */
-  private Filter defaultSecurityFilter = null;
+  private final Filter defaultSecurityFilter;
 
   /** Site specific security configurations */
-  private Map<Site, Filter> siteFilters = null;
+  private final Map<Site, Filter> siteFilters = new ConcurrentHashMap<>();
 
   /** The sites that are online */
-  protected SiteManager sites = null;
+  private final SiteManager sites;
 
   /**
    * Creates a new security filter that will apply the default filter to those
@@ -80,14 +79,8 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
   public SecurityFilter(SiteManager sites, Filter filter) {
     this.sites = sites;
     this.defaultSecurityFilter = filter;
-    this.siteFilters = new HashMap<Site, Filter>();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
-   */
   @Override
   public void init(FilterConfig config) throws ServletException {
     this.sites.addSiteListener(this);
@@ -99,22 +92,11 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see javax.servlet.Filter#destroy()
-   */
   @Override
   public void destroy() {
     siteFilters.clear();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-   *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
-   */
   @Override
   public void doFilter(ServletRequest request, ServletResponse response,
       FilterChain chain) throws IOException, ServletException {
@@ -178,22 +160,11 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
     siteFilters.remove(site);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.kernel.site.SiteServiceListener#siteAppeared(ch.entwine.weblounge.common.site.Site,
-   *      org.osgi.framework.ServiceReference)
-   */
   @Override
   public void siteAppeared(Site site, ServiceReference reference) {
     registerSecurity(site, reference.getBundle());
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.kernel.site.SiteServiceListener#siteDisappeared(ch.entwine.weblounge.common.site.Site)
-   */
   @Override
   public void siteDisappeared(Site site) {
     siteFilters.remove(site);
@@ -211,25 +182,22 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
     URL securityConfiguration = site.getSecurity();
     if (securityConfiguration != null) {
       // Test availability of the security configuration
-      InputStream is = null;
-      try {
-        String configPath = securityConfiguration.toExternalForm();
-        if (configPath.startsWith("file://${bundle.root}")) {
-          String bundlePath = configPath.substring(21);
-          securityConfiguration = bundle.getResource(bundlePath);
-        } else if (configPath.startsWith("file://${site.root}")) {
-          String bundlePath = UrlUtils.concat("/site", configPath.substring(19));
-          securityConfiguration = bundle.getResource(bundlePath);
-        }
 
-        // Is the configuration available?
-        if (securityConfiguration == null) {
-          throw new IllegalStateException("The security configuration of site '" + site.getIdentifier() + "' cannot be found at " + securityConfiguration);
-        }
+      String configPath = securityConfiguration.toExternalForm();
+      if (configPath.startsWith("file://${bundle.root}")) {
+        String bundlePath = configPath.substring(21);
+        securityConfiguration = bundle.getResource(bundlePath);
+      } else if (configPath.startsWith("file://${site.root}")) {
+        String bundlePath = UrlUtils.concat("/site", configPath.substring(19));
+        securityConfiguration = bundle.getResource(bundlePath);
+      }
 
-        // Start reading the configuration
-        is = securityConfiguration.openStream();
+      // Is the configuration available?
+      if (securityConfiguration == null) {
+        throw new IllegalStateException("The security configuration of site '" + site.getIdentifier() + "' cannot be found at " + securityConfiguration);
+      }
 
+      try (InputStream is = securityConfiguration.openStream()) {
         // Turn the stream into a Spring Security filter chain
         ConfigurableOsgiBundleApplicationContext springContext = null;
         springContext = new OsgiBundleXmlApplicationContext(new String[] { securityConfiguration.toExternalForm() });
@@ -242,19 +210,12 @@ public final class SecurityFilter implements Filter, SiteServiceListener {
         siteFilters.put(site, siteSecurityFilter);
       } catch (IOException e) {
         throw new IllegalStateException("Security configuration " + securityConfiguration + " of site '" + site.getIdentifier() + "' cannot be read: " + e.getMessage(), e);
-      } catch (Throwable t) {
-        throw new IllegalStateException("Error registering security configuration " + securityConfiguration + " of site '" + site.getIdentifier() + "': " + t.getMessage(), t);
-      } finally {
-        IOUtils.closeQuietly(is);
+      } catch (Exception e) {
+        throw new IllegalStateException("Error registering security configuration " + securityConfiguration + " of site '" + site.getIdentifier() + "': " + e.getMessage(), e);
       }
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     return "Security filter";
