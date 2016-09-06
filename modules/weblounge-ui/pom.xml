@@ -44,27 +44,6 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.ui</Bundle-SymbolicName>
-            <Http-Context>/weblounge</Http-Context>
-            <Http-Resource>/</Http-Resource>
-            <Http-Welcome>index.html</Http-Welcome>
-            <Import-Package>
-              ch.entwine.weblounge.common.content.image;version=${project.version},
-              ch.entwine.weblounge.common.impl.content.image;version=${project.version},
-              ch.entwine.weblounge.common.impl.util.xml;version=${project.version},
-              ch.entwine.weblounge.common.language;version=${project.version},
-              ch.entwine.weblounge.common.security;version=${project.version},
-              ch.entwine.weblounge.common.site;version=${project.version},
-              ch.entwine.weblounge.kernel.runtime;version=${project.version},
-              javax.xml.namespace,
-              javax.xml.parsers,
-              javax.xml.xpath,
-              org.osgi.framework;version="1.4.0",
-              org.osgi.service.component;version="1.1.0", 
-              org.slf4j;version="[1.5.0,1.6.0)",
-              org.w3c.dom,
-              org.xml.sax
-            </Import-Package>
             <Export-Package>
               ch.entwine.weblounge.ui.runtime;version=${project.version}
             </Export-Package>

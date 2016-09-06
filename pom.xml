@@ -24,6 +24,7 @@
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
+    <maven-bundle-plugin.version>3.0.1</maven-bundle-plugin.version>
   </properties>
 
   <organization>
@@ -422,7 +423,6 @@
           <version>2.16</version>
           <configuration>
             <useFile>false</useFile>
-            <encoding>UTF-8</encoding>
             <systemProperties>
               <property>
                 <name>file.encoding</name>
@@ -469,7 +469,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>2.4.0</version>
+          <version>${maven-bundle-plugin.version}</version>
           <inherited>true</inherited>
           <extensions>true</extensions>
           <configuration>
@@ -478,7 +478,8 @@
               <Bundle-DocURL>http://github.com/entwinemedia/weblounge</Bundle-DocURL>
               <Bundle-Vendor>Entwine</Bundle-Vendor>
               <Bundle-Name>${project.name}</Bundle-Name>
-              <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+              <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+              <Build-Version>${buildNumber}</Build-Version>
             </instructions>
           </configuration>
         </plugin>

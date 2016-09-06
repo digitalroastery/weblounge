@@ -183,20 +183,6 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.bridge</Bundle-SymbolicName>
-            <Import-Package>
-              ch.entwine.weblounge.common.content;version=${project.version},
-              ch.entwine.weblounge.common.content.image;version=${project.version},
-              ch.entwine.weblounge.common.content.page;version=${project.version},
-              ch.entwine.weblounge.common.repository;version=${project.version},
-              ch.entwine.weblounge.common.language;version=${project.version},
-              ch.entwine.weblounge.common.scheduler;version=${project.version},
-              ch.entwine.weblounge.common.site;version=${project.version},
-              org.apache.commons.io;version="2.0",
-              org.apache.commons.lang;version="2.6",
-              org.slf4j;version="[1.5.0,1.6.0)",
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               ch.entwine.weblounge.bridge.mail;version=${project.version},
               ch.entwine.weblounge.bridge.oaipmh;version=${project.version},
