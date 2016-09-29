@@ -1,5 +1,5 @@
 <div class="loginTitle">weblounge 3</div>
-<form name="f" action="/system/weblounge/login/form" method="post">
+<form name="f" action="/system/weblounge/login/form" method="post" id="loginform">
 	<table classborder="0" cellpadding="05" cellspacing="0" class="loginTable">
 	    <tr>
 	      <th colspan="2">Login with username and password</th>
@@ -10,18 +10,16 @@
 	    </tr>
 	    <tr>
 	      <td>Username</td>
-	      <td><input name="j_username" type="text" id="j_username"></td>
+	      <td><input name="j_username" type="text" id="username"></td>
 	    </tr>
 	    <tr>
 	      <td>Password</td>
-	      <td><input name="j_password" type="password"></td>
+	      <td><input name="j_password" type="password" id="password"></td>
 	    </tr>
-	    <!--
 	    <tr>
-	      <td><input name="_spring_security_remember_me" type="checkbox"></td>
-	      <td>Remember me on this computer.</td>
+	      <td><input name="_spring_security_remember_me" id="remember" type="checkbox" style="float:right"></td>
+	      <td>Remember me</td>
 	    </tr>
-		-->
 	    <tr>
 	      <td>&nbsp;</td>
 	      <td>&nbsp;</td>
