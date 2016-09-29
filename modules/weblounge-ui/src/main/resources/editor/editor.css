@@ -52,10 +52,6 @@ div.DataTables_sort_wrapper span {
 	display: block;
 }
 
-#wbl-pageleteditor p {
-	
-}
-
 #wbl-pageleteditor span.required {
 	font-size: 12px;
 }
@@ -76,8 +72,6 @@ div.DataTables_sort_wrapper span {
 #wbl-pageleteditor form ul li {
 	margin-left: 0;
 }
-
-
 
 /* Horizontal form in pagelet-dialogs */
 #wbl-pageleteditor .ui-dialog-content {

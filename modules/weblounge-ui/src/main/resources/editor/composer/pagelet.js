@@ -85,6 +85,7 @@ steal.plugins('jqueryui/dialog',
 		.dialog({
 			title: pageletName,
 			width: 500,
+            zIndex: 10002,
 			modal: true,
 			autoOpen: false,
 			closeOnEscape: false,
